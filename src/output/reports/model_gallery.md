@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-09-27 23:23:22 BST
+Generated on: 2026-10-02 14:15:17 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -26,65 +26,66 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                       |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | 8.93s   | 108 tok/s  | 1.49            | 19      | 1,646      | 540     | none                                                                                                               |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 5.99s   | 55.2 tok/s | 2.21            | 10      | 2,120      | 103     | none                                                                                                               |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 6.15s   | 36.1 tok/s | 1.55            | 17      | 2,120      | 79      | none                                                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | 9.86s   | 21.6 tok/s | 2.18            | 15      | 309        | 114     | none                                                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | 5.12s   | 232 tok/s  | 0.99            | 3.3     | 938        | 564     | none                                                                                                               |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.31s   | 105 tok/s  | 0.77            | 7.0     | 398        | 93      | none                                                                                                               |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 7.87s   | 65.9 tok/s | 2.70            | 13      | 2,935      | 199     | none                                                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 4.01s   | 187 tok/s  | 1.61            | 7.8     | 2,934      | 121     | none                                                                                                               |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 5.87s   | 71.6 tok/s | 1.44            | 8.2     | 1,531      | 181     | none                                                                                                               |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.51s   | 153 tok/s  | 2.74            | 3.9     | 4,091      | 108     | none                                                                                                               |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 6.36s   | 75.0 tok/s | 1.28            | 24      | 1,295      | 130     | none                                                                                                               |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | 29.83s  | 80.5 tok/s | 16.68           | 8.4     | 16,556     | 901     | none                                                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 42.70s  | 68.4 tok/s | 37.01           | 23      | 16,554     | 168     | none                                                                                                               |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | 78.43s  | 18.6 tok/s | 65.14           | 26      | 16,554     | 190     | none                                                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 40.83s  | 66.6 tok/s | 37.03           | 11      | 16,554     | 120     | none                                                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 38.80s  | 72.5 tok/s | 33.01           | 25      | 16,569     | 123     | none                                                                                                               |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | 38.79s  | 88.2 tok/s | 34.50           | 11      | 16,569     | 111     | none                                                                                                               |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 59.25s  | 27.6 tok/s | 51.52           | 21      | 16,569     | 128     | none                                                                                                               |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 5.25s   | 99.4 tok/s | 1.60            | 6.5     | 2,098      | 143     | none                                                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | 6.79s   | 52.9 tok/s | 2.68            | 28      | 597        | 81      | none                                                                                                               |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.45s   | 60.7 tok/s | 1.00            | 7.6     | 601        | 112     | none                                                                                                               |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.28s   | 109 tok/s  | 1.04            | 16      | 601        | 106     | none                                                                                                               |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 9.72s   | 25.2 tok/s | 1.79            | 20      | 601        | 113     | none                                                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.33s   | 169 tok/s  | 1.28            | 4.6     | 1,384      | 91      | none                                                                                                               |
-| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | 33.21s  | 86.3 tok/s | 29.54           | 11      | 16,566     | 123     | none                                                                                                               |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 8.62s   | 36.2 tok/s | 1.96            | 18      | 1,281      | 144     | none                                                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 9.73s   | 130 tok/s  | 5.60            | 23      | 3,636      | 120     | none                                                                                                               |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`    | 2.32s   | 477 tok/s  | 0.71            | 1.9     | 2,123      | 96      | duplicate keywords; prompt hint repeated                                                                           |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | 10.59s  | 29.5 tok/s | 3.65            | 23      | 2,402      | 119     | prompt hint repeated                                                                                               |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | 9.17s   | 71.1 tok/s | 5.73            | 8.7     | 6,393      | 83      | prompt hint repeated                                                                                               |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 23.93s  | 40.1 tok/s | 13.85           | 78      | 6,393      | 117     | prompt hint repeated                                                                                               |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | 7.59s   | 33.9 tok/s | 1.95            | 18      | 2,620      | 89      | prompt hint repeated                                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`    | 4.10s   | 57.1 tok/s | 0.83            | 9.3     | 1,144      | 98      | prompt hint repeated                                                                                               |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `concerns detected`    | 44.56s  | 89.3 tok/s | 41.60           | 9.3     | 16,565     | 107     | prompt hint repeated                                                                                               |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.61s   | 121 tok/s  | 1.15            | 5.6     | 1,438      | 118     | prompt hint repeated                                                                                               |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 37.42s  | 47.5 tok/s | 21.44           | 92      | 3,498      | 111     | prompt hint repeated                                                                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`    | 19.77s  | 55.5 tok/s | 13.69           | 14      | 16,565     | 215     | duplicate keywords                                                                                                 |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `concerns detected`    | 8.68s   | 30.6 tok/s | 1.52            | 17      | 596        | 127     | unsupplied place name                                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | 4.00s   | 123 tok/s  | 0.82            | 5.9     | 597        | 93      | duplicate keywords                                                                                                 |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | 8.01s   | 39.2 tok/s | 2.51            | 16      | 3,125      | 119     | prompt hint repeated                                                                                               |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | 4.88s   | 127 tok/s  | 2.19            | 5.4     | 4,217      | 118     | prompt hint repeated                                                                                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 3.59s   | 338 tok/s  | 1.36            | 2.1     | 341        | 38      | labelled fields not detected                                                                                       |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | 20.90s  | 61.1 tok/s | 1.43            | 20      | 1,331      | 1,000   | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `major concerns`       | 3.75s   | 205 tok/s  | 1.19            | 4.0     | 2,115      | 122     | labelled fields not detected                                                                                       |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 59.37s  | 22.3 tok/s | 10.40           | 25      | 4,410      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                  |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.52s   | 311 tok/s  | 0.99            | 1.1     | 1,217      | 39      | labelled fields not detected                                                                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 4.85s   | 71.3 tok/s | 0.88            | 7.2     | 595        | 114     | labelled fields not detected                                                                                       |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 5.68s   | 128 tok/s  | 3.72            | 4.4     | 5,666      | 82      | labelled fields not detected                                                                                       |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.60s   | 105 tok/s  | 1.53            | 6.7     | 2,201      | 18      | control tokens visible; labelled fields not detected                                                               |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 2.05s   | 208 tok/s  | 0.72            | 1.8     | 337        | 23      | labelled fields not detected                                                                                       |
+| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                          |
+|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | 8.66s   | 108 tok/s  | 1.33            | 19      | 1,646      | 540     | none                                                                                                                  |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.05s   | 55.9 tok/s | 2.25            | 10      | 2,120      | 103     | none                                                                                                                  |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 6.03s   | 36.8 tok/s | 1.52            | 17      | 2,120      | 79      | none                                                                                                                  |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected` | 2.79s   | 335 tok/s  | 1.04            | 2.1     | 2,123      | 159     | none                                                                                                                  |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | 9.90s   | 21.6 tok/s | 2.17            | 15      | 309        | 114     | none                                                                                                                  |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | 5.05s   | 239 tok/s  | 0.97            | 3.2     | 938        | 564     | none                                                                                                                  |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.40s   | 105 tok/s  | 0.77            | 7.0     | 398        | 93      | none                                                                                                                  |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 7.89s   | 64.6 tok/s | 2.66            | 13      | 2,935      | 199     | none                                                                                                                  |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 4.08s   | 186 tok/s  | 1.61            | 7.8     | 2,934      | 121     | none                                                                                                                  |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 5.87s   | 71.9 tok/s | 1.44            | 8.5     | 1,531      | 181     | none                                                                                                                  |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.48s   | 155 tok/s  | 2.83            | 3.9     | 4,091      | 108     | none                                                                                                                  |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 6.33s   | 74.4 tok/s | 1.25            | 24      | 1,295      | 130     | none                                                                                                                  |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | 32.55s  | 80.5 tok/s | 19.26           | 8.4     | 16,556     | 901     | none                                                                                                                  |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 44.60s  | 74.4 tok/s | 39.06           | 23      | 16,554     | 168     | none                                                                                                                  |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | 82.26s  | 18.6 tok/s | 68.69           | 26      | 16,554     | 190     | none                                                                                                                  |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 42.13s  | 67.5 tok/s | 38.36           | 11      | 16,554     | 120     | none                                                                                                                  |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 40.27s  | 75.2 tok/s | 35.12           | 25      | 16,569     | 123     | none                                                                                                                  |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | 41.41s  | 89.8 tok/s | 37.91           | 11      | 16,569     | 111     | none                                                                                                                  |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 61.97s  | 27.5 tok/s | 54.22           | 21      | 16,569     | 128     | none                                                                                                                  |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 5.15s   | 102 tok/s  | 1.61            | 6.5     | 2,098      | 143     | none                                                                                                                  |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | 6.50s   | 59.0 tok/s | 2.50            | 28      | 597        | 81      | none                                                                                                                  |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.33s   | 60.2 tok/s | 0.97            | 7.6     | 601        | 112     | none                                                                                                                  |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.16s   | 106 tok/s  | 1.03            | 16      | 601        | 106     | none                                                                                                                  |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 9.60s   | 25.3 tok/s | 1.77            | 20      | 601        | 113     | none                                                                                                                  |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.35s   | 161 tok/s  | 1.28            | 4.6     | 1,384      | 97      | none                                                                                                                  |
+| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | 38.12s  | 85.3 tok/s | 34.43           | 11      | 16,566     | 123     | none                                                                                                                  |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 8.70s   | 36.2 tok/s | 2.00            | 18      | 1,281      | 144     | none                                                                                                                  |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 9.80s   | 127 tok/s  | 5.71            | 23      | 3,636      | 124     | none                                                                                                                  |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`    | 2.23s   | 481 tok/s  | 0.66            | 1.9     | 2,123      | 96      | duplicate keywords; prompt hint repeated                                                                              |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | 10.39s  | 30.0 tok/s | 3.59            | 23      | 2,402      | 119     | prompt hint repeated                                                                                                  |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | 8.81s   | 75.7 tok/s | 5.66            | 8.7     | 6,393      | 83      | prompt hint repeated                                                                                                  |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 21.21s  | 41.0 tok/s | 11.49           | 78      | 6,393      | 117     | prompt hint repeated                                                                                                  |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | 7.39s   | 34.9 tok/s | 1.91            | 18      | 2,620      | 89      | prompt hint repeated                                                                                                  |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`    | 4.05s   | 57.5 tok/s | 0.83            | 9.3     | 1,144      | 98      | prompt hint repeated                                                                                                  |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `concerns detected`    | 48.09s  | 87.4 tok/s | 45.12           | 9.3     | 16,565     | 107     | prompt hint repeated                                                                                                  |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.49s   | 128 tok/s  | 1.12            | 5.6     | 1,438      | 118     | prompt hint repeated                                                                                                  |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 35.12s  | 47.9 tok/s | 20.08           | 92      | 3,498      | 111     | prompt hint repeated                                                                                                  |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`    | 20.44s  | 56.7 tok/s | 14.50           | 14      | 16,565     | 215     | duplicate keywords                                                                                                    |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `concerns detected`    | 8.58s   | 31.2 tok/s | 1.51            | 17      | 596        | 127     | unsupplied place name                                                                                                 |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | 4.00s   | 122 tok/s  | 0.82            | 5.9     | 597        | 93      | duplicate keywords                                                                                                    |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | 8.07s   | 39.7 tok/s | 2.66            | 16      | 3,125      | 119     | prompt hint repeated                                                                                                  |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | 4.73s   | 126 tok/s  | 2.19            | 5.4     | 4,217      | 118     | prompt hint repeated                                                                                                  |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 3.11s   | 335 tok/s  | 1.20            | 2.2     | 341        | 38      | labelled fields not detected                                                                                          |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | 20.47s  | 62.1 tok/s | 1.37            | 20      | 1,331      | 1,000   | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords    |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `major concerns`       | 3.73s   | 210 tok/s  | 1.18            | 4.0     | 2,115      | 122     | labelled fields not detected                                                                                          |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 61.12s  | 21.1 tok/s | 9.62            | 25      | 4,410      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.37s   | 325 tok/s  | 0.97            | 1.1     | 1,217      | 39      | labelled fields not detected                                                                                          |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 5.10s   | 70.8 tok/s | 0.87            | 7.2     | 595        | 135     | labelled fields not detected                                                                                          |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 6.01s   | 130 tok/s  | 4.04            | 4.4     | 5,666      | 82      | labelled fields not detected                                                                                          |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.62s   | 107 tok/s  | 1.52            | 6.7     | 2,201      | 18      | control tokens visible; labelled fields not detected                                                                  |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 2.00s   | 207 tok/s  | 0.71            | 1.8     | 337        | 23      | labelled fields not detected                                                                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/MiniCPM-o-4_5-4bit` at 3.31s
+Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/InternVL3_5-1B-4bit` at 2.79s
 
-Lowest peak memory among completions without detected concerns: `mlx-community/MiniCPM-V-4.6-4bit` at 3.3 GB
+Lowest peak memory among completions without detected concerns: `mlx-community/InternVL3_5-1B-4bit` at 2.1 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
@@ -92,17 +93,17 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                 | Mechanical checks | Observations                                                                                                       |
-|-------------------------------------------------------------------------------------------------------|-------------------|--------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                            | `major concerns`  | labelled fields not detected                                                                                       |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | `major concerns`  | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                | `major concerns`  | labelled fields not detected                                                                                       |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)       | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                  |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)         | `major concerns`  | labelled fields not detected                                                                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                     | `major concerns`  | labelled fields not detected                                                                                       |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)        | `major concerns`  | labelled fields not detected                                                                                       |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | `major concerns`  | control tokens visible; labelled fields not detected                                                               |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                          | `major concerns`  | labelled fields not detected                                                                                       |
+| Model                                                                                                 | Mechanical checks | Observations                                                                                                          |
+|-------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                            | `major concerns`  | labelled fields not detected                                                                                          |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | `major concerns`  | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords    |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                | `major concerns`  | labelled fields not detected                                                                                          |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)       | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)         | `major concerns`  | labelled fields not detected                                                                                          |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                     | `major concerns`  | labelled fields not detected                                                                                          |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)        | `major concerns`  | labelled fields not detected                                                                                          |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | `major concerns`  | control tokens visible; labelled fields not detected                                                                  |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                          | `major concerns`  | labelled fields not detected                                                                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -116,6 +117,7 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Blue and light blue motor cabin cruiser at a UK marina \| Description: On September 26th, 2026, a blue and light blue motor cabin cruiser with a tan canop... \| Keywords (15): Blue and light blue motor cabin cruiser, tan canopy, calm water, marina, reflection, UK, yacht, boat fender, ...[1,523 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Blue Cabin Cruiser at Marina \| Description: A blue cabin cruiser with a tan canopy is moored at a marina dock, surrounded by sailboats and leisure boats on c... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Blue Cabin Cruiser at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina, reflecting in calm water... \| Keywords (13): Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, ...                                                                               |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected` | Title: Blue and Light Blue Motor Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser moored at a marina, surrounded by other sailboats... \| Keywords (23): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                                |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | Title: Blue and Tan Motor Cabin Cruiser at Marina Dock \| Description: A blue and tan motor cabin cruiser is moored at a marina dock on a calm day, with the ear... \| Keywords (10): Motor cabin cruiser, Marina dock, Calm water, Early evening, Tan canopy, Blue hull, Sailboats, Leisure boats, ...                                                                               |
 | [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Blue Cabin Cruiser Moored Calm Harbor \| Description: A blue cabin cruiser with tan canopy is moored at a marina, reflecting on calm water surrounded by other s... \| Keywords (17): boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, ...[1,844 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Blue Motor Cabin Cruiser at Calm Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina, reflecting in... \| Keywords (16): Boat, Cabin cruiser, Canopy, Dock, Marina, Motorboat, Reflection, Sailboat, Water, Blue hull, Tan canopy, ...                                                                               |
@@ -136,10 +138,10 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Blue Motor Cabin Cruiser Moored at a Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a dock, surrounded by oth... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Blue motor cabin cruiser moored at a marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy sits moored at a dock alongside vari... \| Keywords (17): Blue motorboat, boat canopy, boat fender, boating, cabin cruiser, calm water, dock, harbour, marina, mast, ...                                                                               |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: Blue Motor Cabin Cruiser Moored at a Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on 26 Septe... \| Keywords (17): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Marina Calm: Blue Motor Cabin Cruiser" \| Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock, surrounded by other... \| Keywords (10): Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboats, Leisure boats, Evening light, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Marina Calm: Blue Motor Cabin Cruiser" \| Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock, surrounded by other sa... \| Keywords (14): Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboats, Leisure boats, Reflection, ...                                                                               |
 | [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | Title: Blue and Light Blue Canopy Cruiser Moored at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canvas canopy is moored alongs... \| Keywords (15): motor cabin cruiser, blue hull, light blue paint, tan canvas canopy, marina dock, moored boat, calm water, ...                                                                               |
 | [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Blue Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on 26 September 2026, alo... \| Keywords (18): Boat, Cabin cruiser, Marina, Dock, Calm water, Reflection, Tan canopy, Sailboats, Leisure boats, Mooring, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Evenhaze Motor Cruiser at Marina Dock \| Description: A blue and light blue motor cabin cruiser named "Evenhaze," featuring a tan canopy, is moored at a wooden d... \| Keywords (16): Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Motorboat, Nautical, ...                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Evenhaze Motor Cruiser at Marina Dock \| Description: A blue and light blue motor cabin cruiser named Evenhaze, featuring a tan canopy, is moored at a wooden do... \| Keywords (17): Boat, Motorboat, Cabin cruiser, Boat canopy, Boat fender, Marina, Dock, Mooring, Sailboat, Watercraft, ...                                                                               |
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`    | Title: Boat Docking at a Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats a... \| Keywords (14): Boat, Boat, Cabin, Cruiser, Dock, Marina, Reflection, Sailboat, Sailing, Water, Reflection, Rope, Sailboat, ...                                                                               |
 | [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | Title: Blue and Light Blue Motor Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock along... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
 | [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | Title: Blue Motor Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by other sailbo... \| Keywords (9): Boat, Cabin cruiser, Marina, Motorboat, Reflection, Tan canopy, Watercraft, Blue motorboat, Calm water                                                                               |
@@ -155,11 +157,11 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | Title: Blue Cabin Cruiser Moored at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
 | [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | Title: Blue and Light Blue Motor Cabin Cruiser with Tan Canopy Moored at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is m... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A serene marina scene featuring a blue and light blue motor cabin cruiser moored alongside other sailboats and leisure boats on calm water, with a clear reflection in the early evening light.                                                                                                                                                                                       |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | Title: (not detected) \| Description: Combine the context and visible details. Mention the boat type, location (marina), time of day (early evening), and distinct... \| Keywords (100): Need 10-18 unique, comma-separated. Include boat types (motor cabin cruiser, sailboat, leisure boat, dock, ...                                                                               |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (126): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Nautical, ...                                                                                                                                                                                                 |
 | [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `major concerns`       | Title: Blue and white motor cabin cruiser at marina dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evenin... \| Keywords: (not detected)                                                                               |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (20): We need title 5-10 words. Concrete., ...                                                                                                                                                                                                                                                                       |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (13): We need title 5-10 words. Concrete., ...                                                                                                                                                                                                                                                                       |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A 5-10-word, 1-2-sentence, factual description, combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.                                                                                                                                                                                                                         |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and motorboats on calm water, reflecting the warm light of the early evening sun. The boat is positioned in the foreground, with its reflection clearly visible on t...                                                                                              |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and motorboats on calm water, reflecting the warm light of the early evening sun. The boat is primarily blue with a light blue cabin, a tan canvas canopy, and a red...                                                                                              |
 | [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Tranquil Marina Reflections" \| Description: (not detected) \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                                                                                                                                    |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a blue and white boat with a tan colored canopy.                                                                                                                                                                                                                                                                                  |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | "Boat in a Marina at a Dock with a Motorboat and Canopy in the Early Evening Light"                                                                                                                                                                                                                                                                                                   |
@@ -167,14 +169,14 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.3`
-- `mlx`: `0.32.3.dev20260927+02ce1fb6a`
-- `transformers`: `5.17.0`
+- `mlx-vlm`: `0.7.4`
+- `mlx`: `0.32.4.dev20261002+255328713`
+- `transformers`: `5.18.0`
 - `tokenizers`: `0.23.2`
 - `huggingface-hub`: `1.33.0`
 - *Python Version:* 3.14.7
 - *OS:* Darwin 27.0.0
-- *macOS Version:* 27.0
+- *macOS Version:* 27.0.1
 - *GPU/Chip:* Apple M5 Max
 - *MLX Device:* Apple M5 Max
 - *GPU Architecture:* applegpu_g17s
@@ -254,16 +256,16 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.65s
-- *Generation time:* 6.48s
-- *Total time:* 8.93s
-- *Prompt preparation time:* 0.799
-- *First-token latency:* 0.735
-- *Cleanup time:* 0.115
+- *Model load time:* 1.66s
+- *Generation time:* 6.34s
+- *Total time:* 8.66s
+- *Prompt preparation time:* 0.657
+- *First-token latency:* 0.698
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 1,646
 - *Generation tokens:* 540
 - *Total tokens:* 2,186
-- *Prompt throughput (raw):* 2,240 tok/s
+- *Prompt throughput (raw):* 2,360 tok/s
 - *Generation throughput (raw):* 108 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
@@ -346,16 +348,16 @@ Keywords: Blue and light blue motor cabin cruiser, tan canopy, calm water, marin
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
 - *Model load time:* 1.19s
-- *Generation time:* 4.08s
-- *Total time:* 5.99s
-- *Prompt preparation time:* 0.717
-- *First-token latency:* 1.51
-- *Cleanup time:* 0.117
+- *Generation time:* 4.09s
+- *Total time:* 6.05s
+- *Prompt preparation time:* 0.759
+- *First-token latency:* 1.47
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 2,120
 - *Generation tokens:* 103
 - *Total tokens:* 2,223
-- *Prompt throughput (raw):* 1,404 tok/s
-- *Generation throughput (raw):* 55.2 tok/s
+- *Prompt throughput (raw):* 1,439 tok/s
+- *Generation throughput (raw):* 55.9 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
@@ -405,17 +407,17 @@ Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.69s
-- *Generation time:* 3.74s
-- *Total time:* 6.15s
-- *Prompt preparation time:* 0.712
-- *First-token latency:* 0.854
-- *Cleanup time:* 0.113
+- *Model load time:* 1.65s
+- *Generation time:* 3.67s
+- *Total time:* 6.03s
+- *Prompt preparation time:* 0.707
+- *First-token latency:* 0.831
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 2,120
 - *Generation tokens:* 79
 - *Total tokens:* 2,199
-- *Prompt throughput (raw):* 2,483 tok/s
-- *Generation throughput (raw):* 36.1 tok/s
+- *Prompt throughput (raw):* 2,552 tok/s
+- *Generation throughput (raw):* 36.8 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
@@ -447,6 +449,63 @@ Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marin
 
 ---
 
+<a id="model-mlx-community-internvl35-1b-4bit"></a>
+
+### mlx-community/InternVL3_5-1B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
+- *Model load time:* 0.56s
+- *Generation time:* 1.51s
+- *Total time:* 2.79s
+- *Prompt preparation time:* 0.706
+- *First-token latency:* 0.354
+- *Cleanup time:* 0.0938
+- *Prompt tokens:* 2,123
+- *Generation tokens:* 159
+- *Total tokens:* 2,282
+- *Prompt throughput (raw):* 6,004 tok/s
+- *Generation throughput (raw):* 335 tok/s
+- *Peak memory (GB):* 2.1
+- *Active memory (GB):* 1.1
+- *Cache memory (GB):* 0.29
+- *Model-load active memory (GB):* 1.08
+- *Post-cleanup active memory (GB):* 0.00274
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1376
+- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue and Light Blue Motor Cabin Cruiser at Marina
+
+Description: A blue and light blue motor cabin cruiser moored at a marina, surrounded by other sailboats and leisure boats, with clear reflections on calm water and early evening light.
+
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Watercraft, Yacht, GPS 50.682100°N, 3.466600°W, 2026-09-26, 17:36:29 UTC+01:00
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 ### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
@@ -461,22 +520,22 @@ Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.77s
+- *Model load time:* 1.82s
 - *Generation time:* 7.46s
-- *Total time:* 9.86s
-- *Prompt preparation time:* 0.622
-- *First-token latency:* 1.58
-- *Cleanup time:* 0.115
+- *Total time:* 9.90s
+- *Prompt preparation time:* 0.617
+- *First-token latency:* 1.6
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 309
 - *Generation tokens:* 114
 - *Total tokens:* 423
-- *Prompt throughput (raw):* 195 tok/s
+- *Prompt throughput (raw):* 194 tok/s
 - *Generation throughput (raw):* 21.6 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.59
-- *Model-load active memory (GB):* 11.3
-- *Post-cleanup active memory (GB):* 0.00389
+- *Model-load active memory (GB):* 11.4
+- *Post-cleanup active memory (GB):* 0.0042
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -519,22 +578,22 @@ Keywords: Motor cabin cruiser, Marina dock, Calm water, Early evening, Tan canop
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.92s
-- *Generation time:* 3.42s
-- *Total time:* 5.12s
-- *Prompt preparation time:* 0.762
-- *First-token latency:* 0.257
-- *Cleanup time:* 0.107
+- *Model load time:* 0.95s
+- *Generation time:* 3.33s
+- *Total time:* 5.05s
+- *Prompt preparation time:* 0.752
+- *First-token latency:* 0.246
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 938
 - *Generation tokens:* 564
 - *Total tokens:* 1,502
-- *Prompt throughput (raw):* 3,656 tok/s
-- *Generation throughput (raw):* 232 tok/s
-- *Peak memory (GB):* 3.3
+- *Prompt throughput (raw):* 3,810 tok/s
+- *Generation throughput (raw):* 239 tok/s
+- *Peak memory (GB):* 3.2
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
+- *Cache memory (GB):* 0.04
 - *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00439
+- *Post-cleanup active memory (GB):* 0.0047
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -685,22 +744,22 @@ Keywords: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sail
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.08s
+- *Model load time:* 1.18s
 - *Generation time:* 1.66s
-- *Total time:* 3.31s
-- *Prompt preparation time:* 0.561
+- *Total time:* 3.40s
+- *Prompt preparation time:* 0.558
 - *First-token latency:* 0.235
-- *Cleanup time:* 0.107
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 398
 - *Generation tokens:* 93
 - *Total tokens:* 491
-- *Prompt throughput (raw):* 1,694 tok/s
+- *Prompt throughput (raw):* 1,696 tok/s
 - *Generation throughput (raw):* 105 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.0047
+- *Post-cleanup active memory (GB):* 0.00502
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -743,22 +802,22 @@ Keywords: Boat, Cabin cruiser, Canopy, Dock, Marina, Motorboat, Reflection, Sail
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.52s
-- *Generation time:* 5.73s
-- *Total time:* 7.87s
-- *Prompt preparation time:* 0.605
-- *First-token latency:* 2.12
-- *Cleanup time:* 0.109
+- *Model load time:* 1.53s
+- *Generation time:* 5.75s
+- *Total time:* 7.89s
+- *Prompt preparation time:* 0.604
+- *First-token latency:* 2.09
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 2,935
 - *Generation tokens:* 199
 - *Total tokens:* 3,134
-- *Prompt throughput (raw):* 1,382 tok/s
-- *Generation throughput (raw):* 65.9 tok/s
+- *Prompt throughput (raw):* 1,405 tok/s
+- *Generation throughput (raw):* 64.6 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00497
+- *Post-cleanup active memory (GB):* 0.00528
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -803,22 +862,22 @@ Boat, cabin cruiser, marina, moored vessel, calm water, reflections, early eveni
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.14s
+- *Model load time:* 1.21s
 - *Generation time:* 2.26s
-- *Total time:* 4.01s
-- *Prompt preparation time:* 0.601
-- *First-token latency:* 1.03
-- *Cleanup time:* 0.0975
+- *Total time:* 4.08s
+- *Prompt preparation time:* 0.596
+- *First-token latency:* 1.04
+- *Cleanup time:* 0.0959
 - *Prompt tokens:* 2,934
 - *Generation tokens:* 121
 - *Total tokens:* 3,055
-- *Prompt throughput (raw):* 2,837 tok/s
-- *Generation throughput (raw):* 187 tok/s
+- *Prompt throughput (raw):* 2,831 tok/s
+- *Generation throughput (raw):* 186 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00523
+- *Post-cleanup active memory (GB):* 0.00554
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -863,22 +922,22 @@ blue motor cabin cruiser, marina dock, calm water reflections, tan boat canopy, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.17s
-- *Generation time:* 3.97s
+- *Model load time:* 1.18s
+- *Generation time:* 3.96s
 - *Total time:* 5.87s
-- *Prompt preparation time:* 0.719
-- *First-token latency:* 0.753
-- *Cleanup time:* 0.109
+- *Prompt preparation time:* 0.721
+- *First-token latency:* 0.751
+- *Cleanup time:* 0.105
 - *Prompt tokens:* 1,531
 - *Generation tokens:* 181
 - *Total tokens:* 1,712
-- *Prompt throughput (raw):* 2,033 tok/s
-- *Generation throughput (raw):* 71.6 tok/s
-- *Peak memory (GB):* 8.2
+- *Prompt throughput (raw):* 2,038 tok/s
+- *Generation throughput (raw):* 71.9 tok/s
+- *Peak memory (GB):* 8.5
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.31
 - *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00554
+- *Post-cleanup active memory (GB):* 0.00585
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -921,22 +980,22 @@ Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.22s
-- *Generation time:* 3.45s
-- *Total time:* 5.51s
-- *Prompt preparation time:* 0.821
-- *First-token latency:* 1.97
-- *Cleanup time:* 0.108
+- *Model load time:* 1.14s
+- *Generation time:* 3.53s
+- *Total time:* 5.48s
+- *Prompt preparation time:* 0.801
+- *First-token latency:* 2.06
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 4,091
 - *Generation tokens:* 108
 - *Total tokens:* 4,199
-- *Prompt throughput (raw):* 2,081 tok/s
-- *Generation throughput (raw):* 153 tok/s
+- *Prompt throughput (raw):* 1,984 tok/s
+- *Generation throughput (raw):* 155 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00647
+- *Post-cleanup active memory (GB):* 0.00679
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -978,28 +1037,28 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.65s
-- *Generation time:* 3.01s
-- *Total time:* 6.36s
-- *Prompt preparation time:* 0.692
-- *First-token latency:* 0.634
-- *Cleanup time:* 0.138
+- *Model load time:* 2.63s
+- *Generation time:* 3.00s
+- *Total time:* 6.33s
+- *Prompt preparation time:* 0.693
+- *First-token latency:* 0.602
+- *Cleanup time:* 0.135
 - *Prompt tokens:* 1,295
 - *Generation tokens:* 130
 - *Total tokens:* 1,425
-- *Prompt throughput (raw):* 2,042 tok/s
-- *Generation throughput (raw):* 75.0 tok/s
+- *Prompt throughput (raw):* 2,152 tok/s
+- *Generation throughput (raw):* 74.4 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.00698
+- *Post-cleanup active memory (GB):* 0.00729
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
 - *Resolved model revision:* 4620fdbbd1e7a1f14f936d49f1aa012abcda4569
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit/snapshots/4620fdbbd1e7a1f14f936d49f1aa012abcda4569
@@ -1038,22 +1097,22 @@ Motorboat, Cabin cruiser, Marina, Sailboat, Dock, Water reflection, Boat fender,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.92s
-- *Generation time:* 27.89s
-- *Total time:* 29.83s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 15.8
-- *Cleanup time:* 0.201
+- *Model load time:* 0.84s
+- *Generation time:* 30.47s
+- *Total time:* 32.55s
+- *Prompt preparation time:* 1.22
+- *First-token latency:* 18.2
+- *Cleanup time:* 0.207
 - *Prompt tokens:* 16,556
 - *Generation tokens:* 901
 - *Total tokens:* 17,457
-- *Prompt throughput (raw):* 1,051 tok/s
+- *Prompt throughput (raw):* 911 tok/s
 - *Generation throughput (raw):* 80.5 tok/s
 - *Peak memory (GB):* 8.4
 - *Active memory (GB):* 4.3
 - *Cache memory (GB):* 2.7
 - *Model-load active memory (GB):* 4.26
-- *Post-cleanup active memory (GB):* 0.00767
+- *Post-cleanup active memory (GB):* 0.00798
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1163,22 +1222,22 @@ Keywords: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 2.17s
-- *Generation time:* 39.48s
-- *Total time:* 42.70s
-- *Prompt preparation time:* 1.05
-- *First-token latency:* 36.1
-- *Cleanup time:* 0.173
+- *Model load time:* 1.98s
+- *Generation time:* 41.32s
+- *Total time:* 44.60s
+- *Prompt preparation time:* 1.29
+- *First-token latency:* 38
+- *Cleanup time:* 0.14
 - *Prompt tokens:* 16,554
 - *Generation tokens:* 168
 - *Total tokens:* 16,722
-- *Prompt throughput (raw):* 459 tok/s
-- *Generation throughput (raw):* 68.4 tok/s
+- *Prompt throughput (raw):* 436 tok/s
+- *Generation throughput (raw):* 74.4 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
 - *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00798
+- *Post-cleanup active memory (GB):* 0.00829
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1224,22 +1283,22 @@ Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.98s
-- *Generation time:* 75.39s
-- *Total time:* 78.43s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 64.2
-- *Cleanup time:* 0.201
+- *Model load time:* 2.05s
+- *Generation time:* 78.92s
+- *Total time:* 82.26s
+- *Prompt preparation time:* 1.28
+- *First-token latency:* 67.6
+- *Cleanup time:* 0.182
 - *Prompt tokens:* 16,554
 - *Generation tokens:* 190
 - *Total tokens:* 16,744
-- *Prompt throughput (raw):* 258 tok/s
+- *Prompt throughput (raw):* 245 tok/s
 - *Generation throughput (raw):* 18.6 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 5.5
 - *Model-load active memory (GB):* 19.6
-- *Post-cleanup active memory (GB):* 0.00829
+- *Post-cleanup active memory (GB):* 0.0086
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1282,22 +1341,22 @@ Keywords: Cabin cruiser, Marina, Dock, Mooring, Sailboat, Motorboat, Watercraft,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.96s
-- *Generation time:* 38.84s
-- *Total time:* 40.83s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 36.1
-- *Cleanup time:* 0.121
+- *Model load time:* 0.94s
+- *Generation time:* 40.14s
+- *Total time:* 42.13s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 37.4
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 16,554
 - *Generation tokens:* 120
 - *Total tokens:* 16,674
-- *Prompt throughput (raw):* 459 tok/s
-- *Generation throughput (raw):* 66.6 tok/s
+- *Prompt throughput (raw):* 442 tok/s
+- *Generation throughput (raw):* 67.5 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.0086
+- *Post-cleanup active memory (GB):* 0.00892
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1340,28 +1399,28 @@ Keywords: cabin cruiser, boat canopy, fender, marina, dock, sailboat, motorboat,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.79s
-- *Generation time:* 34.71s
-- *Total time:* 38.80s
-- *Prompt preparation time:* 1.29
-- *First-token latency:* 31.9
-- *Cleanup time:* 0.154
+- *Model load time:* 2.47s
+- *Generation time:* 36.76s
+- *Total time:* 40.27s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 34.2
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 16,569
 - *Generation tokens:* 123
 - *Total tokens:* 16,692
-- *Prompt throughput (raw):* 519 tok/s
-- *Generation throughput (raw):* 72.5 tok/s
+- *Prompt throughput (raw):* 484 tok/s
+- *Generation throughput (raw):* 75.2 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00911
+- *Post-cleanup active memory (GB):* 0.00942
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
 - *Resolved model revision:* 1e20fd8d42056f870933bf98ca6211024744f7ec
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-35B-A3B-4bit/snapshots/1e20fd8d42056f870933bf98ca6211024744f7ec
@@ -1397,28 +1456,28 @@ Keywords: Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Ha
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.71s
-- *Generation time:* 35.77s
-- *Total time:* 38.79s
-- *Prompt preparation time:* 1.3
-- *First-token latency:* 33.4
-- *Cleanup time:* 0.112
+- *Model load time:* 1.22s
+- *Generation time:* 39.16s
+- *Total time:* 41.41s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 37
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 16,569
 - *Generation tokens:* 111
 - *Total tokens:* 16,680
-- *Prompt throughput (raw):* 496 tok/s
-- *Generation throughput (raw):* 88.2 tok/s
+- *Prompt throughput (raw):* 448 tok/s
+- *Generation throughput (raw):* 89.8 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 5.96
-- *Post-cleanup active memory (GB):* 0.00964
+- *Post-cleanup active memory (GB):* 0.00995
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
 - *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
@@ -1474,27 +1533,27 @@ Evenhaze, cabin cruiser, tan canopy, marina, dock, sailboats, leisure craft, eve
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
 - *Model load time:* 2.03s
-- *Generation time:* 56.16s
-- *Total time:* 59.25s
+- *Generation time:* 58.88s
+- *Total time:* 61.97s
 - *Prompt preparation time:* 1.04
-- *First-token latency:* 50.6
-- *Cleanup time:* 0.179
+- *First-token latency:* 53.3
+- *Cleanup time:* 0.135
 - *Prompt tokens:* 16,569
 - *Generation tokens:* 128
 - *Total tokens:* 16,697
-- *Prompt throughput (raw):* 327 tok/s
-- *Generation throughput (raw):* 27.6 tok/s
+- *Prompt throughput (raw):* 311 tok/s
+- *Generation throughput (raw):* 27.5 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0101
+- *Post-cleanup active memory (GB):* 0.0105
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
 - *Resolved model revision:* 5ff8ef173ad0d7c3aae92f0be43031a6ab8067c6
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-nvfp4/snapshots/5ff8ef173ad0d7c3aae92f0be43031a6ab8067c6
@@ -1533,22 +1592,22 @@ Blue motor cruiser, Cornish harbour, Evenhaze, Marina, Moored boat, Tan canopy, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.22s
-- *Generation time:* 3.04s
-- *Total time:* 5.25s
-- *Prompt preparation time:* 0.973
-- *First-token latency:* 0.722
-- *Cleanup time:* 0.117
+- *Model load time:* 1.13s
+- *Generation time:* 3.02s
+- *Total time:* 5.15s
+- *Prompt preparation time:* 0.989
+- *First-token latency:* 0.731
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 2,098
 - *Generation tokens:* 143
 - *Total tokens:* 2,241
-- *Prompt throughput (raw):* 2,906 tok/s
-- *Generation throughput (raw):* 99.4 tok/s
+- *Prompt throughput (raw):* 2,872 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.46
-- *Post-cleanup active memory (GB):* 0.0115
+- *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1591,22 +1650,22 @@ Keywords: Motorboat, Marina, Calm Water, Reflective Surface, Evening Light, Blue
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.41s
-- *Generation time:* 2.69s
-- *Total time:* 6.79s
-- *Prompt preparation time:* 0.679
-- *First-token latency:* 0.325
-- *Cleanup time:* 0.146
+- *Model load time:* 3.31s
+- *Generation time:* 2.51s
+- *Total time:* 6.50s
+- *Prompt preparation time:* 0.669
+- *First-token latency:* 0.316
+- *Cleanup time:* 0.142
 - *Prompt tokens:* 597
 - *Generation tokens:* 81
 - *Total tokens:* 678
-- *Prompt throughput (raw):* 1,835 tok/s
-- *Generation throughput (raw):* 52.9 tok/s
+- *Prompt throughput (raw):* 1,892 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
 - *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0115
+- *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1647,22 +1706,22 @@ Keywords: Boat, cabin cruiser, motorboat,, marina, dock, harbor, reflection, wat
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.91s
-- *Generation time:* 2.85s
-- *Total time:* 5.45s
-- *Prompt preparation time:* 0.687
-- *First-token latency:* 0.359
-- *Cleanup time:* 0.124
+- *Model load time:* 1.82s
+- *Generation time:* 2.84s
+- *Total time:* 5.33s
+- *Prompt preparation time:* 0.663
+- *First-token latency:* 0.36
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 601
 - *Generation tokens:* 112
 - *Total tokens:* 713
-- *Prompt throughput (raw):* 1,672 tok/s
-- *Generation throughput (raw):* 60.7 tok/s
+- *Prompt throughput (raw):* 1,669 tok/s
+- *Generation throughput (raw):* 60.2 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.33
 - *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.0131
+- *Post-cleanup active memory (GB):* 0.0134
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1705,22 +1764,22 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.60s
-- *Generation time:* 2.02s
-- *Total time:* 5.28s
-- *Prompt preparation time:* 0.651
-- *First-token latency:* 0.415
-- *Cleanup time:* 0.141
+- *Model load time:* 2.48s
+- *Generation time:* 2.03s
+- *Total time:* 5.16s
+- *Prompt preparation time:* 0.639
+- *First-token latency:* 0.404
+- *Cleanup time:* 0.145
 - *Prompt tokens:* 601
 - *Generation tokens:* 106
 - *Total tokens:* 707
-- *Prompt throughput (raw):* 1,448 tok/s
-- *Generation throughput (raw):* 109 tok/s
+- *Prompt throughput (raw):* 1,489 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 15.4
-- *Post-cleanup active memory (GB):* 0.0136
+- *Post-cleanup active memory (GB):* 0.0139
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1761,22 +1820,22 @@ Keywords: Blue motorboat, boat canopy, boat fender, boating, cabin cruiser, calm
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.78s
-- *Generation time:* 6.28s
-- *Total time:* 9.72s
-- *Prompt preparation time:* 0.655
-- *First-token latency:* 1.16
-- *Cleanup time:* 0.172
+- *Model load time:* 2.71s
+- *Generation time:* 6.24s
+- *Total time:* 9.60s
+- *Prompt preparation time:* 0.637
+- *First-token latency:* 1.17
+- *Cleanup time:* 0.15
 - *Prompt tokens:* 601
 - *Generation tokens:* 113
 - *Total tokens:* 714
-- *Prompt throughput (raw):* 519 tok/s
-- *Generation throughput (raw):* 25.2 tok/s
+- *Prompt throughput (raw):* 514 tok/s
+- *Generation throughput (raw):* 25.3 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.80
 - *Model-load active memory (GB):* 18.4
-- *Post-cleanup active memory (GB):* 0.0141
+- *Post-cleanup active memory (GB):* 0.0144
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1817,22 +1876,22 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Do
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.64s
-- *Generation time:* 1.83s
-- *Total time:* 3.33s
-- *Prompt preparation time:* 0.859
-- *First-token latency:* 0.455
-- *Cleanup time:* 0.101
+- *Model load time:* 0.60s
+- *Generation time:* 1.89s
+- *Total time:* 3.35s
+- *Prompt preparation time:* 0.847
+- *First-token latency:* 0.462
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 1,384
-- *Generation tokens:* 91
-- *Total tokens:* 1,475
-- *Prompt throughput (raw):* 3,042 tok/s
-- *Generation throughput (raw):* 169 tok/s
+- *Generation tokens:* 97
+- *Total tokens:* 1,481
+- *Prompt throughput (raw):* 2,994 tok/s
+- *Generation throughput (raw):* 161 tok/s
 - *Peak memory (GB):* 4.6
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0149
+- *Post-cleanup active memory (GB):* 0.0152
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1851,8 +1910,8 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Do
 
 <pre class="model-output-readable">
 Title: "Marina Calm: Blue Motor Cabin Cruiser"
-Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock, surrounded by other sailboats and leisure boats, reflecting the serene water under the evening light.
-Keywords: Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboats, Leisure boats, Evening light, Water reflection, Mooring, Nautical setting.
+Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock, surrounded by other sailboats and leisure boats, reflecting the serene early evening light.
+Keywords: Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboats, Leisure boats, Reflection, Evening light, Watercraft, Nautical, Mooring, Mast, Rope, Water reflection.
 </pre>
 
 </details>
@@ -1873,28 +1932,28 @@ Keywords: Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboat
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.19s
-- *Generation time:* 30.98s
-- *Total time:* 33.21s
+- *Model load time:* 1.20s
+- *Generation time:* 35.88s
+- *Total time:* 38.12s
 - *Prompt preparation time:* 1.03
-- *First-token latency:* 28.6
-- *Cleanup time:* 0.121
+- *First-token latency:* 33.5
+- *Cleanup time:* 0.127
 - *Prompt tokens:* 16,566
 - *Generation tokens:* 123
 - *Total tokens:* 16,689
-- *Prompt throughput (raw):* 579 tok/s
-- *Generation throughput (raw):* 86.3 tok/s
+- *Prompt throughput (raw):* 495 tok/s
+- *Generation throughput (raw):* 85.3 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 5.97
-- *Post-cleanup active memory (GB):* 0.0171
+- *Post-cleanup active memory (GB):* 0.0174
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1419
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
 - *Resolved model revision:* 3ea706a5e7b8aefb85bf37e72fe610613a50ca27
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--MiMo-V2.6-Distill-Qwen-9B-MLX-4bit/snapshots/3ea706a5e7b8aefb85bf37e72fe610613a50ca27
@@ -1933,22 +1992,22 @@ motor cabin cruiser, blue hull, light blue paint, tan canvas canopy, marina dock
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.09s
-- *Generation time:* 5.94s
-- *Total time:* 8.62s
-- *Prompt preparation time:* 0.575
-- *First-token latency:* 1.4
-- *Cleanup time:* 0.123
+- *Model load time:* 2.11s
+- *Generation time:* 5.99s
+- *Total time:* 8.70s
+- *Prompt preparation time:* 0.591
+- *First-token latency:* 1.44
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 1,281
 - *Generation tokens:* 144
 - *Total tokens:* 1,425
-- *Prompt throughput (raw):* 914 tok/s
+- *Prompt throughput (raw):* 888 tok/s
 - *Generation throughput (raw):* 36.2 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 15.1
-- *Post-cleanup active memory (GB):* 0.0174
+- *Post-cleanup active memory (GB):* 0.0177
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1994,22 +2053,22 @@ Boat, Cabin cruiser, Marina, Dock, Calm water, Reflection, Tan canopy, Sailboats
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.55s
-- *Generation time:* 6.53s
-- *Total time:* 9.73s
-- *Prompt preparation time:* 0.651
-- *First-token latency:* 5
-- *Cleanup time:* 0.136
+- *Model load time:* 2.45s
+- *Generation time:* 6.69s
+- *Total time:* 9.80s
+- *Prompt preparation time:* 0.647
+- *First-token latency:* 5.11
+- *Cleanup time:* 0.149
 - *Prompt tokens:* 3,636
-- *Generation tokens:* 120
-- *Total tokens:* 3,756
-- *Prompt throughput (raw):* 727 tok/s
-- *Generation throughput (raw):* 130 tok/s
+- *Generation tokens:* 124
+- *Total tokens:* 3,760
+- *Prompt throughput (raw):* 711 tok/s
+- *Generation throughput (raw):* 127 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.15
+- *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.0176
+- *Post-cleanup active memory (GB):* 0.0179
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2031,9 +2090,9 @@ Boat, Cabin cruiser, Marina, Dock, Calm water, Reflection, Tan canopy, Sailboats
 
 Title: Evenhaze Motor Cruiser at Marina Dock
 
-Description: A blue and light blue motor cabin cruiser named "Evenhaze," featuring a tan canopy, is moored at a wooden dock in a calm harbor, with its clear reflection visible in the water under early evening light, surrounded by other sailboats and leisure craft.
+Description: A blue and light blue motor cabin cruiser named Evenhaze, featuring a tan canopy, is moored at a wooden dock in a calm marina, with its reflection visible in the water under early evening light, surrounded by other sailboats and leisure craft.
 
-Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Watercraft, Yacht
+Keywords: Boat, Motorboat, Cabin cruiser, Boat canopy, Boat fender, Marina, Dock, Mooring, Sailboat, Watercraft, Reflection, Calm water, Nautical, Boating, Water reflection, Yacht, Leisure boats
 </pre>
 
 </details>
@@ -2055,20 +2114,20 @@ Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbo
 - *Observations:* Duplicate keywords: boat, reflection, sailboat; Repeats the
   prompt's hint instead of describing the image: description
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.42s
-- *Generation time:* 0.92s
-- *Total time:* 2.32s
-- *Prompt preparation time:* 0.592
-- *First-token latency:* 0.132
-- *Cleanup time:* 0.0831
+- *Model load time:* 0.43s
+- *Generation time:* 0.86s
+- *Total time:* 2.23s
+- *Prompt preparation time:* 0.551
+- *First-token latency:* 0.12
+- *Cleanup time:* 0.0801
 - *Prompt tokens:* 2,123
 - *Generation tokens:* 96
 - *Total tokens:* 2,219
-- *Prompt throughput (raw):* 16,044 tok/s
-- *Generation throughput (raw):* 477 tok/s
+- *Prompt throughput (raw):* 17,624 tok/s
+- *Generation throughput (raw):* 481 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.08
+- *Cache memory (GB):* 0.07
 - *Model-load active memory (GB):* 0.897
 - *Post-cleanup active memory (GB):* 0.000134
 - *Post-cleanup cache memory (GB):* 0.0
@@ -2117,17 +2176,17 @@ Boat, Boat, Cabin, Cruiser, Dock, Marina, Reflection, Sailboat, Sailing, Water, 
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.28s
-- *Generation time:* 7.69s
-- *Total time:* 10.59s
-- *Prompt preparation time:* 0.602
+- *Model load time:* 2.26s
+- *Generation time:* 7.56s
+- *Total time:* 10.39s
+- *Prompt preparation time:* 0.559
 - *First-token latency:* 2.99
-- *Cleanup time:* 0.114
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 2,402
 - *Generation tokens:* 119
 - *Total tokens:* 2,521
-- *Prompt throughput (raw):* 805 tok/s
-- *Generation throughput (raw):* 29.5 tok/s
+- *Prompt throughput (raw):* 803 tok/s
+- *Generation throughput (raw):* 30.0 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.47
@@ -2178,17 +2237,17 @@ Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.51s
-- *Generation time:* 6.90s
-- *Total time:* 9.17s
-- *Prompt preparation time:* 0.747
-- *First-token latency:* 5.06
-- *Cleanup time:* 0.153
+- *Model load time:* 1.44s
+- *Generation time:* 6.76s
+- *Total time:* 8.81s
+- *Prompt preparation time:* 0.606
+- *First-token latency:* 5.11
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 6,393
 - *Generation tokens:* 83
 - *Total tokens:* 6,476
-- *Prompt throughput (raw):* 1,262 tok/s
-- *Generation throughput (raw):* 71.1 tok/s
+- *Prompt throughput (raw):* 1,250 tok/s
+- *Generation throughput (raw):* 75.7 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
@@ -2235,17 +2294,17 @@ Keywords: Boat, Cabin cruiser, Marina, Motorboat, Reflection, Tan canopy, Waterc
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.23s
-- *Generation time:* 16.77s
-- *Total time:* 23.93s
-- *Prompt preparation time:* 0.913
-- *First-token latency:* 12.4
-- *Cleanup time:* 0.261
+- *Model load time:* 6.25s
+- *Generation time:* 14.34s
+- *Total time:* 21.21s
+- *Prompt preparation time:* 0.614
+- *First-token latency:* 10.5
+- *Cleanup time:* 0.218
 - *Prompt tokens:* 6,393
 - *Generation tokens:* 117
 - *Total tokens:* 6,510
-- *Prompt throughput (raw):* 517 tok/s
-- *Generation throughput (raw):* 40.1 tok/s
+- *Prompt throughput (raw):* 606 tok/s
+- *Generation throughput (raw):* 41.0 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
 - *Cache memory (GB):* 1.4
@@ -2292,17 +2351,17 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.17s
-- *Generation time:* 4.58s
-- *Total time:* 7.59s
-- *Prompt preparation time:* 0.833
-- *First-token latency:* 1.15
-- *Cleanup time:* 0.12
+- *Model load time:* 2.13s
+- *Generation time:* 4.46s
+- *Total time:* 7.39s
+- *Prompt preparation time:* 0.801
+- *First-token latency:* 1.13
+- *Cleanup time:* 0.115
 - *Prompt tokens:* 2,620
 - *Generation tokens:* 89
 - *Total tokens:* 2,709
-- *Prompt throughput (raw):* 2,279 tok/s
-- *Generation throughput (raw):* 33.9 tok/s
+- *Prompt throughput (raw):* 2,320 tok/s
+- *Generation throughput (raw):* 34.9 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
@@ -2349,22 +2408,22 @@ Keywords: blue, light blue, motor cabin cruiser, tan canopy, marina dock, sailbo
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.99s
-- *Generation time:* 2.55s
-- *Total time:* 4.10s
-- *Prompt preparation time:* 0.554
-- *First-token latency:* 0.297
-- *Cleanup time:* 0.0883
+- *Model load time:* 0.96s
+- *Generation time:* 2.53s
+- *Total time:* 4.05s
+- *Prompt preparation time:* 0.548
+- *First-token latency:* 0.294
+- *Cleanup time:* 0.0862
 - *Prompt tokens:* 1,144
 - *Generation tokens:* 98
 - *Total tokens:* 1,242
-- *Prompt throughput (raw):* 3,857 tok/s
-- *Generation throughput (raw):* 57.1 tok/s
+- *Prompt throughput (raw):* 3,893 tok/s
+- *Generation throughput (raw):* 57.5 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00705
+- *Post-cleanup active memory (GB):* 0.00736
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2408,22 +2467,22 @@ Keywords: boat, motorboat, canopy, marina, dock, sailboat, calm water, reflectio
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.81s
-- *Generation time:* 42.80s
-- *Total time:* 44.56s
-- *Prompt preparation time:* 0.941
-- *First-token latency:* 40.7
-- *Cleanup time:* 0.109
+- *Model load time:* 0.80s
+- *Generation time:* 46.35s
+- *Total time:* 48.09s
+- *Prompt preparation time:* 0.93
+- *First-token latency:* 44.3
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 16,565
 - *Generation tokens:* 107
 - *Total tokens:* 16,672
-- *Prompt throughput (raw):* 407 tok/s
-- *Generation throughput (raw):* 89.3 tok/s
+- *Prompt throughput (raw):* 374 tok/s
+- *Generation throughput (raw):* 87.4 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 4.7
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 4.68
-- *Post-cleanup active memory (GB):* 0.00736
+- *Post-cleanup active memory (GB):* 0.00767
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2466,22 +2525,22 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.68s
-- *Generation time:* 2.13s
-- *Total time:* 3.61s
-- *Prompt preparation time:* 0.8
-- *First-token latency:* 0.38
-- *Cleanup time:* 0.0928
+- *Model load time:* 0.64s
+- *Generation time:* 2.05s
+- *Total time:* 3.49s
+- *Prompt preparation time:* 0.802
+- *First-token latency:* 0.367
+- *Cleanup time:* 0.0901
 - *Prompt tokens:* 1,438
 - *Generation tokens:* 118
 - *Total tokens:* 1,556
-- *Prompt throughput (raw):* 3,780 tok/s
-- *Generation throughput (raw):* 121 tok/s
+- *Prompt throughput (raw):* 3,921 tok/s
+- *Generation throughput (raw):* 128 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.40
 - *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0104
+- *Post-cleanup active memory (GB):* 0.0107
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2523,22 +2582,22 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 12.61s
-- *Generation time:* 23.78s
-- *Total time:* 37.42s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 19.8
-- *Cleanup time:* 0.354
+- *Model load time:* 11.85s
+- *Generation time:* 22.40s
+- *Total time:* 35.12s
+- *Prompt preparation time:* 0.864
+- *First-token latency:* 18.7
+- *Cleanup time:* 0.321
 - *Prompt tokens:* 3,498
 - *Generation tokens:* 111
 - *Total tokens:* 3,609
-- *Prompt throughput (raw):* 177 tok/s
-- *Generation throughput (raw):* 47.5 tok/s
+- *Prompt throughput (raw):* 187 tok/s
+- *Generation throughput (raw):* 47.9 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 85
-- *Post-cleanup active memory (GB):* 0.0106
+- *Post-cleanup active memory (GB):* 0.0109
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2583,22 +2642,22 @@ Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: harbor
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.21s
-- *Generation time:* 17.57s
-- *Total time:* 19.77s
-- *Prompt preparation time:* 0.978
-- *First-token latency:* 12.8
-- *Cleanup time:* 0.129
+- *Model load time:* 1.19s
+- *Generation time:* 18.30s
+- *Total time:* 20.44s
+- *Prompt preparation time:* 0.949
+- *First-token latency:* 13.6
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 16,565
 - *Generation tokens:* 215
 - *Total tokens:* 16,780
-- *Prompt throughput (raw):* 1,293 tok/s
-- *Generation throughput (raw):* 55.5 tok/s
+- *Prompt throughput (raw):* 1,215 tok/s
+- *Generation throughput (raw):* 56.7 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.0109
+- *Post-cleanup active memory (GB):* 0.0113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2659,22 +2718,22 @@ Blue cabin cruiser, Evenhaze, marina dock, sailboats, leisure boats, calm water,
 - *Maintainer status:* none
 - *Observations:* Names a place the prompt did not supply: Plymouth Devon
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.37s
-- *Generation time:* 5.68s
-- *Total time:* 8.68s
-- *Prompt preparation time:* 0.616
-- *First-token latency:* 0.935
+- *Model load time:* 2.36s
+- *Generation time:* 5.59s
+- *Total time:* 8.58s
+- *Prompt preparation time:* 0.609
+- *First-token latency:* 0.936
 - *Cleanup time:* 0.139
 - *Prompt tokens:* 596
 - *Generation tokens:* 127
 - *Total tokens:* 723
-- *Prompt throughput (raw):* 638 tok/s
-- *Generation throughput (raw):* 30.6 tok/s
+- *Prompt throughput (raw):* 637 tok/s
+- *Generation throughput (raw):* 31.2 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.45
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.012
+- *Post-cleanup active memory (GB):* 0.0123
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2717,22 +2776,22 @@ Keywords: Boat, Cabin cruiser, Motorboat, Mooring, Marina, Dock, Sailboat, Yacht
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: motorboat
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.75s
-- *Generation time:* 1.58s
+- *Model load time:* 1.74s
+- *Generation time:* 1.59s
 - *Total time:* 4.00s
-- *Prompt preparation time:* 0.66
-- *First-token latency:* 0.188
-- *Cleanup time:* 0.116
+- *Prompt preparation time:* 0.669
+- *First-token latency:* 0.187
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 597
 - *Generation tokens:* 93
 - *Total tokens:* 690
-- *Prompt throughput (raw):* 3,183 tok/s
-- *Generation throughput (raw):* 123 tok/s
+- *Prompt throughput (raw):* 3,186 tok/s
+- *Generation throughput (raw):* 122 tok/s
 - *Peak memory (GB):* 5.9
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0147
+- *Post-cleanup active memory (GB):* 0.015
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2774,22 +2833,22 @@ Keywords: Motorboat, Cabin Cruiser, Marina, Dock, Mooring, Boat, Watercraft, Ref
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.86s
-- *Generation time:* 5.55s
-- *Total time:* 8.01s
-- *Prompt preparation time:* 0.594
-- *First-token latency:* 1.94
-- *Cleanup time:* 0.115
+- *Model load time:* 1.81s
+- *Generation time:* 5.67s
+- *Total time:* 8.07s
+- *Prompt preparation time:* 0.588
+- *First-token latency:* 2.11
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 3,125
 - *Generation tokens:* 119
 - *Total tokens:* 3,244
-- *Prompt throughput (raw):* 1,611 tok/s
-- *Generation throughput (raw):* 39.2 tok/s
+- *Prompt throughput (raw):* 1,485 tok/s
+- *Generation throughput (raw):* 39.7 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
 - *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0163
+- *Post-cleanup active memory (GB):* 0.0166
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2835,22 +2894,22 @@ Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.98s
+- *Model load time:* 0.85s
 - *Generation time:* 3.13s
-- *Total time:* 4.88s
-- *Prompt preparation time:* 0.762
-- *First-token latency:* 1.47
-- *Cleanup time:* 0.104
+- *Total time:* 4.73s
+- *Prompt preparation time:* 0.747
+- *First-token latency:* 1.49
+- *Cleanup time:* 0.109
 - *Prompt tokens:* 4,217
 - *Generation tokens:* 118
 - *Total tokens:* 4,335
-- *Prompt throughput (raw):* 2,860 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Prompt throughput (raw):* 2,840 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.72
 - *Model-load active memory (GB):* 3.93
-- *Post-cleanup active memory (GB):* 0.0166
+- *Post-cleanup active memory (GB):* 0.0169
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2894,20 +2953,20 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.80s
-- *Generation time:* 1.47s
-- *Total time:* 3.59s
-- *Prompt preparation time:* 1.31
-- *First-token latency:* 0.106
-- *Cleanup time:* 0.0978
+- *Model load time:* 0.66s
+- *Generation time:* 1.31s
+- *Total time:* 3.11s
+- *Prompt preparation time:* 1.14
+- *First-token latency:* 0.104
+- *Cleanup time:* 0.0865
 - *Prompt tokens:* 341
 - *Generation tokens:* 38
 - *Total tokens:* 379
-- *Prompt throughput (raw):* 3,218 tok/s
-- *Generation throughput (raw):* 338 tok/s
-- *Peak memory (GB):* 2.1
+- *Prompt throughput (raw):* 3,266 tok/s
+- *Generation throughput (raw):* 335 tok/s
+- *Peak memory (GB):* 2.2
 - *Active memory (GB):* 1.2
-- *Cache memory (GB):* 0.02
+- *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
 - *Post-cleanup active memory (GB):* 0.00092
 - *Post-cleanup cache memory (GB):* 0.0
@@ -2947,28 +3006,28 @@ A serene marina scene featuring a blue and light blue motor cabin cruiser moored
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Response repeats the same text; Required labelled fields not
-  detected: title; Response appears cut off at the token limit; Internal
-  reasoning block appears incomplete; Duplicate keywords: dock, marina, calm
-  water, reflections, early evening, blue hull, tan canopy, blue and light
-  blue, marina dock, leisure boats, early evening light, blue and light blue
-  hull, other sailboats, correct conflicts, moored
+  detected: title, description; Response appears cut off at the token limit;
+  Internal reasoning block appears incomplete; Duplicate keywords: boat, boat
+  canopy, boat fender, boating, cabin cruiser, calm water, dock, harbor,
+  marina, mast, nautical, reflection, rope, sailboat, sailing, water
+  reflection, watercraft, mooring, motorboat, yacht wait
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.44s
-- *Generation time:* 17.81s
-- *Total time:* 20.90s
-- *Prompt preparation time:* 0.642
-- *First-token latency:* 0.708
-- *Cleanup time:* 0.134
+- *Model load time:* 2.34s
+- *Generation time:* 17.49s
+- *Total time:* 20.47s
+- *Prompt preparation time:* 0.632
+- *First-token latency:* 0.681
+- *Cleanup time:* 0.123
 - *Prompt tokens:* 1,331
 - *Generation tokens:* 1,000
 - *Total tokens:* 2,331
-- *Prompt throughput (raw):* 1,880 tok/s
-- *Generation throughput (raw):* 61.1 tok/s
+- *Prompt throughput (raw):* 1,955 tok/s
+- *Generation throughput (raw):* 62.1 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00308
+- *Post-cleanup active memory (GB):* 0.00339
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2987,16 +3046,31 @@ A serene marina scene featuring a blue and light blue motor cabin cruiser moored
 <pre class="model-output-readable">
 ◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-09-26 17:36:29 UTC+01:00) and GPS coordinates (50.682100°N, 3.466600°W). The descriptive hints mention a blue and light blue motor cabin cruiser with a tan canopy at a marina, with reflections, early evening light, calm water, and other boats in the background.
 
-The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other vessels and calm water reflections.
+The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other boats, masts, and the marina setting.
 
-Now, for the title: needs to be 5-10 words. Maybe something like "Motor cabin cruiser moored at marina in early evening light."
+For the title, I need a concise 5-10 word British-English title. Maybe something like "Motor cabin cruiser docked at marina with reflections in calm water."
 
-Description: Combine the context and visible details. Mention the boat type, location (marina), time of day (early evening), and distinctive features (tan canopy, blue hull, reflections). So, "A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light."
+For the description, combine the context and visible details: "A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, reflecting in early evening light."
 
-Keywords: Need 10-18 unique, comma-separated. Include boat types (motor cabin cruiser, sailboat, leisure boat, dock, marina, calm water, reflections, early evening, blue hull, tan canopy, blue and light blue), plus the GPS and date/time. Wait, the user said to treat capture date/time and GPS as authoritative but not claim they are visible. So maybe exclude them from keywords. Focus on visible details. So keywords: Motor cabin cruiser, blue hull, light blue, tan canopy, marina dock, sailboats, leisure boats, calm water, reflections, early evening, blue and light blue, blue hull, tan canopy, marina, dock, other boats, water reflection.
-
-Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, "motor cabin cruiser" and "cruise" or "motorboat". Let's list the visible unique elements: blue and light blue hull, tan canopy, marina dock, other boats (sailboats, leisure boats), calm water, reflections, early evening light, blue hull, tan canopy, dock, marina. Maybe 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, blue hull, tan canopy, dock, marina, calm water, other boats. That's 13. Maybe add "moored" as a keyword? But the hint says "moored" is already in hints. Wait the keywords from hints include "Mooring" but the user said to retain details supported by the image, correct conflicts, omit uncertain. The image shows the boat moored, so "moored" is visible. But the hints include "Mooring" so maybe include that. Wait the user said to prefer image evidence over hints. The image shows the boat is moored, so include "moored". But the hints might have "Mooring" which is similar. Let's check the hints: the hints include "Mooring" so maybe include that. But the user says to prefer image evidence. The image shows the boat is moored, so "moored" is visible. So include "moored". But the hints have "Mooring" – perhaps the user wants to use the hint's terms. Wait, the instructions say "retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details." So if the image shows the boat is moored, then "moored" is a visible detail, so include it. But the hints have "Mooring" which is similar. Maybe use "moored" instead. Let's list keywords: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. Wait, need to make sure 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. That's 14. Maybe combine "blue hull" and "blue and light
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. Need to check if all are relevant. "Boat fender" might not be visible, but the image has blue fenders. Wait, the boat has blue fenders. So include that. Also, "Harbor" instead of Marina? Wait, the hint says Marina. So use Marina. Also, "Yacht" is a type of boat, but "Motorboat" is in the hints. Maybe include "Motorboat" as per the context. Let's check the context's keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. So use those. Need to pick 10-18 unique ones. Let's list them: Boat, Boat canopy, Boat fender, Boat, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. Wait, Boat and Boat are repeated. Maybe remove duplicates. So: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 11 keywords. Maybe add Dock and Marina. Let me count again. The description mentions Marina, Dock, so include those. The boat has a tan canopy, so Boat canopy. The fenders are blue, so Boat fender. The setting is a Marina. The boat is a Cabin cruiser. The water is calm, so Calm Water. The background has other boats, so Sailboat. Reflections, Water reflection. So the keywords would be: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. Wait, maybe "Mooring" is in the hints but not visible. The boat is moored, so maybe include Mooring. But is it visible? The image shows it's moored at the dock, so yes. So add Mooring. Then the keywords would be: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Mooring, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 12. Maybe too many? Wait, the user said 10-18, so 12 is okay. Let me check again. The context's hints include Marina, Dock, Mast, Sailboat, etc. The image has Masts from other boats. So Mast could be included. So maybe add Mast. So updated keywords: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Mooring, Mast, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 13. Maybe that's acceptable. Now, the title: "Motor cabin cruiser docked at marina with reflections in calm water." Factual description: "A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-09-26 17:36:29 UTC+01:00) and GPS coordinates (50.682100°N, 3.466600°W). The descriptive hints mention a blue and light blue motor cabin cruiser with a tan canopy at a marina, with reflections, early evening light, calm water, and other boats in the background.
+
+The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other boats, masts, and the marina setting.
+
+For the title, I need a concise 5-10 word British-English title. Maybe something like "Motor cabin cruiser docked at marina with reflections in calm water." 
+
+For the description, combine the context and visible details: "A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, reflecting in early evening light." 
+
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. Need to check if all are relevant. "Boat fender" might not be visible, but the image has blue fenders. Wait, the boat has blue fenders. So include that. Also, "Harbor" instead of Marina? Wait, the hint says Marina. So use Marina. Also, "Yacht" is a type of boat, but "Motorboat" is in the hints. Maybe include "Motorboat" as per the context. Let's check the context's keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. So use those. Need to pick 10-18 unique ones. Let's list them: Boat, Boat canopy, Boat fender, Boat, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. Wait, Boat and Boat are repeated. Maybe remove duplicates. So: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 11 keywords. Maybe add Dock and Marina. Let me count again. The description mentions Marina, Dock, so include those. The boat has a tan canopy, so Boat canopy. The fenders are blue, so Boat fender. The setting is a Marina. The boat is a Cabin cruiser. The water is calm, so Calm Water. The background has other boats, so Sailboat. Reflections, Water reflection. So the keywords would be: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. Wait, maybe "Mooring" is in the hints but not visible. The boat is moored, so maybe include Mooring. But is it visible? The image shows it's moored at the dock, so yes. So add Mooring. Then the keywords would be: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Mooring, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 12. Maybe too many? Wait, the user said 10-18, so 12 is okay. Let me check again. The context's hints include Marina, Dock, Mast, Sailboat, etc. The image has Masts from other boats. So Mast could be included. So maybe add Mast. So updated keywords: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Mooring, Mast, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 13. Maybe that's acceptable. Now, the title: "Motor cabin cruiser docked at marina with reflections in calm water." Factual description: "A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water
+```
+
+</details>
 
 </details>
 
@@ -3016,22 +3090,22 @@ Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, 
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.20s
-- *Generation time:* 1.79s
-- *Total time:* 3.75s
-- *Prompt preparation time:* 0.753
-- *First-token latency:* 0.484
-- *Cleanup time:* 0.0934
+- *Model load time:* 1.22s
+- *Generation time:* 1.77s
+- *Total time:* 3.73s
+- *Prompt preparation time:* 0.739
+- *First-token latency:* 0.473
+- *Cleanup time:* 0.0937
 - *Prompt tokens:* 2,115
 - *Generation tokens:* 122
 - *Total tokens:* 2,237
-- *Prompt throughput (raw):* 4,367 tok/s
-- *Generation throughput (raw):* 205 tok/s
+- *Prompt throughput (raw):* 4,468 tok/s
+- *Generation throughput (raw):* 210 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 2.81
-- *Post-cleanup active memory (GB):* 0.00336
+- *Model-load active memory (GB):* 2.82
+- *Post-cleanup active memory (GB):* 0.00367
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3071,24 +3145,25 @@ Description: A blue and light blue motor cabin cruiser with a tan canopy is moor
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible
+  at the token limit; Conversation-role control tokens remain visible;
+  Duplicate keywords: setting, action, lighting
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.32s
-- *Generation time:* 55.30s
-- *Total time:* 59.37s
-- *Prompt preparation time:* 0.731
-- *First-token latency:* 9.72
-- *Cleanup time:* 0.23
+- *Model load time:* 3.26s
+- *Generation time:* 57.12s
+- *Total time:* 61.12s
+- *Prompt preparation time:* 0.729
+- *First-token latency:* 8.93
+- *Cleanup time:* 0.22
 - *Prompt tokens:* 4,410
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,410
-- *Prompt throughput (raw):* 454 tok/s
-- *Generation throughput (raw):* 22.3 tok/s
+- *Prompt throughput (raw):* 494 tok/s
+- *Generation throughput (raw):* 21.1 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00595
+- *Post-cleanup active memory (GB):* 0.00626
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -3129,41 +3204,37 @@ Keywords:
 
 We need title 5-10 words. Concrete.
 
-Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention? Possibly include in description? Might be metadata. Probably include date/time? The description should combine relevant context with main visible subject... Could mention captured on 2026-09-26. Could include GPS? Maybe not necessary. Probably mention location? GPS is 50.682100°N, 3.466600°W. That's near... maybe Exmouth? That's Devon. Could just say at marina. Might be okay to include date.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention date/time? Probably include in description? Might be metadata. Could mention captured on 2026-09-26... Might be okay. It says combining relevant context with main visible subject. So maybe include location? GPS coordinates. But do not claim they are visible. So we can say captured at... GPS... The description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could include time. Probably safe to mention capture date/time.
 
-Do not claim they are visible. So we cannot say "the image shows date". We can say "captured on...". That's fine.
+We must not claim they are visible. So don't say "visible GPS". Just state fact.
 
-Distinctive details: boat named EVENHAZE, blue hull with red boot stripe, light blue superstructure, tan bimini canopy, blue fenders, moored at wooden dock, sailboats behind, calm water reflection, late afternoon light.
+Need British-English.
 
-Early evening light hint. Capture time 17:36:29 UTC+01:00 = 5:36pm, so late afternoon/early evening.
+Title: maybe "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
 
-Title: 5-10 words. Eg "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
+Description: Need 1-2 sentence. Include boat named Evenhaze? In image name visible "EVENHAZE". So yes. Blue hull with red boot stripe, light blue superstructure, tan canvas canopy. Moored alongside wooden dock with sailboats behind. Calm water with reflections. Capture date/time 2026-09-26 17:36:29 UTC+01:00. GPS 50.682100°N, 3.466600°W. Lighting is late afternoon sun.
 
-Description: 1-2 sentence. Should be factual. Include capture date/time and GPS? Might be relevant context. Could say "Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the motor cabin cruiser Evenhaze..." That might be okay. Not claiming visible.
+We must not claim GPS is visible. So just state.
 
-Make sure British-English: moor, etc. Use British spelling.
+Maybe: "Motor cabin cruiser Evenhaze, with a dark blue hull, white superstructure and tan canvas canopy, is moored at a wooden marina pontoon alongside sailboats on calm water at 50.682100°N, 3.466600°W, captured on 2026-09-26 17:36:29 UTC+01:00 in late afternoon light with clear reflections." That's one sentence long.
 
-Keywords: 10-18 unique comma-separated. Use hints but also add visible details: Evenhaze, blue hull, red boot stripe, tan canopy, etc. Use keywords list.
+Ensure factual. Distinctive details: blue fenders, wooden oar? The wooden pole on cabin.
 
-Let's craft.
+Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use British English spelling. Keywords hints list. Use items: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbour, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. But need unique. Also maybe "Evenhaze", "blue hull", "tan bimini". Keep to hints.
 
-Title: Blue Cabin Cruiser Evenhaze Moored at Marina Dock
+Provide 10-18 keywords. Let's pick ~15.
 
-That's 8 words.
+Keywords: Cabin cruiser, Motorboat, Marina, Dock, Mooring, Sailboat, Boat canopy, Boat fender, Calm water, Water reflection, Nautical, Harbour, Mast, Rope, Evenhaze
 
-Description: Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the blue-hulled motor cabin cruiser Evenhaze with a tan sprayhood is moored alongside a wooden pontoon in a busy marina. It sits among sailboats and leisure craft on calm water in late afternoon light, with clear reflections and blue fenders visible along its hull.
+Ensure comma separated.
 
-That's two sentences. Good.
+Return exactly three sections.
 
-Keywords: maybe 13-15 items.
+Make sure title line "Title:" then text. Description: ... Keywords: ...
 
-Boat, Motor cabin cruiser, Evenhaze, Blue hull, Tan canopy, Marina, Dock, Mooring, Sailboat, Calm water, Reflection, Fenders, Pontoon, Nautical
+No extra text.
 
-Need comma-separated. Unique.
-
-Ensure 10-18. Let's produce 15.
-
-Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sprayhood, Marina, Dock, Pontoon, Mooring, Sailboat, Calm water, Water
+Check word count title 5-10 words. Let's count: Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(
 </pre>
 
 <details>
@@ -3194,41 +3265,37 @@ Keywords:
 
 We need title 5-10 words. Concrete.
 
-Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention? Possibly include in description? Might be metadata. Probably include date/time? The description should combine relevant context with main visible subject... Could mention captured on 2026-09-26. Could include GPS? Maybe not necessary. Probably mention location? GPS is 50.682100°N, 3.466600°W. That's near... maybe Exmouth? That's Devon. Could just say at marina. Might be okay to include date.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention date/time? Probably include in description? Might be metadata. Could mention captured on 2026-09-26... Might be okay. It says combining relevant context with main visible subject. So maybe include location? GPS coordinates. But do not claim they are visible. So we can say captured at... GPS... The description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could include time. Probably safe to mention capture date/time.
 
-Do not claim they are visible. So we cannot say "the image shows date". We can say "captured on...". That's fine.
+We must not claim they are visible. So don't say "visible GPS". Just state fact.
 
-Distinctive details: boat named EVENHAZE, blue hull with red boot stripe, light blue superstructure, tan bimini canopy, blue fenders, moored at wooden dock, sailboats behind, calm water reflection, late afternoon light.
+Need British-English.
 
-Early evening light hint. Capture time 17:36:29 UTC+01:00 = 5:36pm, so late afternoon/early evening.
+Title: maybe "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
 
-Title: 5-10 words. Eg "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
+Description: Need 1-2 sentence. Include boat named Evenhaze? In image name visible "EVENHAZE". So yes. Blue hull with red boot stripe, light blue superstructure, tan canvas canopy. Moored alongside wooden dock with sailboats behind. Calm water with reflections. Capture date/time 2026-09-26 17:36:29 UTC+01:00. GPS 50.682100°N, 3.466600°W. Lighting is late afternoon sun.
 
-Description: 1-2 sentence. Should be factual. Include capture date/time and GPS? Might be relevant context. Could say "Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the motor cabin cruiser Evenhaze..." That might be okay. Not claiming visible.
+We must not claim GPS is visible. So just state.
 
-Make sure British-English: moor, etc. Use British spelling.
+Maybe: "Motor cabin cruiser Evenhaze, with a dark blue hull, white superstructure and tan canvas canopy, is moored at a wooden marina pontoon alongside sailboats on calm water at 50.682100°N, 3.466600°W, captured on 2026-09-26 17:36:29 UTC+01:00 in late afternoon light with clear reflections." That's one sentence long.
 
-Keywords: 10-18 unique comma-separated. Use hints but also add visible details: Evenhaze, blue hull, red boot stripe, tan canopy, etc. Use keywords list.
+Ensure factual. Distinctive details: blue fenders, wooden oar? The wooden pole on cabin.
 
-Let's craft.
+Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use British English spelling. Keywords hints list. Use items: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbour, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. But need unique. Also maybe "Evenhaze", "blue hull", "tan bimini". Keep to hints.
 
-Title: Blue Cabin Cruiser Evenhaze Moored at Marina Dock
+Provide 10-18 keywords. Let's pick ~15.
 
-That's 8 words.
+Keywords: Cabin cruiser, Motorboat, Marina, Dock, Mooring, Sailboat, Boat canopy, Boat fender, Calm water, Water reflection, Nautical, Harbour, Mast, Rope, Evenhaze
 
-Description: Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the blue-hulled motor cabin cruiser Evenhaze with a tan sprayhood is moored alongside a wooden pontoon in a busy marina. It sits among sailboats and leisure craft on calm water in late afternoon light, with clear reflections and blue fenders visible along its hull.
+Ensure comma separated.
 
-That's two sentences. Good.
+Return exactly three sections.
 
-Keywords: maybe 13-15 items.
+Make sure title line "Title:" then text. Description: ... Keywords: ...
 
-Boat, Motor cabin cruiser, Evenhaze, Blue hull, Tan canopy, Marina, Dock, Mooring, Sailboat, Calm water, Reflection, Fenders, Pontoon, Nautical
+No extra text.
 
-Need comma-separated. Unique.
-
-Ensure 10-18. Let's produce 15.
-
-Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sprayhood, Marina, Dock, Pontoon, Mooring, Sailboat, Calm water, Water
+Check word count title 5-10 words. Let's count: Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(
 ```
 
 </details>
@@ -3252,22 +3319,22 @@ Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sp
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.48s
-- *Generation time:* 1.12s
-- *Total time:* 2.52s
-- *Prompt preparation time:* 0.912
-- *First-token latency:* 0.124
-- *Cleanup time:* 0.0878
+- *Model load time:* 0.36s
+- *Generation time:* 1.10s
+- *Total time:* 2.37s
+- *Prompt preparation time:* 0.907
+- *First-token latency:* 0.12
+- *Cleanup time:* 0.0827
 - *Prompt tokens:* 1,217
 - *Generation tokens:* 39
 - *Total tokens:* 1,256
-- *Prompt throughput (raw):* 9,847 tok/s
-- *Generation throughput (raw):* 311 tok/s
+- *Prompt throughput (raw):* 10,174 tok/s
+- *Generation throughput (raw):* 325 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
 - *Model-load active memory (GB):* 0.16
-- *Post-cleanup active memory (GB):* 0.0103
+- *Post-cleanup active memory (GB):* 0.0106
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3307,22 +3374,22 @@ Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sp
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.74s
-- *Generation time:* 2.49s
-- *Total time:* 4.85s
-- *Prompt preparation time:* 0.607
-- *First-token latency:* 0.302
-- *Cleanup time:* 0.124
+- *Model load time:* 1.71s
+- *Generation time:* 2.78s
+- *Total time:* 5.10s
+- *Prompt preparation time:* 0.587
+- *First-token latency:* 0.306
+- *Cleanup time:* 0.116
 - *Prompt tokens:* 595
-- *Generation tokens:* 114
-- *Total tokens:* 709
-- *Prompt throughput (raw):* 1,969 tok/s
-- *Generation throughput (raw):* 71.3 tok/s
+- *Generation tokens:* 135
+- *Total tokens:* 730
+- *Prompt throughput (raw):* 1,944 tok/s
+- *Generation throughput (raw):* 70.8 tok/s
 - *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
-- *Cache memory (GB):* 0.04
+- *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
-- *Post-cleanup active memory (GB):* 0.0126
+- *Post-cleanup active memory (GB):* 0.0129
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3340,7 +3407,7 @@ Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sp
 *Readable output:*
 
 <pre class="model-output-readable">
-A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and motorboats on calm water, reflecting the warm light of the early evening sun. The boat is positioned in the foreground, with its reflection clearly visible on the water's surface. The dock is made of weathered wood and concrete, and the surrounding water is a deep blue. Other boats of various sizes and colors are visible in the background, adding to the marina setting. The overall scene is peaceful and serene, capturing a moment of calm in the harbor.
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and motorboats on calm water, reflecting the warm light of the early evening sun. The boat is primarily blue with a light blue cabin, a tan canvas canopy, and a red stripe along the waterline. It has a wooden deck and a small mast. The dock is made of weathered wood and concrete, and the water is a deep blue, reflecting the boat and the surrounding marina. Other boats of various sizes and colors are visible in the background, along with the masts of sailboats. The overall scene is peaceful and serene, capturing a moment in a bustling harbor.
 </pre>
 
 </details>
@@ -3361,22 +3428,22 @@ A blue and light blue motor cabin cruiser with a tan canopy is moored at a marin
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: description
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.44s
-- *Generation time:* 4.37s
-- *Total time:* 5.68s
-- *Prompt preparation time:* 0.875
-- *First-token latency:* 2.89
-- *Cleanup time:* 0.0943
+- *Model load time:* 0.43s
+- *Generation time:* 4.67s
+- *Total time:* 6.01s
+- *Prompt preparation time:* 0.908
+- *First-token latency:* 3.21
+- *Cleanup time:* 0.0934
 - *Prompt tokens:* 5,666
 - *Generation tokens:* 82
 - *Total tokens:* 5,748
-- *Prompt throughput (raw):* 1,957 tok/s
-- *Generation throughput (raw):* 128 tok/s
+- *Prompt throughput (raw):* 1,765 tok/s
+- *Generation throughput (raw):* 130 tok/s
 - *Peak memory (GB):* 4.4
 - *Active memory (GB):* 2.4
 - *Cache memory (GB):* 1.3
 - *Model-load active memory (GB):* 2.36
-- *Post-cleanup active memory (GB):* 0.015
+- *Post-cleanup active memory (GB):* 0.0153
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3417,22 +3484,22 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.17s
-- *Generation time:* 1.70s
-- *Total time:* 3.60s
-- *Prompt preparation time:* 0.722
-- *First-token latency:* 0.827
-- *Cleanup time:* 0.168
+- *Model load time:* 1.19s
+- *Generation time:* 1.69s
+- *Total time:* 3.62s
+- *Prompt preparation time:* 0.731
+- *First-token latency:* 0.831
+- *Cleanup time:* 0.183
 - *Prompt tokens:* 2,201
 - *Generation tokens:* 18
 - *Total tokens:* 2,219
-- *Prompt throughput (raw):* 2,661 tok/s
-- *Generation throughput (raw):* 105 tok/s
+- *Prompt throughput (raw):* 2,648 tok/s
+- *Generation throughput (raw):* 107 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.7
-- *Post-cleanup active memory (GB):* 0.0154
+- *Post-cleanup active memory (GB):* 0.0157
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3482,22 +3549,22 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.56s
-- *Generation time:* 0.83s
-- *Total time:* 2.05s
-- *Prompt preparation time:* 0.661
-- *First-token latency:* 0.087
-- *Cleanup time:* 0.1
+- *Model load time:* 0.52s
+- *Generation time:* 0.82s
+- *Total time:* 2.00s
+- *Prompt preparation time:* 0.653
+- *First-token latency:* 0.0936
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 337
 - *Generation tokens:* 23
 - *Total tokens:* 360
-- *Prompt throughput (raw):* 3,875 tok/s
-- *Generation throughput (raw):* 208 tok/s
+- *Prompt throughput (raw):* 3,599 tok/s
+- *Generation throughput (raw):* 207 tok/s
 - *Peak memory (GB):* 1.8
-- *Active memory (GB):* 0.61
+- *Active memory (GB):* 0.62
 - *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 0.614
-- *Post-cleanup active memory (GB):* 0.016
+- *Post-cleanup active memory (GB):* 0.0163
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000

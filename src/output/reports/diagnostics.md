@@ -20,9 +20,9 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 50    |
-| Conclusive outcomes | 50    |
-| Completed           | 50    |
+| Attempted           | 51    |
+| Conclusive outcomes | 51    |
+| Completed           | 51    |
 | Crashed             | 0     |
 | Indeterminate       | 0     |
 
@@ -30,7 +30,7 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 47    |
+| none                           | 48    |
 | observation needs reproduction | 3     |
 
 Mechanical-check counts
@@ -38,7 +38,7 @@ Mechanical-check counts
 | Mechanical checks    | Count |
 |----------------------|-------|
 | major concerns       | 9     |
-| no concerns detected | 27    |
+| no concerns detected | 28    |
 | concerns detected    | 14    |
 
 Observation counts
@@ -51,17 +51,17 @@ Observation counts
 | Response appears cut off at the token limit                               | 2     |
 | Internal reasoning block appears incomplete                               | 1     |
 | Conversation-role control tokens remain visible                           | 1     |
-| Repeated keyword entries                                                  | 4     |
+| Repeated keyword entries                                                  | 5     |
 | Output repeats the prompt's own hint text instead of describing the image | 11    |
 | Names a place the prompt did not supply                                   | 1     |
 
 ## Triage
 
-| Model                                                                                                    | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                       |
-|----------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | completed | major concerns    | observation needs reproduction | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                               |
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)       | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                  |
+| Model                                                                                                    | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                          |
+|----------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | completed | major concerns    | observation needs reproduction | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords    |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                                  |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)       | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
 
 ## Crashes requiring action
 
@@ -87,22 +87,22 @@ None.
   token_cap_truncation, thinking_trace_incomplete, duplicate_keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
 - *Family README in installed mlx-vlm:* none
-- *Labelled fields not detected:* ["title"]
-- *Repeated fragment:* keyword: "tan canopy"
+- *Labelled fields not detected:* ["title", "description"]
+- *Repeated fragment:* keyword: "dock"
 - *Thinking trace markers:* ["\u25c1think\u25b7"]
-- *Keyword count:* 100
-- *Keywords taken verbatim from the prompt's keyword hints:* 5
-- *Duplicate keywords:* ["dock", "marina", "calm water", "reflections", "early
-  evening", "blue hull", "tan canopy", "blue and light blue", "marina dock",
-  "leisure boats", "early evening light", "blue and light blue hull", "other
-  sailboats", "correct conflicts", "moored"]
+- *Keyword count:* 126
+- *Keywords taken verbatim from the prompt's keyword hints:* 19
+- *Duplicate keywords:* ["boat", "boat canopy", "boat fender", "boating",
+  "cabin cruiser", "calm water", "dock", "harbor", "marina", "mast",
+  "nautical", "reflection", "rope", "sailboat", "sailing", "water reflection",
+  "watercraft", "mooring", "motorboat", "yacht wait"]
 - *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
-  "incomplete_thinking_trace"]
+  "incomplete_thinking_trace", "unfinished_list"]
 - *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.426
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.373
 - *Peak memory at first token (GB):* 20.067
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.6
@@ -132,15 +132,13 @@ None.
 ```text
 ◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-09-26 17:36:29 UTC+01:00) and GPS coordinates (50.682100°N, 3.466600°W). The descriptive hints mention a blue and light blue motor cabin cruiser with a tan canopy at a marina, with reflections, early evening light, calm water, and other boats in the background.
 
-The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other vessels and calm water reflections.
+The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other boats, masts, and the marina setting.
 
-Now, for the title: needs to be 5-10 words. Maybe something like "Motor cabin cruiser moored at marina in early evening light."
+For the title, I need a concise 5-10 word British-English title. Maybe something like "Motor cabin cruiser docked at marina with reflections in calm water." 
 
-Description: Combine the context and visible details. Mention the boat type, location (marina), time of day (early evening), and distinctive features (tan canopy, blue hull, reflections). So, "A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light."
+For the description, combine the context and visible details: "A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, reflecting in early evening light." 
 
-Keywords: Need 10-18 unique, comma-separated. Include boat types (motor cabin cruiser, sailboat, leisure boat, dock, marina, calm water, reflections, early evening, blue hull, tan canopy, blue and light blue), plus the GPS and date/time. Wait, the user said to treat capture date/time and GPS as authoritative but not claim they are visible. So maybe exclude them from keywords. Focus on visible details. So keywords: Motor cabin cruiser, blue hull, light blue, tan canopy, marina dock, sailboats, leisure boats, calm water, reflections, early evening, blue and light blue, blue hull, tan canopy, marina, dock, other boats, water reflection.
-
-Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, "motor cabin cruiser" and "cruise" or "motorboat". Let's list the visible unique elements: blue and light blue hull, tan canopy, marina dock, other boats (sailboats, leisure boats), calm water, reflections, early evening light, blue hull, tan canopy, dock, marina. Maybe 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, blue hull, tan canopy, dock, marina, calm water, other boats. That's 13. Maybe add "moored" as a keyword? But the hint says "moored" is already in hints. Wait the keywords from hints include "Mooring" but the user said to retain details supported by the image, correct conflicts, omit uncertain. The image shows the boat moored, so "moored" is visible. But the hints include "Mooring" so maybe include that. Wait the user said to prefer image evidence over hints. The image shows the boat is moored, so include "moored". But the hints might have "Mooring" which is similar. Let's check the hints: the hints include "Mooring" so maybe include that. But the user says to prefer image evidence. The image shows the boat is moored, so "moored" is visible. So include "moored". But the hints have "Mooring" – perhaps the user wants to use the hint's terms. Wait, the instructions say "retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details." So if the image shows the boat is moored, then "moored" is a visible detail, so include it. But the hints have "Mooring" which is similar. Maybe use "moored" instead. Let's list keywords: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. Wait, need to make sure 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. That's 14. Maybe combine "blue hull" and "blue and light
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. Need to check if all are relevant. "Boat fender" might not be visible, but the image has blue fenders. Wait, the boat has blue fenders. So include that. Also, "Harbor" instead of Marina? Wait, the hint says Marina. So use Marina. Also, "Yacht" is a type of boat, but "Motorboat" is in the hints. Maybe include "Motorboat" as per the context. Let's check the context's keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. So use those. Need to pick 10-18 unique ones. Let's list them: Boat, Boat canopy, Boat fender, Boat, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. Wait, Boat and Boat are repeated. Maybe remove duplicates. So: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 11 keywords. Maybe add Dock and Marina. Let me count again. The description mentions Marina, Dock, so include those. The boat has a tan canopy, so Boat canopy. The fenders are blue, so Boat fender. The setting is a Marina. The boat is a Cabin cruiser. The water is calm, so Calm Water. The background has other boats, so Sailboat. Reflections, Water reflection. So the keywords would be: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. Wait, maybe "Mooring" is in the hints but not visible. The boat is moored, so maybe include Mooring. But is it visible? The image shows it's moored at the dock, so yes. So add Mooring. Then the keywords would be: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Mooring, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 12. Maybe too many? Wait, the user said 10-18, so 12 is okay. Let me check again. The context's hints include Marina, Dock, Mast, Sailboat, etc. The image has Masts from other boats. So Mast could be included. So maybe add Mast. So updated keywords: Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Mooring, Mast, Nautical, Reflection, Sailboat, Water reflection, Watercraft, Yacht. That's 13. Maybe that's acceptable. Now, the title: "Motor cabin cruiser docked at marina with reflections in calm water." Factual description: "A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water
 ```
 
 </details>
@@ -168,11 +166,11 @@ Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, 
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.528
-- *Peak memory at first token (GB):* 6.729
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.521
+- *Peak memory at first token (GB):* 6.73
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.015
+- *Post-cleanup active memory (GB):* 0.016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2201
 - *Prompt composition:* 2,201 = 409 text/template + 1,792 image tokens (81%;
@@ -200,7 +198,7 @@ Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, 
 <a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
 <details>
-<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — major concerns — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible</summary>
+<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — major concerns — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords</summary>
 
 ### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
@@ -212,23 +210,24 @@ Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, 
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_special_token, role_boundary_token_present
+  unexpected_special_token, role_boundary_token_present, duplicate_keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description"]
 - *Unexpected special tokens:* ["&lt;|message|&gt;"]
 - *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
 - *Title word count:* 0
-- *Keyword count:* 20
+- *Keyword count:* 13
 - *Keywords taken verbatim from the prompt's keyword hints:* 0
-- *Token-cap degradation evidence:* ["missing_sections", "unfinished_list"]
+- *Duplicate keywords:* ["setting", "action", "lighting"]
+- *Token-cap degradation evidence:* ["missing_sections"]
 - *Special tokens emitted (by token id):* ["&lt;|message|&gt;"]
 - *Resolved model revision:* 98377360cbc84f982e90336f956b08adb46cad88
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 10.404
-- *Peak memory at first token (GB):* 25.464
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.616
+- *Peak memory at first token (GB):* 25.465
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
@@ -281,41 +280,37 @@ Keywords:
 
 We need title 5-10 words. Concrete.
 
-Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention? Possibly include in description? Might be metadata. Probably include date/time? The description should combine relevant context with main visible subject... Could mention captured on 2026-09-26. Could include GPS? Maybe not necessary. Probably mention location? GPS is 50.682100°N, 3.466600°W. That's near... maybe Exmouth? That's Devon. Could just say at marina. Might be okay to include date.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention date/time? Probably include in description? Might be metadata. Could mention captured on 2026-09-26... Might be okay. It says combining relevant context with main visible subject. So maybe include location? GPS coordinates. But do not claim they are visible. So we can say captured at... GPS... The description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could include time. Probably safe to mention capture date/time.
 
-Do not claim they are visible. So we cannot say "the image shows date". We can say "captured on...". That's fine.
+We must not claim they are visible. So don't say "visible GPS". Just state fact.
 
-Distinctive details: boat named EVENHAZE, blue hull with red boot stripe, light blue superstructure, tan bimini canopy, blue fenders, moored at wooden dock, sailboats behind, calm water reflection, late afternoon light.
+Need British-English.
 
-Early evening light hint. Capture time 17:36:29 UTC+01:00 = 5:36pm, so late afternoon/early evening.
+Title: maybe "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
 
-Title: 5-10 words. Eg "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
+Description: Need 1-2 sentence. Include boat named Evenhaze? In image name visible "EVENHAZE". So yes. Blue hull with red boot stripe, light blue superstructure, tan canvas canopy. Moored alongside wooden dock with sailboats behind. Calm water with reflections. Capture date/time 2026-09-26 17:36:29 UTC+01:00. GPS 50.682100°N, 3.466600°W. Lighting is late afternoon sun.
 
-Description: 1-2 sentence. Should be factual. Include capture date/time and GPS? Might be relevant context. Could say "Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the motor cabin cruiser Evenhaze..." That might be okay. Not claiming visible.
+We must not claim GPS is visible. So just state.
 
-Make sure British-English: moor, etc. Use British spelling.
+Maybe: "Motor cabin cruiser Evenhaze, with a dark blue hull, white superstructure and tan canvas canopy, is moored at a wooden marina pontoon alongside sailboats on calm water at 50.682100°N, 3.466600°W, captured on 2026-09-26 17:36:29 UTC+01:00 in late afternoon light with clear reflections." That's one sentence long.
 
-Keywords: 10-18 unique comma-separated. Use hints but also add visible details: Evenhaze, blue hull, red boot stripe, tan canopy, etc. Use keywords list.
+Ensure factual. Distinctive details: blue fenders, wooden oar? The wooden pole on cabin.
 
-Let's craft.
+Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use British English spelling. Keywords hints list. Use items: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbour, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht. But need unique. Also maybe "Evenhaze", "blue hull", "tan bimini". Keep to hints.
 
-Title: Blue Cabin Cruiser Evenhaze Moored at Marina Dock
+Provide 10-18 keywords. Let's pick ~15.
 
-That's 8 words.
+Keywords: Cabin cruiser, Motorboat, Marina, Dock, Mooring, Sailboat, Boat canopy, Boat fender, Calm water, Water reflection, Nautical, Harbour, Mast, Rope, Evenhaze
 
-Description: Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the blue-hulled motor cabin cruiser Evenhaze with a tan sprayhood is moored alongside a wooden pontoon in a busy marina. It sits among sailboats and leisure craft on calm water in late afternoon light, with clear reflections and blue fenders visible along its hull.
+Ensure comma separated.
 
-That's two sentences. Good.
+Return exactly three sections.
 
-Keywords: maybe 13-15 items.
+Make sure title line "Title:" then text. Description: ... Keywords: ...
 
-Boat, Motor cabin cruiser, Evenhaze, Blue hull, Tan canopy, Marina, Dock, Mooring, Sailboat, Calm water, Reflection, Fenders, Pontoon, Nautical
+No extra text.
 
-Need comma-separated. Unique.
-
-Ensure 10-18. Let's produce 15.
-
-Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sprayhood, Marina, Dock, Pontoon, Mooring, Sailboat, Calm water, Water
+Check word count title 5-10 words. Let's count: Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(
 ```
 
 </details>
@@ -360,33 +355,34 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                           |
 |-------------------------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------|
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2098 prompt / 143 generated; 99.4 tok/s; 6.5 GB peak  |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 597 prompt / 81 generated; 52.9 tok/s; 28 GB peak     |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2098 prompt / 143 generated; 102 tok/s; 6.5 GB peak   |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 597 prompt / 81 generated; 59.0 tok/s; 28 GB peak     |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1646 prompt / 540 generated; 108 tok/s; 19 GB peak    |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 601 prompt / 112 generated; 60.7 tok/s; 7.6 GB peak   |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 601 prompt / 106 generated; 109 tok/s; 16 GB peak     |
-| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 601 prompt / 113 generated; 25.2 tok/s; 20 GB peak    |
-| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1384 prompt / 91 generated; 169 tok/s; 4.6 GB peak    |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2120 prompt / 103 generated; 55.2 tok/s; 10 GB peak   |
-| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2120 prompt / 79 generated; 36.1 tok/s; 17 GB peak    |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 601 prompt / 112 generated; 60.2 tok/s; 7.6 GB peak   |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 601 prompt / 106 generated; 106 tok/s; 16 GB peak     |
+| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 601 prompt / 113 generated; 25.3 tok/s; 20 GB peak    |
+| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1384 prompt / 97 generated; 161 tok/s; 4.6 GB peak    |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2120 prompt / 103 generated; 55.9 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2120 prompt / 79 generated; 36.8 tok/s; 17 GB peak    |
+| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2123 prompt / 159 generated; 335 tok/s; 2.1 GB peak   |
 | mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 309 prompt / 114 generated; 21.6 tok/s; 15 GB peak    |
 | mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 398 prompt / 93 generated; 105 tok/s; 7.0 GB peak     |
-| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 938 prompt / 564 generated; 232 tok/s; 3.3 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2935 prompt / 199 generated; 65.9 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2934 prompt / 121 generated; 187 tok/s; 7.8 GB peak   |
-| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1531 prompt / 181 generated; 71.6 tok/s; 8.2 GB peak  |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4091 prompt / 108 generated; 153 tok/s; 3.9 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1295 prompt / 130 generated; 75.0 tok/s; 24 GB peak   |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 938 prompt / 564 generated; 239 tok/s; 3.2 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2935 prompt / 199 generated; 64.6 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2934 prompt / 121 generated; 186 tok/s; 7.8 GB peak   |
+| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1531 prompt / 181 generated; 71.9 tok/s; 8.5 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4091 prompt / 108 generated; 155 tok/s; 3.9 GB peak   |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1295 prompt / 130 generated; 74.4 tok/s; 24 GB peak   |
 | mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16556 prompt / 901 generated; 80.5 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16554 prompt / 168 generated; 68.4 tok/s; 23 GB peak  |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16554 prompt / 168 generated; 74.4 tok/s; 23 GB peak  |
 | mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16554 prompt / 190 generated; 18.6 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16554 prompt / 120 generated; 66.6 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16569 prompt / 123 generated; 72.5 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16569 prompt / 111 generated; 88.2 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16569 prompt / 128 generated; 27.6 tok/s; 21 GB peak  |
-| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16566 prompt / 123 generated; 86.3 tok/s; 11 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16554 prompt / 120 generated; 67.5 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16569 prompt / 123 generated; 75.2 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16569 prompt / 111 generated; 89.8 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16569 prompt / 128 generated; 27.5 tok/s; 21 GB peak  |
+| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16566 prompt / 123 generated; 85.3 tok/s; 11 GB peak  |
 | nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1281 prompt / 144 generated; 36.2 tok/s; 18 GB peak   |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3636 prompt / 120 generated; 130 tok/s; 23 GB peak    |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3636 prompt / 124 generated; 127 tok/s; 23 GB peak    |
 
 </details>
 
@@ -483,17 +479,17 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.7.3                                                                                                                                           |
-| mlx-vlm source revision    | 967bf90b8e7ae6e5110b6da87134f30d94591d2e                                                                                                        |
-| mlx                        | 0.32.3.dev20260927+02ce1fb6a                                                                                                                    |
-| mlx source revision        | 02ce1fb6a                                                                                                                                       |
-| mlx-audio                  | 0.5.6                                                                                                                                           |
-| transformers               | 5.17.0                                                                                                                                          |
+| mlx-vlm                    | 0.7.4                                                                                                                                           |
+| mlx-vlm source revision    | 66e68ce36816cb5134acba3b0d72c6271f35ba24                                                                                                        |
+| mlx                        | 0.32.4.dev20261002+255328713                                                                                                                    |
+| mlx source revision        | 255328713                                                                                                                                       |
+| mlx-audio                  | 0.5.7                                                                                                                                           |
+| transformers               | 5.18.0                                                                                                                                          |
 | tokenizers                 | 0.23.2                                                                                                                                          |
 | huggingface-hub            | 1.33.0                                                                                                                                          |
 | Python Version             | 3.14.7                                                                                                                                          |
 | OS                         | Darwin 27.0.0                                                                                                                                   |
-| macOS Version              | 27.0                                                                                                                                            |
+| macOS Version              | 27.0.1                                                                                                                                          |
 | SDK Version                | 27.0                                                                                                                                            |
 | SDK Path                   | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk                                              |
 | Xcode Version              | 27.0                                                                                                                                            |
@@ -514,7 +510,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (192,433,568 bytes, sha256=5088f85ae8a394d4b426a9b8604cc0850c4ea6d993725bb2f7963315a614ba9f) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,851,904 bytes, sha256=3492c73dc32ae63685cd78b58469d470a9b923babb1acf81862313a134efbc08)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (202,780,128 bytes, sha256=c5019305795c15c1acbc011f7e4026bd87f24a0a6b0ff0862a43a611c64ef13d) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,552,704 bytes, sha256=020e1ab566b61b1d6cadfb1d036bc840317f4b4d1753030f452680684d210ff1)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->
