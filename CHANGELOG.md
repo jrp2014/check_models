@@ -653,6 +653,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The per-model "Mechanical observations" log line names each finding in
+  words, using the report labels (e.g. "Output repeats the prompt's own hint
+  text instead of describing the image") instead of internal codes such as
+  `prompt_hint_echoed`. The codes stay in `results.jsonl` and in the
+  file log's `REPRO` line.
 - The loaded-weight size (`model_weight_buffer_gb`) is measured over the
   model's parameters, the arrays upstream load evaluates. Measuring the whole
   module tree also reached private derived arrays (rotary caches) that are

@@ -1191,6 +1191,38 @@ class TestProcessImageWithModelMock:
         assert "truncated 50 characters for file-log size bound" in body
         assert len(body) < len(huge) + 80
 
+    def test_observation_log_line_uses_readable_labels(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """The per-model observation line names findings in words, not internal codes."""
+        result = check_models.PerformanceResult(
+            model_name="org/m", success=True, generation=_FakeGenerationResult()
+        )
+        assessment = types.SimpleNamespace(observations=("prompt_hint_echoed",))
+        caplog.set_level(logging.INFO, logger=check_models.LOGGER_NAME)
+        with (
+            patch.object(
+                check_models,
+                "_populate_result_quality_analysis",
+                side_effect=lambda r, **_: replace(
+                    r,
+                    quality_analysis=check_models.analyze_generation_text("Hello world", 2),
+                ),
+            ),
+            patch.object(check_models, "_assess_result", return_value=assessment),
+            patch.object(check_models, "_reproduction_log_line", return_value="REPRO"),
+        ):
+            check_models._assess_and_log_model_outcome(
+                result, args=cast("Any", types.SimpleNamespace(max_tokens=10)), prompt="p"
+            )
+        line = next(
+            record.getMessage()
+            for record in caplog.records
+            if record.getMessage().startswith("Mechanical observations for org/m")
+        )
+        assert "Output repeats the prompt's own hint text" in line
+        assert "prompt_hint_echoed" not in line
+
     def test_log_perf_block_reads_cache_memory_field(self) -> None:
         """Compact memory logging should use the stored cache_memory field name."""
         result = check_models.PerformanceResult(

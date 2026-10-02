@@ -18851,7 +18851,9 @@ def _assess_and_log_model_outcome(
             logger.info(
                 "Mechanical observations for %s: %s",
                 result.model_name,
-                ", ".join(assessment.observations),
+                _human_observation_labels(
+                    assessment.observations, details=_observation_details(result)
+                ),
             )
     _log_system_state_note(result)
     # One grep-able line per model with what a rerun needs, so the file log
