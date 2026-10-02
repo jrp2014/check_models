@@ -34,6 +34,10 @@ Notable changes to this project will be documented in this file.
   "Bootstrap complete".
 - Tooling: the local-mlx pin file uses an explicit `mktemp` template, so the
   updater's pin helpers also work with GNU `mktemp`.
+- Report publication reads results and system facts from the render context
+  alone. `ReportGenerationInputs` keeps only publication settings and derives
+  `results` and `system_info` from the context, so the publication step no
+  longer reconciles two result collections. No report output changes.
 - The baseline comparison records, for each changed text, the shared prefix
   in characters, both lengths, and whether the prompt token count changed
   (e.g. "shared prefix 216 characters; length 404 → 422; same prompt

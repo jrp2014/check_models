@@ -2035,13 +2035,11 @@ def _all_artifacts(
 ) -> tuple[check_models.ReportArtifact, ...]:
     """Return the full artifact plan for tests that assume a fully successful run."""
     inputs = check_models.ReportGenerationInputs(
-        results=[],
         library_versions={},
         prompt="p",
         metadata=None,
         overall_time=0.0,
         image_path=None,
-        system_info={},
         report_context=_build_report_render_context(results=[], prompt="p"),
         output_paths=output_paths,
     )
@@ -2244,13 +2242,11 @@ def _report_generation_inputs(
     )
     context = _build_report_render_context(results=[result], prompt="Describe the image.")
     return check_models.ReportGenerationInputs(
-        results=[result],
         library_versions=_stub_versions(),
         prompt="Describe the image.",
         metadata=None,
         overall_time=1.0,
         image_path=None,
-        system_info={},
         report_context=context,
         output_paths=check_models._resolve_report_output_paths(args),
         run_args=args,
@@ -2452,13 +2448,11 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
     context = _build_report_render_context(results=[result], prompt="Describe the image.")
     output_paths = check_models._resolve_report_output_paths(args)
     inputs = check_models.ReportGenerationInputs(
-        results=[result],
         library_versions=_stub_versions(),
         prompt="Describe the image.",
         metadata=None,
         overall_time=1.0,
         image_path=None,
-        system_info={},
         report_context=context,
         output_paths=output_paths,
         run_args=args,

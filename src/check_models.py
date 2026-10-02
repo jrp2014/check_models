@@ -1489,15 +1489,18 @@ class ReportOutputPaths:
 
 @dataclass(frozen=True)
 class ReportGenerationInputs:
-    """Inputs required to generate final report artifacts and log their paths."""
+    """Publication settings for one run; report data is owned by ``report_context``.
 
-    results: list[PerformanceResult]
+    The assessed results and captured system facts live only in the render
+    context, so every artifact reads the same copy; these accessors derive
+    from it rather than holding parallel collections.
+    """
+
     library_versions: LibraryVersionDict
     prompt: str
     metadata: MetadataDict | None
     overall_time: float
     image_path: Path | None
-    system_info: dict[str, str]
     report_context: ReportRenderContext
     output_paths: ReportOutputPaths
     run_args: argparse.Namespace | None = None
@@ -1510,6 +1513,16 @@ class ReportGenerationInputs:
     # Wall-clock epoch when the run began; lets the retained record and the
     # dashboard report end-to-end duration once report generation is done.
     overall_start_time: float | None = None
+
+    @property
+    def results(self) -> list[PerformanceResult]:
+        """Assessed results in report order, as cached by the render context."""
+        return list(self.report_context.result_set.results)
+
+    @property
+    def system_info(self) -> dict[str, str]:
+        """System facts captured for this run, as cached by the render context."""
+        return self.report_context.system_info
 
 
 _RUN_ISSUE_SUMMARY_KEY: Final[str] = "run_issue_summary"
@@ -25641,13 +25654,6 @@ def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
 ) -> tuple[ReportArtifactOutcome, ...]:
     """Write canonical JSONL first, then isolate every optional renderer."""
-    cached_results = {
-        result.model_name: result for result in inputs.report_context.result_set.results
-    }
-    inputs = replace(
-        inputs,
-        results=[cached_results.get(result.model_name, result) for result in inputs.results],
-    )
     artifacts = _build_report_artifacts(inputs)
     by_key = {artifact.key: artifact for artifact in artifacts}
     outcomes: list[ReportArtifactOutcome] = []
@@ -26041,7 +26047,6 @@ def finalize_execution(
         log_file_path(history_path, label="   History:     ")
 
         report_inputs = ReportGenerationInputs(
-            results=results,
             library_versions=library_versions,
             prompt=prompt,
             metadata=metadata,
@@ -26049,7 +26054,6 @@ def finalize_execution(
             started_at=started_at,
             overall_start_time=overall_start_time,
             image_path=image_path,
-            system_info=system_info,
             report_context=report_context,
             output_paths=output_paths,
             run_args=args,

@@ -1214,13 +1214,11 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         output_dir=tmp_path,
     )
     inputs = check_models.ReportGenerationInputs(
-        results=[],
         library_versions={"mlx": "0.0.0"},
         prompt="prompt",
         metadata=None,
         overall_time=1.0,
         image_path=None,
-        system_info={},
         report_context=check_models._build_report_render_context(results=[], prompt="prompt"),
         output_paths=check_models._resolve_report_output_paths(args),
         runtime_fingerprint={},
@@ -1310,13 +1308,11 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
     ):
         path.parent.mkdir(parents=True, exist_ok=True)
     inputs = check_models.ReportGenerationInputs(
-        results=[result],
         library_versions={"mlx": "0.0.0"},
         prompt="Describe the image.",
         metadata=None,
         overall_time=1.0,
         image_path=None,
-        system_info={},
         report_context=context,
         output_paths=paths,
         run_args=args,
@@ -1368,13 +1364,11 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
     paths = check_models._resolve_report_output_paths(args)
 
     inputs = check_models.ReportGenerationInputs(
-        results=[],
         library_versions={},
         prompt="p",
         metadata=None,
         overall_time=0.0,
         image_path=None,
-        system_info={},
         report_context=check_models._build_report_render_context(results=[], prompt="p"),
         output_paths=paths,
     )
@@ -1420,13 +1414,11 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
             paths.index,
             artifacts=check_models._build_report_artifacts(
                 check_models.ReportGenerationInputs(
-                    results=[],
                     library_versions={},
                     prompt="p",
                     metadata=None,
                     overall_time=0.0,
                     image_path=None,
-                    system_info={},
                     report_context=check_models._build_report_render_context(
                         results=[], prompt="p"
                     ),
