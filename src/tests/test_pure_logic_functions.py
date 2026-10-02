@@ -23,8 +23,10 @@ if TYPE_CHECKING:  # pragma: no cover
     import types
     from collections.abc import Mapping, Sequence
 
+import mlx.core as mx
 import pytest
 import yaml
+from mlx import nn
 
 
 @pytest.fixture(scope="module")
@@ -1019,11 +1021,43 @@ class TestHardwareFacts:
         runtime = MagicMock()
         runtime.get_array_buffer_size.return_value = 5_400_000_000
         monkeypatch.setattr(mod, "mx", runtime)
-        assert mod._sample_model_weight_buffer_gb(object()) == pytest.approx(5.4)
+        model = MagicMock()
+        assert mod._sample_model_weight_buffer_gb(model) == pytest.approx(5.4)
+        runtime.get_array_buffer_size.assert_called_once_with(model.parameters.return_value)
         runtime.get_array_buffer_size.side_effect = RuntimeError("no arrays")
+        assert mod._sample_model_weight_buffer_gb(model) is None
         assert mod._sample_model_weight_buffer_gb(object()) is None
         monkeypatch.setattr(mod, "mx", object())
-        assert mod._sample_model_weight_buffer_gb(object()) is None
+        assert mod._sample_model_weight_buffer_gb(model) is None
+
+    def test_loaded_weight_size_ignores_lazy_private_arrays(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Unevaluated derived arrays beside the weights neither fail nor get evaluated.
+
+        Regression: measuring the whole module tree raised "Arrays must be
+        evaluated before querying buffer size" for a rotary cache that upstream
+        load never evaluates, and logged a traceback for every model.
+        """
+
+        class _Model(nn.Module):
+            def __init__(self) -> None:
+                super().__init__()
+                self.proj = nn.Linear(4, 4, bias=False)
+                self._inv_freq = mx.arange(8) * 2  # derived, evaluated on first use
+
+        model = _Model()
+        mx.eval(model.parameters())  # what upstream load does when not lazy
+        caplog.set_level(logging.DEBUG, logger=mod.LOGGER_NAME)
+
+        assert mod._sample_model_weight_buffer_gb(model) is not None
+        assert not any(record.exc_info for record in caplog.records)
+
+        lazy_model = _Model()  # --lazy: the weights themselves are unevaluated
+        assert mod._sample_model_weight_buffer_gb(lazy_model) is None
+        assert not any(record.exc_info for record in caplog.records)
 
     @pytest.mark.parametrize(
         ("message", "limit"),

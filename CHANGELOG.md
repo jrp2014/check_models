@@ -653,6 +653,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The loaded-weight size (`model_weight_buffer_gb`) is measured over the
+  model's parameters, the arrays upstream load evaluates. Measuring the whole
+  module tree also reached private derived arrays (rotary caches) that are
+  still unevaluated after load, so `mx.get_array_buffer_size` refused and
+  every model logged a traceback with no size recorded. With `--lazy` the
+  weights are unevaluated and the size is left unrecorded, without forcing
+  an evaluation.
 - Chat-template facts follow transformers' real behaviour: the source
   order is the processor loader's precedence (a `processor_config.json` key,
   then the legacy `chat_template.json`, then `chat_template.jinja`, then the

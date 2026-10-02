@@ -14487,13 +14487,25 @@ def _sample_mlx_memory_gb(getter_name: MlxMemoryGetterName) -> float | None:
 
 
 def _sample_model_weight_buffer_gb(model: object) -> float | None:
-    """Bytes the loaded weights occupy (mlx >= 0.32.3), counting shared buffers once."""
+    """Bytes the loaded weights occupy (mlx >= 0.32.3), counting shared buffers once.
+
+    Measures ``model.parameters()``, the arrays upstream load evaluates. The
+    whole module tree also holds private derived arrays (rotary frequency
+    caches and the like) that stay unevaluated until first use, and
+    ``get_array_buffer_size`` refuses unevaluated arrays. Nothing is evaluated
+    here, since that would move work into the load phase, so weights still
+    unevaluated (``--lazy``) record no size.
+    """
     measure = getattr(mx, "get_array_buffer_size", None)
-    if not callable(measure):
+    parameters = getattr(model, "parameters", None)
+    if not callable(measure) or not callable(parameters):
         return None
     try:
-        raw_value = measure(model)
-    except (AttributeError, RuntimeError, TypeError, ValueError):
+        raw_value = measure(parameters())
+    except ValueError as error:
+        logger.debug("Loaded weight size not recorded: %s", error)
+        return None
+    except (AttributeError, RuntimeError, TypeError):
         logger.debug(
             "Unable to measure loaded weights with mx.get_array_buffer_size", exc_info=True
         )
