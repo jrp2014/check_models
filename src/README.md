@@ -19,7 +19,7 @@ Get up and running immediately with your cached models.
 The fastest way to start is using the automated setup script (requires Conda):
 
 ```bash
-# Sets up a 'mlx-vlm' environment with Python 3.13 and all dependencies
+# Sets up a 'mlx-vlm' environment with Python 3.14 and all dependencies
 bash tools/setup_conda_env.sh
 conda activate mlx-vlm
 ```
@@ -54,7 +54,8 @@ python -m check_models --verbose
 python -m check_models --dry-run
 ```
 
-**Python Version**: 3.13+ is recommended and tested.
+**Python Version**: 3.13+ is supported; the working `mlx-vlm` env and fresh
+envs use 3.14. CI tests both.
 
 ## Capabilities
 
@@ -111,7 +112,7 @@ bash tools/setup_conda_env.sh
 conda activate mlx-vlm
 ```
 
-The script handles Python 3.13 setup, dependencies, and optional PyTorch support.
+The script handles Python 3.14 setup, dependencies, and optional PyTorch support.
 
 For clean machines and normal project use, this conda workflow is the supported path.
 
@@ -125,7 +126,7 @@ install commands from the `src/` directory.
 
 ```bash
 cd src
-conda create -n mlx-vlm python=3.13
+conda create -n mlx-vlm python=3.14
 conda activate mlx-vlm
 pip install -e .
 ```
@@ -785,14 +786,14 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "Jinja2>=3.1.0
 
 ## Requirements
 
-- **Python**: 3.13+ (3.13 is the tested baseline)
+- **Python**: 3.13+ (the floor); the working `mlx-vlm` env runs 3.14, and CI
+  tests both
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
-The working `mlx-vlm` env stays on the tested baseline. To see whether a newer
-Python has become viable without touching that env, run
-`make probe-python-next` (defaults to 3.14): it installs the PyPI stack into a
-throwaway `mlx-vlm-314` conda env and verifies imports and the fast test lane.
-`PROBE_PYTHON=3.15` targets a later version. Two opt-in checks:
+To see whether the next Python has become viable without touching the working
+`mlx-vlm` env, run `make probe-python-next` (defaults to 3.15): it installs the
+PyPI stack into a throwaway `mlx-vlm-315` conda env and verifies imports and
+the fast test lane. `PROBE_PYTHON=3.16` targets a later version. Two opt-in checks:
 
 - `PROBE_SOURCE_BUILD=1` first compiles the local mlx checkout (in a throwaway
   clone of its HEAD, so the checkout the working env loads is not written to)

@@ -81,7 +81,7 @@ for triage.
 
 > [!TIP]
 > **Platform**: macOS with Apple Silicon is required.
-> **Python**: 3.13+ is recommended and tested.
+> **Python**: 3.13+ is supported; the working env and fresh envs use 3.14.
 
 ## Ecosystem (quick links)
 

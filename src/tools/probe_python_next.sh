@@ -28,8 +28,8 @@
 # check runs unless an earlier one it depends on failed.
 #
 # Usage:
-#   bash tools/probe_python_next.sh                 # 3.14, wheels + tests
-#   PROBE_PYTHON=3.15 bash tools/probe_python_next.sh
+#   bash tools/probe_python_next.sh                 # 3.15, wheels + tests
+#   PROBE_PYTHON=3.16 bash tools/probe_python_next.sh
 #   PROBE_SOURCE_BUILD=1 bash tools/probe_python_next.sh   # build mlx from source first
 #   PROBE_TORCH=1 bash tools/probe_python_next.sh          # also check the torch extra
 #   PROBE_RECREATE=1 bash tools/probe_python_next.sh       # fresh env first
@@ -39,7 +39,7 @@
 
 set -euo pipefail
 
-PROBE_PYTHON="${PROBE_PYTHON:-3.14}"
+PROBE_PYTHON="${PROBE_PYTHON:-3.15}"
 PROBE_ENV="${PROBE_ENV:-mlx-vlm-${PROBE_PYTHON//./}}"
 PROBE_SOURCE_BUILD="${PROBE_SOURCE_BUILD:-0}"
 PROBE_TORCH="${PROBE_TORCH:-0}"

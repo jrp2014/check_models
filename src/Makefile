@@ -212,7 +212,7 @@ update-quick: ## Quick in-env refresh: upgrade pip and reinstall project (dev+ex
 	@echo "  To change dependency bounds, edit pyproject.toml and run: make deps-sync"
 
 .PHONY: probe-python-next
-probe-python-next: ## Check whether the next Python (default 3.14) is viable in a throwaway conda env; never touches mlx-vlm
+probe-python-next: ## Check whether the next Python (default 3.15) is viable in a throwaway conda env; never touches mlx-vlm
 	bash tools/probe_python_next.sh
 
 # Aggregates

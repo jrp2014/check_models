@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: fresh envs from `tools/setup_conda_env.sh` (and the manual conda
+  recipe) are created on Python 3.14, the version the working `mlx-vlm` env
+  runs; the supported floor (`requires-python`, type-checker targets) stays
+  3.13 and CI still tests both. `make probe-python-next` now defaults to
+  3.15. A test requires CI to cover the fresh-env version.
 - Tooling: `tools/update.sh` updates only the environment it names. The
   target is the active venv, or the conda env in `CONDA_ENV` (which
   `make update` now passes through), and a different or missing active env

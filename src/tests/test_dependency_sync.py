@@ -2196,8 +2196,12 @@ def test_python_floor_is_single_sourced() -> None:
 
     assert ".".join(str(part) for part in validate_env.REQUIRED_PYTHON_VERSION) == floor
 
+    # Fresh envs are created on the working version, which may sit above the
+    # floor; CI must test it (checked against the workflow versions below).
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
-    assert f"python={floor}" in setup_script
+    env_match = re.search(r'^ENV_PYTHON_VERSION="(3\.\d{1,2})"$', setup_script, re.MULTILINE)
+    assert env_match is not None
+    env_version = env_match.group(1)
 
     # CI runs the floor plus any newer candidate (a staged Python move is
     # rehearsed in CI before the working env follows). Every literal version
@@ -2209,6 +2213,7 @@ def test_python_floor_is_single_sourced() -> None:
         workflow_text = workflow_path.read_text(encoding="utf-8")
         for match in re.finditer(r'"(3\.\d{1,2})"', workflow_text):
             ci_versions.add(match.group(1))
+    assert env_version in ci_versions, f"CI does not test the fresh-env Python {env_version}"
     assert floor in ci_versions, f"CI no longer tests the Python floor {floor}: {ci_versions}"
     for version in ci_versions:
         assert tuple(int(part) for part in version.split(".")) >= floor_parts, version

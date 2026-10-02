@@ -8,7 +8,8 @@
 #
 # Key Features:
 # - Validates macOS/Apple Silicon compatibility
-# - Creates conda environment with Python 3.13
+# - Creates conda environment with Python 3.14 (the working version; the
+#   supported floor in pyproject.toml stays 3.13)
 # - Installs all runtime and optional dependencies
 # - Optionally installs development tools
 # - Verifies the mlx / mlx-metal backend pair and provides usage instructions
@@ -23,6 +24,8 @@ set -euo pipefail
 
 # Default environment name
 DEFAULT_ENV_NAME="mlx-vlm"
+# Fresh envs match the working mlx-vlm env, not the floor (requires-python).
+ENV_PYTHON_VERSION="3.14"
 
 # Help function
 show_help() {
@@ -194,9 +197,8 @@ create_environment() {
         fi
     fi
 
-    # Create new environment with Python 3.13
-    log_info "Creating new environment with Python 3.13..."
-    conda_cmd create -n "$ENV_NAME" python=3.13 -y
+    log_info "Creating new environment with Python $ENV_PYTHON_VERSION..."
+    conda_cmd create -n "$ENV_NAME" "python=$ENV_PYTHON_VERSION" -y
 
     log_success "Environment '$ENV_NAME' created successfully"
 }
