@@ -1323,6 +1323,49 @@ def test_update_script_rebuild_decision(inputs: str, expected: str) -> None:
     assert result.stdout.strip() == expected
 
 
+@pytest.mark.parametrize(
+    ("imports", "version", "head", "expected_status", "reason"),
+    [
+        (True, "0.32.3.dev20261002+255328713", "2553287133a" + "0" * 29, 0, ""),
+        (True, "0.32.3.dev20260927+02ce1fb6a", "2553287133a" + "0" * 29, 1, "was not built from"),
+        (True, "0.32.3", "2553287133a" + "0" * 29, 1, "was not built from"),
+        (False, "0.32.3.dev20261002+255328713", "2553287133a" + "0" * 29, 1, "does not import"),
+    ],
+)
+def test_update_script_skips_a_rebuild_only_for_the_checkouts_own_build(
+    *, imports: bool, version: str, head: str, expected_status: int, reason: str
+) -> None:
+    """Regression: a lost mlx.core behind an unchanged pull was "verified" and skipped."""
+    function = _update_script_function("installed_build_matches_checkout")
+    stubs = (
+        f"python() {{ return {0 if imports else 1}; }}\n"
+        f"get_installed_distribution_version() {{ echo '{version}'; }}\n"
+        f"git() {{ echo '{head}'; }}\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", f"{stubs}{function}\ninstalled_build_matches_checkout mlx /repo"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == expected_status
+    assert reason in result.stdout
+    pure_python = subprocess.run(  # noqa: S603 - as above
+        ["/bin/bash", "-c", f"{function}\ninstalled_build_matches_checkout mlx-vlm /repo"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert pure_python.returncode == 0
+
+
+def test_update_script_leaves_setuptools_to_pip_above_mlxs_build_floor() -> None:
+    """No upper cap: builds are isolated, and the old <82 cap only made the env look stale."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    assert "<82" not in update_script
+    assert "--no-build-isolation" not in update_script
+
+
 def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
     """Stage 2 records git status --porcelain; Stage 3 consults it before skipping."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
@@ -1441,7 +1484,7 @@ def test_update_script_quarantines_broken_packaging_metadata_before_upgrade() ->
     """The packaging-tool upgrade should preflight only its own metadata."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     helper_name = "quarantine_broken_pip_metadata.py"
-    install_command = 'pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly'
+    install_command = 'pip_install_tool pip wheel "setuptools>=80" build pyrefly'
 
     assert helper_name in update_script
     helper_position = update_script.index(helper_name)
@@ -1539,7 +1582,7 @@ def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
     assert update_script.count("run_eager_pip_install") >= 3  # def + two wrappers
     # Detection is a separate, non-mutating gate so set -e reaches the updater.
     assert "if local_mlx_repos_present; then" in update_script
-    assert 'pip_install_tool "setuptools>=80,<82"' in update_script
+    assert 'pip_install_tool "setuptools>=80"' in update_script
 
     local_update_pos = main_flow.index("update_local_mlx_repos")
     pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-vlm")

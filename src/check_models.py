@@ -5982,7 +5982,7 @@ def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) 
         return Image.open(Path(image_path))
 
     logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-    with urlopen(  # noqa: S310 - scheme is restricted to http/https by caller
+    with urlopen(  # noqa: S310 - scheme is restricted to http/https by caller  # skylos: ignore[SKY-D216] the operator's own --image URL, http(s) only
         image_str,
         timeout=30,
     ) as response:

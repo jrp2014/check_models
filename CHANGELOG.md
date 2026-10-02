@@ -592,6 +592,27 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/update.sh` skips the mlx rebuild only when the installed mlx is the
+  checkout's own build: `mlx.core` imports and the version's `+<sha>` is the
+  checkout HEAD. An earlier run had pulled 50 commits and lost the compiled
+  extension, and the next run's no-op pull, clean tree and matching editable
+  path were taken as "unchanged; skipping rebuild".
+- Skylos 4.43 flags the `--image` URL download as possible SSRF
+  (SKY-D216); suppressed inline with the reason: the URL is the operator's
+  own argument and the scheme is restricted to http(s) before the fetch.
+- `tools/update.sh` no longer caps setuptools below 82; only mlx's build
+  floor (`>=80`) stays. The cap had no recorded reason, every source build
+  runs in pip's isolated build environment (which installed setuptools 84
+  for the mlx build regardless), and nothing installed needs
+  `pkg_resources`; the cap only made each run report setuptools as
+  outdated and fight torch's eager upgrade.
+- `tools/update.sh` stops before pulling when a local MLX checkout holds
+  iCloud conflict copies (`<name> 2.<ext>`), naming them and how to list
+  them. A stale `.git/refs/heads/main 2` had made `git pull` fail with "bad
+  object", which the generic pull-failure hints did not explain, and 804
+  untracked copies in the mlx tree made every run look modified and force a
+  rebuild. "No copies" counts as success, so the check cannot end the run
+  under `set -e`.
 - `tools/update.sh` updates conda in base together with every installed
   `conda*` package; updating conda alone left its plugins
   (`conda-anaconda-telemetry`, `conda-anaconda-tos`) behind, printing

@@ -448,6 +448,31 @@ verify_expected_editable_install() {
 	echo "✓ Verified editable install: $package_name"
 }
 
+# The rebuild shortcut must prove the installed mlx IS the checkout's build.
+# The editable path alone passed on 2026-10-02 after an earlier run had pulled
+# 50 commits and lost the compiled extension: "unchanged upstream" (this run's
+# pull was a no-op), clean, path verified, and no mlx.core. Prints the reason
+# and fails when the build is missing or from another commit; other packages
+# (pure Python) always pass.
+installed_build_matches_checkout() {
+	local package_name="$1"
+	local repo_path="$2"
+	[[ "$package_name" == "mlx" ]] || return 0
+	if ! python -c "import mlx.core" >/dev/null 2>&1; then
+		echo "mlx.core does not import"
+		return 1
+	fi
+	local version build_rev head_rev
+	version="$(get_installed_distribution_version mlx)"
+	build_rev="${version##*+}"
+	head_rev="$(git -C "$repo_path" rev-parse HEAD 2>/dev/null || echo unknown)"
+	if [[ -z "$build_rev" || "$build_rev" == "$version" || "$head_rev" != "$build_rev"* ]]; then
+		echo "installed mlx ${version:-<unknown>} was not built from checkout HEAD ${head_rev:0:9}"
+		return 1
+	fi
+	return 0
+}
+
 get_installed_distribution_version() {
 	pip_show_field "$1" "Version"
 }
@@ -668,7 +693,9 @@ python "$SCRIPT_DIR/quarantine_broken_pip_metadata.py" \
 
 # Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
-pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly
+# setuptools keeps only mlx's build floor (>=80): every source build runs in
+# pip's isolated build environment, which takes the latest setuptools anyway.
+pip_install_tool pip wheel "setuptools>=80" build pyrefly
 
 # Resolve project extras once; the install itself runs after MLX updates so
 # pyproject.toml performs the final dependency reconciliation.
@@ -855,6 +882,23 @@ check_mlx_build_requirements() {
 
 # A pull that did not complete leaves the checkout's state unknown to the
 # rest of the script, so report what git sees and stop rather than guess.
+# iCloud Drive ("Desktop & Documents") leaves conflict copies named
+# "<name> 2.<ext>" beside files it could not reconcile. Inside .git they break
+# ref parsing ("fatal: bad object refs/heads/main 2"); in the working tree they
+# are untracked files that make every run look modified and force a rebuild.
+find_icloud_conflict_copies() {
+	local repo_path="$1"
+	find "$repo_path/.git" \( -name '* [0-9]' -o -name '* [0-9].*' \) -print 2>/dev/null
+	git -C "$repo_path" -c core.quotepath=off ls-files --others --exclude-standard 2>/dev/null |
+		grep -E ' [0-9]+(\.[^/]*)?$' |
+		while IFS= read -r copy; do
+			echo "$repo_path/$copy"
+		done
+	# grep exits 1 when there are no copies; under errexit/pipefail that
+	# status would end the whole script silently, so absence is success.
+	return 0
+}
+
 report_git_pull_failure() {
 	local repo_name="$1" repo_path="$2"
 	echo ""
@@ -988,6 +1032,30 @@ update_local_mlx_repos() {
 	# that upstream now also changes, a diverged branch, no network) stops the
 	# run with diagnostics: continuing would leave that repo unbuilt and its
 	# install unguarded against the eager upgrades later in this script.
+	# Stage 0: iCloud conflict copies break git and force rebuilds; name them
+	# and stop rather than fail later with a misleading pull error.
+	for idx in "${!REPO_NAMES[@]}"; do
+		local ICLOUD_COPIES
+		ICLOUD_COPIES="$(find_icloud_conflict_copies "${REPO_PATHS[idx]}")"
+		if [[ -n "$ICLOUD_COPIES" ]]; then
+			local COPY_COUNT
+			COPY_COUNT="$(printf '%s\n' "$ICLOUD_COPIES" | wc -l | tr -d ' ')"
+			echo ""
+			echo "❌ ${REPO_NAMES[idx]} has $COPY_COUNT iCloud conflict copies (\"<name> 2.<ext>\"); stopping."
+			printf '%s\n' "$ICLOUD_COPIES" | head -5 | while IFS= read -r copy; do
+				echo "     $copy"
+			done
+			echo "   iCloud Drive syncs this folder and leaves such copies beside files it could"
+			echo "   not reconcile. Inside .git they break git (\"bad object refs/heads/main 2\");"
+			echo "   in the working tree they make every run look modified and force a rebuild."
+			echo "   They are untracked duplicates: review, then delete them. List them with"
+			echo "     cd ${REPO_PATHS[idx]} && find .git -name '* [0-9]*'; git ls-files --others --exclude-standard | grep -E ' [0-9]+(\.[^/]*)?\$'"
+			echo "   Keeping git checkouts outside iCloud-synced folders prevents this."
+			echo "   Nothing was pulled, built or reinstalled."
+			exit 1
+		fi
+	done
+
 	echo ""
 	echo "Stage 1: Syncing repositories with git pull --ff-only..."
 	for idx in "${!REPO_NAMES[@]}"; do
@@ -1059,8 +1127,13 @@ update_local_mlx_repos() {
 		# rebuilt environment, or a missing install all fail it; a dirty checkout
 		# (Stage 2) always rebuilds; FORCE_REINSTALL=1 never skips.
 		local editable_verified=0
+		local build_mismatch=""
 		if verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null 2>&1; then
-			editable_verified=1
+			if build_mismatch="$(installed_build_matches_checkout "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}")"; then
+				editable_verified=1
+			else
+				echo "⚠️  ${REPO_NAMES[idx]}: ${build_mismatch} — rebuild forced"
+			fi
 		fi
 		# Only mlx compiles Metal kernels; mlx-vlm is pure Python.
 		local toolchain_matches=1
@@ -1108,7 +1181,7 @@ update_local_mlx_repos() {
 			# Use pip_install_tool to avoid eager transitive upgrades.
 			echo "[update.sh] Installing MLX build dependencies..."
 			pip_install_tool cmake
-			pip_install_tool "setuptools>=80,<82"
+			pip_install_tool "setuptools>=80"
 			pip_install_tool typing_extensions
 
 			local JIT_SETTING_RAW="${MLX_METAL_JIT:-}"
