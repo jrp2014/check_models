@@ -1488,6 +1488,23 @@ class ReportOutputPaths:
 
 
 @dataclass(frozen=True)
+class RunStartFacts:
+    """Facts observed once at run start and reported unchanged everywhere later.
+
+    Several system facts are labelled "(run start)" (available memory, swap,
+    power source and mode), so they are captured here once and passed on,
+    never re-read: a surface without them reports them as unavailable rather
+    than measuring now.
+    """
+
+    library_versions: LibraryVersionDict
+    system_info: dict[str, str]
+    preflight_issues: tuple[str, ...] = ()
+    # Whether this run wrote environment.log, so finalisation links it only then.
+    environment_logged: bool = False
+
+
+@dataclass(frozen=True)
 class ReportGenerationInputs:
     """Publication settings for one run; report data is owned by ``report_context``.
 
@@ -1509,6 +1526,7 @@ class ReportGenerationInputs:
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
     comparison: RunComparison | None = None
     history_appended: bool = False
+    environment_logged: bool = False
     started_at: str | None = None
     # Wall-clock epoch when the run began; lets the retained record and the
     # dashboard report end-to-end duration once report generation is done.
@@ -1807,7 +1825,6 @@ DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "diagnostics.md"
-_PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
 _GITHUB_REPO_URL: Final[str] = "https://github.com/jrp2014/check_models"
 _GITHUB_RAW_URL: Final[str] = "https://raw.githubusercontent.com/jrp2014/check_models"
 _GITHUB_DEFAULT_BRANCH: Final[str] = "main"
@@ -5882,14 +5899,11 @@ def get_device_info() -> SystemProfilerDict | None:
         return None
 
 
-def print_version_info(
-    versions: LibraryVersionDict, system_info: Mapping[str, str] | None = None
-) -> None:
-    """Print library versions and system / hardware info.
+def print_version_info(versions: LibraryVersionDict, system_info: Mapping[str, str]) -> None:
+    """Print library versions and the run-start system / hardware snapshot.
 
-    ``system_info`` is the run-start snapshot when the caller has one, so the
-    closing summary repeats the facts the run started with; otherwise they are
-    read now. Errors are swallowed so version printing never fails.
+    The closing summary repeats the facts the run started with. Errors are
+    swallowed so version printing never fails.
     """
     logger.info("--- Library Versions ---")
     version_rows = [[name, ver or ""] for name, ver in sorted(versions.items())]
@@ -5903,8 +5917,6 @@ def print_version_info(
 
     # --- System / hardware information block ---
     try:
-        if system_info is None:
-            system_info = get_system_characteristics()
         if system_info:
             logger.info("")  # spacer
             logger.info("--- System Information ---")
@@ -6946,12 +6958,10 @@ def _build_report_render_context(
     ]
     result_set: ResultSet = ResultSet(resolved_results)
     image_profile = _load_image_input_profile(image_path)
-    resolved_system_info: dict[str, str] = (
-        system_info if system_info is not None else get_system_characteristics()
-    )
     return ReportRenderContext(
         result_set=result_set,
-        system_info=resolved_system_info,
+        # Missing facts stay unavailable; reporting never measures the system now.
+        system_info=system_info if system_info is not None else {},
         recommended_working_set_bytes=recommended_working_set_bytes,
         image_profile=image_profile,
         preflight_issues=tuple(preflight_issues),
@@ -9349,7 +9359,7 @@ def _build_html_report_context(
     ]
     return CanonicalHtmlReportContext(
         result_set=ResultSet(analyzed_results),
-        system_info=system_info if system_info is not None else get_system_characteristics(),
+        system_info=system_info if system_info is not None else {},
         assessments=tuple(
             (result.model_name, _assess_result(result)) for result in analyzed_results
         ),
@@ -17197,8 +17207,8 @@ def _dump_environment_to_log(output_path: Path) -> bool:
     return True
 
 
-def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
-    """Configure logging, collect versions, print warnings."""
+def setup_environment(args: argparse.Namespace) -> RunStartFacts:
+    """Configure logging, then capture and print the run-start facts."""
     # Apply CLI output preferences before constructing the Rich console handler.
     _apply_cli_output_preferences(args)
 
@@ -17244,12 +17254,9 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         logger.debug("Verbose/debug mode enabled.")
 
     # Dump full environment to log file for reproducibility (after logging setup)
-    if not args.dry_run:
-        # Recorded on args so finalisation reports the environment log as a
-        # current artifact only when this run actually wrote it.
-        args.environment_logged = _dump_environment_to_log(
-            _resolve_report_output_paths(args).environment
-        )
+    environment_logged = not args.dry_run and _dump_environment_to_log(
+        _resolve_report_output_paths(args).environment
+    )
 
     # Note extra framework installs that are not part of the normal MLX path.
     st_present = bool(find_spec("sentence_transformers"))
@@ -17261,7 +17268,6 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     library_versions: LibraryVersionDict = get_library_versions()
     preflight_issues = _collect_preflight_package_issues(library_versions)
-    _set_run_preflight_issues(args, preflight_issues)
     if preflight_issues:
         logger.warning(
             "Environment warnings from start-up checks (they can change which code runs):"
@@ -17272,7 +17278,6 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Taken once, here: "(run start)" facts must mean the start of the run
     # wherever they are reported later.
     system_info = get_system_characteristics()
-    _set_run_system_info(args, system_info)
     if args.verbose:
         print_version_info(library_versions, system_info)
 
@@ -17281,45 +17286,12 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         log_warning_note("SECURITY WARNING: --trust-remote-code is enabled.")
         log_warning_note("This allows execution of remote code and may pose security risks.")
 
-    return library_versions
-
-
-_RUN_SYSTEM_INFO_ARG_ATTR: Final[str] = "_check_models_run_start_system_info"
-
-
-def _set_run_system_info(args: argparse.Namespace, system_info: Mapping[str, str]) -> None:
-    """Keep the run-start system facts so every later surface reports the same snapshot."""
-    setattr(args, _RUN_SYSTEM_INFO_ARG_ATTR, dict(system_info))
-
-
-def _get_run_system_info(args: argparse.Namespace | None) -> dict[str, str]:
-    """Return the run-start system facts, taking them now only if none were kept.
-
-    Several facts are labelled "(run start)" (available memory, swap, power
-    source and mode); re-reading them at the end of a sweep reported end-of-run
-    values under those labels, in the final summary and the retained reports.
-    """
-    stored = getattr(args, _RUN_SYSTEM_INFO_ARG_ATTR, None) if args is not None else None
-    if isinstance(stored, dict):
-        return dict(stored)
-    return get_system_characteristics()
-
-
-def _set_run_preflight_issues(args: argparse.Namespace, issues: Sequence[str]) -> None:
-    """Store preflight warning strings on argparse namespace for later reporting."""
-    setattr(args, _PREFLIGHT_ISSUES_ARG_ATTR, tuple(issue for issue in issues))
-
-
-def _get_run_preflight_issues(args: argparse.Namespace | None) -> tuple[str, ...]:
-    """Read preflight warning strings from argparse namespace."""
-    if args is None:
-        return ()
-    raw = getattr(args, _PREFLIGHT_ISSUES_ARG_ATTR, ())
-    if isinstance(raw, tuple):
-        return tuple(str(item) for item in raw)
-    if isinstance(raw, list):
-        return tuple(str(item) for item in raw)
-    return ()
+    return RunStartFacts(
+        library_versions=library_versions,
+        system_info=system_info,
+        preflight_issues=tuple(preflight_issues),
+        environment_logged=environment_logged,
+    )
 
 
 def _raise_for_missing_runtime_dependencies() -> None:
@@ -25032,17 +25004,22 @@ def _write_diagnostics_artifacts(
 def _write_environment_failure_diagnostics(
     *,
     args: argparse.Namespace,
-    library_versions: LibraryVersionDict,
+    run_facts: RunStartFacts | None,
     error_message: str,
 ) -> None:
-    """Write a minimal diagnostics report when runtime deps are missing."""
+    """Write a minimal diagnostics report when runtime deps are missing.
+
+    Uses the run-start facts when start-up got that far; otherwise the facts
+    are read now, at the failure, which is the only moment they describe.
+    """
     diagnostics_path: Path = _resolve_report_output_paths(args).diagnostics
     diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
-    system_info = get_system_characteristics()
     parts = _build_environment_failure_diagnostics(
         error_message=error_message,
-        versions=library_versions,
-        system_info=system_info,
+        versions=(run_facts.library_versions if run_facts is not None else get_library_versions()),
+        system_info=(
+            run_facts.system_info if run_facts is not None else get_system_characteristics()
+        ),
     )
     try:
         _write_text_file(diagnostics_path, "\n".join(parts) + "\n")
@@ -25688,7 +25665,7 @@ def _generate_reports_and_log_outputs(
     # check_models.log for the whole run, and environment.log is written by the
     # earlier environment dump when enabled.
     outcomes.append(ReportArtifactOutcome(key="log", path=inputs.output_paths.log, succeeded=True))
-    if bool(getattr(inputs.run_args, "environment_logged", False)):
+    if inputs.environment_logged:
         outcomes.append(
             ReportArtifactOutcome(
                 key="environment", path=inputs.output_paths.environment, succeeded=True
@@ -25875,7 +25852,7 @@ def finalize_execution(
     *,
     args: argparse.Namespace,
     results: list[PerformanceResult],
-    library_versions: LibraryVersionDict,
+    run_facts: RunStartFacts,
     overall_start_time: float,
     prompt: str,
     image_path: Path | None = None,
@@ -25884,12 +25861,13 @@ def finalize_execution(
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.time() - overall_start_time
+    library_versions = run_facts.library_versions
+    # The run-start snapshot, not a fresh read: several facts are labelled
+    # "(run start)" and the comparison relies on them.
+    system_info = run_facts.system_info
     if results:
         metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
 
-        # The run-start snapshot, not a fresh read: several facts are labelled
-        # "(run start)" and the comparison relies on them.
-        system_info = _get_run_system_info(args)
         recommended_working_set_bytes = _get_recommended_working_set_bytes()
         runtime_fingerprint = collect_runtime_fingerprint()
         requested_revision = (
@@ -25917,7 +25895,7 @@ def finalize_execution(
             eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
             system_info=system_info,
             recommended_working_set_bytes=recommended_working_set_bytes,
-            preflight_issues=_get_run_preflight_issues(args),
+            preflight_issues=run_facts.preflight_issues,
             model_provenance=model_provenance,
         )
         results = list(report_context.result_set.results)
@@ -25999,6 +25977,7 @@ def finalize_execution(
             output_paths=output_paths,
             run_args=args,
             history_appended=history_record is not None,
+            environment_logged=run_facts.environment_logged,
             model_revision=requested_revision,
             trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
             runtime_fingerprint=runtime_fingerprint,
@@ -26029,7 +26008,7 @@ def finalize_execution(
             "(full package list in environment.log)."
         )
     else:
-        print_version_info(library_versions, _get_run_system_info(args))
+        print_version_info(library_versions, system_info)
 
 
 # =============================================================================
@@ -26063,9 +26042,9 @@ def main(args: argparse.Namespace) -> None:
     # what a person experienced, including any time the machine was asleep.
     overall_start_time: float = time.time()
     started_at: str = local_now_str()
-    library_versions: LibraryVersionDict | None = None
+    run_facts: RunStartFacts | None = None
     try:
-        library_versions = setup_environment(args)
+        run_facts = setup_environment(args)
         # Validate all CLI arguments early to fail fast (after logging setup)
         validate_cli_arguments(args)
 
@@ -26080,7 +26059,7 @@ def main(args: argparse.Namespace) -> None:
 
         # Handle dry-run mode: show what would be run and exit
         if getattr(args, "dry_run", False):
-            _handle_dry_run(args, prompt, library_versions)
+            _handle_dry_run(args, prompt, run_facts)
             return
 
         # Hard-fail before any model execution when core runtime deps are unavailable.
@@ -26100,7 +26079,7 @@ def main(args: argparse.Namespace) -> None:
         finalize_execution(
             args=args,
             results=results,
-            library_versions=library_versions,
+            run_facts=run_facts,
             overall_start_time=overall_start_time,
             prompt=prompt,
             image_path=image_path,
@@ -26122,7 +26101,7 @@ def main(args: argparse.Namespace) -> None:
             )
             _write_environment_failure_diagnostics(
                 args=args,
-                library_versions=library_versions or get_library_versions(),
+                run_facts=run_facts,
                 error_message=message,
             )
         else:
@@ -26136,14 +26115,14 @@ def main(args: argparse.Namespace) -> None:
 def _handle_dry_run(
     args: argparse.Namespace,
     prompt: str,
-    library_versions: LibraryVersionDict,
+    run_facts: RunStartFacts,
 ) -> None:
     """Handle --dry-run mode: display what would be run without invoking models.
 
     Args:
         args: Parsed command line arguments
         prompt: Generated or user-provided prompt
-        library_versions: Dictionary of library versions
+        run_facts: Library versions and system facts captured at run start
     """
     print_cli_section("Dry Run Mode")
     logger.info("🔍 Validating configuration without running models...")
@@ -26226,7 +26205,7 @@ def _handle_dry_run(
     log_blank()
 
     # Library versions
-    print_version_info(library_versions)
+    print_version_info(run_facts.library_versions, run_facts.system_info)
 
     log_blank()
     log_success("Dry run complete. No models were invoked.", prefix="✅")

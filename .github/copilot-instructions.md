@@ -122,6 +122,15 @@ The file is organized in this order — search for these exact landmark headers 
 - **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `transformers`) hard-fail before inference in `_raise_for_missing_runtime_dependencies`. `mlx-lm` is not a dependency at all (mlx-vlm dropped it in 0.6.14 and nothing here imports it) — do not reintroduce it as a floor, an extra, or a report row.
 - **Generation seam**: every inference goes through `_generate_with_repetition_guard`, a loop over upstream `mlx_vlm.generate.stream_generate` that mirrors upstream `generate()` (custom EOS registration, draft-chunk skipping, final-chunk metrics) and adds the tail-cycle abort. There is no direct `generate()` call, so nothing upstream prints for us: verbose echo of non-draft chunks, `text_already_printed` handling, and `processor.clean_output` all live at that seam and must be covered by tests there.
 - **Isolation**: `--isolate` (opt-in) runs one child interpreter per model. The parent writes the child spec with `_isolated_worker_spec` and the child reads it with `_isolated_params_from_spec`; keep them a matched pair and remember that tests with a mocked subprocess never exercise the child parser — the round-trip test does.
+- **Data ownership**: `ReportRenderContext` is the one owner of assessed
+  results and captured system facts; `ReportGenerationInputs` holds
+  publication settings and derives the rest. Harness timing and memory
+  samples live on `PerformanceResult`, `RuntimeDiagnostics` and
+  `StreamObservations`, never as attributes on the upstream
+  `GenerationResult`. Run-start facts (library versions, system facts,
+  preflight issues) are captured once in `RunStartFacts` and passed on, not
+  stored on `argparse.Namespace`; a surface without them reports them as
+  unavailable rather than probing the system again.
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).

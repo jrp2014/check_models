@@ -2360,7 +2360,7 @@ def test_stale_environment_log_is_not_presented_as_current(tmp_path: Path) -> No
     outcomes = check_models._generate_reports_and_log_outputs(inputs)
     assert all(outcome.key != "environment" for outcome in outcomes)
 
-    inputs = replace(inputs, run_args=replace_namespace(inputs.run_args, environment_logged=True))
+    inputs = replace(inputs, environment_logged=True)
     outcomes = check_models._generate_reports_and_log_outputs(inputs)
     environment = next(outcome for outcome in outcomes if outcome.key == "environment")
     assert environment.succeeded is True
@@ -6882,7 +6882,9 @@ def test_write_environment_failure_diagnostics_writes_report(
     caplog.set_level(logging.INFO)
 
     check_models._write_environment_failure_diagnostics(
-        args=args, library_versions={"mlx": "0.32.3"}, error_message="mlx_vlm is not importable"
+        args=args,
+        run_facts=check_models.RunStartFacts(library_versions={"mlx": "0.32.3"}, system_info={}),
+        error_message="mlx_vlm is not importable",
     )
 
     diagnostics = check_models.ReportOutputPaths.from_root(args.output_dir).diagnostics
@@ -6898,7 +6900,9 @@ def test_write_environment_failure_diagnostics_contains_write_errors(
 
     with patch.object(check_models, "_write_text_file", side_effect=OSError("disk full")):
         check_models._write_environment_failure_diagnostics(
-            args=args, library_versions={}, error_message="boom"
+            args=args,
+            run_facts=check_models.RunStartFacts(library_versions={}, system_info={}),
+            error_message="boom",
         )
 
     assert "Failed to write environment diagnostics report" in caplog.text

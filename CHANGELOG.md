@@ -47,6 +47,13 @@ Notable changes to this project will be documented in this file.
   upstream result's declared fields only, dropping the `__dict__` and `dir()`
   fallbacks, and reports no longer fall back to memory attributes on the
   generation object.
+- Run-start facts are captured once in `RunStartFacts` (library versions,
+  system facts, preflight issues, whether `environment.log` was written),
+  returned by `setup_environment` and passed to finalisation, instead of being
+  stored as private attributes on the CLI namespace. Reporting never probes
+  the system: a render context, standalone HTML context or version printout
+  built without captured system facts shows them as unavailable instead of
+  measuring them at report time.
 - The baseline comparison records, for each changed text, the shared prefix
   in characters, both lengths, and whether the prompt token count changed
   (e.g. "shared prefix 216 characters; length 404 → 422; same prompt

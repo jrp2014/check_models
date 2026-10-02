@@ -360,7 +360,11 @@ class TestValidateAndWarnModelSelection:
             patch.object(mod, "_arch_precheck_for_model", return_value=(None, None, None)),
             caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME),
         ):
-            mod._handle_dry_run(args, "Describe this image.", {})
+            mod._handle_dry_run(
+                args,
+                "Describe this image.",
+                mod.RunStartFacts(library_versions={}, system_info={}),
+            )
 
         assert any(
             "missing-model" in message and "will have no effect" in message
@@ -385,7 +389,11 @@ class TestValidateAndWarnModelSelection:
             patch.object(mod, "_arch_precheck_for_model", return_value=(None, None, None)),
             caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME),
         ):
-            mod._handle_dry_run(args, "Describe this image.", {})
+            mod._handle_dry_run(
+                args,
+                "Describe this image.",
+                mod.RunStartFacts(library_versions={}, system_info={}),
+            )
 
         assert any(
             "org/partial: its cached main revision fails the default-discovery layout check"

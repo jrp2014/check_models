@@ -117,12 +117,12 @@ def _run_finalize_with_report_patches(
     args: argparse.Namespace,
     results: list[PerformanceResult],
     overall_start_time: float,
+    environment_logged: bool = False,
 ) -> None:
     """Run finalization with report writers patched out for path/log assertions."""
     with ExitStack() as stack:
         for patch_target in _FINALIZE_REPORT_PATCHES:
             stack.enter_context(patch(patch_target))
-        stack.enter_context(patch("check_models.get_system_characteristics", return_value={}))
         stack.enter_context(
             patch("check_models.append_history_record", return_value=_finalize_history_stub())
         )
@@ -133,7 +133,11 @@ def _run_finalize_with_report_patches(
         finalize_execution(
             args=args,
             results=results,
-            library_versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
+            run_facts=check_models.RunStartFacts(
+                library_versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
+                system_info={},
+                environment_logged=environment_logged,
+            ),
             overall_start_time=overall_start_time,
             prompt="test prompt",
             image_path=None,
@@ -1124,11 +1128,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     derived = check_models.ReportOutputPaths.from_root(tmp_path)
     derived.environment.write_text("env", encoding="utf-8")
 
-    args = argparse.Namespace(
-        output_dir=tmp_path,
-        # This run "wrote" the env log; mere pre-existence no longer counts.
-        environment_logged=True,
-    )
+    args = argparse.Namespace(output_dir=tmp_path)
     result = PerformanceResult(
         model_name="dummy/model",
         generation=_StubGeneration(),
@@ -1142,6 +1142,8 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         args=args,
         results=[result],
         overall_start_time=time.time() - 0.5,
+        # This run "wrote" the env log; mere pre-existence no longer counts.
+        environment_logged=True,
     )
 
     messages = [record.message for record in caplog.records]
@@ -1967,6 +1969,7 @@ def test_wall_clock_gap_is_attached_only_beyond_the_threshold() -> None:
 
 
 def test_run_start_system_facts_are_reused_not_re_read(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Facts labelled (run start) keep their run-start values in reports and the summary.
@@ -1975,19 +1978,55 @@ def test_run_start_system_facts_are_reused_not_re_read(
     the end of the sweep and labelled end-of-run values "(run start)" (power
     read Battery at the top of the log and AC at the bottom).
     """
-    args = argparse.Namespace()
-    check_models._set_run_system_info(args, {"Power Source (run start)": "Battery"})
     monkeypatch.setattr(
         check_models,
         "get_system_characteristics",
-        lambda: {"Power Source (run start)": "AC"},
+        lambda: pytest.fail("finalisation must not re-read the system facts"),
     )
-    assert check_models._get_run_system_info(args) == {"Power Source (run start)": "Battery"}
-    # Without a kept snapshot (direct callers, tests) the facts are read now.
-    assert check_models._get_run_system_info(argparse.Namespace()) == {
-        "Power Source (run start)": "AC"
+    result = PerformanceResult(model_name="dummy/model", generation=_StubGeneration(), success=True)
+    with ExitStack() as stack:
+        for patch_target in _FINALIZE_REPORT_PATCHES:
+            stack.enter_context(patch(patch_target))
+        stack.enter_context(
+            patch("check_models.append_history_record", return_value=_finalize_history_stub())
+        )
+        stack.enter_context(patch("check_models.generate_diagnostics_report", return_value=False))
+        stack.enter_context(
+            patch("check_models.generate_run_issue_summary_report", return_value=None)
+        )
+        context_builder = stack.enter_context(
+            patch(
+                "check_models._build_report_render_context",
+                wraps=check_models._build_report_render_context,
+            )
+        )
+        finalize_execution(
+            args=argparse.Namespace(output_dir=tmp_path),
+            results=[result],
+            run_facts=check_models.RunStartFacts(
+                library_versions={"mlx": "0.0.0"},
+                system_info={"Power Source (run start)": "Battery"},
+            ),
+            overall_start_time=time.time() - 0.5,
+            prompt="test prompt",
+        )
+
+    assert context_builder.call_args.kwargs["system_info"] == {
+        "Power Source (run start)": "Battery"
     }
-    assert check_models._get_run_system_info(None) == {"Power Source (run start)": "AC"}
+
+
+def test_standalone_report_context_leaves_missing_system_facts_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A context built without captured facts never measures the system now."""
+    monkeypatch.setattr(
+        check_models,
+        "get_system_characteristics",
+        lambda: pytest.fail("reporting must not probe the system"),
+    )
+    assert check_models._build_report_render_context(results=[], prompt="p").system_info == {}
+    assert check_models._build_html_report_context(results=[], prompt="p").system_info == {}
 
 
 def test_environment_dump_lists_an_editable_install_once(
