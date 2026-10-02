@@ -598,6 +598,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The decoding-label lookup in the baseline comparison is annotated
+  `dict[str, str]`; Pylance inferred the constant's literal keys and
+  rejected a plain `str` lookup.
 - Allocation failures name the Metal limit mlx reported: one buffer above
   the maximum buffer size, the buffer-count limit (a number of buffers, not
   bytes; no longer classed as out-of-memory), or exhausted memory

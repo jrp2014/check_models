@@ -21999,7 +21999,8 @@ def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str
     rows = []
     if comparison.text_changed_models:
         rows.append(("Generated text changed", ", ".join(comparison.text_changed_models)))
-    labels = dict(_DECODING_GROUP_LABELS)
+    # Annotated: Pylance infers the Final table's literal keys, then rejects str lookups.
+    labels: dict[str, str] = dict(_DECODING_GROUP_LABELS)
     if comparison.text_changes_by_decoding:
         rows.append(
             (
