@@ -777,7 +777,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "mlx>=0.32.1" "mlx-vlm>=0.6.16" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0"
+pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "Jinja2>=3.1.0" "mlx>=0.32.3" "mlx-vlm>=0.6.16" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -985,7 +985,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "mlx>=0.32.1" "mlx-vlm>=0.6.16" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0"
+pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "Jinja2>=3.1.0" "mlx>=0.32.3" "mlx-vlm>=0.6.16" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0"
 ```
 <!-- MINIMAL_INSTALL_END -->
 

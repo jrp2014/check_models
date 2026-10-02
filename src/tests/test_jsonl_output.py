@@ -431,6 +431,7 @@ def test_retained_metadata_captures_public_snapshot_contract(
         "generation_settings",
         "trust_remote_code",
         "comparison",
+        "mlx_environment",
     }
     assert header["format_version"] == "3.0"
     assert header["eval_mode"] == "triage"
@@ -864,7 +865,9 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields(tmp_path: Path) ->
         success=True,
         active_memory=None,
         cache_memory=None,
-        runtime_diagnostics=RuntimeDiagnostics(model_load_active_memory_gb=1.0),
+        runtime_diagnostics=RuntimeDiagnostics(
+            model_load_active_memory_gb=1.0, model_weight_buffer_gb=0.8
+        ),
     )
     output_file = tmp_path / "results.jsonl"
     save_jsonl_report([result], output_file, prompt="describe", system_info={})
@@ -878,6 +881,7 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields(tmp_path: Path) ->
     assert metrics["active_memory_gb"] == 0.75
     assert metrics["cache_memory_gb"] == 0.25
     assert metrics["model_load_active_memory_gb"] == 1.0
+    assert metrics["model_weight_buffer_gb"] == 0.8
     assert metrics["peak_memory_delta_gb"] == 0.5
 
 

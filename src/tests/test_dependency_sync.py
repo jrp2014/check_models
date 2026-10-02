@@ -36,7 +36,7 @@ from tools import (
 )
 
 if typing.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -2757,8 +2757,9 @@ def test_hub_precheck_memory_verdict_uses_weights_against_memory_facts() -> None
 
 def _fetch_with_siblings(
     monkeypatch: pytest.MonkeyPatch,
-    siblings: dict[str, int | None],
+    siblings: Mapping[str, int | None],
     fetched: dict[str, str] | None = None,
+    pipeline_tag: str | None = None,
 ) -> hub_precheck.HubCandidate:
     """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set)."""
     import huggingface_hub  # noqa: PLC0415 - patched for this call only
@@ -2771,9 +2772,11 @@ def _fetch_with_siblings(
 
     class _Api:
         def model_info(self, _repo_id: str, **_kwargs: object) -> object:
-            return type("Info", (), {"siblings": [_Sibling(n, s) for n, s in siblings.items()]})()
+            listing = [_Sibling(n, s) for n, s in siblings.items()]
+            return type("Info", (), {"siblings": listing, "pipeline_tag": pipeline_tag})()
 
     texts = {"config.json": '{"model_type": "qwen3_vl"}', **(fetched or {})}
+    siblings = {**dict.fromkeys(texts, 100), **siblings}
     monkeypatch.setattr(huggingface_hub, "HfApi", _Api)
     monkeypatch.setattr(huggingface_hub, "hf_hub_url", lambda _repo, name: name)
     monkeypatch.setattr(huggingface_hub.utils, "build_hf_headers", dict)
@@ -2819,6 +2822,52 @@ def test_hub_precheck_memory_counts_only_the_weights_the_loader_selects(
     status, reasons = unsized.verdict()
     assert status == "WARN"
     assert any("memory fit not assessed" in reason for reason in reasons)
+
+
+def test_hub_precheck_reads_the_template_in_the_processors_file_order(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: chat_template.json was never read (Idefics3 looked text-only)."""
+    base = {"tokenizer_config.json": 100, "model.safetensors": 1_000}
+    multimodal = '{"chat_template": "{% for part in message[\'content\'] %}{% endfor %}"}'
+    text_only = '{"chat_template": "{{ bos }}{{ message[\'content\'] + eos }}"}'
+    candidate = _fetch_with_siblings(
+        monkeypatch,
+        base,
+        {"chat_template.json": multimodal, "tokenizer_config.json": text_only},
+        pipeline_tag="image-text-to-text",
+    )
+    assert (candidate.template, candidate.template_source) == (
+        "iterates-content",
+        "chat_template.json",
+    )
+    assert candidate.pipeline_tag == "image-text-to-text"
+    rendered = hub_precheck.render([candidate])
+    assert "template from: chat_template.json; pipeline_tag: image-text-to-text" in rendered
+    only_tokenizer = _fetch_with_siblings(monkeypatch, base, {"tokenizer_config.json": text_only})
+    status, reasons = only_tokenizer.verdict()
+    assert status == "BLOCKED"
+    assert any("text-only chat template in tokenizer_config.json" in reason for reason in reasons)
+
+
+def test_hub_precheck_records_checkpoint_model_code_instead_of_blocking_the_type(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """config.json model_file makes mlx-vlm import checkpoint code, so no package is needed."""
+    config = '{"model_type": "brand_new", "model_file": "modeling.py"}'
+    template = '{"chat_template": "{% for part in message[\'content\'] %}{% endfor %}"}'
+    candidate = _fetch_with_siblings(
+        monkeypatch,
+        {"tokenizer_config.json": 100, "model.safetensors": 1_000},
+        {"config.json": config, "tokenizer_config.json": template},
+    )
+    assert candidate.model_file == "modeling.py"
+    assert candidate.arch_supported is None
+    status, reasons = candidate.verdict()
+    assert status == "WARN"
+    assert any(
+        "model_file='modeling.py'" in reason and "runs that file" in reason for reason in reasons
+    )
 
 
 def test_hub_precheck_weight_selection_mirrors_the_loader() -> None:

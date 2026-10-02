@@ -6,13 +6,14 @@ from typing import Final
 
 # Floors also guarantee upstream-shipped typing, which the quality gate relies
 # on now that no local stubs are generated at all: mlx >= 0.32.1 wheels bundle
+# (the floor is 0.32.3 for mx.get_array_buffer_size, ml-explore/mlx#4436)
 # mlx/core/*.pyi (0.32.0 shipped py.typed without stubs, ml-explore/mlx#3916),
 # transformers >= 4.51 ships py.typed inline annotations
 # (huggingface/transformers#37022), and mlx-vlm >= 0.6.16 ships py.typed
 # (Blaizzy/mlx-vlm#1985), so these floors keep the type checkers supplied
 # without local stub generation.
 PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.32.1",
+    "mlx": "0.32.3",
     "mlx-vlm": "0.6.16",
     "transformers": "5.14.0",
     "huggingface-hub": "1.10.1",
@@ -61,6 +62,7 @@ VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     "packaging": ">=26.0",
     "rich": ">=14.1.0",
     "PyYAML": ">=6.0",
+    "Jinja2": ">=3.1.0",
 }
 
 VALIDATE_ENV_EXTRAS_FALLBACK_SPECS: Final[dict[str, str]] = {

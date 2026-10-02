@@ -129,6 +129,12 @@ class HubCandidate:
     # The hub listed no size for at least one selected weight file, so the
     # memory fit is unknown rather than assumed.
     weights_size_unknown: bool = False
+    # Which file the chat template was read from (None when none was found).
+    template_source: str | None = None
+    # The hub's task label (e.g. "image-text-to-text"); recorded, not gated on.
+    pipeline_tag: str | None = None
+    # config.json names checkpoint-shipped model code (mlx-vlm loads it as "custom").
+    model_file: str | None = None
 
     def verdict(self) -> tuple[str, list[str]]:
         """Return ("OK" | "WARN" | "BLOCKED", reasons)."""
@@ -143,6 +149,11 @@ class HubCandidate:
             blocked.append(
                 f"no mlx-vlm package for model_type {self.model_type!r} "
                 f"(resolves to {self.resolved_model_type!r})"
+            )
+        elif self.model_file is not None:
+            warnings.append(
+                f"config.json declares model_file={self.model_file!r}: mlx-vlm imports and "
+                "runs that file from the checkpoint instead of its own model packages"
             )
         elif self.arch_supported is None:
             warnings.append(
@@ -168,15 +179,21 @@ class HubCandidate:
                 "the hub lists no size for some weight files the loader would read; "
                 "memory fit not assessed"
             )
+        source = f" in {self.template_source}" if self.template_source else ""
         if self.template == "string-only":
             blocked.append(
-                "text-only chat template (concatenates message content as a string); "
+                f"text-only chat template{source} (concatenates message content as a string); "
                 "list-content messages fail at prefill"
             )
         elif self.template == "absent":
-            warnings.append("no chat template found; the processor may supply one")
+            warnings.append(
+                "no chat template found in chat_template.jinja/.json, processor_config.json "
+                "or tokenizer_config.json; the processor may supply one"
+            )
         elif self.template == "unknown":
-            warnings.append("chat template shape not recognised; check it handles content parts")
+            warnings.append(
+                f"chat template shape{source} not recognised; check it handles content parts"
+            )
         if blocked:
             return "BLOCKED", blocked + warnings
         return ("WARN", warnings) if warnings else ("OK", [])
@@ -224,7 +241,21 @@ def _fetch_text(url: str, headers: dict[str, str]) -> str | None:
         return None
 
 
+# The order AutoProcessor reads a chat template in (transformers
+# processing_utils): a .jinja file, then chat_template.json, then the
+# processor and tokenizer configs. Reading only .jinja and tokenizer_config
+# misjudged checkpoints whose multimodal template lives in chat_template.json
+# (Idefics3 looked text-only; pixtral looked template-less).
+_TEMPLATE_SOURCES: Final[tuple[str, ...]] = (
+    "chat_template.jinja",
+    "chat_template.json",
+    "processor_config.json",
+    "tokenizer_config.json",
+)
+
+
 def _template_from_tokenizer_config(text: str | None) -> str | None:
+    """Read ``chat_template`` from a JSON config (string or named-template list)."""
     if text is None:
         return None
     try:
@@ -243,6 +274,50 @@ def _template_from_tokenizer_config(text: str | None) -> str | None:
         ]
         return "\n".join(parts) if parts else None
     return None
+
+
+type TextFetcher = Callable[[str], str | None]
+
+
+def _config_facts(fetch: TextFetcher) -> tuple[object, str | None]:
+    """config.json's raw model_type and its declared ``model_file``, when readable."""
+    config_text = fetch("config.json")
+    if config_text is None:
+        return None, None
+    try:
+        config = json.loads(config_text)
+    except json.JSONDecodeError:
+        return None, None
+    if not isinstance(config, dict):
+        return None, None
+    declared_file = config.get("model_file")
+    model_file = declared_file if isinstance(declared_file, str) and declared_file else None
+    return config.get("model_type") or config.get("speculators_model_type"), model_file
+
+
+def _first_template(files: Iterable[str], fetch: TextFetcher) -> tuple[str | None, str | None]:
+    """The chat template AutoProcessor would read, and the file it came from."""
+    names = set(files)
+    for source in _TEMPLATE_SOURCES:
+        if source not in names:
+            continue
+        text = fetch(source)
+        found = text if source.endswith(".jinja") else _template_from_tokenizer_config(text)
+        if found:
+            return found, source
+    return None, None
+
+
+def _selected_weight_sizes(
+    files: Sequence[str], size_by_name: dict[str, int | None], fetch: TextFetcher
+) -> list[int | None]:
+    """Hub sizes of the weight files the loader would read (None where unlisted)."""
+    index_text = (
+        fetch("model.safetensors.index.json")
+        if "model.safetensors.index.json" in size_by_name
+        else None
+    )
+    return [size_by_name.get(name) for name in selected_weight_files(files, index_text)]
 
 
 def fetch_candidate(
@@ -264,40 +339,31 @@ def fetch_candidate(
     # The whole repository's size is shown for information only; the memory
     # verdict uses the weights the loader would select.
     sizes = [sibling.size for sibling in info.siblings or () if sibling.size]
-    size_gb = round(sum(sizes) / 1e9, 1) if sizes else None
     size_by_name = {sibling.rfilename: sibling.size for sibling in info.siblings or ()}
     memory_bytes, working_set_bytes = (memory_check or _default_memory_check)()
     headers = build_hf_headers()
-    index_text = (
-        _fetch_text(hf_hub_url(repo_id, "model.safetensors.index.json"), headers)
-        if "model.safetensors.index.json" in size_by_name
-        else None
-    )
-    weight_sizes = [size_by_name.get(name) for name in selected_weight_files(files, index_text)]
+
+    def fetch(file_name: str) -> str | None:
+        return _fetch_text(hf_hub_url(repo_id, file_name), headers)
+
+    weight_sizes = _selected_weight_sizes(files, size_by_name, fetch)
     weights_known = bool(weight_sizes) and all(weight_sizes)
-    config_text = _fetch_text(hf_hub_url(repo_id, "config.json"), headers)
-    model_type_raw: object = None
-    if config_text is not None:
-        try:
-            config = json.loads(config_text)
-        except json.JSONDecodeError:
-            config = {}
-        if isinstance(config, dict):
-            model_type_raw = config.get("model_type") or config.get("speculators_model_type")
+    model_type_raw, model_file = _config_facts(fetch)
     model_type, resolved, supported = check(model_type_raw)
-    template = _fetch_text(hf_hub_url(repo_id, "chat_template.jinja"), headers)
-    if template is None:
-        template = _template_from_tokenizer_config(
-            _fetch_text(hf_hub_url(repo_id, "tokenizer_config.json"), headers)
-        )
+    # mlx-vlm imports a declared model_file from the checkpoint instead of its
+    # own packages (get_model_and_args), so the package check does not apply.
+    template, template_source = _first_template(files, fetch)
     return HubCandidate(
         repo_id=repo_id,
         files=files,
-        size_gb=size_gb,
+        size_gb=round(sum(sizes) / 1e9, 1) if sizes else None,
         model_type=model_type,
         resolved_model_type=resolved,
-        arch_supported=supported,
+        arch_supported=None if model_file is not None else supported,
         template=template_shape(template),
+        template_source=template_source,
+        pipeline_tag=getattr(info, "pipeline_tag", None),
+        model_file=model_file,
         weights_gb=_gigabytes(sum(size or 0 for size in weight_sizes)) if weights_known else None,
         memory_gb=_gigabytes(memory_bytes),
         working_set_gb=_gigabytes(working_set_bytes),
@@ -315,6 +381,16 @@ def render(candidates: Sequence[HubCandidate]) -> str:
         lines.append(
             f"{status:7} {size:>9}  {arch:24} template={candidate.template:17} {candidate.repo_id}"
         )
+        facts = [
+            f"{label}: {value}"
+            for label, value in (
+                ("template from", candidate.template_source),
+                ("pipeline_tag", candidate.pipeline_tag),
+            )
+            if value
+        ]
+        if facts:
+            lines.append("          (" + "; ".join(facts) + ")")
         lines.extend(f"          - {reason}" for reason in reasons)
     return "\n".join(lines)
 

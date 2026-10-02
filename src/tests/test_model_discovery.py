@@ -566,6 +566,38 @@ def test_model_arch_precheck_is_indeterminate_without_config_or_install(
     assert check_models._model_arch_precheck(repo) == ("qwen2_vl", "qwen2_vl", None)
 
 
+def test_model_arch_precheck_defers_to_checkpoint_model_code(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """config.json model_file makes mlx-vlm import checkpoint code: no package verdict."""
+    snapshot = tmp_path / "snap"
+    snapshot.mkdir()
+    check_models._write_text_file(
+        snapshot / "config.json",
+        json.dumps({"model_type": "brand_new", "model_file": "modeling.py"}),
+    )
+    repo = _FakeSnapshotRepo(
+        repo_id="org/custom",
+        repo_type="model",
+        refs={"main": _FakeSnapshotRef(snapshot_path=str(snapshot))},
+    )
+    monkeypatch.setattr(
+        check_models, "_installed_mlx_vlm_model_types", lambda: frozenset({"qwen2_vl"})
+    )
+    monkeypatch.setattr(check_models, "_mlx_vlm_model_remapping", dict)
+    assert check_models._model_arch_precheck(repo) == ("brand_new", "brand_new", None)
+    assert check_models._declared_model_file({"model_file": "modeling.py"}) == "modeling.py"
+    assert check_models._declared_model_file({"model_file": ""}) is None
+    entry = check_models.CachedModelEligibility(
+        repo_id="org/custom", supported=True, model_file="modeling.py"
+    )
+    monkeypatch.setattr(check_models, "get_cached_model_eligibility", lambda: (entry,))
+    summary = check_models._arch_precheck_summary("org/custom")
+    assert summary is not None
+    assert summary.startswith("not checked: config.json model_file='modeling.py'")
+
+
 def test_arch_precheck_summary_renders_verdict(monkeypatch: pytest.MonkeyPatch) -> None:
     """The per-model fact renders yes/no with alias resolution, or omits itself."""
     monkeypatch.setattr(

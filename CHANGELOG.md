@@ -6,30 +6,36 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- `run_summary.md` opens with a one-line verdict for mlx-vlm maintainers
-  (crashes needing action, other results needing reproduction, and how many
-  of those are unchanged since the baseline); the review table gains a
-  "Since baseline" column (unchanged / changed / new). Start-up environment
-  warnings (upstream version drift, API drift, and now one package installed
-  at two versions) are carried in `results.jsonl` and listed under the
-  verdict; before, they reached only the log.
-- The baseline throughput table is introduced by a sentence naming it and,
-  when mlx changed since the baseline, the two mlx revisions. No cause is
-  suggested: a first-run shader-compilation note was tried and withdrawn when
-  a warm rerun left the same models slow.
-- The quality table adds counted facts: prompt tokens (image tokens
-  included) and, when the answer has a Keywords field, the keyword count with
-  how many appear verbatim in the prompt's keyword hints (recorded as
-  `keywords_from_hints`). Counts only; no verdicts are derived from them, and
-  a custom `--prompt` without those fields shows neither.
-- Report trimming: the scope disclaimer is stated once per report; "Reached
-  token limit" and "Incomplete output at token limit" are one row; the
-  observation-cluster table appears only when a signature is shared by two or
-  more models; the constraint breakdown no longer repeats the per-model
-  duplicate-keyword flag; clean completions are no longer listed again by
-  name. Diagnostics round measured floats to three decimals and show
-  maintainer status and usability as words (`observation needs
-  reproduction`, `usable with caveats`) rather than identifiers.
+- Checkpoint sampling follows mlx-vlm's own `load()`: only the
+  `generation_config.json` keys in `mlx_vlm.utils.GENERATION_CONFIG_DEFAULT_KEYS`
+  (temperature, top_p, top_k, with do_sample) are applied. A declared
+  `min_p` or `repetition_penalty` is no longer applied (7 of 51 cached
+  models declared a repetition penalty), so those models' text can change
+  once against older baselines. A missing key list is reported as API drift.
+- New recorded facts (no verdicts):
+  - per model: `generation_config.json` settings nothing applied (e.g. a
+    declared `max_new_tokens` of 16384), EOS ids by declaring file, which
+    files carry a chat template, the variables the template reads (via
+    `jinja2.meta`) and any passed chat-template option it never reads, and
+    the loaded weights' own size (`mx.get_array_buffer_size`) beside
+    post-load active memory;
+  - per run: MLX_/MTL_ environment variables (a difference withholds the
+    throughput comparison and splits history bands), the Metal max buffer
+    size and buffer-count limit, the MLX memory limit and the GPU wired
+    limit.
+- `tools.hub_precheck` reads the chat template in AutoProcessor's file
+  order (`.jinja`, `chat_template.json`, `processor_config.json`,
+  `tokenizer_config.json`) and names the file; it had never read
+  `chat_template.json`, so Idefics3 looked text-only and pixtral
+  template-less. It also records the hub `pipeline_tag`, and a config
+  `model_file` (checkpoint-shipped code mlx-vlm imports instead of its own
+  packages) is reported instead of failing the architecture check, here and
+  in the cached-repo check.
+- The native repro command passes `--verbose`, so upstream prints token
+  counts, tok/s and peak memory to compare with the harness's.
+- Dependencies: `mlx>=0.32.3` (for `mx.get_array_buffer_size`) and a
+  declared `Jinja2>=3.1.0`.
+
 - Console log simplifications. Each per-model result opens with one readable
   line (`[n/N] <model>: completed, unusable output; observations: …; next
   step: …`) instead of wrapped `key=value` pairs; the DEBUG `REPRO` line
@@ -592,84 +598,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- `make probe-python-next` (`tools/probe_python_next.sh`) no longer misleads
-  for `PROBE_PYTHON=3.15`. Before, check 1 installed the project from PyPI, and
-  mlx 0.32.3 has no cp315 wheel or sdist there, so the probe exited before the
-  `PROBE_SOURCE_BUILD=1` build, which is the check that decides whether
-  `tools/update.sh` would keep working. ml-explore/mlx#4555 (merged
-  2026-09-29) added 3.15 support at source level. The source build now runs
-  first and pins its result (`--constraint mlx==<built version>`) for the
-  project install. It builds in a throwaway shallow clone of the checkout's
-  HEAD, using pip's isolated build as `update.sh` does. The old in-place
-  editable build overwrote `python/mlx/lib/libmlx.dylib` and `mlx.metallib`,
-  which the working env's editable install loads. A new opt-in
-  `PROBE_TORCH=1` check installs the `torch` extra (read from
-  `pyproject.toml`, without the project) and imports torch and torchvision.
-  Its failure reads "torch extra unavailable: about half the roster would
-  fail" and stays out of the core verdict and the exit status. Every check now
-  runs unless one it depends on failed, and a closing verdict lists each
-  result. `PROBE_MLX_REPO` overrides the checkout path. Tests in
-  `test_dependency_sync.py` run the shipped script against a fake conda and
-  interpreter with a real git checkout.
-- `tools/update.sh` skips the mlx rebuild only when the installed mlx is the
-  checkout's own build: `mlx.core` imports, and both the version compiled
-  into it (`mlx.core.__version__`) and pip's metadata carry the checkout
-  HEAD as `+<sha>` (metadata alone could pass a stale extension). An earlier run had pulled 50 commits and lost the compiled
-  extension, and the next run's no-op pull, clean tree and matching editable
-  path were taken as "unchanged; skipping rebuild".
-- The baseline comparison states a macOS change as a fact ("macOS changed
-  since the baseline: 27.0 → 27.0.1"). It had said the first run after an
-  OS upgrade compiles Metal pipelines cold and is "not comparable until a
-  second run" on every run compared against a pre-upgrade baseline,
-  including warm ones, and the `->` rendered as `-&gt;`.
-- Skylos 4.43 flags the `--image` URL download as possible SSRF
-  (SKY-D216); suppressed inline with the reason: the URL is the operator's
-  own argument and the scheme is restricted to http(s) before the fetch.
-- `tools/update.sh` no longer caps setuptools below 82; only mlx's build
-  floor (`>=80`) stays. The cap had no recorded reason, every source build
-  runs in pip's isolated build environment (which installed setuptools 84
-  for the mlx build regardless), and nothing installed needs
-  `pkg_resources`; the cap only made each run report setuptools as
-  outdated and fight torch's eager upgrade.
-- `tools/update.sh` stops before pulling when a local MLX checkout has a
-  malformed git ref (a name with a space under `.git/refs`, as iCloud's
-  "`main 2`" conflict copy was): git ref names cannot contain spaces, and
-  the stale copy had made `git pull` fail with "bad object". Untracked
-  "`<name> 2.<ext>`" files beside an existing original are reported as
-  suspected iCloud conflict copies, as a warning only (a numbered name alone
-  is a legitimate file); 804 such copies had made every run look modified.
-  "Nothing found" counts as success, so neither check can end the run under
-  `set -e`.
-- `tools/update.sh` updates conda in base together with every installed
-  `conda*` package; updating conda alone left its plugins
-  (`conda-anaconda-telemetry`, `conda-anaconda-tos`) behind, printing
-  "Error while loading conda entry point" on every command after conda
-  26.9. A plugin that still fails to load afterwards is named with the
-  remedy, and the update continues.
-- `tools.hub_precheck` sizes the memory verdict from the weights mlx-vlm's
-  loader would read (index shards that exist, else root-level
-  `*.safetensors` except `consolidated.safetensors`); a nested alternate
-  checkpoint had been added in and could turn a fitting model BLOCKED. When
-  the hub lists no size for a selected file, the fit is reported as not
-  assessed. The repository total stays a separate figure.
-- EXIF UserComment values with an `ASCII`/`UNICODE`/`JIS` character-code
-  header are decoded as text again instead of being labelled binary (the
-  header's NUL bytes had tripped the binary check).
-- Crash drafts' checkpoint checks quote each recorded snapshot gap and give
-  it its own check (weights: confirm the download; tokenizer or processor
-  files: try another conversion) instead of asserting that "the processor
-  used its defaults" for every note, including missing weight shards.
-- System-state notes give the worst level and the above-normal count
-  separately ("thermal state reached serious; above nominal at both
-  checks"); a fair check and a serious one had read as "serious at both".
-- `environment.log` lists each editable install (mlx, mlx-vlm, mlx-lm,
-  check_models) once; importlib found each twice, through its site-packages
-  dist-info and its checkout on `sys.path`. Two different versions of one
-  name are still both listed.
-- A run without a terminal (output piped or redirected, as in a background
-  sweep) now logs at the full 120-column width instead of a 100-column
-  fallback, which had folded the closing comparison table into cells three
-  or four characters wide in `check_models.log`.
+- Allocation failures name the Metal limit mlx reported: one buffer above
+  the maximum buffer size, the buffer-count limit (a number of buffers, not
+  bytes; no longer classed as out-of-memory), or exhausted memory
+  (`[malloc] Unable to allocate`, which the old `metal::malloc` match
+  missed).
 - System facts labelled "(run start)" (available memory, swap, power source
   and mode) are taken once at the start of the run and reused by the reports
   and the closing summary; both had re-read them at the end, so an unplugged

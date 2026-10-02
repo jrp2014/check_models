@@ -14,7 +14,17 @@ from check_models import (
     ("message", "expected_type"),
     [
         # Critical errors
-        ("[metal::malloc] Attempting to allocate...", "OOM"),
+        # mlx's three allocator errors (mlx/backend/metal/allocator.cpp):
+        (
+            (
+                "[metal::malloc] Attempting to allocate 9 bytes which is greater than "
+                "the maximum allowed buffer size of 8 bytes."
+            ),
+            "OOM",
+        ),
+        ("[malloc] Unable to allocate 123 bytes.", "OOM"),
+        # A buffer *count* cap, not a memory amount: not an out-of-memory failure.
+        ("[metal::malloc] Resource limit (499000) exceeded.", "Error"),
         ("maximum allowed buffer size exceeded", "OOM"),
         (
             (

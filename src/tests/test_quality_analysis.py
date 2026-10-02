@@ -1610,24 +1610,34 @@ def test_exact_prompt_composition_counts_image_ids_from_a_prepare_inputs_pass(
 def test_declared_sampling_fills_only_what_the_cli_left_unset() -> None:
     """Checkpoint values apply to unset keys; CLI keys win; do_sample false stays greedy."""
     kwargs = cast("Any", {"temperature": 0.0, "top_p": 1.0, "top_k": 0, "min_p": 0.0})
-    declared = {"do_sample": True, "temperature": 0.7, "top_p": 0.8, "top_k": 20, "min_p": 2.0}
+    declared = {
+        "do_sample": True,
+        "temperature": 0.7,
+        "top_p": 0.8,
+        "top_k": 20,
+        "min_p": 0.05,
+        "repetition_penalty": 1.1,
+    }
     sources = check_models._apply_declared_sampling(kwargs, declared, explicit={"top_p"})
     assert kwargs == {"temperature": 0.7, "top_p": 1.0, "top_k": 20, "min_p": 0.0}
     assert sources == {
         "temperature": "generation_config",
         "top_p": "cli",
         "top_k": "generation_config",
-        "min_p": "default",  # 2.0 is out of range and ignored
+        # mlx-vlm's load() applies neither, so the harness does not either.
+        "min_p": "default",
         "repetition_penalty": "default",
     }
     greedy = cast("Any", {"temperature": 0.0, "top_p": 1.0, "top_k": 0, "min_p": 0.0})
     sources = check_models._apply_declared_sampling(
         greedy, {"do_sample": False, "temperature": 0.9, "repetition_penalty": 1.1}, explicit=()
     )
-    assert greedy["temperature"] == 0.0
-    assert greedy["repetition_penalty"] == 1.1
+    assert greedy == {"temperature": 0.0, "top_p": 1.0, "top_k": 0, "min_p": 0.0}
     assert sources["temperature"] == "default"
-    assert sources["repetition_penalty"] == "generation_config"
+    assert sources["repetition_penalty"] == "default"
+    # The applied keys are upstream's own list when mlx-vlm provides it.
+    assert set(check_models.upstream_generation_config_keys) >= {"temperature", "top_p", "top_k"}
+    assert "repetition_penalty" not in check_models.upstream_generation_config_keys
     untouched = cast("Any", {"temperature": 0.0})
     assert check_models._apply_declared_sampling(untouched, {}, explicit=()) == dict.fromkeys(
         check_models._CHECKPOINT_SAMPLING_DESTS, "default"
@@ -1824,3 +1834,58 @@ def test_place_names_the_prompt_never_supplied_are_flagged() -> None:
         "Ely",
     ]
     assert places("A swan on the River Cam.", None) == []
+
+
+def test_checkpoint_file_facts_record_what_each_file_declares(tmp_path: Path) -> None:
+    """Unapplied generation settings, EOS ids by file and template locations are facts."""
+    snapshot = tmp_path / "snapshot"
+    snapshot.mkdir()
+    files = {
+        "config.json": {"eos_token_id": None, "text_config": {"eos_token_id": [1, 2]}},
+        "generation_config.json": {
+            "eos_token_id": 2,
+            "temperature": 0.6,
+            "do_sample": True,
+            "max_new_tokens": 16384,
+            "repetition_penalty": 1.05,
+            "transformers_version": "5.18.0",
+        },
+        "chat_template.json": {"chat_template": "{{ messages }}"},
+        "tokenizer_config.json": {"chat_template": "{{ bos_token }}{{ messages }}"},
+    }
+    for name, payload in files.items():
+        check_models._write_text_file(snapshot / name, json.dumps(payload))
+    unapplied = check_models._unapplied_generation_settings(
+        snapshot, {"temperature": "generation_config", "repetition_penalty": "default"}
+    )
+    # Applied keys and bookkeeping are left out; what nothing applied is kept with its value.
+    assert unapplied == {"max_new_tokens": 16384, "repetition_penalty": 1.05}
+    assert check_models._declared_eos_token_ids(snapshot) == {
+        "config.json text_config": [1, 2],
+        "generation_config.json": 2,
+    }
+    assert check_models._chat_template_sources(snapshot) == (
+        "chat_template.json",
+        "tokenizer_config.json",
+    )
+    assert check_models._chat_template_sources(None) == ()
+
+
+def test_chat_template_variables_come_from_the_parsed_template() -> None:
+    """jinja2.meta names what a template reads, so unread options are a fact, not a guess."""
+    template = (
+        "{% for message in messages %}{{ message['content'] }}{% endfor %}"
+        "{% if enable_thinking %}<think>{% endif %}{% if add_generation_prompt %}A:{% endif %}"
+    )
+    processor = types.SimpleNamespace(chat_template=template)
+    assert check_models._chat_template_variables(processor) == (
+        "add_generation_prompt",
+        "enable_thinking",
+        "messages",
+    )
+    named = types.SimpleNamespace(
+        chat_template={"default": "{{ messages }}", "tool": "{{ tools }}"}
+    )
+    assert check_models._chat_template_variables(named) == ("messages", "tools")
+    assert check_models._chat_template_variables(types.SimpleNamespace(chat_template="{% if")) == ()
+    assert check_models._chat_template_variables(types.SimpleNamespace(chat_template=None)) == ()

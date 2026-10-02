@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import base64
 import dataclasses
+import functools
 import hashlib
 import html
 import io
@@ -783,6 +784,8 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
         "thinking_start_token": run_args.thinking_start_token,
         "thinking_end_token": run_args.thinking_end_token,
         "processor_kwargs": run_args.processor_kwargs,
+        # Upstream then prints token counts, tok/s and peak memory, not only text.
+        "verbose": True,
     }
     actual = {key: getattr(parsed, key, "MISSING") for key in expected}
     # The parser may normalise a scalar image or prompt into a list.
@@ -8225,3 +8228,60 @@ def test_observation_clusters_render_only_for_shared_signatures() -> None:
     section = check_models._run_issue_summary_observation_cluster_section
     assert section((one,)) is None
     assert section((one, two)) is not None
+
+
+def test_mlx_environment_variables_are_recorded_and_split_throughput(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """MLX_/MTL_ variables change timings, so a difference withholds throughput, not outputs."""
+    monkeypatch.setenv("MLX_MAX_OPS_PER_BUFFER", "4")
+    monkeypatch.setenv("MLX_VLM_WIDTH", "120")  # the harness's own display setting
+    monkeypatch.setenv("MTL_CAPTURE_ENABLED", "1")
+    assert check_models._mlx_environment() == {
+        "MLX_MAX_OPS_PER_BUFFER": "4",
+        "MTL_CAPTURE_ENABLED": "1",
+    }
+    fingerprint = functools.partial(
+        check_models._comparison_fingerprint,
+        prompt="p",
+        image_sha256="a" * 64,
+        generation_settings={},
+        execution_mode="in_process",
+        eval_mode="assisted",
+        system_info={},
+    )
+    # Unset variables leave the fingerprint (and so the history bands) unchanged.
+    assert fingerprint() == fingerprint(mlx_environment={})
+    assert fingerprint() != fingerprint(mlx_environment={"MLX_MAX_OPS_PER_BUFFER": "4"})
+
+    change = check_models._mlx_environment_change
+    meta = cast("check_models.JsonlMetadataRecord", {"mlx_environment": {}})
+    tuned = cast(
+        "check_models.JsonlMetadataRecord", {"mlx_environment": {"MLX_MAX_OPS_PER_BUFFER": "4"}}
+    )
+    assert change(meta, meta) is None
+    assert change(cast("check_models.JsonlMetadataRecord", {}), meta) is None
+    assert change(meta, tuned) == (
+        "MLX environment variables differ (MLX_MAX_OPS_PER_BUFFER unset → 4); "
+        "throughput is not compared"
+    )
+    not_recorded = change(cast("check_models.JsonlMetadataRecord", {}), tuned)
+    assert not_recorded is not None
+    assert "were not recorded for the baseline" in not_recorded
+
+    baseline = _comparison_baseline([_comparison_record("org/steady", tps=50.0)])
+    baseline.metadata["mlx_environment"] = {}
+    current_metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "mlx_environment": {"MLX_MAX_OPS_PER_BUFFER": "4"}},
+    )
+    kwargs = {**_verified_comparison_kwargs(baseline), "current_metadata": current_metadata}
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/steady", tps=55.0))],
+        baseline,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison is not None
+    assert comparison.comparable  # outputs are still compared
+    assert not comparison.throughput_comparable
+    assert any("MLX environment variables differ" in note for note in comparison.environment_notes)

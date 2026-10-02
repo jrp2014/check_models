@@ -956,6 +956,8 @@ class TestHardwareFacts:
             "architecture": " applegpu_g17s ",
             "memory_size": 128 * 1024**3,
             "max_recommended_working_set_size": 96 * 1024**3,
+            "max_buffer_length": 86_586_540_032,
+            "resource_limit": 499_000,
             "ignored": "value",
         }
         mod._get_mlx_device_info.cache_clear()
@@ -972,9 +974,70 @@ class TestHardwareFacts:
                 "architecture": "applegpu_g17s",
                 "memory_size": 128 * 1024**3,
                 "max_recommended_working_set_size": 96 * 1024**3,
+                "max_buffer_length": 86_586_540_032,
+                "resource_limit": 499_000,
             }
         )
         runtime.device_info.assert_called_once_with()
+
+    def test_memory_limit_facts_name_each_limit_in_decimal_gb(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Allocator caps, the MLX memory limit and the wired limit are recorded as facts."""
+        runtime = MagicMock()
+        runtime.get_memory_limit.return_value = 131_000_000_000
+        monkeypatch.setattr(mod, "mx", runtime)
+        monkeypatch.setattr(mod, "_get_macos_sysctl_value", lambda _name: "0")
+        facts = mod._get_memory_limit_facts(
+            {"max_buffer_length": 86_586_540_032, "resource_limit": 499_000}
+        )
+        assert facts == {
+            "Max Metal Buffer": "86.6 GB",
+            "Metal Buffer-Count Limit": "499,000 buffers",
+            "MLX Memory Limit": "131 GB",
+            "GPU Wired Limit": "macOS default (iogpu.wired_limit_mb=0)",
+        }
+        monkeypatch.setattr(mod, "_get_macos_sysctl_value", lambda _name: "100000")
+        assert mod._get_memory_limit_facts({})["GPU Wired Limit"].endswith("(iogpu.wired_limit_mb)")
+
+    def test_loaded_weight_size_comes_from_get_array_buffer_size(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """mx.get_array_buffer_size counts the weights once; failures read as unavailable."""
+        runtime = MagicMock()
+        runtime.get_array_buffer_size.return_value = 5_400_000_000
+        monkeypatch.setattr(mod, "mx", runtime)
+        assert mod._sample_model_weight_buffer_gb(object()) == pytest.approx(5.4)
+        runtime.get_array_buffer_size.side_effect = RuntimeError("no arrays")
+        assert mod._sample_model_weight_buffer_gb(object()) is None
+        monkeypatch.setattr(mod, "mx", object())
+        assert mod._sample_model_weight_buffer_gb(object()) is None
+
+    @pytest.mark.parametrize(
+        ("message", "limit"),
+        [
+            (
+                (
+                    "[metal::malloc] Attempting to allocate 9 bytes which is greater than the "
+                    "maximum allowed buffer size of 8 bytes."
+                ),
+                "maximum Metal buffer size",
+            ),
+            ("[metal::malloc] Resource limit (499000) exceeded.", "buffer-count limit"),
+            ("[malloc] Unable to allocate 123 bytes.", "memory exhausted"),
+            ("shape mismatch", None),
+        ],
+    )
+    def test_allocation_failures_name_the_limit_mlx_reported(
+        self, mod: types.ModuleType, message: str, limit: str | None
+    ) -> None:
+        """Regression: every "metal::malloc" read as out-of-memory, buffer-count cap included."""
+        named = mod._metal_allocation_limit(message)
+        assert (named is None) if limit is None else (limit in named)
 
     @pytest.mark.parametrize(
         "payload",
@@ -1286,7 +1349,7 @@ class TestPreflightDependencyDiagnostics:
         issues = mod._detect_upstream_version_issues(
             {
                 "mlx-vlm": "0.6.16",
-                "mlx": "0.32.1",
+                "mlx": "0.32.3",
                 "mlx-audio": "0.4.3",
                 "transformers": "5.15.0",
                 "huggingface-hub": "1.10.1",
@@ -1438,6 +1501,23 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
             ),
         )
         assert "missing-dependency placeholder" not in issues[0]
+
+    def test_runtime_api_drift_reports_a_moved_generation_config_key_list(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The sampling keys come from mlx-vlm; losing that import is drift, not silence."""
+        monkeypatch.setattr(mod, "upstream_generation_config_keys_imported", False)
+        issues = mod._detect_runtime_api_drift_issues()
+        assert any(
+            "GENERATION_CONFIG_DEFAULT_KEYS is missing" in issue and "temperature" in issue
+            for issue in issues
+        )
+        monkeypatch.setattr(mod, "upstream_generation_config_keys_imported", True)
+        assert not any(
+            "GENERATION_CONFIG" in issue for issue in mod._detect_runtime_api_drift_issues()
+        )
 
     def test_get_generation_result_contract_issues_reports_missing_fields(
         self,

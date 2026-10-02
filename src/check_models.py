@@ -135,6 +135,9 @@ import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
+from jinja2 import Environment as JinjaEnvironment
+from jinja2 import TemplateSyntaxError as JinjaTemplateSyntaxError
+from jinja2 import meta as jinja_meta
 from packaging.version import InvalidVersion, Version
 from rich import box
 from rich.bar import Bar
@@ -815,6 +818,18 @@ apply_chat_template: ApplyChatTemplateCallable = cast(
 )
 load: LoadCallable = cast("LoadCallable", _raise_mlx_vlm_missing)
 load_image: LoadImageCallable = cast("LoadImageCallable", _raise_mlx_vlm_missing)
+# The generation_config.json keys mlx-vlm's own load() applies
+# (mlx_vlm.utils.GENERATION_CONFIG_DEFAULT_KEYS, since 0.6.10). The harness
+# takes exactly these, so a checkpoint is measured as upstream runs it; this
+# copy stands in when mlx-vlm is absent or the name moves.
+upstream_generation_config_keys: tuple[str, ...] = (
+    "eos_token_id",
+    "temperature",
+    "top_p",
+    "top_k",
+    "do_sample",
+)
+upstream_generation_config_keys_imported: bool = False
 
 
 mlx_vlm_probe_error = _probe_import_runtime(
@@ -859,6 +874,16 @@ if mlx_vlm_probe_error is None:
         vlm_version = _mlx_vlm_version
     except ImportError:
         MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
+    else:
+        try:
+            from mlx_vlm.utils import (
+                GENERATION_CONFIG_DEFAULT_KEYS as _MLX_VLM_GENERATION_CONFIG_KEYS,
+            )
+        except ImportError:
+            pass  # keep the copy above; the drift check reports the move
+        else:
+            upstream_generation_config_keys = tuple(_MLX_VLM_GENERATION_CONFIG_KEYS)
+            upstream_generation_config_keys_imported = True
 else:
     MISSING_DEPENDENCIES["mlx-vlm"] = mlx_vlm_probe_error
 
@@ -891,6 +916,10 @@ class MlxDeviceInfo(TypedDict, total=False):
     architecture: str
     memory_size: int
     max_recommended_working_set_size: int
+    # Metal allocator limits (mlx/backend/metal/allocator.cpp): the largest
+    # single buffer, and the buffer-count cap (iogpu.rsrc_limit, not bytes).
+    max_buffer_length: int
+    resource_limit: int
 
 
 class _ExifNotExtracted:
@@ -1031,6 +1060,7 @@ class JsonlMetricsRecord(GenerationFactsRecord, total=False):
 
     peak_memory_working_set_pct: float
     model_load_active_memory_gb: float
+    model_weight_buffer_gb: float
     peak_memory_delta_gb: float
     first_token_peak_memory_gb: float
     post_cleanup_active_memory_gb: float
@@ -1207,6 +1237,8 @@ class JsonlMetadataRecord(TypedDict, total=False):
     # Start-up environment warnings (version drift, API drift, one package at
     # two versions), carried so the reports surface them, not only the log.
     preflight_issues: NotRequired[list[str]]
+    # MLX_/MTL_ environment variables set for the run ({} when none were).
+    mlx_environment: NotRequired[dict[str, str]]
 
 
 class ModelProvenanceRecord(TypedDict):
@@ -1620,6 +1652,7 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
     model_load_active_memory: float | None  # Dynamically added post-load active memory (GB)
+    model_weight_buffer: float | None  # Dynamically added loaded-weight bytes (GB)
     peak_memory: float | None  # Upstream peak memory (GB)
     finish_reason: str | None  # Upstream stop/length termination classification
 
@@ -1703,6 +1736,11 @@ def _generation_optional_nonnegative_float_metric(
 def _object_model_load_active_memory_gb(source: object | None) -> float | None:
     """Return the locally attached post-model-load active memory baseline."""
     return _generation_optional_nonnegative_float_metric(source, _MODEL_LOAD_ACTIVE_MEMORY_ATTR)
+
+
+def _object_model_weight_buffer_gb(source: object | None) -> float | None:
+    """Return the locally attached loaded-weight size (mx.get_array_buffer_size)."""
+    return _generation_optional_nonnegative_float_metric(source, _MODEL_WEIGHT_BUFFER_ATTR)
 
 
 def _extract_generation_performance_data(
@@ -1797,6 +1835,7 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     }
 )
 _MODEL_LOAD_ACTIVE_MEMORY_ATTR: Final[str] = "model_load_active_memory"
+_MODEL_WEIGHT_BUFFER_ATTR: Final[str] = "model_weight_buffer"
 
 
 class _LinkStyleState:
@@ -1907,6 +1946,18 @@ class PromptDiagnostics:
     # Where each effective sampling setting came from: "cli", "generation_config"
     # or "default" (see _apply_declared_sampling).
     sampling_sources: dict[str, str] = dataclass_field(default_factory=dict)
+    # generation_config.json settings neither mlx-vlm's load() nor the harness
+    # applies (e.g. max_new_tokens, repetition_penalty, reasoning_budget).
+    unapplied_generation_settings: dict[str, JsonLike] = dataclass_field(default_factory=dict)
+    # EOS ids as each checkpoint file declares them ("config.json",
+    # "config.json text_config", "generation_config.json"), when present.
+    declared_eos_token_ids: dict[str, JsonLike] = dataclass_field(default_factory=dict)
+    # Snapshot files that carry a chat template, in AutoProcessor's read order.
+    chat_template_sources: tuple[str, ...] = ()
+    # Variables the processor's chat template reads (jinja2.meta), and the
+    # chat-template kwargs this run passed that the template never reads.
+    chat_template_variables: tuple[str, ...] = ()
+    unread_chat_template_kwargs: tuple[str, ...] = ()
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
     # processor config). Evidence only: never an observation, never affects
     # usability; retained so a later failure can be traced to a snapshot that
@@ -2010,6 +2061,9 @@ class RuntimeDiagnostics:
     input_validation_time_s: float | None = None
     model_load_time_s: float | None = None
     model_load_active_memory_gb: float | None = None
+    # The loaded weights' own bytes, each buffer once (mx.get_array_buffer_size);
+    # active memory after load also holds every other load-time allocation.
+    model_weight_buffer_gb: float | None = None
     prompt_prep_time_s: float | None = None
     # Legacy output key: this times the complete mlx_vlm.generate() call,
     # including prepare_inputs(), model prefill, and token decoding.
@@ -2166,6 +2220,19 @@ def _model_burden_rows(
             (
                 "Load active memory vs checkpoint",
                 f"{load_active / weight_gb:.2f}x ({load_active:.2f} GB vs {weight_gb:.2f} GB on disk)",
+            )
+        )
+    weights_in_memory = runtime.model_weight_buffer_gb if runtime is not None else None
+    if weights_in_memory is not None:
+        rows.append(
+            (
+                "Loaded weights in memory (mx.get_array_buffer_size)",
+                f"{weights_in_memory:.2f} GB"
+                + (
+                    f"; other load-time allocations {load_active - weights_in_memory:.2f} GB"
+                    if load_active is not None and load_active >= weights_in_memory
+                    else ""
+                ),
             )
         )
     return tuple(rows)
@@ -5675,6 +5742,14 @@ def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
         )
 
     issues.extend(_get_generation_result_contract_issues(_resolve_generation_result_type()))
+    if (
+        stream_generate is not _raise_mlx_vlm_missing
+        and not upstream_generation_config_keys_imported
+    ):
+        issues.append(
+            "mlx_vlm.utils.GENERATION_CONFIG_DEFAULT_KEYS is missing; checkpoint sampling uses "
+            "the harness's copy (" + ", ".join(upstream_generation_config_keys) + ")."
+        )
     return tuple(dict.fromkeys(issues))
 
 
@@ -10053,6 +10128,7 @@ def _diagnostics_result_facts(
             _declared_sampling_fact(prompt_diagnostics, generation_kwargs),
         ),
         ("Sampling settings source", _sampling_sources_fact(prompt_diagnostics)),
+        *_checkpoint_fact_rows(prompt_diagnostics),
         (
             "Post-cleanup active memory (GB)",
             runtime.post_cleanup_active_memory_gb if runtime is not None else None,
@@ -10098,11 +10174,11 @@ _UPSTREAM_MEMORY_ESTIMATE_RE: Final[re.Pattern[str]] = re.compile(
     r"requires\s+[\d,.]+\s*[GM]B\b[^.\n]*", re.IGNORECASE
 )
 _OOM_CAPACITY_NOTE: Final[str] = (
-    "An out-of-memory failure records that this checkpoint, image and prompt "
-    "needed more memory than this machine could commit during generation. That "
-    "is a resource-capacity outcome, not by itself evidence of a defect in "
-    "mlx-vlm or in the model. Checkpoint size alone does not predict peak "
-    "memory reliably enough to skip models automatically, so these facts are "
+    "A memory-capacity failure records that this checkpoint, image and prompt "
+    "hit a Metal allocation limit on this machine (named above when the message "
+    "says which). That is a resource-capacity outcome, not by itself evidence of "
+    "a defect in mlx-vlm or in the model. Checkpoint size alone does not predict "
+    "peak memory reliably enough to skip models automatically, so these facts are "
     "informational."
 )
 
@@ -10127,6 +10203,11 @@ def _oom_capacity_rows(
 ) -> tuple[tuple[str, str], ...]:
     """Bring the already-recorded capacity facts for an OOM crash together."""
     rows: list[tuple[str, str]] = []
+    limit = _metal_allocation_limit(result.root_error_message) or _metal_allocation_limit(
+        result.error_message
+    )
+    if limit is not None:
+        rows.append(("Allocation limit hit", limit))
     burden = result.model_burden
     if burden is not None and burden.weight_bytes:
         weight = f"{burden.weight_bytes / 1e9:.1f} GB"
@@ -10136,6 +10217,9 @@ def _oom_capacity_rows(
     for label, key in (
         ("Machine RAM", "RAM"),
         ("Recommended working set", "Recommended Working Set"),
+        ("Max Metal buffer", "Max Metal Buffer"),
+        ("Metal buffer-count limit", "Metal Buffer-Count Limit"),
+        ("MLX memory limit", "MLX Memory Limit"),
     ):
         value = system_info.get(key) if system_info is not None else None
         if value:
@@ -10172,6 +10256,26 @@ def _oom_capacity_rows(
             ("Upstream memory estimate", f"model {match.group(0).strip()} (mlx-vlm warning)")
         )
     return tuple(rows)
+
+
+def _checkpoint_fact_rows(
+    diagnostics: PromptDiagnostics | None,
+) -> tuple[tuple[str, object], ...]:
+    """Checkpoint-file facts for the diagnostics entry (None values are left out)."""
+    if diagnostics is None:
+        return ()
+    return (
+        (
+            "generation_config.json settings not applied (by mlx-vlm or the harness)",
+            diagnostics.unapplied_generation_settings or None,
+        ),
+        ("EOS ids declared, by file", diagnostics.declared_eos_token_ids or None),
+        ("Chat template found in", ", ".join(diagnostics.chat_template_sources) or None),
+        (
+            "Chat-template options passed that the template never reads",
+            ", ".join(diagnostics.unread_chat_template_kwargs) or None,
+        ),
+    )
 
 
 def _runtime_termination_facts(
@@ -11473,14 +11577,54 @@ def _get_mlx_device_info() -> MlxDeviceInfo:
     recommended_size = payload.get("max_recommended_working_set_size")
     if type(recommended_size) is int and recommended_size > 0:
         info["max_recommended_working_set_size"] = recommended_size
+    max_buffer_length = payload.get("max_buffer_length")
+    if type(max_buffer_length) is int and max_buffer_length > 0:
+        info["max_buffer_length"] = max_buffer_length
+    resource_limit = payload.get("resource_limit")
+    if type(resource_limit) is int and resource_limit > 0:
+        info["resource_limit"] = resource_limit
     return info
+
+
+def _get_memory_limit_facts(device_info: MlxDeviceInfo) -> dict[str, str]:
+    """The limits a large model runs into, as recorded values (decimal GB).
+
+    Max Metal Buffer and the buffer-count limit are the allocator's own caps
+    (an allocation failure names which one it hit); the MLX memory limit
+    (mx.get_memory_limit, 1.5x the working set by default) is where mlx
+    starts waiting on frees; the wired limit is the system's iogpu setting
+    (0 means the macOS default).
+    """
+    facts: dict[str, str] = {}
+    if (max_buffer := device_info.get("max_buffer_length")) is not None:
+        facts["Max Metal Buffer"] = f"{fmt_num(max_buffer / DECIMAL_GB)} GB"
+    if (resource_limit := device_info.get("resource_limit")) is not None:
+        facts["Metal Buffer-Count Limit"] = f"{resource_limit:,} buffers"
+    get_memory_limit = getattr(mx, "get_memory_limit", None) if mx is not None else None
+    if callable(get_memory_limit):
+        try:
+            raw_limit: object = get_memory_limit()
+        except (RuntimeError, TypeError, ValueError):
+            raw_limit = 0
+        limit = raw_limit if isinstance(raw_limit, int) and not isinstance(raw_limit, bool) else 0
+        if limit > 0:
+            facts["MLX Memory Limit"] = f"{fmt_num(limit / DECIMAL_GB)} GB"
+    wired = _get_macos_sysctl_value("iogpu.wired_limit_mb")
+    if wired is not None and wired.strip().isdigit():
+        megabytes = int(wired.strip())
+        facts["GPU Wired Limit"] = (
+            "macOS default (iogpu.wired_limit_mb=0)"
+            if megabytes == 0
+            else f"{fmt_num(megabytes * 1_048_576 / DECIMAL_GB)} GB (iogpu.wired_limit_mb)"
+        )
+    return facts
 
 
 def _get_macos_sysctl_value(name: str) -> str | None:
     """Read one allowlisted macOS hardware sysctl through the bounded runner."""
     if platform.system() != "Darwin":
         return None
-    if name not in {"hw.memsize", "machdep.cpu.brand_string"}:
+    if name not in {"hw.memsize", "machdep.cpu.brand_string", "iogpu.wired_limit_mb"}:
         return None
     return _run_macos_toolchain_command(["/usr/sbin/sysctl", "-n", name])
 
@@ -11672,6 +11816,7 @@ def get_system_characteristics() -> dict[str, str]:
             # Decimal GB, like peak memory; RAM above keeps Apple's binary "128 GB".
             working_set_gb = recommended_working_set_bytes / DECIMAL_GB
             info["Recommended Working Set"] = f"{fmt_num(working_set_gb)} GB"
+        info.update(_get_memory_limit_facts(device_info))
 
         fused_attention = _probe_fused_attention()
         fused_attention_labels = {
@@ -12578,12 +12723,14 @@ def _apply_declared_sampling(
 
     Returns the source of each sampling setting: ``cli`` (given on the command
     line or pinned by a per-run override; always wins), ``generation_config``
-    (taken from the checkpoint) or ``default`` (the harness default). A
-    declared ``do_sample: false`` is the checkpoint asking for greedy decoding,
-    so its temperature, top_p, top_k and min_p are not applied while a
-    repetition penalty still is.
+    (taken from the checkpoint) or ``default`` (the harness default). Only the
+    keys mlx-vlm's own ``load()`` applies are taken (temperature, top_p,
+    top_k), so a declared ``min_p`` or ``repetition_penalty`` stays at the
+    default as it does upstream. A declared ``do_sample: false`` is the
+    checkpoint asking for greedy decoding, so none of them is applied.
     """
     greedy_declared = declared.get("do_sample") is False
+    applied_upstream = set(upstream_generation_config_keys)
     settings = cast("dict[str, object]", generate_kwargs)
     sources: dict[str, str] = {}
     for key in _CHECKPOINT_SAMPLING_DESTS:
@@ -12591,7 +12738,7 @@ def _apply_declared_sampling(
             sources[key] = "cli"
             continue
         value = declared.get(key)
-        blocked = greedy_declared and key != "repetition_penalty"
+        blocked = greedy_declared or key not in applied_upstream
         if value is None or blocked or not _declared_sampling_value_is_valid(key, value):
             sources[key] = "default"
             continue
@@ -12672,6 +12819,105 @@ def _exact_prompt_composition(
     return len(flat), sum(1 for ident in flat if ident == token_id)
 
 
+# generation_config.json keys that are bookkeeping, not decoding settings.
+_GENERATION_CONFIG_BOOKKEEPING: Final[frozenset[str]] = frozenset(
+    {"_from_model_config", "transformers_version", "bos_token_id", "pad_token_id"}
+)
+# Where a chat template can live, in AutoProcessor's read order
+# (transformers processing_utils): .jinja first, then the JSON configs.
+_CHAT_TEMPLATE_FILES: Final[tuple[str, ...]] = (
+    "chat_template.jinja",
+    "chat_template.json",
+    "processor_config.json",
+    "tokenizer_config.json",
+)
+
+
+def _unapplied_generation_settings(
+    snapshot_path: Path | None, sampling_sources: Mapping[str, str]
+) -> dict[str, JsonLike]:
+    """generation_config.json settings that nothing in this run applied, with their values."""
+    if snapshot_path is None:
+        return {}
+    payload = _read_snapshot_json(snapshot_path, "generation_config.json")
+    if not isinstance(payload, dict):
+        return {}
+    applied = {key for key, source in sampling_sources.items() if source == "generation_config"}
+    applied |= {"do_sample", "eos_token_id"} & set(upstream_generation_config_keys)
+    return {
+        key: _prompt_diag_json_value(value)
+        for key, value in sorted(payload.items())
+        if key not in applied and key not in _GENERATION_CONFIG_BOOKKEEPING and value is not None
+    }
+
+
+def _declared_eos_token_ids(snapshot_path: Path | None) -> dict[str, JsonLike]:
+    """EOS ids from each checkpoint file that declares them (files can disagree)."""
+    if snapshot_path is None:
+        return {}
+    declared: dict[str, JsonLike] = {}
+    config = _read_snapshot_json(snapshot_path, "config.json")
+    if isinstance(config, dict):
+        if config.get("eos_token_id") is not None:
+            declared["config.json"] = _prompt_diag_json_value(config["eos_token_id"])
+        text_config = config.get("text_config")
+        if isinstance(text_config, dict) and text_config.get("eos_token_id") is not None:
+            declared["config.json text_config"] = _prompt_diag_json_value(
+                text_config["eos_token_id"]
+            )
+    generation = _read_snapshot_json(snapshot_path, "generation_config.json")
+    if isinstance(generation, dict) and generation.get("eos_token_id") is not None:
+        declared["generation_config.json"] = _prompt_diag_json_value(generation["eos_token_id"])
+    return declared
+
+
+def _chat_template_sources(snapshot_path: Path | None) -> tuple[str, ...]:
+    """Snapshot files that carry a chat template (several can, and can differ)."""
+    if snapshot_path is None or not snapshot_path.is_dir():
+        return ()
+    sources: list[str] = []
+    for file_name in _CHAT_TEMPLATE_FILES:
+        if file_name.endswith(".jinja"):
+            if _read_snapshot_text(snapshot_path, file_name):
+                sources.append(file_name)
+            continue
+        payload = _read_snapshot_json(snapshot_path, file_name)
+        if isinstance(payload, dict) and payload.get("chat_template"):
+            sources.append(file_name)
+    return tuple(sources)
+
+
+def _chat_template_variables(processor: object) -> tuple[str, ...]:
+    """Variables the processor's chat template reads, from its jinja2 syntax tree.
+
+    Uses the template the processor renders with (processor, else tokenizer);
+    named-template lists contribute every template. Empty when there is no
+    template or it does not parse.
+    """
+    template: object = getattr(processor, "chat_template", None) or getattr(
+        getattr(processor, "tokenizer", None), "chat_template", None
+    )
+    if isinstance(template, dict):
+        texts = [value for value in template.values() if isinstance(value, str)]
+    elif isinstance(template, list):
+        texts = [
+            item["template"]
+            for item in template
+            if isinstance(item, dict) and isinstance(item.get("template"), str)
+        ]
+    else:
+        texts = [template] if isinstance(template, str) else []
+    # Parsed only, never rendered, so autoescaping is moot; on to satisfy S701.
+    environment = JinjaEnvironment(autoescape=True)
+    variables: set[str] = set()
+    for text in texts:
+        try:
+            variables |= jinja_meta.find_undeclared_variables(environment.parse(text))
+        except JinjaTemplateSyntaxError:
+            return ()
+    return tuple(sorted(variables))
+
+
 def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is an explicit keyword  # skylos: ignore[SKY-C303]
     *,
     params: ProcessImageParams,
@@ -12695,6 +12941,8 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
     processed_height = params.resize_shape[0] if params.resize_shape is not None else None
     processed_width = params.resize_shape[1] if params.resize_shape is not None else None
     snapshot_path = _resolve_model_snapshot_path(params.model_identifier, params.revision)
+    template_variables = _chat_template_variables(processor)
+    passed_template_kwargs = _build_chat_template_kwargs(params)
     return PromptDiagnostics(
         model_type=model_type,
         processor_class=_qualified_class_name(processor),
@@ -12726,6 +12974,19 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
             else _declared_sampling_defaults(snapshot_path)
         ),
         sampling_sources=dict(sampling_sources or {}),
+        unapplied_generation_settings=_unapplied_generation_settings(
+            snapshot_path, sampling_sources or {}
+        ),
+        declared_eos_token_ids=_declared_eos_token_ids(snapshot_path),
+        chat_template_sources=_chat_template_sources(snapshot_path),
+        chat_template_variables=template_variables,
+        unread_chat_template_kwargs=tuple(
+            sorted(
+                key
+                for key in passed_template_kwargs
+                if template_variables and key not in template_variables
+            )
+        ),
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
@@ -12810,7 +13071,20 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         payload["snapshot_notes"] = [
             _prompt_diag_json_value(note) for note in diagnostics.snapshot_notes
         ]
+    payload.update(_checkpoint_facts_to_json(diagnostics))
     return payload
+
+
+def _checkpoint_facts_to_json(diagnostics: PromptDiagnostics) -> dict[str, JsonLike]:
+    """The checkpoint-file facts (generation config, EOS, chat template), when present."""
+    facts: dict[str, JsonLike] = {}
+    for key in ("unapplied_generation_settings", "declared_eos_token_ids"):
+        if mapping := getattr(diagnostics, key):
+            facts[key] = dict(mapping)
+    for key in ("chat_template_sources", "chat_template_variables", "unread_chat_template_kwargs"):
+        if values := getattr(diagnostics, key):
+            facts[key] = list(values)
+    return facts
 
 
 _IMAGE_VALIDATION_CACHE: dict[str, tuple[int, int] | None] = {}
@@ -12983,6 +13257,10 @@ class CachedModelEligibility:
     # found). A neutral discovery fact — self-opening thinkers declare markers
     # without pre-opening a block, which render-time checks cannot see.
     thinking_template: bool | None = None
+    # config.json ``model_file``: mlx-vlm imports this file from the checkpoint
+    # instead of its own packages (get_model_and_args), so the package check
+    # does not apply and ``arch_supported`` stays None.
+    model_file: str | None = None
 
     @property
     def selected(self) -> bool:
@@ -13156,13 +13434,28 @@ _GENERATION_FAILURE_PHASES: Final[frozenset[str]] = frozenset(
 )
 # Message needles that identify a memory-capacity failure (Metal allocator and
 # command-buffer wording); shared by stage classification and the crash draft.
+# Not "metal::malloc": mlx prefixes both the single-buffer-size error and the
+# buffer-count error ("Resource limit (N) exceeded", not a memory amount) with
+# it, while real exhaustion reads "[malloc] Unable to allocate N bytes".
 _OOM_MESSAGE_NEEDLES: Final[tuple[str, ...]] = (
-    "metal::malloc",
+    "unable to allocate",
     "maximum allowed buffer size",
     "insufficient memory",
     "out of memory",
     "kiogpucommandbuffercallbackerroroutofmemory",
 )
+
+
+def _metal_allocation_limit(message: str | None) -> str | None:
+    """Name the Metal allocator limit an error message reports, in mlx's own wording."""
+    text = (message or "").casefold()
+    if "maximum allowed buffer size" in text:
+        return "one buffer larger than the maximum Metal buffer size"
+    if "resource limit" in text and "exceeded" in text:
+        return "the Metal buffer-count limit (a number of buffers, not bytes)"
+    if "unable to allocate" in text:
+        return "memory exhausted (Metal could not allocate the buffer)"
+    return None
 
 
 def _failure_phase_human_label(phase: str | None) -> str:
@@ -14014,6 +14307,7 @@ def _build_runtime_diagnostics(
     time_to_first_token_s: float | None = None,
     first_token_peak_memory_gb: float | None = None,
     model_load_active_memory_gb: float | None = None,
+    model_weight_buffer_gb: float | None = None,
     post_cleanup_active_memory_gb: float | None = None,
     post_cleanup_cache_memory_gb: float | None = None,
 ) -> RuntimeDiagnostics:
@@ -14022,6 +14316,7 @@ def _build_runtime_diagnostics(
         input_validation_time_s=phase_timer.duration("input_validation"),
         model_load_time_s=phase_timer.duration("model_load"),
         model_load_active_memory_gb=model_load_active_memory_gb,
+        model_weight_buffer_gb=model_weight_buffer_gb,
         prompt_prep_time_s=phase_timer.duration("prompt_prep"),
         decode_time_s=phase_timer.duration("decode"),
         cleanup_time_s=phase_timer.duration("cleanup"),
@@ -14141,6 +14436,23 @@ def _sample_mlx_memory_gb(getter_name: MlxMemoryGetterName) -> float | None:
     return float(raw_value) / DECIMAL_GB
 
 
+def _sample_model_weight_buffer_gb(model: object) -> float | None:
+    """Bytes the loaded weights occupy (mlx >= 0.32.3), counting shared buffers once."""
+    measure = getattr(mx, "get_array_buffer_size", None)
+    if not callable(measure):
+        return None
+    try:
+        raw_value = measure(model)
+    except (AttributeError, RuntimeError, TypeError, ValueError):
+        logger.debug(
+            "Unable to measure loaded weights with mx.get_array_buffer_size", exc_info=True
+        )
+        return None
+    if isinstance(raw_value, bool) or not isinstance(raw_value, int) or raw_value < 0:
+        return None
+    return raw_value / DECIMAL_GB
+
+
 def _sample_active_memory_gb() -> float | None:
     """Sample MLX active memory in GB when the runtime exposes the metric."""
     return _sample_mlx_memory_gb("get_active_memory")
@@ -14160,10 +14472,12 @@ def _attach_model_load_memory_baseline(
     output: GenerationResult | SupportsGenerationResult,
     *,
     model_load_active_memory_gb: float | None,
+    model_weight_buffer_gb: float | None = None,
 ) -> SupportsGenerationResult:
-    """Attach the post-model-load active memory baseline to the generation result."""
+    """Attach the post-model-load memory facts to the generation result."""
     result = cast("SupportsGenerationResult", output)
     result.model_load_active_memory = model_load_active_memory_gb
+    result.model_weight_buffer = model_weight_buffer_gb
     return result
 
 
@@ -14786,6 +15100,7 @@ def _run_model_generation(
         raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 
     model_load_active_memory_gb = _sample_active_memory_gb()
+    model_weight_buffer_gb = _sample_model_weight_buffer_gb(model)
 
     prepared = _prepare_generation(
         params,
@@ -14807,6 +15122,7 @@ def _run_model_generation(
     result = _attach_model_load_memory_baseline(
         result,
         model_load_active_memory_gb=model_load_active_memory_gb,
+        model_weight_buffer_gb=model_weight_buffer_gb,
     )
     setattr(cast("Any", result), _PROMPT_DIAGNOSTICS_ATTR, prepared.prompt_diagnostics)
     return result
@@ -15037,6 +15353,7 @@ def _build_success_process_result(
                 observations.first_token_peak_memory_gb if observations is not None else None
             ),
             model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
+            model_weight_buffer_gb=_object_model_weight_buffer_gb(output),
             stop_reason=stop_reason,
         ),
         requested_max_tokens=params.max_tokens,
@@ -17876,9 +18193,18 @@ def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | N
     config = _read_cached_repo_json(repo, "config.json")
     if config is None:
         return None, None, None
-    return arch_precheck_for_model_type(
+    model_type, resolved, supported = arch_precheck_for_model_type(
         config.get("model_type") or config.get("speculators_model_type")
     )
+    if _declared_model_file(config) is not None:
+        return model_type, resolved, None
+    return model_type, resolved, supported
+
+
+def _declared_model_file(config: Mapping[str, object]) -> str | None:
+    """The checkpoint-shipped model code config.json names, if any."""
+    value = config.get("model_file")
+    return value if isinstance(value, str) and value else None
 
 
 def arch_precheck_for_model_type(
@@ -17971,6 +18297,7 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
         arch_supported=arch_supported,
         capability=_classify_image_capability(repo),
         thinking_template=_template_declares_thinking(_hf_cache_main_snapshot_path(repo)),
+        model_file=_declared_model_file(_read_cached_repo_json(repo, "config.json") or {}),
     )
 
 
@@ -18045,6 +18372,12 @@ def _arch_precheck_for_model(model_id: str) -> tuple[str | None, str | None, boo
 
 def _arch_precheck_summary(model_id: str) -> str | None:
     """Render the architecture pre-check as one human-readable fact value."""
+    for entry in get_cached_model_eligibility():
+        if entry.repo_id == model_id and entry.model_file is not None:
+            return (
+                f"not checked: config.json model_file={entry.model_file!r} "
+                "(mlx-vlm imports and runs that checkpoint file instead of its own packages)"
+            )
     model_type, resolved, supported = _arch_precheck_for_model(model_id)
     if supported is None or model_type is None:
         return None
@@ -19509,6 +19842,7 @@ def _build_jsonl_metadata_record(  # noqa: PLR0913 - the schema-3 header names e
         "assessment_profile": mode_policy.assessment_profile,
         "metadata_exposed_to_prompt": mode_policy.metadata_exposed_to_prompt,
         "execution_mode": execution_mode,
+        "mlx_environment": _mlx_environment(),
     }
     if started_at is not None:
         record["started_at"] = started_at
@@ -19549,6 +19883,8 @@ def _build_jsonl_metrics_record(
     )
     if model_load_active_memory_gb is not None:
         metrics["model_load_active_memory_gb"] = model_load_active_memory_gb
+    if runtime is not None and runtime.model_weight_buffer_gb is not None:
+        metrics["model_weight_buffer_gb"] = runtime.model_weight_buffer_gb
     peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
     if peak_memory_delta_gb is not None:
         metrics["peak_memory_delta_gb"] = peak_memory_delta_gb
@@ -20943,6 +21279,13 @@ def _removed_model_status(
     )
 
 
+def _throughput_comparable(
+    *, same_mode: bool, same_hardware: bool, blockers: Sequence[str]
+) -> bool:
+    """Throughput is compared only between like-for-like runs with nothing withheld."""
+    return same_mode and same_hardware and not any(blockers)
+
+
 def compare_run_results(
     current: Sequence[JsonlResultRecord],
     baseline: ComparisonBaseline,
@@ -20973,11 +21316,12 @@ def compare_run_results(
     )
     baseline_hardware = _comparison_hardware(baseline.metadata)
     current_hardware = _comparison_hardware(current_metadata)
-    throughput_comparable = (
-        current_execution_mode == str(baseline.metadata.get("execution_mode", "in_process"))
-        and baseline_hardware == current_hardware
-        and not unverified_facts
-        and not incomparable_reasons
+    environment_change = _mlx_environment_change(baseline.metadata, current_metadata)
+    throughput_comparable = _throughput_comparable(
+        same_mode=current_execution_mode
+        == str(baseline.metadata.get("execution_mode", "in_process")),
+        same_hardware=baseline_hardware == current_hardware,
+        blockers=(*unverified_facts, *incomparable_reasons, environment_change or ""),
     )
     current_by = {record["model"]: record for record in current}
     baseline_by = {record["model"]: record for record in baseline.results}
@@ -21020,6 +21364,7 @@ def compare_run_results(
     prefill_sorted = _prefill_tps_ratios(pairs) if throughput_comparable else []
     environment_notes = (
         *_os_change_notes(baseline.metadata, current_metadata),
+        *((environment_change,) if environment_change is not None else ()),
         *_run_environment_notes("current", current),
         *_run_environment_notes("baseline", baseline.results),
     )
@@ -21092,6 +21437,50 @@ def _comparison_hardware(metadata: JsonlMetadataRecord | None) -> str | None:
     return _hardware_identity(metadata.get("system") if metadata is not None else None)
 
 
+# Environment variables mlx and Metal read that change performance (mlx
+# docs/src/usage/environment_variables.rst: MLX_MAX_OPS_PER_BUFFER,
+# MLX_METAL_FAST_SYNCH, MLX_DISABLE_COMPILE, ...; MTL_CAPTURE_ENABLED). The
+# harness's own display setting is not one of them.
+_MLX_ENVIRONMENT_PREFIXES: Final[tuple[str, ...]] = ("MLX_", "MTL_")
+_HARNESS_ONLY_ENVIRONMENT: Final[frozenset[str]] = frozenset({"MLX_VLM_WIDTH"})
+
+
+def _mlx_environment() -> dict[str, str]:
+    """The MLX_/MTL_ variables set for this run (empty when none are)."""
+    return {
+        key: value
+        for key, value in sorted(os.environ.items())
+        if key.startswith(_MLX_ENVIRONMENT_PREFIXES) and key not in _HARNESS_ONLY_ENVIRONMENT
+    }
+
+
+def _mlx_environment_change(
+    baseline_metadata: JsonlMetadataRecord | None,
+    current_metadata: JsonlMetadataRecord | None,
+) -> str | None:
+    """State how the MLX_/MTL_ variables differ between the runs, when they do."""
+    before = baseline_metadata.get("mlx_environment") if baseline_metadata else None
+    now = current_metadata.get("mlx_environment") if current_metadata else None
+    if now is None or (before is None and not now):
+        return None
+    if before is None:
+        return (
+            "MLX environment variables set now ("
+            + ", ".join(f"{key}={value}" for key, value in now.items())
+            + ") were not recorded for the baseline; throughput is not compared"
+        )
+    if before == now:
+        return None
+    changed = sorted(
+        f"{key} {before.get(key, 'unset')} \u2192 {now.get(key, 'unset')}"
+        for key in set(before) | set(now)
+        if before.get(key) != now.get(key)
+    )
+    return (
+        "MLX environment variables differ (" + "; ".join(changed) + "); throughput is not compared"
+    )
+
+
 def _comparison_fingerprint(
     *,
     prompt: str,
@@ -21100,6 +21489,7 @@ def _comparison_fingerprint(
     execution_mode: str,
     eval_mode: str,
     system_info: Mapping[str, object] | None,
+    mlx_environment: Mapping[str, str] | None = None,
 ) -> str:
     """Identity of one throughput workload: inputs, settings, lane, mode and hardware.
 
@@ -21120,6 +21510,9 @@ def _comparison_fingerprint(
         "eval_mode": eval_mode,
         "hardware": _hardware_identity(system_info),
     }
+    if mlx_environment:
+        # Only when set, so runs without such variables keep their history.
+        payload["mlx_environment"] = dict(sorted(mlx_environment.items()))
     return hashlib.sha256(
         json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
     ).hexdigest()
@@ -21137,6 +21530,7 @@ def _comparison_fingerprint_from_metadata(metadata: JsonlMetadataRecord) -> str:
         execution_mode=str(metadata.get("execution_mode", "in_process")),
         eval_mode=str(metadata.get("eval_mode", "")),
         system_info=cast("Mapping[str, object] | None", metadata.get("system")),
+        mlx_environment=metadata.get("mlx_environment"),
     )
 
 
@@ -24141,11 +24535,17 @@ def _build_native_mlx_vlm_cli_tokens(
     resolved_revision: str | None = None,
     minimal_load: bool = False,
 ) -> list[str]:
-    """Build a native ``python -m mlx_vlm.generate`` command for issue drafts."""
+    """Build a native ``python -m mlx_vlm.generate`` command for issue drafts.
+
+    ``--verbose`` makes upstream print prompt/generation tokens, tok/s and peak
+    memory (it prints only the text by default), so a maintainer can set the
+    native run's numbers beside the harness's.
+    """
     tokens = [
         "python",
         "-m",
         "mlx_vlm.generate",
+        "--verbose",
         "--model",
         model_name,
         "--image",
@@ -25491,6 +25891,7 @@ def finalize_execution(
                 execution_mode="isolated" if getattr(args, "isolate", False) else "in_process",
                 eval_mode=eval_mode,
                 system_info=system_info,
+                mlx_environment=_mlx_environment(),
             ),
             model_provenance=model_provenance,
         )
