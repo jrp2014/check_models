@@ -1423,6 +1423,210 @@ def test_update_script_leaves_setuptools_to_pip_above_mlxs_build_floor() -> None
     assert "--no-build-isolation" not in update_script
 
 
+_PROBE_FAKE_MLX_VERSION = "0.32.4.dev20261002+abc1234"
+
+
+def _run_probe_python_next(
+    tmp_path: Path,
+    *,
+    fail_regex: str = "",
+    **probe_env: str,
+) -> tuple[subprocess.CompletedProcess[str], list[str], Path]:
+    """Run probe_python_next.sh against fake conda/python; return result, call log, mlx repo.
+
+    The fake interpreter logs each call as ``PY[<cwd>] <args>`` (plus the
+    contents of any ``--constraint`` file) and fails when its arguments match
+    ``fail_regex``. The mlx checkout is a real one-commit git repo, so the
+    script's clone step runs for real.
+    """
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    call_log = tmp_path / "calls.log"
+    fake_py = fake_bin / "python3.15"
+    safe_io.write_text_no_follow(
+        fake_py,
+        dedent(
+            f"""\
+            #!/bin/bash
+            printf 'PY[%s] %s\\n' "$PWD" "$*" >> "{call_log}"
+            prev=""
+            for arg in "$@"; do
+                if [[ "$prev" == "--constraint" ]]; then
+                    printf 'CONSTRAINT %s\\n' "$(cat "$arg")" >> "{call_log}"
+                fi
+                prev="$arg"
+            done
+            if [[ "${{1:-}}" == "-" ]]; then cat > /dev/null; fi
+            if [[ -n "$FAKE_FAIL" ]] && printf '%s' "$*" | grep -qE -- "$FAKE_FAIL"; then
+                exit 1
+            fi
+            case "${{1:-}}:${{2:-}}" in
+                -V:*) echo "Python 3.15.0" ;;
+                -c:*tomllib*) exec "{sys.executable}" "$@" ;;
+                -c:*importlib.metadata*) echo "{_PROBE_FAKE_MLX_VERSION}" ;;
+            esac
+            """,
+        ),
+        mode=0o755,
+    )
+    safe_io.write_text_no_follow(
+        fake_bin / "conda",
+        dedent(
+            f"""\
+            #!/bin/bash
+            case "$1" in
+                env) printf 'base  /opt/conda\\nmlx-vlm-315  /opt/conda/envs/mlx-vlm-315\\n' ;;
+                run) if [[ "$*" == *sys.executable* ]]; then echo "{fake_py}"; else echo "Python 3.14.9"; fi ;;
+                *) echo "unexpected conda $*" >&2; exit 2 ;;
+            esac
+            """,
+        ),
+        mode=0o755,
+    )
+
+    mlx_repo = tmp_path / "mlx"
+    git = ["git", "-C", str(mlx_repo), "-c", "user.name=probe", "-c", "user.email=probe@test"]
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created directory
+        ["git", "init", "-q", str(mlx_repo)],  # noqa: S607 - git from PATH, as the probe uses it
+        check=True,
+    )
+    safe_io.write_text_no_follow(mlx_repo / "setup.py", "# placeholder\n")
+    subprocess.run([*git, "add", "setup.py"], check=True)  # noqa: S603 - fixed git command on a test repo
+    subprocess.run([*git, "commit", "-q", "-m", "init"], check=True)  # noqa: S603 - fixed git command on a test repo
+
+    scratch = tmp_path / "scratch"
+    scratch.mkdir()
+    base_env = {
+        k: v for k, v in os.environ.items() if not k.startswith(("PROBE_", "CONDA_DEFAULT"))
+    }
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs the shipped probe with fakes
+        ["/bin/bash", str(PKG_ROOT / "tools" / "probe_python_next.sh")],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={
+            **base_env,
+            "PATH": f"{fake_bin}:{os.environ['PATH']}",
+            "TMPDIR": str(scratch),
+            "PROBE_PYTHON": "3.15",
+            "PROBE_MLX_REPO": str(mlx_repo),
+            "FAKE_FAIL": fail_regex,
+            **probe_env,
+        },
+    )
+    assert not list(scratch.iterdir()), "probe left its temp dir behind"
+    calls = safe_io.read_text_no_follow(call_log).splitlines() if call_log.exists() else []
+    return result, calls, mlx_repo
+
+
+def _probe_call_index(calls: list[str], needle: str) -> int:
+    return next(i for i, line in enumerate(calls) if needle in line)
+
+
+def test_probe_python_next_builds_mlx_in_a_clone_before_the_pypi_install(tmp_path: Path) -> None:
+    """With PROBE_SOURCE_BUILD=1 a missing mlx wheel must not hide the source-build result.
+
+    The build runs first, in a throwaway clone (an in-place build would
+    overwrite the dylib and metallib the working env loads), and the project
+    install is constrained to that build.
+    """
+    result, calls, mlx_repo = _run_probe_python_next(tmp_path, PROBE_SOURCE_BUILD="1")
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    build = _probe_call_index(calls, "-m pip install -q .")
+    project = _probe_call_index(calls, "[extras]")
+    assert build < project
+    assert calls[build].startswith(f"PY[{tmp_path / 'scratch'}/")
+    assert "--no-build-isolation" not in calls[build]
+    assert "--constraint" in calls[project]
+    assert calls[project + 1] == f"CONSTRAINT mlx=={_PROBE_FAKE_MLX_VERSION}"
+    assert "Core: viable, including the mlx source build" in result.stdout
+
+    status = subprocess.run(  # noqa: S603 - fixed git command on a test repo
+        ["git", "-C", str(mlx_repo), "status", "--porcelain", "--ignored"],  # noqa: S607 - git from PATH
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert status.stdout == ""
+
+
+@pytest.mark.parametrize(
+    ("env", "fail_regex", "outcome"),
+    [
+        pytest.param(
+            {"PROBE_SOURCE_BUILD": "1"},
+            r"install -q \.$",
+            (
+                1,
+                ["mlx source build FAILED", "Core: not viable yet"],
+                "[extras]",
+            ),
+            id="failed-build-skips-pypi-install",
+        ),
+        pytest.param(
+            {},
+            r"\[extras\]",
+            (
+                1,
+                ["PROBE_SOURCE_BUILD=1 builds it from the local checkout", "Core: not viable yet"],
+                "-m pytest",
+            ),
+            id="missing-wheel-points-at-source-build",
+        ),
+        pytest.param(
+            {"PROBE_TORCH": "1"},
+            "torchvision>=",
+            (
+                0,
+                [
+                    "torch extra unavailable: about half the roster would fail",
+                    "Core: viable from PyPI",
+                ],
+                "",
+            ),
+            id="torch-failure-stays-outside-core-verdict",
+        ),
+        pytest.param(
+            {"PROBE_TORCH": "1"},
+            r"\[extras\]",
+            (
+                1,
+                ["Core: not viable yet", "Torch extra: available"],
+                "",
+            ),
+            id="torch-checked-even-when-core-fails",
+        ),
+    ],
+)
+def test_probe_python_next_verdicts(
+    tmp_path: Path,
+    env: dict[str, str],
+    fail_regex: str,
+    outcome: tuple[int, list[str], str],
+) -> None:
+    """Each check's failure is reported, gates only the checks that need it, and torch never sets the exit."""
+    returncode, expected, absent = outcome
+    result, calls, _ = _run_probe_python_next(tmp_path, fail_regex=fail_regex, **env)
+    assert result.returncode == returncode, result.stdout + result.stderr
+    for text in expected:
+        assert text in result.stdout
+    if absent:
+        assert not any(absent in line for line in calls)
+
+
+def test_probe_python_next_torch_check_installs_the_pyproject_extra(tmp_path: Path) -> None:
+    """The torch check installs exactly the torch extra's requirements, without the project."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    torch_extra = pyproject["project"]["optional-dependencies"]["torch"]
+
+    result, calls, _ = _run_probe_python_next(tmp_path, PROBE_TORCH="1")
+    assert result.returncode == 0, result.stdout + result.stderr
+    torch_install = calls[_probe_call_index(calls, "torchvision>=")]
+    assert torch_install.endswith("-m pip install -q " + " ".join(torch_extra))
+    assert "Torch extra: available" in result.stdout
+
+
 def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
     """Stage 2 records git status --porcelain; Stage 3 consults it before skipping."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")

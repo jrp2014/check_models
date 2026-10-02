@@ -592,6 +592,25 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `make probe-python-next` (`tools/probe_python_next.sh`) no longer misleads
+  for `PROBE_PYTHON=3.15`. Before, check 1 installed the project from PyPI, and
+  mlx 0.32.3 has no cp315 wheel or sdist there, so the probe exited before the
+  `PROBE_SOURCE_BUILD=1` build, which is the check that decides whether
+  `tools/update.sh` would keep working. ml-explore/mlx#4555 (merged
+  2026-09-29) added 3.15 support at source level. The source build now runs
+  first and pins its result (`--constraint mlx==<built version>`) for the
+  project install. It builds in a throwaway shallow clone of the checkout's
+  HEAD, using pip's isolated build as `update.sh` does. The old in-place
+  editable build overwrote `python/mlx/lib/libmlx.dylib` and `mlx.metallib`,
+  which the working env's editable install loads. A new opt-in
+  `PROBE_TORCH=1` check installs the `torch` extra (read from
+  `pyproject.toml`, without the project) and imports torch and torchvision.
+  Its failure reads "torch extra unavailable: about half the roster would
+  fail" and stays out of the core verdict and the exit status. Every check now
+  runs unless one it depends on failed, and a closing verdict lists each
+  result. `PROBE_MLX_REPO` overrides the checkout path. Tests in
+  `test_dependency_sync.py` run the shipped script against a fake conda and
+  interpreter with a real git checkout.
 - `tools/update.sh` skips the mlx rebuild only when the installed mlx is the
   checkout's own build: `mlx.core` imports, and both the version compiled
   into it (`mlx.core.__version__`) and pip's metadata carry the checkout

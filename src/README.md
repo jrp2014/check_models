@@ -789,10 +789,19 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "mlx>=0.32.1" 
 The working `mlx-vlm` env stays on the tested baseline. To see whether a newer
 Python has become viable without touching that env, run
 `make probe-python-next` (defaults to 3.14): it installs the PyPI stack into a
-throwaway `mlx-vlm-314` conda env, verifies imports and the fast test lane, and
-optionally (`PROBE_SOURCE_BUILD=1`) compiles the local mlx source tree — the one
-signal PyPI wheels cannot give and the thing that would actually break
-`tools/update.sh` after a switch. `PROBE_PYTHON=3.15` targets a later version.
+throwaway `mlx-vlm-314` conda env and verifies imports and the fast test lane.
+`PROBE_PYTHON=3.15` targets a later version. Two opt-in checks:
+
+- `PROBE_SOURCE_BUILD=1` first compiles the local mlx checkout (in a throwaway
+  clone of its HEAD, so the checkout the working env loads is not written to)
+  and pins that build for the rest of the probe. This is the one signal PyPI
+  wheels cannot give and the thing that would actually break `tools/update.sh`
+  after a switch. Because it runs first, a missing mlx wheel on PyPI does not
+  hide it. `PROBE_MLX_REPO` overrides the checkout path.
+- `PROBE_TORCH=1` installs the `torch` extra and imports torch and
+  torchvision. A failure is reported as "torch extra unavailable: about half
+  the roster would fail" and stays outside the core verdict. The exit status
+  covers only the build, install and test checks.
 
 ### Advanced Configuration
 
