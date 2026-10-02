@@ -593,8 +593,9 @@ Notable changes to this project will be documented in this file.
 ### Fixed
 
 - `tools/update.sh` skips the mlx rebuild only when the installed mlx is the
-  checkout's own build: `mlx.core` imports and the version's `+<sha>` is the
-  checkout HEAD. An earlier run had pulled 50 commits and lost the compiled
+  checkout's own build: `mlx.core` imports, and both the version compiled
+  into it (`mlx.core.__version__`) and pip's metadata carry the checkout
+  HEAD as `+<sha>` (metadata alone could pass a stale extension). An earlier run had pulled 50 commits and lost the compiled
   extension, and the next run's no-op pull, clean tree and matching editable
   path were taken as "unchanged; skipping rebuild".
 - The baseline comparison states a macOS change as a fact ("macOS changed
@@ -611,13 +612,15 @@ Notable changes to this project will be documented in this file.
   for the mlx build regardless), and nothing installed needs
   `pkg_resources`; the cap only made each run report setuptools as
   outdated and fight torch's eager upgrade.
-- `tools/update.sh` stops before pulling when a local MLX checkout holds
-  iCloud conflict copies (`<name> 2.<ext>`), naming them and how to list
-  them. A stale `.git/refs/heads/main 2` had made `git pull` fail with "bad
-  object", which the generic pull-failure hints did not explain, and 804
-  untracked copies in the mlx tree made every run look modified and force a
-  rebuild. "No copies" counts as success, so the check cannot end the run
-  under `set -e`.
+- `tools/update.sh` stops before pulling when a local MLX checkout has a
+  malformed git ref (a name with a space under `.git/refs`, as iCloud's
+  "`main 2`" conflict copy was): git ref names cannot contain spaces, and
+  the stale copy had made `git pull` fail with "bad object". Untracked
+  "`<name> 2.<ext>`" files beside an existing original are reported as
+  suspected iCloud conflict copies, as a warning only (a numbered name alone
+  is a legitimate file); 804 such copies had made every run look modified.
+  "Nothing found" counts as success, so neither check can end the run under
+  `set -e`.
 - `tools/update.sh` updates conda in base together with every installed
   `conda*` package; updating conda alone left its plugins
   (`conda-anaconda-telemetry`, `conda-anaconda-tos`) behind, printing

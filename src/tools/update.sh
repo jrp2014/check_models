@@ -458,18 +458,30 @@ installed_build_matches_checkout() {
 	local package_name="$1"
 	local repo_path="$2"
 	[[ "$package_name" == "mlx" ]] || return 0
-	if ! python -c "import mlx.core" >/dev/null 2>&1; then
+	# mlx.core.__version__ is compiled into the extension (MLX_VERSION), so it
+	# names the binary actually loaded; pip metadata alone can describe a
+	# newer install while a stale extension is what imports.
+	local runtime_version
+	if ! runtime_version="$(python -c "import mlx.core as mx; print(mx.__version__)" 2>/dev/null)"; then
 		echo "mlx.core does not import"
 		return 1
 	fi
-	local version build_rev head_rev
-	version="$(get_installed_distribution_version mlx)"
-	build_rev="${version##*+}"
+	local dist_version head_rev
+	dist_version="$(get_installed_distribution_version mlx)"
 	head_rev="$(git -C "$repo_path" rev-parse HEAD 2>/dev/null || echo unknown)"
-	if [[ -z "$build_rev" || "$build_rev" == "$version" || "$head_rev" != "$build_rev"* ]]; then
-		echo "installed mlx ${version:-<unknown>} was not built from checkout HEAD ${head_rev:0:9}"
-		return 1
-	fi
+	local label version build_rev
+	for label in "compiled mlx.core" "mlx package metadata"; do
+		if [[ "$label" == "compiled mlx.core" ]]; then
+			version="$runtime_version"
+		else
+			version="$dist_version"
+		fi
+		build_rev="${version##*+}"
+		if [[ -z "$build_rev" || "$build_rev" == "$version" || "$head_rev" != "$build_rev"* ]]; then
+			echo "$label reports ${version:-<unknown>}, not a build of checkout HEAD ${head_rev:0:9}"
+			return 1
+		fi
+	done
 	return 0
 }
 
@@ -883,19 +895,28 @@ check_mlx_build_requirements() {
 # A pull that did not complete leaves the checkout's state unknown to the
 # rest of the script, so report what git sees and stop rather than guess.
 # iCloud Drive ("Desktop & Documents") leaves conflict copies named
-# "<name> 2.<ext>" beside files it could not reconcile. Inside .git they break
-# ref parsing ("fatal: bad object refs/heads/main 2"); in the working tree they
-# are untracked files that make every run look modified and force a rebuild.
-find_icloud_conflict_copies() {
+# "<name> 2.<ext>" beside files it could not reconcile. Two cases differ:
+#  - Under .git/refs a name with a space is a malformed ref (git ref names
+#    cannot contain spaces): git fails ("fatal: bad object refs/heads/main 2"),
+#    so it blocks the update.
+#  - In the working tree a numbered name is only *suspected*: "experiment 2.py"
+#    can be a real file. Flagged only when its un-numbered original exists
+#    beside it, and only as a warning; the dirty-checkout rebuild still applies.
+# Both report "nothing found" as success, so errexit/pipefail cannot end the run.
+find_malformed_git_refs() {
+	find "$1/.git/refs" -name '* *' -print 2>/dev/null
+	return 0
+}
+
+find_suspected_conflict_copies() {
 	local repo_path="$1"
-	find "$repo_path/.git" \( -name '* [0-9]' -o -name '* [0-9].*' \) -print 2>/dev/null
+	local numbered='^(.*) [0-9]+(\.[^/]*)?$'
 	git -C "$repo_path" -c core.quotepath=off ls-files --others --exclude-standard 2>/dev/null |
-		grep -E ' [0-9]+(\.[^/]*)?$' |
 		while IFS= read -r copy; do
-			echo "$repo_path/$copy"
+			if [[ "$copy" =~ $numbered ]] && [[ -e "$repo_path/${BASH_REMATCH[1]}${BASH_REMATCH[2]}" ]]; then
+				echo "$repo_path/$copy"
+			fi
 		done
-	# grep exits 1 when there are no copies; under errexit/pipefail that
-	# status would end the whole script silently, so absence is success.
 	return 0
 }
 
@@ -1032,27 +1053,37 @@ update_local_mlx_repos() {
 	# that upstream now also changes, a diverged branch, no network) stops the
 	# run with diagnostics: continuing would leave that repo unbuilt and its
 	# install unguarded against the eager upgrades later in this script.
-	# Stage 0: iCloud conflict copies break git and force rebuilds; name them
-	# and stop rather than fail later with a misleading pull error.
+	# Stage 0: malformed refs (typically iCloud conflict copies) break git, so
+	# name them and stop rather than fail later with a misleading pull error;
+	# suspected conflict copies in the working tree only warn.
 	for idx in "${!REPO_NAMES[@]}"; do
-		local ICLOUD_COPIES
-		ICLOUD_COPIES="$(find_icloud_conflict_copies "${REPO_PATHS[idx]}")"
-		if [[ -n "$ICLOUD_COPIES" ]]; then
-			local COPY_COUNT
-			COPY_COUNT="$(printf '%s\n' "$ICLOUD_COPIES" | wc -l | tr -d ' ')"
+		local BROKEN_REFS
+		BROKEN_REFS="$(find_malformed_git_refs "${REPO_PATHS[idx]}")"
+		if [[ -n "$BROKEN_REFS" ]]; then
 			echo ""
-			echo "❌ ${REPO_NAMES[idx]} has $COPY_COUNT iCloud conflict copies (\"<name> 2.<ext>\"); stopping."
-			printf '%s\n' "$ICLOUD_COPIES" | head -5 | while IFS= read -r copy; do
-				echo "     $copy"
+			echo "❌ ${REPO_NAMES[idx]} has malformed git refs (names with a space); stopping."
+			printf '%s\n' "$BROKEN_REFS" | while IFS= read -r ref; do
+				echo "     $ref"
 			done
-			echo "   iCloud Drive syncs this folder and leaves such copies beside files it could"
-			echo "   not reconcile. Inside .git they break git (\"bad object refs/heads/main 2\");"
-			echo "   in the working tree they make every run look modified and force a rebuild."
-			echo "   They are untracked duplicates: review, then delete them. List them with"
-			echo "     cd ${REPO_PATHS[idx]} && find .git -name '* [0-9]*'; git ls-files --others --exclude-standard | grep -E ' [0-9]+(\.[^/]*)?\$'"
+			echo "   Ref names cannot contain spaces, so git fails on them (\"bad object\")."
+			echo "   \"<name> 2\" is how iCloud Drive names a conflict copy; if the un-numbered"
+			echo "   ref beside it is intact, delete the numbered file."
 			echo "   Keeping git checkouts outside iCloud-synced folders prevents this."
 			echo "   Nothing was pulled, built or reinstalled."
 			exit 1
+		fi
+		local SUSPECTED_COPIES
+		SUSPECTED_COPIES="$(find_suspected_conflict_copies "${REPO_PATHS[idx]}")"
+		if [[ -n "$SUSPECTED_COPIES" ]]; then
+			local COPY_COUNT
+			COPY_COUNT="$(printf '%s\n' "$SUSPECTED_COPIES" | wc -l | tr -d ' ')"
+			echo "⚠️  ${REPO_NAMES[idx]}: $COPY_COUNT untracked file(s) named like iCloud conflict copies"
+			echo "   (\"<name> 2.<ext>\" beside an existing \"<name>.<ext>\"), e.g."
+			printf '%s\n' "$SUSPECTED_COPIES" | head -3 | while IFS= read -r copy; do
+				echo "     $copy"
+			done
+			echo "   If they are copies, deleting them stops the checkout looking modified"
+			echo "   (which forces a rebuild). Continuing."
 		fi
 	done
 

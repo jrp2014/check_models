@@ -1323,24 +1323,50 @@ def test_update_script_rebuild_decision(inputs: str, expected: str) -> None:
     assert result.stdout.strip() == expected
 
 
+_HEAD_255328713 = "2553287133a" + "0" * 29
+
+
 @pytest.mark.parametrize(
-    ("imports", "version", "head", "expected_status", "reason"),
+    ("runtime", "metadata", "expected_status", "reason"),
     [
-        (True, "0.32.3.dev20261002+255328713", "2553287133a" + "0" * 29, 0, ""),
-        (True, "0.32.3.dev20260927+02ce1fb6a", "2553287133a" + "0" * 29, 1, "was not built from"),
-        (True, "0.32.3", "2553287133a" + "0" * 29, 1, "was not built from"),
-        (False, "0.32.3.dev20261002+255328713", "2553287133a" + "0" * 29, 1, "does not import"),
+        ("0.32.4.dev20261002+255328713", "0.32.4.dev20261002+255328713", 0, ""),
+        (
+            "0.32.3.dev20260927+02ce1fb6a",
+            "0.32.3.dev20260927+02ce1fb6a",
+            1,
+            "compiled mlx.core reports 0.32.3.dev20260927+02ce1fb6a",
+        ),
+        # A stale extension that still imports beside current metadata.
+        (
+            "0.32.3.dev20260927+02ce1fb6a",
+            "0.32.4.dev20261002+255328713",
+            1,
+            "compiled mlx.core reports 0.32.3.dev20260927+02ce1fb6a",
+        ),
+        (
+            "0.32.4.dev20261002+255328713",
+            "0.32.3.dev20260927+02ce1fb6a",
+            1,
+            "mlx package metadata reports 0.32.3.dev20260927+02ce1fb6a",
+        ),
+        ("0.32.4", "0.32.4.dev20261002+255328713", 1, "compiled mlx.core reports 0.32.4,"),
+        (None, "0.32.4.dev20261002+255328713", 1, "mlx.core does not import"),
     ],
 )
 def test_update_script_skips_a_rebuild_only_for_the_checkouts_own_build(
-    *, imports: bool, version: str, head: str, expected_status: int, reason: str
+    *, runtime: str | None, metadata: str, expected_status: int, reason: str
 ) -> None:
-    """Regression: a lost mlx.core behind an unchanged pull was "verified" and skipped."""
+    """Both the loaded binary and pip's record must be builds of checkout HEAD.
+
+    Regressions: a lost mlx.core behind an unchanged pull was "verified" and
+    skipped; and pip metadata alone passed a stale extension that still imports.
+    """
     function = _update_script_function("installed_build_matches_checkout")
+    python_stub = f"echo '{runtime}'" if runtime is not None else "return 1"
     stubs = (
-        f"python() {{ return {0 if imports else 1}; }}\n"
-        f"get_installed_distribution_version() {{ echo '{version}'; }}\n"
-        f"git() {{ echo '{head}'; }}\n"
+        f"python() {{ {python_stub}; }}\n"
+        f"get_installed_distribution_version() {{ echo '{metadata}'; }}\n"
+        f"git() {{ echo '{_HEAD_255328713}'; }}\n"
     )
     result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
         ["/bin/bash", "-c", f"{stubs}{function}\ninstalled_build_matches_checkout mlx /repo"],
@@ -1357,6 +1383,37 @@ def test_update_script_skips_a_rebuild_only_for_the_checkouts_own_build(
         check=False,
     )
     assert pure_python.returncode == 0
+
+
+def _conflict_probe(function_name: str, repo: Path) -> list[str]:
+    """Run one extracted update.sh detector against a repo; return the paths it reports."""
+    function = _update_script_function(function_name)
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", f'set -euo pipefail\n{function}\n{function_name} "$1"', "_", str(repo)],
+        capture_output=True,
+        text=True,
+        check=True,  # nothing found must not trip errexit/pipefail
+    )
+    return [line.removeprefix(f"{repo}/") for line in result.stdout.splitlines()]
+
+
+def test_update_script_flags_conflict_copies_only_with_evidence(tmp_path: Path) -> None:
+    """A numbered name alone is legitimate; one beside its original is only suspected."""
+    repo = tmp_path / "repo"
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created directory
+        ["git", "init", "-q", str(repo)],  # noqa: S607 - git from PATH, as update.sh uses it
+        check=True,
+    )
+    for name in ("ops.py", "ops 2.py", "experiment 2.py", "notes 3"):
+        safe_io.write_text_no_follow(repo / name, "x\n")
+    assert _conflict_probe("find_suspected_conflict_copies", repo) == ["ops 2.py"]
+    assert _conflict_probe("find_malformed_git_refs", repo) == []
+
+    refs = repo / ".git" / "refs" / "heads"
+    refs.mkdir(parents=True, exist_ok=True)
+    safe_io.write_text_no_follow(refs / "main", "a" * 40 + "\n")
+    safe_io.write_text_no_follow(refs / "main 2", "b" * 40 + "\n")
+    assert _conflict_probe("find_malformed_git_refs", repo) == [".git/refs/heads/main 2"]
 
 
 def test_update_script_leaves_setuptools_to_pip_above_mlxs_build_floor() -> None:
