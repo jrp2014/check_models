@@ -20470,6 +20470,21 @@ _CRASH_CONTINUITY_CHANGE_STATUSES: Final[frozenset[str]] = frozenset(
 )
 
 
+class TextDivergence(NamedTuple):
+    """Where one model's generated text first differs from the baseline's, as counted facts.
+
+    A late first difference with unchanged prompt tokens reads as a near-tied
+    token flipping; character 0 is a different answer from the start. Counted
+    in characters: the retained record has no per-token text.
+    """
+
+    model: str
+    first_difference: int  # characters both runs share before they differ
+    baseline_chars: int
+    current_chars: int
+    prompt_tokens_unchanged: bool | None  # None when either side lacks the count
+
+
 class ArchitectureCommits(NamedTuple):
     """Upstream commits between the runs that touched one affected model's architecture package.
 
@@ -20527,6 +20542,8 @@ class RunComparison:
     environment_notes: tuple[str, ...] = ()
     # Models that completed in both runs with different generated text.
     text_changed_models: tuple[str, ...] = ()
+    # Where each changed text first diverges (same models, same order).
+    text_divergence: tuple[TextDivergence, ...] = ()
     # Upstream commits between the baseline's and this run's revision of each
     # editable component: (name, baseline rev, current rev, count, subjects).
     component_changes: tuple[ComponentChange, ...] = ()
@@ -21001,6 +21018,34 @@ def _generated_text_changes(
     return len(completed), changed
 
 
+def _text_divergence(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> list[TextDivergence]:
+    """For each model whose text changed, where it first differs and whether prompt tokens did."""
+    divergence: list[TextDivergence] = []
+    for model, now, before in _completed_in_both(pairs):
+        baseline_text = before.get("generated_text", "") or ""
+        current_text = now.get("generated_text", "") or ""
+        if baseline_text == current_text:
+            continue
+        counts = [(record.get("metrics") or {}).get("prompt_tokens") for record in (before, now)]
+        unchanged = (
+            counts[0] == counts[1]
+            if all(isinstance(count, int) and not isinstance(count, bool) for count in counts)
+            else None
+        )
+        divergence.append(
+            TextDivergence(
+                model=model,
+                first_difference=len(os.path.commonprefix([baseline_text, current_text])),
+                baseline_chars=len(baseline_text),
+                current_chars=len(current_text),
+                prompt_tokens_unchanged=unchanged,
+            )
+        )
+    return divergence
+
+
 def _prefill_tps_ratios(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
 ) -> list[float]:
@@ -21412,6 +21457,7 @@ def compare_run_results(
     diff_pairs = pairs if outputs_comparable else []
     changes.extend(_assessment_changes(diff_pairs))
     text_compared, text_changed = _generated_text_changes(diff_pairs)
+    divergence = _text_divergence(diff_pairs)
     identical_text = text_compared - len(text_changed)
     prefill_sorted = _prefill_tps_ratios(pairs) if throughput_comparable else []
     environment_notes = (
@@ -21458,6 +21504,7 @@ def compare_run_results(
         revision_changes=tuple(revision_changes),
         throughput_comparable=throughput_comparable,
         text_changed_models=tuple(text_changed),
+        text_divergence=tuple(divergence),
         prompt_tps_ratio_median=_quantile(prefill_sorted, 0.5) if prefill_sorted else None,
         prompt_tps_ratio_min=prefill_sorted[0] if prefill_sorted else None,
         prompt_tps_ratio_max=prefill_sorted[-1] if prefill_sorted else None,
@@ -21718,6 +21765,16 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             "compared_models": comparison.prompt_tps_compared_models,
         },
         "text_changed_models": cast("JsonLike", list(comparison.text_changed_models)),
+        "text_divergence": [
+            {
+                "model": entry.model,
+                "first_difference": entry.first_difference,
+                "baseline_chars": entry.baseline_chars,
+                "current_chars": entry.current_chars,
+                "prompt_tokens_unchanged": entry.prompt_tokens_unchanged,
+            }
+            for entry in comparison.text_divergence
+        ],
         "component_changes": [
             {
                 "component": change.name,
@@ -21974,6 +22031,20 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         throughput_comparable=_comparison_req_bool(value.get("throughput_comparable", True)),
         environment_notes=_comparison_str_items(value.get("environment_notes") or []),
         text_changed_models=_comparison_str_items(value.get("text_changed_models") or []),
+        text_divergence=tuple(
+            TextDivergence(
+                _comparison_req_str(entry["model"]),
+                _comparison_req_int(entry["first_difference"]),
+                _comparison_req_int(entry["baseline_chars"]),
+                _comparison_req_int(entry["current_chars"]),
+                (
+                    None
+                    if entry.get("prompt_tokens_unchanged") is None
+                    else _comparison_req_bool(entry["prompt_tokens_unchanged"])
+                ),
+            )
+            for entry in _comparison_rows(value.get("text_divergence"))
+        ),
         component_changes=tuple(
             ComponentChange(
                 _comparison_req_str(entry["component"]),
@@ -22046,11 +22117,35 @@ class _ComparisonView:
     continuity_note: str | None = None
 
 
+def _text_change_label(model: str, divergence: TextDivergence | None) -> str:
+    """One changed model, with where its text first differs when that was recorded."""
+    if divergence is None:
+        return model
+    prompt = {
+        True: "; same prompt tokens",
+        False: "; prompt tokens changed",
+        None: "",
+    }[divergence.prompt_tokens_unchanged]
+    return (
+        f"{model} (first differs at character {divergence.first_difference:,} of "
+        f"{divergence.baseline_chars:,} \u2192 {divergence.current_chars:,}{prompt})"
+    )
+
+
 def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
     """Name the models whose generated text changed, and split the count by decoding."""
     rows = []
     if comparison.text_changed_models:
-        rows.append(("Generated text changed", ", ".join(comparison.text_changed_models)))
+        where = {entry.model: entry for entry in comparison.text_divergence}
+        rows.append(
+            (
+                "Generated text changed",
+                ", ".join(
+                    _text_change_label(model, where.get(model))
+                    for model in comparison.text_changed_models
+                ),
+            )
+        )
     # Annotated: Pylance infers the Final table's literal keys, then rejects str lookups.
     labels: dict[str, str] = dict(_DECODING_GROUP_LABELS)
     if comparison.text_changes_by_decoding:

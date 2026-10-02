@@ -7538,12 +7538,13 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
         ),
     )
     rows = dict(check_models._comparison_view(comparison).summary_rows)
-    assert rows["Generated text changed"] == "org/a"
+    assert rows["Generated text changed"].startswith("org/a (first differs at character ")
     assert rows["Prefill tok/s ratio (now/baseline)"].startswith("0.750")
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
     assert restored.text_changed_models == ("org/a",)
+    assert restored.text_divergence == comparison.text_divergence
     assert restored.component_changes == comparison.component_changes
     assert restored.prompt_tps_ratio_median == pytest.approx(0.75)
 
@@ -8315,3 +8316,30 @@ def test_mlx_environment_variables_are_recorded_and_split_throughput(
     assert comparison.comparable  # outputs are still compared
     assert not comparison.throughput_comparable
     assert any("MLX environment variables differ" in note for note in comparison.environment_notes)
+
+
+def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
+    """A late first difference with unchanged prompt tokens is a near-tie flip, stated as counts."""
+    shared = "Title: Blue cabin cruiser\nDescription: A blue boat "
+    baseline = _comparison_baseline([_comparison_record("org/a", text=shared + "on calm water.")])
+    cast("dict[str, Any]", baseline.results[0]["metrics"])["prompt_tokens"] = 1384
+    current = _comparison_record("org/a", text=shared + "in evening light.")
+    cast("dict[str, Any]", current["metrics"])["prompt_tokens"] = 1384
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", current)],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    (entry,) = comparison.text_divergence
+    assert entry == check_models.TextDivergence(
+        "org/a", len(shared), len(shared) + 14, len(shared) + 17, prompt_tokens_unchanged=True
+    )
+    label = check_models._text_change_label("org/a", entry)
+    assert label == (
+        f"org/a (first differs at character {len(shared)} of {len(shared) + 14} \u2192 "
+        f"{len(shared) + 17}; same prompt tokens)"
+    )
+    assert check_models._text_change_label("org/a", None) == "org/a"
+    moved = entry._replace(prompt_tokens_unchanged=False)
+    assert check_models._text_change_label("org/a", moved).endswith("; prompt tokens changed)")
