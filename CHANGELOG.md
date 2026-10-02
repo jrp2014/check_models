@@ -6,12 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- The baseline comparison records where each changed text first diverges:
-  the characters both runs share before they differ, both lengths, and
-  whether the prompt token count changed (e.g. "first differs at character
-  216 of 404 → 422; same prompt tokens"). Kept in `results.jsonl` as
-  `comparison.text_divergence`; counted in characters, since the record has
-  no per-token text.
+- The baseline comparison records, for each changed text, the shared prefix
+  in characters, both lengths, and whether the prompt token count changed
+  (e.g. "shared prefix 216 characters; length 404 → 422; same prompt
+  token count"; a count, not a claim the token ids matched); one answer
+  extending the other reads as the shorter length shared. One calculation decides which texts changed and describes them.
+  Kept in `results.jsonl` as `comparison.text_divergence`; counted in
+  characters, since the record has no per-token text.
 - Checkpoint sampling follows mlx-vlm's own `load()`: only the
   `generation_config.json` keys in `mlx_vlm.utils.GENERATION_CONFIG_DEFAULT_KEYS`
   (temperature, top_p, top_k, with do_sample) are applied. A declared

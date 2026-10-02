@@ -7538,7 +7538,7 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
         ),
     )
     rows = dict(check_models._comparison_view(comparison).summary_rows)
-    assert rows["Generated text changed"].startswith("org/a (first differs at character ")
+    assert rows["Generated text changed"].startswith("org/a (shared prefix ")
     assert rows["Prefill tok/s ratio (now/baseline)"].startswith("0.750")
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
@@ -7916,7 +7916,7 @@ def test_decoding_split_counts_the_same_pairs_as_the_text_count() -> None:
         ("b", row("completed", "y"), row("completed", "y")),
     ]
     compared, changed = check_models._generated_text_changes(pairs)
-    assert (compared, changed) == (1, [])
+    assert (compared, changed) == (1, [])  # identical outputs produce no entry
     assert check_models._text_changes_by_decoding(pairs) == (("greedy", 0, 1),)
 
 
@@ -8318,28 +8318,99 @@ def test_mlx_environment_variables_are_recorded_and_split_throughput(
     assert any("MLX environment variables differ" in note for note in comparison.environment_notes)
 
 
+def _divergence(
+    baseline_text: str, current_text: str, tokens: tuple[object, object] = (10, 10)
+) -> tuple[int, list[check_models.TextDivergence]]:
+    """Run the comparison's one text-change calculation on a single pair."""
+    before = _comparison_record("org/a", text=baseline_text)
+    now = _comparison_record("org/a", text=current_text)
+    for record, count in ((before, tokens[0]), (now, tokens[1])):
+        metrics = cast("dict[str, Any]", record["metrics"])
+        if count is None:
+            metrics.pop("prompt_tokens", None)
+        else:
+            metrics["prompt_tokens"] = count
+    pairs = [
+        (
+            "org/a",
+            cast("check_models.JsonlResultRecord", now),
+            cast("check_models.JsonlResultRecord", before),
+        )
+    ]
+    return check_models._generated_text_changes(pairs)
+
+
 def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
-    """A late first difference with unchanged prompt tokens is a near-tie flip, stated as counts."""
+    """Counts only: shared prefix, both lengths, and whether the prompt token count changed."""
     shared = "Title: Blue cabin cruiser\nDescription: A blue boat "
-    baseline = _comparison_baseline([_comparison_record("org/a", text=shared + "on calm water.")])
-    cast("dict[str, Any]", baseline.results[0]["metrics"])["prompt_tokens"] = 1384
-    current = _comparison_record("org/a", text=shared + "in evening light.")
-    cast("dict[str, Any]", current["metrics"])["prompt_tokens"] = 1384
-    comparison = check_models.compare_run_results(
-        [cast("check_models.JsonlResultRecord", current)],
-        baseline,
-        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    compared, (entry,) = _divergence(
+        shared + "on calm water.", shared + "in evening light.", (1384, 1384)
     )
-    assert comparison is not None
-    (entry,) = comparison.text_divergence
+    assert compared == 1
     assert entry == check_models.TextDivergence(
-        "org/a", len(shared), len(shared) + 14, len(shared) + 17, prompt_tokens_unchanged=True
+        "org/a", len(shared), len(shared) + 14, len(shared) + 17, prompt_token_count_unchanged=True
     )
-    label = check_models._text_change_label("org/a", entry)
-    assert label == (
-        f"org/a (first differs at character {len(shared)} of {len(shared) + 14} \u2192 "
-        f"{len(shared) + 17}; same prompt tokens)"
+    assert check_models._text_change_label("org/a", entry) == (
+        f"org/a (shared prefix {len(shared)} characters; length {len(shared) + 14} \u2192 "
+        f"{len(shared) + 17}; same prompt token count)"
     )
     assert check_models._text_change_label("org/a", None) == "org/a"
-    moved = entry._replace(prompt_tokens_unchanged=False)
-    assert check_models._text_change_label("org/a", moved).endswith("; prompt tokens changed)")
+
+
+@pytest.mark.parametrize(
+    ("baseline_text", "current_text", "tokens", "expected"),
+    [
+        # Identical output: no entry at all.
+        ("same", "same", (10, 10), None),
+        # Text appended at the end: the whole shorter answer is shared.
+        ("A blue boat.", "A blue boat. It is moored.", (10, 10), (12, 12, 26, True)),
+        # Text removed at the end.
+        ("A blue boat. It is moored.", "A blue boat.", (10, 11), (12, 26, 12, False)),
+        # Different from the first character.
+        ("Blue boat.", "A boat.", (10, 10), (0, 10, 7, True)),
+        # A missing token count leaves the prompt comparison unstated.
+        ("x1", "x2", (None, 10), (1, 2, 2, None)),
+    ],
+)
+def test_text_divergence_boundaries(
+    baseline_text: str,
+    current_text: str,
+    tokens: tuple[object, object],
+    expected: tuple[int, int, int, bool | None] | None,
+) -> None:
+    """Exact prefixes, first-character changes and missing counts stay neutral counts."""
+    _compared, changed = _divergence(baseline_text, current_text, tokens)
+    if expected is None:
+        assert changed == []
+        return
+    (entry,) = changed
+    assert (
+        entry.shared_prefix_chars,
+        entry.baseline_chars,
+        entry.current_chars,
+        entry.prompt_token_count_unchanged,
+    ) == expected
+    label = check_models._text_change_label("org/a", entry)
+    assert label.endswith(
+        {True: "; same prompt token count)", False: "; prompt token count changed)", None: ")"}[
+            expected[3]
+        ]
+    )
+
+
+def test_text_divergence_is_withheld_for_incomparable_runs() -> None:
+    """A different prompt withholds the output diff, divergence included."""
+    baseline = _comparison_baseline([_comparison_record("org/a", text="old answer")])
+    current_metadata = cast(
+        "check_models.JsonlMetadataRecord", {**baseline.metadata, "prompt": "a different prompt"}
+    )
+    kwargs = {**_verified_comparison_kwargs(baseline), "current_metadata": current_metadata}
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a", text="new answer"))],
+        baseline,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison is not None
+    assert not comparison.comparable
+    assert comparison.text_divergence == ()
+    assert comparison.text_changed_models == ()

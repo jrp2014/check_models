@@ -20471,18 +20471,20 @@ _CRASH_CONTINUITY_CHANGE_STATUSES: Final[frozenset[str]] = frozenset(
 
 
 class TextDivergence(NamedTuple):
-    """Where one model's generated text first differs from the baseline's, as counted facts.
+    """How much of one model's generated text the baseline and this run share, as counts.
 
-    A late first difference with unchanged prompt tokens reads as a near-tied
-    token flipping; character 0 is a different answer from the start. Counted
-    in characters: the retained record has no per-token text.
+    ``shared_prefix_chars`` is the length of the common prefix: equal to the
+    shorter length when one answer extends the other, 0 when they differ from
+    the first character. Counted in characters: the retained record has no
+    per-token text.
     """
 
     model: str
-    first_difference: int  # characters both runs share before they differ
+    shared_prefix_chars: int
     baseline_chars: int
     current_chars: int
-    prompt_tokens_unchanged: bool | None  # None when either side lacks the count
+    # Counts only: equal counts do not show the token ids were the same.
+    prompt_token_count_unchanged: bool | None  # None when either side lacks the count
 
 
 class ArchitectureCommits(NamedTuple):
@@ -21007,23 +21009,15 @@ def _text_changes_by_decoding(
 
 def _generated_text_changes(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
-) -> tuple[int, list[str]]:
-    """Count the models completed in both runs and name those whose text differs."""
+) -> tuple[int, list[TextDivergence]]:
+    """Count the models completed in both runs; describe each whose text differs.
+
+    The one place that decides a text changed: the changed-model list is
+    derived from these records.
+    """
     completed = _completed_in_both(pairs)
-    changed = [
-        model
-        for model, now, before in completed
-        if now.get("generated_text", "") != before.get("generated_text", "")
-    ]
-    return len(completed), changed
-
-
-def _text_divergence(
-    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
-) -> list[TextDivergence]:
-    """For each model whose text changed, where it first differs and whether prompt tokens did."""
-    divergence: list[TextDivergence] = []
-    for model, now, before in _completed_in_both(pairs):
+    changed: list[TextDivergence] = []
+    for model, now, before in completed:
         baseline_text = before.get("generated_text", "") or ""
         current_text = now.get("generated_text", "") or ""
         if baseline_text == current_text:
@@ -21034,16 +21028,16 @@ def _text_divergence(
             if all(isinstance(count, int) and not isinstance(count, bool) for count in counts)
             else None
         )
-        divergence.append(
+        changed.append(
             TextDivergence(
                 model=model,
-                first_difference=len(os.path.commonprefix([baseline_text, current_text])),
+                shared_prefix_chars=len(os.path.commonprefix([baseline_text, current_text])),
                 baseline_chars=len(baseline_text),
                 current_chars=len(current_text),
-                prompt_tokens_unchanged=unchanged,
+                prompt_token_count_unchanged=unchanged,
             )
         )
-    return divergence
+    return len(completed), changed
 
 
 def _prefill_tps_ratios(
@@ -21456,8 +21450,8 @@ def compare_run_results(
     pairs = [(model, current_by[model], baseline_by[model]) for model in shared]
     diff_pairs = pairs if outputs_comparable else []
     changes.extend(_assessment_changes(diff_pairs))
-    text_compared, text_changed = _generated_text_changes(diff_pairs)
-    divergence = _text_divergence(diff_pairs)
+    text_compared, divergence = _generated_text_changes(diff_pairs)
+    text_changed = [entry.model for entry in divergence]
     identical_text = text_compared - len(text_changed)
     prefill_sorted = _prefill_tps_ratios(pairs) if throughput_comparable else []
     environment_notes = (
@@ -21768,10 +21762,10 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "text_divergence": [
             {
                 "model": entry.model,
-                "first_difference": entry.first_difference,
+                "shared_prefix_chars": entry.shared_prefix_chars,
                 "baseline_chars": entry.baseline_chars,
                 "current_chars": entry.current_chars,
-                "prompt_tokens_unchanged": entry.prompt_tokens_unchanged,
+                "prompt_token_count_unchanged": entry.prompt_token_count_unchanged,
             }
             for entry in comparison.text_divergence
         ],
@@ -22034,13 +22028,13 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         text_divergence=tuple(
             TextDivergence(
                 _comparison_req_str(entry["model"]),
-                _comparison_req_int(entry["first_difference"]),
+                _comparison_req_int(entry["shared_prefix_chars"]),
                 _comparison_req_int(entry["baseline_chars"]),
                 _comparison_req_int(entry["current_chars"]),
                 (
                     None
-                    if entry.get("prompt_tokens_unchanged") is None
-                    else _comparison_req_bool(entry["prompt_tokens_unchanged"])
+                    if entry.get("prompt_token_count_unchanged") is None
+                    else _comparison_req_bool(entry["prompt_token_count_unchanged"])
                 ),
             )
             for entry in _comparison_rows(value.get("text_divergence"))
@@ -22118,16 +22112,16 @@ class _ComparisonView:
 
 
 def _text_change_label(model: str, divergence: TextDivergence | None) -> str:
-    """One changed model, with where its text first differs when that was recorded."""
+    """One changed model, with how much text it shares with the baseline when recorded."""
     if divergence is None:
         return model
     prompt = {
-        True: "; same prompt tokens",
-        False: "; prompt tokens changed",
+        True: "; same prompt token count",
+        False: "; prompt token count changed",
         None: "",
-    }[divergence.prompt_tokens_unchanged]
+    }[divergence.prompt_token_count_unchanged]
     return (
-        f"{model} (first differs at character {divergence.first_difference:,} of "
+        f"{model} (shared prefix {divergence.shared_prefix_chars:,} characters; length "
         f"{divergence.baseline_chars:,} \u2192 {divergence.current_chars:,}{prompt})"
     )
 
