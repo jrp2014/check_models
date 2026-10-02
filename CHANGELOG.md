@@ -6,6 +6,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `check_models.log` and the terminal are quieter. Under `--verbose` a
+  completed model's entry in "Per-model results" is its summary line plus any
+  warnings. The token, timing and memory tree has been removed (the
+  comparison table and `results.jsonl` carry those figures), along with the
+  metrics legend that described it and the rule between consecutive
+  completed models. Each model's captured block in the file log no longer
+  repeats the harness's own console lines, which the log already holds with
+  their own timestamps. It also drops progress bars that reached 100%,
+  keeping a bar's last state only when it stopped short or moved bytes.
+  `results.jsonl` and the failure capture are unchanged.
 - Tooling: fresh envs from `tools/setup_conda_env.sh` (and the manual conda
   recipe) are created on Python 3.14, the version the working `mlx-vlm` env
   runs; the supported floor (`requires-python`, type-checker targets) stays

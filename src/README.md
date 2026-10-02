@@ -69,20 +69,22 @@ envs use 3.14. CI tests both.
 - **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) that verify metadata against clearly visible image content, avoid speculation, and compact long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
-  - Detailed verbose timing: input validation, prompt prep, cleanup, upstream
-    model prefill/first-token time (excluding input preparation), and stop reason
+  - Detailed timing in `results.jsonl`: input validation, prompt prep, cleanup,
+    upstream model prefill/first-token time (excluding input preparation), and
+    stop reason
   - Tokens: total, prompt, generated with tokens/sec
   - Memory: peak, active/cache snapshots, and post-cleanup active/cache residue (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
 - **Multiple Output Formats**:
-  - **CLI**: Colorized; `--verbose` adds the detailed metrics tree
+  - **CLI**: Colorized; `--verbose` streams each model's output live and ends
+    with one summary line per model before the comparison tables
   - **HTML**: Standalone report with inline CSS, failed row highlighting
   - **Markdown**: Tiny run index, evidence gallery, and conditional diagnostics
   - **JSONL**: The sole schema-3 machine contract — run-level metadata header
     plus per-result records — for downstream analysis and public snapshots
 - **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
 - **Machine Parsable**: SUMMARY lines with `key=value` format for automation
-- **Visual Hierarchy**: Emoji prefixes, tree-structured metrics, wrapped text output
+- **Visual Hierarchy**: Emoji prefixes, summary tables and charts, wrapped text output
 
 ## Feature Highlights
 
@@ -96,7 +98,7 @@ envs use 3.14. CI tests both.
 | Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
 | Timeout | Signal‑based (UNIX) manager; configurable per run. |
 | Output preview | Non‑verbose mode still shows wrapped generated text (80 cols). |
-| Metrics modes | `--verbose` shows the full detailed metrics tree, including phase timings and stop reason when available. |
+| Metrics modes | Per-model timing, token and memory figures appear in the end-of-run comparison table; `results.jsonl` keeps the full phase timings and stop reason. |
 
 ## Installation and Environment Setup
 
@@ -1491,7 +1493,7 @@ This provides:
 
 - Detailed model loading information
 - EXIF metadata extraction details
-- Performance metric breakdowns
+- Live per-model output and phase progress
 - Error stack traces
 - Library version information
 

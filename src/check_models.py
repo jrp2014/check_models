@@ -150,7 +150,6 @@ from rich.logging import RichHandler
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.tree import Tree
 
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
@@ -2376,20 +2375,28 @@ class PhaseTimer:
         return duration
 
 
+# Set on a thread while the harness's own console log handler writes, so a
+# tee'd stream can tell the harness's log lines from upstream output.
+_HARNESS_CONSOLE_WRITE = threading.local()
+
+
 class _TeeCaptureStream(io.TextIOBase):
     """Mirror writes to an underlying stream while buffering text for diagnostics."""
 
-    __slots__ = ("_buffer", "_stream")
+    __slots__ = ("_buffer", "_external_buffer", "_stream")
 
     def __init__(self, stream: TextIO) -> None:
         self._stream = stream
         self._buffer = io.StringIO()
+        self._external_buffer = io.StringIO()
 
     def writable(self) -> bool:
         return True
 
     def write(self, data: str) -> int:
         self._buffer.write(data)
+        if not getattr(_HARNESS_CONSOLE_WRITE, "active", False):
+            self._external_buffer.write(data)
         return self._stream.write(data)
 
     def flush(self) -> None:
@@ -2427,6 +2434,14 @@ class _TeeCaptureStream(io.TextIOBase):
 
     def getvalue(self) -> str:
         return self._buffer.getvalue()
+
+    def external_value(self) -> str:
+        """Return the buffered text without the harness's own console log lines.
+
+        The file log already holds those lines once, with their own
+        timestamps; re-logging the tee'd copy would show each one twice.
+        """
+        return self._external_buffer.getvalue()
 
 
 # Gallery rendering helpers (outside class)
@@ -3557,6 +3572,14 @@ class StyleAwareRichHandler(RichHandler):
         logging.ERROR: "bold red",
         logging.CRITICAL: "bold red reverse",
     }
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Write the record, marking the write as the harness's own for tee'd streams."""
+        _HARNESS_CONSOLE_WRITE.active = True
+        try:
+            super().emit(record)
+        finally:
+            _HARNESS_CONSOLE_WRITE.active = False
 
     def render_message(self, record: logging.LogRecord, message: str) -> ConsoleRenderable:
         """Render log records as Rich Text without changing the stored log record."""
@@ -15323,6 +15346,34 @@ def _compose_stream_capture_for_file_log(
     )
 
 
+# A tqdm bar as captured: "Prefill:  85%|████████▌ | 2048/2402 [...]".
+_PROGRESS_BAR_LINE_RE: Final[re.Pattern[str]] = re.compile(
+    r"^(?P<label>[^|]*?):\s+(?P<percent>\d{1,3})%\|"
+)
+
+
+def _drop_finished_progress_bars(text: str) -> str:
+    """Drop progress bars that only say a step finished.
+
+    A tee'd tqdm bar leaves every state it drew. One that reached 100% (a
+    cache hit's "Fetching 10 files", a completed prefill) adds nothing the
+    timings lack, so it is dropped; a bar's last state is kept when it
+    stopped short (a stall or a timeout) or moved bytes (a real download).
+    """
+    lines = text.replace("\r", "\n").splitlines()
+    last_state: dict[str, tuple[int, bool]] = {}
+    bar_indexes: set[int] = set()
+    for index, line in enumerate(lines):
+        if match := _PROGRESS_BAR_LINE_RE.match(_strip_ansi(line).strip()):
+            bar_indexes.add(index)
+            telling = match["percent"] != "100" or line.rstrip().endswith("B/s]")
+            last_state[match["label"]] = (index, telling)
+    kept_bars = {index for index, telling in last_state.values() if telling}
+    return "\n".join(
+        line for index, line in enumerate(lines) if index not in bar_indexes or index in kept_bars
+    )
+
+
 def _log_stream_capture_to_file(
     *,
     model_identifier: str,
@@ -15333,11 +15384,13 @@ def _log_stream_capture_to_file(
 
     Live generation already reaches the terminal via ``_TeeCaptureStream``. Re-logging
     to the console would duplicate that block; ``log_destination="file"`` keeps the
-    durable copy without a second terminal echo.
+    durable copy without a second terminal echo. Callers pass the tee's
+    ``external_value()``, and finished progress bars are dropped, so the block
+    holds only what upstream printed that the log does not already record.
     """
     body = _compose_stream_capture_for_file_log(
         stdout_text=stdout_text,
-        stderr_text=stderr_text,
+        stderr_text=_drop_finished_progress_bars(stderr_text),
     )
     if body is None:
         return
@@ -16445,8 +16498,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         # This is independent of --verbose: the terminal already saw the live stream.
         _log_stream_capture_to_file(
             model_identifier=params.model_identifier,
-            stdout_text=stdout_capture.getvalue(),
-            stderr_text=stderr_capture.getvalue(),
+            stdout_text=stdout_capture.external_value(),
+            stderr_text=stderr_capture.external_value(),
         )
         _update_phase("cleanup")
         with phase_timer.track("cleanup"):
@@ -16721,38 +16774,6 @@ def _log_rich_table(
     _log_rich_renderable(table, indent=indent)
 
 
-type MetricTreeRow = tuple[str, str]
-
-
-def _metric_tree_label(label: str, value: str, *, width: int = 12) -> Text:
-    """Build one Rich tree node for a key/value metric row, label padded to ``width``."""
-    text = Text()
-    if label:
-        text.append(_display_align(label, width, alignment="left"), style="bold")
-        text.append(" ")
-    text.append(value)
-    return text
-
-
-def _log_metric_tree(
-    title: str,
-    rows: Sequence[MetricTreeRow],
-    *,
-    emoji: str = "",
-    indent: str = "  ",
-) -> None:
-    """Log a Rich tree for grouped CLI metrics."""
-    if not rows:
-        return
-    title_text = Text(f"{emoji} {title}" if emoji else title, style="bold white")
-    tree = Tree(title_text, guide_style="dim")
-    # Pad to this tree's longest label so every value lines up.
-    width = max([12, *(len(label) for label, _value in rows)])
-    for label, value in rows:
-        tree.add(_metric_tree_label(label, value, width=width))
-    _log_rich_renderable(tree, indent=indent)
-
-
 _SUMMARY_USABILITY_WORDS: Final[dict[str, str]] = {
     "usable": "usable output",
     "usable_with_caveats": "usable output with caveats",
@@ -16866,7 +16887,11 @@ def _log_verbose_success_details(
     analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
 ) -> None:
-    """Emit verbose block with warnings and metrics after the guard's live echo."""
+    """Emit the warnings under a model's summary line after the guard's live echo.
+
+    The timing, token and memory figures are left to the comparison table
+    that follows the per-model lines, and to results.jsonl.
+    """
     if not res.generation:
         return
 
@@ -16885,172 +16910,11 @@ def _log_verbose_success_details(
             prompt=prompt,
         )
 
-    log_blank()
-
     _log_quality_warnings(analysis, gen_tokens)
 
     if not gen_text:
         log_metric_label("Generated Text:", emoji="📝")
         logger.info("   <empty>", extra={"style_hint": LogStyles.GENERATED_TEXT})
-
-    log_blank()
-    log_metric_label("Performance Metrics:", emoji="📊")
-    _log_token_summary(res)
-    _log_detailed_timings(res)
-    log_blank()
-    _log_perf_block(res)
-    log_blank()
-
-
-def _log_token_summary(res: PerformanceResult) -> None:
-    """Log tokens and generation TPS with tree structure for visual hierarchy."""
-    if res.generation is None:
-        return
-
-    p_tokens = _generation_int_metric(res.generation, "prompt_tokens") or 0
-    g_tokens = _generation_int_metric(res.generation, "generation_tokens") or 0
-    tot_tokens = (p_tokens or 0) + (g_tokens or 0)
-    gen_tps = _generation_float_metric(res.generation, "generation_tps") or 0.0
-    prompt_tps = _generation_float_metric(res.generation, "prompt_tps") or 0.0
-
-    _log_metric_tree(
-        "Tokens:",
-        (
-            ("Prompt:", f"{fmt_num(p_tokens):>8} @ {fmt_num(prompt_tps)} tok/s"),
-            ("Generated:", f"{fmt_num(g_tokens):>8} @ {fmt_num(gen_tps)} tok/s"),
-            ("Total:", f"{fmt_num(tot_tokens):>8}"),
-        ),
-        emoji="🔢",
-    )
-
-
-def _log_detailed_timings(res: PerformanceResult) -> None:
-    """Log detailed runtime timings and termination metadata with tree structure."""
-    total_time_val = res.total_time
-    generation_time_val = res.generation_time
-    model_load_time_val = res.model_load_time
-    runtime = res.runtime_diagnostics
-
-    if not total_time_val or total_time_val <= 0:
-        return
-    total_time_seconds = total_time_val
-
-    tt_val = format_field_value("total_time", total_time_val)
-    tt_disp = tt_val if isinstance(tt_val, str) else _format_time_seconds(total_time_val)
-    entries: list[tuple[str, str]] = [("Total:", f"{tt_disp:>8}")]
-
-    def _append_phase_entry(
-        *,
-        label: str,
-        value: float | None,
-        field_name: str,
-        include_pct: bool = True,
-    ) -> None:
-        if value is None or value <= 0:
-            return
-        formatted = format_field_value(field_name, value)
-        display = formatted if isinstance(formatted, str) else _format_time_seconds(value)
-        if include_pct:
-            pct = value / total_time_seconds * 100
-            entries.append((label, f"{display:>8} ({pct:>3.0f}%)"))
-            return
-        entries.append((label, f"{display:>8}"))
-
-    _append_phase_entry(
-        label="Generation:",
-        value=generation_time_val,
-        field_name="generation_time",
-    )
-    _append_phase_entry(
-        label="Load:",
-        value=model_load_time_val,
-        field_name="model_load_time",
-    )
-
-    if runtime is not None:
-        _append_phase_entry(
-            label="Validation:",
-            value=runtime.input_validation_time_s,
-            field_name="total_time",
-        )
-        _append_phase_entry(
-            label="Prompt prep:",
-            value=runtime.prompt_prep_time_s,
-            field_name="total_time",
-        )
-        # Cleanup runs after the total is taken (load + prep + generation sum
-        # to it), so a share of the total would push the percentages past 100.
-        _append_phase_entry(
-            label="Cleanup (after total):",
-            value=runtime.cleanup_time_s,
-            field_name="total_time",
-            include_pct=False,
-        )
-        _append_phase_entry(
-            label="First token (upstream):",
-            value=runtime.first_token_latency_s,
-            field_name="total_time",
-            include_pct=False,
-        )
-        _append_phase_entry(
-            label="First token (measured):",
-            value=runtime.time_to_first_token_s,
-            field_name="total_time",
-            include_pct=False,
-        )
-        if runtime.stop_reason:
-            entries.append(("Stop reason:", runtime.stop_reason))
-
-    _log_metric_tree("Timing:", entries, emoji="⏱")
-
-
-def _log_perf_block(res: PerformanceResult) -> None:
-    """Log inner performance metrics (memory) with tree structure and emoji."""
-    active_mem = res.active_memory or 0.0
-    cached_mem = res.cache_memory or 0.0
-    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
-
-    # Only show memory section if at least one value is present
-    if active_mem <= 0 and cached_mem <= 0 and peak_mem <= 0:
-        return
-
-    entries: list[MetricTreeRow] = []
-    recommended_working_set_bytes = _get_recommended_working_set_bytes()
-
-    def _append_mem(label: str, field: str, raw_val: float) -> None:
-        if raw_val <= 0:
-            return
-        formatted = (
-            _format_peak_memory_context(raw_val, recommended_working_set_bytes)
-            if field == "peak_memory"
-            else format_field_value(field, raw_val)
-        )
-        unit = "GB"
-        text = (
-            formatted
-            if "recommended working set" in formatted or formatted.endswith(unit)
-            else f"{formatted} GB"
-        )
-        entries.append((label, f"{text:>8}"))
-
-    _append_mem("Active Δ:", "active_memory", active_mem)
-    _append_mem("Cache Δ:", "cache_memory", cached_mem)
-    _append_mem("Peak:", "peak_memory", peak_mem)
-    _log_metric_tree("Memory:", entries, emoji="💾")
-
-
-def log_metrics_legend() -> None:
-    """Emit a one-time legend at the beginning of processing for clarity."""
-    log_blank()
-    panel = Panel(
-        "Detailed mode: separate lines for timing, memory, tokens, TPS\n"
-        "Warnings are shown for repetitive output and token-cap truncation.",
-        title="📖 Metrics Legend",
-        border_style="blue",
-        box=box.ROUNDED,
-    )
-    _log_rich_renderable(panel, width=get_terminal_width(max_width=100))
-    log_blank()
 
 
 def _log_failure_details(result: PerformanceResult) -> None:
@@ -18805,10 +18669,6 @@ def process_models(
             except ValueError:
                 logger.exception("Invalid model identifier '%s'", model_id)
                 raise
-
-    # Emit legend once if verbose
-    if args.verbose:
-        log_metrics_legend()
 
     arch, gpu_info = get_system_info()
     logger.debug("System: %s, GPU: %s", arch, gpu_info if gpu_info is not None else "")
@@ -25919,13 +25779,19 @@ def finalize_execution(
         # are not read as the first result's; the order is the report's, not
         # the run's.
         print_cli_section("Per-model results (failures first, then fastest to slowest)")
+        verbose = bool(getattr(args, "verbose", False))
+        previous_has_block = False
         for index, result in enumerate(results, start=1):
-            if index > 1:
+            # Under --verbose a completed model is its summary line and any
+            # warnings, so only a failure's details or a preview needs a rule.
+            has_block = not (verbose and result.success)
+            if index > 1 and (has_block or previous_has_block):
                 print_cli_separator()
+            previous_has_block = has_block
             print_model_result(
                 result,
                 assessment=assessments[result.model_name],
-                verbose=bool(getattr(args, "verbose", False)),
+                verbose=verbose,
                 run_index=index,
                 total_runs=len(results),
                 prompt=prompt,

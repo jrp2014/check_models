@@ -6,7 +6,6 @@ import argparse
 import io
 import json
 import logging
-import re
 import time
 from contextlib import ExitStack
 from dataclasses import replace
@@ -32,7 +31,6 @@ if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from collections.abc import Callable, Sequence
     from pathlib import Path
 
-    from rich.panel import Panel
 
 type ExpectedObservationCode = Literal[
     "empty_output",
@@ -244,20 +242,10 @@ def test_console_handler_hides_file_only_records() -> None:
     assert "console message" in output
 
 
-def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
-    """Compact mode should emit Timing and Tokens lines."""
-    caplog.set_level(logging.INFO)
-    res = _build_perf()
-    print_model_result(res, verbose=True)
-    # New format uses "Timing:" (line 1) and "Tokens:" (line 2)
-    timing_lines = [r.message for r in caplog.records if "Timing:" in r.message]
-    assert timing_lines, "Expected Timing line in compact mode logs"
-
-
-def test_metrics_mode_compact_shows_working_set_context(
+def test_verbose_success_is_summary_line_without_metrics_block(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Compact memory output should include the detected Metal denominator."""
+    """A completed model is one summary line; its figures live in the comparison table."""
     caplog.set_level(logging.INFO)
     res = PerformanceResult(
         model_name="dummy/model",
@@ -265,14 +253,25 @@ def test_metrics_mode_compact_shows_working_set_context(
         success=True,
         generation_time=1.0,
         model_load_time=0.5,
-        total_time=1.5,
+        total_time=1.8,
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.05,
+            model_load_time_s=0.5,
+            prompt_prep_time_s=0.15,
+            decode_time_s=1.0,
+            cleanup_time_s=0.1,
+            first_token_latency_s=0.3,
+            stop_reason="completed",
+        ),
     )
 
-    with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
-        print_model_result(res, verbose=True)
+    print_model_result(res, verbose=True)
 
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "1.0 GB (50% of 2 GB recommended working set)" in messages
+    messages = [record.message for record in caplog.records]
+    assert messages[0].startswith("dummy/model: completed")
+    for label in ("Performance Metrics:", "Tokens:", "Timing:", "Memory:", "Prompt prep:"):
+        assert not any(label in message for message in messages), label
+    assert all(message.strip() for message in messages)
 
 
 def test_metrics_mode_verbose_does_not_repeat_generated_text(
@@ -294,112 +293,6 @@ def test_metrics_mode_verbose_does_not_repeat_generated_text(
     messages = [record.message for record in caplog.records]
     assert not any("Generated Text:" in message for message in messages)
     assert not any("Distinct streamed output" in message for message in messages)
-    assert any("Timing:" in message for message in messages)
-
-
-def test_verbose_metrics_show_phase_timings_and_stop_reason(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Verbose always renders the detailed phase tree — no second flag needed."""
-    caplog.set_level(logging.INFO)
-    res = PerformanceResult(
-        model_name="dummy/model",
-        generation=_StubGeneration(),
-        success=True,
-        generation_time=1.0,
-        model_load_time=0.5,
-        total_time=1.8,
-        runtime_diagnostics=RuntimeDiagnostics(
-            input_validation_time_s=0.05,
-            model_load_time_s=0.5,
-            prompt_prep_time_s=0.15,
-            decode_time_s=1.0,
-            cleanup_time_s=0.1,
-            first_token_latency_s=0.3,
-            stop_reason="timeout",
-        ),
-    )
-
-    print_model_result(res, verbose=True)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert re.search(r"Prompt prep:\s+0\.15s", messages)
-    assert re.search(r"First token \(upstream\):\s+0\.30s", messages)
-    assert re.search(r"Stop reason:\s+timeout", messages)
-    # Labels are padded to the tree's longest, so values share one column.
-    columns = {
-        line.index(value)
-        for line in messages.splitlines()
-        for value in ("0.15s", "0.30s")
-        if value in line and ("Prompt prep" in line or "First token (upstream)" in line)
-    }
-    assert len(columns) == 1
-
-
-def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
-    """Detailed mode should emit token lines plus Performance Metrics header."""
-    caplog.set_level(logging.INFO)
-    res = _build_perf()
-    print_model_result(res, verbose=True)
-    # Detailed mode uses "Performance Metrics:" header and separate "Tokens:" section
-    perf_lines = [r.message for r in caplog.records if "Performance Metrics:" in r.message]
-    token_lines = [r.message for r in caplog.records if "Tokens:" in r.message]
-    assert token_lines, "Expected token summary lines in detailed mode"
-    assert perf_lines, "Expected Performance Metrics header in detailed mode"
-
-
-def test_metrics_mode_detailed_shows_working_set_context(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Detailed peak-memory rows should include the same Metal context."""
-    caplog.set_level(logging.INFO)
-    res = PerformanceResult(
-        model_name="dummy/model",
-        generation=_StubGeneration(peak_memory=1.0),
-        success=True,
-        generation_time=1.0,
-        model_load_time=0.5,
-        total_time=1.5,
-    )
-
-    with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
-        print_model_result(res, verbose=True)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "1.0 GB (50% of 2 GB recommended working set)" in messages
-
-
-def test_metrics_mode_detailed_logs_runtime_phase_details(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Detailed mode should surface extra runtime phases and stop reason."""
-    caplog.set_level(logging.INFO)
-    res = PerformanceResult(
-        model_name="dummy/model",
-        generation=_StubGeneration(),
-        success=True,
-        generation_time=1.0,
-        model_load_time=0.5,
-        total_time=1.8,
-        runtime_diagnostics=RuntimeDiagnostics(
-            input_validation_time_s=0.05,
-            model_load_time_s=0.5,
-            prompt_prep_time_s=0.15,
-            decode_time_s=1.0,
-            cleanup_time_s=0.1,
-            first_token_latency_s=0.3,
-            stop_reason="completed",
-        ),
-    )
-
-    print_model_result(res, verbose=True)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "Validation:" in messages
-    assert "Prompt prep:" in messages
-    assert "Cleanup (after total):" in messages
-    assert "First token (upstream):" in messages
-    assert "Stop reason:" in messages
 
 
 def test_print_model_result_non_verbose_labels_generated_text_preview(
@@ -970,26 +863,6 @@ def test_machine_summary_uses_observation_vocabulary() -> None:
     assert "quality=" not in sentence
 
 
-def test_metrics_legend_names_only_retained_mechanical_warnings(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """The CLI legend should not claim that the harness detects hallucinations."""
-    panels: list[Panel] = []
-    monkeypatch.setattr(
-        check_models,
-        "_log_rich_renderable",
-        lambda panel, **_kwargs: panels.append(panel),
-    )
-    monkeypatch.setattr(check_models, "log_blank", lambda: None)
-
-    check_models.log_metrics_legend()
-
-    assert len(panels) == 1
-    legend = str(panels[0].renderable)
-    assert "repetitive output and token-cap truncation" in legend
-    assert "hallucinated" not in legend
-
-
 def test_log_summary_failure_uses_only_recorded_failure_facts(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1157,17 +1030,23 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     _assert_report_artifact_log_order(messages)
 
 
-def test_finalize_execution_separates_each_model_result_block(
+def test_finalize_execution_rules_off_only_failure_blocks_under_verbose(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """A model's metrics should end before the next model summary begins."""
+    """Under --verbose completed models are consecutive lines; a failure's details get a rule."""
     caplog.set_level(logging.INFO)
     args = argparse.Namespace(
         verbose=True,
         output_dir=tmp_path,
     )
     results = [
+        PerformanceResult(
+            model_name="dummy/broken",
+            generation=None,
+            success=False,
+            error_message="boom",
+        ),
         PerformanceResult(
             model_name="dummy/first",
             generation=_StubGeneration(text="first result"),
@@ -1187,21 +1066,19 @@ def test_finalize_execution_separates_each_model_result_block(
     )
 
     messages = [record.message for record in caplog.records]
-    first_summary = _message_index(messages, "[1/2] dummy/first:")
-    second_summary = _message_index(messages, "[2/2] dummy/second:")
-    first_timing = next(
-        index
-        for index, message in enumerate(messages[first_summary:second_summary], first_summary)
-        if "Tokens:" in message
-    )
+    broken = _message_index(messages, "[1/3] dummy/broken:")
+    first = _message_index(messages, "[2/3] dummy/first:")
+    second = _message_index(messages, "[3/3] dummy/second:")
     separators = [
         index
-        for index, message in enumerate(messages[first_summary:second_summary], first_summary)
+        for index, message in enumerate(messages[broken:second], broken)
         if message and set(message) == {"─"}
     ]
 
+    assert any("boom" in message for message in messages[broken:first])
     assert len(separators) == 1
-    assert first_timing < separators[0] < second_summary
+    assert broken < separators[0] < first
+    assert second == first + 1
 
 
 def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:

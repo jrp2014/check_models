@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
 import pytest
+from rich.console import Console
 from transformers.processing_utils import ProcessorMixin
 
 if TYPE_CHECKING:
@@ -1223,32 +1224,6 @@ class TestProcessImageWithModelMock:
         assert "Output repeats the prompt's own hint text" in line
         assert "prompt_hint_echoed" not in line
 
-    def test_log_perf_block_reads_cache_memory_field(self) -> None:
-        """Compact memory logging should use the stored cache_memory field name."""
-        result = check_models.PerformanceResult(
-            model_name="test/fake-model",
-            success=True,
-            generation=_FakeGenerationResult(peak_memory=1.2),
-            active_memory=0.5,
-            cache_memory=0.3,
-        )
-        logged_values: list[tuple[str, str]] = []
-
-        def _capture_tree(
-            _title: str,
-            rows: Sequence[tuple[str, str]],
-            *,
-            emoji: str = "",
-            indent: str = "",
-        ) -> None:
-            del emoji, indent
-            logged_values.extend(rows)
-
-        with patch.object(check_models, "_log_metric_tree", side_effect=_capture_tree):
-            check_models._log_perf_block(result)
-
-        assert ("Cache Δ:", " 0.30 GB") in logged_values
-
     def test_finalize_process_result_preserves_every_non_cleanup_field(
         self, test_image: Path
     ) -> None:
@@ -2231,6 +2206,34 @@ def test_tee_capture_stream_looks_like_the_terminal_to_progress_bars(tmp_path: P
         check_models._TeeCaptureStream(io.StringIO()).fileno()
 
 
+def test_tee_capture_keeps_harness_console_lines_out_of_its_external_text() -> None:
+    """The harness's own console log lines are not re-logged as upstream output.
+
+    Regression: each model's captured block in check_models.log repeated
+    every harness line ("Loading model weights...", decoding settings) that
+    the log already held with its own timestamp.
+    """
+    terminal = io.StringIO()
+    tee = check_models._TeeCaptureStream(terminal)
+    console = Console(file=cast("TextIO", tee), width=100, no_color=True, force_terminal=False)
+    with patch.object(check_models, "_make_rich_console", return_value=console):
+        handler = check_models._make_console_log_handler(level=logging.INFO, verbose=True)
+    test_logger = logging.getLogger("check-models-tee-external-test")
+    test_logger.handlers[:] = [handler]
+    test_logger.setLevel(logging.INFO)
+    test_logger.propagate = False
+    try:
+        tee.write("Prefill:  50%|#####     | 1/2\n")
+        test_logger.info("Loading model weights and processor...")
+        tee.write("upstream warning\n")
+    finally:
+        test_logger.handlers.clear()
+
+    assert "Loading model weights" in terminal.getvalue()
+    assert "Loading model weights" in tee.getvalue()
+    assert tee.external_value() == "Prefill:  50%|#####     | 1/2\nupstream warning\n"
+
+
 class TestTeeCaptureStreamFinalization:
     """Late finalization must not raise once the underlying stream is closed."""
 
@@ -2340,7 +2343,7 @@ class TestFileLogTimeline:
             check_models._log_stream_capture_to_file(
                 model_identifier="org/model",
                 stdout_text="Title: cats\nKeywords: a, b\n",
-                stderr_text="Prefill: 100%\n",
+                stderr_text="upstream warning\n",
             )
         record = next(
             r for r in caplog.records if "Captured mlx-vlm console output for" in r.getMessage()
@@ -2349,7 +2352,39 @@ class TestFileLogTimeline:
         assert header == "Captured mlx-vlm console output for org/model:"
         assert continuation, "captured body missing"
         assert all(line.startswith("[org/model] ") for line in continuation), continuation
-        assert "[org/model] Prefill: 100%" in continuation
+        assert "[org/model] upstream warning" in continuation
+
+    def test_captured_block_keeps_only_progress_bars_that_did_not_just_finish(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Finished bars repeat the timings; a stalled bar or a download is evidence."""
+        stderr_text = (
+            "Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]\r"
+            "Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2936.98it/s]\n"
+            "Prefill:   0%|          | 0/2123 [00:00<?, ?tok/s]\n"
+            "Prefill: 100%|#########9| 2122/2123 [00:00<00:00, 25919.49tok/s]\n"
+            "model.safetensors: 100%|##########| 4.7G/4.7G [01:07<00:00, 70.1MB/s]\n"
+            "Prefill:  32%|###       | 2048/6393 [00:06<00:12, 339.37tok/s]\n"
+            "upstream warning\n"
+        )
+        with caplog.at_level(logging.DEBUG, logger=check_models.LOGGER_NAME):
+            check_models._log_stream_capture_to_file(
+                model_identifier="org/model",
+                stdout_text="Title: cats\n",
+                stderr_text=stderr_text,
+            )
+        body = next(
+            r.getMessage()
+            for r in caplog.records
+            if "Captured mlx-vlm console output for" in r.getMessage()
+        )
+        assert "Fetching" not in body
+        assert "2122/2123" not in body
+        assert body.count("Prefill:") == 1
+        assert "[org/model] Prefill:  32%|" in body
+        assert "[org/model] model.safetensors: 100%|" in body
+        assert "[org/model] upstream warning" in body
+        assert "[org/model] Title: cats" in body
 
 
 class TestStreamObservations:
