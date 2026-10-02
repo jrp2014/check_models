@@ -43,12 +43,27 @@ class _FakeGenerationResult:
     prompt_tps: float = 100.0
     generation_tps: float = 42.0
     peak_memory: float = 1.2
-    time: float = 0.0
-    active_memory: float = 0.5
-    cache_memory: float = 0.3
-    model_load_active_memory: float | None = None
     finish_reason: str | None = None
-    _check_models_prompt_diagnostics: check_models.PromptDiagnostics | None = None
+
+
+def _fake_run(
+    generation: _FakeGenerationResult | None = None,
+    *,
+    observations: check_models.StreamObservations | None = None,
+) -> check_models._GenerationRun:
+    """Wrap a fake upstream result with the harness measurements a real run returns."""
+    return check_models._GenerationRun(
+        output=cast("Any", generation if generation is not None else _FakeGenerationResult()),
+        duration_s=0.0,
+        observations=observations
+        if observations is not None
+        else check_models.StreamObservations(),
+        prompt_diagnostics=check_models.PromptDiagnostics(),
+        active_memory_gb=0.5,
+        cache_memory_gb=0.3,
+        model_load_active_memory_gb=None,
+        model_weight_buffer_gb=None,
+    )
 
 
 class _FakeModel:
@@ -193,13 +208,12 @@ class TestProcessImageWithModelMock:
 
     def test_success_returns_performance_result(self, test_image: Path) -> None:
         """Successful generation should produce a PerformanceResult with success=True."""
-        fake_result = _FakeGenerationResult()
         params = _build_params(test_image)
 
         with patch.object(
             check_models,
             "_run_model_generation",
-            return_value=fake_result,
+            return_value=_fake_run(),
         ):
             result = check_models.process_image_with_model(params)
 
@@ -218,10 +232,10 @@ class TestProcessImageWithModelMock:
             *_args: object,
             phase_callback: Callable[[str], None],
             **_kwargs: object,
-        ) -> _FakeGenerationResult:
+        ) -> check_models._GenerationRun:
             phase_callback("model_load")
             phase_callback("decode")
-            return _FakeGenerationResult()
+            return _fake_run()
 
         with patch.object(
             check_models,
@@ -288,9 +302,6 @@ class TestProcessImageWithModelMock:
             prompt_tps=22.0,
             generation_tps=33.0,
             peak_memory=4.5,
-            time=1.25,
-            active_memory=0.75,
-            cache_memory=0.25,
         )
 
         metrics = check_models._extract_generation_performance_data(fake_result)
@@ -301,9 +312,6 @@ class TestProcessImageWithModelMock:
         assert metrics.prompt_tps == 22.0
         assert metrics.generation_tps == 33.0
         assert metrics.peak_memory_gb == 4.5
-        assert metrics.generation_time_s == 1.25
-        assert metrics.active_memory_gb == 0.75
-        assert metrics.cache_memory_gb == 0.25
         assert metrics.first_token_latency_s == 0.5
 
     def test_load_model_forwards_upstream_load_flags(self, test_image: Path) -> None:
@@ -769,7 +777,7 @@ class TestProcessImageWithModelMock:
         ):
             result = check_models._run_model_generation(params)
 
-        assert result is fake_generation
+        assert result.output is fake_generation
         generate_kwargs = mock_generate.call_args.kwargs
         assert generate_kwargs["prompt"] == "formatted prompt"
         assert generate_kwargs["image"] == str(test_image)
@@ -781,7 +789,7 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["skip_special_tokens"] is True
         assert generate_kwargs["cropping"] is False
         assert generate_kwargs["max_patches"] == 3
-        prompt_diagnostics = result._check_models_prompt_diagnostics
+        prompt_diagnostics = result.prompt_diagnostics
         assert prompt_diagnostics is not None
         assert prompt_diagnostics.processed_image_width == 384
         assert prompt_diagnostics.processed_image_height == 512
@@ -813,7 +821,7 @@ class TestProcessImageWithModelMock:
         ):
             result = check_models._run_model_generation(params)
 
-        assert result is fake_generation
+        assert result.output is fake_generation
         assert mock_generate.call_args.kwargs["processor"] is fake_processor
 
     def test_run_model_generation_passes_thinking_kwargs(self, test_image: Path) -> None:
@@ -852,7 +860,7 @@ class TestProcessImageWithModelMock:
         ):
             result = check_models._run_model_generation(params)
 
-        assert result is fake_generation
+        assert result.output is fake_generation
         assert mock_template.call_args.kwargs["enable_thinking"] is True
         assert mock_template.call_args.kwargs["thinking_budget"] == 96
         assert mock_template.call_args.kwargs["thinking_start_token"] == "<think>"
@@ -900,7 +908,7 @@ class TestProcessImageWithModelMock:
         ):
             result = check_models._run_model_generation(params)
 
-        assert result is fake_generation
+        assert result.output is fake_generation
         generate_kwargs = mock_generate.call_args.kwargs
         assert generate_kwargs["seed"] == 0
         assert generate_kwargs["presence_penalty"] == 0.25
@@ -908,7 +916,7 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["frequency_penalty"] == 0.5
         assert generate_kwargs["frequency_context_size"] == 64
         assert generate_kwargs["logit_bias"] == {42: -1.5, 123: 2.0}
-        prompt_diagnostics = result._check_models_prompt_diagnostics
+        prompt_diagnostics = result.prompt_diagnostics
         assert prompt_diagnostics is not None
         assert prompt_diagnostics.generate_kwargs["seed"] == 0
         assert prompt_diagnostics.generate_kwargs["presence_penalty"] == 0.25
@@ -975,7 +983,7 @@ class TestProcessImageWithModelMock:
         ):
             result = check_models._run_model_generation(params)
 
-        assert result is fake_generation
+        assert result.output is fake_generation
         assert runtime.sync_calls == 1
         assert runtime.active_calls == 2
         assert runtime.cache_calls == 1
@@ -1015,10 +1023,10 @@ class TestProcessImageWithModelMock:
         ):
             result = check_models._run_model_generation(params)
 
-        assert result is fake_generation
-        assert getattr(result, "model_load_active_memory", None) == 2.0
-        assert result.active_memory == 4.0
-        assert result.cache_memory == 3.0
+        assert result.output is fake_generation
+        assert result.model_load_active_memory_gb == 2.0
+        assert result.active_memory_gb == 4.0
+        assert result.cache_memory_gb == 3.0
         assert runtime.active_calls == 2
 
     @pytest.mark.parametrize(
@@ -1043,7 +1051,9 @@ class TestProcessImageWithModelMock:
             finish_reason=finish_reason,
         )
 
-        with patch.object(check_models, "_run_model_generation", return_value=fake_result):
+        with patch.object(
+            check_models, "_run_model_generation", return_value=_fake_run(fake_result)
+        ):
             result = check_models.process_image_with_model(params)
 
         assert result.runtime_diagnostics is not None
@@ -1064,7 +1074,7 @@ class TestProcessImageWithModelMock:
             patch.object(
                 check_models,
                 "_run_model_generation",
-                return_value=_FakeGenerationResult(),
+                return_value=_fake_run(),
             ),
             patch.object(check_models, "_cleanup_runtime_resources", side_effect=_record_cleanup),
         ):
@@ -1110,8 +1120,8 @@ class TestProcessImageWithModelMock:
             active_values=(0.125 * check_models.DECIMAL_GB,),
             cache_value=0.25 * check_models.DECIMAL_GB,
         )
-        run_outcome: _FakeGenerationResult | ValueError = (
-            ValueError("bad config") if generation_fails else _FakeGenerationResult()
+        run_outcome: check_models._GenerationRun | ValueError = (
+            ValueError("bad config") if generation_fails else _fake_run()
         )
 
         with (
@@ -1146,10 +1156,10 @@ class TestProcessImageWithModelMock:
             "Peak memory: 25.836 GB\n"
         )
 
-        def _run_and_print(*_args: object, **_kwargs: object) -> _FakeGenerationResult:
+        def _run_and_print(*_args: object, **_kwargs: object) -> check_models._GenerationRun:
             sys.stdout.write(live_block)
-            return _FakeGenerationResult(
-                text="A top-down view of two cats laying on a pink blanket."
+            return _fake_run(
+                _FakeGenerationResult(text="A top-down view of two cats laying on a pink blanket.")
             )
 
         with (
@@ -1186,7 +1196,9 @@ class TestProcessImageWithModelMock:
         result = check_models.PerformanceResult(
             model_name="test/fake-model",
             success=True,
-            generation=_FakeGenerationResult(active_memory=0.5, cache_memory=0.3, peak_memory=1.2),
+            generation=_FakeGenerationResult(peak_memory=1.2),
+            active_memory=0.5,
+            cache_memory=0.3,
         )
         logged_values: list[tuple[str, str]] = []
 
@@ -1575,27 +1587,38 @@ class TestIsolatedExecution:
         assert updated[0].rerun_evidence is not None
         assert updated[0].rerun_evidence.rerun_success is True
 
-    def test_dynamic_generation_attributes_survive_isolation(self) -> None:
-        """Metrics check_models attaches to the upstream object are not declared fields."""
+    def test_harness_measurements_survive_isolation_beside_the_generation(self) -> None:
+        """Harness memory samples cross isolation on the result, not the upstream object."""
 
         @dataclass
         class _UpstreamLike:
             text: str = "hi"
             prompt_tokens: int = 3
 
-        generation = _UpstreamLike()
-        # Attached the way check_models attaches runtime metrics: dynamically.
-        setattr(generation, "active_memory", 0.5)  # noqa: B010 - deliberately dynamic
-        setattr(generation, "cache_memory", 0.25)  # noqa: B010 - deliberately dynamic
         result = check_models.PerformanceResult(
-            model_name="org/m", success=True, generation=generation
+            model_name="org/m",
+            success=True,
+            generation=_UpstreamLike(),
+            active_memory=0.5,
+            cache_memory=0.25,
+            runtime_diagnostics=check_models.RuntimeDiagnostics(model_load_active_memory_gb=2.0),
         )
-        restored = check_models._performance_result_from_json(
-            json.loads(json.dumps(check_models._performance_result_to_json(result)))
-        )
-        assert getattr(restored.generation, "active_memory", None) == 0.5
-        assert getattr(restored.generation, "cache_memory", None) == 0.25
+        payload = json.loads(json.dumps(check_models._performance_result_to_json(result)))
+        assert payload["generation"] == {"text": "hi", "prompt_tokens": 3}
+        restored = check_models._performance_result_from_json(payload)
+        assert restored.active_memory == 0.5
+        assert restored.cache_memory == 0.25
+        assert restored.runtime_diagnostics == result.runtime_diagnostics
         assert getattr(restored.generation, "prompt_tokens", None) == 3
+
+    def test_duck_typed_generation_serialises_its_consumed_fields(self) -> None:
+        """A non-dataclass generation (an empty stream) carries the fields reports read."""
+        generation = types.SimpleNamespace(text="", finish_reason=None, peak_memory=1.5)
+        result = check_models.PerformanceResult(
+            model_name="org/m", success=True, generation=cast("Any", generation)
+        )
+        payload = check_models._performance_result_to_json(result)
+        assert payload["generation"] == {"text": "", "peak_memory": 1.5, "finish_reason": None}
 
     def test_isolated_download_timeout_is_environmental(self, test_image: Path) -> None:
         """A worker deadline that expired mid-download stays indeterminate, not actionable."""
@@ -2593,7 +2616,7 @@ class TestStreamObservations:
         assert check_models._upstream_stop_token_ids(object()) == frozenset()
         assert check_models._emitted_special_tokens([2], object(), excluded=()) == ()
 
-    def test_success_result_reads_observations_off_the_output(self, test_image: Path) -> None:
+    def test_success_result_reads_the_run_observations(self, test_image: Path) -> None:
         """Measured TTFT, first-token peak and id-detected tokens reach the result."""
         output = _FakeGenerationResult()
         output.text = "Hello <|box|> world"  # reached the text, so it is leakage
@@ -2601,11 +2624,10 @@ class TestStreamObservations:
             started_at=10.0, first_token_at=10.75, first_token_peak_memory_gb=3.25
         )
         observations.special_tokens = ("<|box|>",)
-        setattr(output, check_models._STREAM_OBSERVATIONS_ATTR, observations)
         phase_timer = check_models.PhaseTimer()
         result, _stop = check_models._build_success_process_result(
             params=_build_params(test_image),
-            output=cast("Any", output),
+            run=_fake_run(output, observations=observations),
             phase_timer=phase_timer,
             total_start_time=time.perf_counter(),
             upstream_boundary="generation_started",

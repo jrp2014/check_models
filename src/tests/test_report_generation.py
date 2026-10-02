@@ -65,9 +65,6 @@ class _MockGeneration:
     prompt_tps: float | None = 1200.0
     generation_tps: float | None = 80.0
     peak_memory: float | None = 4.5
-    time: float | None = None
-    active_memory: float | None = None
-    cache_memory: float | None = None
 
 
 @dataclass

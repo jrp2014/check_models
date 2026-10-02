@@ -57,9 +57,6 @@ class MockGeneration:
     prompt_tps: float | None = 2.0
     generation_tps: float | None = 5.0
     peak_memory: float | None = 1.5
-    time: float | None = None
-    active_memory: float | None = None
-    cache_memory: float | None = None
     quality_analysis: object | None = None
 
 
@@ -857,14 +854,14 @@ def test_metadata_includes_component_and_model_provenance(
     assert rows[0]["model_provenance"]["requested_revision"] == "release-branch"
 
 
-def test_jsonl_metrics_fall_back_to_generation_runtime_fields(tmp_path: Path) -> None:
-    """JSONL metrics should use performance fields attached to GenerationResult."""
+def test_jsonl_metrics_combine_upstream_and_harness_fields(tmp_path: Path) -> None:
+    """Upstream metrics come from the generation; harness samples from the result."""
     result = PerformanceResult(
         model_name="fake/model",
-        generation=MockGeneration(active_memory=0.75, cache_memory=0.25),
+        generation=MockGeneration(),
         success=True,
-        active_memory=None,
-        cache_memory=None,
+        active_memory=0.75,
+        cache_memory=0.25,
         runtime_diagnostics=RuntimeDiagnostics(
             model_load_active_memory_gb=1.0, model_weight_buffer_gb=0.8
         ),

@@ -38,6 +38,15 @@ Notable changes to this project will be documented in this file.
   alone. `ReportGenerationInputs` keeps only publication settings and derives
   `results` and `system_info` from the context, so the publication step no
   longer reconciles two result collections. No report output changes.
+- Harness measurements stay on harness-owned objects. The upstream
+  `GenerationResult` is no longer given `time`, `active_memory`,
+  `cache_memory`, `model_load_active_memory`, `model_weight_buffer`, stream
+  observations or prompt diagnostics; a successful run returns them beside
+  the upstream result, and they land on `PerformanceResult`,
+  `RuntimeDiagnostics` and `StreamObservations`. Isolation serialises the
+  upstream result's declared fields only, dropping the `__dict__` and `dir()`
+  fallbacks, and reports no longer fall back to memory attributes on the
+  generation object.
 - The baseline comparison records, for each changed text, the shared prefix
   in characters, both lengths, and whether the prompt token count changed
   (e.g. "shared prefix 216 characters; length 404 → 422; same prompt

@@ -13,9 +13,6 @@ class MockGenerationResult:
     prompt_tokens: int | None = 100
     generation_tokens: int | None = 50
     generation_tps: float | None = 10.0
-    time: float | None = None
-    active_memory: float | None = None
-    cache_memory: float | None = None
 
 
 def test_sort_results_by_time_failures_come_first() -> None:

@@ -1647,15 +1647,13 @@ class SupportsGenerationText(Protocol):
 
 @runtime_checkable
 class SupportsGenerationResult(SupportsGenerationText, Protocol):
-    """Structural subset of live GenerationResult objects enriched locally.
+    """Structural subset of the upstream GenerationResult fields consumed here.
 
     Using a Protocol keeps typing resilient to upstream changes in the
     concrete GenerationResult while still giving linters strong guarantees
-    about the attributes actually consumed here.
-
-    Note: `time`, `active_memory`, and `cache_memory` are added dynamically by
-    our code after generation. `peak_memory` comes from the upstream
-    GenerationResult returned by mlx-vlm.
+    about the attributes actually consumed here. The harness never adds
+    attributes to these objects: its own timing and memory samples live on
+    ``PerformanceResult``, ``RuntimeDiagnostics`` and ``StreamObservations``.
     """
 
     token: object | None
@@ -1665,11 +1663,6 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     total_tokens: int | None
     prompt_tps: float | None
     generation_tps: float | None
-    time: float | None  # Dynamically added timing attribute
-    active_memory: float | None  # Dynamically added active memory (GB)
-    cache_memory: float | None  # Dynamically added cache memory (GB)
-    model_load_active_memory: float | None  # Dynamically added post-load active memory (GB)
-    model_weight_buffer: float | None  # Dynamically added loaded-weight bytes (GB)
     peak_memory: float | None  # Upstream peak memory (GB)
     finish_reason: str | None  # Upstream stop/length termination classification
 
@@ -1684,9 +1677,6 @@ class GenerationPerformanceData:
     prompt_tps: float = 0.0
     generation_tps: float = 0.0
     peak_memory_gb: float = 0.0
-    active_memory_gb: float = 0.0
-    cache_memory_gb: float = 0.0
-    generation_time_s: float | None = None
     # Upstream model-loop time until the first token; excludes prepare_inputs().
     first_token_latency_s: float | None = None
     finish_reason: str | None = None
@@ -1750,16 +1740,6 @@ def _generation_optional_nonnegative_float_metric(
     return value if value is not None and value >= 0.0 else None
 
 
-def _object_model_load_active_memory_gb(source: object | None) -> float | None:
-    """Return the locally attached post-model-load active memory baseline."""
-    return _generation_optional_nonnegative_float_metric(source, _MODEL_LOAD_ACTIVE_MEMORY_ATTR)
-
-
-def _object_model_weight_buffer_gb(source: object | None) -> float | None:
-    """Return the locally attached loaded-weight size (mx.get_array_buffer_size)."""
-    return _generation_optional_nonnegative_float_metric(source, _MODEL_WEIGHT_BUFFER_ATTR)
-
-
 def _extract_generation_performance_data(
     generation: object | None,
 ) -> GenerationPerformanceData:
@@ -1785,9 +1765,6 @@ def _extract_generation_performance_data(
         prompt_tps=prompt_tps,
         generation_tps=_generation_nonnegative_float_metric(generation, "generation_tps"),
         peak_memory_gb=_generation_nonnegative_float_metric(generation, "peak_memory"),
-        active_memory_gb=_generation_nonnegative_float_metric(generation, "active_memory"),
-        cache_memory_gb=_generation_nonnegative_float_metric(generation, "cache_memory"),
-        generation_time_s=_generation_optional_nonnegative_float_metric(generation, "time"),
         first_token_latency_s=first_token_latency_s,
         finish_reason=finish_reason or None,
     )
@@ -1851,8 +1828,6 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_ENV_OUTPUT.name,
     }
 )
-_MODEL_LOAD_ACTIVE_MEMORY_ATTR: Final[str] = "model_load_active_memory"
-_MODEL_WEIGHT_BUFFER_ATTR: Final[str] = "model_weight_buffer"
 
 
 class _LinkStyleState:
@@ -7155,7 +7130,7 @@ def _peak_memory_delta_from_model_load_gb(result: PerformanceResult) -> float | 
     model_load_active_gb = (
         result.runtime_diagnostics.model_load_active_memory_gb
         if result.runtime_diagnostics is not None
-        else _object_model_load_active_memory_gb(result.generation)
+        else None
     )
     if peak_memory_gb is None or model_load_active_gb is None:
         return None
@@ -14533,32 +14508,6 @@ def _sample_post_cleanup_memory_gb() -> tuple[float | None, float | None]:
     return _sample_active_memory_gb(), _sample_cache_memory_gb()
 
 
-def _attach_model_load_memory_baseline(
-    output: GenerationResult | SupportsGenerationResult,
-    *,
-    model_load_active_memory_gb: float | None,
-    model_weight_buffer_gb: float | None = None,
-) -> SupportsGenerationResult:
-    """Attach the post-model-load memory facts to the generation result."""
-    result = cast("SupportsGenerationResult", output)
-    result.model_load_active_memory = model_load_active_memory_gb
-    result.model_weight_buffer = model_weight_buffer_gb
-    return result
-
-
-def _attach_generation_runtime_metrics(
-    output: GenerationResult | SupportsGenerationResult,
-    *,
-    duration: float,
-) -> SupportsGenerationResult:
-    """Attach local timing and allocator snapshot metrics to a generation result."""
-    result = cast("SupportsGenerationResult", output)
-    result.time = duration
-    result.active_memory = _sample_active_memory_gb() or 0.0
-    result.cache_memory = _sample_cache_memory_gb() or 0.0
-    return result
-
-
 def _finalize_process_result(
     *,
     result_payload: PerformanceResult | None,
@@ -14755,7 +14704,7 @@ def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int)
 
 @dataclass
 class StreamObservations:
-    """Facts only the streaming loop can see; attached to the generation result.
+    """Facts only the streaming loop can see; returned beside the generation result.
 
     ``started_at`` is set by the caller right before the upstream call.
     ``first_chunk_at`` records the first stream activity of any kind (a
@@ -14782,13 +14731,22 @@ class StreamObservations:
         return max(self.first_token_at - self.started_at, 0.0)
 
 
-_STREAM_OBSERVATIONS_ATTR: Final[str] = "_check_models_stream_observations"
+class _GenerationRun(NamedTuple):
+    """One successful upstream generation plus the harness's own measurements.
 
+    ``output`` is the upstream result exactly as mlx-vlm returned it; every
+    timing and memory sample the harness takes travels beside it here rather
+    than as attributes added to the upstream object.
+    """
 
-def _object_stream_observations(value: object | None) -> StreamObservations | None:
-    """Return the stream observations attached to a generation result, if any."""
-    observations = getattr(value, _STREAM_OBSERVATIONS_ATTR, None)
-    return observations if isinstance(observations, StreamObservations) else None
+    output: GenerationResult | SupportsGenerationResult
+    duration_s: float
+    observations: StreamObservations
+    prompt_diagnostics: PromptDiagnostics
+    active_memory_gb: float | None
+    cache_memory_gb: float | None
+    model_load_active_memory_gb: float | None
+    model_weight_buffer_gb: float | None
 
 
 def _chunk_carries_token(chunk: object) -> bool:
@@ -15050,12 +15008,12 @@ def _execute_prepared_generation(
     *,
     phase_callback: Callable[[str], None] | None,
     phase_timer: PhaseTimer | None,
-) -> tuple[GenerationResult | SupportsGenerationResult, float]:
-    """Run the upstream generate call and return (output, synchronised duration).
+) -> tuple[GenerationResult | SupportsGenerationResult, float, StreamObservations]:
+    """Run the upstream generate call; return (output, synchronised duration, observations).
 
     This is the execution half: it owns the upstream call, decode-phase
     timing, MLX synchronisation, and exception tagging with prompt
-    diagnostics. Metric attachment stays with the caller.
+    diagnostics. Memory sampling stays with the caller.
     """
     observations = StreamObservations()
 
@@ -15102,7 +15060,6 @@ def _execute_prepared_generation(
             prepared.generation_processor,
             excluded=_expected_stop_token_names(prepared),
         )
-        setattr(cast("Any", output), _STREAM_OBSERVATIONS_ATTR, observations)
     except Exception as generation_err:
         # Every class, not just the wrapped ones: an IndexError from model
         # code still needs the rendered prompt and kwargs to be reproduced.
@@ -15113,15 +15070,15 @@ def _execute_prepared_generation(
         # this only closes it when an exception escaped before that point.
         if phase_timer is not None:
             phase_timer.stop("decode")
-    return output, duration
+    return output, duration, observations
 
 
 def _run_model_generation(
     params: ProcessImageParams,
     phase_callback: Callable[[str], None] | None = None,
     phase_timer: PhaseTimer | None = None,
-) -> GenerationResult | SupportsGenerationResult:
-    """Load model + processor, prepare the request, execute it, attach metrics.
+) -> _GenerationRun:
+    """Load model + processor, prepare the request, execute it, sample memory.
 
     Load, prepare, and execute stay in one call because they form a tightly
     coupled sequence (tokenizer/model/config interplay varies by repo), but
@@ -15175,22 +15132,24 @@ def _run_model_generation(
         phase_callback=phase_callback,
         phase_timer=phase_timer,
     )
-    output, duration = _execute_prepared_generation(
+    output, duration, observations = _execute_prepared_generation(
         params,
         prepared,
         phase_callback=phase_callback,
         phase_timer=phase_timer,
     )
 
-    # Capture local timing plus active/cache memory snapshots while model state is intact.
-    result = _attach_generation_runtime_metrics(output, duration=duration)
-    result = _attach_model_load_memory_baseline(
-        result,
+    # Sample active/cache memory while model state is intact.
+    return _GenerationRun(
+        output=output,
+        duration_s=duration,
+        observations=observations,
+        prompt_diagnostics=prepared.prompt_diagnostics,
+        active_memory_gb=_sample_active_memory_gb(),
+        cache_memory_gb=_sample_cache_memory_gb(),
         model_load_active_memory_gb=model_load_active_memory_gb,
         model_weight_buffer_gb=model_weight_buffer_gb,
     )
-    setattr(cast("Any", result), _PROMPT_DIAGNOSTICS_ATTR, prepared.prompt_diagnostics)
-    return result
 
 
 def _build_failure_result(  # noqa: PLR0913 - every retained failure fact is an explicit keyword  # skylos: ignore[SKY-C303]
@@ -15374,7 +15333,7 @@ def _log_stream_capture_to_file(
 def _build_success_process_result(
     *,
     params: ProcessImageParams,
-    output: GenerationResult | SupportsGenerationResult,
+    run: _GenerationRun,
     phase_timer: PhaseTimer,
     total_start_time: float,
     upstream_boundary: UpstreamBoundary,
@@ -15382,21 +15341,21 @@ def _build_success_process_result(
     stderr_text: str = "",
 ) -> tuple[PerformanceResult, str | None]:
     """Build the successful PerformanceResult and resolved stop reason."""
-    performance_data = _extract_generation_performance_data(output)
-    observations = _object_stream_observations(output)
-    generation_time = performance_data.generation_time_s or phase_timer.duration("decode")
+    performance_data = _extract_generation_performance_data(run.output)
+    observations = run.observations
+    generation_time = run.duration_s or phase_timer.duration("decode")
     total_time = time.perf_counter() - total_start_time
     model_load_time = phase_timer.duration("model_load")
     first_token_latency_s = performance_data.first_token_latency_s
-    active_mem_gb = performance_data.active_memory_gb
-    cache_mem_gb = performance_data.cache_memory_gb
+    active_mem_gb = run.active_memory_gb or 0.0
+    cache_mem_gb = run.cache_memory_gb or 0.0
     stop_reason = _resolve_generation_stop_reason(
         performance_data,
         requested_max_tokens=params.max_tokens,
     )
     result_payload = PerformanceResult(
         model_name=params.model_identifier,
-        generation=output,
+        generation=run.output,
         success=True,
         upstream_boundary=upstream_boundary,
         captured_upstream_output=_compose_stream_capture_for_file_log(
@@ -15411,20 +15370,16 @@ def _build_success_process_result(
         runtime_diagnostics=_build_runtime_diagnostics(
             phase_timer,
             first_token_latency_s=first_token_latency_s,
-            time_to_first_token_s=(
-                observations.time_to_first_token_s if observations is not None else None
-            ),
-            first_token_peak_memory_gb=(
-                observations.first_token_peak_memory_gb if observations is not None else None
-            ),
-            model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
-            model_weight_buffer_gb=_object_model_weight_buffer_gb(output),
+            time_to_first_token_s=observations.time_to_first_token_s,
+            first_token_peak_memory_gb=observations.first_token_peak_memory_gb,
+            model_load_active_memory_gb=run.model_load_active_memory_gb,
+            model_weight_buffer_gb=run.model_weight_buffer_gb,
             stop_reason=stop_reason,
         ),
         requested_max_tokens=params.max_tokens,
-        prompt_diagnostics=_object_prompt_diagnostics(output),
+        prompt_diagnostics=run.prompt_diagnostics,
         assessment_profile=params.assessment_profile,
-        emitted_special_tokens=observations.special_tokens if observations is not None else (),
+        emitted_special_tokens=observations.special_tokens,
     )
     result_payload = _populate_result_quality_analysis(
         result_payload,
@@ -16118,32 +16073,36 @@ def _coerce_json_value(annotation: object, value: object) -> object:
     return _coerce_json_container(origin, annotation, value)
 
 
+# The upstream fields reports read (``SupportsGenerationResult`` plus text).
+_CONSUMED_GENERATION_FIELDS: Final[tuple[str, ...]] = (
+    "text",
+    "token",
+    "logprobs",
+    "prompt_tokens",
+    "generation_tokens",
+    "total_tokens",
+    "prompt_tps",
+    "generation_tps",
+    "peak_memory",
+    "finish_reason",
+)
+
+
 def _performance_result_to_json(result: PerformanceResult) -> dict[str, JsonLike]:
     """Serialise a PerformanceResult for the parent, flattening upstream generation."""
     payload = cast("dict[str, JsonLike]", _json_safe(result))
     generation = result.generation
     if generation is not None:
-        generation_payload: dict[str, JsonLike] = {}
-        if is_dataclass(generation) and not isinstance(generation, type):
-            generation_payload = {
-                field.name: _json_safe(getattr(generation, field.name))
-                for field in fields(generation)
-            }
-        # check_models attaches runtime metrics (active_memory, cache_memory,
-        # model_load_active_memory) to the upstream object dynamically; the
-        # instance dict carries those, declared fields alone would drop them.
-        instance_dict = getattr(generation, "__dict__", None)
-        if isinstance(instance_dict, dict):
-            for name, value in instance_dict.items():
-                if not name.startswith("_") and name not in generation_payload:
-                    generation_payload[name] = _json_safe(value)
-        if not generation_payload:
-            generation_payload = {
-                name: _json_safe(getattr(generation, name))
-                for name in dir(generation)
-                if not name.startswith("_") and not callable(getattr(generation, name, None))
-            }
-        payload["generation"] = generation_payload
+        # The upstream result is a dataclass; its declared fields are the
+        # whole of it, since the harness keeps its own measurements on the
+        # PerformanceResult. A duck-typed result (an empty stream) carries
+        # just the consumed fields.
+        names = (
+            [field.name for field in fields(generation)]
+            if is_dataclass(generation) and not isinstance(generation, type)
+            else [name for name in _CONSUMED_GENERATION_FIELDS if hasattr(generation, name)]
+        )
+        payload["generation"] = {name: _json_safe(getattr(generation, name)) for name in names}
     return payload
 
 
@@ -16419,7 +16378,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             redirect_stderr(cast("TextIO", stderr_capture)),
             TimeoutManager(params.timeout),
         ):
-            output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+            generation_run = _run_model_generation(
                 params=params,
                 phase_callback=_update_phase,
                 phase_timer=phase_timer,
@@ -16432,7 +16391,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             )
         result_payload, stop_reason = _build_success_process_result(
             params=params,
-            output=output,
+            run=generation_run,
             phase_timer=phase_timer,
             total_start_time=total_start_time,
             upstream_boundary=upstream_boundary,
@@ -17025,11 +16984,8 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
 
 def _log_perf_block(res: PerformanceResult) -> None:
     """Log inner performance metrics (memory) with tree structure and emoji."""
-    active_mem = getattr(res.generation, "active_memory", 0.0) or 0.0
-    cached_mem = getattr(res.generation, "cache_memory", None)
-    if not isinstance(cached_mem, int | float):
-        cached_mem = getattr(res.generation, "cached_memory", 0.0)
-    cached_mem = float(cached_mem or 0.0)
+    active_mem = res.active_memory or 0.0
+    cached_mem = res.cache_memory or 0.0
     peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
 
     # Only show memory section if at least one value is present
@@ -19684,18 +19640,6 @@ def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
     return prompt if len(prompt) <= max_chars else f"{prompt[:max_chars]}..."
 
 
-def _resolved_memory_deltas_gb(
-    result: PerformanceResult,
-    performance: GenerationPerformanceData,
-) -> tuple[float, float]:
-    """Prefer explicitly captured memory deltas, falling back to generation data."""
-    active = (
-        result.active_memory if result.active_memory is not None else performance.active_memory_gb
-    )
-    cache = result.cache_memory if result.cache_memory is not None else performance.cache_memory_gb
-    return active, cache
-
-
 def _generation_facts_record(result: PerformanceResult) -> GenerationFactsRecord:
     """Project a result's generation into the facts both serialised forms carry.
 
@@ -19704,7 +19648,6 @@ def _generation_facts_record(result: PerformanceResult) -> GenerationFactsRecord
     if result.generation is None:
         return {}
     performance = _extract_generation_performance_data(result.generation)
-    active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance)
     return {
         "prompt_tokens": performance.prompt_tokens,
         "generation_tokens": performance.generation_tokens,
@@ -19712,8 +19655,8 @@ def _generation_facts_record(result: PerformanceResult) -> GenerationFactsRecord
         "prompt_tps": performance.prompt_tps,
         "generation_tps": performance.generation_tps,
         "peak_memory_gb": performance.peak_memory_gb,
-        "active_memory_gb": active_memory_gb,
-        "cache_memory_gb": cache_memory_gb,
+        "active_memory_gb": result.active_memory or 0.0,
+        "cache_memory_gb": result.cache_memory or 0.0,
     }
 
 
@@ -19942,9 +19885,7 @@ def _build_jsonl_metrics_record(
     facts = _generation_facts_record(result)
     metrics.update(cast("JsonlMetricsRecord", facts))  # a valid partial; see the history builder
     model_load_active_memory_gb = (
-        runtime.model_load_active_memory_gb
-        if runtime is not None
-        else _object_model_load_active_memory_gb(generation)
+        runtime.model_load_active_memory_gb if runtime is not None else None
     )
     if model_load_active_memory_gb is not None:
         metrics["model_load_active_memory_gb"] = model_load_active_memory_gb

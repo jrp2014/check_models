@@ -56,9 +56,6 @@ class _StubGeneration:
     generation_tokens: int | None
     generation_tps: float | None
     peak_memory: float | None
-    active_memory: float | None
-    cache_memory: float | None
-    time: float | None
     text: str | None
 
     def __init__(
@@ -76,9 +73,6 @@ class _StubGeneration:
         self.generation_tokens = generation_tokens
         self.generation_tps = generation_tps
         self.peak_memory = peak_memory
-        self.active_memory = None
-        self.cache_memory = None
-        self.time = 1.0
         self.text = text
 
 
