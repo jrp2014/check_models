@@ -139,7 +139,32 @@ cleanup_pip_invalid_distribution_backups
 if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
 	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
 		echo "[update.sh] Updating conda (base)..."
-		conda update -n base conda -y
+		# Update conda together with every installed conda* package (plugins
+		# such as conda-anaconda-telemetry/-tos, the libmamba solver): nothing
+		# depends on the plugins, so "conda update conda" alone left them behind
+		# importing plugin hooks a newer conda no longer exports.
+		CONDA_BASE_PACKAGES=()
+		while IFS= read -r package; do
+			CONDA_BASE_PACKAGES+=("$package")
+		done < <(conda list -n base 2>/dev/null | awk '!/^#/ && $1 ~ /^conda(-|$)/ {print $1}')
+		if [[ ${#CONDA_BASE_PACKAGES[@]} -eq 0 ]]; then
+			CONDA_BASE_PACKAGES=(conda)
+		fi
+		conda update -n base "${CONDA_BASE_PACKAGES[@]}" -y
+
+		# Diagnose rather than hide: a plugin that still cannot load prints
+		# "Error while loading conda entry point" on every conda command.
+		# (--version skips plugin loading; "config --show" loads them cheaply.)
+		PLUGIN_ERRORS=$(conda config --show channels 2>&1 >/dev/null | grep "Error while loading conda entry point" || true)
+		if [[ -n "$PLUGIN_ERRORS" ]]; then
+			echo "⚠️  conda plugins in base still fail to load after the update:"
+			while IFS= read -r line; do
+				echo "   $line"
+			done <<<"$PLUGIN_ERRORS"
+			echo "   conda itself works; no compatible plugin build is on your channels yet."
+			echo "   Check with: conda search <plugin>; remove a plugin you do not need with"
+			echo "   conda remove -n base <plugin>. Continuing."
+		fi
 
 		# Now attempt to update the active environment's conda-managed packages.
 		# Dry-run first to detect conflicts with pip-installed packages.

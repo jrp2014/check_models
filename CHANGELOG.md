@@ -592,6 +592,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/update.sh` updates conda in base together with every installed
+  `conda*` package; updating conda alone left its plugins
+  (`conda-anaconda-telemetry`, `conda-anaconda-tos`) behind, printing
+  "Error while loading conda entry point" on every command after conda
+  26.9. A plugin that still fails to load afterwards is named with the
+  remedy, and the update continues.
 - `tools.hub_precheck` sizes the memory verdict from the weights mlx-vlm's
   loader would read (index shards that exist, else root-level
   `*.safetensors` except `consolidated.safetensors`); a nested alternate
