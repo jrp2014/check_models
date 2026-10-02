@@ -597,6 +597,11 @@ Notable changes to this project will be documented in this file.
   checkout HEAD. An earlier run had pulled 50 commits and lost the compiled
   extension, and the next run's no-op pull, clean tree and matching editable
   path were taken as "unchanged; skipping rebuild".
+- The baseline comparison states a macOS change as a fact ("macOS changed
+  since the baseline: 27.0 → 27.0.1"). It had said the first run after an
+  OS upgrade compiles Metal pipelines cold and is "not comparable until a
+  second run" on every run compared against a pre-upgrade baseline,
+  including warm ones, and the `->` rendered as `-&gt;`.
 - Skylos 4.43 flags the `--image` URL download as possible SSRF
   (SKY-D216); suppressed inline with the reason: the URL is the operator's
   own argument and the scheme is restricted to http(s) before the fetch.

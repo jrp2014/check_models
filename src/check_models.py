@@ -20665,11 +20665,12 @@ def _os_change_notes(
     baseline_metadata: JsonlMetadataRecord | None,
     current_metadata: JsonlMetadataRecord | None,
 ) -> list[str]:
-    """Note an OS version change between runs: the first run after one has cold Metal caches.
+    """Note an OS version change between the baseline and this run, as a fact only.
 
-    Observed going from macOS 26 to 27: prefill throughput read 2-5x lower on
-    the first sweep and returned to baseline on the next, with identical
-    outputs. Decode ratios of short generations are dented the same way.
+    The first sweep after macOS 26 -> 27 read prefill 2-5x low and recovered on
+    the next, but the note fires on every run compared against a pre-upgrade
+    baseline (not only the first), so it states the change and suggests no
+    cause; the timing ratios beside it show whether it mattered.
     """
 
     def _version(metadata: JsonlMetadataRecord | None) -> str | None:
@@ -20680,12 +20681,8 @@ def _os_change_notes(
     before, after = _version(baseline_metadata), _version(current_metadata)
     if before is None or after is None or before == after:
         return []
-    note = (
-        f"macOS changed {before} -> {after}: the first run after an OS upgrade compiles "
-        "Metal pipelines cold, so prefill, time-to-first-token and short-generation "
-        "throughput are not comparable until a second run"
-    )
-    return [note]
+    # An arrow character, not "->": the Markdown renderer escaped ">" to "&gt;".
+    return [f"macOS changed since the baseline: {before} \u2192 {after}"]
 
 
 def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> list[str]:
