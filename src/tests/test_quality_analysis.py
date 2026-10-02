@@ -1887,5 +1887,87 @@ def test_chat_template_variables_come_from_the_parsed_template() -> None:
         chat_template={"default": "{{ messages }}", "tool": "{{ tools }}"}
     )
     assert check_models._chat_template_variables(named) == ("messages", "tools")
-    assert check_models._chat_template_variables(types.SimpleNamespace(chat_template="{% if")) == ()
-    assert check_models._chat_template_variables(types.SimpleNamespace(chat_template=None)) == ()
+    # Unavailable (no template, or one that does not parse) is None, not "reads nothing".
+    assert (
+        check_models._chat_template_variables(types.SimpleNamespace(chat_template="{% if")) is None
+    )
+    assert check_models._chat_template_variables(types.SimpleNamespace(chat_template=None)) is None
+    plain = types.SimpleNamespace(chat_template="Hello")
+    assert check_models._chat_template_variables(plain) == ()
+
+
+@pytest.mark.parametrize(
+    ("template", "expected"),
+    [
+        (
+            (
+                "{% for m in messages %}{% generation %}{{ m['content'] }}{% endgeneration %}"
+                "{% endfor %}{% if enable_thinking %}<think>{% endif %}"
+            ),
+            ("enable_thinking", "messages"),
+        ),
+        (
+            (
+                "{% for m in messages %}{% if m['role'] == 'system' %}{% continue %}{% endif %}"
+                "{{ m['content'] }}{% if loop.last %}{% break %}{% endif %}{% endfor %}"
+            ),
+            ("messages",),
+        ),
+    ],
+)
+def test_chat_template_variables_parse_transformers_extensions(
+    template: str, expected: tuple[str, ...]
+) -> None:
+    """Regression: {% generation %} and loop-control tags made a valid template unparseable."""
+    processor = types.SimpleNamespace(chat_template=template)
+    assert check_models._chat_template_variables(processor) == expected
+    # Through the diagnostic record: [] and absent stay distinct.
+    diagnostics = check_models.PromptDiagnostics(chat_template_variables=expected)
+    assert check_models._checkpoint_facts_to_json(diagnostics)["chat_template_variables"] == list(
+        expected
+    )
+    empty = check_models.PromptDiagnostics(chat_template_variables=())
+    assert check_models._checkpoint_facts_to_json(empty)["chat_template_variables"] == []
+    unavailable = check_models.PromptDiagnostics(chat_template_variables=None)
+    assert "chat_template_variables" not in check_models._checkpoint_facts_to_json(unavailable)
+
+
+_TEMPLATE_FILE_CONTENTS: dict[str, str] = {
+    "processor_config.json": json.dumps({"chat_template": "PROCESSOR"}),
+    "chat_template.json": json.dumps({"chat_template": "LEGACY_JSON"}),
+    "chat_template.jinja": "JINJA",
+}
+_TEMPLATE_FILE_MARKERS: dict[str, str] = {
+    "processor_config.json": "PROCESSOR",
+    "chat_template.json": "LEGACY_JSON",
+    "chat_template.jinja": "JINJA",
+}
+
+
+@pytest.mark.parametrize(
+    "present",
+    [
+        ("chat_template.json", "chat_template.jinja"),
+        ("processor_config.json", "chat_template.json", "chat_template.jinja"),
+        ("processor_config.json", "chat_template.jinja"),
+        ("chat_template.jinja",),
+    ],
+)
+def test_chat_template_source_order_matches_the_real_processor_loader(
+    tmp_path: Path, present: tuple[str, ...]
+) -> None:
+    """Regression: .jinja was listed first, but the loader prefers the legacy JSON file.
+
+    The harness's first-listed source must be the template transformers'
+    ProcessorMixin.get_processor_dict actually loads, and tools.hub_precheck
+    must use the same precedence.
+    """
+    processing_utils = pytest.importorskip("transformers.processing_utils")
+    from tools import hub_precheck  # noqa: PLC0415 - tools package is test-local
+
+    for name in present:
+        check_models._write_text_file(tmp_path / name, _TEMPLATE_FILE_CONTENTS[name])
+    processor_dict, _kwargs = processing_utils.ProcessorMixin.get_processor_dict(str(tmp_path))
+    used = check_models._chat_template_sources(tmp_path)[0]
+    assert processor_dict["chat_template"] == _TEMPLATE_FILE_MARKERS[used]
+    assert hub_precheck._TEMPLATE_SOURCES == check_models._CHAT_TEMPLATE_FILES

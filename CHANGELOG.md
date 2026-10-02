@@ -598,6 +598,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Chat-template facts follow transformers' real behaviour: the source
+  order is the processor loader's precedence (a `processor_config.json` key,
+  then the legacy `chat_template.json`, then `chat_template.jinja`, then the
+  tokenizer config), checked in a test against
+  `ProcessorMixin.get_processor_dict`, in both the harness and
+  `tools.hub_precheck`; templates parse with transformers' extensions
+  (`{% generation %}` blocks, loop controls); and a template that could not
+  be analysed is recorded as unavailable rather than as reading nothing.
+- The allocation-capacity section also renders for the Metal buffer-count
+  limit, which is classified as an error rather than out-of-memory.
 - The decoding-label lookup in the baseline comparison is annotated
   `dict[str, str]`; Pylance inferred the constant's literal keys and
   rejected a plain `str` lookup.

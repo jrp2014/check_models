@@ -138,6 +138,9 @@ from huggingface_hub.errors import HFValidationError
 from jinja2 import Environment as JinjaEnvironment
 from jinja2 import TemplateSyntaxError as JinjaTemplateSyntaxError
 from jinja2 import meta as jinja_meta
+from jinja2 import nodes as jinja_nodes
+from jinja2.ext import Extension as JinjaExtension
+from jinja2.ext import loopcontrols as jinja_loopcontrols
 from packaging.version import InvalidVersion, Version
 from rich import box
 from rich.bar import Bar
@@ -167,6 +170,7 @@ else:
 
 
 if TYPE_CHECKING:
+    from jinja2.parser import Parser as JinjaParser
     from mlx import nn
     from mlx_vlm.generate import GenerationResult
     from mlx_vlm.generate.types import GenerateKwargs, ProcessorLike
@@ -1952,11 +1956,14 @@ class PromptDiagnostics:
     # EOS ids as each checkpoint file declares them ("config.json",
     # "config.json text_config", "generation_config.json"), when present.
     declared_eos_token_ids: dict[str, JsonLike] = dataclass_field(default_factory=dict)
-    # Snapshot files that carry a chat template, in AutoProcessor's read order.
+    # Snapshot files that carry a chat template, in the processor's precedence
+    # (the first is the one it uses).
     chat_template_sources: tuple[str, ...] = ()
     # Variables the processor's chat template reads (jinja2.meta), and the
     # chat-template kwargs this run passed that the template never reads.
-    chat_template_variables: tuple[str, ...] = ()
+    # None when no template was found or it could not be parsed; () when it
+    # parsed and reads no variables.
+    chat_template_variables: tuple[str, ...] | None = None
     unread_chat_template_kwargs: tuple[str, ...] = ()
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
     # processor config). Evidence only: never an observation, never affects
@@ -10174,9 +10181,9 @@ _UPSTREAM_MEMORY_ESTIMATE_RE: Final[re.Pattern[str]] = re.compile(
     r"requires\s+[\d,.]+\s*[GM]B\b[^.\n]*", re.IGNORECASE
 )
 _OOM_CAPACITY_NOTE: Final[str] = (
-    "A memory-capacity failure records that this checkpoint, image and prompt "
-    "hit a Metal allocation limit on this machine (named above when the message "
-    "says which). That is a resource-capacity outcome, not by itself evidence of "
+    "An allocation failure records that this checkpoint, image and prompt hit a "
+    "Metal allocation limit on this machine (named above when the message says "
+    "which). That is a resource-capacity outcome, not by itself evidence of "
     "a defect in mlx-vlm or in the model. Checkpoint size alone does not predict "
     "peak memory reliably enough to skip models automatically, so these facts are "
     "informational."
@@ -10195,6 +10202,19 @@ def _is_oom_failure(result: PerformanceResult) -> bool:
     return any(needle in haystack for needle in _OOM_MESSAGE_NEEDLES)
 
 
+def _failure_allocation_limit(result: PerformanceResult) -> str | None:
+    """The Metal allocator limit a failed run's messages name, if any.
+
+    Wider than _is_oom_failure: the buffer-count limit is not a memory amount
+    (so not out-of-memory) but is still an allocation limit worth its context.
+    """
+    if result.success:
+        return None
+    return _metal_allocation_limit(result.root_error_message) or _metal_allocation_limit(
+        result.error_message
+    )
+
+
 def _oom_capacity_rows(
     result: PerformanceResult,
     *,
@@ -10203,10 +10223,7 @@ def _oom_capacity_rows(
 ) -> tuple[tuple[str, str], ...]:
     """Bring the already-recorded capacity facts for an OOM crash together."""
     rows: list[tuple[str, str]] = []
-    limit = _metal_allocation_limit(result.root_error_message) or _metal_allocation_limit(
-        result.error_message
-    )
-    if limit is not None:
+    if (limit := _failure_allocation_limit(result)) is not None:
         rows.append(("Allocation limit hit", limit))
     burden = result.model_burden
     if burden is not None and burden.weight_bytes:
@@ -10270,7 +10287,10 @@ def _checkpoint_fact_rows(
             diagnostics.unapplied_generation_settings or None,
         ),
         ("EOS ids declared, by file", diagnostics.declared_eos_token_ids or None),
-        ("Chat template found in", ", ".join(diagnostics.chat_template_sources) or None),
+        (
+            "Chat template found in (the first is the one the processor uses)",
+            ", ".join(diagnostics.chat_template_sources) or None,
+        ),
         (
             "Chat-template options passed that the template never reads",
             ", ".join(diagnostics.unread_chat_template_kwargs) or None,
@@ -10348,10 +10368,10 @@ def _diagnostics_model_blocks(
                 level=4,
             )
         )
-        if _is_oom_failure(result):
+        if _is_oom_failure(result) or _failure_allocation_limit(result) is not None:
             blocks.append(
                 _report_section(
-                    "Memory capacity context (informational)",
+                    "Allocation capacity context (informational)",
                     ReportKeyValues(
                         _oom_capacity_rows(
                             result, system_info=system_info, image_profile=image_profile
@@ -12823,12 +12843,15 @@ def _exact_prompt_composition(
 _GENERATION_CONFIG_BOOKKEEPING: Final[frozenset[str]] = frozenset(
     {"_from_model_config", "transformers_version", "bos_token_id", "pad_token_id"}
 )
-# Where a chat template can live, in AutoProcessor's read order
-# (transformers processing_utils): .jinja first, then the JSON configs.
+# Where a chat template can live, in the precedence the processor applies
+# (transformers ProcessorMixin.get_processor_dict): a processor_config.json
+# key overrides the files, the legacy chat_template.json beats
+# chat_template.jinja, and the tokenizer's config is the fallback. The first
+# source listed is the one the processor uses.
 _CHAT_TEMPLATE_FILES: Final[tuple[str, ...]] = (
-    "chat_template.jinja",
-    "chat_template.json",
     "processor_config.json",
+    "chat_template.json",
+    "chat_template.jinja",
     "tokenizer_config.json",
 )
 
@@ -12887,12 +12910,33 @@ def _chat_template_sources(snapshot_path: Path | None) -> tuple[str, ...]:
     return tuple(sources)
 
 
-def _chat_template_variables(processor: object) -> tuple[str, ...]:
+class _GenerationBlockParser(JinjaExtension):
+    """Parse-only twin of transformers' ``{% generation %}`` tag.
+
+    transformers compiles chat templates with its AssistantTracker extension
+    (defined inside a private function, so not importable) and jinja2's
+    loopcontrols; without both, valid templates fail to parse.
+    """
+
+    tags: set[str] = {"generation"}  # noqa: RUF012 - same declaration as jinja2.ext.Extension.tags
+
+    def parse(self, parser: JinjaParser) -> jinja_nodes.Node:
+        lineno = next(parser.stream).lineno
+        body = parser.parse_statements(("name:endgeneration",), drop_needle=True)
+        return jinja_nodes.CallBlock(self.call_method("_render"), [], [], body).set_lineno(lineno)
+
+    def _render(self, caller: Callable[[], str]) -> str:
+        return caller()
+
+
+def _chat_template_variables(processor: object) -> tuple[str, ...] | None:
     """Variables the processor's chat template reads, from its jinja2 syntax tree.
 
     Uses the template the processor renders with (processor, else tokenizer);
-    named-template lists contribute every template. Empty when there is no
-    template or it does not parse.
+    named-template lists contribute every template. Parsed with the same
+    extensions transformers compiles templates with. None when there is no
+    template or it does not parse (analysis unavailable); an empty tuple when
+    it parsed and reads nothing.
     """
     template: object = getattr(processor, "chat_template", None) or getattr(
         getattr(processor, "tokenizer", None), "chat_template", None
@@ -12907,14 +12951,18 @@ def _chat_template_variables(processor: object) -> tuple[str, ...]:
         ]
     else:
         texts = [template] if isinstance(template, str) else []
+    if not texts:
+        return None
     # Parsed only, never rendered, so autoescaping is moot; on to satisfy S701.
-    environment = JinjaEnvironment(autoescape=True)
+    environment = JinjaEnvironment(
+        autoescape=True, extensions=[_GenerationBlockParser, jinja_loopcontrols]
+    )
     variables: set[str] = set()
     for text in texts:
         try:
             variables |= jinja_meta.find_undeclared_variables(environment.parse(text))
         except JinjaTemplateSyntaxError:
-            return ()
+            return None
     return tuple(sorted(variables))
 
 
@@ -12984,7 +13032,7 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
             sorted(
                 key
                 for key in passed_template_kwargs
-                if template_variables and key not in template_variables
+                if template_variables is not None and key not in template_variables
             )
         ),
         snapshot_notes=snapshot_notes,
@@ -13081,9 +13129,13 @@ def _checkpoint_facts_to_json(diagnostics: PromptDiagnostics) -> dict[str, JsonL
     for key in ("unapplied_generation_settings", "declared_eos_token_ids"):
         if mapping := getattr(diagnostics, key):
             facts[key] = dict(mapping)
-    for key in ("chat_template_sources", "chat_template_variables", "unread_chat_template_kwargs"):
+    for key in ("chat_template_sources", "unread_chat_template_kwargs"):
         if values := getattr(diagnostics, key):
             facts[key] = list(values)
+    # Written even when empty: [] (parsed, reads nothing) differs from absent
+    # (no template, or it did not parse).
+    if diagnostics.chat_template_variables is not None:
+        facts["chat_template_variables"] = list(diagnostics.chat_template_variables)
     return facts
 
 

@@ -6557,9 +6557,9 @@ def test_oom_crash_gets_a_capacity_context_block_beside_the_exception() -> None:
     )
     rendered = "\n".join(check_models.render_report_markdown(blocks))
     assert rendered.index("Root exception and chain") < rendered.index(
-        "Memory capacity context (informational)"
+        "Allocation capacity context (informational)"
     )
-    assert rendered.index("Memory capacity context (informational)") < rendered.index(
+    assert rendered.index("Allocation capacity context (informational)") < rendered.index(
         "Execution and provenance"
     )
     for fact in (
@@ -6583,6 +6583,36 @@ def test_oom_crash_gets_a_capacity_context_block_beside_the_exception() -> None:
     )
     assert check_models._is_oom_failure(plain) is False
     assert check_models._is_oom_failure(crash) is True
+
+    # The buffer-count cap is not out-of-memory, but its context still renders.
+    buffer_count = dataclasses.replace(
+        crash,
+        error_stage="Error",
+        root_error_message="[metal::malloc] Resource limit (499000) exceeded.",
+        error_message="Model runtime error: [metal::malloc] Resource limit (499000) exceeded.",
+        captured_output_on_fail="",
+    )
+    assert check_models._is_oom_failure(buffer_count) is False
+    rendered = " ".join(
+        "\n".join(
+            check_models.render_report_markdown(
+                check_models._diagnostics_model_blocks(
+                    buffer_count,
+                    check_models._assess_result(buffer_count),
+                    run_args=None,
+                    model_provenance=None,
+                    system_info={"Metal Buffer-Count Limit": "499,000 buffers"},
+                    image_profile=None,
+                )
+            )
+        ).split()
+    )
+    assert "Allocation capacity context (informational)" in rendered
+    assert (
+        "Allocation limit hit:* the Metal buffer-count limit (a number of buffers, not bytes)"
+        in rendered
+    )
+    assert "Metal buffer-count limit:* 499,000 buffers" in rendered
 
 
 def test_run_summary_counts_cap_hits_and_renders_constraint_breakdown(

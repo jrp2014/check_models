@@ -241,15 +241,18 @@ def _fetch_text(url: str, headers: dict[str, str]) -> str | None:
         return None
 
 
-# The order AutoProcessor reads a chat template in (transformers
-# processing_utils): a .jinja file, then chat_template.json, then the
-# processor and tokenizer configs. Reading only .jinja and tokenizer_config
-# misjudged checkpoints whose multimodal template lives in chat_template.json
-# (Idefics3 looked text-only; pixtral looked template-less).
+# The template the processor ends up with, in transformers'
+# ProcessorMixin.get_processor_dict precedence: a "chat_template" key in
+# processor_config.json overrides the files; the legacy chat_template.json
+# wins over chat_template.jinja; the tokenizer's config applies only when the
+# processor has none. Reading only .jinja and tokenizer_config misjudged
+# checkpoints whose multimodal template lives in chat_template.json (Idefics3
+# looked text-only; pixtral looked template-less). Kept equal to
+# check_models._CHAT_TEMPLATE_FILES (a test checks both against the loader).
 _TEMPLATE_SOURCES: Final[tuple[str, ...]] = (
-    "chat_template.jinja",
-    "chat_template.json",
     "processor_config.json",
+    "chat_template.json",
+    "chat_template.jinja",
     "tokenizer_config.json",
 )
 
