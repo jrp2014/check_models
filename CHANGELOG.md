@@ -6,6 +6,29 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: `tools/update.sh` updates only the environment it names. The
+  target is the active venv, or the conda env in `CONDA_ENV` (which
+  `make update` now passes through), and a different or missing active env
+  stops the run before any change; Python and pip calls go to that env's
+  interpreter. It now runs every check that needs no pull or build (target
+  env, malformed refs, missing tracked files, MLX build requirements) and
+  prints its planned changes before the first change, and a failure lists the
+  steps that had completed and the one that failed.
+- Tooling: `conda update --all` in `update.sh` decides ownership from
+  `conda list --json` records, not `pip list` (which also lists
+  conda-installed distributions, so ordinary conda updates were skipped as
+  pip conflicts). Pip-owned or ambiguously owned packages still skip it unless
+  `CONDA_UPDATE_ALL=1`.
+- Tooling: running `run_commit_hygiene.sh` directly refuses, changing nothing,
+  when a file it would check or re-stage (including `src/README.md` for the
+  dependency sync) also has unstaged edits; it previously staged those edits.
+  Commits through pre-commit are unaffected.
+- Tooling: `make bootstrap-dev` installs the hooks once, fails when
+  environment validation fails, and reports a skipped optional step
+  (markdownlint-cli2 via npm) in its final line instead of always printing
+  "Bootstrap complete".
+- Tooling: the local-mlx pin file uses an explicit `mktemp` template, so the
+  updater's pin helpers also work with GNU `mktemp`.
 - The baseline comparison records, for each changed text, the shared prefix
   in characters, both lengths, and whether the prompt token count changed
   (e.g. "shared prefix 216 characters; length 404 → 422; same prompt

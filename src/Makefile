@@ -101,26 +101,27 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + torch + hooks + validat
 	$(UPGRADE_PIP_CMD)
 	$(RUN_PY) -m pip install -e .[dev,extras,torch]
 	$(RUN_PY) -m pip install huggingface_hub
-	@echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."
-	@if command -v npm >/dev/null 2>&1; then \
-		echo "[bootstrap] npm found, installing markdownlint-cli2..."; \
-		npm install --silent --no-audit --no-fund 2>/dev/null || echo "⚠️  npm install failed (run 'npm install' inside src)"; \
+	@echo "[bootstrap] Installing commit/push hooks (pre-commit ships with the dev extras)..."
+	$(RUN_PY) -m pre_commit install
+	@# markdownlint-cli2 is optional: the quality gate falls back to npx.
+	@optional=""; \
+	echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."; \
+	if ! command -v npm >/dev/null 2>&1; then \
+		optional="npm not found: markdownlint-cli2 will use npx on demand (install Node.js: https://nodejs.org/ or 'brew install node')"; \
+	elif ! npm install --silent --no-audit --no-fund; then \
+		optional="npm install failed: run 'npm install' inside src"; \
+	fi; \
+	echo "[bootstrap] Running environment validation..."; \
+	if ! $(RUN_PY) -m tools.validate_env; then \
+		echo "❌ Bootstrap failed: environment validation found issues (details above)"; \
+		exit 1; \
+	fi; \
+	if [ -n "$$optional" ]; then \
+		echo "✓ Bootstrap complete, with an optional step skipped:"; \
+		echo "  ⚠️  $$optional"; \
 	else \
-		echo "[bootstrap] npm not found - markdownlint-cli2 will use npx on-demand"; \
-		echo "  To install npm: https://nodejs.org/ or 'brew install node'"; \
+		echo "✓ Bootstrap complete"; \
 	fi
-	@echo "[bootstrap] Installing commit/push hooks..."
-	@$(RUN_TOOL_PREFIX) pre-commit install || echo "⚠️  Could not install git hooks (pre-commit ships with the dev extras)"
-	@if command -v pre-commit >/dev/null 2>&1; then \
-		echo "[bootstrap] Installing pre-commit framework hooks..."; \
-		$(RUN_TOOL_PREFIX) pre-commit install || echo "⚠️  pre-commit install failed"; \
-	else \
-		echo "[bootstrap] pre-commit framework not found (optional)"; \
-		echo "  Install with: pip install pre-commit && pre-commit install"; \
-	fi
-	@echo "[bootstrap] Running environment validation..."
-	@$(RUN_PY) -m tools.validate_env || echo "⚠️  Validation found issues (run 'python -m tools.validate_env' for details)"
-	@echo "✓ Bootstrap complete"
 
 # Markdown linting setup
 .PHONY: install-markdownlint
@@ -194,9 +195,12 @@ test-cov: ## Run pytest with coverage
 deps-sync: ## Sync README dependency blocks
 	$(RUN_PY) tools/update_readme_deps.py
 
+# update.sh changes the active environment (conda update --all, pip, local
+# MLX builds), so it cannot run through `conda run`; it takes the same
+# CONDA_ENV target and stops before any change unless that env is active.
 .PHONY: update
 update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, smoke)
-	bash tools/update.sh
+	CONDA_ENV='$(CONDA_ENV)' bash tools/update.sh
 
 .PHONY: update-quick
 update-quick: ## Quick in-env refresh: upgrade pip and reinstall project (dev+extras+torch)

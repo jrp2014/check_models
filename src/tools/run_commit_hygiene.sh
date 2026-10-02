@@ -55,6 +55,31 @@ if [ "${#staged_files[@]}" -eq 0 ]; then
     exit 0
 fi
 
+# The checks read, and the fixers rewrite and re-stage, whole working-tree
+# files. The pre-commit framework stashes unstaged edits before this runs, so
+# under it the working tree equals the index; a direct invocation has no such
+# protection, and re-staging a partially staged file would commit edits the
+# user chose not to stage. Refuse before touching anything instead. The README
+# sync regenerates src/README.md from the working-tree pyproject.toml and
+# stages it, so both files must be free of unstaged edits too.
+partially_staged=()
+for file in "${staged_files[@]}"; do
+    if ! git diff --quiet -- "$file"; then
+        partially_staged+=("$file")
+    fi
+done
+if [ "$needs_readme_sync" -eq 1 ] && ! git diff --quiet -- src/README.md; then
+    partially_staged+=("src/README.md (regenerated from the staged src/pyproject.toml)")
+fi
+if [ "${#partially_staged[@]}" -gt 0 ]; then
+    echo "❌ Unstaged edits in files this hook would check or re-stage:"
+    printf '   - %s\n' "${partially_staged[@]}"
+    echo "   Nothing was changed. Commit through pre-commit (it stashes unstaged"
+    echo "   edits first and restores them afterwards), or stage or stash those"
+    echo "   edits before running this script directly."
+    exit 1
+fi
+
 if [ "$needs_readme_sync" -eq 1 ]; then
     readme_already_tracked=0
     echo "[commit] Syncing README dependency blocks"

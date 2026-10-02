@@ -437,7 +437,11 @@ python -m tools.update_readme_deps --check
 #### Advanced: update.sh options (what `make update` runs)
 
 `make update` runs `src/tools/update.sh`; invoke the script directly when you
-need its environment-variable switches:
+need its environment-variable switches. Both target the conda env named by
+`CONDA_ENV` (default `mlx-vlm`, or the active venv) and stop before changing
+anything unless that env is the active one. The script checks the local MLX
+checkouts and build requirements and prints its planned changes before the
+first one; if a step fails, it lists the steps that had completed.
 
 ```bash
 cd src

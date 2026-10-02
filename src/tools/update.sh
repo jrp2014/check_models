@@ -3,6 +3,13 @@
 # Installs/updates the project and all dependencies from pyproject.toml.
 #
 # Execution Order:
+#   Preflight (changes nothing; any failure stops the run here):
+#   a. Resolve the target environment: the active venv, or the conda env named
+#      by CONDA_ENV (default mlx-vlm), which must be the active one
+#   b. Check local mlx/mlx-vlm checkouts (malformed refs, missing tracked
+#      files) and the MLX build requirements
+#   c. Print the planned changes
+#   Changes (a failure reports which steps had completed):
 #   0. Copy a dated snapshot of the untracked sweep history to the backups
 #      directory (HISTORY_BACKUP_DIR, default ../../backups beside the repos)
 #   1. Update conda/Homebrew by default unless UPDATE_SYSTEM_PACKAGES=0
@@ -18,7 +25,9 @@
 #                                     # after the local mlx build is pinned: preserving the
 #                                     # local source build takes precedence)
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
-#   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
+#   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even when conda would change
+#                                     # pip-installed or ambiguously owned packages
+#   CONDA_ENV=other ./update.sh       # Target conda env (must be the active one)
 #   UPDATE_SYSTEM_PACKAGES=0 ./update.sh # Skip conda base/env and Homebrew updates
 #   UPDATE_NODE_TOOLING=0 ./update.sh # Offline: install markdownlint from the local lockfile
 #   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
@@ -62,25 +71,54 @@
 
 set -euo pipefail
 
-# Check if we're in a virtual environment (conda, venv, virtualenv)
-if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]]; then
-	echo "⚠️  WARNING: You don't appear to be in a virtual environment!"
-	echo "   (No VIRTUAL_ENV or CONDA_DEFAULT_ENV detected)"
-	echo ""
-	echo "   This script will update packages globally on your system."
-	echo "   It's strongly recommended to activate a virtual environment first:"
-	echo ""
-	echo "   • conda: conda activate <env-name>"
-	echo "   • venv/virtualenv: source /path/to/venv/bin/activate"
-	echo ""
-	read -p "   Continue anyway? [y/N] " -n 1 -r
-	echo
-	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-		echo "[update.sh] Aborted by user."
-		exit 1
+# Determine project root (assuming check_models/src/tools/update.sh)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Same override convention as common_quality.sh and the Makefiles.
+CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
+
+# One environment-selection contract with the Makefiles and common_quality.sh:
+# an active venv is the target; otherwise the target is the conda env named by
+# CONDA_ENV, and it must be the active one, because the conda operations here
+# act on the active env and a mismatch would update an env other than the one
+# announced. Sets UPDATE_ENV_TYPE, UPDATE_ENV_NAME and UPDATE_PYTHON. Returns
+# 1 on a mismatch or a missing interpreter, and 2 when no environment manager
+# exists and only a system Python is left (the caller asks before using it).
+# Shell parameter expansion only: no external command, so it is testable with
+# any PATH.
+resolve_update_target() {
+	if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+		UPDATE_ENV_TYPE="venv"
+		UPDATE_ENV_NAME="${VIRTUAL_ENV##*/}"
+		UPDATE_PYTHON="$VIRTUAL_ENV/bin/python"
+	elif [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
+		if [[ "$CONDA_DEFAULT_ENV" != "$CONDA_ENV" ]]; then
+			echo "❌ conda env '$CONDA_DEFAULT_ENV' is active, but the update target is '$CONDA_ENV'."
+			echo "   Nothing was changed. Activate the target first (conda activate $CONDA_ENV),"
+			echo "   or set CONDA_ENV=$CONDA_DEFAULT_ENV to update the active env instead."
+			return 1
+		fi
+		UPDATE_ENV_TYPE="conda"
+		UPDATE_ENV_NAME="$CONDA_ENV"
+		UPDATE_PYTHON="${CONDA_PREFIX:-}/bin/python"
+	elif command -v conda >/dev/null 2>&1; then
+		echo "❌ No environment is active; the update target is conda env '$CONDA_ENV'."
+		echo "   Nothing was changed. Activate it first: conda activate $CONDA_ENV"
+		return 1
+	else
+		UPDATE_ENV_TYPE="system"
+		UPDATE_ENV_NAME="system"
+		UPDATE_PYTHON="$(command -v python3 || command -v python || true)"
 	fi
-	echo "[update.sh] Proceeding with global installation (user confirmed)..."
-fi
+	if [[ -z "$UPDATE_PYTHON" || ! -x "$UPDATE_PYTHON" ]]; then
+		echo "❌ No Python interpreter at '${UPDATE_PYTHON:-<none>}' for the $UPDATE_ENV_TYPE target '$UPDATE_ENV_NAME'."
+		echo "   Nothing was changed."
+		return 1
+	fi
+	[[ "$UPDATE_ENV_TYPE" == "system" ]] && return 2
+	return 0
+}
 
 cleanup_pip_invalid_distribution_backups() {
 	if [[ "${CLEAN_PIP_INVALID_DISTS:-1}" != "1" ]]; then
@@ -131,94 +169,171 @@ PY
 	fi
 }
 
-cleanup_pip_invalid_distribution_backups
+# Which manager owns each package conda plans to change, from conda's own
+# package records (`conda list --json`): a record from the pypi channel is a
+# distribution pip installed, any other record is conda's. Visibility to pip
+# says nothing about ownership (pip lists conda-installed distributions too).
+# A name with both kinds of record (pip installed over conda's copy) or with
+# none (unreadable records) is "ambiguous". Prints "<name> <owner>" per name.
+#   $1 file holding the conda list --json output; $2... package names
+conda_change_ownership() {
+	local records_file="$1"
+	shift
+	python - "$records_file" "$@" <<'PY'
+from __future__ import annotations
 
-# Update conda itself (base) and environment packages with pip-conflict safety check.
-# NOTE: conda update --all can break pip-installed packages (mlx, mlx-vlm) by
-# reshuffling shared dependencies like numpy. Keep conflict checks in place.
-if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
-	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
-		echo "[update.sh] Updating conda (base)..."
-		# Update conda together with every installed conda* package (plugins
-		# such as conda-anaconda-telemetry/-tos, the libmamba solver): nothing
-		# depends on the plugins, so "conda update conda" alone left them behind
-		# importing plugin hooks a newer conda no longer exports.
-		CONDA_BASE_PACKAGES=()
-		while IFS= read -r package; do
-			CONDA_BASE_PACKAGES+=("$package")
-		done < <(conda list -n base 2>/dev/null | awk '!/^#/ && $1 ~ /^conda(-|$)/ {print $1}')
-		if [[ ${#CONDA_BASE_PACKAGES[@]} -eq 0 ]]; then
-			CONDA_BASE_PACKAGES=(conda)
-		fi
-		conda update -n base "${CONDA_BASE_PACKAGES[@]}" -y
+import json
+import re
+import sys
+from pathlib import Path
 
-		# Diagnose rather than hide: a plugin that still cannot load prints
-		# "Error while loading conda entry point" on every conda command.
-		# (--version skips plugin loading; "config --show" loads them cheaply.)
-		PLUGIN_ERRORS=$(conda config --show channels 2>&1 >/dev/null | grep "Error while loading conda entry point" || true)
-		if [[ -n "$PLUGIN_ERRORS" ]]; then
-			echo "⚠️  conda plugins in base still fail to load after the update:"
-			while IFS= read -r line; do
-				echo "   $line"
-			done <<<"$PLUGIN_ERRORS"
-			echo "   conda itself works; no compatible plugin build is on your channels yet."
-			echo "   Check with: conda search <plugin>; remove a plugin you do not need with"
-			echo "   conda remove -n base <plugin>. Continuing."
-		fi
+records_file, *changes = sys.argv[1:]
 
-		# Now attempt to update the active environment's conda-managed packages.
-		# Dry-run first to detect conflicts with pip-installed packages.
-		echo ""
-		echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
-		DRY_RUN_OUTPUT=$(conda update --all --dry-run 2>&1) || true
 
-		# Extract package names conda wants to change. Conda prints change lines
-		# as "  name   old-build --> new-build" (two dashes); accept one or two so
-		# the parse cannot silently report "already up to date" on a format tweak.
-		CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+-{1,2}>\s+\S+' | awk '{print $1}' 2>/dev/null || true)
+def normalize(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
 
-		if [[ -z "$CONDA_CHANGES" ]]; then
-			echo "[update.sh] Conda environment is already up to date"
-		else
-			# Get pip-installed packages (not installed by conda)
-			PIP_ONLY_PKGS=$(pip list --format=freeze 2>/dev/null | cut -d= -f1 | tr '[:upper:]' '[:lower:]' || true)
 
-			# Check for overlaps between conda changes and pip packages
-			CONFLICTS=""
-			while IFS= read -r pkg; do
-				[[ -z "$pkg" ]] && continue
-				pkg_lower=$(echo "$pkg" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-				if echo "$PIP_ONLY_PKGS" | tr '_' '-' | grep -qx "$pkg_lower"; then
-					CONFLICTS="${CONFLICTS}  - ${pkg}\n"
-				fi
-			done <<< "$CONDA_CHANGES"
+owners: dict[str, set[str]] = {}
+try:
+    records = json.loads(Path(records_file).read_text(encoding="utf-8"))
+except (OSError, ValueError):
+    records = []
+for record in records if isinstance(records, list) else []:
+    if not isinstance(record, dict) or not record.get("name"):
+        continue
+    pypi = "pypi" in (record.get("channel"), record.get("platform"))
+    owners.setdefault(normalize(record["name"]), set()).add("pip" if pypi else "conda")
 
-			if [[ -n "$CONFLICTS" ]]; then
-				echo ""
-				echo "⚠️  WARNING: conda wants to update packages also managed by pip:"
-				echo -e "$CONFLICTS"
-				echo "   This may break pip-installed packages (mlx, mlx-vlm, etc.)."
-				echo "   Skipping conda update --all to be safe."
-				echo "   To force: CONDA_UPDATE_ALL=1 ./update.sh"
-				echo ""
-				if [[ "${CONDA_UPDATE_ALL:-0}" == "1" ]]; then
-					echo "[update.sh] CONDA_UPDATE_ALL=1 set — proceeding with conda update --all..."
-					conda update --all -y
-				fi
-			else
-				echo "[update.sh] No pip conflicts detected — updating conda environment packages..."
-				conda update --all -y
-			fi
-		fi
-	else
-		echo "[update.sh] Not in conda environment; skipping conda update"
+for change in changes:
+    found = owners.get(normalize(change), set())
+    print(change, next(iter(found)) if len(found) == 1 else "ambiguous")
+PY
+}
+
+# Pure update/skip decision for `conda update --all`, kept apart from the
+# ownership lookup. Only a plan whose every change is conda-owned runs
+# unasked; a pip-owned or ambiguous change, or no ownership answer at all,
+# skips it unless CONDA_UPDATE_ALL=1.
+#   $1 CONDA_UPDATE_ALL (0/1); $2 "<name> <owner>" lines
+conda_update_all_decision() {
+	local force="$1" ownership="$2" name owner answered=0
+	if [[ "$force" == "1" ]]; then
+		echo "update"
+		return 0
 	fi
-else
-	echo "[update.sh] Skipping conda base/environment package updates (UPDATE_SYSTEM_PACKAGES=0)"
-fi
+	while read -r name owner; do
+		[[ -z "$name" ]] && continue
+		answered=1
+		if [[ "$owner" != "conda" ]]; then
+			echo "skip"
+			return 0
+		fi
+	done <<< "$ownership"
+	if [[ $answered -eq 1 ]]; then
+		echo "update"
+	else
+		echo "skip"
+	fi
+}
 
-# Homebrew updates are system-wide; run them with the conda system path unless explicitly skipped.
-if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
+# Update conda itself (base) and the target env's packages with a pip-ownership
+# safety check. NOTE: conda update --all can break pip-installed packages (mlx,
+# mlx-vlm) by reshuffling shared dependencies like numpy.
+update_conda_packages() {
+	if [[ -z "${CONDA_DEFAULT_ENV:-}" ]]; then
+		echo "[update.sh] Not in conda environment; skipping conda update"
+		return 0
+	fi
+	echo "[update.sh] Updating conda (base)..."
+	# Update conda together with every installed conda* package (plugins
+	# such as conda-anaconda-telemetry/-tos, the libmamba solver): nothing
+	# depends on the plugins, so "conda update conda" alone left them behind
+	# importing plugin hooks a newer conda no longer exports.
+	local CONDA_BASE_PACKAGES=()
+	local package
+	while IFS= read -r package; do
+		CONDA_BASE_PACKAGES+=("$package")
+	done < <(conda list -n base 2>/dev/null | awk '!/^#/ && $1 ~ /^conda(-|$)/ {print $1}')
+	if [[ ${#CONDA_BASE_PACKAGES[@]} -eq 0 ]]; then
+		CONDA_BASE_PACKAGES=(conda)
+	fi
+	conda update -n base "${CONDA_BASE_PACKAGES[@]}" -y
+
+	# Diagnose rather than hide: a plugin that still cannot load prints
+	# "Error while loading conda entry point" on every conda command.
+	# (--version skips plugin loading; "config --show" loads them cheaply.)
+	local PLUGIN_ERRORS line
+	PLUGIN_ERRORS=$(conda config --show channels 2>&1 >/dev/null | grep "Error while loading conda entry point" || true)
+	if [[ -n "$PLUGIN_ERRORS" ]]; then
+		echo "⚠️  conda plugins in base still fail to load after the update:"
+		while IFS= read -r line; do
+			echo "   $line"
+		done <<<"$PLUGIN_ERRORS"
+		echo "   conda itself works; no compatible plugin build is on your channels yet."
+		echo "   Check with: conda search <plugin>; remove a plugin you do not need with"
+		echo "   conda remove -n base <plugin>. Continuing."
+	fi
+
+	if [[ "$UPDATE_ENV_TYPE" != "conda" ]]; then
+		echo "[update.sh] Target is $UPDATE_ENV_TYPE env '$UPDATE_ENV_NAME', not a conda env; skipping conda update --all"
+		return 0
+	fi
+
+	# Now attempt to update the target environment's conda-managed packages.
+	# Dry-run first to see which packages conda would change.
+	echo ""
+	echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
+	local DRY_RUN_OUTPUT CONDA_CHANGES
+	DRY_RUN_OUTPUT=$(conda update -n "$CONDA_ENV" --all --dry-run 2>&1) || true
+
+	# Extract package names conda wants to change. Conda prints change lines
+	# as "  name   old-build --> new-build" (two dashes); accept one or two so
+	# the parse cannot silently report "already up to date" on a format tweak.
+	CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+-{1,2}>\s+\S+' | awk '{print $1}' 2>/dev/null || true)
+
+	if [[ -z "$CONDA_CHANGES" ]]; then
+		echo "[update.sh] Conda environment is already up to date"
+		return 0
+	fi
+
+	local records_file ownership not_conda_owned changes=()
+	while IFS= read -r package; do
+		[[ -n "$package" ]] && changes+=("$package")
+	done <<< "$CONDA_CHANGES"
+	records_file="$(mktemp "${TMPDIR:-/tmp}/update-conda-records.XXXXXX")"
+	conda list -n "$CONDA_ENV" --json > "$records_file" 2>/dev/null || : > "$records_file"
+	# A lookup that fails or answers for fewer packages than asked is no
+	# evidence of ownership: treat every change as ambiguous.
+	if ! ownership="$(conda_change_ownership "$records_file" "${changes[@]}")" ||
+		[[ "$(printf '%s\n' "$ownership" | grep -c .)" -ne ${#changes[@]} ]]; then
+		ownership="$(printf '%s ambiguous\n' "${changes[@]}")"
+	fi
+	rm -f "$records_file"
+	not_conda_owned="$(printf '%s\n' "$ownership" | awk 'NF && $2 != "conda" {printf "  - %s (%s)\n", $1, ($2 == "pip" ? "installed by pip" : "ownership unclear")}')"
+
+	if [[ -n "$not_conda_owned" ]]; then
+		echo ""
+		echo "⚠️  WARNING: conda wants to change packages it does not solely own:"
+		echo "$not_conda_owned"
+		echo "   This may break pip-installed packages (mlx, mlx-vlm, etc.)."
+	fi
+	if [[ "$(conda_update_all_decision "${CONDA_UPDATE_ALL:-0}" "$ownership")" == "update" ]]; then
+		if [[ -n "$not_conda_owned" ]]; then
+			echo "[update.sh] CONDA_UPDATE_ALL=1 set — proceeding with conda update --all..."
+		else
+			echo "[update.sh] Every planned change is a conda-owned package — updating conda environment packages..."
+		fi
+		conda update -n "$CONDA_ENV" --all -y
+	else
+		echo "   Skipping conda update --all to be safe."
+		echo "   To force: CONDA_UPDATE_ALL=1 ./update.sh"
+		echo ""
+	fi
+}
+
+# Homebrew updates are system-wide.
+update_homebrew() {
 	if command -v brew >/dev/null 2>&1; then
 		echo "[update.sh] Updating Homebrew..."
 		brew update
@@ -226,20 +341,11 @@ if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
 	else
 		echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
 	fi
-else
-	echo "[update.sh] Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)"
-fi
-
-# Determine project root (assuming check_models/src/tools/update.sh)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-
-# Same override convention as common_quality.sh and the Makefiles.
-CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
+}
 
 # The append-only sweep history is deliberately untracked (it carries local
 # paths and grows every run) and the folder's iCloud sync is not a backup, so
-# a dated copy lands beside the local repos before anything else runs. A
+# a dated copy lands beside the local repos before anything else changes. A
 # copy identical to the newest existing snapshot is not repeated.
 backup_run_history() {
 	if [[ "${SKIP_HISTORY_BACKUP:-0}" == "1" ]]; then
@@ -285,8 +391,6 @@ backup_run_history() {
 	echo "[update.sh]   $((kept + 1)) snapshot(s) retained in $backup_dir"
 }
 
-backup_run_history
-
 # Repo-local markdownlint tools (if npm is available). The audit and funding
 # steps are extra registry round-trips whose output nothing here consumes;
 # the advisory endpoint has hung installs for minutes when it was degraded
@@ -295,7 +399,7 @@ backup_run_history
 # package.json, never an exact pin or an npm override): a stale pin is how a
 # transitive smol-toml advisory reached the gate. UPDATE_NODE_TOOLING=0 is the
 # offline escape hatch, installing whatever the untracked lockfile holds.
-if command -v npm >/dev/null 2>&1; then
+update_node_tooling() {
 	if [[ "${UPDATE_NODE_TOOLING:-1}" == "1" ]]; then
 		echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
 		npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
@@ -304,10 +408,8 @@ if command -v npm >/dev/null 2>&1; then
 		npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT"
 	fi
 	echo "[update.sh] repo-local npm tooling is installed"
-else
-	echo "[update.sh] npm not found; skipping repo-local markdownlint install"
-	echo "   (Install Node.js/npm for markdown linting: brew install node)"
-fi
+}
+
 
 # Once the local mlx build is installed, later pip runs must not replace it:
 # a PyPI release overtakes the local dev version in PEP 440 ordering (0.32.2
@@ -333,7 +435,8 @@ pin_local_mlx_build() {
 		echo "   the PyPI wheel. Inspect: pip show mlx"
 		return 1
 	fi
-	LOCAL_MLX_CONSTRAINT_FILE="$(mktemp -t mlx-local-pin)"
+	# Explicit template: GNU mktemp needs the X's, which BSD mktemp also accepts.
+	LOCAL_MLX_CONSTRAINT_FILE="$(mktemp "${TMPDIR:-/tmp}/mlx-local-pin.XXXXXX")"
 	printf 'mlx==%s\n' "$pinned_version" > "$LOCAL_MLX_CONSTRAINT_FILE"
 	LOCAL_MLX_PIN_ARGS=(--constraint "$LOCAL_MLX_CONSTRAINT_FILE")
 	echo "[update.sh] Pinned local mlx $pinned_version for the rest of this run"
@@ -700,14 +803,16 @@ PY
 
 # Ensure global Python packaging tools are current. Quarantine malformed
 # metadata for only these requested tools before pip attempts an uninstall.
-python "$SCRIPT_DIR/quarantine_broken_pip_metadata.py" \
-	pip wheel setuptools build pyrefly
+update_packaging_tools() {
+	python "$SCRIPT_DIR/quarantine_broken_pip_metadata.py" \
+		pip wheel setuptools build pyrefly
 
-# Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
-echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
-# setuptools keeps only mlx's build floor (>=80): every source build runs in
-# pip's isolated build environment, which takes the latest setuptools anyway.
-pip_install_tool pip wheel "setuptools>=80" build pyrefly
+	# Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
+	echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
+	# setuptools keeps only mlx's build floor (>=80): every source build runs in
+	# pip's isolated build environment, which takes the latest setuptools anyway.
+	pip_install_tool pip wheel "setuptools>=80" build pyrefly
+}
 
 # Resolve project extras once; the install itself runs after MLX updates so
 # pyproject.toml performs the final dependency reconciliation.
@@ -735,7 +840,9 @@ reconcile_project_environment_from_pyproject() {
 	python -m pip check
 	(
 		cd "$PROJECT_ROOT"
-		python -m tools.validate_env --expected-conda-env "${CONDA_DEFAULT_ENV:-$CONDA_ENV}"
+		local expected_env_args=()
+		[[ "$UPDATE_ENV_TYPE" == "conda" ]] && expected_env_args=(--expected-conda-env "$CONDA_ENV")
+		python -m tools.validate_env ${expected_env_args[@]+"${expected_env_args[@]}"}
 	)
 }
 
@@ -1032,61 +1139,13 @@ update_local_mlx_repos() {
 	echo "📦 Updating local MLX repositories: ${REPO_NAMES[*]}"
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	
-	# Check build requirements if mlx is present
-	for repo in "${REPO_NAMES[@]}"; do
-		if [[ "$repo" == "mlx" ]]; then
-			echo ""
-			echo "Verifying build requirements for MLX..."
-			if ! check_mlx_build_requirements; then
-				echo ""
-				echo "❌ Build requirements not met. Cannot build MLX."
-				cd "$ORIGINAL_DIR"
-				return 1
-			fi
-			echo ""
-			break
-		fi
-	done
-
 	# Stage 1: Sync all repositories first. --ff-only never creates a merge
 	# commit in an upstream checkout. A pull that cannot complete (local edits
 	# that upstream now also changes, a diverged branch, no network) stops the
 	# run with diagnostics: continuing would leave that repo unbuilt and its
 	# install unguarded against the eager upgrades later in this script.
-	# Stage 0: malformed refs (typically iCloud conflict copies) break git, so
-	# name them and stop rather than fail later with a misleading pull error;
-	# suspected conflict copies in the working tree only warn.
-	for idx in "${!REPO_NAMES[@]}"; do
-		local BROKEN_REFS
-		BROKEN_REFS="$(find_malformed_git_refs "${REPO_PATHS[idx]}")"
-		if [[ -n "$BROKEN_REFS" ]]; then
-			echo ""
-			echo "❌ ${REPO_NAMES[idx]} has malformed git refs (names with a space); stopping."
-			printf '%s\n' "$BROKEN_REFS" | while IFS= read -r ref; do
-				echo "     $ref"
-			done
-			echo "   Ref names cannot contain spaces, so git fails on them (\"bad object\")."
-			echo "   \"<name> 2\" is how iCloud Drive names a conflict copy; if the un-numbered"
-			echo "   ref beside it is intact, delete the numbered file."
-			echo "   Keeping git checkouts outside iCloud-synced folders prevents this."
-			echo "   Nothing was pulled, built or reinstalled."
-			exit 1
-		fi
-		local SUSPECTED_COPIES
-		SUSPECTED_COPIES="$(find_suspected_conflict_copies "${REPO_PATHS[idx]}")"
-		if [[ -n "$SUSPECTED_COPIES" ]]; then
-			local COPY_COUNT
-			COPY_COUNT="$(printf '%s\n' "$SUSPECTED_COPIES" | wc -l | tr -d ' ')"
-			echo "⚠️  ${REPO_NAMES[idx]}: $COPY_COUNT untracked file(s) named like iCloud conflict copies"
-			echo "   (\"<name> 2.<ext>\" beside an existing \"<name>.<ext>\"), e.g."
-			printf '%s\n' "$SUSPECTED_COPIES" | head -3 | while IFS= read -r copy; do
-				echo "     $copy"
-			done
-			echo "   If they are copies, deleting them stops the checkout looking modified"
-			echo "   (which forces a rebuild). Continuing."
-		fi
-	done
-
+	# Stage 0 (malformed refs, conflict copies, missing tracked files, build
+	# requirements) ran in preflight_local_mlx_repos before anything changed.
 	echo ""
 	echo "Stage 1: Syncing repositories with git pull --ff-only..."
 	for idx in "${!REPO_NAMES[@]}"; do
@@ -1098,6 +1157,8 @@ update_local_mlx_repos() {
 			echo "✓ Git pull successful for ${REPO_NAMES[idx]}"
 			if [[ "$PRE_PULL_HEAD" != "unknown" && "$(git rev-parse HEAD 2>/dev/null)" == "$PRE_PULL_HEAD" ]]; then
 				REPO_UNCHANGED[idx]=1
+			else
+				COMPLETED_STEPS+=("git pull ${REPO_NAMES[idx]}: ${PRE_PULL_HEAD:0:9} -> $(git rev-parse --short=9 HEAD 2>/dev/null)")
 			fi
 		else
 			report_git_pull_failure "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"
@@ -1108,25 +1169,13 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 2: Verify repository integrity before building
+	# Stage 2: Verify each checkout's local state before building (corruption
+	# was checked in preflight; this feeds the rebuild shortcut).
 	echo ""
-	echo "Stage 2: Verifying repository integrity..."
+	echo "Stage 2: Checking for local changes..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
-		
-		# Check for missing git-tracked files
-		local MISSING_FILES
-		MISSING_FILES=$(git ls-files --deleted 2>/dev/null)
-		if [[ -n "$MISSING_FILES" ]]; then
-			local FILE_COUNT
-			FILE_COUNT=$(echo "$MISSING_FILES" | wc -l | tr -d ' ')
-			echo "❌ ERROR: Repository ${REPO_NAMES[idx]} is corrupt - $FILE_COUNT missing tracked file(s)"
-			echo "$MISSING_FILES" | head -3
-			echo ""
-			echo "Fix with: cd ${REPO_PATHS[idx]} && git restore ."
-			exit 1
-		fi
 		
 		# Uncommitted or untracked changes make the rebuild shortcut unsafe: HEAD
 		# can be unchanged while modified C++, Metal, or packaging inputs would
@@ -1137,7 +1186,7 @@ update_local_mlx_repos() {
 			REPO_DIRTY[idx]=1
 		fi
 	done
-	echo "✓ All repositories verified"
+	echo "✓ Local-change check complete"
 	cd "$ORIGINAL_DIR"
 
 	# Stage 3: Build and install packages in dependency order (mlx → mlx-vlm).
@@ -1253,6 +1302,7 @@ update_local_mlx_repos() {
 
 		if "${INSTALL_CMD[@]}"; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
+			COMPLETED_STEPS+=("built and installed ${REPO_NAMES[idx]} from ${REPO_PATHS[idx]}")
 			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 				metal_compiler_version > "$(mlx_build_toolchain_stamp "${REPO_PATHS[idx]}")"
 				pin_local_mlx_build
@@ -1349,10 +1399,140 @@ verify_local_installs_survived_reconcile() {
 	done
 }
 
-# Clean build artifacts if requested
-if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then
-	clean_local_mlx_builds
-fi
+# Repository checks that need no pull or build, run before the first change
+# so a broken checkout stops the run while nothing has been touched. What can
+# only be known after a pull (whether HEAD moved, whether the build matches)
+# stays at its stage in update_local_mlx_repos.
+# - Malformed refs: iCloud Drive ("Desktop & Documents") leaves conflict
+#   copies named "<name> 2.<ext>"; under .git/refs a name with a space is a
+#   malformed ref git fails on ("fatal: bad object refs/heads/main 2").
+# - Suspected conflict copies in the working tree only warn (see
+#   find_suspected_conflict_copies).
+# - Missing tracked files mean a corrupt checkout.
+# - Build requirements (CMake, Xcode, SDK, Metal toolchain) when mlx is local.
+preflight_local_mlx_repos() {
+	local parent_dir repo repo_path
+	parent_dir="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	for repo in mlx mlx-vlm; do
+		repo_path="$parent_dir/$repo"
+		[[ -d "$repo_path/.git" ]] || continue
+
+		local broken_refs
+		broken_refs="$(find_malformed_git_refs "$repo_path")"
+		if [[ -n "$broken_refs" ]]; then
+			echo ""
+			echo "❌ $repo has malformed git refs (names with a space); stopping."
+			printf '%s\n' "$broken_refs" | while IFS= read -r ref; do
+				echo "     $ref"
+			done
+			echo "   Ref names cannot contain spaces, so git fails on them (\"bad object\")."
+			echo "   \"<name> 2\" is how iCloud Drive names a conflict copy; if the un-numbered"
+			echo "   ref beside it is intact, delete the numbered file."
+			echo "   Keeping git checkouts outside iCloud-synced folders prevents this."
+			echo "   Nothing was changed."
+			return 1
+		fi
+
+		local suspected_copies copy_count
+		suspected_copies="$(find_suspected_conflict_copies "$repo_path")"
+		if [[ -n "$suspected_copies" ]]; then
+			copy_count="$(printf '%s\n' "$suspected_copies" | wc -l | tr -d ' ')"
+			echo "⚠️  $repo: $copy_count untracked file(s) named like iCloud conflict copies"
+			echo "   (\"<name> 2.<ext>\" beside an existing \"<name>.<ext>\"), e.g."
+			printf '%s\n' "$suspected_copies" | head -3 | while IFS= read -r copy; do
+				echo "     $copy"
+			done
+			echo "   If they are copies, deleting them stops the checkout looking modified"
+			echo "   (which forces a rebuild). Continuing."
+		fi
+
+		local missing_files file_count
+		missing_files="$(git -C "$repo_path" ls-files --deleted 2>/dev/null)"
+		if [[ -n "$missing_files" ]]; then
+			file_count="$(printf '%s\n' "$missing_files" | wc -l | tr -d ' ')"
+			echo "❌ ERROR: Repository $repo is corrupt - $file_count missing tracked file(s)"
+			printf '%s\n' "$missing_files" | head -3
+			echo ""
+			echo "Fix with: cd $repo_path && git restore ."
+			echo "Nothing was changed."
+			return 1
+		fi
+	done
+
+	if [[ -d "$parent_dir/mlx/.git" ]]; then
+		echo ""
+		echo "Verifying build requirements for MLX..."
+		if ! check_mlx_build_requirements; then
+			echo ""
+			echo "❌ Build requirements not met. Cannot build MLX. Nothing was changed."
+			return 1
+		fi
+		echo ""
+	fi
+}
+
+# State the run's intended changes before making any of them.
+report_update_plan() {
+	local system_packages="Homebrew"
+	if [[ "$UPDATE_ENV_TYPE" == "conda" ]]; then
+		system_packages="conda base, conda env '$CONDA_ENV' (conda-owned packages only), Homebrew"
+	elif [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
+		system_packages="conda base, Homebrew"
+	fi
+	[[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]] || system_packages="skipped (UPDATE_SYSTEM_PACKAGES=0)"
+	local node_tooling="skipped (npm not found)"
+	if command -v npm >/dev/null 2>&1; then
+		node_tooling="markdownlint-cli2@latest"
+		[[ "${UPDATE_NODE_TOOLING:-1}" == "1" ]] || node_tooling="from package-lock.json (UPDATE_NODE_TOOLING=0)"
+	fi
+	local mlx_source="PyPI (unless a local dev build is detected)"
+	if local_mlx_repos_present; then
+		mlx_source="pull and rebuild the local checkouts in $(cd "$SCRIPT_DIR/../../.." && pwd)"
+	fi
+	[[ "${SKIP_MLX:-0}" == "1" ]] && mlx_source="$mlx_source; PyPI MLX updates skipped (SKIP_MLX=1)"
+	echo ""
+	echo "[update.sh] Target: $UPDATE_ENV_TYPE env '$UPDATE_ENV_NAME' ($UPDATE_PYTHON)"
+	echo "[update.sh] Planned changes, in order:"
+	echo "   1. Sweep-history snapshot (SKIP_HISTORY_BACKUP=1 skips)"
+	echo "   2. Stale pip '~' backups removed (CLEAN_PIP_INVALID_DISTS=0 skips)"
+	echo "   3. System packages: $system_packages"
+	echo "   4. Node tooling: $node_tooling"
+	echo "   5. Packaging tools: pip, wheel, setuptools, build, pyrefly"
+	echo "   6. MLX: $mlx_source"
+	echo "   7. Project reinstall: $INSTALL_GROUPS, then pip check and validate_env"
+	echo ""
+}
+
+# Each change runs as a named step so a failure can say what had already
+# changed. The pin-file cleanup trap is chained in, not replaced.
+COMPLETED_STEPS=()
+CURRENT_STEP=""
+run_step() {
+	CURRENT_STEP="$1"
+	shift
+	"$@"
+	COMPLETED_STEPS+=("$CURRENT_STEP")
+	CURRENT_STEP=""
+}
+
+report_update_outcome() {
+	local status=$?
+	cleanup_local_mlx_constraint
+	[[ $status -eq 0 ]] && return 0
+	echo ""
+	if [[ ${#COMPLETED_STEPS[@]} -eq 0 && -z "$CURRENT_STEP" ]]; then
+		echo "[update.sh] Stopped (exit $status) before changing anything."
+		return 0
+	fi
+	echo "[update.sh] Stopped (exit $status)."
+	if [[ ${#COMPLETED_STEPS[@]} -gt 0 ]]; then
+		echo "   Completed before the stop:"
+		printf '     - %s\n' "${COMPLETED_STEPS[@]}"
+	fi
+	if [[ -n "$CURRENT_STEP" ]]; then
+		echo "   Failed during (may be partly applied): $CURRENT_STEP"
+	fi
+}
 
 # Detection is separate from mutation so the updater runs as an ordinary
 # command: under `set -e` any failure inside it (build, install, or editable
@@ -1368,13 +1548,109 @@ local_mlx_repos_present() {
 	return 1
 }
 
+# Update MLX from PyPI unless skipped, or drop the PyPI Metal backend that a
+# local build makes stale.
+update_mlx_from_pypi_or_preserve_local() {
+	if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
+		if [[ "${SKIP_MLX:-0}" == "1" ]]; then
+			echo "[update.sh] Skipping PyPI MLX updates (SKIP_MLX=1 environment variable set)"
+		elif [[ $SKIP_MLX_PYPI -eq 1 ]]; then
+			echo "[update.sh] Skipping PyPI MLX updates (using local development builds)"
+			# Remove stale mlx-metal from PyPI when using local builds
+			# (local builds compile their own Metal backend). Guarded on mlx itself
+			# being editable/dev: if mlx is a PyPI wheel, mlx-metal is its backend
+			# and removing it would break the runtime.
+			local MLX_IS_LOCAL_BUILD=0
+			local MLX_INSTALLED_VERSION
+			MLX_INSTALLED_VERSION="$(get_installed_distribution_version mlx)"
+			if [[ -n "$(get_editable_project_location mlx)" ]] ||
+				[[ "$MLX_INSTALLED_VERSION" == *".dev"* ]] ||
+				[[ "$MLX_INSTALLED_VERSION" == *"+"* ]]; then
+				MLX_IS_LOCAL_BUILD=1
+			fi
+			if [[ $MLX_IS_LOCAL_BUILD -eq 1 ]] && pip show mlx-metal >/dev/null 2>&1; then
+				echo "[update.sh] Removing stale mlx-metal PyPI package (not needed with local builds)..."
+				pip uninstall -y mlx-metal || true
+			fi
+		fi
+	else
+		echo "[update.sh] Updating MLX packages from PyPI to latest..."
+		# Explicitly upgrade MLX ecosystem from PyPI, triggering eager transitive upgrades
+		# mlx-metal is the Metal GPU backend - must be explicitly installed
+		pip_install mlx mlx-metal mlx-vlm
+	fi
+}
+
+# ── Preflight: nothing in this section changes the system ──────────────────
+
+UPDATE_ENV_TYPE=""
+UPDATE_ENV_NAME=""
+UPDATE_PYTHON=""
+target_status=0
+resolve_update_target || target_status=$?
+if [[ $target_status -eq 2 ]]; then
+	echo "⚠️  WARNING: You don't appear to be in a virtual environment!"
+	echo "   (No VIRTUAL_ENV or CONDA_DEFAULT_ENV detected, and conda is not installed)"
+	echo ""
+	echo "   This script will update packages globally with $UPDATE_PYTHON."
+	echo "   It's strongly recommended to activate a virtual environment first:"
+	echo ""
+	echo "   • venv/virtualenv: source /path/to/venv/bin/activate"
+	echo ""
+	read -p "   Continue anyway? [y/N] " -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo "[update.sh] Aborted by user."
+		exit 1
+	fi
+	echo "[update.sh] Proceeding with global installation (user confirmed)..."
+elif [[ $target_status -ne 0 ]]; then
+	exit 1
+fi
+
+# Every Python and pip call below goes to the resolved target interpreter,
+# whatever else PATH holds.
+python() { "$UPDATE_PYTHON" "$@"; }
+pip() { "$UPDATE_PYTHON" -m pip "$@"; }
+
+preflight_local_mlx_repos
+report_update_plan
+trap report_update_outcome EXIT
+
+# ── Changes ────────────────────────────────────────────────────────────────
+
+run_step "sweep-history snapshot" backup_run_history
+run_step "stale pip backup cleanup" cleanup_pip_invalid_distribution_backups
+
+if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
+	run_step "conda base and environment updates" update_conda_packages
+	run_step "Homebrew update and upgrade" update_homebrew
+else
+	echo "[update.sh] Skipping conda base/environment package updates (UPDATE_SYSTEM_PACKAGES=0)"
+	echo "[update.sh] Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)"
+fi
+
+if command -v npm >/dev/null 2>&1; then
+	run_step "repo-local markdownlint tooling" update_node_tooling
+else
+	echo "[update.sh] npm not found; skipping repo-local markdownlint install"
+	echo "   (Install Node.js/npm for markdown linting: brew install node)"
+fi
+
+run_step "packaging tools (pip, wheel, setuptools, build, pyrefly)" update_packaging_tools
+
+# Clean build artifacts if requested
+if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then
+	run_step "local MLX build-artifact cleanup" clean_local_mlx_builds
+fi
+
 # Determine if we should skip PyPI MLX updates
 SKIP_MLX_PYPI=0
 LOCAL_MLX_READY=0
 VERIFIED_LOCAL_INSTALLS=()
 
 if local_mlx_repos_present; then
-	update_local_mlx_repos
+	run_step "local MLX repositories (pull, build, install)" update_local_mlx_repos
 	SKIP_MLX_PYPI=1
 	echo "[update.sh] Local MLX builds updated - skipping PyPI updates"
 else
@@ -1395,36 +1671,9 @@ else
 	fi
 fi
 
-# Update MLX from PyPI if not skipped
-if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
-	if [[ "${SKIP_MLX:-0}" == "1" ]]; then
-		echo "[update.sh] Skipping PyPI MLX updates (SKIP_MLX=1 environment variable set)"
-	elif [[ $SKIP_MLX_PYPI -eq 1 ]]; then
-		echo "[update.sh] Skipping PyPI MLX updates (using local development builds)"
-		# Remove stale mlx-metal from PyPI when using local builds
-		# (local builds compile their own Metal backend). Guarded on mlx itself
-		# being editable/dev: if mlx is a PyPI wheel, mlx-metal is its backend
-		# and removing it would break the runtime.
-		MLX_IS_LOCAL_BUILD=0
-		MLX_INSTALLED_VERSION="$(get_installed_distribution_version mlx)"
-		if [[ -n "$(get_editable_project_location mlx)" ]] ||
-			[[ "$MLX_INSTALLED_VERSION" == *".dev"* ]] ||
-			[[ "$MLX_INSTALLED_VERSION" == *"+"* ]]; then
-		MLX_IS_LOCAL_BUILD=1
-		fi
-		if [[ $MLX_IS_LOCAL_BUILD -eq 1 ]] && pip show mlx-metal >/dev/null 2>&1; then
-			echo "[update.sh] Removing stale mlx-metal PyPI package (not needed with local builds)..."
-			pip uninstall -y mlx-metal || true
-		fi
-	fi
-else
-	echo "[update.sh] Updating MLX packages from PyPI to latest..."
-	# Explicitly upgrade MLX ecosystem from PyPI, triggering eager transitive upgrades
-	# mlx-metal is the Metal GPU backend - must be explicitly installed
-	pip_install mlx mlx-metal mlx-vlm
-fi
+run_step "MLX packages from PyPI, or stale mlx-metal removal" update_mlx_from_pypi_or_preserve_local
 
-reconcile_project_environment_from_pyproject
+run_step "project reinstall from pyproject.toml" reconcile_project_environment_from_pyproject
 verify_local_installs_survived_reconcile
 
 if [[ $LOCAL_MLX_READY -eq 1 ]]; then

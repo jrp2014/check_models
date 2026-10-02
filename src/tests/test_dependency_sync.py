@@ -1846,7 +1846,10 @@ def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
     assert 'pip_install_tool "setuptools>=80"' in update_script
 
     local_update_pos = main_flow.index("update_local_mlx_repos")
-    pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-vlm")
+    pypi_update_pos = main_flow.index("update_mlx_from_pypi_or_preserve_local")
+    assert "pip_install mlx mlx-metal mlx-vlm" in _update_script_function(
+        "update_mlx_from_pypi_or_preserve_local"
+    )
     reconcile_pos = main_flow.index("reconcile_project_environment_from_pyproject")
     local_smoke_pos = main_flow.index("run_local_mlx_backend_smoke")
     critical_check_pos = main_flow.index("[update.sh] Verifying critical packages")
@@ -3077,3 +3080,455 @@ pip_install somepkg
         script.index('echo "\u26a0\ufe0f  Failed to install ${REPO_NAMES[idx]}"') :
     ]
     assert 'preserve_local_mlx_after_failed_build "${REPO_PATHS[idx]}"' in failure_branch
+
+
+# ---------------------------------------------------------------------------
+# Updater environment targeting, conda ownership, preflight ordering
+# ---------------------------------------------------------------------------
+
+
+def _fake_tool_bin(tmp_path: Path, log: Path, names: Iterable[str]) -> Path:
+    """Fake executables that only record their invocation in ``log``."""
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir(exist_ok=True)
+    for name in names:
+        safe_io.write_text_no_follow(
+            fake_bin / name, f'#!/bin/bash\necho "{name} $*" >> "{log}"\n', mode=0o755
+        )
+    return fake_bin
+
+
+def _fake_python_prefix(tmp_path: Path, name: str) -> Path:
+    """An env prefix whose bin/python is an executable stub."""
+    prefix = tmp_path / "envs" / name
+    (prefix / "bin").mkdir(parents=True)
+    safe_io.write_text_no_follow(prefix / "bin" / "python", "#!/bin/bash\n", mode=0o755)
+    return prefix
+
+
+def _resolve_update_target(env: Mapping[str, str], path: str) -> tuple[int, dict[str, str], str]:
+    """Run update.sh's target resolution with exactly ``env``; return status, target, output."""
+    function = _update_script_function("resolve_update_target")
+    driver = (
+        f"{function}\n"
+        "status=0; resolve_update_target || status=$?\n"
+        'echo "STATUS=$status"; echo "TYPE=${UPDATE_ENV_TYPE:-}"\n'
+        'echo "NAME=${UPDATE_ENV_NAME:-}"; echo "PYTHON=${UPDATE_PYTHON:-}"\n'
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", driver],
+        capture_output=True,
+        text=True,
+        check=True,
+        env={"PATH": path, "CONDA_ENV": "mlx-vlm", **env},
+    )
+    fields = dict(
+        line.split("=", 1) for line in result.stdout.splitlines() if line.split("=", 1)[0].isupper()
+    )
+    return int(fields.pop("STATUS")), fields, result.stdout
+
+
+def test_update_target_is_the_active_conda_env_when_it_matches(tmp_path: Path) -> None:
+    """The correct env active: its own interpreter is the target, whatever PATH holds."""
+    prefix = _fake_python_prefix(tmp_path, "mlx-vlm")
+    status, target, _ = _resolve_update_target(
+        {"CONDA_DEFAULT_ENV": "mlx-vlm", "CONDA_PREFIX": str(prefix)}, "/usr/bin:/bin"
+    )
+    assert status == 0
+    assert target == {"TYPE": "conda", "NAME": "mlx-vlm", "PYTHON": f"{prefix}/bin/python"}
+
+
+def test_update_target_refuses_a_different_active_conda_env(tmp_path: Path) -> None:
+    """Regression: CONDA_ENV=review-target with mlx-vlm active updated mlx-vlm."""
+    prefix = _fake_python_prefix(tmp_path, "mlx-vlm")
+    status, target, output = _resolve_update_target(
+        {
+            "CONDA_DEFAULT_ENV": "mlx-vlm",
+            "CONDA_PREFIX": str(prefix),
+            "CONDA_ENV": "review-target",
+        },
+        "/usr/bin:/bin",
+    )
+    assert status == 1
+    assert target["PYTHON"] == ""
+    assert "'mlx-vlm' is active, but the update target is 'review-target'" in output
+    assert "Nothing was changed" in output
+
+
+def test_update_target_with_no_env_active(tmp_path: Path) -> None:
+    """No env active: refuse when conda could provide the target; else ask for system Python."""
+    log = tmp_path / "calls.log"
+    with_conda = _fake_tool_bin(tmp_path, log, ["conda"])
+    status, target, output = _resolve_update_target({}, f"{with_conda}:/usr/bin:/bin")
+    assert status == 1
+    assert target["PYTHON"] == ""
+    assert "conda activate mlx-vlm" in output
+
+    system_bin = tmp_path / "system-bin"
+    system_bin.mkdir()
+    safe_io.write_text_no_follow(system_bin / "python3", "#!/bin/bash\n", mode=0o755)
+    status, target, _ = _resolve_update_target({}, str(system_bin))
+    assert status == 2, "a system Python is only used after the caller confirms"
+    assert target == {"TYPE": "system", "NAME": "system", "PYTHON": f"{system_bin}/python3"}
+    assert not log.exists(), "resolution must not run conda"
+
+
+def test_update_target_is_an_active_venv(tmp_path: Path) -> None:
+    """An active venv is the target, as in the Makefiles."""
+    prefix = _fake_python_prefix(tmp_path, "dev-venv")
+    status, target, _ = _resolve_update_target({"VIRTUAL_ENV": str(prefix)}, "/usr/bin:/bin")
+    assert status == 0
+    assert target == {"TYPE": "venv", "NAME": "dev-venv", "PYTHON": f"{prefix}/bin/python"}
+
+
+def _copy_update_script_layout(tmp_path: Path) -> Path:
+    """update.sh in a check_models/src/tools layout whose parent holds no MLX checkouts."""
+    tools_dir = tmp_path / "work" / "check_models" / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    shutil.copy2(PKG_ROOT / "tools" / "update.sh", tools_dir / "update.sh")
+    return tools_dir / "update.sh"
+
+
+def test_update_script_mismatched_env_stops_before_any_change(tmp_path: Path) -> None:
+    """The whole script, not just the resolver: no tool runs when the target is wrong."""
+    log = tmp_path / "calls.log"
+    fake_bin = _fake_tool_bin(tmp_path, log, ["conda", "brew", "npm", "pip", "python", "python3"])
+    script = _copy_update_script_layout(tmp_path)
+    result = subprocess.run(  # noqa: S603 - fixed bash runs a copied repo script with fake tools
+        ["/bin/bash", str(script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        stdin=subprocess.DEVNULL,
+        env={
+            "PATH": f"{fake_bin}:/usr/bin:/bin",
+            "HOME": str(tmp_path),
+            "CONDA_DEFAULT_ENV": "mlx-vlm",
+            "CONDA_PREFIX": str(_fake_python_prefix(tmp_path, "mlx-vlm")),
+            "CONDA_ENV": "review-target",
+        },
+    )
+    assert result.returncode == 1
+    assert "update target is 'review-target'" in result.stdout
+    assert not log.exists(), safe_io.read_text_no_follow(log)
+
+
+def test_update_script_broken_checkout_stops_in_preflight(tmp_path: Path) -> None:
+    """Repository problems that need no pull stop the run before conda, brew, npm or pip."""
+    log = tmp_path / "calls.log"
+    fake_bin = _fake_tool_bin(tmp_path, log, ["conda", "brew", "npm", "pip"])
+    script = _copy_update_script_layout(tmp_path)
+    mlx_vlm = tmp_path / "work" / "mlx-vlm"
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created directory
+        ["git", "init", "-q", str(mlx_vlm)],  # noqa: S607 - git from PATH, as update.sh uses it
+        check=True,
+    )
+    refs = mlx_vlm / ".git" / "refs" / "heads"
+    refs.mkdir(parents=True, exist_ok=True)
+    safe_io.write_text_no_follow(refs / "main 2", "b" * 40 + "\n")
+    venv = _fake_python_prefix(tmp_path, "venv")
+    result = subprocess.run(  # noqa: S603 - fixed bash runs a copied repo script with fake tools
+        ["/bin/bash", str(script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        stdin=subprocess.DEVNULL,
+        env={"PATH": f"{fake_bin}:/usr/bin:/bin", "HOME": str(tmp_path), "VIRTUAL_ENV": str(venv)},
+    )
+    assert result.returncode == 1
+    assert "mlx-vlm has malformed git refs" in result.stdout
+    assert "Nothing was changed." in result.stdout
+    assert "Planned changes" not in result.stdout
+    assert not log.exists(), safe_io.read_text_no_follow(log)
+
+
+def test_update_script_failure_reports_the_steps_already_completed() -> None:
+    """A failing step names itself and every step that finished before it."""
+    functions = "".join(
+        _update_script_function(name) for name in ("run_step", "report_update_outcome")
+    )
+    driver = (
+        "set -euo pipefail\n"
+        "cleanup_local_mlx_constraint() { :; }\n"
+        'COMPLETED_STEPS=()\nCURRENT_STEP=""\n'
+        f"{functions}"
+        "trap report_update_outcome EXIT\n"
+        'run_step "conda base and environment updates" true\n'
+        'run_step "Homebrew update and upgrade" false\n'
+        'run_step "never reached" true\n'
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
+        ["/bin/bash", "-c", driver], capture_output=True, text=True, check=False
+    )
+    assert result.returncode == 1
+    assert (
+        "Completed before the stop:\n     - conda base and environment updates\n" in result.stdout
+    )
+    assert "Failed during (may be partly applied): Homebrew update and upgrade" in result.stdout
+    assert "never reached" not in result.stdout
+
+
+def test_update_script_main_flow_runs_preflight_before_the_first_change() -> None:
+    """Target resolution, repo checks and the plan precede every changing step."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    main_flow = update_script[update_script.index("# ── Preflight") :]
+    first_change = main_flow.index("run_step ")
+    for preflight in (
+        "resolve_update_target ||",
+        "preflight_local_mlx_repos",
+        "report_update_plan",
+    ):
+        assert main_flow.index(preflight) < first_change, preflight
+    assert main_flow.index("trap report_update_outcome EXIT") < first_change
+    assert 'pip() { "$UPDATE_PYTHON" -m pip "$@"; }' in main_flow
+
+
+def test_make_update_passes_the_resolved_target_to_the_updater() -> None:
+    """``make update`` hands update.sh the same CONDA_ENV the other targets announce."""
+    result = subprocess.run(  # noqa: S603 - fixed make dry run of a repo target
+        ["make", "-n", "-C", str(PKG_ROOT), "update", "CONDA_ENV=review-target"],  # noqa: S607 - make from PATH
+        capture_output=True,
+        text=True,
+        check=True,
+        env={**os.environ, "CONDA_DEFAULT_ENV": "mlx-vlm"},
+    )
+    assert "CONDA_ENV='review-target' bash tools/update.sh" in result.stdout
+
+
+_CONDA_RECORDS = [
+    {"name": "openssl", "channel": "conda-forge", "platform": "osx-arm64"},
+    {"name": "mlx", "channel": "pypi", "platform": "pypi", "build_string": "pypi_0"},
+    {"name": "numpy", "channel": "conda-forge", "platform": "osx-arm64"},
+    {"name": "numpy", "channel": "pypi", "platform": "pypi", "build_string": "pypi_0"},
+    {"name": "typing_extensions", "channel": "conda-forge", "platform": "noarch"},
+]
+
+
+def _conda_update_decision(
+    tmp_path: Path, changes: list[str], records: object, *, force: str = "0"
+) -> tuple[dict[str, str], str]:
+    """Run the extracted ownership lookup and decision; return owners and the decision."""
+    records_file = tmp_path / "records.json"
+    safe_io.write_text_no_follow(
+        records_file, records if isinstance(records, str) else json.dumps(records)
+    )
+    functions = "".join(
+        _update_script_function(name)
+        for name in ("conda_change_ownership", "conda_update_all_decision")
+    )
+    driver = (
+        f'python() {{ "{sys.executable}" "$@"; }}\n'
+        f"{functions}"
+        'ownership="$(conda_change_ownership "$@")"\n'
+        'echo "$ownership"\n'
+        f'echo "DECISION $(conda_update_all_decision {force} "$ownership")"\n'
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
+        ["/bin/bash", "-c", driver, "_", str(records_file), *changes],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    lines = dict(line.split(" ", 1) for line in result.stdout.splitlines())
+    return lines, lines.pop("DECISION")
+
+
+def test_conda_update_proceeds_when_every_change_is_conda_owned(tmp_path: Path) -> None:
+    """Regression: pip lists conda's own distributions, so every update looked like a conflict."""
+    owners, decision = _conda_update_decision(
+        tmp_path, ["openssl", "typing-extensions"], _CONDA_RECORDS
+    )
+    assert owners == {"openssl": "conda", "typing-extensions": "conda"}
+    assert decision == "update"
+
+
+def test_conda_update_skips_a_pip_owned_change(tmp_path: Path) -> None:
+    """A distribution only pip installed is protected; CONDA_UPDATE_ALL=1 overrides."""
+    owners, decision = _conda_update_decision(tmp_path, ["openssl", "mlx"], _CONDA_RECORDS)
+    assert owners == {"openssl": "conda", "mlx": "pip"}
+    assert decision == "skip"
+    _, forced = _conda_update_decision(tmp_path, ["mlx"], _CONDA_RECORDS, force="1")
+    assert forced == "update"
+
+
+@pytest.mark.parametrize(
+    ("changes", "records", "owner"),
+    [
+        pytest.param(["numpy"], _CONDA_RECORDS, "ambiguous", id="pip-over-conda"),
+        pytest.param(["libfoo"], _CONDA_RECORDS, "ambiguous", id="no-record"),
+        pytest.param(["openssl"], "conda list failed\n", "ambiguous", id="unreadable-records"),
+    ],
+)
+def test_conda_update_skips_when_ownership_is_ambiguous(
+    tmp_path: Path, changes: list[str], records: object, owner: str
+) -> None:
+    """Uncertain ownership keeps the conservative outcome."""
+    owners, decision = _conda_update_decision(tmp_path, changes, records)
+    assert owners == dict.fromkeys(changes, owner)
+    assert decision == "skip"
+
+
+def test_conda_update_skips_without_an_ownership_answer() -> None:
+    """No ownership lines (a failed lookup) is not evidence that conda owns anything."""
+    function = _update_script_function("conda_update_all_decision")
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", f'{function}\nconda_update_all_decision 0 ""'],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.stdout.strip() == "skip"
+
+
+# ---------------------------------------------------------------------------
+# Commit hygiene: direct runs must not widen what the user staged
+# ---------------------------------------------------------------------------
+
+
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(  # noqa: S603 - fixed git command on a test-created repo
+        ["git", "-C", str(repo), *args],  # noqa: S607 - git from PATH
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+
+
+def _hygiene_repo(tmp_path: Path) -> Path:
+    """A disposable repo carrying the hygiene script, with one committed baseline."""
+    repo = tmp_path / "repo"
+    tools_dir = repo / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    for name in ("run_commit_hygiene.sh", "common_quality.sh"):
+        shutil.copy2(PKG_ROOT / "tools" / name, tools_dir / name)
+    _git(tmp_path, "init", "-q", str(repo))
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test")
+    safe_io.write_text_no_follow(repo / "src" / "app.py", "value = 0\n")
+    safe_io.write_text_no_follow(repo / "src" / "notes.md", "# Notes\n\nOld.\n")
+    safe_io.write_text_no_follow(repo / "src" / "README.md", "# Readme\n")
+    safe_io.write_text_no_follow(repo / "src" / "pyproject.toml", '[project]\nname = "x"\n')
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "baseline")
+    return repo
+
+
+def _run_hygiene(repo: Path) -> subprocess.CompletedProcess[str]:
+    # The fallback resolves $CONDA_PREFIX/bin/python, i.e. this test's interpreter.
+    return subprocess.run(  # noqa: S603 - fixed bash runs the copied repo script
+        ["/bin/bash", str(repo / "src" / "tools" / "run_commit_hygiene.sh")],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=repo,
+        env={
+            **os.environ,
+            "CONDA_ENV": "no-such-env",
+            "CONDA_PREFIX": str(Path(sys.executable).parent.parent),
+            "QUALITY_ALLOW_PYTHON_FALLBACK": "1",
+        },
+    )
+
+
+def test_direct_hygiene_run_still_fixes_fully_staged_files(tmp_path: Path) -> None:
+    """With nothing unstaged, the fixer's change is staged as before."""
+    repo = _hygiene_repo(tmp_path)
+    safe_io.write_text_no_follow(repo / "src" / "app.py", "value=1\n")
+    _git(repo, "add", "src/app.py")
+
+    result = _run_hygiene(repo)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert _git(repo, "show", ":src/app.py") == "value = 1\n"
+    assert _git(repo, "diff", "--name-only") == ""
+
+
+@pytest.mark.parametrize(
+    ("path", "staged", "unstaged"),
+    [
+        pytest.param("src/app.py", "value = 1\n", "value = 2\n", id="python"),
+        pytest.param(
+            "src/notes.md", "# Notes\n\nStaged.\n", "# Notes\n\nUnstaged.\n", id="markdown"
+        ),
+    ],
+)
+def test_direct_hygiene_run_preserves_partial_staging(
+    tmp_path: Path, path: str, staged: str, unstaged: str
+) -> None:
+    """Regression: a staged ``value = 1`` became ``value = 2`` from an unstaged edit."""
+    repo = _hygiene_repo(tmp_path)
+    safe_io.write_text_no_follow(repo / path, staged)
+    _git(repo, "add", path)
+    safe_io.write_text_no_follow(repo / path, unstaged)
+
+    result = _run_hygiene(repo)
+
+    assert result.returncode == 1
+    assert f"   - {path}" in result.stdout
+    assert _git(repo, "show", f":{path}") == staged
+    assert safe_io.read_text_no_follow(repo / path) == unstaged
+
+
+def test_direct_hygiene_run_does_not_stage_unstaged_readme_edits(tmp_path: Path) -> None:
+    """README sync regenerates and stages src/README.md, so its own edits must be staged first."""
+    repo = _hygiene_repo(tmp_path)
+    safe_io.write_text_no_follow(
+        repo / "src" / "pyproject.toml", '[project]\nname = "x"\nversion = "1"\n'
+    )
+    _git(repo, "add", "src/pyproject.toml")
+    safe_io.write_text_no_follow(repo / "src" / "README.md", "# Readme\n\nUnstaged draft.\n")
+
+    result = _run_hygiene(repo)
+
+    assert result.returncode == 1
+    assert "src/README.md (regenerated from the staged src/pyproject.toml)" in result.stdout
+    assert _git(repo, "diff", "--cached", "--name-only") == "src/pyproject.toml\n"
+    assert (
+        safe_io.read_text_no_follow(repo / "src" / "README.md") == "# Readme\n\nUnstaged draft.\n"
+    )
+
+
+# ---------------------------------------------------------------------------
+# bootstrap-dev: one hook install, and success means the environment validated
+# ---------------------------------------------------------------------------
+
+
+def _run_bootstrap(
+    tmp_path: Path, *, validation_status: int
+) -> tuple[subprocess.CompletedProcess[str], list[str]]:
+    log = tmp_path / "python-calls.log"
+    fake_python = tmp_path / "fake-python"
+    safe_io.write_text_no_follow(
+        fake_python,
+        "#!/bin/bash\n"
+        f'echo "$*" >> "{log}"\n'
+        f'if [ "$*" = "-m tools.validate_env" ]; then exit {validation_status}; fi\n',
+        mode=0o755,
+    )
+    result = subprocess.run(  # noqa: S603 - fixed make target with a fake interpreter
+        ["make", "-s", "-C", str(PKG_ROOT), "bootstrap-dev", f"PYTHON={fake_python}"],  # noqa: S607 - make from PATH
+        capture_output=True,
+        text=True,
+        check=False,
+        # A venv selects RUN_PY=$(PYTHON); no npm on PATH makes markdownlint the optional omission.
+        env={"PATH": "/usr/bin:/bin", "HOME": str(tmp_path), "VIRTUAL_ENV": str(tmp_path / "venv")},
+    )
+    return result, safe_io.read_text_no_follow(log).splitlines()
+
+
+def test_bootstrap_fails_when_environment_validation_fails(tmp_path: Path) -> None:
+    """Required validation failing must fail the target, never print "Bootstrap complete"."""
+    result, calls = _run_bootstrap(tmp_path, validation_status=1)
+    assert result.returncode != 0
+    assert "Bootstrap failed" in result.stdout
+    assert "Bootstrap complete" not in result.stdout
+    assert calls.count("-m pre_commit install") == 1
+
+
+def test_bootstrap_reports_optional_omissions_on_success(tmp_path: Path) -> None:
+    """Optional steps that were skipped are summarised after a successful bootstrap."""
+    result, calls = _run_bootstrap(tmp_path, validation_status=0)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Bootstrap complete, with an optional step skipped:" in result.stdout
+    assert "npm not found" in result.stdout
+    assert calls.count("-m pre_commit install") == 1

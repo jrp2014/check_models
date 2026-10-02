@@ -768,7 +768,9 @@ pre-commit run --hook-stage pre-push --all-files
 
 The commit-stage hook is intentionally staged-file based; run it by making a
 normal commit, or call `bash src/tools/run_commit_hygiene.sh` directly after
-staging files.
+staging files. Run directly, it refuses (and changes nothing) while a file it
+would check or re-stage also has unstaged edits, since its fixers re-stage
+whole files; pre-commit stashes those edits for you.
 
 
 ### Manual Installation
