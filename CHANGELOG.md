@@ -696,6 +696,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Crash attribution no longer reads the interpreter's environment path as
+  a package: with a conda environment named `mlx-vlm`, every frame under
+  `envs/mlx-vlm/…/site-packages/` matched mlx-vlm, so a crash raised in
+  huggingface_hub or transformers code (Llama-4-Scout's config validation)
+  was labelled an mlx-vlm fault. Crash drafts now say when the exception
+  was raised in another package's code, listing its innermost library
+  frames, and the maintainer verdict counts only crashes in mlx-vlm (or of
+  unknown origin) as mlx-vlm's action, naming the rest separately.
 - Image capability is also read one sub-config down: composite checkpoints
   keep their vision settings in a `*_config` section (Qwen3-Omni has
   `thinker_config.vision_config` and an empty top-level `vision_config`),

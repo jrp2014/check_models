@@ -8409,3 +8409,68 @@ def test_text_divergence_is_withheld_for_incomparable_runs() -> None:
     assert not comparison.comparable
     assert comparison.text_divergence == ()
     assert comparison.text_changed_models == ()
+
+
+_CONFIG_CRASH_TRACEBACK = (
+    "Traceback (most recent call last):\n"
+    '  File "/Users/u/src/check_models/src/check_models.py", line 16460, in process_image\n'
+    '  File "/Users/u/src/mlx-vlm/mlx_vlm/utils.py", line 980, in load\n'
+    '  File "/env/lib/python3.14/site-packages/transformers/configuration_utils.py", line 946\n'
+    '  File "/env/lib/python3.14/site-packages/transformers/models/llama4/'
+    'configuration_llama4.py", line 258, in __post_init__\n'
+    '  File "/env/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 146\n'
+    "TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)\n"
+)
+
+
+def test_crash_drafts_name_the_package_whose_code_raised() -> None:
+    """A crash raised in another library says so, with its innermost library frames."""
+    assert check_models._library_frames(_CONFIG_CRASH_TRACEBACK) == (
+        "huggingface_hub/dataclasses.py",
+        "transformers/models/llama4/configuration_llama4.py",
+        "transformers/configuration_utils.py",
+    )
+    section = check_models._checkpoint_checks_section(
+        model="org/llama4",
+        phase="model_load",
+        model_type="llama4",
+        arch_supported=True,
+        snapshot_notes=(),
+        failure_package="huggingface-hub",
+        failure_frames=check_models._library_frames(_CONFIG_CRASH_TRACEBACK),
+    )
+    text = " ".join("\n".join(check_models.render_report_markdown((section,))).split())
+    assert "The exception was raised in huggingface-hub code, not mlx-vlm's" in text
+    assert "`huggingface_hub/dataclasses.py` ← `transformers/models/llama4/" in text
+    own = check_models._checkpoint_checks_section(
+        model="org/m",
+        phase="model_load",
+        model_type="qwen2_vl",
+        arch_supported=True,
+        snapshot_notes=(),
+        failure_package="mlx-vlm",
+    )
+    assert "raised in" not in " ".join(
+        "\n".join(check_models.render_report_markdown((own,))).split()
+    )
+
+
+def test_maintainer_verdict_counts_only_crashes_in_mlx_vlm_as_its_work() -> None:
+    """A crash raised in another package's code is reported, but not as mlx-vlm's action."""
+
+    def crash(model: str, package: str) -> check_models.JsonlResultRecord:
+        record = _issue_summary_result(model, execution="crashed", usability="not_evaluated")
+        cast("dict[str, Any]", record["failure"])["package"] = package
+        return cast("check_models.JsonlResultRecord", record)
+
+    verdict = check_models._run_issue_summary_maintainer_verdict
+    line = verdict((crash("org/llama4", "huggingface-hub"),), (), None)
+    assert line == (
+        "**For mlx-vlm maintainers:** no crashes need action; 1 crash raised outside mlx-vlm "
+        "(in huggingface-hub code)."
+    )
+    mixed = verdict((crash("org/a", "mlx-vlm"), crash("org/b", "transformers")), (), None)
+    assert mixed.startswith("**For mlx-vlm maintainers:** 1 crash needs action")
+    assert "1 crash raised outside mlx-vlm (in transformers code)" in mixed
+    # Unknown origin is not ruled out as mlx-vlm's.
+    assert "1 crash needs action" in verdict((crash("org/c", "unknown"),), (), None)

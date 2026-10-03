@@ -1,5 +1,7 @@
 """Unit tests for error classification and package attribution logic."""
 
+import sys
+
 import pytest
 
 from check_models import (
@@ -161,3 +163,21 @@ def test_error_signature_normalizes_numeric_variants() -> None:
         error_traceback=None,
     )
     assert sig_a == sig_b
+
+
+def test_an_environment_named_after_a_package_does_not_claim_its_libraries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: a conda env called mlx-vlm made every site-packages frame read as mlx-vlm."""
+    monkeypatch.setattr(sys, "prefix", "/Users/u/miniconda3/envs/mlx-vlm")
+    monkeypatch.setattr(sys, "exec_prefix", "/Users/u/miniconda3/envs/mlx-vlm")
+    origin = (
+        "builtins /Users/u/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/"
+        "huggingface_hub/dataclasses.py"
+    )
+    assert _attribute_error_to_package("Field 'x' expected bool, got int", origin) == (
+        "huggingface-hub"
+    )
+    # An editable mlx-vlm checkout is still mlx-vlm.
+    checkout = "/Users/u/src/mlx-vlm/mlx_vlm/utils.py"
+    assert _attribute_error_to_package("boom", checkout) == "mlx-vlm"

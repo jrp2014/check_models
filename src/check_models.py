@@ -13862,14 +13862,33 @@ def _classify_error(error_msg: str) -> str:
     return "Error"
 
 
+def _without_interpreter_prefixes(text: str) -> str:
+    """Drop the interpreter/environment prefix from paths before package matching.
+
+    A conda environment named after a package ("envs/mlx-vlm/") put that name
+    into every installed library's frame path, so a frame in
+    site-packages/huggingface_hub/ read as mlx-vlm. Only the part from
+    site-packages/ on names the owning package.
+    """
+    prefixes = {sys.prefix, sys.base_prefix, sys.exec_prefix}
+    home = str(Path.home())
+    for prefix in sorted(prefixes, key=len, reverse=True):
+        text = text.replace(prefix, "<env>")
+        if prefix.startswith(home):
+            text = text.replace("~" + prefix[len(home) :], "<env>")
+    return text
+
+
 def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None) -> str:
     """Heuristically attribute an error to the most likely owning package.
 
     Uses ordered pattern precedence across message/traceback text so diagnostics
-    can route issue reports to the right upstream project.
+    can route issue reports to the right upstream project. Interpreter and
+    environment paths are removed first, so an environment's own name never
+    reads as a package.
     """
-    msg_lower = error_msg.lower()
-    tb_lower = (traceback_str or "").lower()
+    msg_lower = _without_interpreter_prefixes(error_msg).lower()
+    tb_lower = _without_interpreter_prefixes(traceback_str or "").lower()
     combined = msg_lower + " " + tb_lower
     # transformers_modules is the dynamic-module cache transformers uses for a
     # repo's trust_remote_code files: a frame there means the failing code
@@ -23336,6 +23355,8 @@ def _run_issue_summary_crash_section(
             tuple(str(note) for note in retained_notes) if isinstance(retained_notes, list) else ()
         ),
         level=4,
+        failure_package=failure.get("package") if failure is not None else None,
+        failure_frames=_library_frames(failure.get("traceback") if failure is not None else None),
     )
     return ReportSection(
         result["model"],
@@ -23985,6 +24006,13 @@ def _token_limit_summary(results: Sequence[JsonlResultRecord]) -> str:
     return f"{reached} ({incomplete} with incomplete output)" if reached else "0"
 
 
+def _failure_package(result: JsonlResultRecord) -> str | None:
+    """The package a crash was attributed to, as recorded."""
+    failure = result.get("failure")
+    package = failure.get("package") if isinstance(failure, dict) else None
+    return package if isinstance(package, str) else None
+
+
 def _run_issue_summary_maintainer_verdict(
     actionable: Sequence[JsonlResultRecord],
     other: Sequence[JsonlResultRecord],
@@ -23994,13 +24022,24 @@ def _run_issue_summary_maintainer_verdict(
     lead = "**For mlx-vlm maintainers:** "
     if not actionable and not other:
         return lead + "nothing to act on: no crashes, and no result points at mlx-vlm."
+    # A crash raised in another package's code (by its recorded package) is
+    # someone's work, but not mlx-vlm's; unknown origin is not ruled out.
+    in_mlx_vlm = [r for r in actionable if _failure_package(r) in _MLX_VLM_OWNED_PACKAGES]
+    elsewhere = sorted(
+        {str(_failure_package(r)) for r in actionable} - {"mlx-vlm", "unknown", "None"}
+    )
     crash_part = (
-        f"{_pluralized_count(len(actionable), 'crash', 'crashes')} "
-        f"{'needs' if len(actionable) == 1 else 'need'} action "
+        f"{_pluralized_count(len(in_mlx_vlm), 'crash', 'crashes')} "
+        f"{'needs' if len(in_mlx_vlm) == 1 else 'need'} action "
         "(see *Crashes requiring action*)"
-        if actionable
+        if in_mlx_vlm
         else "no crashes need action"
     )
+    if outside := len(actionable) - len(in_mlx_vlm):
+        crash_part += (
+            f"; {_pluralized_count(outside, 'crash', 'crashes')} raised outside mlx-vlm "
+            f"(in {', '.join(elsewhere)} code)"
+        )
     if not other:
         return lead + crash_part + "."
     other_part = (
@@ -24694,6 +24733,32 @@ def _snapshot_note_checks(snapshot_notes: Sequence[str]) -> list[str]:
     return items
 
 
+_TRACEBACK_FILE_RE: Final[re.Pattern[str]] = re.compile(r'File "([^"]+\.py)"')
+_MLX_VLM_OWNED_PACKAGES: Final[frozenset[str | None]] = frozenset({None, "mlx-vlm", "unknown"})
+
+
+def _library_frames(traceback_text: str | None, *, limit: int = 3) -> tuple[str, ...]:
+    """Innermost library files a traceback passed through, relative to site-packages.
+
+    Facts for routing a crash: which installed package's code raised it and
+    what called that code. Harness frames are left out; an editable mlx-vlm
+    checkout is shown from ``mlx_vlm/``.
+    """
+    frames: list[str] = []
+    for path in reversed(_TRACEBACK_FILE_RE.findall(traceback_text or "")):
+        if "site-packages/" in path:
+            relative = path.rsplit("site-packages/", 1)[1]
+        elif "/mlx_vlm/" in path:
+            relative = "mlx_vlm/" + path.rsplit("/mlx_vlm/", 1)[1]
+        else:
+            continue
+        if relative not in frames:
+            frames.append(relative)
+        if len(frames) == limit:
+            break
+    return tuple(frames)
+
+
 def _checkpoint_checks_section(
     *,
     model: str,
@@ -24702,6 +24767,8 @@ def _checkpoint_checks_section(
     arch_supported: bool | None,
     snapshot_notes: Sequence[str],
     level: int = 2,
+    failure_package: str | None = None,
+    failure_frames: Sequence[str] = (),
 ) -> ReportSection:
     """List the checkpoint-side checks to run before treating a crash as an mlx-vlm bug.
 
@@ -24713,6 +24780,14 @@ def _checkpoint_checks_section(
     visible.
     """
     items: list[str] = []
+    if failure_package not in _MLX_VLM_OWNED_PACKAGES:
+        path = " \u2190 ".join(f"`{frame}`" for frame in failure_frames)
+        items.append(
+            f"The exception was raised in {failure_package} code, not mlx-vlm's"
+            + (f" (innermost library frames: {path})" if path else "")
+            + ". Check the checkpoint's files against that library first, and report "
+            "there if the library is at fault."
+        )
     if arch_supported is False:
         items.append(
             f"The installed mlx-vlm has no loader for model type `{model_type}`. "
@@ -24796,6 +24871,8 @@ def _generate_github_issue_reports(
                     if result.prompt_diagnostics is not None
                     else ()
                 ),
+                failure_package=result.error_package,
+                failure_frames=_library_frames(result.error_traceback),
             ),
             _report_section(
                 "Maintainer evidence",
