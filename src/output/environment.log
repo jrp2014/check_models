@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-10-02 23:56:43 BST
+FULL ENVIRONMENT DUMP - 2026-10-04 00:22:12 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -8,7 +8,7 @@ Total packages: 166
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
-ast_serialize==0.12.0
+ast_serialize==0.12.1
 attrs==26.1.0
 blessed==1.50.0
 boolean.py==5.0
@@ -19,7 +19,7 @@ certifi==2026.7.22
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
-check_models==0.17.38
+check_models==0.17.39
 click==8.5.0
 cmake==4.4.3
 coverage==7.16.2
@@ -60,14 +60,14 @@ license-expression==30.4.4
 linkify-it-py==2.2.0
 llguidance==1.9.1
 markdown-it-py==4.2.0
-MarkupSafe==3.0.3
+MarkupSafe==3.0.4
 mcp==1.30.0
 mcp-types==2.3.0
 mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.4.dev20261002+255328713
+mlx==0.32.4.dev20261003+0e3ff3643
 mlx-audio==0.5.7
 mlx-lm==0.32.0
 mlx-vlm==0.7.4
@@ -126,7 +126,7 @@ scipy==1.18.1
 sentencepiece==0.2.2
 setuptools==84.0.0
 shellingham==1.5.4
-skylos==4.43.0
+skylos==4.43.2
 sortedcontainers==2.4.0
 sounddevice==0.5.6
 sse-starlette==3.5.0
@@ -168,11 +168,11 @@ uvicorn==0.54.0
 virtualenv==21.14.5
 vulture==2.16
 wcwidth==0.9.1
-websockets==17.1
+websockets==17.2
 wheel==0.48.0
 xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-10-02 23:56:43 BST
+Environment dump completed at 2026-10-04 00:22:12 BST
 ================================================================================
