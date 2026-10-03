@@ -668,6 +668,32 @@ class TestImageCapabilityClassifier:
         assert "image_token_id" in cap.evidence[0]
         assert cap.skip_reason is None
 
+    def test_vision_keys_nested_in_a_sub_config_are_image_evidence(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Regression: Qwen3-Omni keeps vision under thinker_config and was skipped as text-only."""
+        cap = _capability_for(
+            monkeypatch,
+            config={
+                "model_type": "qwen3_omni_moe",
+                "architectures": ["Qwen3OmniMoeForConditionalGeneration"],
+                "vision_config": {},  # empty at the top level
+                "thinker_config": {"vision_config": {"depth": 27}, "image_token_id": 151655},
+                "quantization_config": {"bits": 4},
+            },
+        )
+        assert cap.verdict == "yes"
+        assert cap.evidence == (
+            "image-input keys: thinker_config.image_token_id, thinker_config.vision_config",
+        )
+        # A sub-config with no image keys, or one not named *_config, adds nothing.
+        assert (
+            check_models._config_image_input_keys(
+                {"text_config": {"vocab_size": 10}, "thinker": {"vision_config": {"depth": 1}}}
+            )
+            == ()
+        )
+
     def test_text_only_config_is_no(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """A generative config with no modality evidence is text-only."""
         cap = _capability_for(

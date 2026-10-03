@@ -690,6 +690,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Image capability is also read one sub-config down: composite checkpoints
+  keep their vision settings in a `*_config` section (Qwen3-Omni has
+  `thinker_config.vision_config` and an empty top-level `vision_config`),
+  so `mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit` was skipped as
+  "text-only generation". Nested evidence is named with its parent.
 - The Skylos dependency scan removes its report once checked (and the
   quality step clears any leftover first), instead of leaving the ~15 MB
   file in `src/.skylos/`, where the next run's quality step stopped on it (`SKY-ANALYSIS-INCOMPLETE`:

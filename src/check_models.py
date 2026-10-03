@@ -17905,6 +17905,26 @@ def _capability_negative_signal(
     return None
 
 
+def _config_image_input_keys(config: Mapping[str, JsonLike]) -> tuple[str, ...]:
+    """Image-input keys with real values, at the top level or one sub-config down.
+
+    Composite checkpoints nest their vision settings in a sub-config
+    (Qwen3-Omni keeps ``vision_config`` and ``image_token_id`` under
+    ``thinker_config``, with an empty top-level ``vision_config``), so every
+    ``*_config`` mapping is searched one level deep; nested keys are named
+    with their parent ("thinker_config.vision_config").
+    """
+    found = [key for key in _IMAGE_INPUT_CONFIG_KEYS if _meaningful_config_value(config.get(key))]
+    for parent, sub_config in config.items():
+        if parent.endswith("_config") and isinstance(sub_config, dict):
+            found.extend(
+                f"{parent}.{key}"
+                for key in _IMAGE_INPUT_CONFIG_KEYS
+                if _meaningful_config_value(sub_config.get(key))
+            )
+    return tuple(sorted(found))
+
+
 def _capability_from_image_evidence(
     config: Mapping[str, JsonLike],
     *,
@@ -17920,9 +17940,7 @@ def _capability_from_image_evidence(
     (classification, detection, segmentation, multimodal embedding) are a
     confident exclusion.
     """
-    image_keys = tuple(
-        sorted(k for k in _IMAGE_INPUT_CONFIG_KEYS if _meaningful_config_value(config.get(k)))
-    )
+    image_keys = _config_image_input_keys(config)
     arch_text = " ".join(architectures)
     generative_arch = any(m in arch_text for m in _GENERATIVE_ARCH_MARKERS)
     non_generative_image_arch = next(
