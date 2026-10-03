@@ -9,7 +9,7 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 13m 42s
+- Run duration: 13m 34s
 - Evaluation lane: assisted
 - Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
