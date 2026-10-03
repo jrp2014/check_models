@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: the Skylos quality gate no longer fails locally on "Unverified
+  import" (SKY-D223) for `mlx` and `mlx_vlm`. Both are declared dependencies,
+  but as editable builds they have no installed file list, so Skylos has to
+  ask PyPI and fails when that lookup does. The three first imports carry a
+  `skylos: ignore[SKY-D223]` with the reason beside them.
 - Tooling: `make quality` runs the Skylos dependency scan as its own step.
   `tools/check_dependency_advisories.py` fails it on any advisory outside a
   short accepted list, and on a scan that did not finish. Skylos's ignore list

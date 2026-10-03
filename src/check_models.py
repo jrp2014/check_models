@@ -168,10 +168,13 @@ else:
     psutil = _psutil_runtime
 
 
+# SKY-D223 below: mlx and mlx-vlm are declared dependencies, but as editable
+# builds they have no installed file list, so Skylos must ask PyPI and reports
+# "Unverified import" when that lookup fails.
 if TYPE_CHECKING:
     from jinja2.parser import Parser as JinjaParser
-    from mlx import nn
-    from mlx_vlm.generate import GenerationResult
+    from mlx import nn  # skylos: ignore[SKY-D223]
+    from mlx_vlm.generate import GenerationResult  # skylos: ignore[SKY-D223]
     from mlx_vlm.generate.types import GenerateKwargs, ProcessorLike
     from PIL.Image import Image as PILImage
     from transformers import PreTrainedTokenizer

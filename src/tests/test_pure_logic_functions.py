@@ -23,7 +23,10 @@ if TYPE_CHECKING:  # pragma: no cover
     import types
     from collections.abc import Mapping, Sequence
 
-import mlx.core as mx
+# SKY-D223: mlx is a declared dependency, but as an editable build it has no
+# installed file list, so Skylos must ask PyPI and reports "Unverified import"
+# when that lookup fails.
+import mlx.core as mx  # skylos: ignore[SKY-D223]
 import pytest
 import yaml
 from mlx import nn
