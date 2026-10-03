@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: `make quality` runs the Skylos dependency scan as its own step.
+  `tools/check_dependency_advisories.py` fails it on any advisory outside a
+  short accepted list, and on a scan that did not finish. Skylos's ignore list
+  does not reach dependency advisories, so this is the only way to accept one.
+  The list holds GHSA-vfj7-8cjw-p6xm (braces 3.0.3 via markdownlint-cli2,
+  which has no fixed release). The step says when a listed advisory stops
+  being reported, so its entry can be dropped.
 - `check_models.log` and the terminal are quieter. Under `--verbose` a
   completed model's entry in "Per-model results" is its summary line plus any
   warnings. The token, timing and memory tree has been removed (the

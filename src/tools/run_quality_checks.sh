@@ -133,7 +133,25 @@ quality_run_python_tool vulture
 # own advisory wrapper below, which post-filters the JSON report.
 echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . --quality --secrets --sca --ai-defects --gate --no-upload --format concise </dev/null
+    quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise </dev/null
+
+# The dependency scan runs on its own because Skylos's ignore list does not
+# reach dependency advisories: tools.check_dependency_advisories fails on any
+# advisory outside its short accepted list, and on an unfinished scan.
+echo "=== Skylos Dependency Scan ==="
+mkdir -p .skylos
+sca_report_path=".skylos/skylos-dependency-scan.json"
+rm -f "$sca_report_path"
+set +e
+TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+    quality_run_skylos . --sca --json -o "$sca_report_path" --no-upload </dev/null >/dev/null
+sca_exit_code=$?
+set -e
+if [ ! -f "$sca_report_path" ]; then
+    echo "❌ Skylos dependency scan did not produce $sca_report_path (exit $sca_exit_code)." >&2
+    exit "$((sca_exit_code == 0 ? 1 : sca_exit_code))"
+fi
+"$QUALITY_PYTHON" -m tools.check_dependency_advisories "$sca_report_path"
 
 if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Skylos Danger Gate ==="

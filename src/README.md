@@ -1579,7 +1579,7 @@ Key commands:
 - `make test` — run pytest only; useful for a faster test loop before the full gate
 - `make vulture` — run the configured dead-code scan for `src/check_models.py` and `src/tools/`
 - `make probe-python-next` — check whether the next Python release is viable for the MLX stack in a throwaway conda env
-- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit, full pytest, shellcheck, markdownlint)
+- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets gate, Skylos dependency scan with its accepted-advisory list, Skylos danger gate, full pytest, shellcheck, markdownlint)
 - `make skylos-danger` — advisory Skylos `--danger` scan for workflow and security findings
 - `make skylos-danger-llm` — advisory Skylos `--danger` scan with LLM-oriented output for agent triage
 - `make skylos-verify` — narrow `skylos verify` wrapper for file/range agent checks

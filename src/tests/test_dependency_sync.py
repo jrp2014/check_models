@@ -26,6 +26,7 @@ from packaging.requirements import Requirement
 import check_models
 from check_models_data import dependency_policy
 from tools import (
+    check_dependency_advisories,
     check_suppressions,
     filter_danger_report,
     hub_precheck,
@@ -1046,9 +1047,20 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     )
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
-        r"quality_run_skylos \. --quality --secrets --sca --ai-defects --gate --no-upload "
+        r"quality_run_skylos \. --quality --secrets --ai-defects --gate --no-upload "
         r"--format concise",
         quality_script,
+    )
+    # Dependency advisories are gated by their own step (Skylos's ignore list
+    # cannot accept one advisory), which must run before pytest too.
+    assert re.search(
+        r"quality_run_skylos \. --sca --json -o \"\$sca_report_path\" --no-upload", quality_script
+    )
+    assert '"$QUALITY_PYTHON" -m tools.check_dependency_advisories "$sca_report_path"' in (
+        quality_script
+    )
+    assert quality_script.index('echo "=== Skylos Dependency Scan ==="') < quality_script.index(
+        'echo "=== Pytest ==="'
     )
     assert not re.search(r"quality_run_skylos \. -a\b", quality_script)
 
@@ -2329,6 +2341,57 @@ def test_danger_report_filter_drops_only_worktree_findings(tmp_path: Path) -> No
     report_path = tmp_path / "report.json"
     report_path.write_text(json.dumps({"danger": []}), encoding="utf-8")
     assert filter_danger_report.main(["prog", str(report_path)]) == 0
+
+
+def _dependency_scan_report(status: str | None, *rule_ids: str) -> dict[str, object]:
+    summary: dict[str, object] = {} if status is None else {"sca_coverage": {"status": status}}
+    return {
+        "analysis_summary": summary,
+        "dependency_vulnerabilities": [
+            {"rule_id": rule_id, "file": "package-lock.json", "line": 1, "message": "advisory"}
+            for rule_id in rule_ids
+        ],
+    }
+
+
+def test_dependency_advisory_gate_accepts_only_listed_advisories(tmp_path: Path) -> None:
+    """Only advisories on the accepted list pass; any other advisory fails the step."""
+    accepted = {"SKY-SCA-GHSA-aaaa": "no fixed release"}
+
+    passed, lines = check_dependency_advisories.evaluate(
+        _dependency_scan_report("complete", "SKY-SCA-GHSA-aaaa"), accepted
+    )
+    assert passed
+    assert any("Accepted SKY-SCA-GHSA-aaaa" in line for line in lines)
+
+    passed, lines = check_dependency_advisories.evaluate(
+        _dependency_scan_report("complete", "SKY-SCA-GHSA-aaaa", "SKY-SCA-GHSA-bbbb"), accepted
+    )
+    assert not passed
+    assert any(line.startswith("❌ SKY-SCA-GHSA-bbbb") for line in lines)
+
+    # A listed advisory that is no longer reported passes, with a prompt to drop it.
+    passed, lines = check_dependency_advisories.evaluate(
+        _dependency_scan_report("complete"), accepted
+    )
+    assert passed
+    assert any("no longer reported" in line for line in lines)
+
+    report_path = tmp_path / "skylos-dependency-scan.json"
+    report_path.write_text(
+        json.dumps(_dependency_scan_report("complete", "SKY-SCA-GHSA-bbbb")), encoding="utf-8"
+    )
+    assert check_dependency_advisories.main(["prog", str(report_path)]) == 1
+    assert check_dependency_advisories.main(["prog", str(tmp_path / "missing.json")]) == 1
+
+
+@pytest.mark.parametrize("status", ["incomplete", "unavailable", "unknown", None])
+def test_dependency_advisory_gate_fails_closed_on_unfinished_scan(status: str | None) -> None:
+    """An unfinished or unlabelled scan never passes, even with no advisories listed."""
+    passed, lines = check_dependency_advisories.evaluate(_dependency_scan_report(status), {})
+
+    assert not passed
+    assert "did not finish" in lines[0]
 
 
 def test_artifact_schema_version_constants_match_typed_dict_literals() -> None:
