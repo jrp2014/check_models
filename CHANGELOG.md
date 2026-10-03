@@ -8,9 +8,17 @@ Notable changes to this project will be documented in this file.
 
 - Tooling: the Skylos quality gate no longer fails locally on "Unverified
   import" (SKY-D223) for `mlx` and `mlx_vlm`. Both are declared dependencies,
-  but as editable builds they have no installed file list, so Skylos has to
-  ask PyPI and fails when that lookup does. The three first imports carry a
-  `skylos: ignore[SKY-D223]` with the reason beside them.
+  but Skylos 4.43.2 reads an editable install's `RECORD` (the loader files)
+  as an empty module inventory and prefers it over PyPI's. The three first
+  imports carry a `skylos: ignore[SKY-D223]`, to be dropped once Skylos fixes
+  that precedence.
+- Tooling: `update.sh` checks conda's whole `update --all` plan before
+  applying it. It reads the `--dry-run --json` transaction and checks every
+  package the plan links or unlinks, so a new install or removal that would
+  replace a pip-owned package (shown without an `old --> new` arrow in conda's
+  text listing) now skips the update, as a pip-owned upgrade already did. A
+  package that is not installed at all counts as a plain new install, and an
+  editable install (`<develop>`) counts as pip's.
 - Tooling: `make quality` runs the Skylos dependency scan as its own step.
   `tools/check_dependency_advisories.py` fails it on any advisory outside a
   short accepted list, and on a scan that did not finish. Skylos's ignore list

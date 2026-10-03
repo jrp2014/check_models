@@ -168,9 +168,10 @@ else:
     psutil = _psutil_runtime
 
 
-# SKY-D223 below: mlx and mlx-vlm are declared dependencies, but as editable
-# builds they have no installed file list, so Skylos must ask PyPI and reports
-# "Unverified import" when that lookup fails.
+# SKY-D223 below: mlx and mlx-vlm are declared dependencies. Skylos 4.43.2
+# reads an editable install's RECORD (the loader files, not the modules) as an
+# empty inventory and prefers it over PyPI's, so it reports "Unverified
+# import". Drop these suppressions once Skylos fixes that precedence.
 if TYPE_CHECKING:
     from jinja2.parser import Parser as JinjaParser
     from mlx import nn  # skylos: ignore[SKY-D223]

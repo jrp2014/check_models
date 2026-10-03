@@ -169,12 +169,50 @@ PY
 	fi
 }
 
+# Every package name a `conda ... --dry-run --json` plan links or unlinks:
+# updates, new installs and removals alike, so no part of the transaction goes
+# unchecked. Prints one name per line (nothing when the env is up to date);
+# fails when the plan is unreadable or conda reported an error.
+#   $1 file holding the dry-run JSON
+conda_plan_packages() {
+	python - "$1" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+try:
+    # Progress records, when conda emits any, come first, NUL-separated.
+    text = Path(sys.argv[1]).read_text(encoding="utf-8")
+    plan = json.loads([chunk for chunk in text.split("\0") if chunk.strip()][-1])
+except (OSError, ValueError, IndexError):
+    raise SystemExit(1) from None
+if not isinstance(plan, dict) or not plan.get("success") or "error" in plan:
+    raise SystemExit(1)
+actions = plan.get("actions", [])
+names: set[str] = set()
+for prefix_actions in actions if isinstance(actions, list) else [actions]:
+    if not isinstance(prefix_actions, dict):
+        raise SystemExit(1)
+    for key in ("LINK", "UNLINK"):
+        for record in prefix_actions.get(key, []):
+            if not isinstance(record, dict) or not record.get("name"):
+                raise SystemExit(1)
+            names.add(str(record["name"]))
+print("\n".join(sorted(names)), end="\n" if names else "")
+PY
+}
+
 # Which manager owns each package conda plans to change, from conda's own
-# package records (`conda list --json`): a record from the pypi channel is a
-# distribution pip installed, any other record is conda's. Visibility to pip
-# says nothing about ownership (pip lists conda-installed distributions too).
-# A name with both kinds of record (pip installed over conda's copy) or with
-# none (unreadable records) is "ambiguous". Prints "<name> <owner>" per name.
+# package records (`conda list --json`): a record from the pypi channel (or
+# conda's <develop> label for an editable install) is a distribution pip
+# installed, any other record is conda's. Visibility to pip says nothing about
+# ownership (pip lists conda-installed distributions too). A name with both
+# kinds of record (pip installed over conda's copy) is "ambiguous"; so is
+# every name when the records are unreadable. A name with no record is not
+# installed, so the plan adds it without replacing anything: "absent".
+# Prints "<name> <owner>" per name.
 #   $1 file holding the conda list --json output; $2... package names
 conda_change_ownership() {
 	local records_file="$1"
@@ -198,23 +236,28 @@ owners: dict[str, set[str]] = {}
 try:
     records = json.loads(Path(records_file).read_text(encoding="utf-8"))
 except (OSError, ValueError):
-    records = []
-for record in records if isinstance(records, list) else []:
+    records = None
+readable = isinstance(records, list) and bool(records)
+for record in records if readable else []:
     if not isinstance(record, dict) or not record.get("name"):
         continue
-    pypi = "pypi" in (record.get("channel"), record.get("platform"))
-    owners.setdefault(normalize(record["name"]), set()).add("pip" if pypi else "conda")
+    pip = record.get("platform") == "pypi" or record.get("channel") in ("pypi", "<develop>")
+    owners.setdefault(normalize(record["name"]), set()).add("pip" if pip else "conda")
 
 for change in changes:
     found = owners.get(normalize(change), set())
-    print(change, next(iter(found)) if len(found) == 1 else "ambiguous")
+    if not readable or len(found) > 1:
+        print(change, "ambiguous")
+    else:
+        print(change, next(iter(found)) if found else "absent")
 PY
 }
 
 # Pure update/skip decision for `conda update --all`, kept apart from the
-# ownership lookup. Only a plan whose every change is conda-owned runs
-# unasked; a pip-owned or ambiguous change, or no ownership answer at all,
-# skips it unless CONDA_UPDATE_ALL=1.
+# ownership lookup. Only a plan whose every change is conda-owned (or a new
+# install of a package nothing owns yet) runs unasked; a pip-owned or
+# ambiguous change, or no ownership answer at all, skips it unless
+# CONDA_UPDATE_ALL=1.
 #   $1 CONDA_UPDATE_ALL (0/1); $2 "<name> <owner>" lines
 conda_update_all_decision() {
 	local force="$1" ownership="$2" name owner answered=0
@@ -225,7 +268,7 @@ conda_update_all_decision() {
 	while read -r name owner; do
 		[[ -z "$name" ]] && continue
 		answered=1
-		if [[ "$owner" != "conda" ]]; then
+		if [[ "$owner" != "conda" && "$owner" != "absent" ]]; then
 			echo "skip"
 			return 0
 		fi
@@ -281,26 +324,29 @@ update_conda_packages() {
 	fi
 
 	# Now attempt to update the target environment's conda-managed packages.
-	# Dry-run first to see which packages conda would change.
+	# Dry-run first; conda's JSON plan names every package the transaction
+	# links or unlinks (the text listing shows new installs and removals
+	# without an "old --> new" arrow, so parsing it missed them).
 	echo ""
 	echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
-	local DRY_RUN_OUTPUT CONDA_CHANGES
-	DRY_RUN_OUTPUT=$(conda update -n "$CONDA_ENV" --all --dry-run 2>&1) || true
-
-	# Extract package names conda wants to change. Conda prints change lines
-	# as "  name   old-build --> new-build" (two dashes); accept one or two so
-	# the parse cannot silently report "already up to date" on a format tweak.
-	CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+-{1,2}>\s+\S+' | awk '{print $1}' 2>/dev/null || true)
-
-	if [[ -z "$CONDA_CHANGES" ]]; then
+	local plan_file records_file changes_text ownership not_conda_owned changes=()
+	plan_file="$(mktemp "${TMPDIR:-/tmp}/update-conda-plan.XXXXXX")"
+	conda update -n "$CONDA_ENV" --all --dry-run --json --quiet > "$plan_file" 2>/dev/null || true
+	if ! changes_text="$(conda_plan_packages "$plan_file")"; then
+		rm -f "$plan_file"
+		echo "⚠️  conda's dry-run plan could not be read; skipping conda update --all."
+		echo "   See it with: conda update -n $CONDA_ENV --all --dry-run"
+		return 0
+	fi
+	rm -f "$plan_file"
+	if [[ -z "$changes_text" ]]; then
 		echo "[update.sh] Conda environment is already up to date"
 		return 0
 	fi
 
-	local records_file ownership not_conda_owned changes=()
 	while IFS= read -r package; do
 		[[ -n "$package" ]] && changes+=("$package")
-	done <<< "$CONDA_CHANGES"
+	done <<< "$changes_text"
 	records_file="$(mktemp "${TMPDIR:-/tmp}/update-conda-records.XXXXXX")"
 	conda list -n "$CONDA_ENV" --json > "$records_file" 2>/dev/null || : > "$records_file"
 	# A lookup that fails or answers for fewer packages than asked is no
@@ -310,7 +356,7 @@ update_conda_packages() {
 		ownership="$(printf '%s ambiguous\n' "${changes[@]}")"
 	fi
 	rm -f "$records_file"
-	not_conda_owned="$(printf '%s\n' "$ownership" | awk 'NF && $2 != "conda" {printf "  - %s (%s)\n", $1, ($2 == "pip" ? "installed by pip" : "ownership unclear")}')"
+	not_conda_owned="$(printf '%s\n' "$ownership" | awk 'NF && $2 != "conda" && $2 != "absent" {printf "  - %s (%s)\n", $1, ($2 == "pip" ? "installed by pip" : "ownership unclear")}')"
 
 	if [[ -n "$not_conda_owned" ]]; then
 		echo ""
@@ -322,7 +368,7 @@ update_conda_packages() {
 		if [[ -n "$not_conda_owned" ]]; then
 			echo "[update.sh] CONDA_UPDATE_ALL=1 set — proceeding with conda update --all..."
 		else
-			echo "[update.sh] Every planned change is a conda-owned package — updating conda environment packages..."
+			echo "[update.sh] Every package in the plan is conda-owned or newly installed — updating conda environment packages..."
 		fi
 		conda update -n "$CONDA_ENV" --all -y
 	else

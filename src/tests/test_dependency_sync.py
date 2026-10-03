@@ -2651,38 +2651,6 @@ def test_agent_skills_are_well_formed_and_listed() -> None:
     assert claude_skills.resolve() == AGENT_SKILLS_DIR.resolve()
 
 
-def test_update_script_parses_conda_change_lines_as_conda_prints_them() -> None:
-    """The conda dry-run parser must match real change lines, else updates never run.
-
-    Conda writes ``  name   old --> new`` with two dashes; the script once
-    expected a single dash, matched nothing, and always reported the
-    environment as already up to date. The pattern is read from the script so
-    the test exercises the real grep invocation.
-    """
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    match = re.search(
-        r"CONDA_CHANGES=\$\(echo \"\$DRY_RUN_OUTPUT\" \| grep -E '([^']+)'", update_script
-    )
-    assert match is not None
-    pattern = match.group(1)
-    sample = (
-        "The following packages will be UPDATED:\n"
-        "  python                          3.14.7-hedc06ab_101_cp314 --> 3.14.8-h80e0c04_101_cp314 \n"
-        "  tk           pkgs/main/osx-arm64::tk-9.0.4-h4792a3e_1 --> pkgs/main/osx-arm64::tk-9.0.5-h4792a3e_1 \n"
-        "  openssl                                       3.5.5-h7b0d5a0_0 -> 3.5.6-h7b0d5a0_0 \n"
-        "# All requested packages already installed.\n"
-    )
-    result = subprocess.run(  # noqa: S603 - fixed /usr/bin/grep runs the script's own pattern on a literal sample
-        ["/usr/bin/grep", "-E", pattern],
-        input=sample,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    names = [line.split()[0] for line in result.stdout.splitlines()]
-    assert names == ["python", "tk", "openssl"], result.stdout
-
-
 def test_batched_noqa_audit_slices_ruff_output_per_finding(tmp_path: Path) -> None:
     """One ruff run over every noqa variant returns each finding only its own lines."""
     first = tmp_path / "first.py"
@@ -3423,8 +3391,8 @@ def test_conda_update_skips_a_pip_owned_change(tmp_path: Path) -> None:
     ("changes", "records", "owner"),
     [
         pytest.param(["numpy"], _CONDA_RECORDS, "ambiguous", id="pip-over-conda"),
-        pytest.param(["libfoo"], _CONDA_RECORDS, "ambiguous", id="no-record"),
         pytest.param(["openssl"], "conda list failed\n", "ambiguous", id="unreadable-records"),
+        pytest.param(["openssl"], [], "ambiguous", id="empty-records"),
     ],
 )
 def test_conda_update_skips_when_ownership_is_ambiguous(
@@ -3434,6 +3402,139 @@ def test_conda_update_skips_when_ownership_is_ambiguous(
     owners, decision = _conda_update_decision(tmp_path, changes, records)
     assert owners == dict.fromkeys(changes, owner)
     assert decision == "skip"
+
+
+def test_conda_update_treats_an_uninstalled_package_as_a_new_install(tmp_path: Path) -> None:
+    """A package with no record replaces nothing, so it does not block the update."""
+    owners, decision = _conda_update_decision(tmp_path, ["libnew", "openssl"], _CONDA_RECORDS)
+    assert owners == {"libnew": "absent", "openssl": "conda"}
+    assert decision == "update"
+
+
+def _conda_plan_record(name: str, version: str) -> dict[str, str]:
+    return {"name": name, "version": version, "channel": "conda-forge", "platform": "osx-arm64"}
+
+
+# A real `conda update --all --dry-run --json` shape: an ordinary update
+# (openssl, unlinked and relinked) plus a new install of numpy, which conda's
+# text listing shows without an "old --> new" arrow.
+_CONDA_PLAN_WITH_PIP_COLLISION = {
+    "success": True,
+    "dry_run": True,
+    "prefix": "/envs/review-target",
+    "actions": {
+        "PREFIX": "/envs/review-target",
+        "FETCH": [],
+        "UNLINK": [_conda_plan_record("openssl", "3.5.5")],
+        "LINK": [_conda_plan_record("openssl", "3.5.6"), _conda_plan_record("numpy", "2.3.4")],
+    },
+}
+
+
+def _run_update_conda_packages(
+    tmp_path: Path, plan: object, records: object, *, force: str = "0"
+) -> tuple[str, str]:
+    """Run update.sh's real conda step against a fake conda; return output and conda calls."""
+    plan_file = tmp_path / "plan.json"
+    records_file = tmp_path / "env-records.json"
+    log = tmp_path / "conda-calls.log"
+    for path, payload in ((plan_file, plan), (records_file, records)):
+        safe_io.write_text_no_follow(
+            path, payload if isinstance(payload, str) else json.dumps(payload)
+        )
+    functions = "".join(
+        _update_script_function(name)
+        for name in (
+            "conda_plan_packages",
+            "conda_change_ownership",
+            "conda_update_all_decision",
+            "update_conda_packages",
+        )
+    )
+    driver = (
+        f'python() {{ "{sys.executable}" "$@"; }}\n'
+        "conda() {\n"
+        f'    echo "conda $*" >> "{log}"\n'
+        '    case "$*" in\n'
+        f'        *--dry-run*) cat "{plan_file}" ;;\n'
+        f'        "list -n review-target --json") cat "{records_file}" ;;\n'
+        "    esac\n"
+        "}\n"
+        f"{functions}"
+        "UPDATE_ENV_TYPE=conda UPDATE_ENV_NAME=review-target update_conda_packages\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
+        ["/bin/bash", "-c", driver],
+        capture_output=True,
+        text=True,
+        check=True,
+        env={
+            "PATH": "/usr/bin:/bin",
+            "TMPDIR": str(tmp_path),
+            "CONDA_DEFAULT_ENV": "review-target",
+            "CONDA_ENV": "review-target",
+            "CONDA_UPDATE_ALL": force,
+        },
+    )
+    return result.stdout, safe_io.read_text_no_follow(log)
+
+
+def test_conda_update_checks_new_installs_in_the_plan_not_just_updates(tmp_path: Path) -> None:
+    """Regression: an ordinary update plus a conda install over pip's numpy was approved.
+
+    The text parser saw only "old --> new" rows (openssl), so the plan read as
+    all conda-owned and `conda update --all -y` replaced pip's numpy too.
+    """
+    records = [
+        {"name": "openssl", "channel": "conda-forge", "platform": "osx-arm64"},
+        {"name": "numpy", "channel": "pypi", "platform": "pypi", "build_string": "pypi_0"},
+    ]
+    output, calls = _run_update_conda_packages(tmp_path, _CONDA_PLAN_WITH_PIP_COLLISION, records)
+    assert "numpy (installed by pip)" in output
+    assert "Skipping conda update --all" in output
+    assert "conda update -n review-target --all -y" not in calls
+
+    _, forced_calls = _run_update_conda_packages(
+        tmp_path, _CONDA_PLAN_WITH_PIP_COLLISION, records, force="1"
+    )
+    assert "conda update -n review-target --all -y" in forced_calls
+
+    # The same plan with numpy not installed at all is a plain new install.
+    output, calls = _run_update_conda_packages(
+        tmp_path, _CONDA_PLAN_WITH_PIP_COLLISION, records[:1]
+    )
+    assert "conda-owned or newly installed" in output
+    assert "conda update -n review-target --all -y" in calls
+
+
+@pytest.mark.parametrize(
+    ("plan", "expected"),
+    [
+        pytest.param(
+            {"success": True, "message": "All requested packages already installed."},
+            "already up to date",
+            id="up-to-date",
+        ),
+        pytest.param(
+            {"exception_name": "PackagesNotFoundError", "error": "...", "message": "..."},
+            "plan could not be read",
+            id="conda-error",
+        ),
+        pytest.param("not json\n", "plan could not be read", id="unreadable"),
+        pytest.param(
+            {"success": True, "actions": {"LINK": [{"version": "1"}]}},
+            "plan could not be read",
+            id="nameless-record",
+        ),
+    ],
+)
+def test_conda_update_never_applies_an_unusable_or_empty_plan(
+    tmp_path: Path, plan: object, expected: str
+) -> None:
+    """Only a readable plan with changes reaches the ownership check, let alone the update."""
+    output, calls = _run_update_conda_packages(tmp_path, plan, _CONDA_RECORDS)
+    assert expected in output
+    assert "--all -y" not in calls
 
 
 def test_conda_update_skips_without_an_ownership_answer() -> None:
@@ -3453,7 +3554,7 @@ def test_conda_update_skips_without_an_ownership_answer() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _git(repo: Path, *args: str) -> str:
+def _hygiene_git(repo: Path, *args: str) -> str:
     return subprocess.run(  # noqa: S603 - fixed git command on a test-created repo
         ["git", "-C", str(repo), *args],  # noqa: S607 - git from PATH
         capture_output=True,
@@ -3469,15 +3570,15 @@ def _hygiene_repo(tmp_path: Path) -> Path:
     tools_dir.mkdir(parents=True)
     for name in ("run_commit_hygiene.sh", "common_quality.sh"):
         shutil.copy2(PKG_ROOT / "tools" / name, tools_dir / name)
-    _git(tmp_path, "init", "-q", str(repo))
-    _git(repo, "config", "user.email", "test@example.com")
-    _git(repo, "config", "user.name", "Test")
+    _hygiene_git(tmp_path, "init", "-q", str(repo))
+    _hygiene_git(repo, "config", "user.email", "test@example.com")
+    _hygiene_git(repo, "config", "user.name", "Test")
     safe_io.write_text_no_follow(repo / "src" / "app.py", "value = 0\n")
     safe_io.write_text_no_follow(repo / "src" / "notes.md", "# Notes\n\nOld.\n")
     safe_io.write_text_no_follow(repo / "src" / "README.md", "# Readme\n")
     safe_io.write_text_no_follow(repo / "src" / "pyproject.toml", '[project]\nname = "x"\n')
-    _git(repo, "add", "-A")
-    _git(repo, "commit", "-q", "-m", "baseline")
+    _hygiene_git(repo, "add", "-A")
+    _hygiene_git(repo, "commit", "-q", "-m", "baseline")
     return repo
 
 
@@ -3502,13 +3603,13 @@ def test_direct_hygiene_run_still_fixes_fully_staged_files(tmp_path: Path) -> No
     """With nothing unstaged, the fixer's change is staged as before."""
     repo = _hygiene_repo(tmp_path)
     safe_io.write_text_no_follow(repo / "src" / "app.py", "value=1\n")
-    _git(repo, "add", "src/app.py")
+    _hygiene_git(repo, "add", "src/app.py")
 
     result = _run_hygiene(repo)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert _git(repo, "show", ":src/app.py") == "value = 1\n"
-    assert _git(repo, "diff", "--name-only") == ""
+    assert _hygiene_git(repo, "show", ":src/app.py") == "value = 1\n"
+    assert _hygiene_git(repo, "diff", "--name-only") == ""
 
 
 @pytest.mark.parametrize(
@@ -3526,14 +3627,14 @@ def test_direct_hygiene_run_preserves_partial_staging(
     """Regression: a staged ``value = 1`` became ``value = 2`` from an unstaged edit."""
     repo = _hygiene_repo(tmp_path)
     safe_io.write_text_no_follow(repo / path, staged)
-    _git(repo, "add", path)
+    _hygiene_git(repo, "add", path)
     safe_io.write_text_no_follow(repo / path, unstaged)
 
     result = _run_hygiene(repo)
 
     assert result.returncode == 1
     assert f"   - {path}" in result.stdout
-    assert _git(repo, "show", f":{path}") == staged
+    assert _hygiene_git(repo, "show", f":{path}") == staged
     assert safe_io.read_text_no_follow(repo / path) == unstaged
 
 
@@ -3543,14 +3644,14 @@ def test_direct_hygiene_run_does_not_stage_unstaged_readme_edits(tmp_path: Path)
     safe_io.write_text_no_follow(
         repo / "src" / "pyproject.toml", '[project]\nname = "x"\nversion = "1"\n'
     )
-    _git(repo, "add", "src/pyproject.toml")
+    _hygiene_git(repo, "add", "src/pyproject.toml")
     safe_io.write_text_no_follow(repo / "src" / "README.md", "# Readme\n\nUnstaged draft.\n")
 
     result = _run_hygiene(repo)
 
     assert result.returncode == 1
     assert "src/README.md (regenerated from the staged src/pyproject.toml)" in result.stdout
-    assert _git(repo, "diff", "--cached", "--name-only") == "src/pyproject.toml\n"
+    assert _hygiene_git(repo, "diff", "--cached", "--name-only") == "src/pyproject.toml\n"
     assert (
         safe_io.read_text_no_follow(repo / "src" / "README.md") == "# Readme\n\nUnstaged draft.\n"
     )
