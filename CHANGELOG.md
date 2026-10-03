@@ -690,6 +690,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The Skylos dependency scan removes its report once checked (and the
+  quality step clears any leftover first), instead of leaving the ~15 MB
+  file in `src/.skylos/`, where the next run's quality step stopped on it (`SKY-ANALYSIS-INCOMPLETE`:
+  file exceeds the secret scan's 8 MB limit), failing every gate and
+  pre-push check after the first.
 - The per-model "Mechanical observations" log line names each finding in
   words, using the report labels (e.g. "Output repeats the prompt's own hint
   text instead of describing the image") instead of internal codes such as

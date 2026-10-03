@@ -131,6 +131,12 @@ quality_run_python_tool vulture
 # added (ai-defects); the audit pass only printed a grade card over the same
 # files, at the cost of a second full analysis (~9 s). Danger stays in its
 # own advisory wrapper below, which post-filters the JSON report.
+# The dependency report (~15 MB, below) must not be in the tree this step
+# scans: its secret scan stops on files over 8 MB (SKY-ANALYSIS-INCOMPLETE).
+# It is removed after its own step; this also clears one an interrupted run
+# left behind.
+sca_report_path=".skylos/skylos-dependency-scan.json"
+rm -f "$sca_report_path"
 echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
     quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise </dev/null
@@ -139,9 +145,10 @@ TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
 # reach dependency advisories: tools.check_dependency_advisories fails on any
 # advisory outside its short accepted list, and on an unfinished scan.
 echo "=== Skylos Dependency Scan ==="
+# Skylos only writes reports inside the project ("could not safely write
+# output file" for a temp path), so the report goes in .skylos/ and is
+# removed as soon as it has been checked.
 mkdir -p .skylos
-sca_report_path=".skylos/skylos-dependency-scan.json"
-rm -f "$sca_report_path"
 set +e
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
     quality_run_skylos . --sca --json -o "$sca_report_path" --no-upload </dev/null >/dev/null
@@ -151,7 +158,12 @@ if [ ! -f "$sca_report_path" ]; then
     echo "❌ Skylos dependency scan did not produce $sca_report_path (exit $sca_exit_code)." >&2
     exit "$((sca_exit_code == 0 ? 1 : sca_exit_code))"
 fi
-"$QUALITY_PYTHON" -m tools.check_dependency_advisories "$sca_report_path"
+sca_check_status=0
+"$QUALITY_PYTHON" -m tools.check_dependency_advisories "$sca_report_path" || sca_check_status=$?
+rm -f "$sca_report_path"
+if [ "$sca_check_status" -ne 0 ]; then
+    exit "$sca_check_status"
+fi
 
 if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Skylos Danger Gate ==="
