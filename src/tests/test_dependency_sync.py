@@ -2398,8 +2398,10 @@ def _dependency_scan_report(coverage: object, *findings: dict[str, object]) -> d
 
 
 def _evaluate_scan(tmp_path: Path, report: object) -> tuple[bool, list[str]]:
-    passed, lines = check_dependency_advisories.evaluate(report, (_BRACES,), scan_root=tmp_path)
-    return bool(passed), list(lines)
+    result: tuple[bool, list[str]] = check_dependency_advisories.evaluate(
+        report, (_BRACES,), scan_root=tmp_path
+    )
+    return result
 
 
 def test_dependency_advisory_gate_accepts_only_the_reviewed_occurrence(tmp_path: Path) -> None:
