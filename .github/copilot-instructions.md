@@ -308,6 +308,7 @@ the `.agents/skills/` copy.
 | Skill | When to use | File |
 | ----- | ----------- | ---- |
 | `add-or-fix-type-checking` | Typing errors from mypy, ty, pyrefly, or `make quality` | `.agents/skills/add-or-fix-type-checking/SKILL.md` |
+| `triaging-skylos-findings` | A Skylos gate finding from `make quality` or CI, or new findings after a Skylos upgrade: narrow repro, fix versus suppression, Skylos bug reports (adapted from Skylos's own skills) | `.agents/skills/triaging-skylos-findings/SKILL.md` |
 | `native-mlx-vlm-repro` | Isolate failures with native `python -m mlx_vlm.generate` / Python load→template→`stream_generate` outside the harness | `.agents/skills/native-mlx-vlm-repro/SKILL.md` |
 | `upstream-mlx-vlm-issues` | Draft or improve maintainer-ready mlx-vlm GitHub issue Markdown from diagnostics or crash drafts (do not file unless asked) | `.agents/skills/upstream-mlx-vlm-issues/SKILL.md` |
 | `hf-cache-mlx-vlm-models` | List or reason about HF cache models under default discovery: the mlx-vlm server-style layout filter plus the image-capability classification and architecture pre-check | `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md` |

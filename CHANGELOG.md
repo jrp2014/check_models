@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Agent skills: added `triaging-skylos-findings`, adapted from the `skylos`
+  and `skylos-security` skills in Skylos's own repository. It maps where
+  Skylos gates this repo, how to reproduce one finding with `--select` and
+  `--diff`, the order to try fix, inline suppression and project-wide ignore,
+  re-testing version-pinned workarounds after an upgrade, and drafting a
+  Skylos bug report. The parts about developing Skylos itself (its rule
+  catalogue, cloud policy, LLM evidence filters, benchmarks) were left out.
 - Tooling: the Skylos quality gate no longer fails locally on "Unverified
   import" (SKY-D223) for `mlx` and `mlx_vlm`. Both are declared dependencies,
   but Skylos 4.43.2 reads an editable install's `RECORD` (the loader files)
