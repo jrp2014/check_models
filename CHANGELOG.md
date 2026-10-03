@@ -26,13 +26,19 @@ Notable changes to this project will be documented in this file.
   text listing) now skips the update, as a pip-owned upgrade already did. A
   package that is not installed at all counts as a plain new install, and an
   editable install (`<develop>`) counts as pip's.
-- Tooling: `make quality` runs the Skylos dependency scan as its own step.
-  `tools/check_dependency_advisories.py` fails it on any advisory outside a
-  short accepted list, and on a scan that did not finish. Skylos's ignore list
-  does not reach dependency advisories, so this is the only way to accept one.
-  The list holds GHSA-vfj7-8cjw-p6xm (braces 3.0.3 via markdownlint-cli2,
-  which has no fixed release). The step says when a listed advisory stops
-  being reported, so its entry can be dropped.
+- Tooling: `make quality` runs the Skylos dependency scan as its own step,
+  gated by `tools/check_dependency_advisories.py`. Skylos's ignore list does
+  not reach dependency advisories, so this is the only way to accept one.
+  - The scan passes only with a recognised successful status (`complete`, or
+    `complete_with_unresolved_versions`, accepted for pyproject's unpinned
+    ranges) after a completed advisory query, with at least one dependency
+    checked and no lockfile parse or resolution gaps. Any other status,
+    including `no_supported_manifests` and unknown ones, fails.
+  - An exception matches only its reviewed advisory, ecosystem, package,
+    version and manifest. The one exception is GHSA-vfj7-8cjw-p6xm for braces
+    3.0.3 in `src/package-lock.json` (via markdownlint-cli2), which has no
+    fixed release. It fails once a fixed release exists, and the step says
+    when it stops being reported, so it can be dropped.
 - `check_models.log` and the terminal are quieter. Under `--verbose` a
   completed model's entry in "Per-model results" is its summary line plus any
   warnings. The token, timing and memory tree has been removed (the

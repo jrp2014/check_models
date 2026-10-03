@@ -20,7 +20,7 @@ were checked against Skylos 4.43.2.
 | Step | Command (from `src/tools/`) | Blocks on |
 | ---- | --------------------------- | --------- |
 | Skylos Quality Gate | `run_quality_checks.sh`: `. --quality --secrets --ai-defects --gate --format concise` | any finding (`max_*` are 0 in `[gate]`) |
-| Skylos Dependency Scan | `run_quality_checks.sh`: `. --sca --json`, then `tools.check_dependency_advisories` | any advisory not on that tool's accepted list |
+| Skylos Dependency Scan | `run_quality_checks.sh`: `. --sca --json`, then `tools.check_dependency_advisories` | a scan without a recognised successful status, any advisory not matching an accepted exception exactly (advisory, package, version, manifest), or an accepted one with a fix released |
 | Skylos Danger Gate | `run_skylos_danger_advisory.sh --full --gate` (fast mode drops `--gate`) | any danger finding outside `.worktrees/` |
 | `skylos-advisory` CI job | `run_skylos_danger_advisory.sh`, diff-aware on PRs | nothing (annotations only) |
 

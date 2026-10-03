@@ -2343,55 +2343,154 @@ def test_danger_report_filter_drops_only_worktree_findings(tmp_path: Path) -> No
     assert filter_danger_report.main(["prog", str(report_path)]) == 0
 
 
-def _dependency_scan_report(status: str | None, *rule_ids: str) -> dict[str, object]:
-    summary: dict[str, object] = {} if status is None else {"sca_coverage": {"status": status}}
+_BRACES = check_dependency_advisories.AcceptedAdvisory(
+    rule_id="SKY-SCA-GHSA-test",
+    ecosystem="npm",
+    package="braces",
+    version="3.0.3",
+    manifest="package-lock.json",
+    reason="reviewed: no fixed release",
+)
+
+
+def _sca_coverage(status: object = "complete", **overrides: object) -> dict[str, object]:
+    """A finished Skylos sca_coverage block (shape of skylos 4.43 reports)."""
     return {
-        "analysis_summary": summary,
-        "dependency_vulnerabilities": [
-            {"rule_id": rule_id, "file": "package-lock.json", "line": 1, "message": "advisory"}
-            for rule_id in rule_ids
-        ],
+        "status": status,
+        "complete": True,
+        "query": {"status": "complete", "complete": True},
+        "dependency_count": 87,
+        "parse_error_count": 0,
+        "unresolved_lockfile_dependency_count": 0,
+        "unresolved_dependency_count": 0,
+        **overrides,
     }
 
 
-def test_dependency_advisory_gate_accepts_only_listed_advisories(tmp_path: Path) -> None:
-    """Only advisories on the accepted list pass; any other advisory fails the step."""
-    accepted = {"SKY-SCA-GHSA-aaaa": "no fixed release"}
+def _sca_finding(
+    rule_id: str = "SKY-SCA-GHSA-test",
+    *,
+    package: str = "braces",
+    version: str = "3.0.3",
+    file: str = "package-lock.json",
+    fixed_versions: list[str] | None = None,
+) -> dict[str, object]:
+    return {
+        "rule_id": rule_id,
+        "file": file,
+        "line": 117,
+        "message": f"{package}@{version}: advisory",
+        "metadata": {
+            "ecosystem": "npm",
+            "package_name": package,
+            "package_version": version,
+            "fixed_version": None,
+            "fixed_versions": fixed_versions or [],
+        },
+    }
 
-    passed, lines = check_dependency_advisories.evaluate(
-        _dependency_scan_report("complete", "SKY-SCA-GHSA-aaaa"), accepted
+
+def _dependency_scan_report(coverage: object, *findings: dict[str, object]) -> dict[str, object]:
+    return {
+        "analysis_summary": {"sca_coverage": coverage},
+        "dependency_vulnerabilities": list(findings),
+    }
+
+
+def _evaluate_scan(tmp_path: Path, report: object) -> tuple[bool, list[str]]:
+    passed, lines = check_dependency_advisories.evaluate(report, (_BRACES,), scan_root=tmp_path)
+    return bool(passed), list(lines)
+
+
+def test_dependency_advisory_gate_accepts_only_the_reviewed_occurrence(tmp_path: Path) -> None:
+    """An exception covers its advisory on the reviewed package, version and manifest only."""
+    passed, lines = _evaluate_scan(
+        tmp_path, _dependency_scan_report(_sca_coverage(), _sca_finding())
     )
     assert passed
-    assert any("Accepted SKY-SCA-GHSA-aaaa" in line for line in lines)
+    assert any("Accepted SKY-SCA-GHSA-test" in line for line in lines)
+    # Skylos may report the manifest as an absolute path under the scanned directory.
+    absolute = _sca_finding(file=str(tmp_path / "package-lock.json"))
+    assert _evaluate_scan(tmp_path, _dependency_scan_report(_sca_coverage(), absolute))[0]
 
-    passed, lines = check_dependency_advisories.evaluate(
-        _dependency_scan_report("complete", "SKY-SCA-GHSA-aaaa", "SKY-SCA-GHSA-bbbb"), accepted
-    )
-    assert not passed
-    assert any(line.startswith("❌ SKY-SCA-GHSA-bbbb") for line in lines)
+    for other in (
+        _sca_finding("SKY-SCA-GHSA-other"),
+        _sca_finding(version="3.0.4"),
+        _sca_finding(package="micromatch"),
+        _sca_finding(file="tools/vendor/package-lock.json"),
+    ):
+        passed, lines = _evaluate_scan(tmp_path, _dependency_scan_report(_sca_coverage(), other))
+        assert not passed, other
+        assert not any("Accepted" in line for line in lines), other
+        assert any(line.startswith("❌ ") for line in lines)
 
     # A listed advisory that is no longer reported passes, with a prompt to drop it.
-    passed, lines = check_dependency_advisories.evaluate(
-        _dependency_scan_report("complete"), accepted
-    )
+    passed, lines = _evaluate_scan(tmp_path, _dependency_scan_report(_sca_coverage()))
     assert passed
     assert any("no longer reported" in line for line in lines)
 
+
+def test_dependency_advisory_gate_fails_an_exception_once_a_fix_ships(tmp_path: Path) -> None:
+    """A fixed release turns the accepted advisory back into a blocking one."""
+    report = _dependency_scan_report(_sca_coverage(), _sca_finding(fixed_versions=["3.0.4"]))
+    passed, lines = _evaluate_scan(tmp_path, report)
+    assert not passed
+    assert any("fixed release now exists (3.0.4)" in line for line in lines)
+
+
+def test_dependency_advisory_gate_reads_the_report_file(tmp_path: Path) -> None:
     report_path = tmp_path / "skylos-dependency-scan.json"
     report_path.write_text(
-        json.dumps(_dependency_scan_report("complete", "SKY-SCA-GHSA-bbbb")), encoding="utf-8"
+        json.dumps(_dependency_scan_report(_sca_coverage(), _sca_finding("SKY-SCA-GHSA-new"))),
+        encoding="utf-8",
     )
     assert check_dependency_advisories.main(["prog", str(report_path)]) == 1
     assert check_dependency_advisories.main(["prog", str(tmp_path / "missing.json")]) == 1
 
 
-@pytest.mark.parametrize("status", ["incomplete", "unavailable", "unknown", None])
-def test_dependency_advisory_gate_fails_closed_on_unfinished_scan(status: str | None) -> None:
-    """An unfinished or unlabelled scan never passes, even with no advisories listed."""
-    passed, lines = check_dependency_advisories.evaluate(_dependency_scan_report(status), {})
+@pytest.mark.parametrize(
+    "coverage",
+    [
+        pytest.param(_sca_coverage("incomplete", complete=False), id="incomplete"),
+        pytest.param(_sca_coverage("unavailable", complete=False), id="unavailable"),
+        pytest.param(_sca_coverage("unknown", complete=False), id="unknown"),
+        # Skylos's real status for a tree it found nothing to scan in.
+        pytest.param(
+            _sca_coverage("no_supported_manifests", complete=False, dependency_count=0),
+            id="no-supported-manifests",
+        ),
+        pytest.param(_sca_coverage("some_future_status"), id="unrecognised-status"),
+        pytest.param(_sca_coverage(None), id="missing-status"),
+        pytest.param(_sca_coverage(complete=False), id="complete-flag-false"),
+        pytest.param(_sca_coverage(query={"complete": False}), id="query-incomplete"),
+        pytest.param(_sca_coverage(dependency_count=0), id="nothing-checked"),
+        pytest.param(_sca_coverage(parse_error_count=1), id="parse-error"),
+        pytest.param(
+            _sca_coverage(
+                "complete_with_unresolved_versions", unresolved_lockfile_dependency_count=2
+            ),
+            id="unresolved-lockfile",
+        ),
+        pytest.param(None, id="no-coverage-block"),
+    ],
+)
+def test_dependency_advisory_gate_passes_only_a_finished_scan(
+    tmp_path: Path, coverage: object
+) -> None:
+    """Only a recognised successful status passes; anything else fails, even with no findings."""
+    passed, lines = _evaluate_scan(tmp_path, _dependency_scan_report(coverage))
 
     assert not passed
-    assert "did not finish" in lines[0]
+    assert "did not finish cleanly" in lines[0]
+
+
+def test_dependency_advisory_gate_accepts_unresolved_pyproject_ranges(tmp_path: Path) -> None:
+    """Unpinned pyproject ranges are accepted by policy and named in the output."""
+    coverage = _sca_coverage("complete_with_unresolved_versions", unresolved_dependency_count=12)
+    passed, lines = _evaluate_scan(tmp_path, _dependency_scan_report(coverage, _sca_finding()))
+
+    assert passed
+    assert any("12 declared version ranges" in line for line in lines)
 
 
 def test_artifact_schema_version_constants_match_typed_dict_literals() -> None:
