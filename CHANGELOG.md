@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: the Skylos floor is now 4.44.0, which checks an editable
+  install's modules against the published wheel instead of trusting its
+  loader-only `RECORD`. The three temporary `skylos: ignore[SKY-D223]`
+  suppressions on the first `mlx`/`mlx_vlm` imports are gone. With mlx-vlm
+  installed editable, the same tree reports SKY-D223 on 4.43.2 and nothing
+  on 4.44.0. The SKY-S101 workaround is still needed on 4.44.0.
 - Agent skills: added `triaging-skylos-findings`, adapted from the `skylos`
   and `skylos-security` skills in Skylos's own repository. It maps where
   Skylos gates this repo, how to reproduce one finding with `--select` and

@@ -75,7 +75,7 @@ Then take the first option that holds:
    O_NOFOLLOW.` The suppression audit (`tools/check_suppressions.py`) does
    not re-check Skylos comments, so a stale one stays silently; if it works
    around a Skylos bug, name the Skylos version and record when to remove it
-   (as the SKY-D223 comments and CHANGELOG entry do).
+   (as the SKY-S101 comment in `check_models.py` does).
 4. **Project-wide `ignore`** only for a rule the project rejects as policy,
    with a one-line reason, in both config files. Never raise a `[gate]`
    threshold instead: `max_quality = 0` is deliberate.
@@ -92,8 +92,9 @@ new defects. Run the gate on the old and new versions against the same
 commit to confirm, then triage each new rule as above. Also re-test the
 version-pinned workarounds: delete each suppression or filter that names an
 older Skylos version, rerun its narrow command, and drop it if the finding no
-longer appears (current ones: SKY-D223 for 4.43.2, SKY-S101 for 4.33.2, the
-`.worktrees/` danger filter for 4.33.x).
+longer appears (current ones: SKY-S101 for 4.33.2, still needed on 4.44.0,
+and the `.worktrees/` danger filter for 4.33.x; the SKY-D223 editable-install
+suppressions went with 4.44.0).
 
 ## 4. Drafting a Skylos bug report
 

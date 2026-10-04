@@ -23,10 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
     import types
     from collections.abc import Mapping, Sequence
 
-# SKY-D223: mlx is a declared dependency. Skylos 4.43.2 reads an editable
-# install's RECORD as an empty inventory and reports "Unverified import".
-# Drop this suppression once Skylos fixes that (see check_models.py).
-import mlx.core as mx  # skylos: ignore[SKY-D223]
+import mlx.core as mx
 import pytest
 import yaml
 from mlx import nn
