@@ -2374,7 +2374,10 @@ def _sca_finding(
     version: str = "3.0.3",
     file: str = "package-lock.json",
     fixed_versions: list[str] | None = None,
+    also_in: tuple[str, ...] = (),
 ) -> dict[str, object]:
+    """One Skylos SCA finding; ``also_in`` adds merged occurrences in other lockfiles."""
+    occurrences = [{"file": manifest, "line": 117} for manifest in (file, *also_in)]
     return {
         "rule_id": rule_id,
         "file": file,
@@ -2386,6 +2389,7 @@ def _sca_finding(
             "package_version": version,
             "fixed_version": None,
             "fixed_versions": fixed_versions or [],
+            "dependency_occurrences": occurrences,
         },
     }
 
@@ -2420,6 +2424,9 @@ def test_dependency_advisory_gate_accepts_only_the_reviewed_occurrence(tmp_path:
         _sca_finding(version="3.0.4"),
         _sca_finding(package="micromatch"),
         _sca_finding(file="tools/vendor/package-lock.json"),
+        # Skylos merges the same package version from several lockfiles into one
+        # finding: every merged occurrence must be the reviewed manifest.
+        _sca_finding(also_in=("service/package-lock.json",)),
     ):
         passed, lines = _evaluate_scan(tmp_path, _dependency_scan_report(_sca_coverage(), other))
         assert not passed, other

@@ -700,10 +700,17 @@ Notable changes to this project will be documented in this file.
   a package: with a conda environment named `mlx-vlm`, every frame under
   `envs/mlx-vlm/…/site-packages/` matched mlx-vlm, so a crash raised in
   huggingface_hub or transformers code (Llama-4-Scout's config validation)
-  was labelled an mlx-vlm fault. Crash drafts now say when the exception
-  was raised in another package's code, listing its innermost library
-  frames, and the maintainer verdict counts only crashes in mlx-vlm (or of
-  unknown origin) as mlx-vlm's action, naming the rest separately.
+  was labelled an mlx-vlm fault. Crash drafts keep three things apart: the
+  observed raise site (the innermost library frames), the likely package
+  (the heuristic label, shown as "Likely package" and marked unconfirmed
+  when the innermost frame is mlx-vlm's own), and who fixes it, which stays
+  open because a library can raise on a bad call. The maintainer verdict
+  still counts every crash as mlx-vlm's to look at, and names the ones
+  raised in another library's code.
+- The dependency gate's braces exception now has to match every lockfile
+  occurrence Skylos merges into one finding (`metadata.dependency_occurrences`),
+  not just the finding's first file, so the same braces 3.0.3 in another
+  lockfile fails.
 - Image capability is also read one sub-config down: composite checkpoints
   keep their vision settings in a `*_config` section (Qwen3-Omni has
   `thinker_config.vision_config` and an empty top-level `vision_config`),

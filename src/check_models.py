@@ -10131,7 +10131,7 @@ def _diagnostics_result_facts(
     optional_facts = (
         ("Phase", result.failure_phase),
         ("Stage", result.error_stage),
-        ("Package", result.error_package),
+        ("Likely package", result.error_package),
         ("Error type", result.error_type),
         (
             "Error message",
@@ -24006,11 +24006,11 @@ def _token_limit_summary(results: Sequence[JsonlResultRecord]) -> str:
     return f"{reached} ({incomplete} with incomplete output)" if reached else "0"
 
 
-def _failure_package(result: JsonlResultRecord) -> str | None:
-    """The package a crash was attributed to, as recorded."""
+def _failure_raising_library(result: JsonlResultRecord) -> str | None:
+    """Top-level module of the innermost library frame in a crash's traceback."""
     failure = result.get("failure")
-    package = failure.get("package") if isinstance(failure, dict) else None
-    return package if isinstance(package, str) else None
+    traceback_text = failure.get("traceback") if isinstance(failure, dict) else None
+    return _raising_library(_library_frames(traceback_text))
 
 
 def _run_issue_summary_maintainer_verdict(
@@ -24022,23 +24022,21 @@ def _run_issue_summary_maintainer_verdict(
     lead = "**For mlx-vlm maintainers:** "
     if not actionable and not other:
         return lead + "nothing to act on: no crashes, and no result points at mlx-vlm."
-    # A crash raised in another package's code (by its recorded package) is
-    # someone's work, but not mlx-vlm's; unknown origin is not ruled out.
-    in_mlx_vlm = [r for r in actionable if _failure_package(r) in _MLX_VLM_OWNED_PACKAGES]
-    elsewhere = sorted(
-        {str(_failure_package(r)) for r in actionable} - {"mlx-vlm", "unknown", "None"}
-    )
     crash_part = (
-        f"{_pluralized_count(len(in_mlx_vlm), 'crash', 'crashes')} "
-        f"{'needs' if len(in_mlx_vlm) == 1 else 'need'} action "
+        f"{_pluralized_count(len(actionable), 'crash', 'crashes')} "
+        f"{'needs' if len(actionable) == 1 else 'need'} action "
         "(see *Crashes requiring action*)"
-        if in_mlx_vlm
+        if actionable
         else "no crashes need action"
     )
-    if outside := len(actionable) - len(in_mlx_vlm):
+    # Where a crash was raised is evidence, not a verdict: a library can raise
+    # because mlx-vlm called it wrongly, so these stay in mlx-vlm's count.
+    raised_in = [_failure_raising_library(result) for result in actionable]
+    if outside := sorted({lib for lib in raised_in if lib not in {None, "mlx_vlm"}}):
+        count = sum(lib not in {None, "mlx_vlm"} for lib in raised_in)
         crash_part += (
-            f"; {_pluralized_count(outside, 'crash', 'crashes')} raised outside mlx-vlm "
-            f"(in {', '.join(elsewhere)} code)"
+            f" ({count} raised in {', '.join(f'`{lib}`' for lib in outside)} code; "
+            "whether mlx-vlm's call or that library is at fault is still open)"
         )
     if not other:
         return lead + crash_part + "."
@@ -24734,7 +24732,7 @@ def _snapshot_note_checks(snapshot_notes: Sequence[str]) -> list[str]:
 
 
 _TRACEBACK_FILE_RE: Final[re.Pattern[str]] = re.compile(r'File "([^"]+\.py)"')
-_MLX_VLM_OWNED_PACKAGES: Final[frozenset[str | None]] = frozenset({None, "mlx-vlm", "unknown"})
+_UNATTRIBUTED_PACKAGES: Final[frozenset[str | None]] = frozenset({None, "mlx-vlm", "unknown"})
 
 
 def _library_frames(traceback_text: str | None, *, limit: int = 3) -> tuple[str, ...]:
@@ -24759,6 +24757,47 @@ def _library_frames(traceback_text: str | None, *, limit: int = 3) -> tuple[str,
     return tuple(frames)
 
 
+def _raising_library(frames: Sequence[str]) -> str | None:
+    """Top-level module of the innermost library frame: where the raise was observed."""
+    return frames[0].split("/", 1)[0] if frames else None
+
+
+def _crash_origin_item(failure_package: str | None, failure_frames: Sequence[str]) -> str | None:
+    """Observed raise site, heuristic package and open responsibility, kept apart.
+
+    The frames are evidence of where the exception was raised; the package
+    label is a guess from the message and frames; neither settles who fixes
+    it, since a library can raise because its caller passed the wrong thing.
+    Says nothing when both point at mlx-vlm (or nothing was recorded).
+    """
+    raised_in = _raising_library(failure_frames)
+    likely_elsewhere = failure_package not in _UNATTRIBUTED_PACKAGES
+    if not likely_elsewhere and raised_in in {None, "mlx_vlm"}:
+        return None
+    path = " \u2190 ".join(f"`{frame}`" for frame in failure_frames)
+    parts = [
+        f"Observed: the exception was raised in `{raised_in}` code (innermost library "
+        f"frames: {path})."
+        if raised_in
+        else "Observed: no library frames were recorded."
+    ]
+    if likely_elsewhere:
+        parts.append(
+            f"Likely package (a heuristic from the message and frames): {failure_package}."
+        )
+        if raised_in == "mlx_vlm":
+            parts.append(
+                f"The innermost frame is mlx-vlm's own code, so the {failure_package} "
+                "label is unconfirmed."
+            )
+    parts.append(
+        "Who fixes it is open: a library can raise because its caller passed the wrong "
+        "thing, so check the checkpoint's files against that library and the mlx-vlm "
+        "call that reached it before reporting either way."
+    )
+    return " ".join(parts)
+
+
 def _checkpoint_checks_section(
     *,
     model: str,
@@ -24780,14 +24819,8 @@ def _checkpoint_checks_section(
     visible.
     """
     items: list[str] = []
-    if failure_package not in _MLX_VLM_OWNED_PACKAGES:
-        path = " \u2190 ".join(f"`{frame}`" for frame in failure_frames)
-        items.append(
-            f"The exception was raised in {failure_package} code, not mlx-vlm's"
-            + (f" (innermost library frames: {path})" if path else "")
-            + ". Check the checkpoint's files against that library first, and report "
-            "there if the library is at fault."
-        )
+    if origin_item := _crash_origin_item(failure_package, failure_frames):
+        items.append(origin_item)
     if arch_supported is False:
         items.append(
             f"The installed mlx-vlm has no loader for model type `{model_type}`. "

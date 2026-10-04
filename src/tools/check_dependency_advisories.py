@@ -10,8 +10,9 @@ this module decides:
   status (see SUCCESSFUL_STATUSES); every other status, including ones this
   module does not know, fails, so a scan that checked nothing never passes;
 - pass an advisory only when it matches a reviewed exception exactly: the
-  advisory, ecosystem, package, version and manifest. The same advisory on
-  another version or lockfile fails;
+  advisory, ecosystem, package, version and manifest, for every lockfile
+  occurrence Skylos merged into the finding. The same advisory on another
+  version or lockfile fails;
 - fail an accepted advisory once a fixed release exists, so the exception is
   reconsidered (usually by upgrading) rather than outliving its reason;
 - say when a listed exception is no longer reported, so it can be dropped.
@@ -26,8 +27,12 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools.safe_io import read_text_no_follow
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 @dataclass(frozen=True)
@@ -114,23 +119,40 @@ def _matching_exception(
 ) -> AcceptedAdvisory | None:
     metadata = entry.get("metadata")
     meta = metadata if isinstance(metadata, dict) else {}
-    occurrence = (
+    identity = (
         str(entry.get("rule_id", "")),
         str(meta.get("ecosystem", "")),
         str(meta.get("package_name", "")),
         str(meta.get("package_version", "")),
-        _relative_manifest(entry.get("file"), scan_root),
     )
+    manifests = _finding_manifests(entry, meta, scan_root)
     for exception in accepted:
-        if occurrence == (
+        if identity == (
             exception.rule_id,
             exception.ecosystem,
             exception.package,
             exception.version,
-            exception.manifest,
-        ):
+        ) and manifests == {exception.manifest}:
             return exception
     return None
+
+
+def _finding_manifests(
+    entry: Mapping[str, object], meta: Mapping[str, object], scan_root: Path
+) -> set[str]:
+    """Return every manifest the finding covers.
+
+    Skylos merges one package version found in several lockfiles into one
+    finding, keeping each location in metadata.dependency_occurrences, so the
+    top-level file is only the first.
+    """
+    manifests = {_relative_manifest(entry.get("file"), scan_root)}
+    occurrences = meta.get("dependency_occurrences", [])
+    for occurrence in occurrences if isinstance(occurrences, list) else [None]:
+        file = occurrence.get("file") if isinstance(occurrence, dict) else None
+        # An occurrence with no readable location can never match an exception.
+        manifests.add(_relative_manifest(file, scan_root) if file else "<unknown manifest>")
+    return manifests
 
 
 def _available_fixes(entry: dict[str, object]) -> list[str]:

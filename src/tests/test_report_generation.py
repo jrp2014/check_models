@@ -8423,54 +8423,79 @@ _CONFIG_CRASH_TRACEBACK = (
 )
 
 
-def test_crash_drafts_name_the_package_whose_code_raised() -> None:
-    """A crash raised in another library says so, with its innermost library frames."""
+def _crash_origin_text(failure_package: str, traceback_text: str | None) -> str:
+    section = check_models._checkpoint_checks_section(
+        model="org/m",
+        phase="model_load",
+        model_type="llama4",
+        arch_supported=True,
+        snapshot_notes=(),
+        failure_package=failure_package,
+        failure_frames=check_models._library_frames(traceback_text),
+    )
+    return " ".join("\n".join(check_models.render_report_markdown((section,))).split())
+
+
+_MLX_VLM_RAISE_TRACEBACK = (
+    "Traceback (most recent call last):\n"
+    '  File "/Users/u/src/check_models/src/check_models.py", line 16460, in process_image\n'
+    '  File "/env/lib/python3.14/site-packages/transformers/processing_utils.py", line 12\n'
+    '  File "/Users/u/src/mlx-vlm/mlx_vlm/generate.py", line 600, in generate\n'
+    "ValueError: tokenizer config does not match the processor\n"
+)
+
+
+def test_crash_drafts_keep_observed_origin_and_likely_package_apart() -> None:
+    """The raise site is evidence, the package label a heuristic; neither assigns the fix."""
     assert check_models._library_frames(_CONFIG_CRASH_TRACEBACK) == (
         "huggingface_hub/dataclasses.py",
         "transformers/models/llama4/configuration_llama4.py",
         "transformers/configuration_utils.py",
     )
-    section = check_models._checkpoint_checks_section(
-        model="org/llama4",
-        phase="model_load",
-        model_type="llama4",
-        arch_supported=True,
-        snapshot_notes=(),
-        failure_package="huggingface-hub",
-        failure_frames=check_models._library_frames(_CONFIG_CRASH_TRACEBACK),
-    )
-    text = " ".join("\n".join(check_models.render_report_markdown((section,))).split())
-    assert "The exception was raised in huggingface-hub code, not mlx-vlm's" in text
+    text = _crash_origin_text("huggingface-hub", _CONFIG_CRASH_TRACEBACK)
+    assert "Observed: the exception was raised in `huggingface_hub` code" in text
     assert "`huggingface_hub/dataclasses.py` ← `transformers/models/llama4/" in text
-    own = check_models._checkpoint_checks_section(
-        model="org/m",
-        phase="model_load",
-        model_type="qwen2_vl",
-        arch_supported=True,
-        snapshot_notes=(),
-        failure_package="mlx-vlm",
-    )
-    assert "raised in" not in " ".join(
-        "\n".join(check_models.render_report_markdown((own,))).split()
-    )
+    assert "Likely package (a heuristic from the message and frames): huggingface-hub." in text
+    assert "Who fixes it is open" in text
+    assert "not mlx-vlm's" not in text
+
+    # Regression: the heuristic said transformers while the recorded raise site
+    # was mlx_vlm/generate.py, and the draft claimed transformers raised it.
+    text = _crash_origin_text("transformers", _MLX_VLM_RAISE_TRACEBACK)
+    assert "Observed: the exception was raised in `mlx_vlm` code" in text
+    assert "the transformers label is unconfirmed" in text
+    assert "raised in transformers" not in text
+
+    # Both pointing at mlx-vlm adds nothing.
+    assert "Observed" not in _crash_origin_text("mlx-vlm", _MLX_VLM_RAISE_TRACEBACK)
 
 
-def test_maintainer_verdict_counts_only_crashes_in_mlx_vlm_as_its_work() -> None:
-    """A crash raised in another package's code is reported, but not as mlx-vlm's action."""
+def test_maintainer_verdict_keeps_crashes_raised_in_libraries_in_mlx_vlm_count() -> None:
+    """Where a crash was raised is reported as evidence, never as who must fix it."""
 
-    def crash(model: str, package: str) -> check_models.JsonlResultRecord:
+    def crash(model: str, package: str, traceback_text: str) -> check_models.JsonlResultRecord:
         record = _issue_summary_result(model, execution="crashed", usability="not_evaluated")
-        cast("dict[str, Any]", record["failure"])["package"] = package
+        failure = cast("dict[str, Any]", record["failure"])
+        failure["package"] = package
+        failure["traceback"] = traceback_text
         return cast("check_models.JsonlResultRecord", record)
 
     verdict = check_models._run_issue_summary_maintainer_verdict
-    line = verdict((crash("org/llama4", "huggingface-hub"),), (), None)
+    line = verdict((crash("org/llama4", "huggingface-hub", _CONFIG_CRASH_TRACEBACK),), (), None)
     assert line == (
-        "**For mlx-vlm maintainers:** no crashes need action; 1 crash raised outside mlx-vlm "
-        "(in huggingface-hub code)."
+        "**For mlx-vlm maintainers:** 1 crash needs action (see *Crashes requiring action*) "
+        "(1 raised in `huggingface_hub` code; whether mlx-vlm's call or that library is at "
+        "fault is still open)."
     )
-    mixed = verdict((crash("org/a", "mlx-vlm"), crash("org/b", "transformers")), (), None)
-    assert mixed.startswith("**For mlx-vlm maintainers:** 1 crash needs action")
-    assert "1 crash raised outside mlx-vlm (in transformers code)" in mixed
-    # Unknown origin is not ruled out as mlx-vlm's.
-    assert "1 crash needs action" in verdict((crash("org/c", "unknown"),), (), None)
+    # The heuristic label alone never moves a crash out of mlx-vlm's count.
+    mixed = verdict(
+        (
+            crash("org/a", "transformers", _MLX_VLM_RAISE_TRACEBACK),
+            crash("org/b", "unknown", ""),
+        ),
+        (),
+        None,
+    )
+    assert mixed == (
+        "**For mlx-vlm maintainers:** 2 crashes need action (see *Crashes requiring action*)."
+    )
