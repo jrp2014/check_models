@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-10-04 00:22:12 BST
+FULL ENVIRONMENT DUMP - 2026-10-04 00:57:49 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -41,7 +41,7 @@ httpcore2==2.13.1
 httpx==0.28.1
 httpx-sse==0.4.3
 httpx2==2.13.1
-huggingface_hub==1.33.0
+huggingface_hub==2.1.1
 identify==2.6.20
 idna==3.20
 iniconfig==2.3.0
@@ -174,5 +174,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-10-04 00:22:12 BST
+Environment dump completed at 2026-10-04 00:57:49 BST
 ================================================================================

@@ -9,13 +9,13 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 16m 39s
+- Run duration: 13m 05s
 - Evaluation lane: assisted
 - Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - Input image: JPEG, 9,805 x 6,538 pixels (64.1 MP), 54.2 MB
-- Models attempted: 53 (completed 52, crashed 1, indeterminate 0)
-- Mechanical checks: no concerns detected 29, concerns detected 14, major concerns 9, not assessed 1
+- Models attempted: 52 (completed 52, crashed 0, indeterminate 0)
+- Mechanical checks: no concerns detected 29, concerns detected 14, major concerns 9, not assessed 0
 - Top observations: Response repeats the same text (1), Unrecognised model control tokens remain visible (1), Required labelled fields not detected (9), Response appears cut off at the token limit (2), Internal reasoning block appears incomplete (1)
 
 ## Start here
@@ -30,7 +30,3 @@ establish fitness for other tasks.
 - [results.jsonl](https://github.com/jrp2014/check_models/blob/main/src/output/results.jsonl)
 - [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)
 - [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log)
-
-## Issue drafts
-
-- [mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Llama-4-Scout-17B-16E-Instruct-4bit.md)

@@ -20,17 +20,16 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 53    |
-| Conclusive outcomes | 53    |
+| Attempted           | 52    |
+| Conclusive outcomes | 52    |
 | Completed           | 52    |
-| Crashed             | 1     |
+| Crashed             | 0     |
 | Indeterminate       | 0     |
 
 Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| actionable failure             | 1     |
 | none                           | 50    |
 | observation needs reproduction | 2     |
 
@@ -38,7 +37,6 @@ Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| not assessed         | 1     |
 | major concerns       | 9     |
 | no concerns detected | 29    |
 | concerns detected    | 14    |
@@ -58,206 +56,14 @@ Observation counts
 
 ## Triage
 
-| Model                                                                                                              | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                       |
-|--------------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit](#diagnostic-mlx-community-llama-4-scout-17b-16e-instruct-4bit) | crashed   | not assessed      | actionable failure             | none                                                                                                               |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit)           | completed | major concerns    | observation needs reproduction | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                         | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                               |
+| Model                                                                                                    | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                       |
+|----------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | completed | major concerns    | observation needs reproduction | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                               |
 
 ## Crashes requiring action
 
-<a id="diagnostic-mlx-community-llama-4-scout-17b-16e-instruct-4bit"></a>
-
-### mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit
-
-#### Root exception and chain
-
-```text
-builtins.TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-huggingface_hub.errors.StrictDataclassFieldValidationError: Validation error for field 'attn_temperature_tuning':
-    TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-builtins.ValueError: Model loading failed: Validation error for field 'attn_temperature_tuning':
-    TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-```
-
-#### Execution and provenance
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable failure
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type llama4)
-- *Family README in installed mlx-vlm:* none
-- *Phase:* model_load
-- *Stage:* Model Error
-- *Package:* mlx-vlm
-- *Error type:* ValueError
-- *Error message:* Model loading failed: Validation error for field
-  'attn_temperature_tuning':     TypeError: Field 'attn_temperature_tuning'
-  expected bool, got int (value: 4)
-- *Root error type:* TypeError
-- *Root error message:* Field 'attn_temperature_tuning' expected bool, got int
-  (value: 4)
-- *Resolved model revision:* f89d3ebf0bb8f9b512d6c732aff83937deb55c3e
-- *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.004
-- *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 61.12
-- *Parameter count:* 17.00B (name-estimate)
-- *Quantization:* 4-bit, group 64
-- *Declared context length:* 10,485,760 (text_config.max_position_embeddings)
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
-
-<details>
-<summary>Complete traceback</summary>
-
-```text
-Traceback (most recent call last):
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 144, in __strict_setattr__
-    validator(value)
-    ~~~~~~~~~^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 625, in validator
-    type_validator(field.name, value, field.type)
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 472, in type_validator
-    _validate_simple_type(name, value, expected_type)
-    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 615, in _validate_simple_type
-    raise TypeError(
-        f"Field '{name}' expected {expected_type.__name__}, got {type(value).__name__} (value: {repr(value)})"
-    )
-TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15156, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14012, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 864, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1323, in load
-    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1468, in load_processor
-    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 657, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 657, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 657, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  [Previous line repeated 10 more times]
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/models/auto/processing_auto.py", line 346, in from_pretrained
-    return processor_class.from_pretrained(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/processing_utils.py", line 1754, in from_pretrained
-    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, processor_dict, **kwargs)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/processing_utils.py", line 1879, in _get_arguments_from_pretrained
-    tokenizer = cls._load_tokenizer_from_pretrained(
-        sub_processor_type, pretrained_model_name_or_path, subfolder=subfolder, **kwargs
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/processing_utils.py", line 1815, in _load_tokenizer_from_pretrained
-    tokenizer = auto_processor_class.from_pretrained(
-        pretrained_model_name_or_path, subfolder=subfolder, **kwargs
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/models/auto/tokenization_auto.py", line 807, in from_pretrained
-    config = AutoConfig.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/models/auto/configuration_auto.py", line 440, in from_pretrained
-    return config_class.from_dict(config_dict, **unused_kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/configuration_utils.py", line 946, in from_dict
-    config = cls(**config_dict)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 275, in init_with_validate
-    initial_init(self, *args, **kwargs)  # type: ignore [call-arg]
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/configuration_utils.py", line 172, in __init__
-    self.__post_init__(**additional_kwargs)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/models/llama4/configuration_llama4.py", line 258, in __post_init__
-    self.text_config = Llama4TextConfig(**self.text_config)
-                       ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 275, in init_with_validate
-    initial_init(self, *args, **kwargs)  # type: ignore [call-arg]
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/configuration_utils.py", line 157, in __init__
-    setattr(self, f.name, standard_kwargs[f.name])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/huggingface_hub/dataclasses.py", line 146, in __strict_setattr__
-    raise StrictDataclassFieldValidationError(field=name, cause=e) from e
-huggingface_hub.errors.StrictDataclassFieldValidationError: Validation error for field 'attn_temperature_tuning':
-    TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 16460, in process_image_with_model
-    generation_run = _run_model_generation(
-        params=params,
-        phase_callback=_update_phase,
-        phase_timer=phase_timer,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15171, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Validation error for field 'attn_temperature_tuning':
-    TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-
-```
-
-</details>
-
-#### Captured stdout/stderr
-
-```text
-=== STDERR ===
-[00:24:21] INFO     Loading model weights and processor...
-Fetching 21 files:   0%|          | 0/21 [00:00<?, ?it/s]
-Fetching 21 files: 100%|██████████| 21/21 [00:00<00:00, 5545.23it/s]
-[00:24:27] DEBUG    HF Cache Info for mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit: size=58311.1 MB, files=23
-```
+None.
 
 ## Completed Runs with Observations
 
@@ -294,7 +100,7 @@ Fetching 21 files: 100%|██████████| 21/21 [00:00<00:00, 5545
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.427
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.369
 - *Peak memory at first token (GB):* 20.067
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.6
@@ -364,7 +170,7 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.529
 - *Peak memory at first token (GB):* 6.73
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -389,7 +195,7 @@ Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Do
 - *Configured EOS token:* &lt;|return|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
+  sample(s); power: AC over 2 sample(s); thermal state max nominal over 2
   sample(s); mode snapshot
 
 #### Complete output
@@ -441,35 +247,35 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                           |
 |-------------------------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------|
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2098 prompt / 143 generated; 96.9 tok/s; 6.5 GB peak  |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 597 prompt / 81 generated; 55.2 tok/s; 28 GB peak     |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1646 prompt / 540 generated; 103 tok/s; 19 GB peak    |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 601 prompt / 112 generated; 60.5 tok/s; 7.6 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2098 prompt / 143 generated; 102 tok/s; 6.5 GB peak   |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 597 prompt / 81 generated; 64.4 tok/s; 28 GB peak     |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1646 prompt / 540 generated; 109 tok/s; 19 GB peak    |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 601 prompt / 112 generated; 62.0 tok/s; 7.6 GB peak   |
 | mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 601 prompt / 106 generated; 110 tok/s; 16 GB peak     |
-| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 601 prompt / 113 generated; 25.4 tok/s; 20 GB peak    |
+| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 601 prompt / 113 generated; 26.7 tok/s; 20 GB peak    |
 | mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1384 prompt / 97 generated; 178 tok/s; 4.6 GB peak    |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2120 prompt / 103 generated; 56.1 tok/s; 10 GB peak   |
-| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2120 prompt / 79 generated; 36.7 tok/s; 17 GB peak    |
-| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2123 prompt / 159 generated; 303 tok/s; 2.1 GB peak   |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 309 prompt / 114 generated; 21.6 tok/s; 15 GB peak    |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 398 prompt / 93 generated; 101 tok/s; 7.0 GB peak     |
-| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 938 prompt / 564 generated; 230 tok/s; 3.2 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2935 prompt / 199 generated; 63.8 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2934 prompt / 121 generated; 182 tok/s; 7.8 GB peak   |
-| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1531 prompt / 181 generated; 70.3 tok/s; 8.5 GB peak  |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4091 prompt / 108 generated; 161 tok/s; 3.9 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1295 prompt / 130 generated; 71.3 tok/s; 24 GB peak   |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12797 prompt / 120 generated; 63.0 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16556 prompt / 901 generated; 83.9 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16554 prompt / 168 generated; 73.2 tok/s; 23 GB peak  |
-| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16554 prompt / 190 generated; 19.8 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16554 prompt / 120 generated; 68.6 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16569 prompt / 123 generated; 40.9 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16569 prompt / 111 generated; 91.4 tok/s; 11 GB peak  |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2120 prompt / 103 generated; 57.7 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2120 prompt / 79 generated; 37.6 tok/s; 17 GB peak    |
+| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2123 prompt / 159 generated; 344 tok/s; 2.1 GB peak   |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 309 prompt / 114 generated; 21.2 tok/s; 15 GB peak    |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 398 prompt / 93 generated; 104 tok/s; 7.0 GB peak     |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 938 prompt / 564 generated; 242 tok/s; 3.2 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2935 prompt / 199 generated; 64.3 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2934 prompt / 121 generated; 181 tok/s; 7.8 GB peak   |
+| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1531 prompt / 181 generated; 70.6 tok/s; 8.5 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4091 prompt / 108 generated; 156 tok/s; 3.9 GB peak   |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1295 prompt / 130 generated; 73.7 tok/s; 24 GB peak   |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12797 prompt / 120 generated; 62.7 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16556 prompt / 901 generated; 85.5 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16554 prompt / 168 generated; 76.7 tok/s; 23 GB peak  |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16554 prompt / 190 generated; 20.3 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16554 prompt / 120 generated; 68.4 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16569 prompt / 123 generated; 72.8 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16569 prompt / 111 generated; 91.2 tok/s; 11 GB peak  |
 | mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16569 prompt / 128 generated; 29.6 tok/s; 21 GB peak  |
-| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16566 prompt / 123 generated; 89.1 tok/s; 11 GB peak  |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1281 prompt / 144 generated; 37.0 tok/s; 18 GB peak   |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3636 prompt / 124 generated; 137 tok/s; 23 GB peak    |
+| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16566 prompt / 123 generated; 88.4 tok/s; 11 GB peak  |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1281 prompt / 144 generated; 36.9 tok/s; 18 GB peak   |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3636 prompt / 124 generated; 136 tok/s; 23 GB peak    |
 
 </details>
 
@@ -556,11 +362,10 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 ### Highlighted model revisions
 
-| Model                                             | Resolved revision                        |
-|---------------------------------------------------|------------------------------------------|
-| mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit | f89d3ebf0bb8f9b512d6c732aff83937deb55c3e |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit      | e5abbe34cbfabd829fafd0362856e5b468d19f85 |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit             | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| Model                                        | Resolved revision                        |
+|----------------------------------------------|------------------------------------------|
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit | e5abbe34cbfabd829fafd0362856e5b468d19f85 |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit        | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
 
 ### Components and system
 
@@ -573,7 +378,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | mlx-audio                  | 0.5.7                                                                                                                                           |
 | transformers               | 5.18.0                                                                                                                                          |
 | tokenizers                 | 0.23.2                                                                                                                                          |
-| huggingface-hub            | 1.33.0                                                                                                                                          |
+| huggingface-hub            | 2.1.1                                                                                                                                           |
 | Python Version             | 3.14.7                                                                                                                                          |
 | OS                         | Darwin 27.0.0                                                                                                                                   |
 | macOS Version              | 27.0.1                                                                                                                                          |

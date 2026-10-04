@@ -1,8 +1,8 @@
-# mlx-vlm compatibility findings across 53 cached vision-language models
+# mlx-vlm compatibility findings across 52 cached vision-language models
 
-**For mlx-vlm maintainers:** 1 crash needs action (see *Crashes requiring
-action*); 2 other results need reproducing with mlx-vlm alone before anything
-is reported (all 2 unchanged since the baseline).
+**For mlx-vlm maintainers:** no crashes need action; 2 other results need
+reproducing with mlx-vlm alone before anything is reported (all 2 unchanged
+since the baseline).
 
 **What this run measures.** This run records model responses to one shared
 image and prompt (evaluation lane: assisted). Mechanical checks are not
@@ -13,25 +13,25 @@ locally cached MLX vision-language model got the same image and prompt
 
 ## Run summary
 
-- *Run started:* 2026-10-04 00:22:12 BST
-- *Run finished:* 2026-10-04 00:38:50 BST
-- *Run duration:* 16m 38s
-- *Time by phase:* generation 684s, model load 109s, prompt prep 41s, cleanup
-  8s, outside the model loop 164s
+- *Run started:* 2026-10-04 00:57:49 BST
+- *Run finished:* 2026-10-04 01:10:54 BST
+- *Run duration:* 13m 04s
+- *Time by phase:* generation 633s, model load 93s, prompt prep 40s, cleanup
+  6s, outside the model loop 17s
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in
   the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Input image:* JPEG, 9,805 x 6,538 pixels (64.1 MP), 54.2 MB
-- *Models attempted:* 53
+- *Models attempted:* 52
 - *Sampling settings:* checkpoint generation_config.json values for 25 of 52
   completed models where the command line left them unset; harness defaults
   elsewhere
 - *Completed:* 52
-- *Crashed:* 1
+- *Crashed:* 0
 - *Indeterminate:* 0
-- *Crashes requiring action:* 1
+- *Crashes requiring action:* 0
 - *Other results requiring review:* 2
 - *Reached token limit:* 2 (2 with incomplete output)
 - *Stopped early for repetition:* 0
@@ -67,57 +67,37 @@ Keywords:
 
 ## Since the baseline sweep
 
-- *Baseline:* 7859973d:src/output/results.jsonl
-- *Baseline run timestamp:* 2026-10-03 00:10:18 BST
-- *Baseline check_models:* 0.17.39 @ 058f75b15
-- *Baseline mlx:* 0.32.4.dev20261002+255328713 @ 255328713
+- *Baseline:* 894cc3a8:src/output/results.jsonl
+- *Baseline run timestamp:* 2026-10-04 00:38:52 BST
+- *Baseline check_models:* 0.17.39 @ 7859973d5
+- *Baseline mlx:* 0.32.4.dev20261003+0e3ff3643 @ 0e3ff3643
 - *Baseline mlx-vlm:* 0.7.4 @ 6ecadd767
 - *Baseline transformers:* 5.18.0
 - *Baseline python:* 3.14.7
 - *Baseline hardware:* Apple M5 Max, 40 GPU cores, 128.0 GB RAM
-- *Models compared:* 51
-- *Identical generated text:* 50 of 51 completed in both
-- *Generated text changed:* mlx-community/Muse-Glimmer-30B-OptiQ-4bit (shared
-  prefix 0 characters; length 4,143 → 287; same prompt token count)
-- *Text changed, by decoding:* greedy 0 of 28; sampled, same settings and seed
-  1 of 23
-- *Generation tok/s ratio (now/baseline):* 0.964 (range 0.39-1.09, 50 models)
-- *Prefill tok/s ratio (now/baseline):* 0.950 (range 0.65-1.25, 50 models)
-- *Throughput noise band:* history (last 7 same-prompt runs, Tukey fence, at
+- *Models compared:* 52
+- *Identical generated text:* 52 of 52 completed in both
+- *Text changed, by decoding:* greedy 0 of 29; sampled, same settings and seed
+  0 of 23
+- *Generation tok/s ratio (now/baseline):* 1.014 (range 0.95-1.78, 51 models)
+- *Prefill tok/s ratio (now/baseline):* 1.047 (range 0.95-1.59, 51 models)
+- *Throughput noise band:* history (last 8 same-prompt runs, Tukey fence, at
   least ±10% of the median)
 
-Run environment: current run slept or was suspended during 1 model(s)
+Run environment: baseline run slept or was suspended during 1 model(s)
 (mlx-community/Qwen3.8-27B-nvfp4); those are excluded from throughput
-comparison; baseline run on battery power for 51 of 51 models.
+comparison.
 
-- New this run (no baseline):
-  `mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit`,
-  `mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`
+- In baseline, no longer in the cache:
+  `mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit`
 
-| Model | Execution | Usability | Observation delta |
-| --- | --- | --- | --- |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | completed | major concerns | -duplicate keywords; -role tokens visible; -control tokens visible |
+No execution, usability, or observation-set changes against the baseline.
 
-Generation tok/s outside the expected band for 4 models (mlx changed since the
-baseline: 255328713..0e3ff3643):
+Generation tok/s outside the expected band for 1 model:
 
 | Model | Baseline tok/s | Now tok/s | Ratio | Expected band |
 | --- | --- | --- | --- | --- |
-| mlx-community/InternVL3_5-1B-4bit | 422.5 | 303.0 | 0.72 | 359.1-485.9 (fallback) |
-| mlx-community/MiniCPM-V-4.6-4bit | 301.1 | 229.6 | 0.76 | 255.9-346.3 (fallback) |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | 124.1 | 102.5 | 0.83 | 105.5-142.7 (fallback) |
-| mlx-community/Qwen3.5-35B-A3B-4bit | 105.8 | 40.9 | 0.39 | 48.0-115.3 (history, n=7) |
-
-| Model | Failure continuity |
-| --- | --- |
-| mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit | failed; not run in baseline |
-
-<details>
-<summary>mlx: 1 upstream commit(s) since the baseline (255328713..0e3ff3643)</summary>
-
-- 0e3ff3643 Unroll TK=4 keys per iter in sdpa_vector_2pass_1 (#4596)
-
-</details>
+| mlx-community/granite-vision-3.2-2b-nvfp4 | 141.7 | 144.3 | 1.02 | 117.5-143.6 (history, n=8) |
 
 Mechanical diff only: one image, temperature as configured; single-observation
 flips on one model are usually run-to-run variance, broad shifts are not.
@@ -132,136 +112,58 @@ verbatim in the prompt's keyword hints.
 
 | Model | Mechanical checks | Total | Gen tok/s | Peak GB | Prompt tok | Keywords | Observed |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| mlx-community/aya-vision-8b-4bit | no concerns detected | 5.75s | 96.9 tok/s | 6.5 | 2,098 | 17 (10 from hints) | none |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | no concerns detected | 7.02s | 55.2 tok/s | 28 | 597 | 14 (12 from hints) | none |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | no concerns detected | 9.06s | 103 tok/s | 19 | 1,646 | 15 (12 from hints) | none |
-| mlx-community/gemma-4-12B-it-4bit | no concerns detected | 5.70s | 60.5 tok/s | 7.6 | 601 | 20 (20 from hints) | none |
-| mlx-community/gemma-4-26b-a4b-it-4bit | no concerns detected | 5.18s | 110 tok/s | 16 | 601 | 17 (15 from hints) | none |
-| mlx-community/gemma-4-31b-it-4bit | no concerns detected | 9.90s | 25.4 tok/s | 20 | 601 | 17 (17 from hints) | none |
+| mlx-community/aya-vision-8b-4bit | no concerns detected | 5.15s | 102 tok/s | 6.5 | 2,098 | 17 (10 from hints) | none |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | no concerns detected | 6.35s | 64.4 tok/s | 28 | 597 | 14 (12 from hints) | none |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | no concerns detected | 8.51s | 109 tok/s | 19 | 1,646 | 15 (12 from hints) | none |
+| mlx-community/gemma-4-12B-it-4bit | no concerns detected | 5.26s | 62.0 tok/s | 7.6 | 601 | 20 (20 from hints) | none |
+| mlx-community/gemma-4-26b-a4b-it-4bit | no concerns detected | 5.13s | 110 tok/s | 16 | 601 | 17 (15 from hints) | none |
+| mlx-community/gemma-4-31b-it-4bit | no concerns detected | 9.20s | 26.7 tok/s | 20 | 601 | 17 (17 from hints) | none |
 | mlx-community/granite-4.0-3b-vision-4bit | no concerns detected | 3.27s | 178 tok/s | 4.6 | 1,384 | 14 (8 from hints) | none |
-| mlx-community/InternVL3-14B-4bit | no concerns detected | 5.80s | 56.1 tok/s | 10 | 2,120 | 20 (20 from hints) | none |
-| mlx-community/InternVL3-8B-bf16 | no concerns detected | 5.98s | 36.7 tok/s | 17 | 2,120 | 13 (13 from hints) | none |
-| mlx-community/InternVL3_5-1B-4bit | no concerns detected | 2.80s | 303 tok/s | 2.1 | 2,123 | 23 (19 from hints) | none |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | no concerns detected | 9.83s | 21.6 tok/s | 15 | 309 | 10 (2 from hints) | none |
-| mlx-community/MiniCPM-o-4_5-4bit | no concerns detected | 3.36s | 101 tok/s | 7.0 | 398 | 16 (11 from hints) | none |
-| mlx-community/MiniCPM-V-4.6-4bit | no concerns detected | 5.12s | 230 tok/s | 3.2 | 938 | 17 (12 from hints) | none |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | no concerns detected | 8.05s | 63.8 tok/s | 13 | 2,935 | 20 (7 from hints) | none |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit | no concerns detected | 4.08s | 182 tok/s | 7.8 | 2,934 | 13 (2 from hints) | none |
-| mlx-community/Molmo2-8B-4bit | no concerns detected | 5.97s | 70.3 tok/s | 8.5 | 1,531 | 36 (19 from hints) | none |
-| mlx-community/North-Micro-Vision-Instruct-4bit | no concerns detected | 5.36s | 161 tok/s | 3.9 | 4,091 | 19 (19 from hints) | none |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit | no concerns detected | 6.59s | 71.3 tok/s | 24 | 1,295 | 18 (18 from hints) | none |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit | no concerns detected | 28.25s | 63.0 tok/s | 26 | 12,797 | 20 (20 from hints) | none |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16 | no concerns detected | 31.54s | 83.9 tok/s | 8.4 | 16,556 | 16 (14 from hints) | none |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | no concerns detected | 41.48s | 73.2 tok/s | 23 | 16,554 | 20 (20 from hints) | none |
-| mlx-community/Qwen3-VL-32B-Instruct-4bit | no concerns detected | 76.01s | 19.8 tok/s | 26 | 16,554 | 18 (17 from hints) | none |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit | no concerns detected | 39.79s | 68.6 tok/s | 11 | 16,554 | 18 (15 from hints) | none |
-| mlx-community/Qwen3.5-35B-A3B-4bit | no concerns detected | 37.62s | 40.9 tok/s | 25 | 16,569 | 19 (19 from hints) | none |
-| mlx-community/Qwen3.5-9B-MLX-4bit | no concerns detected | 42.36s | 91.4 tok/s | 11 | 16,569 | 15 (7 from hints) | none |
-| mlx-community/Qwen3.8-27B-nvfp4 | no concerns detected | 61.32s | 29.6 tok/s | 21 | 16,569 | 16 (5 from hints) | none |
-| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit | no concerns detected | 42.50s | 89.1 tok/s | 11 | 16,566 | 15 (1 from hints) | none |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit | no concerns detected | 8.42s | 37.0 tok/s | 18 | 1,281 | 18 (11 from hints) | none |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | no concerns detected | 9.07s | 137 tok/s | 23 | 3,636 | 17 (16 from hints) | none |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | concerns detected | 2.30s | 480 tok/s | 1.9 | 2,123 | 14 (8 from hints) | duplicate keywords; prompt hint repeated |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | concerns detected | 10.94s | 29.0 tok/s | 23 | 2,402 | 20 (20 from hints) | prompt hint repeated |
-| mlx-community/gemma-3-27b-it-qat-4bit | concerns detected | 8.95s | 29.9 tok/s | 17 | 596 | 18 (14 from hints) | unsupplied place name |
-| mlx-community/gemma-4-e4b-it-4bit | concerns detected | 3.90s | 124 tok/s | 5.9 | 597 | 15 (14 from hints) | duplicate keywords |
-| mlx-community/GLM-4.6V-Flash-4bit | concerns detected | 9.17s | 74.3 tok/s | 8.7 | 6,393 | 9 (7 from hints) | prompt hint repeated |
-| mlx-community/GLM-4.6V-nvfp4 | concerns detected | 33.30s | 42.7 tok/s | 78 | 6,393 | 20 (20 from hints) | prompt hint repeated |
-| mlx-community/Idefics3-8B-Llama3-bf16 | concerns detected | 7.35s | 34.9 tok/s | 18 | 2,620 | 10 (1 from hints) | prompt hint repeated |
-| mlx-community/Phi-3.5-vision-instruct-bf16 | concerns detected | 4.18s | 55.3 tok/s | 9.3 | 1,144 | 10 (8 from hints) | prompt hint repeated |
-| mlx-community/pixtral-12b-8bit | concerns detected | 7.89s | 40.5 tok/s | 16 | 3,125 | 20 (20 from hints) | prompt hint repeated |
-| mlx-community/Qwen2-VL-7B-Instruct-4bit | concerns detected | 47.29s | 91.3 tok/s | 9.3 | 16,565 | 20 (20 from hints) | prompt hint repeated |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx | concerns detected | 3.96s | 128 tok/s | 5.6 | 1,438 | 19 (19 from hints) | prompt hint repeated |
-| mlx-community/Step-3.7-Flash-oQ3e | concerns detected | 32.81s | 47.4 tok/s | 92 | 3,498 | 20 (20 from hints) | prompt hint repeated |
-| mlx-community/X-Reasoner-7B-8bit | concerns detected | 19.59s | 56.3 tok/s | 14 | 16,565 | 33 (18 from hints) | duplicate keywords |
-| nativ-community/Mage-VL-OptiQ-4bit | concerns detected | 4.60s | 129 tok/s | 5.4 | 4,217 | 20 (20 from hints) | prompt hint repeated |
-| mlx-community/FastVLM-0.5B-bf16 | major concerns | 3.25s | 327 tok/s | 2.1 | 341 | - | labelled fields not detected |
-| mlx-community/gemma-3n-E4B-it-4bit | major concerns | 5.56s | 71.6 tok/s | 7.2 | 595 | - | labelled fields not detected |
-| mlx-community/granite-vision-3.2-2b-nvfp4 | major concerns | 5.57s | 142 tok/s | 4.4 | 5,666 | 20 (20 from hints) | labelled fields not detected |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit | major concerns | 21.69s | 58.5 tok/s | 20 | 1,331 | 126 (19 from hints) | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit | major concerns | 3.72s | 207 tok/s | 4.0 | 2,115 | - | labelled fields not detected |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit | major concerns | 3.52s | 109 tok/s | 6.7 | 2,201 | - | control tokens visible; labelled fields not detected |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | major concerns | 56.40s | 23.6 tok/s | 25 | 4,410 | - | labelled fields not detected; cut off at token limit |
-| mlx-community/nanoLLaVA-1.5-4bit | major concerns | 1.95s | 207 tok/s | 1.8 | 337 | - | labelled fields not detected |
-| mlx-community/SmolVLM-256M-Instruct-4bit | major concerns | 3.26s | 260 tok/s | 1.1 | 1,217 | - | labelled fields not detected |
-| mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit | not assessed | 6.36s | - | - | - | - | crashed during model loading |
-
-## Crashes requiring action
-
-### mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit
-
-- *Execution / usability:* crashed / not assessed
-- *Phase:* model_load
-- *Stage:* Model Error
-- *Resolved revision:* f89d3ebf0bb8f9b512d6c732aff83937deb55c3e
-
-#### Before filing: rule out the checkpoint
-
-- The crash happened while loading. A load failure can come from the
-  checkpoint (weight names or config that do not match mlx-vlm's model
-  definition) as well as from mlx-vlm: try another conversion of the same
-  model with a native `load()` before filing.
-- Reproduce with the native command below, outside check_models, and say in
-  the issue which of these checks you ran.
-
-Root exception chain
-
-```text
-TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-caused by: StrictDataclassFieldValidationError: Validation error for field 'attn_temperature_tuning':
-    TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-caused by: ValueError: Model loading failed: Validation error for field 'attn_temperature_tuning':
-    TypeError: Field 'attn_temperature_tuning' expected bool, got int (value: 4)
-```
-
-#### Reproduction inputs
-
-- *Image format:* JPEG
-- *Image dimensions:* 9,805 x 6,538 pixels
-- *Image size:* 54,173,041 bytes
-- *Image SHA-256:* bd1c0e60ad08718e500069551a1ac0d3697010373ec1509d4f76cd6e1d79b11a
-
-<details>
-<summary>Exact prompt</summary>
-
-```text
-Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-09-26 17:36:29 UTC+01:00
-- GPS: 50.682100°N, 3.466600°W
-
-Descriptive hints:
-- Description hint: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
-- Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:
-```
-
-</details>
-
-The crash occurred during model load, before image decoding, so the exact
-input image is not required: substitute any local image for the placeholder
-path and run one native mlx-vlm process.
-
-```bash
-python -m mlx_vlm.generate --verbose --model mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit --image any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --revision f89d3ebf0bb8f9b512d6c732aff83937deb55c3e --trust-remote-code
-```
-
-| Evidence | Link |
-| --- | --- |
-| Full diagnostics | [model evidence](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-llama-4-scout-17b-16e-instruct-4bit) |
-| Detailed issue draft | [crash draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Llama-4-Scout-17B-16E-Instruct-4bit.md) |
+| mlx-community/InternVL3-14B-4bit | no concerns detected | 5.71s | 57.7 tok/s | 10 | 2,120 | 20 (20 from hints) | none |
+| mlx-community/InternVL3-8B-bf16 | no concerns detected | 5.90s | 37.6 tok/s | 17 | 2,120 | 13 (13 from hints) | none |
+| mlx-community/InternVL3_5-1B-4bit | no concerns detected | 2.59s | 344 tok/s | 2.1 | 2,123 | 23 (19 from hints) | none |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | no concerns detected | 9.93s | 21.2 tok/s | 15 | 309 | 10 (2 from hints) | none |
+| mlx-community/MiniCPM-o-4_5-4bit | no concerns detected | 3.39s | 104 tok/s | 7.0 | 398 | 16 (11 from hints) | none |
+| mlx-community/MiniCPM-V-4.6-4bit | no concerns detected | 5.09s | 242 tok/s | 3.2 | 938 | 17 (12 from hints) | none |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | no concerns detected | 8.10s | 64.3 tok/s | 13 | 2,935 | 20 (7 from hints) | none |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit | no concerns detected | 4.24s | 181 tok/s | 7.8 | 2,934 | 13 (2 from hints) | none |
+| mlx-community/Molmo2-8B-4bit | no concerns detected | 5.99s | 70.6 tok/s | 8.5 | 1,531 | 36 (19 from hints) | none |
+| mlx-community/North-Micro-Vision-Instruct-4bit | no concerns detected | 5.51s | 156 tok/s | 3.9 | 4,091 | 19 (19 from hints) | none |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit | no concerns detected | 6.38s | 73.7 tok/s | 24 | 1,295 | 18 (18 from hints) | none |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit | no concerns detected | 26.81s | 62.7 tok/s | 26 | 12,797 | 20 (20 from hints) | none |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | no concerns detected | 28.64s | 85.5 tok/s | 8.4 | 16,556 | 16 (14 from hints) | none |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | no concerns detected | 39.46s | 76.7 tok/s | 23 | 16,554 | 20 (20 from hints) | none |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit | no concerns detected | 72.38s | 20.3 tok/s | 26 | 16,554 | 18 (17 from hints) | none |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit | no concerns detected | 38.57s | 68.4 tok/s | 11 | 16,554 | 18 (15 from hints) | none |
+| mlx-community/Qwen3.5-35B-A3B-4bit | no concerns detected | 36.36s | 72.8 tok/s | 25 | 16,569 | 19 (19 from hints) | none |
+| mlx-community/Qwen3.5-9B-MLX-4bit | no concerns detected | 36.43s | 91.2 tok/s | 11 | 16,569 | 15 (7 from hints) | none |
+| mlx-community/Qwen3.8-27B-nvfp4 | no concerns detected | 55.92s | 29.6 tok/s | 21 | 16,569 | 16 (5 from hints) | none |
+| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit | no concerns detected | 33.02s | 88.4 tok/s | 11 | 16,566 | 15 (1 from hints) | none |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit | no concerns detected | 8.40s | 36.9 tok/s | 18 | 1,281 | 18 (11 from hints) | none |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | no concerns detected | 8.81s | 136 tok/s | 23 | 3,636 | 17 (16 from hints) | none |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | concerns detected | 2.21s | 470 tok/s | 1.9 | 2,123 | 14 (8 from hints) | duplicate keywords; prompt hint repeated |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | concerns detected | 10.29s | 30.4 tok/s | 23 | 2,402 | 20 (20 from hints) | prompt hint repeated |
+| mlx-community/gemma-3-27b-it-qat-4bit | concerns detected | 8.69s | 30.8 tok/s | 17 | 596 | 18 (14 from hints) | unsupplied place name |
+| mlx-community/gemma-4-e4b-it-4bit | concerns detected | 3.95s | 123 tok/s | 5.9 | 597 | 15 (14 from hints) | duplicate keywords |
+| mlx-community/GLM-4.6V-Flash-4bit | concerns detected | 8.63s | 78.6 tok/s | 8.7 | 6,393 | 9 (7 from hints) | prompt hint repeated |
+| mlx-community/GLM-4.6V-nvfp4 | concerns detected | 20.39s | 43.2 tok/s | 78 | 6,393 | 20 (20 from hints) | prompt hint repeated |
+| mlx-community/Idefics3-8B-Llama3-bf16 | concerns detected | 7.25s | 35.3 tok/s | 18 | 2,620 | 10 (1 from hints) | prompt hint repeated |
+| mlx-community/Phi-3.5-vision-instruct-bf16 | concerns detected | 4.14s | 55.6 tok/s | 9.3 | 1,144 | 10 (8 from hints) | prompt hint repeated |
+| mlx-community/pixtral-12b-8bit | concerns detected | 7.63s | 40.3 tok/s | 16 | 3,125 | 20 (20 from hints) | prompt hint repeated |
+| mlx-community/Qwen2-VL-7B-Instruct-4bit | concerns detected | 44.45s | 93.0 tok/s | 9.3 | 16,565 | 20 (20 from hints) | prompt hint repeated |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx | concerns detected | 3.53s | 128 tok/s | 5.6 | 1,438 | 19 (19 from hints) | prompt hint repeated |
+| mlx-community/Step-3.7-Flash-oQ3e | concerns detected | 34.30s | 50.1 tok/s | 92 | 3,498 | 20 (20 from hints) | prompt hint repeated |
+| mlx-community/X-Reasoner-7B-8bit | concerns detected | 18.52s | 59.7 tok/s | 14 | 16,565 | 33 (18 from hints) | duplicate keywords |
+| nativ-community/Mage-VL-OptiQ-4bit | concerns detected | 4.64s | 128 tok/s | 5.4 | 4,217 | 20 (20 from hints) | prompt hint repeated |
+| mlx-community/FastVLM-0.5B-bf16 | major concerns | 3.04s | 310 tok/s | 2.2 | 341 | - | labelled fields not detected |
+| mlx-community/gemma-3n-E4B-it-4bit | major concerns | 5.12s | 71.8 tok/s | 7.2 | 595 | - | labelled fields not detected |
+| mlx-community/granite-vision-3.2-2b-nvfp4 | major concerns | 5.07s | 144 tok/s | 4.4 | 5,666 | 20 (20 from hints) | labelled fields not detected |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit | major concerns | 20.41s | 62.2 tok/s | 20 | 1,331 | 126 (19 from hints) | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit | major concerns | 3.74s | 208 tok/s | 4.0 | 2,115 | - | labelled fields not detected |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit | major concerns | 3.56s | 108 tok/s | 6.7 | 2,201 | - | control tokens visible; labelled fields not detected |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | major concerns | 53.32s | 24.3 tok/s | 25 | 4,410 | - | labelled fields not detected; cut off at token limit |
+| mlx-community/nanoLLaVA-1.5-4bit | major concerns | 1.99s | 198 tok/s | 1.8 | 337 | - | labelled fields not detected |
+| mlx-community/SmolVLM-256M-Instruct-4bit | major concerns | 2.33s | 317 tok/s | 1.1 | 1,217 | - | labelled fields not detected |
 
 ## Completed attempts requiring review
 
@@ -282,7 +184,7 @@ python -m mlx_vlm.generate --verbose --model mlx-community/Llama-4-Scout-17B-16E
 - *Generation: seed:* 0
 - *Trust remote code:* true
 - *check_models version:* 0.17.39
-- *check_models revision:* 7859973d56b25a11aee138533438ff8f4d2ffad1
+- *check_models revision:* 894cc3a84fba334445b8ac780a139ee51496d08c
 - *check_models source dirty:* false
 - *mlx-vlm:* 0.7.4
 - *mlx-vlm source revision:* 6ecadd767ca1c7c54763289c750dd180d7945037
