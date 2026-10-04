@@ -1831,6 +1831,18 @@ def test_description_hint_share_is_counted_below_the_echo_threshold() -> None:
     assert general.description_hint_percent is None
 
 
+def test_description_hint_percent_rounds_down_to_match_the_echo_threshold(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """79.66% shows as 79%, never as an unflagged 80%; float noise costs nothing."""
+    answer = f"Title: Swan on River\nDescription: {_SWAN_HINT}\nKeywords: swan"
+    for coverage, shown, echoed in ((0.7966, 79, False), (0.8, 80, True), (0.29, 29, False)):
+        monkeypatch.setattr(check_models, "_hint_coverage", lambda *_args, c=coverage: c)
+        analysis = _assisted(answer)
+        assert analysis.description_hint_percent == shown
+        assert (analysis.echoed_hint_fields == ["description"]) is echoed
+
+
 def test_unlabelled_answer_that_is_the_hint_is_flagged_as_an_echo() -> None:
     """A prompt-only model that hands the hint back without labels is measured whole."""
     unlabelled = _assisted(f"River Deben, Woodbridge. {_SWAN_HINT}")

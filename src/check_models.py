@@ -4497,7 +4497,11 @@ def _description_hint_share(
     if coverage is None:
         return None, None
     # Under the metadata profile the scope is "answer" only for an unlabelled answer.
-    return round(coverage * 100), "description" if scope == "field" else "answer"
+    # Rounded down, so a reported 80% always means the echo threshold was met;
+    # rounding to 6 places first keeps float noise (0.29 * 100 = 28.999...)
+    # from costing a whole percent.
+    percent = math.floor(round(coverage * 100, 6))
+    return percent, "description" if scope == "field" else "answer"
 
 
 def _echoed_hint_fields(
@@ -20756,11 +20760,6 @@ def _observation_history(
         current_codes = _run_observation_codes(cast("Mapping[str, object]", record)) or frozenset()
         # This model's earlier runs, newest first; runs that skipped it do not count.
         model_runs = [(run.timestamp, run.codes[model]) for run in runs if model in run.codes]
-        # A date is open-ended only when the code reaches the oldest run read,
-        # where it runs straight into unread history; "first" otherwise means
-        # first within the runs read, as the report's note says.
-        at_edge = bool(model_runs) and model_runs[-1][0] == runs[-1].timestamp
-        oldest_has = {code for code in current_codes if at_edge and code in model_runs[-1][1]}
         for code in sorted(current_codes):
             consecutive = 0
             for _timestamp, codes in model_runs:
@@ -20768,18 +20767,22 @@ def _observation_history(
                     break
                 consecutive += 1
             showed = [timestamp for timestamp, codes in model_runs if code in codes]
-            open_ended = code in oldest_has and not complete
+            # With older runs unread, a date is open-ended unless an attempt
+            # that was read bounds it: an attempt without the code ends the
+            # streak, and the earliest attempt read showing it leaves the first
+            # observation possibly earlier (as does nothing read showing it).
             entries.append(
                 ObservationHistory(
                     model=model,
                     code=code,
                     first_observed=showed[-1] if showed else None,
-                    first_observed_open_ended=open_ended,
+                    first_observed_open_ended=not complete
+                    and (not showed or showed[-1] == model_runs[-1][0]),
                     consecutive_runs=consecutive + 1,
                     consecutive_since=(
                         model_runs[consecutive - 1][0] if consecutive else current_timestamp
                     ),
-                    consecutive_open_ended=open_ended and consecutive == len(model_runs),
+                    consecutive_open_ended=not complete and consecutive == len(model_runs),
                 )
             )
     return tuple(entries)
@@ -24075,8 +24078,8 @@ def _run_issue_summary_quality_section(
         intro += (
             " Hint text is the percent of the description's words lying in four-word runs "
             "copied from the prompt's description hint (of the whole answer when no field is "
-            f"labelled); {QUALITY.hint_echo_min_coverage:.0%} or more is reported as a "
-            "repeated prompt hint."
+            f"labelled), rounded down; {QUALITY.hint_echo_min_coverage:.0%} or more is reported "
+            "as a repeated prompt hint."
         )
     headers = (
         "Model",
@@ -24129,7 +24132,12 @@ def _observation_history_cell(model: str, entries: Sequence[ObservationHistory])
         )
         first = _history_date(entry.first_observed, open_ended=entry.first_observed_open_ended)
         if entry.first_observed is None:
-            clauses.append(f"{gloss}: first seen this run")
+            # With older runs unread, "first" is only first among the runs read.
+            clauses.append(
+                f"{gloss}: not in earlier runs read"
+                if entry.first_observed_open_ended
+                else f"{gloss}: first seen this run"
+            )
         elif entry.consecutive_runs == 1:
             clauses.append(f"{gloss}: back this run; first {first}")
         else:

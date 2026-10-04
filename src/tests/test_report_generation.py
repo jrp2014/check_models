@@ -6356,18 +6356,27 @@ def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -
             _flagged_record("org/loop", ["repeated_output"]),
             # Shown clean: breaks org/back's streak.
             _comparison_record("org/back"),
+            # Absent from the oldest run read, then flagged in every attempt.
+            _flagged_record("org/late", ["repeated_output"]),
         ),
         "run 2",
     )
     # org/loop not attempted: skipped, neither breaking nor extending its streak.
     _git_commit_results(
-        repo, _retained_version("2026-07-25 10:00:00 BST", _comparison_record("org/back")), "run 3"
+        repo,
+        _retained_version(
+            "2026-07-25 10:00:00 BST",
+            _comparison_record("org/back"),
+            _flagged_record("org/late", ["repeated_output"]),
+        ),
+        "run 3",
     )
     current = _current_run(
         "2026-08-01 10:00:00 BST",
         _flagged_record("org/loop", ["repeated_output", "unexpected_special_token"]),
         _flagged_record("org/back", ["repeated_output"]),
         _flagged_record("org/new"),
+        _flagged_record("org/late", ["repeated_output"]),
         _comparison_record("org/clean"),
     )
 
@@ -6383,6 +6392,7 @@ def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -
         ("org/loop", "unexpected_special_token"),
         ("org/back", "repeated_output"),
         ("org/new", "crashed"),
+        ("org/late", "repeated_output"),
     }
     loop = history["org/loop", "repeated_output"]
     # In every run of org/loop read, back to the oldest: open-ended.
@@ -6398,18 +6408,26 @@ def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -
     assert back["first_observed"] == "2026-07-11 10:00:00 BST"
     assert (back["consecutive_runs"], back["consecutive_since"]) == (1, "2026-08-01 10:00:00 BST")
     assert history["org/new", "crashed"]["first_observed"] is None
+    # No attempt read broke org/late's streak, so unread history keeps it open,
+    # although the model was missing from the oldest run read.
+    late = history["org/late", "repeated_output"]
+    assert (late["consecutive_runs"], late["consecutive_since"]) == (3, "2026-07-18 10:00:00 BST")
+    assert late["consecutive_open_ended"] is True
+    assert late["first_observed_open_ended"] is True
 
     entries = check_models._observation_history_from_metadata({"observation_history": block})
     assert entries is not None
     cells = {
         model: check_models._observation_history_cell(model, entries[1])
-        for model in ("org/loop", "org/back", "org/new", "org/clean")
+        for model in ("org/loop", "org/back", "org/new", "org/late", "org/clean")
     }
+    # With older runs unread, an observation no run read showed is not "first seen".
     assert cells == {
         "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier); "
-        "control tokens visible: first seen this run",
+        "control tokens visible: not in earlier runs read",
         "org/back": "repeated text: back this run; first 2026-07-11 or earlier",
-        "org/new": "crash: first seen this run",
+        "org/new": "crash: not in earlier runs read",
+        "org/late": "repeated text: last 3+ runs (since 2026-07-18 or earlier)",
         "org/clean": "-",
     }
 
@@ -6444,7 +6462,10 @@ def test_observation_history_counts_one_run_per_capture(tmp_path: Path) -> None:
     assert loop["consecutive_runs"] == 2
     assert loop["consecutive_open_ended"] is False
     # The newest version of the run wins: its correction dropped the cap.
-    assert history["org/loop", "token_cap_truncation"]["first_observed"] is None
+    capped = history["org/loop", "token_cap_truncation"]
+    assert capped["first_observed"] is None
+    # With the whole history read, that is a first sighting.
+    assert capped["first_observed_open_ended"] is False
 
 
 def test_observation_history_ignores_the_comparison_baseline(tmp_path: Path) -> None:
@@ -8493,7 +8514,8 @@ def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
     assert "output tokens are the tokens generated (limit 500)" in content
     # An answer with no labelled field is measured whole, and says so.
     assert "| 97% of answer |" in content
-    assert "80% or more is reported as a repeated prompt hint" in content
+    prose = " ".join(content.split())
+    assert "rounded down; 80% or more is reported as a repeated prompt hint" in prose
 
     # A custom --prompt has no Keywords field or hint: no columns, no wording.
     _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/a"),))

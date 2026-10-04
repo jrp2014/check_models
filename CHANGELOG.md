@@ -12,6 +12,7 @@ Notable changes to this project will be documented in this file.
   fitted (995 of 1,000) is visible. A "Hint text" column gives the percent
   of the description lying in four-word runs copied from the prompt's
   description hint, so copying below the 80% echo threshold shows too. It
+  is rounded down, so a shown 80% always means the echo flag fired. It
   is retained as `description_hint_percent` and `description_hint_scope`
   observation details (metadata profile only).
 - Assessment: an answer with no labelled field at all is now compared whole
@@ -27,8 +28,10 @@ Notable changes to this project will be documented in this file.
   runs. The runs come from the git history of the tracked `results.jsonl`
   at `HEAD`, independent of `--compare-with`, deduplicated by run timestamp
   so a report-only correction counts once. At most 80 versions are read,
-  stopping at the first schema-2 version; a date at the edge of what was
-  read is shown "or earlier". The facts are kept in a new
+  stopping at the first schema-2 version. While older runs stay unread, a
+  streak that no attempt read has broken is shown as "N+ runs" since a date
+  "or earlier", and an observation no run read showed is "not in earlier
+  runs read" rather than "first seen this run". The facts are kept in a new
   `observation_history` metadata block, so regeneration needs no git.
   `results.history.jsonl` is unchanged.
 - Tooling: the Skylos floor is now 4.44.0, which checks an editable
