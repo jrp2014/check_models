@@ -6,6 +6,31 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Run summary: the quality table reports counted facts that were hidden.
+  "Prompt / output tok" puts the generated tokens beside the prompt tokens,
+  and the intro names the run's `max_tokens`, so an answer that only just
+  fitted (995 of 1,000) is visible. A "Hint text" column gives the percent
+  of the description lying in four-word runs copied from the prompt's
+  description hint, so copying below the 80% echo threshold shows too. It
+  is retained as `description_hint_percent` and `description_hint_scope`
+  observation details (metadata profile only).
+- Assessment: an answer with no labelled field at all is now compared whole
+  with the description hint, so a prompt-only model that hands the hint back
+  as plain prose (moondream2 did) is reported as a repeated prompt hint. Its
+  share is labelled "of answer".
+- Run summary: each model requiring review gets a History column (a fact
+  row for a crash) that dates every one of its current observations
+  separately, so a new problem is never folded into an older one: when it
+  was first observed, and how many of the model's consecutive runs, ending
+  with this one, have shown it. A run that did not attempt the model is
+  skipped, and one that showed it without the problem breaks the run of
+  runs. The runs come from the git history of the tracked `results.jsonl`
+  at `HEAD`, independent of `--compare-with`, deduplicated by run timestamp
+  so a report-only correction counts once. At most 80 versions are read,
+  stopping at the first schema-2 version; a date at the edge of what was
+  read is shown "or earlier". The facts are kept in a new
+  `observation_history` metadata block, so regeneration needs no git.
+  `results.history.jsonl` is unchanged.
 - Tooling: the Skylos floor is now 4.44.0, which checks an editable
   install's modules against the published wheel instead of trusting its
   loader-only `RECORD`. That clears SKY-D223 for an editable mlx-vlm, so its

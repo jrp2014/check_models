@@ -1246,6 +1246,9 @@ class JsonlMetadataRecord(TypedDict, total=False):
     preflight_issues: NotRequired[list[str]]
     # MLX_/MTL_ environment variables set for the run ({} when none were).
     mlx_environment: NotRequired[dict[str, str]]
+    # Per-observation history of the models this run flagged, read from the
+    # git history of the tracked results.jsonl (see _observation_history_record).
+    observation_history: NotRequired[dict[str, JsonLike]]
 
 
 class ModelProvenanceRecord(TypedDict):
@@ -1333,6 +1336,8 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     keyword_count: int
     keyword_count_range: list[int]
     keywords_from_hints: int
+    description_hint_percent: int
+    description_hint_scope: str
     duplicate_keywords: list[str]
     token_cap_reasons: list[str]
     unchanged_draft_fields: list[str]
@@ -4440,6 +4445,61 @@ def _hint_coverage(candidate: str, hint: str) -> float | None:
     return sum(covered) / len(candidate_words)
 
 
+def _hint_comparison_text(
+    field: str,
+    *,
+    sections: Mapping[str, str],
+    text: str,
+    assessment_profile: AssessmentProfile,
+) -> tuple[str, Literal["field", "answer"]]:
+    """Return the answer text compared with a ``<Field> hint:`` line, and its scope.
+
+    A metadata answer is compared field by field. One with no labelled field
+    at all (a prompt-only model answering in plain prose) is compared whole,
+    as a general-profile answer is, so handing the hint back unlabelled is
+    still seen.
+    """
+    if assessment_profile == "metadata" and sections:
+        return sections.get(field, ""), "field"
+    return text, "answer"
+
+
+def _description_hint_share(
+    prompt: str | None,
+    *,
+    sections: Mapping[str, str],
+    text: str,
+    assessment_profile: AssessmentProfile,
+) -> tuple[int | None, Literal["description", "answer"] | None]:
+    """Percent of the compared words lying in four-word runs copied from the description hint.
+
+    A count behind the binary echo observation, reported for every metadata
+    answer so heavy copying below the echo threshold stays visible. Both
+    parts are None for the general profile, when the prompt has no
+    description hint, or when either side is too short to judge.
+    """
+    if assessment_profile != "metadata":
+        return None, None
+    hint = next(
+        (
+            match.group(2).strip()
+            for match in _PROMPT_HINT_RE.finditer(prompt or "")
+            if match.group(1).lower() == "description"
+        ),
+        None,
+    )
+    if hint is None:
+        return None, None
+    candidate, scope = _hint_comparison_text(
+        "description", sections=sections, text=text, assessment_profile=assessment_profile
+    )
+    coverage = _hint_coverage(candidate, hint)
+    if coverage is None:
+        return None, None
+    # Under the metadata profile the scope is "answer" only for an unlabelled answer.
+    return round(coverage * 100), "description" if scope == "field" else "answer"
+
+
 def _echoed_hint_fields(
     prompt: str | None,
     *,
@@ -4458,7 +4518,9 @@ def _echoed_hint_fields(
         return []
 
     def _echoes(field: str, hint: str) -> bool:
-        candidate = sections.get(field, "") if assessment_profile == "metadata" else text
+        candidate, _scope = _hint_comparison_text(
+            field, sections=sections, text=text, assessment_profile=assessment_profile
+        )
         if field == "title":
             return bool(candidate) and _match_words(candidate) == _match_words(hint)
         coverage = _hint_coverage(candidate, hint)
@@ -4662,6 +4724,10 @@ class GenerationQualityAnalysis:
     emitted_special_tokens: list[str] = dataclass_field(default_factory=list)
     # Output fields that reproduce the prompt's own "<Field> hint:" text.
     echoed_hint_fields: list[str] = dataclass_field(default_factory=list)
+    # Percent of the description (or of the whole answer, when no field is
+    # labelled) inside four-word runs copied from the description hint.
+    description_hint_percent: int | None = None
+    description_hint_scope: Literal["description", "answer"] | None = None
     # Proper place names in the prose that the prompt never supplied.
     unverified_place_names: list[str] = dataclass_field(default_factory=list)
 
@@ -4876,6 +4942,9 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         for wrapper in _dedupe_preserve_order(configured_generation_wrappers)
         if wrapper and wrapper in text
     ]
+    hint_percent, hint_scope = _description_hint_share(
+        prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
+    )
 
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
@@ -4895,6 +4964,8 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         prompt_tokens_text_source=prompt_tokens_text_source,
         prompt_tokens_text_exact_rejected=prompt_tokens_text_exact_rejected,
+        description_hint_percent=hint_percent,
+        description_hint_scope=hint_scope,
         special_token_wrappers=list(normalized.removed_wrappers),
         configured_generation_wrappers=present_configured_wrappers,
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
@@ -9275,6 +9346,9 @@ def _catalog_constraint_observation_details(
         details["keyword_count"] = analysis.keyword_count
     if analysis.keywords_from_hints is not None:
         details["keywords_from_hints"] = analysis.keywords_from_hints
+    if analysis.description_hint_percent is not None and analysis.description_hint_scope:
+        details["description_hint_percent"] = analysis.description_hint_percent
+        details["description_hint_scope"] = analysis.description_hint_scope
     if analysis.duplicate_keywords:
         details["duplicate_keywords"] = list(analysis.duplicate_keywords)
     return details
@@ -10079,6 +10153,8 @@ _OBSERVATION_DETAIL_LABELS: Final[dict[str, str]] = {
     "keyword_count": "Keyword count",
     "keyword_count_range": "Requested keyword count range",
     "keywords_from_hints": "Keywords taken verbatim from the prompt's keyword hints",
+    "description_hint_percent": "Percent of words in four-word runs copied from the description hint",
+    "description_hint_scope": "Text compared with the description hint",
     "duplicate_keywords": "Duplicate keywords",
     "token_cap_reasons": "Token-cap degradation evidence",
     "unchanged_draft_fields": "Draft fields returned unchanged",
@@ -20528,6 +20604,234 @@ def _comparison_side(run: RetainedRun, label: str) -> ComparisonBaseline:
     )
 
 
+# Observation history: when each problem a flagged model shows was first
+# observed, and how many of its consecutive retained runs have shown it. Read
+# from the git history of the tracked results.jsonl at HEAD, independent of
+# the --compare-with baseline, and stored in the run's own metadata.
+_OBSERVATION_HISTORY_MAX_VERSIONS: Final[int] = 80
+_REVIEW_MAINTAINER_STATUSES: Final[frozenset[str]] = frozenset(
+    {"actionable_failure", "observation_needs_reproduction"}
+)
+# A crash is dated like an observation code.
+_CRASH_HISTORY_CODE: Final[str] = "crashed"
+
+
+class RetainedRunObservations(NamedTuple):
+    """One retained run's codes per model: its observations, or {"crashed"}.
+
+    Every completed or crashed model is listed, a clean one with an empty
+    set, so a run that showed a model without the problem breaks its streak
+    while a run that never attempted it does not. Indeterminate attempts are
+    left out: they show neither.
+    """
+
+    timestamp: str
+    codes: Mapping[str, frozenset[str]]
+
+
+class ObservationHistory(NamedTuple):
+    """When one model's current problem was first observed and how long it has persisted.
+
+    ``consecutive_runs`` counts this model's runs, newest first and ending
+    with this one, that all showed the code; runs that did not attempt the
+    model are skipped. ``first_observed`` is the earliest earlier run read
+    that showed it (None: no run read did). The ``*_open_ended`` flags mark
+    a date taken from the oldest run read while older retained runs went
+    unread, so the true start may be earlier.
+    """
+
+    model: str
+    code: str
+    first_observed: str | None
+    first_observed_open_ended: bool
+    consecutive_runs: int
+    consecutive_since: str | None
+    consecutive_open_ended: bool
+
+
+def _run_observation_codes(row: Mapping[str, object]) -> frozenset[str] | None:
+    """One result row's codes, or None for an indeterminate or malformed row.
+
+    Reads only assessment fields every schema-3 run retains, so older runs a
+    stricter current loader would reject still count.
+    """
+    assessment = row.get("assessment")
+    if not isinstance(assessment, dict):
+        return None
+    execution = assessment.get("execution")
+    if execution == "crashed":
+        return frozenset({_CRASH_HISTORY_CODE})
+    if execution != "completed":
+        return None
+    observations = assessment.get("observations")
+    if not isinstance(observations, list):
+        return None
+    return frozenset(code for code in observations if isinstance(code, str))
+
+
+def _retained_run_observations(text: str) -> RetainedRunObservations | None:
+    """Read one retained schema-3 ``results.jsonl``'s codes, or None if unreadable."""
+    try:
+        rows = _parse_jsonl_text_rows(text, "retained run")
+    except ValueError:
+        return None
+    metadata = rows[0]
+    if (
+        not isinstance(metadata, dict)
+        or metadata.get("_type") != "metadata"
+        or not str(metadata.get("format_version", "")).startswith("3.")
+        or not isinstance(timestamp := metadata.get("timestamp"), str)
+    ):
+        return None
+    codes: dict[str, frozenset[str]] = {}
+    for row in rows[1:]:
+        if not isinstance(row, dict) or row.get("_type") != "result":
+            continue
+        model = row.get("model")
+        if isinstance(model, str) and (found := _run_observation_codes(row)) is not None:
+            codes[model] = found
+    return RetainedRunObservations(timestamp, codes)
+
+
+def _retained_observation_runs(
+    jsonl_path: Path, *, current_timestamp: str
+) -> tuple[str, tuple[RetainedRunObservations, ...], bool] | None:
+    """Read the retained runs behind this one from git, newest first.
+
+    Starts at ``HEAD``'s version of the tracked ``results.jsonl`` (the last
+    committed run), whatever baseline ``--compare-with`` chose, and walks back
+    up to ``_OBSERVATION_HISTORY_MAX_VERSIONS`` committed versions. Versions
+    are deduplicated by run timestamp, so a report-only correction of one
+    captured run counts once (its newest version wins). Returns the source
+    label, the runs, and whether the walk read the file's whole history; it
+    stops early at the version limit, a git failure or an unreadable (or
+    schema-2) version. None when the path is not tracked in git.
+    """
+    tracked = _git_tracked_relpath(jsonl_path)
+    if tracked is None:
+        return None
+    repo_root, relpath = tracked
+    log = _run_git_capture(
+        [
+            "log",
+            f"--max-count={_OBSERVATION_HISTORY_MAX_VERSIONS}",
+            "--format=%H",
+            "HEAD",
+            "--",
+            relpath,
+        ],
+        repo_root,
+    )
+    if log is None:
+        return None
+    shas = log.split()
+    runs: list[RetainedRunObservations] = []
+    seen = {current_timestamp}
+    complete = len(shas) < _OBSERVATION_HISTORY_MAX_VERSIONS
+    for sha in shas:
+        text = _run_git_capture(["show", f"{sha}:{relpath}"], repo_root)
+        run = _retained_run_observations(text) if text is not None else None
+        if run is None:
+            complete = False
+            break
+        if run.timestamp not in seen:
+            seen.add(run.timestamp)
+            runs.append(run)
+    return f"HEAD:{relpath}", tuple(runs), complete
+
+
+def _observation_history(
+    current: Sequence[JsonlResultRecord],
+    runs: Sequence[RetainedRunObservations],
+    *,
+    complete: bool,
+    current_timestamp: str,
+) -> tuple[ObservationHistory, ...]:
+    """Date every code of every model this run flagged for review, one entry per code."""
+    entries: list[ObservationHistory] = []
+    for record in current:
+        if record["assessment"]["maintainer_status"] not in _REVIEW_MAINTAINER_STATUSES:
+            continue
+        model = record["model"]
+        current_codes = _run_observation_codes(cast("Mapping[str, object]", record)) or frozenset()
+        # This model's earlier runs, newest first; runs that skipped it do not count.
+        model_runs = [(run.timestamp, run.codes[model]) for run in runs if model in run.codes]
+        # A date is open-ended only when the code reaches the oldest run read,
+        # where it runs straight into unread history; "first" otherwise means
+        # first within the runs read, as the report's note says.
+        at_edge = bool(model_runs) and model_runs[-1][0] == runs[-1].timestamp
+        oldest_has = {code for code in current_codes if at_edge and code in model_runs[-1][1]}
+        for code in sorted(current_codes):
+            consecutive = 0
+            for _timestamp, codes in model_runs:
+                if code not in codes:
+                    break
+                consecutive += 1
+            showed = [timestamp for timestamp, codes in model_runs if code in codes]
+            open_ended = code in oldest_has and not complete
+            entries.append(
+                ObservationHistory(
+                    model=model,
+                    code=code,
+                    first_observed=showed[-1] if showed else None,
+                    first_observed_open_ended=open_ended,
+                    consecutive_runs=consecutive + 1,
+                    consecutive_since=(
+                        model_runs[consecutive - 1][0] if consecutive else current_timestamp
+                    ),
+                    consecutive_open_ended=open_ended and consecutive == len(model_runs),
+                )
+            )
+    return tuple(entries)
+
+
+def _observation_history_record(
+    jsonl_path: Path, current: RetainedRun
+) -> dict[str, JsonLike] | None:
+    """Build the retained ``observation_history`` metadata block, or None without git history."""
+    current_timestamp = current.metadata["timestamp"]
+    read = _retained_observation_runs(jsonl_path, current_timestamp=current_timestamp)
+    if read is None:
+        return None
+    source, runs, complete = read
+    entries = _observation_history(
+        current.results, runs, complete=complete, current_timestamp=current_timestamp
+    )
+    return {
+        "source": source,
+        "runs_read": len(runs),
+        "oldest_run": runs[-1].timestamp if runs else None,
+        "complete": complete,
+        "entries": [cast("JsonLike", entry._asdict()) for entry in entries],
+    }
+
+
+def _observation_history_from_metadata(
+    metadata: Mapping[str, object],
+) -> tuple[dict[str, JsonLike], tuple[ObservationHistory, ...]] | None:
+    """Rehydrate the retained observation history, or None when absent or malformed."""
+    block = metadata.get("observation_history")
+    if not isinstance(block, dict):
+        return None
+    try:
+        entries = tuple(
+            ObservationHistory(
+                model=_comparison_req_str(entry["model"]),
+                code=_comparison_req_str(entry["code"]),
+                first_observed=_comparison_opt_str(entry.get("first_observed")),
+                first_observed_open_ended=_comparison_req_bool(entry["first_observed_open_ended"]),
+                consecutive_runs=_comparison_req_int(entry["consecutive_runs"]),
+                consecutive_since=_comparison_opt_str(entry.get("consecutive_since")),
+                consecutive_open_ended=_comparison_req_bool(entry["consecutive_open_ended"]),
+            )
+            for entry in _comparison_rows(block.get("entries"))
+        )
+    except (KeyError, TypeError, ValueError):
+        logger.warning("Retained observation history is malformed; leaving it out.")
+        return None
+    return cast("dict[str, JsonLike]", block), entries
+
+
 def _resolve_comparison_baseline(
     spec: str | None,
     jsonl_path: Path,
@@ -23291,6 +23595,7 @@ def _run_issue_summary_crash_section(
     output_paths: ReportOutputPaths,
     summary_path: Path,
     issue_reports: Mapping[str, Path],
+    history: tuple[Mapping[str, JsonLike], tuple[ObservationHistory, ...]] | None = None,
 ) -> ReportSection:
     """Build the expanded, bounded evidence section for one actionable crash."""
     failure = result.get("failure")
@@ -23314,6 +23619,8 @@ def _run_issue_summary_crash_section(
             )
             if value
         )
+    if history is not None:
+        facts.append(("History", _observation_history_cell(result["model"], history[1])))
     if requested_revision:
         facts.append(("Requested revision", requested_revision))
     if resolved_revision:
@@ -23635,12 +23942,37 @@ def _run_issue_summary_keyword_cell(result: JsonlResultRecord) -> str:
     return str(count)
 
 
-def _run_issue_summary_prompt_tokens_cell(result: JsonlResultRecord) -> str:
-    """Rendered prompt tokens (image tokens included), which drive prefill time."""
-    prompt_tokens = (result.get("metrics") or {}).get("prompt_tokens")
-    if isinstance(prompt_tokens, int) and not isinstance(prompt_tokens, bool):
-        return f"{prompt_tokens:,}"
-    return "-"
+def _run_issue_summary_tokens_cell(result: JsonlResultRecord) -> str:
+    """Prompt tokens (image tokens included) and generated tokens, as "prompt / output"."""
+    metrics = result.get("metrics") or {}
+
+    def _count(key: str) -> str:
+        value = metrics.get(key)
+        # bool subclasses int; a count is a plain int.
+        return f"{value:,}" if isinstance(value, int) and not isinstance(value, bool) else "-"
+
+    prompt, output = _count("prompt_tokens"), _count("generation_tokens")
+    return "-" if prompt == output == "-" else f"{prompt} / {output}"
+
+
+def _run_issue_summary_hint_text_cell(result: JsonlResultRecord) -> str:
+    """Percent of the description copied from the description hint, in four-word runs."""
+    details = result["assessment"].get("details") or {}
+    percent = details.get("description_hint_percent")
+    if not _is_detail_count(percent):
+        return "-"
+    # A count of the whole answer when no field was labelled says so.
+    return (
+        f"{percent}%"
+        if details.get("description_hint_scope") != "answer"
+        else f"{percent}% of answer"
+    )
+
+
+def _generation_token_limit(generation_settings: Sequence[tuple[str, str]]) -> int | None:
+    """The run's ``max_tokens`` from its retained generation settings, when recorded."""
+    value = dict(generation_settings).get("max_tokens")
+    return int(value) if value is not None and value.isdigit() else None
 
 
 def _run_issue_summary_quality_observed(result: JsonlResultRecord) -> str:
@@ -23692,6 +24024,8 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
 
 def _run_issue_summary_quality_section(
     results: Sequence[JsonlResultRecord],
+    *,
+    token_limit: int | None = None,
 ) -> ReportSection:
     """Rank every attempted model by current-run usability with captured facts."""
     ordered = sorted(
@@ -23706,6 +24040,8 @@ def _run_issue_summary_quality_section(
     show_hint_reuse = any(
         "keywords_from_hints" in (result["assessment"].get("details") or {}) for result in results
     )
+    # A prompt without a description hint has nothing to copy from.
+    show_hint_text = any(_run_issue_summary_hint_text_cell(result) != "-" for result in results)
     rows: list[tuple[ReportCell, ...]] = []
     for result in ordered:
         total_cell, tps_cell, peak_cell = _run_issue_summary_quality_cells(result)
@@ -23716,15 +24052,18 @@ def _run_issue_summary_quality_section(
                 total_cell,
                 tps_cell,
                 peak_cell,
-                _run_issue_summary_prompt_tokens_cell(result),
+                _run_issue_summary_tokens_cell(result),
                 *((_run_issue_summary_keyword_cell(result),) if show_keywords else ()),
+                *((_run_issue_summary_hint_text_cell(result),) if show_hint_text else ()),
                 _run_issue_summary_quality_observed(result),
             )
         )
+    limit_note = f" (limit {token_limit:,})" if token_limit is not None else ""
     intro = (
         "Every attempted model, ordered by its mechanical checks, with counted facts. "
         '"No concerns detected" is not an accuracy verdict: read the final answers in the '
-        "gallery. Prompt tokens include the image tokens, which drive prefill time."
+        "gallery. Prompt tokens include the image tokens, which drive prefill time; output "
+        f"tokens are the tokens generated{limit_note}."
     )
     if show_keywords:
         intro += " Keywords are counted from the answer's Keywords field" + (
@@ -23732,20 +24071,75 @@ def _run_issue_summary_quality_section(
             if show_hint_reuse
             else "."
         )
+    if show_hint_text:
+        intro += (
+            " Hint text is the percent of the description's words lying in four-word runs "
+            "copied from the prompt's description hint (of the whole answer when no field is "
+            f"labelled); {QUALITY.hint_echo_min_coverage:.0%} or more is reported as a "
+            "repeated prompt hint."
+        )
     headers = (
         "Model",
         "Mechanical checks",
         "Total",
         "Gen tok/s",
         "Peak GB",
-        "Prompt tok",
+        "Prompt / output tok",
         *(("Keywords",) if show_keywords else ()),
+        *(("Hint text",) if show_hint_text else ()),
         "Observed",
     )
     return ReportSection(
         "Model quality at a glance",
         (ReportParagraph(intro), ReportTable(headers, tuple(rows), compact=True)),
     )
+
+
+def _observation_history_note(block: Mapping[str, JsonLike]) -> str:
+    """Say what the History column counts and which retained runs it read."""
+    runs_read = block.get("runs_read")
+    oldest = block.get("oldest_run")
+    window = (
+        f"{runs_read} earlier retained runs from git `{block.get('source')}`"
+        + (f", back to {oldest[:10]}" if isinstance(oldest, str) else "")
+        + ("" if block.get("complete") is True else "; older runs were not read")
+    )
+    return (
+        "*History* dates each observation (a crash counts as one) over this model's "
+        f"retained runs: {window}. A run that did not attempt the model is skipped, and a "
+        'report-only correction of a run counts once. "Last N runs" counts consecutive '
+        'runs ending with this one; "first" is the earliest run read that showed it.'
+    )
+
+
+def _history_date(timestamp: str | None, *, open_ended: bool) -> str:
+    # Retained timestamps start with the ISO date ("2026-10-04 21:56:03 BST").
+    date = (timestamp or "unknown date")[:10]
+    return f"{date} or earlier" if open_ended else date
+
+
+def _observation_history_cell(model: str, entries: Sequence[ObservationHistory]) -> str:
+    """One model's per-observation history, as "<observation>: <persistence>" clauses."""
+    clauses: list[str] = []
+    for entry in (entry for entry in entries if entry.model == model):
+        gloss = (
+            "crash"
+            if entry.code == _CRASH_HISTORY_CODE
+            else _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", entry.code), entry.code)
+        )
+        first = _history_date(entry.first_observed, open_ended=entry.first_observed_open_ended)
+        if entry.first_observed is None:
+            clauses.append(f"{gloss}: first seen this run")
+        elif entry.consecutive_runs == 1:
+            clauses.append(f"{gloss}: back this run; first {first}")
+        else:
+            plus = "+" if entry.consecutive_open_ended else ""
+            since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
+            clause = f"{gloss}: last {entry.consecutive_runs}{plus} runs (since {since})"
+            if entry.first_observed != entry.consecutive_since:
+                clause += f"; first {first}"
+            clauses.append(clause)
+    return "; ".join(clauses) or "-"
 
 
 def _since_baseline_status(model: str, comparison: RunComparison | None) -> str | None:
@@ -23765,8 +24159,13 @@ def _run_issue_summary_surfaced_sections(
     output_paths: ReportOutputPaths,
     summary_path: Path,
     comparison: RunComparison | None = None,
+    history: tuple[Mapping[str, JsonLike], tuple[ObservationHistory, ...]] | None = None,
 ) -> tuple[ReportSection, ...]:
-    """Build one compact review table for each non-actionable execution status."""
+    """Build one compact review table for each non-actionable execution status.
+
+    ``history`` is the retained observation-history block and its entries;
+    without it the History column and its note are left out.
+    """
     heading_by_execution: dict[ExecutionStatus, str] = {
         "completed": "Completed attempts requiring review",
         "crashed": "Crashed attempts requiring review",
@@ -23796,6 +24195,11 @@ def _run_issue_summary_surfaced_sections(
                     result["model"],
                     _human_status_label(assessment["usability"]),
                     *(() if since is None else (since,)),
+                    *(
+                        ()
+                        if history is None
+                        else (_observation_history_cell(result["model"], history[1]),)
+                    ),
                     _run_issue_summary_observed_result(result),
                     _run_issue_summary_artifact_link(
                         summary_path=summary_path,
@@ -23810,11 +24214,22 @@ def _run_issue_summary_surfaced_sections(
                 "Model",
                 "Mechanical checks",
                 *(("Since baseline",) if comparison is not None and comparison.comparable else ()),
+                *(("History",) if history is not None else ()),
                 "Observed result",
                 "Evidence",
             )
             sections.append(
-                ReportSection(heading, (ReportTable(headers, tuple(rows), compact=True),))
+                ReportSection(
+                    heading,
+                    (
+                        *(
+                            (ReportParagraph(_observation_history_note(history[0])),)
+                            if history is not None
+                            else ()
+                        ),
+                        ReportTable(headers, tuple(rows), compact=True),
+                    ),
+                )
             )
     return tuple(sections)
 
@@ -24082,6 +24497,7 @@ def generate_run_issue_summary_report(
         f"{len(source.results)} cached vision-language models"
     )
     eval_mode = str(source.metadata.get("eval_mode", "unknown"))
+    history = _observation_history_from_metadata(source.metadata)
     blocks: list[ReportBlock] = [
         ReportParagraph(_run_issue_summary_maintainer_verdict(actionable, other, comparison)),
     ]
@@ -24144,7 +24560,11 @@ def generate_run_issue_summary_report(
     )
     if comparison is not None:
         blocks.append(_run_issue_summary_comparison_section(comparison))
-    blocks.append(_run_issue_summary_quality_section(source.results))
+    blocks.append(
+        _run_issue_summary_quality_section(
+            source.results, token_limit=_generation_token_limit(source.generation_settings)
+        )
+    )
     if (constraint_section := _run_issue_summary_constraint_breakdown(source.results)) is not None:
         blocks.append(constraint_section)
 
@@ -24159,6 +24579,7 @@ def generate_run_issue_summary_report(
                         output_paths=output_paths,
                         summary_path=summary_path,
                         issue_reports=issue_reports or {},
+                        history=history,
                     )
                     for result in actionable
                 ),
@@ -24172,6 +24593,7 @@ def generate_run_issue_summary_report(
                 output_paths=output_paths,
                 summary_path=summary_path,
                 comparison=comparison,
+                history=history,
             )
         )
 
@@ -25468,6 +25890,26 @@ def _compute_run_comparison(
         return None
 
 
+def _with_observation_history(inputs: ReportGenerationInputs, retained: RetainedRun) -> RetainedRun:
+    """Add the observation-history block to the retained metadata (best effort).
+
+    Independent of ``--compare-with``: it always reads the tracked file's
+    own git history. Like the comparison, it is an enhancement that must
+    never cost the run's reports.
+    """
+    try:
+        block = _observation_history_record(inputs.output_paths.jsonl, retained)
+    except Exception as error:  # history must never cost the run's reports
+        logger.warning("Observation history skipped: unexpected failure (%s)", error)
+        logger.debug("Observation history failure detail", exc_info=True)
+        return retained
+    if block is None:
+        return retained
+    return RetainedRun(
+        metadata={**retained.metadata, "observation_history": block}, results=retained.results
+    )
+
+
 def _build_retained_run_guarded(
     inputs: ReportGenerationInputs, artifacts: Sequence[ReportArtifact]
 ) -> RetainedRun | None:
@@ -25610,6 +26052,8 @@ def _generate_reports_and_log_outputs(
 
     retained = _build_retained_run_guarded(inputs, artifacts)
 
+    if retained is not None:
+        retained = _with_observation_history(inputs, retained)
     if retained is not None and inputs.comparison is None:
         comparison = _compute_run_comparison(inputs, retained)
         if comparison is not None:

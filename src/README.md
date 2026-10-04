@@ -284,7 +284,14 @@ The tool generates a deliberately small artifact set in `output/` by default:
   requiring review into severity-ordered compact tables, explains structured
   failures even when no output observation exists, counts completions passing
   mechanical checks, and
-  records remote-code and producer provenance. It links to complete retained
+  records remote-code and producer provenance. Its quality table gives counted
+  facts per model: prompt and output tokens against the run's `max_tokens`,
+  keywords reused from the prompt's hints, and the percent of the description
+  (of the whole answer when no field is labelled) copied from the description
+  hint. Each model requiring review has a History entry that dates every
+  current observation separately from the git history of the tracked
+  `results.jsonl` at `HEAD` (independent of `--compare-with`): when it was
+  first observed and how many of the model's consecutive runs have shown it. It links to complete retained
   evidence without copying full prompts, outputs, tracebacks, or scripts. Its
   cross-file links always use canonical GitHub repository URLs so they still work
   when the report is pasted into an issue.

@@ -1801,6 +1801,56 @@ def test_description_that_hands_back_the_prompt_hint_is_flagged() -> None:
     assert check_models._hint_coverage(_SWAN_HINT, _SWAN_HINT) == 1.0
 
 
+def test_description_hint_share_is_counted_below_the_echo_threshold() -> None:
+    """The copied share is a count for every metadata answer, flagged or not."""
+    echoed = _assisted(f"Title: Swan on River\nDescription: {_SWAN_HINT}\nKeywords: swan, river")
+    assert (echoed.description_hint_percent, echoed.description_hint_scope) == (100, "description")
+
+    # The hint plus a sentence of its own stays below the threshold but is still counted.
+    partial = _assisted(
+        f"Title: Swan on River\nDescription: {_SWAN_HINT} Two moored cruisers carry blue "
+        "canopies, and a brown-brick block with balconies rises behind them in soft "
+        "evening light.\nKeywords: swan"
+    )
+    assert partial.echoed_hint_fields == []
+    assert partial.description_hint_scope == "description"
+    assert partial.description_hint_percent is not None
+    assert 50 < partial.description_hint_percent < 80
+    details = check_models._catalog_constraint_observation_details(partial)
+    assert details["description_hint_percent"] == partial.description_hint_percent
+    assert details["description_hint_scope"] == "description"
+
+    # No hint in the prompt, or the general profile: nothing to count.
+    assert (
+        _assisted("Title: Swan\nDescription: A swan.\nKeywords: swan").description_hint_percent
+        is None
+    )
+    general = check_models.analyze_generation_text(
+        _SWAN_HINT, generated_tokens=90, prompt=_ASSISTED_PROMPT, assessment_profile="general"
+    )
+    assert general.description_hint_percent is None
+
+
+def test_unlabelled_answer_that_is_the_hint_is_flagged_as_an_echo() -> None:
+    """A prompt-only model that hands the hint back without labels is measured whole."""
+    unlabelled = _assisted(f"River Deben, Woodbridge. {_SWAN_HINT}")
+    assert unlabelled.echoed_hint_fields == ["description"]
+    assert unlabelled.description_hint_scope == "answer"
+    assert unlabelled.description_hint_percent is not None
+    assert unlabelled.description_hint_percent >= 80
+    # Its own unlabelled prose is measured too, without an echo.
+    own_words = _assisted(
+        "A mute swan swims past moored motor cruisers beneath a brown-brick apartment block "
+        "with balconies, overhanging branches framing the water in soft daylight."
+    )
+    assert own_words.echoed_hint_fields == []
+    assert own_words.description_hint_scope == "answer"
+    # Once any field is labelled, only the labelled Description is compared.
+    labelled_elsewhere = _assisted(f"Title: Swan on River\n{_SWAN_HINT}")
+    assert labelled_elsewhere.echoed_hint_fields == []
+    assert labelled_elsewhere.description_hint_percent is None
+
+
 def test_place_names_the_prompt_never_supplied_are_flagged() -> None:
     """A place inferred from GPS or guessed outright is reported; supplied and visible facts are not."""
     inferred = _assisted(

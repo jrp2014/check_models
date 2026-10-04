@@ -6269,6 +6269,253 @@ def test_resolve_comparison_baseline_handles_none_path_and_missing(tmp_path: Pat
     assert check_models._resolve_comparison_baseline("auto", jsonl) is None
 
 
+def _flagged_record(model: str, observations: list[str] | None = None) -> dict[str, object]:
+    """A result row put up for review: a crash when no observations are given."""
+    if observations is None:
+        record = _comparison_record(model, execution="crashed", usability="not_evaluated")
+        status = "actionable_failure"
+    else:
+        record = _comparison_record(model, usability="unusable", observations=observations)
+        status = "observation_needs_reproduction"
+    assessment = cast("dict[str, object]", record["assessment"])
+    assessment["maintainer_status"] = status
+    return record
+
+
+def _test_git(repo: Path, *args: str) -> None:
+    """Run git with a fixed identity inside a test repository."""
+    subprocess.run(  # noqa: S603 - fixed git argv built by the test
+        [  # noqa: S607 - git from PATH in a test
+            "git",
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            *args,
+        ],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+    )
+
+
+def _git_commit_results(repo: Path, rows: Sequence[dict[str, object]], message: str) -> None:
+    """Write and commit one retained results.jsonl version in a test repository."""
+    check_models._write_text_file(
+        repo / "results.jsonl", "".join(json.dumps(row) + "\n" for row in rows)
+    )
+    _test_git(repo, "add", "results.jsonl")
+    _test_git(repo, "commit", "-q", "-m", message)
+
+
+def _retained_version(timestamp: str, *records: dict[str, object]) -> list[dict[str, object]]:
+    metadata = _issue_summary_metadata(records)
+    metadata["timestamp"] = timestamp
+    return [metadata, *records]
+
+
+def _current_run(timestamp: str, *records: dict[str, object]) -> check_models.RetainedRun:
+    rows = _retained_version(timestamp, *records)
+    return check_models.RetainedRun(
+        metadata=cast("check_models.JsonlMetadataRecord", rows[0]),
+        results=tuple(cast("check_models.JsonlResultRecord", row) for row in rows[1:]),
+    )
+
+
+def _history_by_code(block: object) -> dict[tuple[str, str], dict[str, object]]:
+    assert isinstance(block, dict)
+    entries = cast("list[dict[str, object]]", block["entries"])
+    return {(str(entry["model"]), str(entry["code"])): entry for entry in entries}
+
+
+def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -> None:
+    """Each code of a flagged model is dated separately, over that model's own runs."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _test_git(repo, "init", "-q")
+    schema2: dict[str, object] = {
+        "_type": "metadata",
+        "format_version": "2.0",
+        "prompt": "p",
+        "timestamp": "t",
+    }
+    _git_commit_results(repo, [schema2], "schema 2")
+    _git_commit_results(
+        repo,
+        _retained_version(
+            "2026-07-11 10:00:00 BST",
+            _flagged_record("org/loop", ["repeated_output"]),
+            _flagged_record("org/back", ["repeated_output"]),
+        ),
+        "run 1",
+    )
+    _git_commit_results(
+        repo,
+        _retained_version(
+            "2026-07-18 10:00:00 BST",
+            _flagged_record("org/loop", ["repeated_output"]),
+            # Shown clean: breaks org/back's streak.
+            _comparison_record("org/back"),
+        ),
+        "run 2",
+    )
+    # org/loop not attempted: skipped, neither breaking nor extending its streak.
+    _git_commit_results(
+        repo, _retained_version("2026-07-25 10:00:00 BST", _comparison_record("org/back")), "run 3"
+    )
+    current = _current_run(
+        "2026-08-01 10:00:00 BST",
+        _flagged_record("org/loop", ["repeated_output", "unexpected_special_token"]),
+        _flagged_record("org/back", ["repeated_output"]),
+        _flagged_record("org/new"),
+        _comparison_record("org/clean"),
+    )
+
+    block = check_models._observation_history_record(repo / "results.jsonl", current)
+    assert block is not None
+    assert block["source"] == "HEAD:results.jsonl"
+    assert block["runs_read"] == 3
+    # The walk stopped at the schema-2 version, so older runs stay unread.
+    assert block["complete"] is False
+    history = _history_by_code(block)
+    assert set(history) == {
+        ("org/loop", "repeated_output"),
+        ("org/loop", "unexpected_special_token"),
+        ("org/back", "repeated_output"),
+        ("org/new", "crashed"),
+    }
+    loop = history["org/loop", "repeated_output"]
+    # In every run of org/loop read, back to the oldest: open-ended.
+    assert (loop["consecutive_runs"], loop["consecutive_since"]) == (3, "2026-07-11 10:00:00 BST")
+    assert loop["first_observed"] == "2026-07-11 10:00:00 BST"
+    assert loop["consecutive_open_ended"] is True
+    assert loop["first_observed_open_ended"] is True
+    # A problem new to a model with an older one is not folded into that streak.
+    tokens = history["org/loop", "unexpected_special_token"]
+    assert (tokens["first_observed"], tokens["consecutive_runs"]) == (None, 1)
+    # A model that came back keeps its first observation apart from its streak.
+    back = history["org/back", "repeated_output"]
+    assert back["first_observed"] == "2026-07-11 10:00:00 BST"
+    assert (back["consecutive_runs"], back["consecutive_since"]) == (1, "2026-08-01 10:00:00 BST")
+    assert history["org/new", "crashed"]["first_observed"] is None
+
+    entries = check_models._observation_history_from_metadata({"observation_history": block})
+    assert entries is not None
+    cells = {
+        model: check_models._observation_history_cell(model, entries[1])
+        for model in ("org/loop", "org/back", "org/new", "org/clean")
+    }
+    assert cells == {
+        "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier); "
+        "control tokens visible: first seen this run",
+        "org/back": "repeated text: back this run; first 2026-07-11 or earlier",
+        "org/new": "crash: first seen this run",
+        "org/clean": "-",
+    }
+
+
+def test_observation_history_counts_one_run_per_capture(tmp_path: Path) -> None:
+    """A report-only correction of a captured run is the same run, not another one."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _test_git(repo, "init", "-q")
+    # Three versions of one captured run: the report-only fixes re-assess it.
+    for message, observations in (
+        ("capture", ["repeated_output", "token_cap_truncation"]),
+        ("report-only fix", ["repeated_output", "duplicate_keywords"]),
+        ("another report-only fix", ["repeated_output"]),
+    ):
+        _git_commit_results(
+            repo,
+            _retained_version("2026-07-25 10:00:00 BST", _flagged_record("org/loop", observations)),
+            message,
+        )
+    current = _current_run(
+        "2026-08-01 10:00:00 BST",
+        _flagged_record("org/loop", ["repeated_output", "token_cap_truncation"]),
+    )
+    block = check_models._observation_history_record(repo / "results.jsonl", current)
+    assert block is not None
+    assert block["runs_read"] == 1
+    # Whole history read: the start is exact, not "or earlier".
+    assert block["complete"] is True
+    history = _history_by_code(block)
+    loop = history["org/loop", "repeated_output"]
+    assert loop["consecutive_runs"] == 2
+    assert loop["consecutive_open_ended"] is False
+    # The newest version of the run wins: its correction dropped the cap.
+    assert history["org/loop", "token_cap_truncation"]["first_observed"] is None
+
+
+def test_observation_history_ignores_the_comparison_baseline(tmp_path: Path) -> None:
+    """History runs from HEAD, so an older --compare-with ref cannot skip a clean run."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _test_git(repo, "init", "-q")
+    for timestamp, record in (
+        ("2026-07-11 10:00:00 BST", _flagged_record("org/m", ["repeated_output"])),
+        ("2026-07-18 10:00:00 BST", _comparison_record("org/m")),
+        ("2026-07-25 10:00:00 BST", _flagged_record("org/m", ["repeated_output"])),
+    ):
+        _git_commit_results(repo, _retained_version(timestamp, record), timestamp)
+    current = _current_run("2026-08-01 10:00:00 BST", _flagged_record("org/m", ["repeated_output"]))
+    # The run's wiring passes only the output paths: the baseline chosen with
+    # --compare-with (here an older ref) never reaches the history.
+    inputs = cast(
+        "check_models.ReportGenerationInputs",
+        Namespace(
+            output_paths=check_models.ReportOutputPaths.from_root(repo),
+            run_args=Namespace(compare_with="HEAD~2"),
+        ),
+    )
+    retained = check_models._with_observation_history(inputs, current)
+    entry = _history_by_code(retained.metadata.get("observation_history"))[
+        "org/m", "repeated_output"
+    ]
+    # The clean 2026-07-18 run breaks the streak whatever the baseline.
+    assert (entry["consecutive_runs"], entry["consecutive_since"]) == (2, "2026-07-25 10:00:00 BST")
+    assert entry["first_observed"] == "2026-07-11 10:00:00 BST"
+
+
+def test_run_summary_shows_observation_history_from_retained_metadata(tmp_path: Path) -> None:
+    """The History column and its note come from the run's own metadata, with or without git."""
+    entry = {
+        "model": "org/loop",
+        "code": "repeated_output",
+        "first_observed": "2026-07-11 10:00:00 BST",
+        "first_observed_open_ended": False,
+        "consecutive_runs": 3,
+        "consecutive_since": "2026-07-18 10:00:00 BST",
+        "consecutive_open_ended": False,
+    }
+    block = {
+        "source": "HEAD:src/output/results.jsonl",
+        "runs_read": 4,
+        "oldest_run": "2026-07-04 10:00:00 BST",
+        "complete": True,
+        "entries": [entry],
+    }
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths, results=(_flagged_record("org/loop", ["repeated_output"]),)
+    )
+    rows = check_models._read_text_file(output_paths.jsonl).splitlines()
+    metadata = json.loads(rows[0])
+    metadata["observation_history"] = block
+    check_models._write_text_file(
+        output_paths.jsonl, "\n".join([json.dumps(metadata), *rows[1:]]) + "\n"
+    )
+    summary = check_models.regenerate_run_issue_summary(tmp_path / "output")
+    assert summary is not None
+    content = check_models._read_text_file(summary)
+    prose = " ".join(content.split())
+    assert "| History |" in content
+    assert "4 earlier retained runs from git `HEAD:src/output/results.jsonl`" in prose
+    assert "back to 2026-07-04" in prose
+    assert "older runs were not read" not in prose
+    assert "| repeated text: last 3 runs (since 2026-07-18); first 2026-07-11 |" in content
+
+
 def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_lists() -> None:
     """The section names the baseline, shows transitions, and keeps targeted runs tidy."""
     baseline = _comparison_baseline([_comparison_record(f"org/m{i}") for i in range(12)])
@@ -8214,9 +8461,20 @@ def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
     """Start-up warnings reach the report, and the quality table carries counted facts."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     result = _issue_summary_result(
-        "org/a", details={"keyword_count": 36, "keywords_from_hints": 20}
+        "org/a",
+        details={
+            "keyword_count": 36,
+            "keywords_from_hints": 20,
+            "description_hint_percent": 56,
+            "description_hint_scope": "description",
+        },
     )
-    _write_issue_summary_fixture(output_paths, results=(result,))
+    result["metrics"] = {"prompt_tokens": 16525, "generation_tokens": 495}
+    unlabelled = _issue_summary_result(
+        "org/b",
+        details={"description_hint_percent": 97, "description_hint_scope": "answer"},
+    )
+    _write_issue_summary_fixture(output_paths, results=(result, unlabelled))
     rows = check_models._read_text_file(output_paths.jsonl).splitlines()
     metadata = json.loads(rows[0])
     metadata["preflight_issues"] = ["mlx is installed at 2 versions (0.31.0, 0.32.3)"]
@@ -8229,16 +8487,22 @@ def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
     assert "**Environment warnings**" in content
     assert "- mlx is installed at 2 versions (0.31.0, 0.32.3)" in content
     assert content.index("**Environment warnings**") < content.index("## Run summary")
-    assert "| Prompt tok | Keywords |" in content
-    assert "| 36 (20 from hints) |" in content
+    assert "| Prompt / output tok | Keywords | Hint text |" in content
+    # Output tokens sit beside the run's limit so a near-cap answer is visible.
+    assert "| 16,525 / 495 | 36 (20 from hints) | 56% |" in content
+    assert "output tokens are the tokens generated (limit 500)" in content
+    # An answer with no labelled field is measured whole, and says so.
+    assert "| 97% of answer |" in content
+    assert "80% or more is reported as a repeated prompt hint" in content
 
-    # A custom --prompt has no Keywords field: no column, no keyword wording.
+    # A custom --prompt has no Keywords field or hint: no columns, no wording.
     _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/a"),))
     summary = check_models.generate_run_issue_summary_report(output_paths)
     assert summary is not None
     content = check_models._read_text_file(summary)
-    assert "| Prompt tok | Observed |" in content
+    assert "| Prompt / output tok | Observed |" in content
     assert "Keywords are counted" not in content
+    assert "Hint text" not in content
 
 
 def test_observation_clusters_render_only_for_shared_signatures() -> None:
