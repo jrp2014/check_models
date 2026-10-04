@@ -168,9 +168,13 @@ else:
     psutil = _psutil_runtime
 
 
+# SKY-D223 on the mlx import below: mlx is a declared dependency, but Skylos
+# 4.44.0 cannot verify an editable mlx build. Its installed RECORD lists only
+# the loader, and Skylos reads module lists only from portable wheels, while
+# mlx publishes platform wheels alone. Drop it once Skylos accepts those.
 if TYPE_CHECKING:
     from jinja2.parser import Parser as JinjaParser
-    from mlx import nn
+    from mlx import nn  # skylos: ignore[SKY-D223]
     from mlx_vlm.generate import GenerationResult
     from mlx_vlm.generate.types import GenerateKwargs, ProcessorLike
     from PIL.Image import Image as PILImage

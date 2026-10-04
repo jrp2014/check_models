@@ -23,7 +23,9 @@ if TYPE_CHECKING:  # pragma: no cover
     import types
     from collections.abc import Mapping, Sequence
 
-import mlx.core as mx
+# SKY-D223: Skylos 4.44.0 cannot verify an editable mlx build (only platform
+# wheels exist, and it reads portable ones); see the note in check_models.py.
+import mlx.core as mx  # skylos: ignore[SKY-D223]
 import pytest
 import yaml
 from mlx import nn

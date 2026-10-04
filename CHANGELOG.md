@@ -8,10 +8,12 @@ Notable changes to this project will be documented in this file.
 
 - Tooling: the Skylos floor is now 4.44.0, which checks an editable
   install's modules against the published wheel instead of trusting its
-  loader-only `RECORD`. The three temporary `skylos: ignore[SKY-D223]`
-  suppressions on the first `mlx`/`mlx_vlm` imports are gone. With mlx-vlm
-  installed editable, the same tree reports SKY-D223 on 4.43.2 and nothing
-  on 4.44.0. The SKY-S101 workaround is still needed on 4.44.0.
+  loader-only `RECORD`. That clears SKY-D223 for an editable mlx-vlm, so its
+  suppression is gone. It does not clear it for an editable mlx: Skylos only
+  reads module lists from portable (`py3-none-any`) wheels, and mlx publishes
+  platform wheels alone. The two first `mlx` imports keep
+  `skylos: ignore[SKY-D223]` until Skylos accepts those. The SKY-S101
+  workaround is still needed on 4.44.0.
 - Agent skills: added `triaging-skylos-findings`, adapted from the `skylos`
   and `skylos-security` skills in Skylos's own repository. It maps where
   Skylos gates this repo, how to reproduce one finding with `--select` and
