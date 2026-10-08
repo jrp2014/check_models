@@ -19,6 +19,23 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: `[tool.pyrefly]` now sets `search-path = ["."]`, so editor
+  Pyrefly (1.3.2) finds `check_models` and `check_models_data` instead of
+  inferring an import root of `src/src`; the gate's generated config already
+  led with that directory.
+- Baseline comparison: the changed-text models moved from one long summary
+  line into a collapsed table (decoding, checkpoint quantization, shared
+  prefix, length, prompt token count); the summary now states only the count.
+  A new "Greedy text changed, by checkpoint quantization" row counts greedy
+  pairs by this run's `config.json` quantization (quantized, not quantized,
+  unknown). The 2026-10-08 sweep showed why: 10 of 22 quantized greedy models
+  changed text and 0 of 7 unquantized ones did, while mlx changed its
+  quantized matmul accumulation.
+- Baseline comparison: the per-model mlx-vlm commit list now also covers the
+  sibling model packages and modules each architecture imports directly (one
+  level, read at the current revision) and names them. Before, `qwen3_5_moe`
+  models showed "no commits touched" although mlx-vlm #2442 changed the
+  `qwen3_5` code they import.
 - Tooling: the Skylos floor is now 4.47.1, which also reads module lists
   from platform wheels, so an editable mlx build is verified and the two
   `skylos: ignore[SKY-D223]` comments on the first `mlx` imports are gone.

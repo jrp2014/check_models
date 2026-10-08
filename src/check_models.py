@@ -20399,6 +20399,11 @@ class TextDivergence(NamedTuple):
     current_chars: int
     # Counts only: equal counts do not show the token ids were the same.
     prompt_token_count_unchanged: bool | None  # None when either side lacks the count
+    # The pair's decoding group (a _DECODING_GROUP_LABELS key).
+    decoding: str = "unknown"
+    # This run's checkpoint quantization from config.json ("4-bit affine",
+    # "not quantized"); None when the record has no model_burden facts.
+    weights: str | None = None
 
 
 class ArchitectureCommits(NamedTuple):
@@ -20412,6 +20417,10 @@ class ArchitectureCommits(NamedTuple):
     architecture: str
     status: str  # "commits", "none", or "unavailable"
     subjects: tuple[str, ...]
+    # Sibling packages and modules under mlx_vlm/models/ that the
+    # architecture's own files import directly (one level), included in the
+    # path-limited log.
+    imports: tuple[str, ...] = ()
 
 
 class ComponentChange(NamedTuple):
@@ -20473,6 +20482,9 @@ class RunComparison:
     # effective decoding settings of both: "greedy", "sampled" (same settings
     # and seed), "changed" (mode or settings differ), "unknown".
     text_changes_by_decoding: tuple[tuple[str, int, int], ...] = ()
+    # (group, text changed, pairs) over greedy pairs only, by this run's
+    # checkpoint quantization: "quantized", "not quantized", "unknown".
+    greedy_text_changes_by_weights: tuple[tuple[str, int, int], ...] = ()
     # (baseline, current) check_models versions when they differ: a phase
     # renamed between them changes a signature without changing the fault.
     harness_versions: tuple[str, ...] = ()
@@ -21148,6 +21160,45 @@ def _text_changes_by_decoding(
     )
 
 
+_WEIGHT_GROUPS: Final[tuple[str, ...]] = ("quantized", "not quantized", "unknown")
+
+
+def _weights_label(record: JsonlResultRecord) -> str | None:
+    """The checkpoint's config.json quantization ("4-bit affine", "not quantized"), or None."""
+    burden = record.get("model_burden")
+    if not isinstance(burden, dict):
+        return None
+    bits = burden.get("quantization_bits")
+    mode = burden.get("quantization_mode")
+    parts = [f"{bits}-bit"] if isinstance(bits, int) and not isinstance(bits, bool) else []
+    if isinstance(mode, str):
+        parts.append(mode)
+    return " ".join(parts) or "not quantized"
+
+
+def _weight_group(label: str | None) -> str:
+    """Collapse a weights label to its _WEIGHT_GROUPS key."""
+    if label is None:
+        return "unknown"
+    return "not quantized" if label == "not quantized" else "quantized"
+
+
+def _greedy_text_changes_by_weights(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> tuple[tuple[str, int, int], ...]:
+    """Count changed text among greedy pairs, split by this run's checkpoint quantization."""
+    counts: dict[str, list[int]] = {}
+    for _model, now, before in _completed_in_both(pairs):
+        if _decoding_group(now, before) != "greedy":
+            continue
+        tally = counts.setdefault(_weight_group(_weights_label(now)), [0, 0])
+        tally[0] += now.get("generated_text", "") != before.get("generated_text", "")
+        tally[1] += 1
+    return tuple(
+        (group, counts[group][0], counts[group][1]) for group in _WEIGHT_GROUPS if group in counts
+    )
+
+
 def _generated_text_changes(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
 ) -> tuple[int, list[TextDivergence]]:
@@ -21176,6 +21227,8 @@ def _generated_text_changes(
                 baseline_chars=len(baseline_text),
                 current_chars=len(current_text),
                 prompt_token_count_unchanged=unchanged,
+                decoding=_decoding_group(now, before),
+                weights=_weights_label(now),
             )
         )
     return len(completed), changed
@@ -21614,6 +21667,7 @@ def compare_run_results(
         ),
         crash_continuity=_crash_continuity(current, baseline_by),
         text_changes_by_decoding=_text_changes_by_decoding(diff_pairs),
+        greedy_text_changes_by_weights=_greedy_text_changes_by_weights(diff_pairs),
         harness_versions=_harness_versions(baseline.metadata, current_metadata),
         changes=tuple(changes),
         identical_text_models=identical_text,
@@ -21867,12 +21921,23 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             cast("JsonLike", entry._asdict()) for entry in comparison.crash_continuity
         ],
         "architecture_commits": [
-            cast("JsonLike", {**entry._asdict(), "subjects": list(entry.subjects)})
+            cast(
+                "JsonLike",
+                {
+                    **entry._asdict(),
+                    "subjects": list(entry.subjects),
+                    "imports": list(entry.imports),
+                },
+            )
             for entry in comparison.architecture_commits
         ],
         "text_changes_by_decoding": {
             group: {"changed": changed, "compared": compared}
             for group, changed, compared in comparison.text_changes_by_decoding
+        },
+        "greedy_text_changes_by_weights": {
+            group: {"changed": changed, "compared": compared}
+            for group, changed, compared in comparison.greedy_text_changes_by_weights
         },
         "harness_versions": cast("JsonLike", list(comparison.harness_versions)),
         "changes": [
@@ -21907,6 +21972,8 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
                 "baseline_chars": entry.baseline_chars,
                 "current_chars": entry.current_chars,
                 "prompt_token_count_unchanged": entry.prompt_token_count_unchanged,
+                "decoding": entry.decoding,
+                "weights": entry.weights,
             }
             for entry in comparison.text_divergence
         ],
@@ -22042,6 +22109,18 @@ def _comparison_rows(raw: JsonLike) -> tuple[dict[str, JsonLike], ...]:
     return tuple(cast("dict[str, JsonLike]", item) for item in raw)
 
 
+def _comparison_group_counts(raw: JsonLike) -> tuple[tuple[str, int, int], ...]:
+    """Rehydrate a {group: {changed, compared}} mapping into (group, changed, compared) rows."""
+    return tuple(
+        (
+            group,
+            _comparison_req_int(_comparison_mapping(counts).get("changed", 0)),
+            _comparison_req_int(_comparison_mapping(counts).get("compared", 0)),
+        )
+        for group, counts in _comparison_mapping(raw).items()
+    )
+
+
 def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
     """Rehydrate the retained metadata comparison for summary regeneration.
 
@@ -22144,16 +22223,13 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
                 _comparison_req_str(entry["architecture"]),
                 _comparison_req_str(entry["status"]),
                 _comparison_str_items(entry.get("subjects") or []),
+                _comparison_str_items(entry.get("imports") or []),
             )
             for entry in _comparison_rows(value.get("architecture_commits"))
         ),
-        text_changes_by_decoding=tuple(
-            (
-                group,
-                _comparison_req_int(_comparison_mapping(counts).get("changed", 0)),
-                _comparison_req_int(_comparison_mapping(counts).get("compared", 0)),
-            )
-            for group, counts in _comparison_mapping(value.get("text_changes_by_decoding")).items()
+        text_changes_by_decoding=_comparison_group_counts(value.get("text_changes_by_decoding")),
+        greedy_text_changes_by_weights=_comparison_group_counts(
+            value.get("greedy_text_changes_by_weights")
         ),
         revision_changes=tuple(
             (
@@ -22177,6 +22253,8 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
                     if entry.get("prompt_token_count_unchanged") is None
                     else _comparison_req_bool(entry["prompt_token_count_unchanged"])
                 ),
+                _comparison_opt_str(entry.get("decoding")) or "unknown",
+                _comparison_opt_str(entry.get("weights")),
             )
             for entry in _comparison_rows(value.get("text_divergence"))
         ),
@@ -22250,35 +22328,50 @@ class _ComparisonView:
     memory_rows: tuple[tuple[str, str, str, str], ...]
     continuity_rows: tuple[tuple[str, str], ...] = ()
     continuity_note: str | None = None
+    text_change_rows: tuple[tuple[str, ...], ...] = ()
 
 
-def _text_change_label(model: str, divergence: TextDivergence | None) -> str:
-    """One changed model, with how much text it shares with the baseline when recorded."""
-    if divergence is None:
-        return model
-    prompt = {
-        True: "; same prompt token count",
-        False: "; prompt token count changed",
-        None: "",
-    }[divergence.prompt_token_count_unchanged]
-    return (
-        f"{model} (shared prefix {divergence.shared_prefix_chars:,} characters; length "
-        f"{divergence.baseline_chars:,} \u2192 {divergence.current_chars:,}{prompt})"
-    )
+_DECODING_CELL_LABELS: Final[dict[str, str]] = {
+    "greedy": "greedy",
+    "sampled": "sampled",
+    "changed": "settings changed",
+    "unknown": "not recorded",
+}
+
+
+def _text_change_rows(comparison: RunComparison) -> tuple[tuple[str, ...], ...]:
+    """One table row per changed model: decoding, weights and the counted divergence."""
+    if not comparison.comparable:
+        return ()
+    where = {entry.model: entry for entry in comparison.text_divergence}
+    rows: list[tuple[str, ...]] = []
+    for model in comparison.text_changed_models:
+        entry = where.get(model)
+        if entry is None:
+            rows.append((model, "-", "-", "-", "-", "-"))
+            continue
+        prompt = {True: "same", False: "changed", None: "-"}[entry.prompt_token_count_unchanged]
+        rows.append(
+            (
+                model,
+                _DECODING_CELL_LABELS.get(entry.decoding, entry.decoding),
+                entry.weights or "-",
+                f"{entry.shared_prefix_chars:,}",
+                f"{entry.baseline_chars:,} \u2192 {entry.current_chars:,}",
+                prompt,
+            )
+        )
+    return tuple(rows)
 
 
 def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
-    """Name the models whose generated text changed, and split the count by decoding."""
+    """Count the changed texts and split the count by decoding and, for greedy, by weights."""
     rows = []
     if comparison.text_changed_models:
-        where = {entry.model: entry for entry in comparison.text_divergence}
         rows.append(
             (
                 "Generated text changed",
-                ", ".join(
-                    _text_change_label(model, where.get(model))
-                    for model in comparison.text_changed_models
-                ),
+                f"{len(comparison.text_changed_models)} models (listed below)",
             )
         )
     # Annotated: Pylance infers the Final table's literal keys, then rejects str lookups.
@@ -22290,6 +22383,16 @@ def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str
                 "; ".join(
                     f"{labels.get(group, group)} {changed} of {compared}"
                     for group, changed, compared in comparison.text_changes_by_decoding
+                ),
+            )
+        )
+    if comparison.greedy_text_changes_by_weights:
+        rows.append(
+            (
+                "Greedy text changed, by checkpoint quantization",
+                "; ".join(
+                    f"{group} {changed} of {compared}"
+                    for group, changed, compared in comparison.greedy_text_changes_by_weights
                 ),
             )
         )
@@ -22456,6 +22559,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
             for entry in comparison.crash_continuity
         ),
         continuity_note=_continuity_note(comparison),
+        text_change_rows=_text_change_rows(comparison),
     )
 
 
@@ -22513,12 +22617,16 @@ _COMPONENT_CHANGE_SUMMARY_SUBJECTS: Final[int] = 15
 
 
 def _architecture_commit_item(entry: ArchitectureCommits) -> str:
-    """One line per affected model: its architecture and what touched that package."""
-    lead = f"`{entry.model}` (`{entry.architecture}`): "
+    """One line per affected model: its architecture, what it imports, and what touched them."""
+    imported = ", ".join(f"`{name}`" for name in entry.imports)
+    lead = f"`{entry.model}` (`{entry.architecture}`" + (
+        f"; imports {imported}): " if imported else "): "
+    )
     if entry.status == "unavailable":
         return lead + "history unavailable (mlx-vlm is not an editable git checkout)"
     if entry.status == "none":
-        return lead + f"no commits touched `mlx_vlm/models/{entry.architecture}/`"
+        scope = " or the entries it imports" if entry.imports else ""
+        return lead + f"no commits touched `mlx_vlm/models/{entry.architecture}/`{scope}"
     return lead + "; ".join(entry.subjects)
 
 
@@ -22546,6 +22654,26 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         blocks.append(
             ReportParagraph(
                 "No execution, usability, or observation-set changes against the baseline."
+            )
+        )
+    if view.text_change_rows:
+        blocks.append(
+            ReportDetails(
+                f"Generated text changed for {len(view.text_change_rows)} models",
+                (
+                    ReportTable(
+                        (
+                            "Model",
+                            "Decoding",
+                            "Weights",
+                            "Shared prefix (chars)",
+                            "Length (chars)",
+                            "Prompt token count",
+                        ),
+                        view.text_change_rows,
+                        compact=True,
+                    ),
+                ),
             )
         )
     if view.flag_lead is not None:
@@ -22589,7 +22717,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
     if comparison.architecture_commits:
         blocks.append(
             ReportDetails(
-                "mlx-vlm commits touching the affected models' architectures",
+                "mlx-vlm commits touching the affected models' architectures and their imports",
                 (
                     ReportBulletList(
                         tuple(
@@ -22618,6 +22746,24 @@ def _plain_log_text(text: str) -> str:
     return text.replace("**", "").replace("`", "")
 
 
+def _log_comparison_model_rows(view: _ComparisonView) -> None:
+    """Log the per-model transition, text-change and crash-continuity rows."""
+    for model, execution, usability, observations in view.change_rows:
+        logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
+    for model, decoding, weights, shared, length, prompt in view.text_change_rows:
+        logger.info(
+            "  text changed: %s (%s, %s; shared prefix %s chars; length %s; prompt tokens %s)",
+            model,
+            decoding,
+            weights,
+            shared,
+            length,
+            prompt,
+        )
+    for model, continuity in view.continuity_rows:
+        logger.info("  %s: %s", model, continuity)
+
+
 def _log_run_comparison(comparison: RunComparison | None) -> None:
     """Log the same comparison rows the summary renders, via the shared view."""
     if comparison is None:
@@ -22643,10 +22789,7 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         )
     for item in view.membership_items:
         logger.info("%s", _plain_log_text(item))
-    for model, execution, usability, observations in view.change_rows:
-        logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
-    for model, continuity in view.continuity_rows:
-        logger.info("  %s: %s", model, continuity)
+    _log_comparison_model_rows(view)
     if view.continuity_note is not None:
         logger.info("%s", view.continuity_note)
     if view.flag_lead is not None:
@@ -25751,11 +25894,11 @@ def _editable_revision_range(
 
 
 def _git_log_subjects(
-    checkout: str, before: str, after: str, *, path: str | None = None
+    checkout: str, before: str, after: str, *, paths: Sequence[str] = ()
 ) -> tuple[str, ...] | None:
-    """Commit subjects in before..after (optionally under one path); None when git cannot say.
+    """Commit subjects in before..after (optionally under some paths); None when git cannot say.
 
-    An empty tuple is a real answer: no commit in the range touched the path.
+    An empty tuple is a real answer: no commit in the range touched the paths.
     """
     log = _run_macos_toolchain_command(
         (
@@ -25766,7 +25909,7 @@ def _git_log_subjects(
             "--format=%h %s",
             f"-n{_COMPONENT_CHANGE_SUBJECT_LIMIT}",
             f"{before}..{after}",
-            *(("--", path) if path is not None else ()),
+            *(("--", *paths) if paths else ()),
         ),
         timeout=5,
         empty_output="",
@@ -25804,6 +25947,49 @@ def _component_commit_ranges(
     return tuple(changes)
 
 
+_MODEL_PACKAGE_IMPORT_RE: Final[re.Pattern[str]] = re.compile(
+    r"^\s*from\s+(?:\.\.|mlx_vlm\.models\.)([A-Za-z_]\w*)", re.MULTILINE
+)
+
+
+def _architecture_imports(checkout: str, revision: str, architecture: str) -> tuple[str, ...]:
+    """Entries under mlx_vlm/models/ that the architecture's own files import directly.
+
+    One level only, read at ``revision``: ``from ..qwen3_5.language import``
+    in ``qwen3_5_moe/`` names ``qwen3_5``; a module such as ``base`` maps to
+    ``base.py``. Empty when git cannot say.
+    """
+    source = _run_macos_toolchain_command(
+        (
+            "git",
+            "-C",
+            checkout,
+            "grep",
+            "-h",
+            "-E",
+            r"^[[:space:]]*from (\.\.|mlx_vlm\.models\.)[A-Za-z_]",
+            revision,
+            "--",
+            f":(glob)mlx_vlm/models/{architecture}/*.py",
+        ),
+        timeout=5,
+    )
+    listing = _run_macos_toolchain_command(
+        ("git", "-C", checkout, "ls-tree", "--name-only", revision, "mlx_vlm/models/"),
+        timeout=5,
+    )
+    if source is None or listing is None:
+        return ()
+    entries = {line.rsplit("/", 1)[-1] for line in listing.splitlines()}
+    imports: list[str] = []
+    for name in sorted(set(_MODEL_PACKAGE_IMPORT_RE.findall(source)) - {architecture}):
+        if name in entries:
+            imports.append(name)
+        elif f"{name}.py" in entries:
+            imports.append(f"{name}.py")
+    return tuple(imports)
+
+
 def _architecture_commits(
     comparison: RunComparison,
     current: Sequence[JsonlResultRecord],
@@ -25812,8 +25998,10 @@ def _architecture_commits(
 ) -> tuple[ArchitectureCommits, ...]:
     """For each model whose outcome, text or failure moved, list mlx-vlm commits touching its package.
 
-    Uses the resolved architecture (a checkpoint's model_type can be an alias)
-    and runs only when mlx-vlm itself moved between the runs.
+    The log covers the architecture's own package plus the sibling packages
+    and modules it imports directly. Uses the resolved architecture (a
+    checkpoint's model_type can be an alias) and runs only when mlx-vlm
+    itself moved between the runs.
     """
     affected = {change.model for change in comparison.changes}
     affected |= set(comparison.text_changed_models)
@@ -25827,6 +26015,7 @@ def _architecture_commits(
         return ()
     span = _editable_revision_range(baseline_provenance, current_provenance, "mlx-vlm")
     subjects_by_architecture: dict[str, tuple[str, ...] | None] = {}
+    imports_by_architecture: dict[str, tuple[str, ...]] = {}
     entries: list[ArchitectureCommits] = []
     for record in current:
         architecture_record = record.get("architecture")
@@ -25837,12 +26026,25 @@ def _architecture_commits(
             continue
         if span is not None and architecture not in subjects_by_architecture:
             checkout, before, after = span
+            imports = _architecture_imports(checkout, after, architecture)
+            imports_by_architecture[architecture] = imports
             subjects_by_architecture[architecture] = _git_log_subjects(
-                checkout, before, after, path=f"mlx_vlm/models/{architecture}"
+                checkout,
+                before,
+                after,
+                paths=[f"mlx_vlm/models/{name}" for name in (architecture, *imports)],
             )
         subjects = subjects_by_architecture.get(architecture)
         status = "unavailable" if subjects is None else ("commits" if subjects else "none")
-        entries.append(ArchitectureCommits(record["model"], architecture, status, subjects or ()))
+        entries.append(
+            ArchitectureCommits(
+                record["model"],
+                architecture,
+                status,
+                subjects or (),
+                imports_by_architecture.get(architecture, ()),
+            )
+        )
     return tuple(entries)
 
 

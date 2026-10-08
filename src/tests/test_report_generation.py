@@ -7800,8 +7800,16 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
             check_models.ComponentChange("mlx-vlm", "45d6e125a", "4774f3d7b", 33, ("abc fix x",)),
         ),
     )
-    rows = dict(check_models._comparison_view(comparison).summary_rows)
-    assert rows["Generated text changed"].startswith("org/a (shared prefix ")
+    view = check_models._comparison_view(comparison)
+    rows = dict(view.summary_rows)
+    assert rows["Generated text changed"] == "1 models (listed below)"
+    assert view.text_change_rows == (("org/a", "not recorded", "-", "0", "9 \u2192 14", "-"),)
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "Generated text changed for 1 models" in rendered
     assert rows["Prefill tok/s ratio (now/baseline)"].startswith("0.750")
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
@@ -7956,13 +7964,23 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         record["prompt_diagnostics"] = {"generate_kwargs": {"seed": 0, **settings}}
         return record
 
+    def weighted(record: dict[str, object], **burden: object) -> dict[str, object]:
+        record["model_burden"] = burden
+        return record
+
     before = [
+        weighted(decoded("org/q4", "q", temperature=0.0), quantization_bits=4),
+        weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
         decoded("org/sampled", "b", temperature=0.7, top_p=0.8),
         decoded("org/reseeded", "c", temperature=0.7, top_p=0.8),
         _comparison_record("org/unrecorded", text="d"),
     ]
     now = [
+        weighted(
+            decoded("org/q4", "Q", temperature=0.0), quantization_bits=4, quantization_mode="affine"
+        ),
+        weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
         decoded("org/sampled", "B", temperature=0.7, top_p=0.8),
         decoded("org/reseeded", "C", temperature=0.7, top_p=0.8, seed=1),
@@ -7975,24 +7993,40 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     )
     assert comparison.text_changes_by_decoding == (
-        ("greedy", 0, 1),
+        ("greedy", 1, 3),
         ("sampled", 1, 1),
         ("changed", 1, 1),
         ("unknown", 0, 1),
     )
-    rows = dict(check_models._comparison_view(comparison).summary_rows)
+    # Greedy pairs only, by this run's config.json quantization; a record
+    # without model_burden facts is "unknown", not "not quantized".
+    assert comparison.greedy_text_changes_by_weights == (
+        ("quantized", 1, 1),
+        ("not quantized", 0, 1),
+        ("unknown", 0, 1),
+    )
+    view = check_models._comparison_view(comparison)
+    rows = dict(view.summary_rows)
     assert rows["Text changed, by decoding"] == (
-        "greedy 0 of 1; sampled, same settings and seed 1 of 1; "
+        "greedy 1 of 3; sampled, same settings and seed 1 of 1; "
         "decoding mode or settings changed 1 of 1; settings not recorded 0 of 1"
     )
+    assert rows["Greedy text changed, by checkpoint quantization"] == (
+        "quantized 1 of 1; not quantized 0 of 1; unknown 0 of 1"
+    )
+    by_model = {row[0]: row[1:3] for row in view.text_change_rows}
+    assert by_model["org/q4"] == ("greedy", "4-bit affine")
+    assert by_model["org/reseeded"] == ("settings changed", "-")
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
     assert restored.text_changes_by_decoding == comparison.text_changes_by_decoding
+    assert restored.greedy_text_changes_by_weights == comparison.greedy_text_changes_by_weights
+    assert restored.text_divergence == comparison.text_divergence
 
 
-def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_path: Path) -> None:
-    """Path-limited git history per affected model; an empty log is "none", not "unknown"."""
+def _architecture_history_repo(tmp_path: Path) -> tuple[Path, str, str]:
+    """A temp mlx-vlm checkout: alpha changes, beta is untouched, gamma imports alpha."""
     repo = tmp_path / "mlx-vlm"
     package = repo / "mlx_vlm" / "models" / "alpha"
     package.mkdir(parents=True)
@@ -8009,6 +8043,14 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
     git("config", "user.email", "t@example.invalid")
     git("config", "user.name", "t")
     check_models._write_text_file(repo / "README.md", "base\n")
+    # gamma reuses alpha's code and a shared module, so alpha's commits concern it too.
+    gamma = repo / "mlx_vlm" / "models" / "gamma"
+    gamma.mkdir(parents=True)
+    check_models._write_text_file(
+        gamma / "gamma.py",
+        "from ..alpha.model import x\nfrom ..base import y\nfrom ...utils import z\n",
+    )
+    check_models._write_text_file(repo / "mlx_vlm" / "models" / "base.py", "y = 0\n")
     git("add", ".")
     git("commit", "-qm", "base")
     before = git("rev-parse", "HEAD")
@@ -8019,11 +8061,18 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
     git("add", ".")
     git("commit", "-qm", "shared sampler change")
     after = git("rev-parse", "HEAD")
+    return repo, before, after
+
+
+def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_path: Path) -> None:
+    """Path-limited git history per affected model; an empty log is "none", not "unknown"."""
+    repo, before, after = _architecture_history_repo(tmp_path)
 
     assert (
-        check_models._git_log_subjects(str(repo), before, after, path="mlx_vlm/models/beta") == ()
+        check_models._git_log_subjects(str(repo), before, after, paths=["mlx_vlm/models/beta"])
+        == ()
     )
-    alpha = check_models._git_log_subjects(str(repo), before, after, path="mlx_vlm/models/alpha")
+    alpha = check_models._git_log_subjects(str(repo), before, after, paths=["mlx_vlm/models/alpha"])
     assert alpha is not None
     assert [subject.split(" ", 1)[1] for subject in alpha] == ["alpha: fix sanitize"]
 
@@ -8042,13 +8091,19 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
         return record
 
     baseline = _comparison_baseline(
-        [affected("org/a", "alpha"), affected("org/b", "beta"), _comparison_record("org/c")]
+        [
+            affected("org/a", "alpha"),
+            affected("org/b", "beta"),
+            affected("org/g", "gamma"),
+            _comparison_record("org/c"),
+        ]
     )
     current = [
         cast("check_models.JsonlResultRecord", record)
         for record in (
             affected("org/a", "alpha"),
             affected("org/b", "beta"),
+            affected("org/g", "gamma"),
             _comparison_record("org/c"),
         )
     ]
@@ -8064,9 +8119,27 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
         {**baseline.metadata, "component_provenance": provenance(after)},
     )
     entries = check_models._architecture_commits(comparison, current, before_meta, after_meta)
-    assert {(e.model, e.status) for e in entries} == {("org/a", "commits"), ("org/b", "none")}
+    assert {(e.model, e.status) for e in entries} == {
+        ("org/a", "commits"),
+        ("org/b", "none"),
+        ("org/g", "commits"),
+    }
+    by_model = {entry.model: entry for entry in entries}
+    # One level of imports, mapped to the package or module path git logs.
+    assert by_model["org/g"].imports == ("alpha", "base.py")
+    assert [subject.split(" ", 1)[1] for subject in by_model["org/g"].subjects] == [
+        "alpha: fix sanitize"
+    ]
     items = [check_models._architecture_commit_item(entry) for entry in entries]
     assert any("no commits touched `mlx_vlm/models/beta/`" in item for item in items)
+    assert check_models._architecture_commit_item(by_model["org/g"]).startswith(
+        "`org/g` (`gamma`; imports `alpha`, `base.py`): "
+    )
+    payload = check_models._run_comparison_to_json(
+        replace(comparison, architecture_commits=entries)
+    )
+    assert payload is not None
+    assert check_models._run_comparison_from_json(payload).architecture_commits == entries
     # A wheel install has no history to read: said as such, never as "no commits".
     wheel = cast(
         "check_models.JsonlMetadataRecord",
@@ -8621,6 +8694,18 @@ def _divergence(
     return check_models._generated_text_changes(pairs)
 
 
+def _divergence_comparison(entry: check_models.TextDivergence) -> check_models.RunComparison:
+    """A one-model comparison carrying a single text divergence."""
+    baseline = _comparison_baseline([_comparison_record("org/a", text="old")])
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a", text="new"))],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    return replace(comparison, text_changed_models=("org/a",), text_divergence=(entry,))
+
+
 def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
     """Counts only: shared prefix, both lengths, and whether the prompt token count changed."""
     shared = "Title: Blue cabin cruiser\nDescription: A blue boat "
@@ -8631,11 +8716,21 @@ def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
     assert entry == check_models.TextDivergence(
         "org/a", len(shared), len(shared) + 14, len(shared) + 17, prompt_token_count_unchanged=True
     )
-    assert check_models._text_change_label("org/a", entry) == (
-        f"org/a (shared prefix {len(shared)} characters; length {len(shared) + 14} \u2192 "
-        f"{len(shared) + 17}; same prompt token count)"
+    comparison = _divergence_comparison(entry)
+    assert check_models._text_change_rows(comparison) == (
+        (
+            "org/a",
+            "not recorded",
+            "-",
+            f"{len(shared)}",
+            f"{len(shared) + 14} \u2192 {len(shared) + 17}",
+            "same",
+        ),
     )
-    assert check_models._text_change_label("org/a", None) == "org/a"
+    # A changed model without a divergence record keeps its row, with no counts.
+    assert check_models._text_change_rows(replace(comparison, text_divergence=())) == (
+        ("org/a", "-", "-", "-", "-", "-"),
+    )
 
 
 @pytest.mark.parametrize(
@@ -8671,12 +8766,8 @@ def test_text_divergence_boundaries(
         entry.current_chars,
         entry.prompt_token_count_unchanged,
     ) == expected
-    label = check_models._text_change_label("org/a", entry)
-    assert label.endswith(
-        {True: "; same prompt token count)", False: "; prompt token count changed)", None: ")"}[
-            expected[3]
-        ]
-    )
+    (row,) = check_models._text_change_rows(_divergence_comparison(entry))
+    assert row[-1] == {True: "same", False: "changed", None: "-"}[expected[3]]
 
 
 def test_text_divergence_is_withheld_for_incomparable_runs() -> None:
