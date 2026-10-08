@@ -17,6 +17,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: the Skylos floor is now 4.47.1, which also reads module lists
+  from platform wheels, so an editable mlx build is verified and the two
+  `skylos: ignore[SKY-D223]` comments on the first `mlx` imports are gone.
+  Checked with an editable-style mlx (loader-only `RECORD`, dev version):
+  4.44.0 still flags both imports, 4.47.1 flags neither. The SKY-S101
+  workaround still reproduces on 4.47.1 and stays.
+- Typing: dropped a `cast` in `_auto_thinking_budget_kwargs` that ty 0.0.85
+  reports as redundant (`redundant-cast`).
 - Run summary: the quality table reports counted facts that were hidden.
   "Prompt / output tok" puts the generated tokens beside the prompt tokens,
   and the intro names the run's `max_tokens`, so an answer that only just
