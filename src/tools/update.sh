@@ -17,6 +17,8 @@
 #   3. Update pip/wheel/setuptools
 #   4. Update local MLX repos (if present) OR update from PyPI
 #   5. Reinstall project in editable mode from pyproject.toml to reconcile deps
+#   End (also after a failed step): a table of what changed, from snapshots of
+#   package versions and checkout revisions taken before step 0 and at exit
 #
 # Usage examples:
 #   ./update.sh                       # Install project + dev + extras + torch (MLX_METAL_JIT=OFF by default)
@@ -1549,6 +1551,131 @@ report_update_plan() {
 	echo ""
 }
 
+# Everything the run can change, one "<source>\t<name>\t<version>" line each,
+# taken before the first change and again at exit so the run ends with what
+# actually changed. Sources: the local mlx/mlx-vlm checkout revisions, the
+# target's Python distributions (those conda did not install), the target conda
+# env and conda base, Homebrew formulae and casks, and the repo-local
+# markdownlint-cli2. Read-only and best-effort: a probe that fails adds no
+# lines, and the summary then reports that source as unreadable rather than
+# as removed. Prints the snapshot.
+snapshot_update_state() {
+	local repo_parent repo
+	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	for repo in mlx mlx-vlm; do
+		[[ -d "$repo_parent/$repo/.git" ]] || continue
+		git -C "$repo_parent/$repo" rev-parse HEAD 2>/dev/null | awk -v r="$repo" 'NF {print "git\t" r "\t" $1}'
+	done
+	# -P keeps the caller's working directory off sys.path.
+	"$UPDATE_PYTHON" -P - "$PROJECT_ROOT/node_modules/markdownlint-cli2/package.json" <<'PY' 2>/dev/null || true
+import importlib.metadata as metadata
+import json
+import sys
+
+seen = set()
+for dist in metadata.distributions():
+    try:
+        name = (dist.metadata.get("Name") or "").lower().replace("_", "-")
+        # The first match on sys.path is the one Python imports.
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        if (dist.read_text("INSTALLER") or "").strip() != "conda":
+            print(f"pip\t{name}\t{dist.version}")
+    except Exception:  # one broken record must not hide the rest
+        continue
+try:
+    with open(sys.argv[1], encoding="utf-8") as handle:
+        print(f"npm\tmarkdownlint-cli2\t{json.load(handle)['version']}")
+except (OSError, ValueError, KeyError):
+    pass
+PY
+	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]] && command -v conda >/dev/null 2>&1; then
+		if [[ "$UPDATE_ENV_TYPE" == "conda" ]]; then
+			conda list -n "$CONDA_ENV" --no-pip 2>/dev/null | awk '!/^#/ && NF >= 2 {print "conda\t" $1 "\t" $2}' || true
+		fi
+		conda list -n base --no-pip 2>/dev/null | awk '!/^#/ && NF >= 2 {print "conda base\t" $1 "\t" $2}' || true
+	fi
+	if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]] && command -v brew >/dev/null 2>&1; then
+		brew list --versions --formula 2>/dev/null | awk 'NF >= 2 {print "brew\t" $1 "\t" $NF}' || true
+		brew list --versions --cask 2>/dev/null | awk 'NF >= 2 {print "cask\t" $1 "\t" $NF}' || true
+	fi
+}
+
+# Compare two snapshots: one "<source>\t<name>\t<before>\t<after>" line per
+# changed, added ("-" before) or removed ("-" after) entry, checkouts first,
+# then by source and name. A source present before but absent after is one
+# "<source>\t-\tunreadable\t-" line instead of a list of false removals.
+# (No field is ever empty: read collapses adjacent tab separators.)
+#   $1 before snapshot; $2 after snapshot
+diff_update_state() {
+	awk -F '\t' -v OFS='\t' '
+		function rank(source) {
+			return index("|git|pip|conda|conda base|brew|cask|npm|", "|" source "|")
+		}
+		NR == FNR { before[$1 FS $2] = $3; before_sources[$1] = 1; next }
+		{ after[$1 FS $2] = $3; after_sources[$1] = 1 }
+		END {
+			for (key in after) {
+				split(key, part, FS)
+				if (!(part[1] in before_sources)) continue
+				if (!(key in before)) print rank(part[1]), part[1], part[2], "-", after[key]
+				else if (before[key] != after[key]) print rank(part[1]), part[1], part[2], before[key], after[key]
+			}
+			for (key in before) {
+				split(key, part, FS)
+				if (part[1] in after_sources && !(key in after)) print rank(part[1]), part[1], part[2], before[key], "-"
+			}
+			for (source in before_sources)
+				if (!(source in after_sources)) print rank(source), source, "-", "unreadable", "-"
+		}
+	' "$1" "$2" | sort -t "$(printf '\t')" -k1,1n -k3,3 | cut -f 2-
+}
+
+# The end-of-run table of what changed. A checkout row shows short revisions
+# and how many commits the pull brought in.
+#   $1 before snapshot; $2 after snapshot
+report_update_changes() {
+	local repo_parent changes source name old new count rows="" unreadable=""
+	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	changes="$(diff_update_state "$1" "$2")"
+	echo ""
+	if [[ -z "$changes" ]]; then
+		echo "[update.sh] Nothing changed: every package version and checkout revision is as before the run."
+		return 0
+	fi
+	while IFS=$'\t' read -r source name old new; do
+		if [[ "$old" == "unreadable" ]]; then
+			unreadable+="${unreadable:+, }$source"
+			continue
+		fi
+		if [[ "$source" == "git" && "$old" != "-" && "$new" != "-" ]]; then
+			count="$(git -C "$repo_parent/$name" rev-list --count "$old..$new" 2>/dev/null || true)"
+			old="${old:0:9}"
+			new="${new:0:9}"
+			[[ -n "$count" ]] && new+=" (+$count commit$([[ "$count" == 1 ]] || echo s))"
+		fi
+		[[ "$old" == "-" ]] && new+=" (new)"
+		[[ "$new" == "-" ]] && new="removed"
+		rows+="$source"$'\t'"$name"$'\t'"$old"$'\t'"$new"$'\n'
+	done <<< "$changes"
+	if [[ -n "$rows" ]]; then
+		echo "[update.sh] What changed in this run:"
+		printf 'Source\tPackage\tBefore\tAfter\n%s' "$rows" | awk -F '\t' '
+			{ for (i = 1; i <= 4; i++) { cell[NR, i] = $i; if (length($i) > width[i]) width[i] = length($i) } }
+			END {
+				for (row = 1; row <= NR; row++)
+					printf "   %-" width[1] "s  %-" width[2] "s  %-" width[3] "s  %s\n", cell[row, 1], cell[row, 2], cell[row, 3], cell[row, 4]
+			}
+		' | sed 's/[[:space:]]*$//'
+	else
+		echo "[update.sh] Nothing changed in what could be read after the run."
+	fi
+	if [[ -n "$unreadable" ]]; then
+		echo "   Not compared (could not be read after the run): $unreadable"
+	fi
+}
+
 # Each change runs as a named step so a failure can say what had already
 # changed. The pin-file cleanup trap is chained in, not replaced.
 COMPLETED_STEPS=()
@@ -1561,23 +1688,37 @@ run_step() {
 	CURRENT_STEP=""
 }
 
+# On every exit after preflight: the stop report on failure, then, once
+# anything ran, the table of what changed (a failed run included, since a
+# partly applied step changes things too).
+UPDATE_STATE_BEFORE=""
 report_update_outcome() {
 	local status=$?
 	cleanup_local_mlx_constraint
-	[[ $status -eq 0 ]] && return 0
-	echo ""
-	if [[ ${#COMPLETED_STEPS[@]} -eq 0 && -z "$CURRENT_STEP" ]]; then
-		echo "[update.sh] Stopped (exit $status) before changing anything."
-		return 0
+	if [[ $status -ne 0 ]]; then
+		echo ""
+		if [[ ${#COMPLETED_STEPS[@]} -eq 0 && -z "$CURRENT_STEP" ]]; then
+			echo "[update.sh] Stopped (exit $status) before changing anything."
+			rm -f "${UPDATE_STATE_BEFORE:-}"
+			return 0
+		fi
+		echo "[update.sh] Stopped (exit $status)."
+		if [[ ${#COMPLETED_STEPS[@]} -gt 0 ]]; then
+			echo "   Completed before the stop:"
+			printf '     - %s\n' "${COMPLETED_STEPS[@]}"
+		fi
+		if [[ -n "$CURRENT_STEP" ]]; then
+			echo "   Failed during (may be partly applied): $CURRENT_STEP"
+		fi
 	fi
-	echo "[update.sh] Stopped (exit $status)."
-	if [[ ${#COMPLETED_STEPS[@]} -gt 0 ]]; then
-		echo "   Completed before the stop:"
-		printf '     - %s\n' "${COMPLETED_STEPS[@]}"
+	if [[ -s "${UPDATE_STATE_BEFORE:-}" ]]; then
+		local after
+		after="$(mktemp "${TMPDIR:-/tmp}/update-state-after.XXXXXX")"
+		snapshot_update_state > "$after" || true
+		report_update_changes "$UPDATE_STATE_BEFORE" "$after" || true
+		rm -f "$after"
 	fi
-	if [[ -n "$CURRENT_STEP" ]]; then
-		echo "   Failed during (may be partly applied): $CURRENT_STEP"
-	fi
+	rm -f "${UPDATE_STATE_BEFORE:-}"
 }
 
 # Detection is separate from mutation so the updater runs as an ordinary
@@ -1661,7 +1802,9 @@ pip() { "$UPDATE_PYTHON" -m pip "$@"; }
 
 preflight_local_mlx_repos
 report_update_plan
+UPDATE_STATE_BEFORE="$(mktemp "${TMPDIR:-/tmp}/update-state-before.XXXXXX")"
 trap report_update_outcome EXIT
+snapshot_update_state > "$UPDATE_STATE_BEFORE" || true
 
 # ── Changes ────────────────────────────────────────────────────────────────
 

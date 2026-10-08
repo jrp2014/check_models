@@ -4,6 +4,17 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `tools/update.sh` ends every run, including one stopped by a failed step,
+  with a table of what changed: each Python package (pip-installed), conda
+  env, conda base, Homebrew and markdownlint-cli2 version that moved, was
+  added or was removed, and each local `mlx`/`mlx-vlm` checkout's old and new
+  revision with the number of commits pulled. It compares snapshots taken
+  before the first change and at exit; an unchanged run says so in one line,
+  and a source that cannot be read at exit is named instead of listed as
+  removed.
+
 ### Changed
 
 - Run summary: the quality table reports counted facts that were hidden.

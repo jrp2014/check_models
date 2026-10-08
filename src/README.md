@@ -1056,7 +1056,11 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > the local Xcode/SDK/Metal toolchain before building, logs the `mlx.metallib`
 > backend artifact, reinstalls this project from `pyproject.toml` after MLX
 > updates to reconcile shared dependencies, and runs a cached-model smoke test
-> in auto mode. Use `make update` for normal PyPI package updates.
+> in auto mode. Use `make update` for normal PyPI package updates. Every run,
+> including one that stops on a failed step, ends with a table of what changed:
+> old and new versions of the target env's Python packages, its conda
+> packages, conda base, Homebrew formulae and casks and markdownlint-cli2, and
+> the old and new `mlx`/`mlx-vlm` revisions with the number of commits pulled.
 
 > [!NOTE]
 > Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; `check_models` ignores it in the normal execution path.

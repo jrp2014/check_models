@@ -3425,6 +3425,175 @@ def test_update_script_main_flow_runs_preflight_before_the_first_change() -> Non
         assert main_flow.index(preflight) < first_change, preflight
     assert main_flow.index("trap report_update_outcome EXIT") < first_change
     assert 'pip() { "$UPDATE_PYTHON" -m pip "$@"; }' in main_flow
+    assert main_flow.index("snapshot_update_state >") < first_change
+
+
+def _git_commit(repo: Path, message: str) -> str:
+    """Make an empty commit in ``repo``; return its full revision."""
+    git = ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@example.com"]
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created repository
+        [*git, "commit", "-q", "--allow-empty", "-m", message], check=True
+    )
+    return subprocess.run(  # noqa: S603 - fixed git command on a test-created repository
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],  # noqa: S607 - git from PATH, as update.sh
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+
+def _run_update_change_report(tmp_path: Path, before: str, after: str) -> str:
+    """Run update.sh's change report on two snapshot texts in a check_models layout."""
+    script = _copy_update_script_layout(tmp_path)
+    safe_io.write_text_no_follow(tmp_path / "before.tsv", before)
+    safe_io.write_text_no_follow(tmp_path / "after.tsv", after)
+    functions = "".join(
+        _update_script_function(name) for name in ("diff_update_state", "report_update_changes")
+    )
+    driver = (
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\n{functions}"
+        f"report_update_changes {tmp_path / 'before.tsv'} {tmp_path / 'after.tsv'}\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
+        ["/bin/bash", "-c", driver], capture_output=True, text=True, check=False
+    )
+    assert result.returncode == 0, result.stderr + result.stdout
+    return result.stdout
+
+
+@pytest.mark.subprocess
+def test_update_change_report_tabulates_versions_and_checkout_commits(tmp_path: Path) -> None:
+    """The end-of-run table lists changed, new and removed entries and pulled commits."""
+    mlx = tmp_path / "work" / "mlx"
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created directory
+        ["git", "init", "-q", str(mlx)],  # noqa: S607 - git from PATH, as update.sh uses it
+        check=True,
+    )
+    old = _git_commit(mlx, "base")
+    for message in ("one", "two", "three"):
+        new = _git_commit(mlx, message)
+    before = (
+        f"git\tmlx\t{old}\npip\tnumpy\t2.3.0\npip\tgone\t1.0\n"
+        "conda\tpython\t3.14.7\nconda base\tconda\t26.1.0\nbrew\tcmake\t4.1.0\n"
+        "npm\tmarkdownlint-cli2\t0.18.0\n"
+    )
+    after = (
+        f"git\tmlx\t{new}\npip\tnumpy\t2.3.1\npip\tadded\t5.2.0\n"
+        "conda\tpython\t3.14.8\nconda base\tconda\t26.1.0\nbrew\tcmake\t4.1.0\n"
+    )
+    output = _run_update_change_report(tmp_path, before, after)
+    rows = [line.split() for line in output.splitlines()[2:]]
+    assert output.splitlines()[1] == "[update.sh] What changed in this run:"
+    assert rows == [
+        ["Source", "Package", "Before", "After"],
+        ["git", "mlx", old[:9], new[:9], "(+3", "commits)"],
+        ["pip", "added", "-", "5.2.0", "(new)"],
+        ["pip", "gone", "1.0", "removed"],
+        ["pip", "numpy", "2.3.0", "2.3.1"],
+        ["conda", "python", "3.14.7", "3.14.8"],
+        ["Not", "compared", "(could", "not", "be", "read", "after", "the", "run):", "npm"],
+    ]
+
+
+@pytest.mark.subprocess
+def test_update_change_report_says_when_nothing_changed(tmp_path: Path) -> None:
+    """An unchanged environment gets one line, not an empty table."""
+    snapshot = "pip\tnumpy\t2.3.0\nbrew\tcmake\t4.1.0\n"
+    output = _run_update_change_report(tmp_path, snapshot, snapshot)
+    assert output.strip() == (
+        "[update.sh] Nothing changed: every package version and checkout revision"
+        " is as before the run."
+    )
+
+
+@pytest.mark.subprocess
+def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
+    """Checkouts, Python distributions, conda, Homebrew and markdownlint all land in it."""
+    script = _copy_update_script_layout(tmp_path)
+    mlx_vlm = tmp_path / "work" / "mlx-vlm"
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created directory
+        ["git", "init", "-q", str(mlx_vlm)],  # noqa: S607 - git from PATH, as update.sh uses it
+        check=True,
+    )
+    head = _git_commit(mlx_vlm, "base")
+    project_root = script.parent.parent
+    package_json = project_root / "node_modules" / "markdownlint-cli2" / "package.json"
+    package_json.parent.mkdir(parents=True)
+    safe_io.write_text_no_follow(package_json, '{"version": "0.18.1"}\n')
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    safe_io.write_text_no_follow(
+        fake_bin / "conda",
+        '#!/bin/bash\necho "# packages in environment"\necho "python 3.14.7 h0 conda-forge"\n',
+        mode=0o755,
+    )
+    safe_io.write_text_no_follow(
+        fake_bin / "brew",
+        '#!/bin/bash\n[[ "$*" == *--cask* ]] && echo "ghostty 1.2.0" || echo "cmake 4.0.9 4.1.0"\n',
+        mode=0o755,
+    )
+    driver = (
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\nPROJECT_ROOT={project_root}\n"
+        f"UPDATE_PYTHON={sys.executable}\nUPDATE_ENV_TYPE=conda\nCONDA_ENV=mlx-vlm\n"
+        f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", driver],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={
+            **os.environ,
+            "PATH": f"{fake_bin}:{os.environ['PATH']}",
+            "CONDA_DEFAULT_ENV": "mlx-vlm",
+        },
+        cwd=tmp_path,
+    )
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.splitlines()
+    assert f"git\tmlx-vlm\t{head}" in lines
+    assert "pip\tpytest\t" + pytest.__version__ in lines
+    assert "npm\tmarkdownlint-cli2\t0.18.1" in lines
+    assert "conda\tpython\t3.14.7" in lines
+    assert "conda base\tpython\t3.14.7" in lines
+    assert "brew\tcmake\t4.1.0" in lines
+    assert "cask\tghostty\t1.2.0" in lines
+
+
+@pytest.mark.subprocess
+def test_update_outcome_reports_changes_on_success_and_after_a_stop(tmp_path: Path) -> None:
+    """The change table follows a clean run and a failed one; the before file is removed."""
+    functions = "".join(
+        _update_script_function(name)
+        for name in (
+            "run_step",
+            "report_update_outcome",
+            "diff_update_state",
+            "report_update_changes",
+        )
+    )
+    before = tmp_path / "before.tsv"
+    for final, expected_status in (("true", 0), ("false", 1)):
+        safe_io.write_text_no_follow(before, "pip\tnumpy\t2.3.0\n")
+        driver = (
+            "set -euo pipefail\n"
+            f"SCRIPT_DIR={tmp_path}\n"
+            "cleanup_local_mlx_constraint() { :; }\n"
+            "snapshot_update_state() { printf 'pip\\tnumpy\\t2.3.1\\n'; }\n"
+            f'COMPLETED_STEPS=()\nCURRENT_STEP=""\nUPDATE_STATE_BEFORE={before}\n'
+            f"{functions}"
+            "trap report_update_outcome EXIT\n"
+            'run_step "packaging tools" true\n'
+            f'run_step "project reinstall" {final}\n'
+        )
+        result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
+            ["/bin/bash", "-c", driver], capture_output=True, text=True, check=False
+        )
+        assert result.returncode == expected_status, result.stderr
+        assert "[update.sh] What changed in this run:" in result.stdout
+        assert re.search(r"pip\s+numpy\s+2\.3\.0\s+2\.3\.1", result.stdout)
+        assert ("Failed during" in result.stdout) == (expected_status != 0)
+        assert not before.exists()
 
 
 def test_make_update_passes_the_resolved_target_to_the_updater() -> None:
