@@ -464,11 +464,11 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "check_models" in content
     assert "0.8.9" in content
     assert "abc123" in content
-    assert "GitHub links" in content
+    assert "**Evidence links**" in content
     # The link caveat is dynamic: pinned wording for a clean-worktree SHA ref,
     # mutable-branch wording otherwise.
     if re.fullmatch(r"[0-9a-f]{40}", check_models._github_blob_ref()):
-        assert "pinned to producer commit" in content
+        assert "pinned to commit" in content
     else:
         assert "mutable" in content
     # Clean models appear only in the at-a-glance table and the named clean
@@ -1397,7 +1397,7 @@ def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
     assert "Exact prompt sent to every model" in content
     assert "full prompt that must not be copied" in content
     assert '"No concerns detected" is not an accuracy verdict' in " ".join(content.split())
-    assert "## Model quality at a glance" in content
+    assert "## Mechanical checks at a glance" in content
     assert "org/clean" in content
     assert "## Crashes requiring action" not in content
     assert "| org/clean | no concerns detected |" in content  # named in the quality table
@@ -1432,7 +1432,7 @@ def test_run_issue_summary_quality_table_ranks_all_models(tmp_path: Path) -> Non
     if summary is None:
         pytest.fail("the fixture run must produce a run summary")
     content = summary.read_text(encoding="utf-8")
-    assert "## Model quality at a glance" in content
+    assert "## Mechanical checks at a glance" in content
     # Sorted usable -> caveats -> crashed, and the crash names its phase.
     assert (
         content.index("org/clean")
@@ -2208,7 +2208,7 @@ def test_run_issue_summary_link_caveat_reflects_blob_ref(tmp_path: Path) -> None
         summary = check_models.generate_run_issue_summary_report(output_paths)
     assert summary is not None
     pinned_content = summary.read_text(encoding="utf-8")
-    assert f"pinned to producer commit `{pinned_sha[:12]}`" in pinned_content
+    assert f"pinned to commit `{pinned_sha[:12]}`" in pinned_content
     assert "mutable" not in pinned_content
 
     with patch.object(check_models, "_GITHUB_REF_OVERRIDE", "main"):
@@ -2216,7 +2216,7 @@ def test_run_issue_summary_link_caveat_reflects_blob_ref(tmp_path: Path) -> None
     assert summary is not None
     branch_content = summary.read_text(encoding="utf-8")
     assert "mutable main branch" in branch_content
-    assert "pinned to producer commit" not in branch_content
+    assert "pinned to commit" not in branch_content
 
 
 def _report_outcome(
@@ -4922,7 +4922,7 @@ class TestMarkdownGalleryReport:
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
         assert "## Current-run Chooser" in content
-        assert "## Avoid for This Run" in content
+        assert "## Major Mechanical Concerns in This Run" in content
         assert "## Resource Highlights" in content
         assert "## Lowest-memory Usable Models (Including Caveats)" not in content
         assert "## Fastest Usable Models (Including Caveats)" not in content
@@ -5105,7 +5105,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "Output preview" not in chooser
         assert "[`org/good`](#model-org-good)" in chooser
@@ -5120,7 +5120,7 @@ class TestMarkdownGalleryReport:
         assert "boom" not in chooser
         avoid = _extract_markdown_subsection(
             content,
-            "## Avoid for This Run",
+            "## Major Mechanical Concerns in This Run",
             end_headings=("## Output at a Glance",),
         )
         assert "Output preview" not in avoid
@@ -5165,7 +5165,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
@@ -5233,7 +5233,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "Output preview" not in chooser
         assert "Peak GB" in chooser
@@ -5312,7 +5312,7 @@ class TestMarkdownGalleryReport:
         headings = [
             "## Current-run Chooser",
             "## Resource Highlights",
-            "## Avoid for This Run",
+            "## Major Mechanical Concerns in This Run",
             "## Complete Per-model Evidence",
         ]
         assert [content.index(heading) for heading in headings] == sorted(
@@ -5440,7 +5440,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "## Title<br><br>Two cats resting" not in chooser
         assert '<pre class="model-output-readable">' in content
@@ -5500,7 +5500,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         short_row = next(line for line in chooser.splitlines() if "org/short" in line)
         assert "no concerns detected" in short_row
@@ -5605,10 +5605,12 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "Output preview" not in chooser
-        assert content.index("## Avoid for This Run") < content.index("## Output at a Glance")
+        assert content.index("## Major Mechanical Concerns in This Run") < content.index(
+            "## Output at a Glance"
+        )
 
     def test_gallery_resource_policies_are_deterministic(self, tmp_path: Path) -> None:
         """Avoid, memory, and speed policies should have explicit stable ordering."""
@@ -5681,13 +5683,13 @@ class TestMarkdownGalleryReport:
         content = out.read_text(encoding="utf-8")
         avoid = _extract_markdown_subsection(
             content,
-            "## Avoid for This Run",
+            "## Major Mechanical Concerns in This Run",
             end_headings=("## Output at a Glance",),
         )
         highlights = _extract_markdown_subsection(
             content,
             "## Resource Highlights",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
         assert avoid.index("org/z-unusable") < avoid.index("org/a-not-evaluated")
@@ -6423,7 +6425,7 @@ def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -
     }
     # With older runs unread, an observation no run read showed is not "first seen".
     assert cells == {
-        "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier)\n"
+        "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier); "
         "control tokens visible: not in earlier runs read",
         "org/back": "repeated text: back this run, first 2026-07-11 or earlier",
         "org/new": "crash: not in earlier runs read",
@@ -6534,7 +6536,9 @@ def test_run_summary_shows_observation_history_from_retained_metadata(tmp_path: 
     assert "4 earlier retained runs from git `HEAD:src/output/results.jsonl`" in prose
     assert "back to 2026-07-04" in prose
     assert "older runs were not read" not in prose
-    assert "| repeated text: last 3 runs (since 2026-07-18), first 2026-07-11 |" in content
+    # The review row is compact; the collapsed chronology keeps the first date.
+    assert "| repeated text: 3 runs since 2026-07-18 |" in content
+    assert "| repeated text | last 3 runs (since 2026-07-18), first 2026-07-11 |" in content
 
 
 def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_lists() -> None:
@@ -8650,9 +8654,25 @@ def test_observation_clusters_render_only_for_shared_signatures() -> None:
         "check_models.JsonlResultRecord",
         _issue_summary_result("org/b", observations=["repeated_output"]),
     )
+
+    def link(model: str) -> check_models.ReportTargetLink:
+        return check_models.ReportTargetLink(model, f"diagnostics.md#{model}")
+
     section = check_models._run_issue_summary_observation_cluster_section
-    assert section((one,)) is None
-    assert section((one, two)) is not None
+    assert section((one,), link=link) is None
+    shared = section((one, two), link=link)
+    assert shared is not None
+    rendered = "\n".join(check_models.render_report_markdown((shared,)))
+    # Shared groups name their models, linked to the evidence.
+    assert "[org/a](diagnostics.md#org/a), [org/b](diagnostics.md#org/b)" in rendered
+    # A one-model signature beside a shared one is left to its review row.
+    three = cast(
+        "check_models.JsonlResultRecord",
+        _issue_summary_result("org/c", observations=["empty_output"]),
+    )
+    mixed = section((one, two, three), link=link)
+    assert mixed is not None
+    assert "org/c" not in "\n".join(check_models.render_report_markdown((mixed,)))
 
 
 def test_mlx_environment_variables_are_recorded_and_split_throughput(
@@ -8916,3 +8936,106 @@ def test_maintainer_verdict_keeps_crashes_raised_in_libraries_in_mlx_vlm_count()
     assert mixed == (
         "**For mlx-vlm maintainers:** 2 crashes need action (see *Crashes requiring action*)."
     )
+
+
+def test_comparison_tabulates_the_largest_prefill_changes_in_seconds() -> None:
+    """Prefill changes outside the band are listed as seconds, largest first."""
+    rates = {"org/fast": (357.0, 3117.0), "org/slow": (1000.0, 500.0), "org/same": (1000.0, 1050.0)}
+    records: dict[str, list[dict[str, object]]] = {"before": [], "now": []}
+    for model, pair in rates.items():
+        for side, rate in zip(("before", "now"), pair, strict=True):
+            record = _comparison_record(model)
+            cast("dict[str, Any]", record["metrics"]).update(prompt_tps=rate, prompt_tokens=312)
+            records[side].append(record)
+    baseline = _comparison_baseline(records["before"])
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", r) for r in records["now"]],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    assert [change.model for change in comparison.prefill_changes] == ["org/fast", "org/slow"]
+    assert check_models._comparison_view(comparison).prefill_rows == (
+        ("org/fast", "0.87", "0.10", "8.73"),
+        ("org/slow", "0.31", "0.62", "0.50"),
+    )
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert check_models._comparison_view(restored).prefill_rows == (
+        check_models._comparison_view(comparison).prefill_rows
+    )
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "| Model | Baseline prefill s | Now prefill s | Prefill tok/s ratio |" in rendered
+    assert "not demonstrated speedups" in " ".join(rendered.split())
+
+
+def test_run_summary_breakdown_says_why_only_some_need_native_reproduction() -> None:
+    """Clear, compliance-only and repro-candidate counts add up to the completions."""
+    results = [
+        _issue_summary_result("org/clear", usability="usable", observations=[]),
+        _issue_summary_result(
+            "org/labels", usability="unusable", observations=["missing_requested_sections"]
+        ),
+        _issue_summary_result(
+            "org/loop",
+            usability="unusable",
+            observations=["repeated_output"],
+            maintainer_status="observation_needs_reproduction",
+        ),
+    ]
+    sentence = check_models._completion_breakdown_sentence(
+        cast("list[check_models.JsonlResultRecord]", results)
+    )
+    assert sentence is not None
+    assert "1 with no mechanical observations, 1 with prompt-compliance" in sentence
+    assert "only those 1 are candidates for native reproduction" in sentence
+
+
+def test_history_summary_keeps_the_longest_streak_and_counts_the_rest() -> None:
+    """The review table gets one compact clause; the chronology keeps every date."""
+    entry = functools.partial(
+        check_models.ObservationHistory, "org/x", first_observed_open_ended=False
+    )
+    entries = (
+        entry(
+            code="duplicate_keywords",
+            first_observed="2026-09-06 x",
+            consecutive_runs=15,
+            consecutive_since="2026-09-25 x",
+            consecutive_open_ended=False,
+        ),
+        entry(
+            code="repetition_abort",
+            first_observed="2026-09-06 x",
+            consecutive_runs=1,
+            consecutive_since="2026-10-08 x",
+            consecutive_open_ended=False,
+        ),
+    )
+    assert check_models._observation_history_summary("org/x", entries) == (
+        "duplicate keywords: 15 runs since 2026-09-25; +1 more, newest back this run"
+    )
+    assert check_models._observation_history_summary("org/other", entries) == "-"
+
+
+def test_output_index_names_the_run_and_its_producer() -> None:
+    """index.md says when the run started and which check_models source wrote it."""
+    metadata = {
+        "started_at": "2026-10-08 21:48:10 BST",
+        "producer": {
+            "name": "check_models",
+            "version": "0.17.41",
+            "git_revision": "7a23a9a8c0ffee",
+            "install_type": "editable",
+            "dirty": False,
+        },
+    }
+    assert check_models._run_identity_text(metadata) == (
+        "started 2026-10-08 21:48:10 BST; check_models 0.17.41 @ 7a23a9a8c"
+    )
+    assert check_models._run_identity_text(None) is None

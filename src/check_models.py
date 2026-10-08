@@ -65,7 +65,7 @@ import time
 import tomllib
 import traceback
 import types
-from collections import Counter
+from collections import Counter, defaultdict
 from collections.abc import (
     Callable,
     Collection,
@@ -9099,7 +9099,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             ]
         )
     parts.extend([_GALLERY_THROUGHPUT_CAVEAT, ""])
-    parts.extend(["## Avoid for This Run", ""])
+    parts.extend(["## Major Mechanical Concerns in This Run", ""])
 
     if data.avoided:
         parts.extend(
@@ -9108,7 +9108,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(_human_status_label(row.usability)),
+                        _markdown_inline_code(_usability_label(row.usability, row.observations)),
                         MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
                     )
                     for row in data.avoided
@@ -9116,7 +9116,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             )
         )
     else:
-        parts.append("No unusable or not-evaluated models in this run.")
+        parts.append("No model had major concerns or went unassessed in this run.")
     parts.append("")
     return parts
 
@@ -11166,16 +11166,16 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         )
     parts.append(f"<p>{html.escape(_GALLERY_THROUGHPUT_CAVEAT)}</p>")
 
-    parts.append("<h3>Avoid for This Run</h3>")
+    parts.append("<h3>Major Mechanical Concerns in This Run</h3>")
     if data.avoided:
         parts.append(
             _html_table(
-                caption="Unusable and not-evaluated models",
+                caption="Models with major concerns or not assessed",
                 headers=("Model", "Mechanical checks", "Observations", "Output preview"),
                 rows=[
                     (
                         _html_model_link(row.model),
-                        _human_status_label(row.usability),
+                        _usability_label(row.usability, row.observations),
                         _gallery_observation_labels(row.observations),
                         row.output_preview,
                     )
@@ -20372,6 +20372,20 @@ class RunComparisonThroughputFlag:
 
 
 @dataclass(frozen=True)
+class RunComparisonPrefillChange:
+    """One model whose prefill rate moved outside the fixed band, as prefill seconds.
+
+    Seconds are prompt tokens divided by prefill tok/s on each side: one timed
+    generation per sweep, so an observation, not a measured speedup.
+    """
+
+    model: str
+    baseline_s: float
+    current_s: float
+    ratio: float  # prefill tok/s now/baseline
+
+
+@dataclass(frozen=True)
 class RunComparisonMemoryChange:
     """One model whose peak memory moved by more than noise."""
 
@@ -20520,6 +20534,8 @@ class RunComparison:
     # can be traced to one model; None in records that predate them.
     tps_ratio_end_models: tuple[str, str] | None = None
     prompt_tps_ratio_end_models: tuple[str, str] | None = None
+    # The largest prefill changes outside the fixed band, largest first.
+    prefill_changes: tuple[RunComparisonPrefillChange, ...] = ()
 
     @property
     def comparable(self) -> bool:
@@ -21272,6 +21288,35 @@ def _prefill_tps_ratios(
     )
 
 
+_PREFILL_CHANGE_ROWS: Final[int] = 5
+
+
+def _prefill_changes(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> tuple[RunComparisonPrefillChange, ...]:
+    """Up to five models whose prefill rate left the fixed band, largest change first."""
+    low, high = _COMPARISON_TPS_RATIO_FALLBACK_BAND
+    changes: list[RunComparisonPrefillChange] = []
+    for model, now, before in pairs:
+        ratio = _prefill_tps_ratio(now, before)
+        if ratio is None or low <= ratio <= high:
+            continue
+        seconds = [_prefill_seconds(record) for record in (before, now)]
+        if seconds[0] is not None and seconds[1] is not None:
+            changes.append(RunComparisonPrefillChange(model, seconds[0], seconds[1], ratio))
+    changes.sort(key=lambda change: abs(math.log(change.ratio)), reverse=True)
+    return tuple(changes[:_PREFILL_CHANGE_ROWS])
+
+
+def _prefill_seconds(record: JsonlResultRecord) -> float | None:
+    """Prompt tokens divided by prefill tok/s, when both were recorded."""
+    metrics = record.get("metrics") or {}
+    tokens, rate = metrics.get("prompt_tokens"), metrics.get("prompt_tps")
+    if isinstance(tokens, int) and isinstance(rate, int | float) and rate > 0:
+        return tokens / float(rate)
+    return None
+
+
 def _prefill_tps_ratio(now: JsonlResultRecord, before: JsonlResultRecord) -> float | None:
     """Prefill tok/s now/baseline for one model, or None when either side lacks a clean rate."""
     if _record_timing_untrusted(now) or _record_timing_untrusted(before):
@@ -21719,6 +21764,7 @@ def compare_run_results(
         text_changed_models=tuple(text_changed),
         text_divergence=tuple(divergence),
         **_ratio_range_fields(prefill_sorted, "prompt_tps"),
+        prefill_changes=_prefill_changes(pairs) if throughput_comparable else (),
     )
 
 
@@ -22037,6 +22083,15 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             }
             for flag in comparison.throughput_flags
         ],
+        "prefill_changes": [
+            {
+                "model": change.model,
+                "baseline_s": _r(change.baseline_s),
+                "current_s": _r(change.current_s),
+                "ratio": _r(change.ratio),
+            }
+            for change in comparison.prefill_changes
+        ],
         "memory_changes": [
             {
                 "model": change.model,
@@ -22117,6 +22172,29 @@ def _comparison_req_bool(raw: JsonLike) -> bool:
         message = f"comparison field is not a boolean: {raw!r}"
         raise TypeError(message)
     return raw
+
+
+def _prefill_changes_from_json(raw: JsonLike) -> tuple[RunComparisonPrefillChange, ...]:
+    """Read the retained prefill-change rows; empty when the record predates them."""
+    return tuple(
+        RunComparisonPrefillChange(
+            model=_comparison_req_str(change["model"]),
+            baseline_s=_comparison_req_float(change["baseline_s"]),
+            current_s=_comparison_req_float(change["current_s"]),
+            ratio=_comparison_req_float(change["ratio"]),
+        )
+        for change in _comparison_rows(raw)
+    )
+
+
+def _prefill_rows(
+    changes: Sequence[RunComparisonPrefillChange],
+) -> tuple[tuple[str, str, str, str], ...]:
+    """Format prefill changes as (model, baseline s, now s, ratio) cells."""
+    return tuple(
+        (change.model, f"{change.baseline_s:.2f}", f"{change.current_s:.2f}", f"{change.ratio:.2f}")
+        for change in changes
+    )
 
 
 def _ratio_end_models_json(models: tuple[str, str] | None) -> dict[str, JsonLike]:
@@ -22323,6 +22401,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         prompt_tps_ratio_max=_comparison_opt_float(prefill.get("max")),
         prompt_tps_compared_models=_comparison_req_int(prefill.get("compared_models", 0)),
         prompt_tps_ratio_end_models=_ratio_end_models_from_json(prefill),
+        prefill_changes=_prefill_changes_from_json(value.get("prefill_changes")),
         **cast("dict[str, Any]", identity),
     )
 
@@ -22380,6 +22459,7 @@ class _ComparisonView:
     continuity_rows: tuple[tuple[str, str], ...] = ()
     continuity_note: str | None = None
     text_change_rows: tuple[tuple[str, ...], ...] = ()
+    prefill_rows: tuple[tuple[str, str, str, str], ...] = ()
 
 
 _DECODING_CELL_LABELS: Final[dict[str, str]] = {
@@ -22633,6 +22713,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         ),
         continuity_note=_continuity_note(comparison),
         text_change_rows=_text_change_rows(comparison),
+        prefill_rows=_prefill_rows(comparison.prefill_changes),
     )
 
 
@@ -22703,6 +22784,27 @@ def _architecture_commit_item(entry: ArchitectureCommits) -> str:
     return lead + "; ".join(entry.subjects)
 
 
+def _prefill_change_blocks(
+    rows: tuple[tuple[str, str, str, str], ...],
+) -> tuple[ReportBlock, ...]:
+    """The largest-prefill-changes lead and table, or nothing when no model left the band."""
+    if not rows:
+        return ()
+    low, high = _COMPARISON_TPS_RATIO_FALLBACK_BAND
+    return (
+        ReportParagraph(
+            f"Largest prefill changes outside {low:.2f}-{high:.2f}x (prefill seconds are "
+            "prompt tokens divided by prefill tok/s; one timed generation per sweep, so "
+            "observations, not demonstrated speedups):"
+        ),
+        ReportTable(
+            ("Model", "Baseline prefill s", "Now prefill s", "Prefill tok/s ratio"),
+            rows,
+            compact=True,
+        ),
+    )
+
+
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
     view = _comparison_view(comparison)
@@ -22759,6 +22861,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 compact=True,
             )
         )
+    blocks.extend(_prefill_change_blocks(view.prefill_rows))
     if view.memory_rows:
         blocks.append(
             ReportTable(
@@ -22807,11 +22910,10 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         )
     blocks.append(
         ReportParagraph(
-            "Mechanical diff only: one image and one run per model, temperature as "
-            "configured, so a single-observation flip on one model is weak evidence of a "
-            "change; a broad shift is stronger. Each tok/s ratio likewise compares one "
-            "timed generation per model in each sweep, with no warm-up or repeats, so a "
-            "range end is a single measurement, not a benchmark."
+            "Mechanical diff only: one image and one generation per model in each sweep, "
+            "with no warm-up or repeats. A difference shows that outputs or timings "
+            "differ, not why, whether it affects one model or many; attributing a cause "
+            "needs matched repeats or a native reproduction."
         )
     )
     return ReportSection("Since the baseline sweep", tuple(blocks))
@@ -22874,6 +22976,8 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info(
             "  %s: %s -> %s tok/s (x%s) outside band %s", model, baseline_tps, now_tps, ratio, band
         )
+    for model, baseline_s, now_s, ratio in view.prefill_rows:
+        logger.info("  %s: prefill %s -> %s s (tok/s x%s)", model, baseline_s, now_s, ratio)
     for model, baseline_peak, now_peak, delta in view.memory_rows:
         logger.info("  %s: peak %s -> %s GB (%s)", model, baseline_peak, now_peak, delta)
     if comparison.comparable and not comparison.has_changes:
@@ -24077,29 +24181,35 @@ def _run_issue_observation_cluster_key(result: JsonlResultRecord) -> tuple[str, 
 
 def _run_issue_summary_observation_cluster_section(
     results: Sequence[JsonlResultRecord],
+    *,
+    link: Callable[[str], ReportTargetLink],
 ) -> ReportSection | None:
-    """Summarize repeated observation signatures above the per-model review tables."""
-    counts: Counter[tuple[str, ...]] = Counter()
+    """List observation signatures shared by two or more review models, naming them.
+
+    A one-model signature only repeats that model's own review row.
+    """
+    members: dict[tuple[str, ...], list[str]] = defaultdict(list)
     for result in results:
-        key = _run_issue_observation_cluster_key(result)
-        if key:
-            counts[key] += 1
-    # A table of one-model signatures repeats the review table below it.
-    if not any(count > 1 for count in counts.values()):
+        if key := _run_issue_observation_cluster_key(result):
+            members[key].append(result["model"])
+    shared = {signature: models for signature, models in members.items() if len(models) > 1}
+    if not shared:
         return None
     rows = tuple(
         (
-            _human_observation_labels(cast("Sequence[ObservationCode]", signature)),
-            str(count),
+            MARKDOWN_ESCAPER.escape(
+                _human_observation_labels(cast("Sequence[ObservationCode]", signature))
+            ),
+            ", ".join(_render_report_cell_markdown(link(model), escaped=False) for model in models),
         )
         # Integration importance first (best display rank in the signature),
         # then frequency: a rare repetition cluster outranks a common
         # constraint-miss cluster.
-        for signature, count in sorted(
-            counts.items(),
+        for signature, models in sorted(
+            shared.items(),
             key=lambda item: (
                 min(_OBSERVATION_DISPLAY_RANK[cast("ObservationCode", code)] for code in item[0]),
-                -item[1],
+                -len(item[1]),
             ),
         )
     )
@@ -24107,9 +24217,9 @@ def _run_issue_summary_observation_cluster_section(
         "Observation clusters",
         (
             ReportParagraph(
-                "Repeated mechanical observation signatures among results requiring review."
+                "Observation signatures shared by two or more results requiring review."
             ),
-            ReportTable(("Observed result", "Models"), rows, compact=True),
+            ReportTable(("Observed result", "Models"), rows, markdown_escaped=True, compact=True),
         ),
     )
 
@@ -24237,6 +24347,12 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
     return tuple(rows)
 
 
+_NATIVE_REPRO_CELLS: Final[dict[str, str]] = {
+    "actionable_failure": "crash: triage",
+    "observation_needs_reproduction": "candidate",
+}
+
+
 def _run_issue_summary_quality_section(
     results: Sequence[JsonlResultRecord],
     *,
@@ -24278,6 +24394,7 @@ def _run_issue_summary_quality_section(
                 *((_run_issue_summary_keyword_cell(result),) if show_keywords else ()),
                 *((_run_issue_summary_hint_text_cell(result),) if show_hint_text else ()),
                 _run_issue_summary_quality_observed(result),
+                _NATIVE_REPRO_CELLS.get(result["assessment"]["maintainer_status"], "-"),
             )
         )
     limit_note = f" (limit {token_limit:,})" if token_limit is not None else ""
@@ -24312,9 +24429,10 @@ def _run_issue_summary_quality_section(
         *(("Keywords",) if show_keywords else ()),
         *(("Hint text",) if show_hint_text else ()),
         "Observed",
+        "Native repro",
     )
     return ReportSection(
-        "Model quality at a glance",
+        "Mechanical checks at a glance",
         (ReportParagraph(intro), ReportTable(headers, tuple(rows), compact=True)),
     )
 
@@ -24331,8 +24449,10 @@ def _observation_history_note(block: Mapping[str, JsonLike]) -> str:
     return (
         "*History* dates each observation (a crash counts as one) over this model's "
         f"retained runs: {window}. A run that did not attempt the model is skipped, and a "
-        'report-only correction of a run counts once. "Last N runs" counts consecutive '
-        'runs ending with this one; "first" is the earliest run read that showed it.'
+        'report-only correction of a run counts once. "Last N runs" and "N runs since" '
+        'count consecutive runs ending with this one; "first" is the earliest run read '
+        "that showed it. The table shows each model's longest-running observation; every "
+        "observation's dates are under *History by observation*."
     )
 
 
@@ -24342,34 +24462,74 @@ def _history_date(timestamp: str | None, *, open_ended: bool) -> str:
     return f"{date} or earlier" if open_ended else date
 
 
-def _observation_history_cell(model: str, entries: Sequence[ObservationHistory]) -> str:
-    """One model's per-observation history, as "<observation>: <persistence>" clauses."""
-    clauses: list[str] = []
-    for entry in (entry for entry in entries if entry.model == model):
-        gloss = (
-            "crash"
-            if entry.code == _CRASH_HISTORY_CODE
-            else _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", entry.code), entry.code)
+def _history_gloss(entry: ObservationHistory) -> str:
+    """The short observation name a history clause leads with."""
+    if entry.code == _CRASH_HISTORY_CODE:
+        return "crash"
+    return _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", entry.code), entry.code)
+
+
+def _history_persistence(entry: ObservationHistory) -> str:
+    """How long one observation has persisted, e.g. "last 3 runs (since 2026-09-25)"."""
+    first = _history_date(entry.first_observed, open_ended=entry.first_observed_open_ended)
+    if entry.first_observed is None:
+        # With older runs unread, "first" is only first among the runs read.
+        return (
+            "not in earlier runs read" if entry.first_observed_open_ended else "first seen this run"
         )
-        first = _history_date(entry.first_observed, open_ended=entry.first_observed_open_ended)
-        if entry.first_observed is None:
-            # With older runs unread, "first" is only first among the runs read.
-            clauses.append(
-                f"{gloss}: not in earlier runs read"
-                if entry.first_observed_open_ended
-                else f"{gloss}: first seen this run"
-            )
-        elif entry.consecutive_runs == 1:
-            clauses.append(f"{gloss}: back this run, first {first}")
-        else:
-            plus = "+" if entry.consecutive_open_ended else ""
-            since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
-            clause = f"{gloss}: last {entry.consecutive_runs}{plus} runs (since {since})"
-            if entry.first_observed != entry.consecutive_since:
-                clause += f", first {first}"
-            clauses.append(clause)
-    # One observation per line (a <br> in Markdown) so the column skims.
-    return "\n".join(clauses) or "-"
+    if entry.consecutive_runs == 1:
+        return f"back this run, first {first}"
+    plus = "+" if entry.consecutive_open_ended else ""
+    since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
+    text = f"last {entry.consecutive_runs}{plus} runs (since {since})"
+    return text + (f", first {first}" if entry.first_observed != entry.consecutive_since else "")
+
+
+def _observation_history_clauses(
+    model: str, entries: Sequence[ObservationHistory]
+) -> tuple[str, ...]:
+    """One model's per-observation history, as "<observation>: <persistence>" clauses."""
+    return tuple(
+        f"{_history_gloss(entry)}: {_history_persistence(entry)}"
+        for entry in entries
+        if entry.model == model
+    )
+
+
+def _observation_history_cell(model: str, entries: Sequence[ObservationHistory]) -> str:
+    """One model's whole history on one line."""
+    return "; ".join(_observation_history_clauses(model, entries)) or "-"
+
+
+def _history_streak(entry: ObservationHistory) -> str:
+    """The short form of a persistence: "16 runs since 2026-09-25", "back this run"."""
+    if entry.first_observed is None:
+        return "not in earlier runs read" if entry.first_observed_open_ended else "new this run"
+    if entry.consecutive_runs == 1:
+        return "back this run"
+    plus = "+" if entry.consecutive_open_ended else ""
+    since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
+    return f"{entry.consecutive_runs}{plus} runs since {since}"
+
+
+def _observation_history_summary(model: str, entries: Sequence[ObservationHistory]) -> str:
+    """A table-sized persistence summary: the longest-running observation and the rest.
+
+    The full per-observation chronology, first dates included, is listed below
+    the review table.
+    """
+    mine = [entry for entry in entries if entry.model == model]
+    if not mine:
+        return "-"
+    longest = max(mine, key=lambda entry: entry.consecutive_runs)
+    streak = _history_streak(longest)
+    if len(mine) > 1 and all(_history_streak(entry) == streak for entry in mine):
+        return f"all {len(mine)}: {streak}"
+    summary = f"{_history_gloss(longest)}: {streak}"
+    if rest := [entry for entry in mine if entry is not longest]:
+        newest = _history_streak(min(rest, key=lambda entry: entry.consecutive_runs))
+        summary += f"; +{len(rest)} more, newest {newest}"
+    return summary
 
 
 def _since_baseline_status(model: str, comparison: RunComparison | None) -> str | None:
@@ -24403,7 +24563,15 @@ def _run_issue_summary_surfaced_sections(
     }
 
     sections: list[ReportSection] = []
-    cluster_section = _run_issue_summary_observation_cluster_section(results)
+    cluster_section = _run_issue_summary_observation_cluster_section(
+        results,
+        link=lambda model: _run_issue_summary_artifact_link(
+            summary_path=summary_path,
+            artifact_path=output_paths.diagnostics,
+            label=model,
+            anchor=_diagnostics_model_anchor(model),
+        ),
+    )
     if cluster_section is not None:
         sections.append(cluster_section)
     for execution, heading in heading_by_execution.items():
@@ -24428,7 +24596,7 @@ def _run_issue_summary_surfaced_sections(
                     *(
                         ()
                         if history is None
-                        else (_observation_history_cell(result["model"], history[1]),)
+                        else (_observation_history_summary(result["model"], history[1]),)
                     ),
                     _run_issue_summary_observed_result(result),
                     _run_issue_summary_artifact_link(
@@ -24458,10 +24626,38 @@ def _run_issue_summary_surfaced_sections(
                             else ()
                         ),
                         ReportTable(headers, tuple(rows), compact=True),
+                        *(
+                            ()
+                            if history is None
+                            else _observation_chronology_blocks(
+                                [row[0] for row in rows], history[1]
+                            )
+                        ),
                     ),
                 )
             )
     return tuple(sections)
+
+
+def _observation_chronology_blocks(
+    models: Sequence[ReportCell], entries: Sequence[ObservationHistory]
+) -> tuple[ReportBlock, ...]:
+    """Every listed model's per-observation history, one row each, collapsed."""
+    rows = tuple(
+        (model, _history_gloss(entry), _history_persistence(entry))
+        for model in models
+        if isinstance(model, str)
+        for entry in entries
+        if entry.model == model
+    )
+    if not rows:
+        return ()
+    return (
+        ReportDetails(
+            "History by observation",
+            (ReportTable(("Model", "Observation", "Persistence"), rows, compact=True),),
+        ),
+    )
 
 
 def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportSection:
@@ -24503,28 +24699,25 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
         for label in ("macOS Version", "GPU/Chip", "Python Version")
         if system.get(label)
     )
+    return ReportSection("Run context", (ReportKeyValues(tuple(rows)),))
+
+
+def _run_issue_summary_link_caveat() -> str:
+    """Say whether the evidence links are durable, before anyone shares them."""
     blob_ref = _github_blob_ref()
     if re.fullmatch(r"[0-9a-f]{40}", blob_ref):
         # Only reachable via an explicit ref override supplied after the run's
         # artifacts were committed; a producer-HEAD pin is never used because
         # that commit predates the artifacts it would claim to contain.
-        link_caveat = (
-            f"GitHub links are pinned to producer commit `{blob_ref[:12]}`, so the "
-            "linked evidence is durable."
+        return (
+            f"**Evidence links** are pinned to commit `{blob_ref[:12]}`, so the linked "
+            "evidence is durable."
         )
-    else:
-        link_caveat = (
-            "GitHub links target the repository's mutable main branch; they resolve "
-            "to this run's evidence only once these artifacts are committed, and a "
-            "later run's commit supersedes them. Pin links to that artifact commit "
-            "when durable issue evidence is required."
-        )
-    return ReportSection(
-        "Run context",
-        (
-            ReportKeyValues(tuple(rows)),
-            ReportParagraph(link_caveat),
-        ),
+    return (
+        "**Evidence links** target the repository's mutable main branch: they show this "
+        "run only once these artifacts are committed, and a later run's commit replaces "
+        "them. Before sharing upstream, pin them to the commit that published these "
+        "artifacts."
     )
 
 
@@ -24599,6 +24792,32 @@ def _run_issue_summary_artifacts_section(
     return ReportSection("Full artifacts", tuple(content))
 
 
+def _completion_breakdown(results: Sequence[JsonlResultRecord]) -> tuple[int, int, int]:
+    """Completed results: no observations, prompt-compliance only, and native-repro candidates."""
+    completed = [
+        result["assessment"]
+        for result in results
+        if result["assessment"]["execution"] == "completed"
+    ]
+    clean = sum(not assessment["observations"] for assessment in completed)
+    review = sum(assessment["maintainer_status"] != "none" for assessment in completed)
+    return clean, len(completed) - clean - review, review
+
+
+def _completion_breakdown_sentence(results: Sequence[JsonlResultRecord]) -> str | None:
+    """Why only some completions with observations need native reproduction."""
+    clean, compliance_only, review = _completion_breakdown(results)
+    if not compliance_only + review:
+        return None
+    return (
+        f"**Completed models:** {clean} with no mechanical observations, "
+        f"{compliance_only} with prompt-compliance observations only (labels, form or "
+        f"copied hint text), and {review} with observations mlx-vlm can produce (such as "
+        "repetition, missing final answers or visible control tokens); only those "
+        f"{review} are candidates for native reproduction."
+    )
+
+
 def _run_issue_summary_clean_completions_section(
     results: Sequence[JsonlResultRecord],
     *,
@@ -24607,17 +24826,7 @@ def _run_issue_summary_clean_completions_section(
     include_gallery_markdown: bool,
 ) -> ReportSection:
     """Name the models that completed with nothing for a maintainer to look at."""
-    clean_count = sum(
-        result["assessment"]["execution"] == "completed"
-        and not result["assessment"]["observations"]
-        for result in results
-    )
-    compliance_only_count = sum(
-        result["assessment"]["execution"] == "completed"
-        and result["assessment"]["maintainer_status"] == "none"
-        and bool(result["assessment"]["observations"])
-        for result in results
-    )
+    clean_count, compliance_only_count, _review = _completion_breakdown(results)
     # The quality table above already names them.
     clean_phrase = _pluralized_count(clean_count, "completion") + " without detected concerns"
     clean_sentence = f"{clean_phrase}."
@@ -24731,6 +24940,9 @@ def generate_run_issue_summary_report(
     blocks: list[ReportBlock] = [
         ReportParagraph(_run_issue_summary_maintainer_verdict(actionable, other, comparison)),
     ]
+    if (breakdown := _completion_breakdown_sentence(source.results)) is not None:
+        blocks.append(ReportParagraph(breakdown))
+    blocks.append(ReportParagraph(_run_issue_summary_link_caveat()))
     if preflight_issues := source.metadata.get("preflight_issues"):
         blocks.extend(
             (
@@ -24996,7 +25208,24 @@ def _output_index_dashboard_lines(
     return lines
 
 
-def generate_output_index_report(
+def _run_identity_text(metadata: Mapping[str, object] | None) -> str | None:
+    """When the run started and which check_models source produced it."""
+    if metadata is None:
+        return None
+    parts: list[str] = []
+    if isinstance(started := metadata.get("started_at"), str):
+        parts.append(f"started {started}")
+    producer = _narrow_run_issue_producer(cast("JsonLike", metadata.get("producer")))
+    if producer is not None:
+        revision = producer["git_revision"]
+        source = f"check_models {producer['version']}" + (f" @ {revision[:9]}" if revision else "")
+        if producer.get("dirty"):
+            source += " (uncommitted changes)"
+        parts.append(source)
+    return "; ".join(parts) or None
+
+
+def generate_output_index_report(  # noqa: PLR0913 - every index fact is an explicit keyword  # skylos: ignore[SKY-C303]
     filename: Path,
     *,
     artifacts: Sequence[ReportArtifact],
@@ -25008,6 +25237,7 @@ def generate_output_index_report(
     image: RunImageRecord | None = None,
     assessment_profile: AssessmentProfile | None = None,
     metadata_exposed_to_prompt: bool | None = None,
+    run_metadata: Mapping[str, object] | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -25025,6 +25255,7 @@ def generate_output_index_report(
     md = [
         "# Check Models Output Index",
         "",
+        *((f"Run: {identity}", "") if (identity := _run_identity_text(run_metadata)) else ()),
         f"Assessment: {_assessment_scope(assessment_profile)}",
         "",
     ]
@@ -26444,6 +26675,7 @@ def _generate_reports_and_log_outputs(
             metadata_exposed_to_prompt=(
                 inputs.report_context.mode_policy.metadata_exposed_to_prompt
             ),
+            run_metadata=retained.metadata if retained is not None else None,
         ),
     )
     run_artifact(index_artifact)

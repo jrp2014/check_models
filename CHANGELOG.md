@@ -19,12 +19,31 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Run summary, from john's review of the warm-rerun report:
+  - A "Largest prefill changes" table lists up to five models whose prefill
+    tok/s left the fixed 0.85-1.15x band, as baseline and current prefill
+    seconds (prompt tokens divided by prefill tok/s) with the ratio, retained
+    as `prefill_changes` in the comparison block and logged.
+  - The opening now says how the completions split (no observations,
+    prompt-compliance only, native-reproduction candidates) and carries the
+    evidence-link caveat, which moved up from Run context.
+  - "Model quality at a glance" is now "Mechanical checks at a glance", with a
+    "Native repro" column; the gallery's "Avoid for This Run" is now "Major
+    Mechanical Concerns in This Run".
+  - The baseline caveat no longer weighs single-model against broad changes:
+    a difference shows that outputs or timings differ, not why.
+  - Review rows show a compact history (the longest-running observation and
+    how many others, with the newest start); every observation's dates are in
+    a collapsed "History by observation" table below.
+  - Observation clusters list only signatures shared by two or more models,
+    with each model linked to its diagnostics.
+- `index.md` names the run's start time and the check_models version and
+  revision that produced it.
 - Baseline comparison: the generation and prefill tok/s ratio rows name the
   model at each end of the range ("lowest 0.12 (model), highest 8.73
   (model)"), kept as `min_model`/`max_model` in the retained comparison block;
   older records still show the bare range. The caveat under the comparison
-  now says each ratio compares one timed generation per model per sweep, with
-  no warm-up or repeats, so a range end is a single measurement.
+  says each sweep makes one generation per model, with no warm-up or repeats.
 - "Major concerns" now says which kind: "generation" when generation itself
   failed (no text, repeated text, no final answer, incomplete reasoning) and
   "answer format" when an answer was generated but missed the requested form
@@ -36,8 +55,8 @@ Notable changes to this project will be documented in this file.
 - Report wording now states what was measured, not why: the prompt-hint
   observation reads "Output repeats the prompt's own hint text" (it no longer
   adds "instead of describing the image", which an accurate hint does not
-  show), and the baseline caveat calls a single-observation flip weak
-  evidence rather than "usually run-to-run variance". `index.md`'s top
+  show), and the baseline caveat drops "usually run-to-run variance".
+  `index.md`'s top
   observations line is now "Observations, most important first" and says how
   many kinds it left out, so an unlisted observation is not read as absent.
   The changed-text table shows "not recorded" for missing quantization and
