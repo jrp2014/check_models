@@ -3473,13 +3473,16 @@ def test_update_change_report_tabulates_versions_and_checkout_commits(tmp_path: 
     for message in ("one", "two", "three"):
         new = _git_commit(mlx, message)
     before = (
-        f"git\tmlx\t{old}\npip\tnumpy\t2.3.0\npip\tgone\t1.0\n"
-        "conda\tpython\t3.14.7\nconda base\tconda\t26.1.0\nbrew\tcmake\t4.1.0\n"
-        "npm\tmarkdownlint-cli2\t0.18.0\n"
+        f"git\t\t\ngit\tmlx\t{old}\npip\tnumpy\t2.3.0\npip\tgone\t1.0\npip\t\t\n"
+        "conda\tpython\t3.14.7\nconda\t\t\nconda base\tconda\t26.1.0\nconda base\t\t\n"
+        "brew\tcmake\t4.1.0\nbrew\t\t\nnpm\tmarkdownlint-cli2\t0.18.0\nnpm\t\t\n"
     )
+    # cask was unreadable before the run, npm after it: neither is compared.
     after = (
-        f"git\tmlx\t{new}\npip\tnumpy\t2.3.1\npip\tadded\t5.2.0\n"
-        "conda\tpython\t3.14.8\nconda base\tconda\t26.1.0\nbrew\tcmake\t4.1.0\n"
+        f"git\t\t\ngit\tmlx\t{new}\npip\tnumpy\t2.3.1\npip\tadded\t5.2.0\npip\t\t\n"
+        "conda\tpython\t3.14.8\nconda\t\t\nconda base\tconda\t26.1.0\nconda base\t\t\n"
+        "brew\tcmake\t4.1.0\nbrew\t\t\ncask\tghostty\t1.2.0\ncask\t\t\n"
+        "npm\tmarkdownlint-cli2\t0.18.0\n"
     )
     output = _run_update_change_report(tmp_path, before, after)
     rows = [line.split() for line in output.splitlines()[2:]]
@@ -3491,14 +3494,32 @@ def test_update_change_report_tabulates_versions_and_checkout_commits(tmp_path: 
         ["pip", "gone", "1.0", "removed"],
         ["pip", "numpy", "2.3.0", "2.3.1"],
         ["conda", "python", "3.14.7", "3.14.8"],
+        ["Not", "compared", "(could", "not", "be", "read", "before", "the", "run):", "cask"],
         ["Not", "compared", "(could", "not", "be", "read", "after", "the", "run):", "npm"],
+    ]
+
+
+@pytest.mark.subprocess
+def test_update_change_report_lists_a_first_install_in_an_empty_source(tmp_path: Path) -> None:
+    """A source read but empty before the run reports what the run installed into it.
+
+    Regression: without read markers an empty source looked unreadable, so a
+    first markdownlint-cli2 install was reported as "Nothing changed".
+    """
+    before = "pip\tnumpy\t2.3.0\npip\t\t\nnpm\t\t\n"
+    after = "pip\tnumpy\t2.3.0\npip\t\t\nnpm\tmarkdownlint-cli2\t0.18.1\nnpm\t\t\n"
+    output = _run_update_change_report(tmp_path, before, after)
+    rows = [line.split() for line in output.splitlines()[2:]]
+    assert rows == [
+        ["Source", "Package", "Before", "After"],
+        ["npm", "markdownlint-cli2", "-", "0.18.1", "(new)"],
     ]
 
 
 @pytest.mark.subprocess
 def test_update_change_report_says_when_nothing_changed(tmp_path: Path) -> None:
     """An unchanged environment gets one line, not an empty table."""
-    snapshot = "pip\tnumpy\t2.3.0\nbrew\tcmake\t4.1.0\n"
+    snapshot = "pip\tnumpy\t2.3.0\npip\t\t\nbrew\tcmake\t4.1.0\nbrew\t\t\n"
     output = _run_update_change_report(tmp_path, snapshot, snapshot)
     assert output.strip() == (
         "[update.sh] Nothing changed: every package version and checkout revision"
@@ -3558,6 +3579,8 @@ def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
     assert "conda base\tpython\t3.14.7" in lines
     assert "brew\tcmake\t4.1.0" in lines
     assert "cask\tghostty\t1.2.0" in lines
+    markers = {line.split("\t", 1)[0] for line in lines if line.endswith("\t\t")}
+    assert markers == {"git", "pip", "npm", "conda", "conda base", "brew", "cask"}
 
 
 @pytest.mark.subprocess
@@ -3574,12 +3597,12 @@ def test_update_outcome_reports_changes_on_success_and_after_a_stop(tmp_path: Pa
     )
     before = tmp_path / "before.tsv"
     for final, expected_status in (("true", 0), ("false", 1)):
-        safe_io.write_text_no_follow(before, "pip\tnumpy\t2.3.0\n")
+        safe_io.write_text_no_follow(before, "pip\tnumpy\t2.3.0\npip\t\t\n")
         driver = (
             "set -euo pipefail\n"
             f"SCRIPT_DIR={tmp_path}\n"
             "cleanup_local_mlx_constraint() { :; }\n"
-            "snapshot_update_state() { printf 'pip\\tnumpy\\t2.3.1\\n'; }\n"
+            "snapshot_update_state() { printf 'pip\\tnumpy\\t2.3.1\\npip\\t\\t\\n'; }\n"
             f'COMPLETED_STEPS=()\nCURRENT_STEP=""\nUPDATE_STATE_BEFORE={before}\n'
             f"{functions}"
             "trap report_update_outcome EXIT\n"

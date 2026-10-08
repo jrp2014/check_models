@@ -1556,17 +1556,20 @@ report_update_plan() {
 # actually changed. Sources: the local mlx/mlx-vlm checkout revisions, the
 # target's Python distributions (those conda did not install), the target conda
 # env and conda base, Homebrew formulae and casks, and the repo-local
-# markdownlint-cli2. Read-only and best-effort: a probe that fails adds no
-# lines, and the summary then reports that source as unreadable rather than
-# as removed. Prints the snapshot.
+# markdownlint-cli2. Read-only and best-effort. Each source that was read
+# completely also gets a "<source>\t\t" marker line, so a source read and
+# found empty (nothing installed yet) is told apart from one that could not
+# be read: only a read source's lines are compared. Prints the snapshot.
 snapshot_update_state() {
-	local repo_parent repo
+	local repo_parent repo listing
 	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	printf 'git\t\t\n'
 	for repo in mlx mlx-vlm; do
 		[[ -d "$repo_parent/$repo/.git" ]] || continue
 		git -C "$repo_parent/$repo" rev-parse HEAD 2>/dev/null | awk -v r="$repo" 'NF {print "git\t" r "\t" $1}'
 	done
-	# -P keeps the caller's working directory off sys.path.
+	# -P keeps the caller's working directory off sys.path. The markers come
+	# last, so a probe that dies part-way marks nothing as read.
 	"$UPDATE_PYTHON" -P - "$PROJECT_ROOT/node_modules/markdownlint-cli2/package.json" <<'PY' 2>/dev/null || true
 import importlib.metadata as metadata
 import json
@@ -1584,50 +1587,71 @@ for dist in metadata.distributions():
             print(f"pip\t{name}\t{dist.version}")
     except Exception:  # one broken record must not hide the rest
         continue
+print("pip\t\t")
 try:
     with open(sys.argv[1], encoding="utf-8") as handle:
         print(f"npm\tmarkdownlint-cli2\t{json.load(handle)['version']}")
+except FileNotFoundError:
+    pass  # read: not installed
 except (OSError, ValueError, KeyError):
-    pass
+    sys.exit(0)  # unreadable: no marker
+print("npm\t\t")
 PY
 	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]] && command -v conda >/dev/null 2>&1; then
-		if [[ "$UPDATE_ENV_TYPE" == "conda" ]]; then
-			conda list -n "$CONDA_ENV" --no-pip 2>/dev/null | awk '!/^#/ && NF >= 2 {print "conda\t" $1 "\t" $2}' || true
+		if [[ "$UPDATE_ENV_TYPE" == "conda" ]] && listing="$(conda list -n "$CONDA_ENV" --no-pip 2>/dev/null)"; then
+			awk '!/^#/ && NF >= 2 {print "conda\t" $1 "\t" $2} END {print "conda\t\t"}' <<< "$listing"
 		fi
-		conda list -n base --no-pip 2>/dev/null | awk '!/^#/ && NF >= 2 {print "conda base\t" $1 "\t" $2}' || true
+		if listing="$(conda list -n base --no-pip 2>/dev/null)"; then
+			awk '!/^#/ && NF >= 2 {print "conda base\t" $1 "\t" $2} END {print "conda base\t\t"}' <<< "$listing"
+		fi
 	fi
 	if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]] && command -v brew >/dev/null 2>&1; then
-		brew list --versions --formula 2>/dev/null | awk 'NF >= 2 {print "brew\t" $1 "\t" $NF}' || true
-		brew list --versions --cask 2>/dev/null | awk 'NF >= 2 {print "cask\t" $1 "\t" $NF}' || true
+		if listing="$(brew list --versions --formula 2>/dev/null)"; then
+			awk 'NF >= 2 {print "brew\t" $1 "\t" $NF} END {print "brew\t\t"}' <<< "$listing"
+		fi
+		if listing="$(brew list --versions --cask 2>/dev/null)"; then
+			awk 'NF >= 2 {print "cask\t" $1 "\t" $NF} END {print "cask\t\t"}' <<< "$listing"
+		fi
 	fi
 }
 
 # Compare two snapshots: one "<source>\t<name>\t<before>\t<after>" line per
 # changed, added ("-" before) or removed ("-" after) entry, checkouts first,
-# then by source and name. A source present before but absent after is one
-# "<source>\t-\tunreadable\t-" line instead of a list of false removals.
-# (No field is ever empty: read collapses adjacent tab separators.)
+# then by source and name. Only sources read both times are compared; a
+# source read only once is one "<source>\t-\tunreadable\t<before|after>"
+# line (the snapshot that could not read it) instead of false additions or
+# removals. (No field is ever empty: read collapses adjacent tab separators.)
 #   $1 before snapshot; $2 after snapshot
 diff_update_state() {
 	awk -F '\t' -v OFS='\t' '
 		function rank(source) {
 			return index("|git|pip|conda|conda base|brew|cask|npm|", "|" source "|")
 		}
-		NR == FNR { before[$1 FS $2] = $3; before_sources[$1] = 1; next }
-		{ after[$1 FS $2] = $3; after_sources[$1] = 1 }
+		NR == FNR {
+			if ($2 == "") read_before[$1] = 1
+			else before[$1 FS $2] = $3
+			next
+		}
+		{
+			if ($2 == "") read_after[$1] = 1
+			else after[$1 FS $2] = $3
+		}
 		END {
 			for (key in after) {
 				split(key, part, FS)
-				if (!(part[1] in before_sources)) continue
+				if (!(part[1] in read_before && part[1] in read_after)) continue
 				if (!(key in before)) print rank(part[1]), part[1], part[2], "-", after[key]
 				else if (before[key] != after[key]) print rank(part[1]), part[1], part[2], before[key], after[key]
 			}
 			for (key in before) {
 				split(key, part, FS)
-				if (part[1] in after_sources && !(key in after)) print rank(part[1]), part[1], part[2], before[key], "-"
+				if (part[1] in read_before && part[1] in read_after && !(key in after))
+					print rank(part[1]), part[1], part[2], before[key], "-"
 			}
-			for (source in before_sources)
-				if (!(source in after_sources)) print rank(source), source, "-", "unreadable", "-"
+			for (source in read_before)
+				if (!(source in read_after)) print rank(source), source, "-", "unreadable", "after"
+			for (source in read_after)
+				if (!(source in read_before)) print rank(source), source, "-", "unreadable", "before"
 		}
 	' "$1" "$2" | sort -t "$(printf '\t')" -k1,1n -k3,3 | cut -f 2-
 }
@@ -1636,7 +1660,7 @@ diff_update_state() {
 # and how many commits the pull brought in.
 #   $1 before snapshot; $2 after snapshot
 report_update_changes() {
-	local repo_parent changes source name old new count rows="" unreadable=""
+	local repo_parent changes source name old new count rows="" unread_after="" unread_before=""
 	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 	changes="$(diff_update_state "$1" "$2")"
 	echo ""
@@ -1645,8 +1669,11 @@ report_update_changes() {
 		return 0
 	fi
 	while IFS=$'\t' read -r source name old new; do
-		if [[ "$old" == "unreadable" ]]; then
-			unreadable+="${unreadable:+, }$source"
+		if [[ "$old" == "unreadable" && "$new" == "after" ]]; then
+			unread_after+="${unread_after:+, }$source"
+			continue
+		elif [[ "$old" == "unreadable" ]]; then
+			unread_before+="${unread_before:+, }$source"
 			continue
 		fi
 		if [[ "$source" == "git" && "$old" != "-" && "$new" != "-" ]]; then
@@ -1671,8 +1698,11 @@ report_update_changes() {
 	else
 		echo "[update.sh] Nothing changed in what could be read after the run."
 	fi
-	if [[ -n "$unreadable" ]]; then
-		echo "   Not compared (could not be read after the run): $unreadable"
+	if [[ -n "$unread_before" ]]; then
+		echo "   Not compared (could not be read before the run): $unread_before"
+	fi
+	if [[ -n "$unread_after" ]]; then
+		echo "   Not compared (could not be read after the run): $unread_after"
 	fi
 }
 

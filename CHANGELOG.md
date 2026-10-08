@@ -11,9 +11,11 @@ Notable changes to this project will be documented in this file.
   env, conda base, Homebrew and markdownlint-cli2 version that moved, was
   added or was removed, and each local `mlx`/`mlx-vlm` checkout's old and new
   revision with the number of commits pulled. It compares snapshots taken
-  before the first change and at exit; an unchanged run says so in one line,
-  and a source that cannot be read at exit is named instead of listed as
-  removed.
+  before the first change and at exit; an unchanged run says so in one line.
+  Each snapshot marks the sources it read, so a first install into a source
+  that was empty (markdownlint-cli2 before any `npm install`) is listed as
+  new, and a source unreadable before or after the run is named instead of
+  being listed as all added or all removed.
 
 ### Changed
 
