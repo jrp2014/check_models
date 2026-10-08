@@ -285,6 +285,7 @@ def check_pip_consistency() -> bool:
             [sys.executable, "-m", "pip", "check"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
         )
     except OSError as e:

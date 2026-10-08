@@ -252,6 +252,7 @@ def _run_for_finding(
                 [sys.executable, "-m", "ruff", "check", str(temp_path)],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
                 check=False,
                 cwd=src_root,
             )
@@ -268,6 +269,7 @@ def _run_for_finding(
                 ],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
                 check=False,
                 cwd=src_root,
             )
@@ -279,6 +281,7 @@ def _run_for_finding(
                 [shellcheck_path, "-x", str(temp_path)],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
                 check=False,
                 cwd=repo_root,
             )
@@ -322,6 +325,7 @@ def _batch_noqa_audit_outputs(
             ],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
             cwd=src_root,
         )

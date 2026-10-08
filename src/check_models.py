@@ -675,6 +675,7 @@ def _probe_import_runtime(
             [sys.executable, "-c", f"import {import_target}"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
             timeout=MLX_IMPORT_PROBE_TIMEOUT_SECONDS,
         )
@@ -5984,6 +5985,7 @@ def get_device_info() -> SystemProfilerDict | None:
         data = subprocess.check_output(
             ["/usr/sbin/system_profiler", "SPDisplaysDataType", "-json"],
             text=True,
+            encoding="utf-8",
             timeout=5,
         )
         return _normalize_system_profiler_data(json.loads(data))
@@ -11658,6 +11660,7 @@ def _run_macos_toolchain_command(
             list(command),
             capture_output=True,
             text=True,
+            encoding="utf-8",
             timeout=timeout,
             check=False,
         )
@@ -20532,6 +20535,7 @@ def _run_git_capture(args: Sequence[str], cwd: Path) -> str | None:
             cwd=cwd,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
             timeout=_COMPARISON_GIT_TIMEOUT_SECONDS,
         )

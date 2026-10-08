@@ -796,7 +796,8 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "Jinja2>=3.1.0
 ## Requirements
 
 - **Python**: 3.13+ (the floor); the working `mlx-vlm` env runs 3.14, and CI
-  tests both
+  tests both. A third CI lane rehearses 3.15: until the stack's wheels exist
+  for it (mlx has none yet), it warns and skips its checks instead of failing
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
 To see whether the next Python has become viable without touching the working
@@ -811,9 +812,16 @@ the fast test lane. `PROBE_PYTHON=3.16` targets a later version. Two opt-in chec
   after a switch. Because it runs first, a missing mlx wheel on PyPI does not
   hide it. `PROBE_MLX_REPO` overrides the checkout path.
 - `PROBE_TORCH=1` installs the `torch` extra and imports torch and
-  torchvision. A failure is reported as "torch extra unavailable: about half
-  the roster would fail" and stays outside the core verdict. The exit status
-  covers only the build, install and test checks.
+  torchvision. PyTorch can publish wheels for a new Python on its own index
+  before PyPI (3.15's macOS wheels are not on PyPI), so when the PyPI install
+  fails the probe retries torch, torchvision and torchaudio from
+  `PROBE_TORCH_INDEX` (default `https://download.pytorch.org/whl/cpu`, whose
+  macOS wheels include MPS) and the rest of the extra from PyPI. The verdict
+  says which source worked; "from the index only" means `tools/update.sh`
+  would need the same index before a switch. A failure from both is reported
+  as "torch extra unavailable: about half the roster would fail" and stays
+  outside the core verdict. The exit status covers only the build, install
+  and test checks.
 
 ### Advanced Configuration
 

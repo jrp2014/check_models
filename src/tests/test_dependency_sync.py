@@ -1637,6 +1637,47 @@ def test_probe_python_next_torch_check_installs_the_pyproject_extra(tmp_path: Pa
     torch_install = calls[_probe_call_index(calls, "torchvision>=")]
     assert torch_install.endswith("-m pip install -q " + " ".join(torch_extra))
     assert "Torch extra: available" in result.stdout
+    assert "--index-url" not in "\n".join(calls)
+
+
+def test_probe_python_next_torch_check_falls_back_to_the_pytorch_index(tmp_path: Path) -> None:
+    """Torch wheels on PyTorch's own index only (as for 3.15) are found and named as such.
+
+    Only the torch packages come from that index, via --index-url so nothing
+    else can resolve from it; the rest of the extra then installs from PyPI.
+    """
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    torch_extra = pyproject["project"]["optional-dependencies"]["torch"]
+    torch_family = [
+        req for req in torch_extra if re.match(r"(torch|torchvision|torchaudio)\b(?![-_.])", req)
+    ]
+    rest = [req for req in torch_extra if req not in torch_family]
+    assert torch_family
+    assert rest
+
+    # Fail only the first, all-PyPI install of the whole extra.
+    pypi_only = " ".join(torch_extra).replace(".", r"\.") + "$"
+    result, calls, _ = _run_probe_python_next(tmp_path, fail_regex=pypi_only, PROBE_TORCH="1")
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    index_install = _probe_call_index(calls, "--index-url")
+    assert calls[index_install].endswith(
+        "-m pip install -q --index-url https://download.pytorch.org/whl/cpu "
+        + " ".join(torch_family)
+    )
+    assert calls[index_install + 1].endswith("-m pip install -q " + " ".join(rest))
+    assert "Torch extra: available from https://download.pytorch.org/whl/cpu only" in result.stdout
+    assert "Core: viable from PyPI" in result.stdout
+
+
+def test_probe_python_next_rejects_a_non_https_torch_index(tmp_path: Path) -> None:
+    """PROBE_TORCH_INDEX reaches pip; anything but a plain https URL stops the probe first."""
+    result, calls, _ = _run_probe_python_next(
+        tmp_path, PROBE_TORCH="1", PROBE_TORCH_INDEX="http://example.test/simple"
+    )
+    assert result.returncode == 1
+    assert "PROBE_TORCH_INDEX must be a plain https:// URL" in result.stderr
+    assert calls == []
 
 
 def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
@@ -2150,11 +2191,13 @@ def test_run_for_finding_uses_active_python_for_ruff(
         *,
         capture_output: bool,
         text: bool,
+        encoding: str,
         check: bool,
         cwd: Path,
     ) -> subprocess.CompletedProcess[str]:
         assert capture_output is True
         assert text is True
+        assert encoding == "utf-8"
         assert check is False
         assert cwd == src_root
         recorded_args.extend(args)
@@ -2229,6 +2272,165 @@ def test_python_floor_is_single_sourced() -> None:
     assert floor in ci_versions, f"CI no longer tests the Python floor {floor}: {ci_versions}"
     for version in ci_versions:
         assert tuple(int(part) for part in version.split(".")) >= floor_parts, version
+
+
+def test_ci_next_python_lane_tracks_the_probe_and_skips_only_its_own_install_failure() -> None:
+    """The static-quality lane for the next Python mirrors probe_python_next.sh.
+
+    Its version is the probe's default and newer than the fresh-env Python. An
+    install failure (wheels not published yet) may skip the checks only on
+    that lane; every other lane still fails, and the checks never run on a
+    half-installed stack.
+    """
+    probe_script = (PKG_ROOT / "tools" / "probe_python_next.sh").read_text(encoding="utf-8")
+    probe_match = re.search(
+        r'^PROBE_PYTHON="\$\{PROBE_PYTHON:-(3\.\d{1,2})\}"$', probe_script, re.MULTILINE
+    )
+    assert probe_match is not None
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+    env_match = re.search(r'^ENV_PYTHON_VERSION="(3\.\d{1,2})"$', setup_script, re.MULTILINE)
+    assert env_match is not None
+
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    job = workflow["jobs"]["static-quality"]
+    next_lanes = [
+        entry["python-version"]
+        for entry in job["strategy"]["matrix"].get("include", [])
+        if entry.get("next-python") is True
+    ]
+    assert next_lanes == [probe_match.group(1)]
+    assert tuple(map(int, next_lanes[0].split("."))) > tuple(
+        map(int, env_match.group(1).split("."))
+    )
+    assert next_lanes[0] not in job["strategy"]["matrix"]["python-version"]
+
+    steps = {step.get("name"): step for step in job["steps"]}
+    setup = next(
+        step for step in job["steps"] if step.get("uses", "").startswith("actions/setup-python@")
+    )
+    assert setup["with"]["allow-prereleases"] == "${{ matrix.next-python == true }}"
+    install = steps["Install dependencies"]
+    assert install["id"] == "install"
+    assert install["env"]["NEXT_PYTHON"] == "${{ matrix.next-python == true }}"
+    install_script = install["run"]
+    # Other lanes exit 1 before the skip; npm and "available=true" follow it.
+    order = [
+        'if ! pip install -e "src/.[dev]"; then',
+        '[[ "$NEXT_PYTHON" != "true" ]]',
+        "exit 1",
+        "available=false",
+        "npm install --ignore-scripts",
+        "available=true",
+    ]
+    positions = [install_script.index(marker) for marker in order]
+    assert positions == sorted(positions)
+    assert steps["Run static quality checks"]["if"] == "steps.install.outputs.available == 'true'"
+
+
+_SUBPROCESS_TEXT_CALLS = frozenset({"run", "check_output", "Popen", "call", "check_call"})
+# Receivers whose ``.open`` is not a text-file open (no encoding parameter).
+_NON_TEXT_OPEN_RECEIVERS = frozenset({"Image", "os", "webbrowser"})
+
+
+def _opens_a_text_file_without_encoding(call: ast.Call) -> bool:
+    """Whether an ``open``/``io.open``/``Path.open`` call opens a text file without an encoding."""
+    func = call.func
+    receiver = (
+        func.value.id
+        if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name)
+        else None
+    )
+    if receiver in _NON_TEXT_OPEN_RECEIVERS:
+        return False
+    # Builtin/io open(file, mode, buffering, encoding); Path.open(mode, buffering, encoding).
+    mode_index = 1 if isinstance(func, ast.Name) or receiver == "io" else 0
+    if len(call.args) > mode_index + 2:
+        return False  # encoding passed positionally
+    mode = next(
+        (keyword.value for keyword in call.keywords if keyword.arg == "mode"),
+        call.args[mode_index] if len(call.args) > mode_index else None,
+    )
+    is_binary = isinstance(mode, ast.Constant) and isinstance(mode.value, str) and "b" in mode.value
+    return not is_binary
+
+
+def _locale_dependent_text_io(call: ast.Call) -> str | None:
+    """Describe a text-I/O call that leaves its encoding to the locale, else None.
+
+    Python 3.15 (PEP 686) decodes such calls as UTF-8 whatever the locale, so
+    naming the encoding keeps 3.13, 3.14 and 3.15 byte-for-byte alike.
+    """
+    func = call.func
+    name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", "")
+    keywords = {keyword.arg for keyword in call.keywords}
+    if "encoding" in keywords or None in keywords:  # explicit, or **kwargs we cannot see
+        return None
+    if name in _SUBPROCESS_TEXT_CALLS and keywords & {"text", "universal_newlines"}:
+        description = f"subprocess.{name}(text=True)"
+    elif name == "open" and _opens_a_text_file_without_encoding(call):
+        description = "open() in text mode"
+    elif (name == "read_text" and not call.args) or (name == "write_text" and len(call.args) < 2):
+        description = f"{name}()"
+    else:
+        description = None
+    return description
+
+
+def test_shipped_text_io_names_its_encoding() -> None:
+    """Shipped code must not depend on the locale's encoding (Python 3.15, PEP 686).
+
+    3.15 makes UTF-8 the default for text I/O without an ``encoding``; on 3.13
+    and 3.14 the locale decides. Ruff's PLW1514 only covers files and is a
+    preview rule (preview is off here), and nothing lints ``subprocess(...,
+    text=True)``. Tests are exempt: they read back what they wrote in one
+    process, so a locale cannot make them disagree with themselves.
+    """
+    sources = [PKG_ROOT / "check_models.py", *sorted((PKG_ROOT / "tools").glob("*.py"))]
+    offenders = [
+        f"{path.relative_to(PKG_ROOT)}:{node.lineno}: {description}"
+        for path in sources
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.Call)
+        and (description := _locale_dependent_text_io(node)) is not None
+    ]
+    assert not offenders, "pass encoding= explicitly:\n" + "\n".join(offenders)
+
+
+def test_locale_dependent_text_io_detector_recognises_each_form() -> None:
+    """The detector behind the shipped-code check must flag and clear the forms it claims to."""
+
+    def describe(source: str) -> str | None:
+        call = ast.parse(source, mode="eval").body
+        assert isinstance(call, ast.Call)
+        return _locale_dependent_text_io(call)
+
+    flagged = [
+        "subprocess.run(cmd, capture_output=True, text=True)",
+        "subprocess.check_output(cmd, universal_newlines=True)",
+        "open(path)",
+        "open(path, 'w')",
+        "path.open()",
+        "path.open(mode)",
+        "path.read_text()",
+        "path.write_text(data)",
+    ]
+    cleared = [
+        "subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8')",
+        "subprocess.run(cmd, capture_output=True)",
+        "subprocess.run(cmd, **kwargs)",
+        "open(path, 'rb')",
+        "open(path, 'r', -1, 'utf-8')",
+        "path.open('rb')",
+        "Image.open(path)",
+        "os.open(path, flags)",
+        "path.read_text(encoding='utf-8')",
+        "path.read_text('utf-8')",
+        "path.write_text(data, 'utf-8')",
+    ]
+    assert [source for source in flagged if describe(source) is None] == []
+    assert [source for source in cleared if describe(source) is not None] == []
 
 
 def test_update_smoke_defaults_are_documented() -> None:

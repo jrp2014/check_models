@@ -55,6 +55,13 @@ jobs:
         # Python move is continuously rehearsed in CI before the working env
         # follows. tests/test_dependency_sync.py keeps this list honest.
         python-version: ["3.13", "3.14"]
+        include:
+          # The Python after the working env's (probe_python_next.sh's
+          # default). Until its wheels exist (mlx has no cp315 wheel and no
+          # sdist yet), the install step warns and skips the checks instead
+          # of failing; once the stack installs, the lane gates like the rest.
+          - python-version: "3.15"
+            next-python: true
 
     steps:
       - name: Checkout
@@ -66,6 +73,7 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ matrix.next-python == true }}
           cache: "pip"
 
       - name: Set up Node.js
@@ -77,12 +85,24 @@ jobs:
         run: brew install shellcheck
 
       - name: Install dependencies
+        id: install
+        env:
+          NEXT_PYTHON: ${{ matrix.next-python == true }}
         run: |
           python -m pip install --upgrade pip
-          pip install -e "src/.[dev]"
+          if ! pip install -e "src/.[dev]"; then
+            if [[ "$NEXT_PYTHON" != "true" ]]; then
+              exit 1
+            fi
+            echo "::warning title=Next Python not installable yet::pip could not install src/.[dev] on $(python -V); its static checks are skipped until the dependency wheels exist."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           npm install --ignore-scripts --no-audit --no-fund --prefix src
+          echo "available=true" >> "$GITHUB_OUTPUT"
 
       - name: Run static quality checks
+        if: steps.install.outputs.available == 'true'
         env:
           CI: true
         # Validation tests must not rewrite tracked `src/output/` assets; they
