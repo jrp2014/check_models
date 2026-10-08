@@ -23,6 +23,12 @@ Notable changes to this project will be documented in this file.
   Checked with an editable-style mlx (loader-only `RECORD`, dev version):
   4.44.0 still flags both imports, 4.47.1 flags neither. The SKY-S101
   workaround still reproduces on 4.47.1 and stays.
+- Tooling: `src/package.json` overrides two transitive markdownlint-cli2
+  packages that Skylos's dependency scan flags: katex 0.19.0
+  (GHSA-238p-pmpm-9mq7, fixed in 0.18.2; micromark-extension-math still asks
+  for `^0.16.0`) and smol-toml 1.9.0 (GHSA-r4xh-jqrq-34v2; markdownlint-cli2
+  0.23.3 pins 1.8.0 exactly). Drop each once markdownlint-cli2 resolves a
+  fixed version itself.
 - Docs: reworded the run-summary line in `src/README.md` that Skylos
   4.47.1 flagged as a prompt-injection pattern (SKY-D260); the meaning is
   unchanged.
