@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-10-04 21:56:04 BST
+Generated on: 2026-10-08 21:59:10 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -28,61 +28,61 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 | Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.11s   | 481 tok/s  | 0.67            | 1.9     | 2,103      | 58      | none                                                                                              |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | 10.27s  | 30.0 tok/s | 3.51            | 23      | 2,372      | 123     | none                                                                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | 8.50s   | 125 tok/s  | 1.31            | 19      | 1,617      | 617     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 8.58s   | 78.7 tok/s | 5.63            | 8.7     | 6,339      | 89      | none                                                                                              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | 8.30s   | 34.3 tok/s | 1.83            | 18      | 2,601      | 130     | none                                                                                              |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.01s   | 57.2 tok/s | 2.09            | 10      | 2,091      | 113     | none                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 5.95s   | 37.3 tok/s | 1.49            | 17      | 2,091      | 80      | none                                                                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 19.45s  | 65.0 tok/s | 1.37            | 20      | 1,312      | 995     | none                                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | 3.34s   | 210 tok/s  | 1.18            | 4.0     | 2,094      | 91      | none                                                                                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.17s   | 106 tok/s  | 0.76            | 7.0     | 369        | 88      | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 6.97s   | 66.0 tok/s | 2.88            | 13      | 2,905      | 140     | none                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 3.87s   | 186 tok/s  | 1.55            | 7.8     | 2,904      | 134     | none                                                                                              |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 5.41s   | 71.4 tok/s | 1.52            | 8.1     | 1,502      | 148     | none                                                                                              |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.34s   | 208 tok/s  | 2.81            | 3.9     | 4,065      | 158     | none                                                                                              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 5.79s   | 103 tok/s  | 1.23            | 24      | 1,267      | 133     | none                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 4.76s   | 58.4 tok/s | 0.83            | 9.3     | 1,115      | 144     | none                                                                                              |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | 26.29s  | 72.8 tok/s | 21.13           | 26      | 12,768     | 138     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 36.09s  | 85.3 tok/s | 31.50           | 23      | 16,525     | 143     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 37.84s  | 69.6 tok/s | 34.32           | 11      | 16,525     | 112     | none                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 35.62s  | 106 tok/s  | 30.81           | 25      | 16,541     | 151     | none                                                                                              |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 61.13s  | 29.3 tok/s | 53.98           | 21      | 16,541     | 121     | none                                                                                              |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 5.00s   | 102 tok/s  | 1.66            | 6.5     | 2,070      | 132     | none                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 8.67s   | 31.2 tok/s | 1.47            | 17      | 572        | 135     | none                                                                                              |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.10s   | 61.1 tok/s | 0.97            | 7.6     | 577        | 108     | none                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.01s   | 122 tok/s  | 1.02            | 16      | 577        | 106     | none                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 9.01s   | 26.2 tok/s | 1.81            | 20      | 577        | 103     | none                                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.27s   | 178 tok/s  | 1.23            | 4.8     | 1,366      | 107     | none                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 7.74s   | 39.8 tok/s | 2.51            | 16      | 3,095      | 119     | none                                                                                              |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 4.62s   | 127 tok/s  | 2.16            | 5.4     | 4,188      | 118     | none                                                                                              |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 7.59s   | 36.6 tok/s | 2.13            | 18      | 1,251      | 114     | none                                                                                              |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 8.62s   | 156 tok/s  | 4.85            | 23      | 3,606      | 132     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 21.05s  | 44.7 tok/s | 11.65           | 78      | 6,339      | 106     | prompt hint repeated                                                                              |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.44s   | 127 tok/s  | 1.13            | 5.6     | 1,407      | 114     | prompt hint repeated                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 36.69s  | 53.1 tok/s | 20.74           | 92      | 3,468      | 111     | prompt hint repeated                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | 6.12s   | 80.2 tok/s | 2.23            | 28      | 573        | 91      | prompt hint repeated                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | 3.70s   | 124 tok/s  | 0.79            | 6.0     | 573        | 83      | prompt hint repeated                                                                              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 2.94s   | 371 tok/s  | 1.16            | 2.2     | 312        | 44      | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | 2.57s   | 422 tok/s  | 0.90            | 2.1     | 2,094      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 38.95s  | 19.3 tok/s | 2.16            | 15      | 290        | 667     | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | 2.96s   | 304 tok/s  | 0.97            | 3.2     | 910        | 104     | incomplete thinking block                                                                         |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | 10.01s  | 31.4 tok/s | 4.11            | 13      | 3,104      | 113     | labelled fields not detected                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 54.80s  | 23.6 tok/s | 8.77            | 25      | 4,390      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | 37.17s  | 125 tok/s  | 33.64           | 9.4     | 16,536     | 225     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.23s   | 553 tok/s  | 0.97            | 1.1     | 1,186      | 22      | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 32.49s  | 57.8 tok/s | 13.10           | 14      | 16,536     | 1,000   | repeated text; cut off at token limit; duplicate keywords                                         |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 4.45s   | 92.6 tok/s | 0.87            | 7.2     | 571        | 129     | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 5.21s   | 144 tok/s  | 3.21            | 4.3     | 5,615      | 86      | labelled fields not detected; duplicate keywords                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 4.13s   | 107 tok/s  | 1.50            | 6.7     | 2,174      | 18      | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 5.04s   | 341 tok/s  | 0.69            | 1.8     | 308        | 1,000   | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | 2.99s   | 162 tok/s  | 0.98            | 4.8     | 1,011      | 48      | labelled fields not detected                                                                      |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.66s   | 491 tok/s  | 1.26            | 1.9     | 2,103      | 58      | none                                                                                              |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 9.37s   | 79.1 tok/s | 6.30            | 8.7     | 6,339      | 98      | none                                                                                              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | 8.95s   | 34.0 tok/s | 2.45            | 18      | 2,601      | 130     | none                                                                                              |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.25s   | 57.8 tok/s | 2.52            | 10      | 2,091      | 113     | none                                                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 5.97s   | 37.7 tok/s | 1.58            | 17      | 2,091      | 80      | none                                                                                              |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 20.95s  | 65.2 tok/s | 2.89            | 20      | 1,312      | 995     | none                                                                                              |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | 6.33s   | 286 tok/s  | 2.33            | 3.2     | 910        | 662     | none                                                                                              |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.42s   | 105 tok/s  | 0.94            | 7.0     | 369        | 88      | none                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 6.67s   | 66.4 tok/s | 2.61            | 13      | 2,905      | 140     | none                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 3.79s   | 188 tok/s  | 1.54            | 7.8     | 2,904      | 132     | none                                                                                              |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 6.86s   | 73.4 tok/s | 3.07            | 8.1     | 1,502      | 148     | none                                                                                              |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.32s   | 206 tok/s  | 2.80            | 3.9     | 4,065      | 148     | none                                                                                              |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 6.24s   | 104 tok/s  | 1.69            | 24      | 1,267      | 129     | none                                                                                              |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 4.95s   | 57.6 tok/s | 0.94            | 9.3     | 1,115      | 144     | none                                                                                              |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | 24.14s  | 72.4 tok/s | 19.01           | 26      | 12,768     | 136     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 38.32s  | 87.8 tok/s | 33.85           | 23      | 16,525     | 133     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 38.79s  | 71.0 tok/s | 35.31           | 11      | 16,525     | 112     | none                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 35.26s  | 112 tok/s  | 30.50           | 25      | 16,541     | 152     | none                                                                                              |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 53.68s  | 30.1 tok/s | 46.67           | 21      | 16,541     | 121     | none                                                                                              |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 5.01s   | 103 tok/s  | 1.70            | 6.5     | 2,070      | 132     | none                                                                                              |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 8.89s   | 31.1 tok/s | 1.55            | 17      | 572        | 138     | none                                                                                              |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.27s   | 61.6 tok/s | 1.11            | 7.6     | 577        | 108     | none                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 4.92s   | 124 tok/s  | 1.00            | 16      | 577        | 106     | none                                                                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 8.91s   | 26.6 tok/s | 1.66            | 20      | 577        | 107     | none                                                                                              |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | 3.96s   | 121 tok/s  | 1.03            | 6.0     | 573        | 79      | none                                                                                              |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 7.78s   | 40.1 tok/s | 2.50            | 16      | 3,095      | 119     | none                                                                                              |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 4.62s   | 129 tok/s  | 2.16            | 5.4     | 4,188      | 118     | none                                                                                              |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 7.73s   | 36.9 tok/s | 2.29            | 18      | 1,251      | 114     | none                                                                                              |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 9.14s   | 159 tok/s  | 5.36            | 23      | 3,606      | 132     | none                                                                                              |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | 10.36s  | 30.6 tok/s | 3.90            | 23      | 2,372      | 117     | prompt hint repeated                                                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | 9.89s   | 127 tok/s  | 1.70            | 19      | 1,617      | 758     | duplicate keywords                                                                                |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 23.79s  | 42.8 tok/s | 13.71           | 78      | 6,339      | 106     | prompt hint repeated                                                                              |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | 3.57s   | 206 tok/s  | 1.45            | 4.0     | 2,094      | 92      | prompt hint repeated                                                                              |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.66s   | 128 tok/s  | 1.36            | 5.6     | 1,407      | 114     | prompt hint repeated                                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 37.61s  | 53.3 tok/s | 20.83           | 92      | 3,468      | 112     | prompt hint repeated                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | 6.96s   | 69.0 tok/s | 3.00            | 28      | 573        | 90      | prompt hint repeated                                                                              |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | 3.83s   | 180 tok/s  | 1.74            | 4.8     | 1,366      | 104     | prompt hint repeated                                                                              |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 3.63s   | 368 tok/s  | 1.88            | 1.8     | 312        | 44      | labelled fields not detected                                                                      |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | 2.62s   | 394 tok/s  | 0.92            | 2.1     | 2,094      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 37.87s  | 20.2 tok/s | 2.66            | 15      | 290        | 667     | repeated text; duplicate keywords                                                                 |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | 9.49s   | 31.8 tok/s | 3.64            | 13      | 3,104      | 113     | labelled fields not detected                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 51.80s  | 24.8 tok/s | 7.84            | 25      | 4,390      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | 39.16s  | 125 tok/s  | 34.71           | 9.4     | 16,536     | 225     | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.40s   | 542 tok/s  | 1.07            | 1.1     | 1,186      | 22      | labelled fields not detected                                                                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 18.02s  | 59.7 tok/s | 12.50           | 14      | 16,536     | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 4.85s   | 96.1 tok/s | 1.27            | 7.1     | 571        | 132     | labelled fields not detected                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 5.18s   | 145 tok/s  | 3.32            | 4.3     | 5,615      | 86      | labelled fields not detected; duplicate keywords                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.53s   | 104 tok/s  | 1.53            | 6.7     | 2,174      | 18      | control tokens visible; labelled fields not detected                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 5.56s   | 283 tok/s  | 0.86            | 1.5     | 308        | 1,000   | repeated text; labelled fields not detected; cut off at token limit                               |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | 2.95s   | 167 tok/s  | 0.99            | 4.8     | 1,011      | 48      | labelled fields not detected; prompt hint repeated                                                |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.11s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.66s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -97,17 +97,16 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                      |
 | [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns`  | incomplete thinking block                                                                         |
 | [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                | `major concerns`  | labelled fields not detected                                                                      |
 | [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
 | [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | repeated text; cut off at token limit; duplicate keywords                                         |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
 | [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                      |
 | [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected; duplicate keywords                                                  |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                              |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns`  | labelled fields not detected                                                                      |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns`  | labelled fields not detected; prompt hint repeated                                                |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -119,51 +118,51 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Harbor at Dusk \| Description: A serene harbor scene at sunset, with moored boats and a backdrop of a dramatic skyline. \| Keywords (10): Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflection                                                                                                                                                  |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | Title: UK Border Security Vessels at Sunset in Ramsgate Harbour \| Description: Two UK Border Security Command patrol vessels, the BSC Defender and BSC Volunteer... \| Keywords (19): UK Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, cliffside buildings, calm water, ...                                                                               |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Ramsgate Harbour Sunset with Patrol Boats \| Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol b... \| Keywords (16): Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, ...[1,912 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsga... \| Keywords (9): Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, Mooring, Maritime, ...                                                                               |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent,... \| Keywords (12): Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, ...                                                                                |
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | Title: UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent. \| Description: The BSC Defender and BSC Volunteer, two UK Border Security Command patrol vessels... \| Keywords (11): uk border security command, patrol vessels, ramsgate harbour, kent, bsc defender, bsc volunteer, ...                                                                               |
 | [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Ramsgate Harbour Sunset with Patrol Boats \| Description: The image captures a serene sunset at Ramsgate Harbour, Kent, with several UK Border Security Comma... \| Keywords (19): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Sunset at Ramsgate Harbour \| Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside... \| Keywords (15): Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, ...                                                                               |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk \| Description: UK Border Security patrol boats, including the Defender and Volunteer,... \| Keywords (12): UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, ...[3,714 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Border security vessels docked in Ramsgate Harbour at sunset \| Description: Patrol boats moored side-by-side against a dramatic sunset, with the town'... \| Keywords (18): Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline, patrol boats, maritime, mooring, boats, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Border Patrol Boats in Ramsgate Harbor at Sunset \| Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, ar... \| Keywords (18): border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, ...[2,120 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: Border security patrol vessels moored in Ramsgate Harbour, Kent, with dramatic sunset lighting reflec... \| Keywords (18): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **BSC Patrol Vessels at Ramsgate Harbour Sunset** \| Description: A fleet of UK Border Security Command patrol boats, including the *BSC Defender* and *BSC... \| Keywords (16): Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, patrol boats, maritime fleet, ...                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Ramsgate Sunset: Border Patrol Boats at Dusk \| Description: At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *BSC Volun... \| Keywords (14): Border security patrol vessels, Ramsgate Harbour, Kent coast, sunset lighting, moored patrol boats, ...                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Ramsgate Sunset: Border Patrol Boats at Dusk \| Description: At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *... \| Keywords (14): Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol boats, coastal town skyline, ...                                                                               |
 | [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Ramsgate Harbour Sunset: Border Security Vessels Moored \| Description: At dusk in Ramsgate Harbour, Kent, a row of Border Security Command patrol vessels, in... \| Keywords (24): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset \| Description: On a dramatic sunset, UK Border Security Command patrol vessels, including the BS... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: Border Security Patrol Vessels Moored in Ramsgate at Sunset \| Description: Multiple UK Border Security Command patrol boats, including the BSC Defender an... \| Keywords (18): Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Harbor, Port, Marina, Mooring, ...                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset \| Description: At dusk, UK Border Security Command patrol vessels, including the BSC Defender an... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: Border Command Patrol Vessels Moored at Ramsgate at Dusk \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volun... \| Keywords (18): Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Sunset, Harbor, Marina, Port, ...                                                                               |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Ramsgate Harbour Sunset with Border Security Vessels \| Description: The sun sets over Ramsgate Harbour, with Border Security Command patrol vessels, includi... \| Keywords (19): Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dusk, England, Coast, Fleet, Maritime, ...                                                                               |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Border Security Command vessels moored in Ramsgate Harbour. \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC... \| Keywords (18): Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, Lifebuoy, Reflection, Buildings, ...                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Border Security Command Vessels at Ramsgate Harbour \| Description: At dusk on October 3, 2026, a fleet of Border Security Command patrol boats, including t... \| Keywords (21): Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, ...                                                                               |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Border Security Command vessels moored at Ramsgate Harbour \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunte... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Border Security Command Vessels at Ramsgate Harbour \| Description: At dusk on October 3, 2026, a fleet of UK Border Security Command patrol vessels, inclu... \| Keywords (19): Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, ...                                                                               |
 | [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Border Security Boats at Sunset in Ramsgate Harbour \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, a... \| Keywords (16): Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Border Security Vessels at Ramsgate Sunset \| Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security... \| Keywords (16): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Maritime patrol, Dusk, Sunset, ...                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: UK Border Vessels at Ramsgate Sunset \| Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security Command p... \| Keywords (18): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dover, Kent, Dusk, Sunset, Patrol boats, ...                                                                               |
 | [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: UK Border Security Command Vessels in Ramsgate Harbour \| Description: A fleet of Border Security Command patrol vessels, including the BSC Defender, is moored... \| Keywords (16): Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, BSC Volunteer, Sunset, ...                                                                                |
 | [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Border Security Command Patrols Kent's Ramsgate Harbour \| Description: At dusk, the UK Border Security Command's patrol vessels, including the BSC Defender a... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: Ramsgate Harbour: UK Border Security Vessels at Sunset \| Description: Captured on 3rd October 2026 at 18:18, UK Border Security Command patrol vessels, inclu... \| Keywords (19): Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Volunteer, harbour, marina, mooring, ...                                                                               |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: Ramsgate Harbour: UK Border Security Vessels at Sunset \| Description: Captured on 3rd October 2026 at 18:18 UTC+01:00, UK Border Security Command patrol vesse... \| Keywords (18): Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Volunteer, patrol boats, harbour, marina, ...                                                                               |
 | [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Fishing vessels and town skyline at sunset in Ramsgate Harbour \| Description: Several fishing vessels are moored side-by-side in Ramsgate Harbour as a dramatic s... \| Keywords (18): Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, Sunset, Dusk, Coast, ...                                                                               |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Border Security Command patrol vessels moored at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC V... \| Keywords (15): Border security vessels, Kent, maritime, patrol boats, sunset, harbour, pier, reflection, England, dusk, boats, ...                                                                               |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: UK Border Security Command vessels in Ramsgate Harbour \| Description: UK Border Security Command patrol vessels, including the BSC Defender, are moored sid... \| Keywords (18): Border security vessels, buildings, coast, dusk, England, fleet, harbour, horizon, Kent, lifebuoy, marina, ...                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Border Security Vessels at Sunset" \| Description: "Two patrol boats from the UK Border Security Command are moored side-by-side in Ramsgate Harbour,... \| Keywords (16): Border security, patrol boats, UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, ...                                                                                |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: UK Border Security Command vessels in Ramsgate Harbour \| Description: UK Border Security Command patrol vessels, including the BSC Defender, are moore... \| Keywords (17): Border security vessels, BSC Defender, buildings, coast, dusk, England, fleet, harbor, horizon, Kent, lifebuoy, ...                                                                               |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Patrol Vessels Moored in Ramsgate Harbour Sunset \| Description: UK Border Security Command vessels are moored in Ramsgate Harbour, Kent, silhouetted ag... \| Keywords (15): Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coast, Maritime, Mooring, Skyline, Defender, ...                                                                               |
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | Title: Border Security Vessels at Sunset in Ramsgate Harbour \| Description: Border security patrol vessels, including the BSC Defender and BSC Volunteer, are moored... \| Keywords (23): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
 | [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: BSC Patrol Vessels Moored at Ramsgate Harbour at Dusk \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, a... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
 | [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Border Security Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored i... \| Keywords (18): Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside buildings, Marina, Reflections, ...                                                                               |
 | [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: BSC Patrol Boats at Ramsgate Harbour Sunset \| Description: At 18:18 UTC+01:00 on October 3, 2026, UK Border Security Command patrol vessels, including th... \| Keywords (17): Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritime, Fleet, Coast, Buildings, Cliffside, ...                                                                               |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | Title: UK Border Security Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are m... \| Keywords (19): UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffside buildings, moored vessels, ...                                                                               |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Sunset over Ramsgate Harbour \| Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silh... \| Keywords (43): Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, ...[1,955 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | Title: Ramsgate Harbour Sunset with Patrol Vessels \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moore... \| Keywords (19): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: Border security vessels docked in Ramsgate Harbour at sunset \| Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic s... \| Keywords (17): Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Border Security Command Patrol Vessels in Ramsgate Harbour \| Description: Border Security Command patrol vessels, including the BSC Defender and BSC Voluntee... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: UK Border Security vessels moored at Ramsgate Harbour at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                                |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: UK Border Security Vessels Moored in Ramsgate Harbour at Sunset \| Description: Border Security Command patrol vessels, including the BSC Defender and Volunte... \| Keywords (16): Ramsgate, Kent, harbor, border security, patrol boats, vessels, sunset, dusk, maritime, marina, mooring, ...                                                                               |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | Title: Patrol Vessels Moored in Ramsgate Harbour at Sunset \| Description: UK Border Security Command patrol vessels are moored side-by-side in Ramsgate Harbour, set a... \| Keywords (15): Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Maritime, Mooring, Coast, Defenders, ...                                                                               |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: UK Border Security Command vessels moored at Ramsgate Harbour at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: UK Border Security Patrol Vessels at Ramsgate Harbour at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and V... \| Keywords (15): Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, sunset, dusk, coast, maritime, mooring, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: "Border Security Vessels at Sunset" \| Description: "Two patrol boats, the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour,... \| Keywords (15): Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, sunset, cliffside skyline, ...                                                                                |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer patrol vessels stand side-by-side against a breathtaking sunset, with the town's cliffside skyline softly illuminated by the fading light.                                                                                                                                                           |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset \| Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC pat... \| Keywords (55): Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, ...                                                                               |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset \| Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC pat... \| Keywords (59): Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, ...                                                                               |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | Title: Ramsgate Harbour Sunset with Border Security Vessels \| Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security... \| Keywords (45): Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, ...                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | Title: Ramsgate Harbour Patrol Vessels at Sunset \| Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsg... \| Keywords (15): Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, ...                                                                               |
 | [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | Ramsgate Harbour Sunset: Border Security Vessels Moored<br><br>Border security patrol boats, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset. The scene captures the town's cliffside skyline and the reflective wat...                                                                                        |
 | [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (2): Need title 5-10 words., ...                                                                                                                                                                                                                                                                                     |
 | [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Border Security Command vessels in Ramsgate Harbour at sunset \| Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moo... \| Keywords (22): Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, ...                                                                               |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | Brokewater, BSC, Dusk, England, Marina, Port, Ramsgate, Reflection                                                                                                                                                                                                                                                                                                                    |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: Dusk at Ramsgate: Border Security Vessels \| Description: UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side... \| Keywords (390): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, ...                                                                               |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | Title: (not detected) \| Description: A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate... \| Keywords (19): fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, ...                                                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: Dusk at Ramsgate: Border Security Vessels \| Description: UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-... \| Keywords (53): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, ...                                                                               |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | Title: (not detected) \| Description: A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate... \| Keywords (20): fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, ...                                                                               |
 | [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Ramsgate Harbour Patrol Boats at Dusk" \| Description: (not detected) \| Keywords (18): Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coast, Dover, Horizon, Lifebuoy, Marina, ...                                                                                                                                                                        |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a harbor with several boats docked in a row.                                                                                                                                                                                                                                                                                      |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, E... \| Description: (not detected) \| Keywords: (not detected)                                                                                                                                                                                                                                    |
@@ -172,9 +171,9 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.4`
-- `mlx`: `0.32.4.dev20261004+65be04707`
-- `transformers`: `5.18.0`
+- `mlx-vlm`: `0.7.7`
+- `mlx`: `0.32.4.dev20261008+3c40e8f92`
+- `transformers`: `5.19.0`
 - `tokenizers`: `0.23.2`
 - `huggingface-hub`: `1.33.0`
 - *Python Version:* 3.14.7
@@ -258,17 +257,17 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.38s
-- *Generation time:* 0.79s
-- *Total time:* 2.11s
-- *Prompt preparation time:* 0.545
-- *First-token latency:* 0.129
-- *Cleanup time:* 0.0663
+- *Model load time:* 0.33s
+- *Generation time:* 1.38s
+- *Total time:* 2.66s
+- *Prompt preparation time:* 0.54
+- *First-token latency:* 0.733
+- *Cleanup time:* 0.0643
 - *Prompt tokens:* 2,103
 - *Generation tokens:* 58
 - *Total tokens:* 2,161
-- *Prompt throughput (raw):* 16,241 tok/s
-- *Generation throughput (raw):* 481 tok/s
+- *Prompt throughput (raw):* 2,869 tok/s
+- *Generation throughput (raw):* 491 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.08
@@ -305,168 +304,6 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-<details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.06s
-- *Generation time:* 7.62s
-- *Total time:* 10.27s
-- *Prompt preparation time:* 0.578
-- *First-token latency:* 2.92
-- *Cleanup time:* 0.0909
-- *Prompt tokens:* 2,372
-- *Generation tokens:* 123
-- *Total tokens:* 2,495
-- *Prompt throughput (raw):* 814 tok/s
-- *Generation throughput (raw):* 30.0 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000396
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.15, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-UK Border Security Vessels at Sunset in Ramsgate Harbour
-
-Description:
-Two UK Border Security Command patrol vessels, the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, with the town's cliffside buildings and a dramatic sunset reflected in the calm water.
-
-Keywords:
-UK Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, cliffside buildings, calm water, reflection, moored boats, maritime, coastal town, dusk, horizon, maritime security, harbor, patrol boats, lifebuoys, marina, port
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.59s
-- *Generation time:* 6.25s
-- *Total time:* 8.50s
-- *Prompt preparation time:* 0.647
-- *First-token latency:* 0.692
-- *Cleanup time:* 0.0961
-- *Prompt tokens:* 1,617
-- *Generation tokens:* 617
-- *Total tokens:* 2,234
-- *Prompt throughput (raw):* 2,336 tok/s
-- *Generation throughput (raw):* 125 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.15
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000609
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1488
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get to work. I'm looking at this image of a port at sunset, and my task is to create metadata for it, specifically in British English. I need to start with the title. Hmm, a 5-10 word title. I'm thinking "Ramsgate Harbour Sunset with Patrol Boats" – that's good. It's descriptive, and it hits the key elements.
-
-Now for the description. I'll need to combine the image with the hints provided. The prompt wants the main subject, setting, action, lighting, and details. Okay, the main subject is the Border Security Command patrol boats, moored in Ramsgate Harbour. The setting is the port with the cliffside skyline. The lighting is the golden hour sunset. The distinctive details are the sunset, the cliffside, and the presence of the Border Security Command vessels. I think the following will be good: "A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky."
-
-Finally, keywords. I need 10 to 18 unique keywords. I'll start with the obvious: Ramsgate, Kent, England, Dover, sunset, dusk, harbor, marina, boats, patrol boats, border security, cliffside, skyline, port, lifeboat, reflection, and coast. That's a good start. Let's refine. I'll add "Dover Strait" for context. I'll also include "UK Border Force" as it's the modern name for the Border Security Command. And "Sea" is a good addition.
-
-Okay, I think I've got it.
-
-Title: Ramsgate Harbour Sunset with Patrol Boats
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
-
-That should cover everything.
-&lt;/think&gt;
-
-Title: Ramsgate Harbour Sunset with Patrol Boats
-
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
-
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get to work. I'm looking at this image of a port at sunset, and my task is to create metadata for it, specifically in British English. I need to start with the title. Hmm, a 5-10 word title. I'm thinking "Ramsgate Harbour Sunset with Patrol Boats" – that's good. It's descriptive, and it hits the key elements.
-
-Now for the description. I'll need to combine the image with the hints provided. The prompt wants the main subject, setting, action, lighting, and details. Okay, the main subject is the Border Security Command patrol boats, moored in Ramsgate Harbour. The setting is the port with the cliffside skyline. The lighting is the golden hour sunset. The distinctive details are the sunset, the cliffside, and the presence of the Border Security Command vessels. I think the following will be good: "A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky."
-
-Finally, keywords. I need 10 to 18 unique keywords. I'll start with the obvious: Ramsgate, Kent, England, Dover, sunset, dusk, harbor, marina, boats, patrol boats, border security, cliffside, skyline, port, lifeboat, reflection, and coast. That's a good start. Let's refine. I'll add "Dover Strait" for context. I'll also include "UK Border Force" as it's the modern name for the Border Security Command. And "Sea" is a good addition.
-
-Okay, I think I've got it.
-
-Title: Ramsgate Harbour Sunset with Patrol Boats
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
-
-That should cover everything.
-</think>
-
-Title: Ramsgate Harbour Sunset with Patrol Boats
-
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
-
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-glm-46v-flash-4bit"></a>
 
 ### mlx-community/GLM-4.6V-Flash-4bit
@@ -481,17 +318,17 @@ Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol b
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.19s
-- *Generation time:* 6.76s
-- *Total time:* 8.58s
-- *Prompt preparation time:* 0.614
-- *First-token latency:* 5.08
-- *Cleanup time:* 0.0841
+- *Model load time:* 1.25s
+- *Generation time:* 7.54s
+- *Total time:* 9.37s
+- *Prompt preparation time:* 0.567
+- *First-token latency:* 5.78
+- *Cleanup time:* 0.0839
 - *Prompt tokens:* 6,339
-- *Generation tokens:* 89
-- *Total tokens:* 6,428
-- *Prompt throughput (raw):* 1,249 tok/s
-- *Generation throughput (raw):* 78.7 tok/s
+- *Generation tokens:* 98
+- *Total tokens:* 6,437
+- *Prompt throughput (raw):* 1,097 tok/s
+- *Generation throughput (raw):* 79.1 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
@@ -516,7 +353,7 @@ Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol b
 <pre class="model-output-readable">
 Title: Ramsgate Harbour Patrol Boats at Sunset
 Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, during a dramatic sunset with the town's cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, Mooring, Maritime, UK Border Security Command
+Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, UK Border Security Command, BSC Defender, Mooring, Maritime, Dusk, England
 </pre>
 
 </details>
@@ -537,17 +374,17 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.87s
-- *Generation time:* 5.62s
-- *Total time:* 8.30s
-- *Prompt preparation time:* 0.801
-- *First-token latency:* 1.07
-- *Cleanup time:* 0.103
+- *Model load time:* 1.90s
+- *Generation time:* 6.28s
+- *Total time:* 8.95s
+- *Prompt preparation time:* 0.769
+- *First-token latency:* 1.7
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 2,601
 - *Generation tokens:* 130
 - *Total tokens:* 2,731
-- *Prompt throughput (raw):* 2,430 tok/s
-- *Generation throughput (raw):* 34.3 tok/s
+- *Prompt throughput (raw):* 1,526 tok/s
+- *Generation throughput (raw):* 34.0 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
@@ -595,17 +432,17 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.23s
-- *Generation time:* 4.07s
-- *Total time:* 6.01s
-- *Prompt preparation time:* 0.711
-- *First-token latency:* 1.4
+- *Model load time:* 1.07s
+- *Generation time:* 4.48s
+- *Total time:* 6.25s
+- *Prompt preparation time:* 0.687
+- *First-token latency:* 1.85
 - *Cleanup time:* 0.101
 - *Prompt tokens:* 2,091
 - *Generation tokens:* 113
 - *Total tokens:* 2,204
-- *Prompt throughput (raw):* 1,495 tok/s
-- *Generation throughput (raw):* 57.2 tok/s
+- *Prompt throughput (raw):* 1,129 tok/s
+- *Generation throughput (raw):* 57.8 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
@@ -656,17 +493,17 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.59s
-- *Generation time:* 3.64s
-- *Total time:* 5.95s
-- *Prompt preparation time:* 0.706
-- *First-token latency:* 0.805
-- *Cleanup time:* 0.0975
+- *Model load time:* 1.58s
+- *Generation time:* 3.71s
+- *Total time:* 5.97s
+- *Prompt preparation time:* 0.681
+- *First-token latency:* 0.909
+- *Cleanup time:* 0.0989
 - *Prompt tokens:* 2,091
 - *Generation tokens:* 80
 - *Total tokens:* 2,171
-- *Prompt throughput (raw):* 2,596 tok/s
-- *Generation throughput (raw):* 37.3 tok/s
+- *Prompt throughput (raw):* 2,300 tok/s
+- *Generation throughput (raw):* 37.7 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
@@ -712,17 +549,17 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.12s
-- *Generation time:* 16.68s
-- *Total time:* 19.45s
-- *Prompt preparation time:* 0.638
-- *First-token latency:* 0.666
-- *Cleanup time:* 0.109
+- *Model load time:* 2.14s
+- *Generation time:* 18.14s
+- *Total time:* 20.95s
+- *Prompt preparation time:* 0.657
+- *First-token latency:* 2.16
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 1,312
 - *Generation tokens:* 995
 - *Total tokens:* 2,307
-- *Prompt throughput (raw):* 1,970 tok/s
-- *Generation throughput (raw):* 65.0 tok/s
+- *Prompt throughput (raw):* 607 tok/s
+- *Generation throughput (raw):* 65.2 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 1.6
@@ -776,12 +613,12 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
 
 ---
 
-<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
 
-### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
+### mlx-community/MiniCPM-V-4.6-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -789,44 +626,153 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.96s
-- *Generation time:* 1.62s
-- *Total time:* 3.34s
-- *Prompt preparation time:* 0.74
-- *First-token latency:* 0.468
-- *Cleanup time:* 0.088
-- *Prompt tokens:* 2,094
-- *Generation tokens:* 91
-- *Total tokens:* 2,185
-- *Prompt throughput (raw):* 4,474 tok/s
-- *Generation throughput (raw):* 210 tok/s
-- *Peak memory (GB):* 4.0
-- *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 2.82
-- *Post-cleanup active memory (GB):* 0.00366
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.88s
+- *Generation time:* 4.65s
+- *Total time:* 6.33s
+- *Prompt preparation time:* 0.784
+- *First-token latency:* 1.56
+- *Cleanup time:* 0.0953
+- *Prompt tokens:* 910
+- *Generation tokens:* 662
+- *Total tokens:* 1,572
+- *Prompt throughput (raw):* 582 tok/s
+- *Generation throughput (raw):* 286 tok/s
+- *Peak memory (GB):* 3.2
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00469
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 1366
 - *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border security vessels docked in Ramsgate Harbour at sunset
-Description: Patrol boats moored side-by-side against a dramatic sunset, with the town's cliffside skyline in the background.
-Keywords: Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline, patrol boats, maritime, mooring, boats, England, Dover, Dusk, Coast, Lifebuoy, Marina, Fleet, Port
+&lt;think&gt;
+We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+
+For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored in Ramsgate Harbor at Sunset".
+
+Now description: Combine the context and visible details. Mention the vessels (border security), the name BSC Defender and Volunteer, location (Ramsgate Harbour, Kent), setting (dusk with sunset), and visible details like lifebuoys, buildings, etc.
+
+Keywords: need 10-18 unique, covering relevant context and visible details. Let's list: border, security, patrol, vessels, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, boats, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency, etc. Ensure they are unique and cover the context and visible details.
+
+Now, let's construct:
+
+Title: Border Patrol Boats in Ramsgate Harbor at Sunset
+
+Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
+
+Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency.
+
+Count the keywords: I'll list them and ensure they are 10-18 unique.
+
+Let me check:
+
+1. border
+2. security
+3. patrol
+4. boats
+5. Ramsgate
+6. harbor
+7. Kent
+8. dusk
+9. sunset
+10. lifebuoys
+11. mooring
+12. maritime
+13. reflected
+14. buildings
+15. cliffside
+16. command
+17. fleet
+18. waters
+
+That's 18 unique keywords. They cover relevant context and visible details.
+
+Now, ensure the title is 5-10 words: "Border Patrol Boats in Ramsgate Harbor at Sunset" is 5 words. Good.
+
+Finally, output exactly Title, Description, Keywords.
+&lt;/think&gt;
+
+Title: Border Patrol Boats in Ramsgate Harbor at Sunset
+
+Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
+
+Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+
+For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored in Ramsgate Harbor at Sunset".
+
+Now description: Combine the context and visible details. Mention the vessels (border security), the name BSC Defender and Volunteer, location (Ramsgate Harbour, Kent), setting (dusk with sunset), and visible details like lifebuoys, buildings, etc.
+
+Keywords: need 10-18 unique, covering relevant context and visible details. Let's list: border, security, patrol, vessels, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, boats, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency, etc. Ensure they are unique and cover the context and visible details.
+
+Now, let's construct:
+
+Title: Border Patrol Boats in Ramsgate Harbor at Sunset
+
+Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
+
+Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency.
+
+Count the keywords: I'll list them and ensure they are 10-18 unique.
+
+Let me check:
+
+1. border
+2. security
+3. patrol
+4. boats
+5. Ramsgate
+6. harbor
+7. Kent
+8. dusk
+9. sunset
+10. lifebuoys
+11. mooring
+12. maritime
+13. reflected
+14. buildings
+15. cliffside
+16. command
+17. fleet
+18. waters
+
+That's 18 unique keywords. They cover relevant context and visible details.
+
+Now, ensure the title is 5-10 words: "Border Patrol Boats in Ramsgate Harbor at Sunset" is 5 words. Good.
+
+Finally, output exactly Title, Description, Keywords.
+</think>
+
+Title: Border Patrol Boats in Ramsgate Harbor at Sunset
+
+Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
+
+Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters
+```
+
+</details>
 
 </details>
 
@@ -846,17 +792,17 @@ Keywords: Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.00s
-- *Generation time:* 1.59s
-- *Total time:* 3.17s
-- *Prompt preparation time:* 0.568
-- *First-token latency:* 0.213
-- *Cleanup time:* 0.0967
+- *Model load time:* 1.05s
+- *Generation time:* 1.79s
+- *Total time:* 3.42s
+- *Prompt preparation time:* 0.566
+- *First-token latency:* 0.397
+- *Cleanup time:* 0.0992
 - *Prompt tokens:* 369
 - *Generation tokens:* 88
 - *Total tokens:* 457
-- *Prompt throughput (raw):* 1,731 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Prompt throughput (raw):* 930 tok/s
+- *Generation throughput (raw):* 105 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
@@ -904,17 +850,17 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.35s
-- *Generation time:* 5.01s
-- *Total time:* 6.97s
-- *Prompt preparation time:* 0.607
-- *First-token latency:* 2.3
-- *Cleanup time:* 0.0969
+- *Model load time:* 1.33s
+- *Generation time:* 4.73s
+- *Total time:* 6.67s
+- *Prompt preparation time:* 0.603
+- *First-token latency:* 2.04
+- *Cleanup time:* 0.0963
 - *Prompt tokens:* 2,905
 - *Generation tokens:* 140
 - *Total tokens:* 3,045
-- *Prompt throughput (raw):* 1,261 tok/s
-- *Generation throughput (raw):* 66.0 tok/s
+- *Prompt throughput (raw):* 1,427 tok/s
+- *Generation throughput (raw):* 66.4 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.56
@@ -964,17 +910,17 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.99s
-- *Generation time:* 2.27s
-- *Total time:* 3.87s
-- *Prompt preparation time:* 0.601
-- *First-token latency:* 0.976
-- *Cleanup time:* 0.0839
+- *Model load time:* 0.93s
+- *Generation time:* 2.25s
+- *Total time:* 3.79s
+- *Prompt preparation time:* 0.597
+- *First-token latency:* 0.973
+- *Cleanup time:* 0.0853
 - *Prompt tokens:* 2,904
-- *Generation tokens:* 134
-- *Total tokens:* 3,038
-- *Prompt throughput (raw):* 2,976 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Generation tokens:* 132
+- *Total tokens:* 3,036
+- *Prompt throughput (raw):* 2,986 tok/s
+- *Generation throughput (raw):* 188 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
@@ -1000,10 +946,10 @@ Title:
 Ramsgate Sunset: Border Patrol Boats at Dusk
 
 Description:
-At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *BSC Volunteer*—moor side-by-side under a vibrant sunset, reflecting across the calm waters while the town’s cliff-top buildings loom in silhouette against the golden horizon.
+At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *BSC Volunteer*—moor side-by-side under a vibrant sunset, reflecting across the calm waters while the town’s cliff-top buildings loom in silhouette against the horizon.
 
 Keywords:
-Border security patrol vessels, Ramsgate Harbour, Kent coast, sunset lighting, moored patrol boats, maritime scene, lifebuoy details, cliffside town skyline, mooring lines, reflective water, UK Border Command, maritime mooring, coastal England, dusk atmosphere.
+Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol boats, coastal town skyline, maritime scene, lifebuoy details, mooring lines, reflective water, cliffside buildings, dusk atmosphere, BSC Defender, BSC Volunteer.
 </pre>
 
 </details>
@@ -1025,16 +971,16 @@ Border security patrol vessels, Ramsgate Harbour, Kent coast, sunset lighting, m
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
 - *Model load time:* 1.05s
-- *Generation time:* 3.60s
-- *Total time:* 5.41s
-- *Prompt preparation time:* 0.745
-- *First-token latency:* 0.844
-- *Cleanup time:* 0.0932
+- *Generation time:* 5.09s
+- *Total time:* 6.86s
+- *Prompt preparation time:* 0.703
+- *First-token latency:* 2.4
+- *Cleanup time:* 0.0918
 - *Prompt tokens:* 1,502
 - *Generation tokens:* 148
 - *Total tokens:* 1,650
-- *Prompt throughput (raw):* 1,779 tok/s
-- *Generation throughput (raw):* 71.4 tok/s
+- *Prompt throughput (raw):* 626 tok/s
+- *Generation throughput (raw):* 73.4 tok/s
 - *Peak memory (GB):* 8.1
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.31
@@ -1082,17 +1028,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.96s
-- *Generation time:* 3.57s
-- *Total time:* 5.34s
-- *Prompt preparation time:* 0.805
-- *First-token latency:* 2.04
-- *Cleanup time:* 0.0914
+- *Model load time:* 0.98s
+- *Generation time:* 3.52s
+- *Total time:* 5.32s
+- *Prompt preparation time:* 0.806
+- *First-token latency:* 2.03
+- *Cleanup time:* 0.0937
 - *Prompt tokens:* 4,065
-- *Generation tokens:* 158
-- *Total tokens:* 4,223
-- *Prompt throughput (raw):* 1,993 tok/s
-- *Generation throughput (raw):* 208 tok/s
+- *Generation tokens:* 148
+- *Total tokens:* 4,213
+- *Prompt throughput (raw):* 2,002 tok/s
+- *Generation throughput (raw):* 206 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
@@ -1116,7 +1062,7 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 <pre class="model-output-readable">
 Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset
 
-Description: On a dramatic sunset, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent. The scene features a town built against a cliffside, with buildings silhouetted against the sky and a body of water reflecting the warm hues of the setting sun. The harbor is dotted with maritime elements, such as lifebuoys and various types of patrol boats, creating a picturesque maritime tableau.
+Description: At dusk, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The vessels, with their distinctive markings and lifebuoy, reflect the maritime and security focus of the location. The tranquil water and the backdrop of the town enhance the scene's serene yet vigilant atmosphere.
 
 Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 </pre>
@@ -1139,17 +1085,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.55s
-- *Generation time:* 2.53s
-- *Total time:* 5.79s
-- *Prompt preparation time:* 0.692
-- *First-token latency:* 0.593
-- *Cleanup time:* 0.126
+- *Model load time:* 2.59s
+- *Generation time:* 2.94s
+- *Total time:* 6.24s
+- *Prompt preparation time:* 0.695
+- *First-token latency:* 1.03
+- *Cleanup time:* 0.133
 - *Prompt tokens:* 1,267
-- *Generation tokens:* 133
-- *Total tokens:* 1,400
-- *Prompt throughput (raw):* 2,136 tok/s
-- *Generation throughput (raw):* 103 tok/s
+- *Generation tokens:* 129
+- *Total tokens:* 1,396
+- *Prompt throughput (raw):* 1,236 tok/s
+- *Generation throughput (raw):* 104 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.15
@@ -1171,14 +1117,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Border Security Patrol Vessels Moored in Ramsgate at Sunset
+Title: Border Command Patrol Vessels Moored at Ramsgate at Dusk
 
-Description:
-Multiple UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour against golden evening light. The town's cliffside skyline of terraced buildings rises behind the fleet as the sun sets, its warm glow reflected across the calm harbour water.
+Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side by side in Ramsgate Harbour against a glowing sunset sky. The town's cliffside skyline of buildings rises behind the fleet, their forms and warm light reflected in the calm water of the harbour.
 
-Keywords:
-Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Harbor, Port, Marina, Mooring, Fleet, Maritime, Buildings, Cliff, Lifebuoy, Reflection, Pier
+Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Sunset, Harbor, Marina, Port, Mooring, Reflection, Lifebuoy, Maritime, Fleet, Buildings, Horizon
 </pre>
 
 </details>
@@ -1199,17 +1142,17 @@ Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Har
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.89s
-- *Generation time:* 3.30s
-- *Total time:* 4.76s
-- *Prompt preparation time:* 0.558
-- *First-token latency:* 0.295
-- *Cleanup time:* 0.0866
+- *Model load time:* 0.93s
+- *Generation time:* 3.45s
+- *Total time:* 4.95s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 0.401
+- *Cleanup time:* 0.0982
 - *Prompt tokens:* 1,115
 - *Generation tokens:* 144
 - *Total tokens:* 1,259
-- *Prompt throughput (raw):* 3,774 tok/s
-- *Generation throughput (raw):* 58.4 tok/s
+- *Prompt throughput (raw):* 2,779 tok/s
+- *Generation throughput (raw):* 57.6 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
@@ -1257,17 +1200,17 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.29s
-- *Generation time:* 23.02s
-- *Total time:* 26.29s
-- *Prompt preparation time:* 0.951
-- *First-token latency:* 20.3
-- *Cleanup time:* 0.142
+- *Model load time:* 2.30s
+- *Generation time:* 20.90s
+- *Total time:* 24.14s
+- *Prompt preparation time:* 0.928
+- *First-token latency:* 18.2
+- *Cleanup time:* 0.14
 - *Prompt tokens:* 12,768
-- *Generation tokens:* 138
-- *Total tokens:* 12,906
-- *Prompt throughput (raw):* 630 tok/s
-- *Generation throughput (raw):* 72.8 tok/s
+- *Generation tokens:* 136
+- *Total tokens:* 12,904
+- *Prompt throughput (raw):* 703 tok/s
+- *Generation throughput (raw):* 72.4 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
@@ -1290,13 +1233,13 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 
 <pre class="model-output-readable">
 Title:
-Border Security Command vessels moored in Ramsgate Harbour.
+Border Security Command vessels moored at Ramsgate Harbour
 
 Description:
-UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, England, during a dramatic sunset. The vessels are docked along a pier, with the town's buildings and a chalk cliff visible on the hillside in the background, all under a vibrant orange and purple sky.
+UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, England, during a dramatic sunset. The vessels are docked along a pier with the town's cliffside skyline and buildings visible in the background, reflecting the warm light on the water.
 
 Keywords:
-Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, Lifebuoy, Reflection, Buildings, Coast, Fleet, Mooring, Port, Pier, Patrol boats, Horizon, England
+Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 </pre>
 
 </details>
@@ -1317,17 +1260,17 @@ Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, L
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.87s
-- *Generation time:* 33.18s
-- *Total time:* 36.09s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 30.6
-- *Cleanup time:* 0.125
+- *Model load time:* 1.92s
+- *Generation time:* 35.37s
+- *Total time:* 38.32s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 32.9
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 16,525
-- *Generation tokens:* 143
-- *Total tokens:* 16,668
-- *Prompt throughput (raw):* 540 tok/s
-- *Generation throughput (raw):* 85.3 tok/s
+- *Generation tokens:* 133
+- *Total tokens:* 16,658
+- *Prompt throughput (raw):* 502 tok/s
+- *Generation throughput (raw):* 87.8 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
@@ -1351,9 +1294,9 @@ Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, L
 <pre class="model-output-readable">
 Title: Border Security Command Vessels at Ramsgate Harbour
 
-Description: At dusk on October 3, 2026, a fleet of Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent. The golden light of the setting sun reflects on the water, illuminating the boats and the cliffside town against a dramatic sky.
+Description: At dusk on October 3, 2026, a fleet of UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour. The boats are docked against a backdrop of the town's cliffside buildings, with the golden sunset reflecting on the water.
 
-Keywords: Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, Maritime, Fleet, Mooring, Harbour, Coast, Buildings, Horizon, Dover, Port, Pier, BSC Defender, BSC Volunteer
+Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, Mooring, Maritime, Coast, Buildings, Horizon, Fleet, Dover, Harbour, Port, Pier
 </pre>
 
 </details>
@@ -1374,17 +1317,17 @@ Keywords: Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.86s
-- *Generation time:* 35.94s
-- *Total time:* 37.84s
+- *Model load time:* 0.85s
+- *Generation time:* 36.89s
+- *Total time:* 38.79s
 - *Prompt preparation time:* 1.03
-- *First-token latency:* 33.4
-- *Cleanup time:* 0.105
+- *First-token latency:* 34.4
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 16,525
 - *Generation tokens:* 112
 - *Total tokens:* 16,637
-- *Prompt throughput (raw):* 495 tok/s
-- *Generation throughput (raw):* 69.6 tok/s
+- *Prompt throughput (raw):* 480 tok/s
+- *Generation throughput (raw):* 71.0 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
@@ -1410,7 +1353,7 @@ Title: Border Security Boats at Sunset in Ramsgate Harbour
 
 Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, under a dramatic sunset. The scene features calm waters reflecting golden light, with cliffside town buildings in the background.
 
-Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, Lifebuoy, Coast, Maritime, Marina, Pier, Horizon, Buildings
+Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, Lifebuoy, Coast, Marina, Maritime, Pier, Port, Horizon
 </pre>
 
 </details>
@@ -1431,17 +1374,17 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.34s
-- *Generation time:* 32.24s
-- *Total time:* 35.62s
+- *Model load time:* 2.37s
+- *Generation time:* 31.85s
+- *Total time:* 35.26s
 - *Prompt preparation time:* 1.02
-- *First-token latency:* 29.9
-- *Cleanup time:* 0.136
+- *First-token latency:* 29.6
+- *Cleanup time:* 0.129
 - *Prompt tokens:* 16,541
-- *Generation tokens:* 151
-- *Total tokens:* 16,692
-- *Prompt throughput (raw):* 553 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Generation tokens:* 152
+- *Total tokens:* 16,693
+- *Prompt throughput (raw):* 559 tok/s
+- *Generation throughput (raw):* 112 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.90
@@ -1463,11 +1406,11 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Vessels at Ramsgate Sunset
+Title: UK Border Vessels at Ramsgate Sunset
 
-Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security Command patrol boats—including the BSC Defender and BSC Volunteer—are moored in formation at Ramsgate Harbour. The vessels are silhouetted against a dramatic orange sky and the iconic white chalk cliffs of Kent, with their hulls and equipment reflecting in the calm water below.
+Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security Command patrol boats—including the BSC Defender and BSC Volunteer—are moored in formation at Ramsgate Harbour. The vessels are silhouetted against the dramatic orange sky and the iconic white cliffs of Kent, with their names and Union Jack flags clearly visible on the hulls.
 
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Maritime patrol, Dusk, Sunset, Reflection, Coast, England, Mooring, Fleet, White cliffs, Lifebuoy, Maritime safety
+Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dover, Kent, Dusk, Sunset, Patrol boats, Mooring, Maritime, Coast, Reflections, White cliffs, Buildings, Pier, Harbour, England
 </pre>
 
 </details>
@@ -1488,17 +1431,17 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.93s
-- *Generation time:* 58.12s
-- *Total time:* 61.13s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 53.1
+- *Model load time:* 1.94s
+- *Generation time:* 50.69s
+- *Total time:* 53.68s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 45.8
 - *Cleanup time:* 0.125
 - *Prompt tokens:* 16,541
 - *Generation tokens:* 121
 - *Total tokens:* 16,662
-- *Prompt throughput (raw):* 312 tok/s
-- *Generation throughput (raw):* 29.3 tok/s
+- *Prompt throughput (raw):* 361 tok/s
+- *Generation throughput (raw):* 30.1 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
@@ -1548,17 +1491,17 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.03s
-- *Generation time:* 2.96s
-- *Total time:* 5.00s
-- *Prompt preparation time:* 0.993
-- *First-token latency:* 0.756
-- *Cleanup time:* 0.102
+- *Model load time:* 1.02s
+- *Generation time:* 2.98s
+- *Total time:* 5.01s
+- *Prompt preparation time:* 0.991
+- *First-token latency:* 0.809
+- *Cleanup time:* 0.0962
 - *Prompt tokens:* 2,070
 - *Generation tokens:* 132
 - *Total tokens:* 2,202
-- *Prompt throughput (raw):* 2,739 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Prompt throughput (raw):* 2,560 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.34
@@ -1607,16 +1550,16 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
 - *Model load time:* 2.25s
-- *Generation time:* 5.80s
-- *Total time:* 8.67s
-- *Prompt preparation time:* 0.604
-- *First-token latency:* 0.888
-- *Cleanup time:* 0.126
+- *Generation time:* 6.00s
+- *Total time:* 8.89s
+- *Prompt preparation time:* 0.615
+- *First-token latency:* 0.965
+- *Cleanup time:* 0.123
 - *Prompt tokens:* 572
-- *Generation tokens:* 135
-- *Total tokens:* 707
-- *Prompt throughput (raw):* 644 tok/s
-- *Generation throughput (raw):* 31.2 tok/s
+- *Generation tokens:* 138
+- *Total tokens:* 710
+- *Prompt throughput (raw):* 593 tok/s
+- *Generation throughput (raw):* 31.1 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.43
@@ -1641,9 +1584,9 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 <pre class="model-output-readable">
 Title: Ramsgate Harbour: UK Border Security Vessels at Sunset
 
-Description: Captured on 3rd October 2026 at 18:18, UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, illuminated against a vibrant sunset and the town’s cliffside buildings. Reflections shimmer on the calm water, highlighting the vessels’ dark hulls and superstructure.
+Description: Captured on 3rd October 2026 at 18:18 UTC+01:00, UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, illuminated against a vibrant sunset and the town’s cliffside buildings. The calm water reflects the lights of the vessels and the colourful sky.
 
-Keywords: Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Volunteer, harbour, marina, mooring, sunset, dusk, buildings, coast, maritime, reflection, fleet, skyline, pier, calm water
+Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Volunteer, patrol boats, harbour, marina, mooring, sunset, dusk, buildings, coast, maritime, reflection, fleet, horizon, pier
 </pre>
 
 </details>
@@ -1664,17 +1607,17 @@ Keywords: Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Vo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.65s
-- *Generation time:* 2.75s
-- *Total time:* 5.10s
-- *Prompt preparation time:* 0.67
-- *First-token latency:* 0.356
+- *Model load time:* 1.70s
+- *Generation time:* 2.86s
+- *Total time:* 5.27s
+- *Prompt preparation time:* 0.681
+- *First-token latency:* 0.493
 - *Cleanup time:* 0.106
 - *Prompt tokens:* 577
 - *Generation tokens:* 108
 - *Total tokens:* 685
-- *Prompt throughput (raw):* 1,621 tok/s
-- *Generation throughput (raw):* 61.1 tok/s
+- *Prompt throughput (raw):* 1,171 tok/s
+- *Generation throughput (raw):* 61.6 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.32
@@ -1725,17 +1668,17 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.44s
-- *Generation time:* 1.89s
-- *Total time:* 5.01s
-- *Prompt preparation time:* 0.653
-- *First-token latency:* 0.388
-- *Cleanup time:* 0.119
+- *Model load time:* 2.38s
+- *Generation time:* 1.86s
+- *Total time:* 4.92s
+- *Prompt preparation time:* 0.648
+- *First-token latency:* 0.384
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 577
 - *Generation tokens:* 106
 - *Total tokens:* 683
-- *Prompt throughput (raw):* 1,488 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Prompt throughput (raw):* 1,502 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -1759,9 +1702,7 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 
 <pre class="model-output-readable">
 Title: Border Security Command patrol vessels moored at sunset
-
 Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The evening light reflects off the water as the fleet rests in the port.
-
 Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour, pier, reflection, England, dusk, boats, mooring, coastal, fleet, marina
 </pre>
 
@@ -1783,17 +1724,17 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.59s
-- *Generation time:* 5.75s
-- *Total time:* 9.01s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 1.18
+- *Model load time:* 2.55s
+- *Generation time:* 5.69s
+- *Total time:* 8.91s
+- *Prompt preparation time:* 0.646
+- *First-token latency:* 1.04
 - *Cleanup time:* 0.13
 - *Prompt tokens:* 577
-- *Generation tokens:* 103
-- *Total tokens:* 680
-- *Prompt throughput (raw):* 487 tok/s
-- *Generation throughput (raw):* 26.2 tok/s
+- *Generation tokens:* 107
+- *Total tokens:* 684
+- *Prompt throughput (raw):* 554 tok/s
+- *Generation throughput (raw):* 26.6 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.78
@@ -1817,20 +1758,20 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 
 <pre class="model-output-readable">
 Title: UK Border Security Command vessels in Ramsgate Harbour
-Description: UK Border Security Command patrol vessels, including the BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, under a dramatic sunset. The town's cliffside skyline is visible in the background.
-Keywords: Border security vessels, buildings, coast, dusk, England, fleet, harbour, horizon, Kent, lifebuoy, marina, maritime, mooring, patrol boats, port, Ramsgate, reflection, sunset
+Description: UK Border Security Command patrol vessels, including the BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, during a dramatic sunset. The town's cliffside skyline is visible in the background under a colourful dusk sky.
+Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England, fleet, harbor, horizon, Kent, lifebuoy, marina, maritime, mooring, patrol boats, Ramsgate, sunset
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
+<a id="model-mlx-community-gemma-4-e4b-it-4bit"></a>
 
-### mlx-community/granite-4.0-3b-vision-4bit
+### mlx-community/gemma-4-e4b-it-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
+<summary>Complete evidence: mlx-community/gemma-4-e4b-it-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -1838,43 +1779,43 @@ Keywords: Border security vessels, buildings, coast, dusk, England, fleet, harbo
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.58s
-- *Generation time:* 1.84s
-- *Total time:* 3.27s
-- *Prompt preparation time:* 0.833
-- *First-token latency:* 0.428
-- *Cleanup time:* 0.0931
-- *Prompt tokens:* 1,366
-- *Generation tokens:* 107
-- *Total tokens:* 1,473
-- *Prompt throughput (raw):* 3,189 tok/s
-- *Generation throughput (raw):* 178 tok/s
-- *Peak memory (GB):* 4.8
-- *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.23
-- *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0149
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
+- *Model load time:* 1.59s
+- *Generation time:* 1.69s
+- *Total time:* 3.96s
+- *Prompt preparation time:* 0.652
+- *First-token latency:* 0.402
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 573
+- *Generation tokens:* 79
+- *Total tokens:* 652
+- *Prompt throughput (raw):* 1,427 tok/s
+- *Generation throughput (raw):* 121 tok/s
+- *Peak memory (GB):* 6.0
+- *Active memory (GB):* 5.2
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 5.16
+- *Post-cleanup active memory (GB):* 0.0147
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1522
+- *Rendered prompt characters:* 1324
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved model revision:* 475b9088d29754a3379866cf5aeb6b41acd313c2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-e4b-it-4bit/snapshots/475b9088d29754a3379866cf5aeb6b41acd313c2
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Border Security Vessels at Sunset"
-Description: "Two patrol boats from the UK Border Security Command are moored side-by-side in Ramsgate Harbour, England, against a dramatic sunset and the town's cliffside skyline."
-Keywords: Border security, patrol boats, UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, sunset, cliffside skyline, maritime, mooring, lifebuoy, reflection, coastal defense, Dover, maritime security.
+Title: Patrol Vessels Moored in Ramsgate Harbour Sunset
+Description: UK Border Security Command vessels are moored in Ramsgate Harbour, Kent, silhouetted against a dramatic sunset over the town's skyline.
+Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coast, Maritime, Mooring, Skyline, Defender, Volunteer, England, Dusk, Fleet
 </pre>
 
 </details>
@@ -1895,17 +1836,17 @@ Keywords: Border security, patrol boats, UK Border Security Command, BSC Defende
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.65s
-- *Generation time:* 5.50s
-- *Total time:* 7.74s
-- *Prompt preparation time:* 0.578
-- *First-token latency:* 1.95
-- *Cleanup time:* 0.104
+- *Model load time:* 1.72s
+- *Generation time:* 5.47s
+- *Total time:* 7.78s
+- *Prompt preparation time:* 0.585
+- *First-token latency:* 1.93
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 3,095
 - *Generation tokens:* 119
 - *Total tokens:* 3,214
-- *Prompt throughput (raw):* 1,590 tok/s
-- *Generation throughput (raw):* 39.8 tok/s
+- *Prompt throughput (raw):* 1,602 tok/s
+- *Generation throughput (raw):* 40.1 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
@@ -1955,17 +1896,17 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 3.10s
+- *Model load time:* 0.78s
+- *Generation time:* 3.08s
 - *Total time:* 4.62s
-- *Prompt preparation time:* 0.737
+- *Prompt preparation time:* 0.751
 - *First-token latency:* 1.47
-- *Cleanup time:* 0.0955
+- *Cleanup time:* 0.0921
 - *Prompt tokens:* 4,188
 - *Generation tokens:* 118
 - *Total tokens:* 4,306
-- *Prompt throughput (raw):* 2,846 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Prompt throughput (raw):* 2,848 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.72
@@ -2010,17 +1951,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.75s
-- *Generation time:* 5.25s
-- *Total time:* 7.59s
+- *Model load time:* 1.76s
+- *Generation time:* 5.38s
+- *Total time:* 7.73s
 - *Prompt preparation time:* 0.575
-- *First-token latency:* 1.57
+- *First-token latency:* 1.72
 - *Cleanup time:* 0.109
 - *Prompt tokens:* 1,251
 - *Generation tokens:* 114
 - *Total tokens:* 1,365
-- *Prompt throughput (raw):* 795 tok/s
-- *Generation throughput (raw):* 36.6 tok/s
+- *Prompt throughput (raw):* 726 tok/s
+- *Generation throughput (raw):* 36.9 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
@@ -2071,17 +2012,17 @@ Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside build
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.25s
-- *Generation time:* 5.70s
-- *Total time:* 8.62s
-- *Prompt preparation time:* 0.649
-- *First-token latency:* 4.24
-- *Cleanup time:* 0.13
+- *Model load time:* 2.28s
+- *Generation time:* 6.19s
+- *Total time:* 9.14s
+- *Prompt preparation time:* 0.648
+- *First-token latency:* 4.75
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 3,606
 - *Generation tokens:* 132
 - *Total tokens:* 3,738
-- *Prompt throughput (raw):* 851 tok/s
-- *Generation throughput (raw):* 156 tok/s
+- *Prompt throughput (raw):* 759 tok/s
+- *Generation throughput (raw):* 159 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.15
@@ -2116,6 +2057,170 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 
 ---
 
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+<details>
+<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 2.06s
+- *Generation time:* 7.73s
+- *Total time:* 10.36s
+- *Prompt preparation time:* 0.554
+- *First-token latency:* 3.32
+- *Cleanup time:* 0.094
+- *Prompt tokens:* 2,372
+- *Generation tokens:* 117
+- *Total tokens:* 2,489
+- *Prompt throughput (raw):* 715 tok/s
+- *Generation throughput (raw):* 30.6 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 0.47
+- *Model-load active memory (GB):* 18
+- *Post-cleanup active memory (GB):* 0.000396
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1298
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.15, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+UK Border Security Patrol Boats at Sunset
+
+Description:
+UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
+
+Keywords:
+UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffside buildings, moored vessels, maritime, harbor, reflection, lifebuoy, maritime security, coastal town, dusk, patrol fleet, waterfront, mooring, horizon, maritime patrol
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: kent, england, dusk, harbour town, royal
+  navy boats, royal navy vessels, royal navy ships
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.59s
+- *Generation time:* 7.67s
+- *Total time:* 9.89s
+- *Prompt preparation time:* 0.625
+- *First-token latency:* 1.1
+- *Cleanup time:* 0.0954
+- *Prompt tokens:* 1,617
+- *Generation tokens:* 758
+- *Total tokens:* 2,375
+- *Prompt throughput (raw):* 1,467 tok/s
+- *Generation throughput (raw):* 127 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.17
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.000609
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1488
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get this done. I need to create metadata for this image, a coastal scene with a sunset and boats. First, I'll break down the instructions. I'm working with an image of a port, a sunset, and some hints. The hints are a bit messy, but the "authoritative" ones are what matter.
+
+I need a title, a description, and keywords. The description needs to be factual. No guessing, just what I *see*. The hints give me a good starting point, but I have to be careful not to invent things. The hints mention a "UK Border Security Command patrol vessel," but the text itself doesn't *show* that. So, I'll focus on what's *actually* in the image. The "BSC Defender" and "BSC Volunteer" are in the hints, but I can't confirm those names.
+
+I'm seeing a sunset over a harbor with a prominent cliff face. The buildings are "row houses" and "terraced houses." There are boats, possibly from the "Royal Navy," with "lifebuoys" and "life rings." The water is calm, and there's a "dusk" sky.
+
+So, I'll start with a title. Something like "Sunset over Ramsgate Harbour" or "Dusk at the Kent Coast." I think "Sunset over Ramsgate Harbour" is perfect.
+
+The description needs to be concise. I'll start with the setting: "A panoramic view of Ramsgate Harbour in Kent, England, during sunset." Then I'll add the details: "Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below." That hits all the key elements.
+
+The keywords are next. I need to be comprehensive, but not too broad. I'll include the place, time, the main subject, the lighting, and the key features. I'll be sure to add things like "Ramsgate Harbour," "Kent," "sunset," "dusk," "harbour," "port," "coast," "sea," "boat," "lifeboat," "lifebuoy," "row houses," "cliffside," "harbour town," "marina," "harbor," "coastal," "maritime," and "dawn."
+
+I'm happy with that. Let's get it formatted correctly.
+&lt;/think&gt;
+
+Title: Sunset over Ramsgate Harbour
+
+Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below.
+
+Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, cliffside, harbour town, marina, harbor, coastal, maritime, dusk, evening, boats, mooring, reflection, cliffs, skyline, town, buildings, terraced houses, harbour town, Kent, coastal town, England, Royal Navy, Royal Navy boats, Royal Navy vessels, Royal Navy ships, Royal Navy lifeboat, Royal Navy lifeboats, Royal Navy vessels, Royal Navy boats, Royal Navy vessels, Royal Navy ships.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get this done. I need to create metadata for this image, a coastal scene with a sunset and boats. First, I'll break down the instructions. I'm working with an image of a port, a sunset, and some hints. The hints are a bit messy, but the "authoritative" ones are what matter.
+
+I need a title, a description, and keywords. The description needs to be factual. No guessing, just what I *see*. The hints give me a good starting point, but I have to be careful not to invent things. The hints mention a "UK Border Security Command patrol vessel," but the text itself doesn't *show* that. So, I'll focus on what's *actually* in the image. The "BSC Defender" and "BSC Volunteer" are in the hints, but I can't confirm those names.
+
+I'm seeing a sunset over a harbor with a prominent cliff face. The buildings are "row houses" and "terraced houses." There are boats, possibly from the "Royal Navy," with "lifebuoys" and "life rings." The water is calm, and there's a "dusk" sky.
+
+So, I'll start with a title. Something like "Sunset over Ramsgate Harbour" or "Dusk at the Kent Coast." I think "Sunset over Ramsgate Harbour" is perfect.
+
+The description needs to be concise. I'll start with the setting: "A panoramic view of Ramsgate Harbour in Kent, England, during sunset." Then I'll add the details: "Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below." That hits all the key elements.
+
+The keywords are next. I need to be comprehensive, but not too broad. I'll include the place, time, the main subject, the lighting, and the key features. I'll be sure to add things like "Ramsgate Harbour," "Kent," "sunset," "dusk," "harbour," "port," "coast," "sea," "boat," "lifeboat," "lifebuoy," "row houses," "cliffside," "harbour town," "marina," "harbor," "coastal," "maritime," and "dawn."
+
+I'm happy with that. Let's get it formatted correctly.
+</think>
+
+Title: Sunset over Ramsgate Harbour
+
+Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below.
+
+Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, cliffside, harbour town, marina, harbor, coastal, maritime, dusk, evening, boats, mooring, reflection, cliffs, skyline, town, buildings, terraced houses, harbour town, Kent, coastal town, England, Royal Navy, Royal Navy boats, Royal Navy vessels, Royal Navy ships, Royal Navy lifeboat, Royal Navy lifeboats, Royal Navy vessels, Royal Navy boats, Royal Navy vessels, Royal Navy ships.
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-glm-46v-nvfp4"></a>
 
 ### mlx-community/GLM-4.6V-nvfp4
@@ -2131,17 +2236,17 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.38s
-- *Generation time:* 14.02s
-- *Total time:* 21.05s
-- *Prompt preparation time:* 0.63
-- *First-token latency:* 10.5
-- *Cleanup time:* 0.211
+- *Model load time:* 6.92s
+- *Generation time:* 16.19s
+- *Total time:* 23.79s
+- *Prompt preparation time:* 0.664
+- *First-token latency:* 12.4
+- *Cleanup time:* 0.25
 - *Prompt tokens:* 6,339
 - *Generation tokens:* 106
 - *Total tokens:* 6,445
-- *Prompt throughput (raw):* 603 tok/s
-- *Generation throughput (raw):* 44.7 tok/s
+- *Prompt throughput (raw):* 511 tok/s
+- *Generation throughput (raw):* 42.8 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
 - *Cache memory (GB):* 1.4
@@ -2173,6 +2278,63 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 
 ---
 
+<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
+
+### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.93s
+- *Generation time:* 1.90s
+- *Total time:* 3.57s
+- *Prompt preparation time:* 0.722
+- *First-token latency:* 0.741
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 2,094
+- *Generation tokens:* 92
+- *Total tokens:* 2,186
+- *Prompt throughput (raw):* 2,826 tok/s
+- *Generation throughput (raw):* 206 tok/s
+- *Peak memory (GB):* 4.0
+- *Active memory (GB):* 2.8
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 2.82
+- *Post-cleanup active memory (GB):* 0.00366
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1349
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Border security vessels docked in Ramsgate Harbour at sunset
+Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
+Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Patrol boat, Patrol boats, Pier, Port, Reflection
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -2189,16 +2351,16 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
 - *Model load time:* 0.60s
-- *Generation time:* 2.03s
-- *Total time:* 3.44s
-- *Prompt preparation time:* 0.808
-- *First-token latency:* 0.371
-- *Cleanup time:* 0.0858
+- *Generation time:* 2.25s
+- *Total time:* 3.66s
+- *Prompt preparation time:* 0.802
+- *First-token latency:* 0.587
+- *Cleanup time:* 0.0877
 - *Prompt tokens:* 1,407
 - *Generation tokens:* 114
 - *Total tokens:* 1,521
-- *Prompt throughput (raw):* 3,790 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Prompt throughput (raw):* 2,395 tok/s
+- *Generation throughput (raw):* 128 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.35
@@ -2245,17 +2407,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 12.99s
-- *Generation time:* 22.83s
-- *Total time:* 36.69s
-- *Prompt preparation time:* 0.845
+- *Model load time:* 13.79s
+- *Generation time:* 22.93s
+- *Total time:* 37.61s
+- *Prompt preparation time:* 0.872
 - *First-token latency:* 19.2
-- *Cleanup time:* 0.283
+- *Cleanup time:* 0.286
 - *Prompt tokens:* 3,468
-- *Generation tokens:* 111
-- *Total tokens:* 3,579
-- *Prompt throughput (raw):* 180 tok/s
-- *Generation throughput (raw):* 53.1 tok/s
+- *Generation tokens:* 112
+- *Total tokens:* 3,580
+- *Prompt throughput (raw):* 181 tok/s
+- *Generation throughput (raw):* 53.3 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.39
@@ -2278,7 +2440,7 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 
 <pre class="model-output-readable">
 Title:
-UK Border Security vessels moored at Ramsgate Harbour at sunset
+UK Border Security Command vessels moored at Ramsgate Harbour at sunset
 
 Description:
 UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
@@ -2306,17 +2468,17 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.19s
-- *Generation time:* 2.24s
-- *Total time:* 6.12s
-- *Prompt preparation time:* 0.666
-- *First-token latency:* 0.303
-- *Cleanup time:* 0.12
+- *Model load time:* 3.24s
+- *Generation time:* 3.01s
+- *Total time:* 6.96s
+- *Prompt preparation time:* 0.68
+- *First-token latency:* 0.894
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 573
-- *Generation tokens:* 91
-- *Total tokens:* 664
-- *Prompt throughput (raw):* 1,890 tok/s
-- *Generation throughput (raw):* 80.2 tok/s
+- *Generation tokens:* 90
+- *Total tokens:* 663
+- *Prompt throughput (raw):* 641 tok/s
+- *Generation throughput (raw):* 69.0 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -2339,21 +2501,21 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Security Vessels Moored in Ramsgate Harbour at Sunset
-Description: Border Security Command patrol vessels, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour against a dramatic sunset cliffside skyline.
-Keywords: Ramsgate, Kent, harbor, border security, patrol boats, vessels, sunset, dusk, maritime, marina, mooring, reflection, cliffs, skyline, England, fleet
+Title: UK Border Security Patrol Vessels at Ramsgate Harbour at Sunset
+Description: UK Border Security Command patrol vessels, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour against a dramatic sunset and town skyline.
+Keywords: Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, sunset, dusk, coast, maritime, mooring, reflection, cliffs, skyline, England
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-4-e4b-it-4bit"></a>
+<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
 
-### mlx-community/gemma-4-e4b-it-4bit
+### mlx-community/granite-4.0-3b-vision-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-e4b-it-4bit</summary>
+<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
@@ -2362,43 +2524,43 @@ Keywords: Ramsgate, Kent, harbor, border security, patrol boats, vessels, sunset
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint instead of describing the image:
   description
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.57s
-- *Generation time:* 1.47s
-- *Total time:* 3.70s
-- *Prompt preparation time:* 0.638
-- *First-token latency:* 0.174
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 573
-- *Generation tokens:* 83
-- *Total tokens:* 656
-- *Prompt throughput (raw):* 3,287 tok/s
-- *Generation throughput (raw):* 124 tok/s
-- *Peak memory (GB):* 6.0
-- *Active memory (GB):* 5.2
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0147
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.65s
+- *Generation time:* 2.32s
+- *Total time:* 3.83s
+- *Prompt preparation time:* 0.846
+- *First-token latency:* 0.917
+- *Cleanup time:* 0.093
+- *Prompt tokens:* 1,366
+- *Generation tokens:* 104
+- *Total tokens:* 1,470
+- *Prompt throughput (raw):* 1,490 tok/s
+- *Generation throughput (raw):* 180 tok/s
+- *Peak memory (GB):* 4.8
+- *Active memory (GB):* 3.0
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 3.03
+- *Post-cleanup active memory (GB):* 0.0149
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1324
+- *Rendered prompt characters:* 1522
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 475b9088d29754a3379866cf5aeb6b41acd313c2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-e4b-it-4bit/snapshots/475b9088d29754a3379866cf5aeb6b41acd313c2
+- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Patrol Vessels Moored in Ramsgate Harbour at Sunset
-Description: UK Border Security Command patrol vessels are moored side-by-side in Ramsgate Harbour, set against a dramatic sunset and the town's skyline.
-Keywords: Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Maritime, Mooring, Coast, Defenders, Buildings, Dusk, Fleet, Patrol Boats, Horizon
+Title: "Border Security Vessels at Sunset"
+Description: "Two patrol boats, the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline."
+Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, sunset, cliffside skyline, maritime, mooring, reflection, lifebuoy, buildings, coast, England.
 </pre>
 
 </details>
@@ -2421,18 +2583,18 @@ Keywords: Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Mari
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.57s
-- *Generation time:* 1.28s
-- *Total time:* 2.94s
-- *Prompt preparation time:* 1.08
-- *First-token latency:* 0.102
-- *Cleanup time:* 0.0852
+- *Model load time:* 0.58s
+- *Generation time:* 2.01s
+- *Total time:* 3.63s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 0.874
+- *Cleanup time:* 0.0758
 - *Prompt tokens:* 312
 - *Generation tokens:* 44
 - *Total tokens:* 356
-- *Prompt throughput (raw):* 3,054 tok/s
-- *Generation throughput (raw):* 371 tok/s
-- *Peak memory (GB):* 2.2
+- *Prompt throughput (raw):* 357 tok/s
+- *Generation throughput (raw):* 368 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
@@ -2474,20 +2636,19 @@ A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: dover, horizon, time,
-  date, timezone
+  after sustained repeated output; Duplicate keywords: dover
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.49s
-- *Generation time:* 1.38s
-- *Total time:* 2.57s
-- *Prompt preparation time:* 0.705
-- *First-token latency:* 0.219
-- *Cleanup time:* 0.0842
+- *Model load time:* 0.50s
+- *Generation time:* 1.43s
+- *Total time:* 2.62s
+- *Prompt preparation time:* 0.685
+- *First-token latency:* 0.251
+- *Cleanup time:* 0.0869
 - *Prompt tokens:* 2,094
 - *Generation tokens:* 200
 - *Total tokens:* 2,294
-- *Prompt throughput (raw):* 9,578 tok/s
-- *Generation throughput (raw):* 422 tok/s
+- *Prompt throughput (raw):* 8,336 tok/s
+- *Generation throughput (raw):* 394 tok/s
 - *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.1
 - *Cache memory (GB):* 0.29
@@ -2513,7 +2674,7 @@ Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset
 
 Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC patrol vessels, including the BSC Defender and BSC Volunteer, moored alongside other boats, with a dramatic skyline of buildings and a lifeguard lifebuoy visible.
 
-Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, Marina, Patrol boats, Pier, Port, Dover, Horizon, Building, Dover, Patrol vessels, British, Coastal, Skyline, Vessel, Defense, Horizon, Distant, Sky, Time, Date, Capture, Timezone, Location, Capture date, Time, Timezone, Time, Date, Timezone, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time,
+Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, Marina, Patrol boats, Pier, Port, Dover, Horizon, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover,
 </pre>
 
 </details>
@@ -2534,17 +2695,17 @@ Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Mar
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Response repeats the same text; Duplicate keywords: sea
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.52s
-- *Generation time:* 36.79s
-- *Total time:* 38.95s
-- *Prompt preparation time:* 0.628
-- *First-token latency:* 1.56
-- *Cleanup time:* 0.101
+- *Model load time:* 1.53s
+- *Generation time:* 35.72s
+- *Total time:* 37.87s
+- *Prompt preparation time:* 0.613
+- *First-token latency:* 2.06
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 290
 - *Generation tokens:* 667
 - *Total tokens:* 957
-- *Prompt throughput (raw):* 186 tok/s
-- *Generation throughput (raw):* 19.3 tok/s
+- *Prompt throughput (raw):* 141 tok/s
+- *Generation throughput (raw):* 20.2 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.70
@@ -2578,83 +2739,6 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.87s
-- *Generation time:* 1.32s
-- *Total time:* 2.96s
-- *Prompt preparation time:* 0.757
-- *First-token latency:* 0.245
-- *Cleanup time:* 0.0944
-- *Prompt tokens:* 910
-- *Generation tokens:* 104
-- *Total tokens:* 1,014
-- *Prompt throughput (raw):* 3,707 tok/s
-- *Generation throughput (raw):* 304 tok/s
-- *Peak memory (GB):* 3.2
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00469
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1366
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-Here's the response following the instructions:
-
-Title: Ramsgate Harbour Patrol Vessels at Sunset
-
-Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsgate Harbour during dusk. The scene is illuminated by the sunset, highlighting the harbor and surrounding buildings.
-
-Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, buildings, reflection
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-Here's the response following the instructions:
-
-Title: Ramsgate Harbour Patrol Vessels at Sunset
-
-Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsgate Harbour during dusk. The scene is illuminated by the sunset, highlighting the harbor and surrounding buildings.
-
-Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, buildings, reflection
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-molmopoint-8b-4bit"></a>
 
 ### mlx-community/MolmoPoint-8B-4bit
@@ -2670,20 +2754,20 @@ Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys,
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.42s
-- *Generation time:* 7.72s
-- *Total time:* 10.01s
-- *Prompt preparation time:* 0.859
-- *First-token latency:* 3.28
-- *Cleanup time:* 0.0936
+- *Model load time:* 1.41s
+- *Generation time:* 7.22s
+- *Total time:* 9.49s
+- *Prompt preparation time:* 0.852
+- *First-token latency:* 2.83
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 3,104
 - *Generation tokens:* 113
 - *Total tokens:* 3,217
-- *Prompt throughput (raw):* 946 tok/s
-- *Generation throughput (raw):* 31.4 tok/s
+- *Prompt throughput (raw):* 1,099 tok/s
+- *Generation throughput (raw):* 31.8 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.6
-- *Cache memory (GB):* 3.8
+- *Cache memory (GB):* 3.9
 - *Model-load active memory (GB):* 7.23
 - *Post-cleanup active memory (GB):* 0.00646
 - *Post-cleanup cache memory (GB):* 0.0
@@ -2731,16 +2815,16 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
   at the token limit; Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Model load time:* 2.88s
-- *Generation time:* 51.17s
-- *Total time:* 54.80s
-- *Prompt preparation time:* 0.733
-- *First-token latency:* 8.07
-- *Cleanup time:* 0.122
+- *Generation time:* 48.16s
+- *Total time:* 51.80s
+- *Prompt preparation time:* 0.729
+- *First-token latency:* 7.16
+- *Cleanup time:* 0.151
 - *Prompt tokens:* 4,390
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,390
-- *Prompt throughput (raw):* 544 tok/s
-- *Generation throughput (raw):* 23.6 tok/s
+- *Prompt throughput (raw):* 613 tok/s
+- *Generation throughput (raw):* 24.8 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
@@ -2789,39 +2873,39 @@ Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That'
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not claim visible. Might just describe scene. The instruction says combining relevant context with main visible subject... Context includes capture date/time. Hmm "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." Means we can use them as facts but not say they are visible in image. Could mention "Captured on 2026-10-03 at 18:18:19 UTC+01:00" but that's meta. Might be okay. Might be better to keep description about visual.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
 
-Let's make description: UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a sunset sky reflecting on the water and the town’s cliffside terraces beyond. The fleet shows lifebuoys, wheelhouses and mooring lines along the quay under a golden-orange sky.
+We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town's cliffside skyline. Image shows multiple patrol boats, white vessels with "Border Security Command" markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
 
-That's one sentence? It's two. Need 1-2 sentences.
+Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
 
-Keywords: 10-18 unique comma-separated. Must cover relevant context and visible details. Include Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina? maybe mooring. Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Also Dover appears in image? The hint mentions Dover, and a vessel has DOVER on it. Image shows "DOVER" on a vessel. Also maybe sunset. Also white cliffs. Could include sunset, white cliffs, etc.
+We need 10-18 unique comma-separated keywords.
 
-Need unique keywords. Provide 10-18.
+Let's produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
 
-Let's list: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, England, dusk, sunset, harbour, mooring, fleet, lifebuoy, cliffside buildings, water reflection, maritime, patrol boat, BSC Defender
+That's 14.
 
-But need comma-separated.
+Ensure unique.
 
-Let's craft ~15 keywords.
-
-Ensure British English: Harbour not Harbor? Hint says Harbor. Might use Harbour. Use British spelling.
-
-Provide:
+Return exactly three sections.
 
 Title:
 Description:
 Keywords:
 
-Make sure exactly those sections.
+No extra text.
 
-Probably output:
+Let's craft description: "UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky."
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden-orange sunset reflecting on the water and the town’s cliffside terraces in the background. The fleet shows lifebuoys, wheelhouses, radar domes and mooring lines along the quay beneath a dramatic evening sky.
+Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
+It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add "Captured on 3 October 2026 at 18:18 BST". But that's metadata. Might be okay.
+
+Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
+
+I think include date not required but allowed. I'll include a brief
 </pre>
 
 <details>
@@ -2855,39 +2939,39 @@ Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That'
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not claim visible. Might just describe scene. The instruction says combining relevant context with main visible subject... Context includes capture date/time. Hmm "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." Means we can use them as facts but not say they are visible in image. Could mention "Captured on 2026-10-03 at 18:18:19 UTC+01:00" but that's meta. Might be okay. Might be better to keep description about visual.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
 
-Let's make description: UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a sunset sky reflecting on the water and the town’s cliffside terraces beyond. The fleet shows lifebuoys, wheelhouses and mooring lines along the quay under a golden-orange sky.
+We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town's cliffside skyline. Image shows multiple patrol boats, white vessels with "Border Security Command" markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
 
-That's one sentence? It's two. Need 1-2 sentences.
+Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
 
-Keywords: 10-18 unique comma-separated. Must cover relevant context and visible details. Include Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina? maybe mooring. Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Also Dover appears in image? The hint mentions Dover, and a vessel has DOVER on it. Image shows "DOVER" on a vessel. Also maybe sunset. Also white cliffs. Could include sunset, white cliffs, etc.
+We need 10-18 unique comma-separated keywords.
 
-Need unique keywords. Provide 10-18.
+Let's produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
 
-Let's list: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, England, dusk, sunset, harbour, mooring, fleet, lifebuoy, cliffside buildings, water reflection, maritime, patrol boat, BSC Defender
+That's 14.
 
-But need comma-separated.
+Ensure unique.
 
-Let's craft ~15 keywords.
-
-Ensure British English: Harbour not Harbor? Hint says Harbor. Might use Harbour. Use British spelling.
-
-Provide:
+Return exactly three sections.
 
 Title:
 Description:
 Keywords:
 
-Make sure exactly those sections.
+No extra text.
 
-Probably output:
+Let's craft description: "UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky."
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden-orange sunset reflecting on the water and the town’s cliffside terraces in the background. The fleet shows lifebuoys, wheelhouses, radar domes and mooring lines along the quay beneath a dramatic evening sky.
+Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
+It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add "Captured on 3 October 2026 at 18:18 BST". But that's metadata. Might be okay.
+
+Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
+
+I think include date not required but allowed. I'll include a brief
 ```
 
 </details>
@@ -2911,16 +2995,16 @@ Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
 - *Observations:* Generation was stopped early after sustained repeated
   output; Duplicate keywords: lifeboat station
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.78s
-- *Generation time:* 35.45s
-- *Total time:* 37.17s
-- *Prompt preparation time:* 0.935
-- *First-token latency:* 32.8
-- *Cleanup time:* 0.096
+- *Model load time:* 1.68s
+- *Generation time:* 36.52s
+- *Total time:* 39.16s
+- *Prompt preparation time:* 0.954
+- *First-token latency:* 33.8
+- *Cleanup time:* 0.0953
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 225
 - *Total tokens:* 16,761
-- *Prompt throughput (raw):* 505 tok/s
+- *Prompt throughput (raw):* 489 tok/s
 - *Generation throughput (raw):* 125 tok/s
 - *Peak memory (GB):* 9.4
 - *Active memory (GB):* 4.4
@@ -2969,17 +3053,17 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.31s
-- *Generation time:* 1.02s
-- *Total time:* 2.23s
-- *Prompt preparation time:* 0.895
-- *First-token latency:* 0.119
-- *Cleanup time:* 0.0809
+- *Model load time:* 0.36s
+- *Generation time:* 1.11s
+- *Total time:* 2.40s
+- *Prompt preparation time:* 0.919
+- *First-token latency:* 0.212
+- *Cleanup time:* 0.0807
 - *Prompt tokens:* 1,186
 - *Generation tokens:* 22
 - *Total tokens:* 1,208
-- *Prompt throughput (raw):* 9,985 tok/s
-- *Generation throughput (raw):* 553 tok/s
+- *Prompt throughput (raw):* 5,594 tok/s
+- *Generation throughput (raw):* 542 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -3021,29 +3105,27 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Duplicate keywords: sunset, buildings, marina, mooring,
-  patrol boats, water, horizon, england, maritime, port, pier, coast, dover,
-  fleet, harbor, lifebuoy, patrol boat, ramsgate, reflection
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: horizon
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.13s
-- *Generation time:* 30.40s
-- *Total time:* 32.49s
-- *Prompt preparation time:* 0.959
-- *First-token latency:* 12.2
-- *Cleanup time:* 0.103
+- *Model load time:* 1.16s
+- *Generation time:* 15.85s
+- *Total time:* 18.02s
+- *Prompt preparation time:* 0.993
+- *First-token latency:* 11.6
+- *Cleanup time:* 0.116
 - *Prompt tokens:* 16,536
-- *Generation tokens:* 1,000
-- *Total tokens:* 17,536
-- *Prompt throughput (raw):* 1,353 tok/s
-- *Generation throughput (raw):* 57.8 tok/s
+- *Generation tokens:* 200
+- *Total tokens:* 16,736
+- *Prompt throughput (raw):* 1,422 tok/s
+- *Generation throughput (raw):* 59.7 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
-- *Cache memory (GB):* 1.3
+- *Cache memory (GB):* 2.4
 - *Model-load active memory (GB):* 9.46
 - *Post-cleanup active memory (GB):* 0.011
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1428
 - *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
@@ -3064,7 +3146,7 @@ Dusk at Ramsgate: Border Security Vessels
 Description:
 UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline, with reflections on the water and a mix of warm and cool lighting.
 
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, Buildings, Marina, Mooring, Patrol boats, Lifebuoys, Reflections, Water, Horizon, England, Maritime, Port, Pier, Horizon, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime,
+Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, Buildings, Marina, Mooring, Patrol boats, Lifebuoys, Reflections, Water, Horizon, England, Coast, Port, Maritime, Horizon, Pier, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon,
 </pre>
 
 </details>
@@ -3085,18 +3167,18 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.55s
-- *Generation time:* 2.27s
-- *Total time:* 4.45s
-- *Prompt preparation time:* 0.606
-- *First-token latency:* 0.287
-- *Cleanup time:* 0.11
+- *Model load time:* 1.57s
+- *Generation time:* 2.65s
+- *Total time:* 4.85s
+- *Prompt preparation time:* 0.604
+- *First-token latency:* 0.7
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 571
-- *Generation tokens:* 129
-- *Total tokens:* 700
-- *Prompt throughput (raw):* 1,988 tok/s
-- *Generation throughput (raw):* 92.6 tok/s
-- *Peak memory (GB):* 7.2
+- *Generation tokens:* 132
+- *Total tokens:* 703
+- *Prompt throughput (raw):* 816 tok/s
+- *Generation throughput (raw):* 96.1 tok/s
+- *Peak memory (GB):* 7.1
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
@@ -3120,11 +3202,11 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 <pre class="model-output-readable">
 **Description:**
 
-A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate, Kent. The boats are lined up along a pier, with a colorful cityscape visible in the background under a vibrant sunset sky. The water reflects the warm hues of the sky, creating a serene and picturesque scene.
+A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate, Kent. The boats are lined up along a pier, with a colorful cityscape visible in the background under a vibrant sunset sky. The water reflects the warm hues of the sunset, creating a serene and picturesque scene.
 
 **Keywords:**
 
-fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, water, reflection, UK, coastal, maritime, fishing, harbor scene, sunset view.
+fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, water, reflection, UK, coastal, maritime, fishing, harbor scene, sunset view, coastal town.
 </pre>
 
 </details>
@@ -3146,17 +3228,17 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 - *Observations:* Required labelled fields not detected: description;
   Duplicate keywords: patrol boats
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.55s
-- *Generation time:* 3.81s
-- *Total time:* 5.21s
-- *Prompt preparation time:* 0.844
-- *First-token latency:* 2.42
-- *Cleanup time:* 0.0884
+- *Model load time:* 0.40s
+- *Generation time:* 3.92s
+- *Total time:* 5.18s
+- *Prompt preparation time:* 0.854
+- *First-token latency:* 2.5
+- *Cleanup time:* 0.0964
 - *Prompt tokens:* 5,615
 - *Generation tokens:* 86
 - *Total tokens:* 5,701
-- *Prompt throughput (raw):* 2,324 tok/s
-- *Generation throughput (raw):* 144 tok/s
+- *Prompt throughput (raw):* 2,243 tok/s
+- *Generation throughput (raw):* 145 tok/s
 - *Peak memory (GB):* 4.3
 - *Active memory (GB):* 2.4
 - *Cache memory (GB):* 1.2
@@ -3202,17 +3284,17 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.74s
-- *Generation time:* 1.67s
-- *Total time:* 4.13s
-- *Prompt preparation time:* 0.719
-- *First-token latency:* 0.813
-- *Cleanup time:* 0.15
+- *Model load time:* 1.09s
+- *Generation time:* 1.70s
+- *Total time:* 3.53s
+- *Prompt preparation time:* 0.732
+- *First-token latency:* 0.827
+- *Cleanup time:* 0.159
 - *Prompt tokens:* 2,174
 - *Generation tokens:* 18
 - *Total tokens:* 2,192
-- *Prompt throughput (raw):* 2,675 tok/s
-- *Generation throughput (raw):* 107 tok/s
+- *Prompt throughput (raw):* 2,628 tok/s
+- *Generation throughput (raw):* 104 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
@@ -3267,18 +3349,18 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
   detected: description, keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.77s
-- *Generation time:* 3.62s
-- *Total time:* 5.04s
-- *Prompt preparation time:* 0.642
-- *First-token latency:* 0.0846
-- *Cleanup time:* 0.0939
+- *Model load time:* 0.49s
+- *Generation time:* 4.39s
+- *Total time:* 5.56s
+- *Prompt preparation time:* 0.678
+- *First-token latency:* 0.204
+- *Cleanup time:* 0.0941
 - *Prompt tokens:* 308
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,308
-- *Prompt throughput (raw):* 3,640 tok/s
-- *Generation throughput (raw):* 341 tok/s
-- *Peak memory (GB):* 1.8
+- *Prompt throughput (raw):* 1,511 tok/s
+- *Generation throughput (raw):* 283 tok/s
+- *Peak memory (GB):* 1.5
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.40
 - *Model-load active memory (GB):* 0.614
@@ -3320,20 +3402,21 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Repeats the prompt's hint instead of describing the image:
+  description
 - *Arch supported by installed mlx-vlm:* yes (model_type moondream1 via
   moondream2)
-- *Model load time:* 0.92s
+- *Model load time:* 0.89s
 - *Generation time:* 1.28s
-- *Total time:* 2.99s
-- *Prompt preparation time:* 0.772
-- *First-token latency:* 0.231
-- *Cleanup time:* 0.0865
+- *Total time:* 2.95s
+- *Prompt preparation time:* 0.775
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.085
 - *Prompt tokens:* 1,011
 - *Generation tokens:* 48
 - *Total tokens:* 1,059
-- *Prompt throughput (raw):* 4,372 tok/s
-- *Generation throughput (raw):* 162 tok/s
+- *Prompt throughput (raw):* 4,313 tok/s
+- *Generation throughput (raw):* 167 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.8
 - *Cache memory (GB):* 0.27
