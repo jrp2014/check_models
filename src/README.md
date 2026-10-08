@@ -326,7 +326,9 @@ Every current-run row uses one immutable assessment with three independent field
 
 These machine codes are retained for compatibility. Human reports describe them as
 "no concerns detected", "concerns detected", "major concerns", and "not assessed";
-none is a semantic accuracy score. The selected assessment profile is recorded in
+none is a semantic accuracy score. Report tables name the kind of major concern:
+"generation" when generation itself failed (no text, repeated text, no final
+answer) and "answer format" when an answer missed the requested form. The selected assessment profile is recorded in
 the JSONL header and each result's assessment.
 
 Assessment is independent of the evaluation lane and prompt wording:

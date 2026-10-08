@@ -8702,6 +8702,28 @@ _USABILITY_GLOSS: Final[dict[str, str]] = {
 }
 
 
+# Major concerns split by where the failure lies: generation itself broke
+# (empty, repeating, no final answer) or a generated answer missed the
+# requested form (labels, extra text, echoed instructions, token limit).
+_GENERATION_FAILURE_OBSERVATIONS: Final[frozenset[ObservationCode]] = (
+    _UNUSABLE_OBSERVATIONS & _INTEGRATION_SIGNAL_OBSERVATIONS
+)
+
+
+def _major_concern_kind(usability: str, observations: Iterable[str]) -> str | None:
+    """Name a major-concerns result's kind ("generation" or "answer format"), else None."""
+    if usability != "unusable":
+        return None
+    return "generation" if _GENERATION_FAILURE_OBSERVATIONS & set(observations) else "answer format"
+
+
+def _usability_label(usability: str, observations: Iterable[str]) -> str:
+    """The usability gloss, naming the kind of major concern when there is one."""
+    kind = _major_concern_kind(usability, observations)
+    label = _human_status_label(usability)
+    return f"{label}: {kind}" if kind else label
+
+
 def _usability_rank(usability: str) -> int:
     """Best-first position in the canonical order; foreign values sort last."""
     return (
@@ -9007,7 +9029,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     chooser_rows = [
         (
             _gallery_summary_model_link(row.model),
-            _markdown_inline_code(_human_status_label(row.usability)),
+            _markdown_inline_code(_usability_label(row.usability, row.observations)),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _format_float_or_dash(row.first_token_latency_s, digits=2),
@@ -11058,7 +11080,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         (
             _html_model_link(row.model),
             _human_status_label(assessments[row.model].execution),
-            _human_status_label(row.usability),
+            _usability_label(row.usability, row.observations),
             _human_status_label(assessments[row.model].maintainer_status),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
@@ -20494,6 +20516,10 @@ class RunComparison:
     prompt_tps_ratio_min: float | None = None
     prompt_tps_ratio_max: float | None = None
     prompt_tps_compared_models: int = 0
+    # The models at the low and high end of each ratio range, so an extreme
+    # can be traced to one model; None in records that predate them.
+    tps_ratio_end_models: tuple[str, str] | None = None
+    prompt_tps_ratio_end_models: tuple[str, str] | None = None
 
     @property
     def comparable(self) -> bool:
@@ -21237,11 +21263,11 @@ def _generated_text_changes(
 
 def _prefill_tps_ratios(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
-) -> list[float]:
-    """Sorted prefill tok/s ratios (now/baseline) over the pairs with clean rates on both sides."""
+) -> list[tuple[float, str]]:
+    """Sorted (prefill tok/s ratio now/baseline, model) over pairs with clean rates on both sides."""
     return sorted(
-        ratio
-        for _model, now, before in pairs
+        (ratio, model)
+        for model, now, before in pairs
         if (ratio := _prefill_tps_ratio(now, before)) is not None
     )
 
@@ -21428,7 +21454,7 @@ def _compare_model_performance(
     before: JsonlResultRecord,
     *,
     bands: Mapping[str, tuple[float, float, int]],
-    ratios: list[float],
+    ratios: list[tuple[float, str]],
     flags: list[RunComparisonThroughputFlag],
     memory: list[RunComparisonMemoryChange],
 ) -> None:
@@ -21444,7 +21470,7 @@ def _compare_model_performance(
     slept = _record_timing_untrusted(now) or _record_timing_untrusted(before)
     now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
     if not slept and now_tps is not None and before_tps is not None:
-        ratios.append(now_tps / before_tps)
+        ratios.append((now_tps / before_tps, model))
         flag = _model_throughput_flag(
             model, now_tps=now_tps, before_tps=before_tps, band=bands.get(model)
         )
@@ -21625,7 +21651,7 @@ def compare_run_results(
     )
 
     changes: list[RunComparisonModelChange] = []
-    ratios: list[float] = []
+    ratios: list[tuple[float, str]] = []
     flags: list[RunComparisonThroughputFlag] = []
     memory: list[RunComparisonMemoryChange] = []
     revision_changes: list[tuple[str, str, str]] = []
@@ -21673,10 +21699,7 @@ def compare_run_results(
         changes=tuple(changes),
         identical_text_models=identical_text,
         text_compared_models=text_compared,
-        tps_ratio_median=_quantile(ratios_sorted, 0.5) if ratios_sorted else None,
-        tps_ratio_min=ratios_sorted[0] if ratios_sorted else None,
-        tps_ratio_max=ratios_sorted[-1] if ratios_sorted else None,
-        tps_compared_models=len(ratios_sorted),
+        **_ratio_range_fields(ratios_sorted, "tps"),
         throughput_flags=tuple(flags),
         memory_changes=tuple(memory),
         history_runs_used=history_runs,
@@ -21695,11 +21718,23 @@ def compare_run_results(
         throughput_comparable=throughput_comparable,
         text_changed_models=tuple(text_changed),
         text_divergence=tuple(divergence),
-        prompt_tps_ratio_median=_quantile(prefill_sorted, 0.5) if prefill_sorted else None,
-        prompt_tps_ratio_min=prefill_sorted[0] if prefill_sorted else None,
-        prompt_tps_ratio_max=prefill_sorted[-1] if prefill_sorted else None,
-        prompt_tps_compared_models=len(prefill_sorted),
+        **_ratio_range_fields(prefill_sorted, "prompt_tps"),
     )
+
+
+def _ratio_range_fields(ranked: Sequence[tuple[float, str]], prefix: str) -> dict[str, Any]:
+    """RunComparison's median, ends, end models and count for sorted (ratio, model) pairs."""
+    if not ranked:
+        return {
+            f"{prefix}_ratio_{field}": None for field in ("median", "min", "max", "end_models")
+        } | {f"{prefix}_compared_models": 0}
+    return {
+        f"{prefix}_ratio_median": _quantile([ratio for ratio, _ in ranked], 0.5),
+        f"{prefix}_ratio_min": ranked[0][0],
+        f"{prefix}_ratio_max": ranked[-1][0],
+        f"{prefix}_ratio_end_models": (ranked[0][1], ranked[-1][1]),
+        f"{prefix}_compared_models": len(ranked),
+    }
 
 
 def _hardware_identity(system_info: Mapping[str, object] | None) -> str | None:
@@ -21958,12 +21993,14 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             "min": _r(comparison.tps_ratio_min),
             "max": _r(comparison.tps_ratio_max),
             "compared_models": comparison.tps_compared_models,
+            **_ratio_end_models_json(comparison.tps_ratio_end_models),
         },
         "prompt_tps_ratio": {
             "median": _r(comparison.prompt_tps_ratio_median),
             "min": _r(comparison.prompt_tps_ratio_min),
             "max": _r(comparison.prompt_tps_ratio_max),
             "compared_models": comparison.prompt_tps_compared_models,
+            **_ratio_end_models_json(comparison.prompt_tps_ratio_end_models),
         },
         "text_changed_models": cast("JsonLike", list(comparison.text_changed_models)),
         "text_divergence": [
@@ -22080,6 +22117,17 @@ def _comparison_req_bool(raw: JsonLike) -> bool:
         message = f"comparison field is not a boolean: {raw!r}"
         raise TypeError(message)
     return raw
+
+
+def _ratio_end_models_json(models: tuple[str, str] | None) -> dict[str, JsonLike]:
+    """The ``min_model``/``max_model`` keys of a retained ratio block, when known."""
+    return {} if models is None else {"min_model": models[0], "max_model": models[1]}
+
+
+def _ratio_end_models_from_json(block: Mapping[str, JsonLike]) -> tuple[str, str] | None:
+    """Read a ratio block's end models; None when the record predates them."""
+    low, high = block.get("min_model"), block.get("max_model")
+    return (low, high) if isinstance(low, str) and isinstance(high, str) else None
 
 
 def _comparison_opt_str(raw: JsonLike) -> str | None:
@@ -22199,6 +22247,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         tps_ratio_min=_comparison_opt_float(ratio.get("min")),
         tps_ratio_max=_comparison_opt_float(ratio.get("max")),
         tps_compared_models=_comparison_req_int(ratio.get("compared_models", 0)),
+        tps_ratio_end_models=_ratio_end_models_from_json(ratio),
         throughput_flags=throughput_flags,
         memory_changes=memory_changes,
         history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
@@ -22273,6 +22322,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         prompt_tps_ratio_min=_comparison_opt_float(prefill.get("min")),
         prompt_tps_ratio_max=_comparison_opt_float(prefill.get("max")),
         prompt_tps_compared_models=_comparison_req_int(prefill.get("compared_models", 0)),
+        prompt_tps_ratio_end_models=_ratio_end_models_from_json(prefill),
         **cast("dict[str, Any]", identity),
     )
 
@@ -22407,12 +22457,29 @@ def _prefill_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
     """Prefill throughput ratio row, withheld under the same rule as the decode ratio."""
     if not comparison.throughput_comparable or comparison.prompt_tps_ratio_median is None:
         return []
-    prefill_text = (
-        f"{comparison.prompt_tps_ratio_median:.3f} (range "
-        f"{comparison.prompt_tps_ratio_min:.2f}-{comparison.prompt_tps_ratio_max:.2f}, "
-        f"{comparison.prompt_tps_compared_models} models)"
+    prefill_text = _ratio_text(
+        comparison.prompt_tps_ratio_median,
+        (comparison.prompt_tps_ratio_min, comparison.prompt_tps_ratio_max),
+        comparison.prompt_tps_ratio_end_models,
+        comparison.prompt_tps_compared_models,
     )
     return [("Prefill tok/s ratio (now/baseline)", prefill_text)]
+
+
+def _ratio_text(
+    median: float,
+    ends: tuple[float | None, float | None],
+    end_models: tuple[str, str] | None,
+    compared: int,
+) -> str:
+    """Median ratio and its range, naming the model at each end when recorded."""
+    low, high = ends
+    if end_models is None:
+        return f"{median:.3f} (range {low:.2f}-{high:.2f}, {compared} models)"
+    return (
+        f"{median:.3f} over {compared} models; lowest {low:.2f} ({end_models[0]}), "
+        f"highest {high:.2f} ({end_models[1]})"
+    )
 
 
 _REMOVED_MODEL_LABELS: Final[tuple[tuple[str, str], ...]] = (
@@ -22433,9 +22500,11 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         and comparison.tps_ratio_min is not None
         and comparison.tps_ratio_max is not None
     ):
-        ratio_text = (
-            f"{comparison.tps_ratio_median:.3f} (range {comparison.tps_ratio_min:.2f}-"
-            f"{comparison.tps_ratio_max:.2f}, {comparison.tps_compared_models} models)"
+        ratio_text = _ratio_text(
+            comparison.tps_ratio_median,
+            (comparison.tps_ratio_min, comparison.tps_ratio_max),
+            comparison.tps_ratio_end_models,
+            comparison.tps_compared_models,
         )
     else:
         ratio_text = "n/a"
@@ -22740,7 +22809,9 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         ReportParagraph(
             "Mechanical diff only: one image and one run per model, temperature as "
             "configured, so a single-observation flip on one model is weak evidence of a "
-            "change; a broad shift is stronger."
+            "change; a broad shift is stronger. Each tok/s ratio likewise compares one "
+            "timed generation per model in each sweep, with no warm-up or repeats, so a "
+            "range end is a single measurement, not a benchmark."
         )
     )
     return ReportSection("Since the baseline sweep", tuple(blocks))
@@ -24176,6 +24247,11 @@ def _run_issue_summary_quality_section(
         results,
         key=lambda result: (
             _usability_rank(result["assessment"]["usability"]),
+            # Within major concerns, answer-format problems before broken generation.
+            _major_concern_kind(
+                result["assessment"]["usability"], result["assessment"]["observations"]
+            )
+            == "generation",
             result["model"].lower(),
         ),
     )
@@ -24192,7 +24268,9 @@ def _run_issue_summary_quality_section(
         rows.append(
             (
                 result["model"],
-                _human_status_label(result["assessment"]["usability"]),
+                _usability_label(
+                    result["assessment"]["usability"], result["assessment"]["observations"]
+                ),
                 total_cell,
                 tps_cell,
                 peak_cell,
@@ -24206,7 +24284,9 @@ def _run_issue_summary_quality_section(
     intro = (
         "Every attempted model, ordered by its mechanical checks, with counted facts. "
         '"No concerns detected" is not an accuracy verdict: read the final answers in the '
-        "gallery. Prompt tokens include the image tokens, which drive prefill time; output "
+        'gallery. "Major concerns: generation" means generation itself failed (no text, '
+        'repeated text, or no final answer); "major concerns: answer format" means an '
+        "answer was generated but missed the requested form. Prompt tokens include the image tokens, which drive prefill time; output "
         f"tokens are the tokens generated{limit_note}."
     )
     if show_keywords:
@@ -24280,15 +24360,16 @@ def _observation_history_cell(model: str, entries: Sequence[ObservationHistory])
                 else f"{gloss}: first seen this run"
             )
         elif entry.consecutive_runs == 1:
-            clauses.append(f"{gloss}: back this run; first {first}")
+            clauses.append(f"{gloss}: back this run, first {first}")
         else:
             plus = "+" if entry.consecutive_open_ended else ""
             since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
             clause = f"{gloss}: last {entry.consecutive_runs}{plus} runs (since {since})"
             if entry.first_observed != entry.consecutive_since:
-                clause += f"; first {first}"
+                clause += f", first {first}"
             clauses.append(clause)
-    return "; ".join(clauses) or "-"
+    # One observation per line (a <br> in Markdown) so the column skims.
+    return "\n".join(clauses) or "-"
 
 
 def _since_baseline_status(model: str, comparison: RunComparison | None) -> str | None:
@@ -24342,7 +24423,7 @@ def _run_issue_summary_surfaced_sections(
             rows.append(
                 (
                     result["model"],
-                    _human_status_label(assessment["usability"]),
+                    _usability_label(assessment["usability"], assessment["observations"]),
                     *(() if since is None else (since,)),
                     *(
                         ()
@@ -24848,6 +24929,10 @@ def _output_index_dashboard_lines(
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
     usability_counter = Counter(assessment.usability for _model, assessment in assessments)
+    major_kinds = Counter(
+        _major_concern_kind(assessment.usability, assessment.observations)
+        for _model, assessment in assessments
+    )
     observation_counter: Counter[ObservationCode] = Counter(
         code for _model, assessment in assessments for code in assessment.observations
     )
@@ -24882,6 +24967,12 @@ def _output_index_dashboard_lines(
             "- Mechanical checks: "
             + ", ".join(
                 f"{_human_status_label(label)} {usability_counter.get(label, 0)}"
+                + (
+                    f" (generation {major_kinds['generation']}, "
+                    f"answer format {major_kinds['answer format']})"
+                    if label == "unusable" and usability_counter.get(label)
+                    else ""
+                )
                 for label in _USABILITY_ORDER
             )
         ),

@@ -442,7 +442,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     # repeat the review tables.
     assert "## Observation clusters" not in content
     assert (
-        "| org/observed | major concerns | Response repeats the same text; "
+        "| org/observed | major concerns: generation | Response repeats the same text; "
         "Required labelled fields not detected: title, keywords |"
     ) in content
     crashed_table = _extract_markdown_subsection(
@@ -6423,9 +6423,9 @@ def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -
     }
     # With older runs unread, an observation no run read showed is not "first seen".
     assert cells == {
-        "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier); "
+        "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier)\n"
         "control tokens visible: not in earlier runs read",
-        "org/back": "repeated text: back this run; first 2026-07-11 or earlier",
+        "org/back": "repeated text: back this run, first 2026-07-11 or earlier",
         "org/new": "crash: not in earlier runs read",
         "org/late": "repeated text: last 3+ runs (since 2026-07-18 or earlier)",
         "org/clean": "-",
@@ -6534,7 +6534,7 @@ def test_run_summary_shows_observation_history_from_retained_metadata(tmp_path: 
     assert "4 earlier retained runs from git `HEAD:src/output/results.jsonl`" in prose
     assert "back to 2026-07-04" in prose
     assert "older runs were not read" not in prose
-    assert "| repeated text: last 3 runs (since 2026-07-18); first 2026-07-11 |" in content
+    assert "| repeated text: last 3 runs (since 2026-07-18), first 2026-07-11 |" in content
 
 
 def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_lists() -> None:
@@ -7812,7 +7812,10 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
         )
     )
     assert "Generated text changed for 1 models" in rendered
-    assert rows["Prefill tok/s ratio (now/baseline)"].startswith("0.750")
+    # Each end of the range names its model, so an extreme can be traced.
+    assert rows["Prefill tok/s ratio (now/baseline)"] == (
+        "0.750 over 2 models; lowest 0.50 (org/a), highest 1.00 (org/b)"
+    )
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
@@ -7820,6 +7823,41 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
     assert restored.text_divergence == comparison.text_divergence
     assert restored.component_changes == comparison.component_changes
     assert restored.prompt_tps_ratio_median == pytest.approx(0.75)
+    assert restored.prompt_tps_ratio_end_models == ("org/a", "org/b")
+    # A record written before the end models were kept renders the bare range.
+    prefill = cast("dict[str, Any]", payload["prompt_tps_ratio"])
+    del prefill["min_model"], prefill["max_model"]
+    older = check_models._run_comparison_from_json(payload)
+    assert older.prompt_tps_ratio_end_models is None
+    assert (
+        dict(check_models._comparison_view(older).summary_rows)[
+            "Prefill tok/s ratio (now/baseline)"
+        ]
+        == "0.750 (range 0.50-1.00, 2 models)"
+    )
+
+
+@pytest.mark.parametrize(
+    ("usability", "observations", "expected"),
+    [
+        (
+            "unusable",
+            ("repeated_output", "missing_requested_sections"),
+            "major concerns: generation",
+        ),
+        (
+            "unusable",
+            ("missing_requested_sections", "unexpected_special_token"),
+            "major concerns: answer format",
+        ),
+        ("usable_with_caveats", ("duplicate_keywords",), "concerns detected"),
+    ],
+)
+def test_major_concerns_name_broken_generation_apart_from_answer_format(
+    usability: str, observations: tuple[str, ...], expected: str
+) -> None:
+    """A missing label and a degenerate generation are both major, but not the same problem."""
+    assert check_models._usability_label(usability, observations) == expected
 
 
 def test_incomparable_runs_keep_roster_and_say_why_a_model_is_absent() -> None:
@@ -8586,10 +8624,10 @@ def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
     assert "| Prompt / output tok | Keywords | Hint text |" in content
     # Output tokens sit beside the run's limit so a near-cap answer is visible.
     assert "| 16,525 / 495 | 36 (20 from hints) | 56% |" in content
-    assert "output tokens are the tokens generated (limit 500)" in content
     # An answer with no labelled field is measured whole, and says so.
     assert "| 97% of answer |" in content
     prose = " ".join(content.split())
+    assert "output tokens are the tokens generated (limit 500)" in prose
     assert "rounded down; 80% or more is reported as a repeated prompt hint" in prose
 
     # A custom --prompt has no Keywords field or hint: no columns, no wording.

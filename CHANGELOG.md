@@ -19,6 +19,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Baseline comparison: the generation and prefill tok/s ratio rows name the
+  model at each end of the range ("lowest 0.12 (model), highest 8.73
+  (model)"), kept as `min_model`/`max_model` in the retained comparison block;
+  older records still show the bare range. The caveat under the comparison
+  now says each ratio compares one timed generation per model per sweep, with
+  no warm-up or repeats, so a range end is a single measurement.
+- "Major concerns" now says which kind: "generation" when generation itself
+  failed (no text, repeated text, no final answer, incomplete reasoning) and
+  "answer format" when an answer was generated but missed the requested form
+  (labels, extra text, echoed instructions, token limit). Shown in the
+  run-summary tables, both gallery choosers and `index.md`'s counts; within
+  major concerns the at-a-glance table lists answer-format rows first.
+- The run summary's History column puts each observation on its own line,
+  with its first date after a comma rather than a second semicolon.
 - Report wording now states what was measured, not why: the prompt-hint
   observation reads "Output repeats the prompt's own hint text" (it no longer
   adds "instead of describing the image", which an accurate hint does not
