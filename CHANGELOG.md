@@ -23,6 +23,9 @@ Notable changes to this project will be documented in this file.
   Checked with an editable-style mlx (loader-only `RECORD`, dev version):
   4.44.0 still flags both imports, 4.47.1 flags neither. The SKY-S101
   workaround still reproduces on 4.47.1 and stays.
+- Docs: reworded the run-summary line in `src/README.md` that Skylos
+  4.47.1 flagged as a prompt-injection pattern (SKY-D260); the meaning is
+  unchanged.
 - Typing: dropped a `cast` in `_auto_thinking_budget_kwargs` that ty 0.0.85
   reports as redundant (`redundant-cast`).
 - Run summary: the quality table reports counted facts that were hidden.
