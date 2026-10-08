@@ -19,6 +19,19 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Report wording now states what was measured, not why: the prompt-hint
+  observation reads "Output repeats the prompt's own hint text" (it no longer
+  adds "instead of describing the image", which an accurate hint does not
+  show), and the baseline caveat calls a single-observation flip weak
+  evidence rather than "usually run-to-run variance". `index.md`'s top
+  observations line is now "Observations, most important first" and says how
+  many kinds it left out, so an unlisted observation is not read as absent.
+  The changed-text table shows "not recorded" for missing quantization and
+  prompt token counts, matching its decoding column, instead of "-".
+- `tools/update.sh`: a local `mlx`/`mlx-vlm` checkout whose HEAD cannot be
+  read leaves the checkouts unmarked in that snapshot, so it is named as not
+  compared instead of listed as removed. An all-unreadable change list now
+  says "Nothing changed in the sources read both before and after the run".
 - Tooling: `[tool.pyrefly]` now sets `search-path = ["."]`, so editor
   Pyrefly (1.3.2) finds `check_models` and `check_models_data` instead of
   inferring an import root of `src/src`; the gate's generated config already

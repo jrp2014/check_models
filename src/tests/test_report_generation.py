@@ -2182,7 +2182,7 @@ def test_output_index_renders_run_dashboard(tmp_path: Path) -> None:
     )
     assert "- Usability:" not in content
     minimal_label = check_models._OBSERVATION_DISPLAY_LABELS["minimal_output"]
-    assert f"- Top observations: {minimal_label} (1)" in content
+    assert f"- Observations, most important first: {minimal_label} (1)" in content
     assert "## Artifacts" in content
     assert content.index("## Run at a glance") < content.index("## Artifacts")
 
@@ -7803,7 +7803,9 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
     view = check_models._comparison_view(comparison)
     rows = dict(view.summary_rows)
     assert rows["Generated text changed"] == "1 models (listed below)"
-    assert view.text_change_rows == (("org/a", "not recorded", "-", "0", "9 \u2192 14", "-"),)
+    assert view.text_change_rows == (
+        ("org/a", "not recorded", "not recorded", "0", "9 \u2192 14", "not recorded"),
+    )
     rendered = "\n".join(
         check_models.render_report_markdown(
             (check_models._run_issue_summary_comparison_section(comparison),)
@@ -8016,7 +8018,7 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
     )
     by_model = {row[0]: row[1:3] for row in view.text_change_rows}
     assert by_model["org/q4"] == ("greedy", "4-bit affine")
-    assert by_model["org/reseeded"] == ("settings changed", "-")
+    assert by_model["org/reseeded"] == ("settings changed", "not recorded")
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
@@ -8721,7 +8723,7 @@ def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
         (
             "org/a",
             "not recorded",
-            "-",
+            "not recorded",
             f"{len(shared)}",
             f"{len(shared) + 14} \u2192 {len(shared) + 17}",
             "same",
@@ -8767,7 +8769,7 @@ def test_text_divergence_boundaries(
         entry.prompt_token_count_unchanged,
     ) == expected
     (row,) = check_models._text_change_rows(_divergence_comparison(entry))
-    assert row[-1] == {True: "same", False: "changed", None: "-"}[expected[3]]
+    assert row[-1] == {True: "same", False: "changed", None: "not recorded"}[expected[3]]
 
 
 def test_text_divergence_is_withheld_for_incomparable_runs() -> None:

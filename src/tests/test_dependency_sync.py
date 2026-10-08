@@ -3584,6 +3584,30 @@ def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
 
 
 @pytest.mark.subprocess
+def test_update_state_snapshot_leaves_an_unreadable_checkout_unmarked(tmp_path: Path) -> None:
+    """A checkout whose HEAD cannot be read is not compared, so it never looks removed."""
+    script = _copy_update_script_layout(tmp_path)
+    (tmp_path / "work" / "mlx" / ".git").mkdir(parents=True)
+    driver = (
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\nPROJECT_ROOT={script.parent.parent}\n"
+        f"UPDATE_PYTHON={sys.executable}\nUPDATE_SYSTEM_PACKAGES=0\n"
+        f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", driver],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={key: value for key, value in os.environ.items() if key != "CONDA_DEFAULT_ENV"},
+        cwd=tmp_path,
+    )
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.splitlines()
+    assert not [line for line in lines if line.startswith("git\t")]
+    assert "pip\t\t" in lines
+
+
+@pytest.mark.subprocess
 def test_update_outcome_reports_changes_on_success_and_after_a_stop(tmp_path: Path) -> None:
     """The change table follows a clean run and a failed one; the before file is removed."""
     functions = "".join(

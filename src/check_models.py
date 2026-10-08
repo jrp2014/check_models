@@ -8633,7 +8633,7 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
     ObservationDisplaySpec("duplicate_keywords", "Repeated keyword entries", "duplicate keywords"),
     ObservationDisplaySpec(
         "prompt_hint_echoed",
-        "Output repeats the prompt's own hint text instead of describing the image",
+        "Output repeats the prompt's own hint text",
         "prompt hint repeated",
     ),
     ObservationDisplaySpec(
@@ -8835,7 +8835,8 @@ def _human_observation_labels(
                 label = f"Final answer emitted twice, around {separator}"
         elif code == "prompt_hint_echoed" and details is not None:
             if echoed := details.get("echoed_hint_fields"):
-                label = f"Repeats the prompt's hint instead of describing the image: {', '.join(echoed)}"
+                # Copying an accurate hint does not show the image went unseen.
+                label = f"Repeats the prompt's hint text: {', '.join(echoed)}"
         elif code == "unverified_place_name" and details is not None:
             if places := details.get("unverified_place_names"):
                 label = f"Names a place the prompt did not supply: {', '.join(places)}"
@@ -22350,12 +22351,15 @@ def _text_change_rows(comparison: RunComparison) -> tuple[tuple[str, ...], ...]:
         if entry is None:
             rows.append((model, "-", "-", "-", "-", "-"))
             continue
-        prompt = {True: "same", False: "changed", None: "-"}[entry.prompt_token_count_unchanged]
+        # Facts missing from either record say so, like the decoding cell.
+        prompt = {True: "same", False: "changed", None: "not recorded"}[
+            entry.prompt_token_count_unchanged
+        ]
         rows.append(
             (
                 model,
                 _DECODING_CELL_LABELS.get(entry.decoding, entry.decoding),
-                entry.weights or "-",
+                entry.weights or "not recorded",
                 f"{entry.shared_prefix_chars:,}",
                 f"{entry.baseline_chars:,} \u2192 {entry.current_chars:,}",
                 prompt,
@@ -22734,8 +22738,9 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         )
     blocks.append(
         ReportParagraph(
-            "Mechanical diff only: one image, temperature as configured; single-observation "
-            "flips on one model are usually run-to-run variance, broad shifts are not."
+            "Mechanical diff only: one image and one run per model, temperature as "
+            "configured, so a single-observation flip on one model is weak evidence of a "
+            "change; a broad shift is stronger."
         )
     )
     return ReportSection("Since the baseline sweep", tuple(blocks))
@@ -24891,7 +24896,11 @@ def _output_index_dashboard_lines(
         top_observations = ", ".join(
             f"{_OBSERVATION_DISPLAY_LABELS[code]} ({count})" for code, count in ranked[:5]
         )
-        lines.append(f"- Top observations: {top_observations}")
+        # Say what was left out, so an unlisted observation is not read as absent.
+        more = len(ranked) - 5
+        if more > 0:
+            top_observations += f"; {more} more kind{'s' if more > 1 else ''} in diagnostics"
+        lines.append(f"- Observations, most important first: {top_observations}")
     lines.append("")
     return lines
 
