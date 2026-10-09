@@ -833,6 +833,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- ty 0.0.86 added `invalid-property-type-override`, which ignores mypy's
+  `# type: ignore[override]`, so CI failed on the `_TeeCaptureStream`
+  `encoding` and `errors` properties. Each now also carries a
+  `# ty: ignore[invalid-property-type-override]`: typeshed declares both as
+  writable attributes, but CPython's are read-only descriptors, so the
+  property is correct. The dev extra now requires `ty>=0.0.86`, because older
+  ty warns that the rule is unknown.
 - Crash attribution no longer reads the interpreter's environment path as
   a package: with a conda environment named `mlx-vlm`, every frame under
   `envs/mlx-vlm/…/site-packages/` matched mlx-vlm, so a crash raised in

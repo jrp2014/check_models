@@ -2426,12 +2426,15 @@ class _TeeCaptureStream(io.TextIOBase):
     # and without a file descriptor they cannot size themselves to the
     # terminal, so every bar came out a ragged ten characters wide. Forwarding
     # both makes a captured bar render exactly as an uncaptured one.
+    # Typeshed declares TextIOBase.encoding and .errors as writable attributes,
+    # but CPython's are read-only descriptors, so a property is the only way to
+    # forward them. mypy and pyrefly honour the type: ignore; ty (0.0.86+) needs its own.
     @property
-    def encoding(self) -> str:  # type: ignore[override]  # TextIOBase declares a plain attribute
+    def encoding(self) -> str:  # type: ignore[override]  # ty: ignore[invalid-property-type-override]  # inaccurate stub
         return getattr(self._stream, "encoding", None) or "utf-8"
 
     @property
-    def errors(self) -> str | None:  # type: ignore[override]  # as encoding, above
+    def errors(self) -> str | None:  # type: ignore[override]  # ty: ignore[invalid-property-type-override]  # as encoding
         return getattr(self._stream, "errors", None)
 
     def fileno(self) -> int:
