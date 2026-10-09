@@ -18046,7 +18046,6 @@ def _config_image_input_keys(config: Mapping[str, JsonLike]) -> tuple[str, ...]:
 def _capability_from_image_evidence(
     config: Mapping[str, JsonLike],
     *,
-    model_type: str,
     architectures: tuple[str, ...],
 ) -> ImageCapability | None:
     """Classify from image-input evidence; None when the config carries none.
@@ -18054,10 +18053,8 @@ def _capability_from_image_evidence(
     Only keys carrying real values count: FastVLM ships image_grid_pinpoints as
     null alongside genuine vision keys, and ``"vision_config": null`` must not
     be positive evidence on its own. A positive verdict also requires a
-    text-generating architecture or a model type the installed mlx-vlm has a
-    loader for (MiniCPM-o, llm-jp-4-vl and Nemotron Omni name bespoke
-    architectures); image evidence without either is ``unknown`` (still run),
-    while known non-generative image architectures
+    text-generating architecture; image evidence without one is ``unknown``
+    (still run), while known non-generative image architectures
     (classification, detection, segmentation, multimodal embedding) are a
     confident exclusion.
     """
@@ -18079,16 +18076,6 @@ def _capability_from_image_evidence(
     if generative_arch:
         return ImageCapability(
             "yes", "image_to_text", (f"image-input keys: {', '.join(image_keys)}",)
-        )
-    _, resolved_model_type, has_loader = arch_precheck_for_model_type(model_type)
-    if has_loader:
-        return ImageCapability(
-            "yes",
-            "image_to_text",
-            (
-                f"image-input keys: {', '.join(image_keys)}",
-                f"installed mlx-vlm loader: {resolved_model_type}",
-            ),
         )
     return ImageCapability(
         "unknown",
@@ -18166,9 +18153,7 @@ def _classify_image_capability(repo: object) -> ImageCapability:
     if negative is not None:
         return negative
 
-    image_verdict = _capability_from_image_evidence(
-        config, model_type=model_type, architectures=architectures
-    )
+    image_verdict = _capability_from_image_evidence(config, architectures=architectures)
     if image_verdict is not None:
         return image_verdict
 

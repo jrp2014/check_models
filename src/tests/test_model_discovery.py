@@ -811,24 +811,28 @@ class TestImageCapabilityClassifier:
         assert cap.verdict == "unknown"
         assert any("no generative-text architecture" in e for e in cap.evidence)
 
-    def test_image_evidence_with_installed_loader_is_yes(
+    def test_installed_loader_alone_is_not_image_to_text(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """MiniCPM-o shape: bespoke architecture name, but mlx-vlm ships its loader."""
+        """A d1-omni-shaped config with an installed loader stays unknown.
+
+        d1-omni takes images but answers structured questions without
+        generating text, so loader availability is not task capability.
+        """
         monkeypatch.setattr(
-            check_models, "_installed_mlx_vlm_model_types", lambda: frozenset({"minicpmo"})
+            check_models, "_installed_mlx_vlm_model_types", lambda: frozenset({"d1_omni"})
         )
         cap = _capability_for(
             monkeypatch,
             config={
-                "model_type": "minicpmo",
-                "architectures": ["MiniCPMO"],
+                "model_type": "d1_omni",
+                "architectures": ["D1OmniModel"],
                 "vision_config": {"hidden_size": 1152},
             },
         )
 
-        assert cap.verdict == "yes"
-        assert "installed mlx-vlm loader: minicpmo" in cap.evidence
+        assert cap.verdict == "unknown"
+        assert any("no generative-text architecture" in e for e in cap.evidence)
 
     @pytest.mark.parametrize(
         "architecture",
