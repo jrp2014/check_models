@@ -21263,10 +21263,19 @@ def _generated_text_changes(
             if all(isinstance(count, int) and not isinstance(count, bool) for count in counts)
             else None
         )
+        # Character-level shared prefix of two texts (not paths, so no os.path).
+        shared_prefix_chars = next(
+            (
+                index
+                for index, (old, new) in enumerate(zip(baseline_text, current_text, strict=False))
+                if old != new
+            ),
+            min(len(baseline_text), len(current_text)),
+        )
         changed.append(
             TextDivergence(
                 model=model,
-                shared_prefix_chars=len(os.path.commonprefix([baseline_text, current_text])),
+                shared_prefix_chars=shared_prefix_chars,
                 baseline_chars=len(baseline_text),
                 current_chars=len(current_text),
                 prompt_token_count_unchanged=unchanged,

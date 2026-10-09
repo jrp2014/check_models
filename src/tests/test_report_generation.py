@@ -8806,6 +8806,8 @@ def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
         ("Blue boat.", "A boat.", (10, 10), (0, 10, 7, True)),
         # A missing token count leaves the prompt comparison unstated.
         ("x1", "x2", (None, 10), (1, 2, 2, None)),
+        # Slashes are plain characters: the prefix is not cut at a path separator.
+        ("cabin/cruiser", "cabin/crew", (10, 10), (8, 13, 10, True)),
     ],
 )
 def test_text_divergence_boundaries(

@@ -1065,6 +1065,10 @@ Notable changes to this project will be documented in this file.
 - The crash section of the run summary no longer guards a `model_provenance`
   the JSONL validator already requires; ty 0.0.80 flags that guard as a
   redundant condition and exits non-zero, which turned the gate red.
+- The text-divergence shared prefix is counted with a plain character
+  comparison instead of `os.path.commonprefix`, which Ruff's new RUF071 flags.
+  Ruff's suggested `commonpath` would compare path components, not text, so it
+  was not applied; the counts are unchanged.
 
 ## [0.17.0] - 2026-09-05
 
