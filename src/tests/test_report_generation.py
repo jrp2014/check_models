@@ -8957,6 +8957,7 @@ def test_comparison_tabulates_the_largest_prefill_changes_in_seconds() -> None:
     )
     assert comparison is not None
     assert [change.model for change in comparison.prefill_changes] == ["org/fast", "org/slow"]
+    assert comparison.has_changes
     assert check_models._comparison_view(comparison).prefill_rows == (
         ("org/fast", "0.87", "0.10", "8.73"),
         ("org/slow", "0.31", "0.62", "0.50"),
@@ -9041,3 +9042,22 @@ def test_output_index_names_the_run_and_its_producer() -> None:
         "started 2026-10-08 21:48:10 BST; check_models 0.17.41 @ 7a23a9a8c"
     )
     assert check_models._run_identity_text(None) is None
+
+
+def test_a_prefill_change_alone_counts_as_a_change() -> None:
+    """A 1 -> 5 s prefill slowdown must not end with "No changes beyond noise"."""
+    before, now = _comparison_record("org/a"), _comparison_record("org/a")
+    for record, rate in ((before, 100.0), (now, 20.0)):
+        cast("dict[str, Any]", record["metrics"]).update(prompt_tps=rate, prompt_tokens=100)
+    baseline = _comparison_baseline([before])
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", now)],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    assert check_models._comparison_view(comparison).prefill_rows == (
+        ("org/a", "1.00", "5.00", "0.20"),
+    )
+    assert comparison.has_changes
+    assert not replace(comparison, prefill_changes=()).has_changes

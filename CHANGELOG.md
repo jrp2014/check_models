@@ -29,7 +29,9 @@ Notable changes to this project will be documented in this file.
   - A "Largest prefill changes" table lists up to five models whose prefill
     tok/s left the fixed 0.85-1.15x band, as baseline and current prefill
     seconds (prompt tokens divided by prefill tok/s) with the ratio, retained
-    as `prefill_changes` in the comparison block and logged.
+    as `prefill_changes` in the comparison block and logged. A prefill change
+    alone counts as a change, so the log no longer follows such a table with
+    "No changes beyond noise".
   - The opening now says how the completions split (no observations,
     prompt-compliance only, native-reproduction candidates) and carries the
     evidence-link caveat, which moved up from Run context.

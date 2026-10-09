@@ -20565,6 +20565,7 @@ class RunComparison:
             or self.models_removed
             or self.changes
             or self.throughput_flags
+            or self.prefill_changes
             or self.memory_changes
             or self.text_changed_models
             or any(
