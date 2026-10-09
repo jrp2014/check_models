@@ -19,6 +19,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Cached-model discovery counts a config with image-input keys as image-capable
+  when the installed mlx-vlm has a loader for its `model_type`, even if its
+  architecture name is bespoke. MiniCPM-o 4.5, llm-jp-4-vl and Nemotron Omni
+  no longer trigger the "unknown image capability" warning; repos that carry no
+  image-input keys (moondream2) still do.
+
 - Run summary, from john's review of the warm-rerun report:
   - A "Largest prefill changes" table lists up to five models whose prefill
     tok/s left the fixed 0.85-1.15x band, as baseline and current prefill

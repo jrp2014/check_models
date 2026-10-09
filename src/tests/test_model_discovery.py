@@ -811,6 +811,25 @@ class TestImageCapabilityClassifier:
         assert cap.verdict == "unknown"
         assert any("no generative-text architecture" in e for e in cap.evidence)
 
+    def test_image_evidence_with_installed_loader_is_yes(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """MiniCPM-o shape: bespoke architecture name, but mlx-vlm ships its loader."""
+        monkeypatch.setattr(
+            check_models, "_installed_mlx_vlm_model_types", lambda: frozenset({"minicpmo"})
+        )
+        cap = _capability_for(
+            monkeypatch,
+            config={
+                "model_type": "minicpmo",
+                "architectures": ["MiniCPMO"],
+                "vision_config": {"hidden_size": 1152},
+            },
+        )
+
+        assert cap.verdict == "yes"
+        assert "installed mlx-vlm loader: minicpmo" in cap.evidence
+
     @pytest.mark.parametrize(
         "architecture",
         [
