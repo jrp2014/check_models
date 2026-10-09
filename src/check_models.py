@@ -20540,6 +20540,11 @@ class RunComparison:
     # (group, text changed, pairs) over greedy pairs only, by this run's
     # checkpoint quantization: "quantized", "not quantized", "unknown".
     greedy_text_changes_by_weights: tuple[tuple[str, int, int], ...] = ()
+    # This run's mlx version string and how many earlier retained runs in the
+    # history file recorded the same one (None when either is unknown). The
+    # first sweep on a freshly built mlx has repeatedly timed slower.
+    mlx_version: str | None = None
+    earlier_runs_on_mlx_version: int | None = None
     # (baseline, current) check_models versions when they differ: a phase
     # renamed between them changes a signature without changing the fault.
     harness_versions: tuple[str, ...] = ()
@@ -21060,6 +21065,34 @@ def _history_tps_bands(
     return bands, len(runs)
 
 
+def _earlier_runs_on_version(
+    history_path: Path | None, package: str, version: str | None, *, exclude_last: bool
+) -> int | None:
+    """Count earlier retained runs whose recorded ``package`` version equals ``version``.
+
+    Reads every run in the history file, whatever its prompt or image: the
+    count is about the installed build, not the workload. None when the
+    version or the history is unavailable.
+    """
+    if version is None or history_path is None or not history_path.is_file():
+        return None
+    try:
+        rows = [line for line in _read_text_file(history_path).splitlines() if line]
+    except OSError:
+        return None
+    if exclude_last and rows:
+        rows = rows[:-1]
+    count = 0
+    for line in rows:
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        versions = record.get("library_versions") if isinstance(record, dict) else None
+        count += isinstance(versions, dict) and versions.get(package) == version
+    return count
+
+
 def _current_model_revisions(
     current: Sequence[JsonlResultRecord],
 ) -> dict[str, str | None]:
@@ -21121,6 +21154,13 @@ def _quantile(ordered: Sequence[float], q: float) -> float:
         return ordered[lower]
     weight = position - lower
     return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+
+def _metadata_library_version(metadata: JsonlMetadataRecord | None, name: str) -> str | None:
+    """One package's recorded version string from a run's metadata, when present."""
+    versions = metadata.get("library_versions") if metadata is not None else None
+    version = versions.get(name) if isinstance(versions, dict) else None
+    return version if isinstance(version, str) and version else None
 
 
 def _comparison_component_rows(metadata: JsonlMetadataRecord) -> tuple[tuple[str, str], ...]:
@@ -21776,6 +21816,13 @@ def compare_run_results(
         throughput_flags=tuple(flags),
         memory_changes=tuple(memory),
         history_runs_used=history_runs,
+        mlx_version=_metadata_library_version(current_metadata, "mlx"),
+        earlier_runs_on_mlx_version=_earlier_runs_on_version(
+            history_path,
+            "mlx",
+            _metadata_library_version(current_metadata, "mlx"),
+            exclude_last=history_excludes_current,
+        ),
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
         baseline_hardware=baseline_hardware,
@@ -22130,6 +22177,8 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             for change in comparison.memory_changes
         ],
         "history_runs_used": comparison.history_runs_used,
+        "mlx_version": comparison.mlx_version,
+        "earlier_runs_on_mlx_version": comparison.earlier_runs_on_mlx_version,
         "execution_mode": execution_mode,
         "hardware": hardware,
     }
@@ -22160,6 +22209,11 @@ def _comparison_req_int(raw: JsonLike) -> int:
         message = f"comparison field is not an integer: {raw!r}"
         raise TypeError(message)
     return raw
+
+
+def _comparison_opt_int(raw: JsonLike) -> int | None:
+    """Narrow one optional retained comparison integer."""
+    return None if raw is None else _comparison_req_int(raw)
 
 
 def _comparison_req_str(raw: JsonLike) -> str:
@@ -22357,6 +22411,8 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         throughput_flags=throughput_flags,
         memory_changes=memory_changes,
         history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
+        mlx_version=_comparison_opt_str(value.get("mlx_version")),
+        earlier_runs_on_mlx_version=_comparison_opt_int(value.get("earlier_runs_on_mlx_version")),
         unverified_facts=_comparison_str_items(value.get("unverified_facts") or []),
         incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
         models_removed_status=tuple(
@@ -22561,6 +22617,19 @@ def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str
     return rows
 
 
+def _mlx_version_history_rows(comparison: RunComparison) -> list[tuple[str, str]]:
+    """How many earlier retained runs used this mlx version, when the history says."""
+    count = comparison.earlier_runs_on_mlx_version
+    if count is None or comparison.mlx_version is None:
+        return []
+    value = (
+        f"none: first retained run on {comparison.mlx_version}"
+        if count == 0
+        else f"{count} on {comparison.mlx_version}"
+    )
+    return [("Earlier retained runs on this mlx version", value)]
+
+
 def _prefill_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
     """Prefill throughput ratio row, withheld under the same rule as the decode ratio."""
     if not comparison.throughput_comparable or comparison.prompt_tps_ratio_median is None:
@@ -22644,6 +22713,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     ]
     summary_rows[2:2] = _changed_text_summary_rows(comparison)
     summary_rows[-1:-1] = _prefill_summary_rows(comparison)
+    summary_rows.extend(_mlx_version_history_rows(comparison))
     if comparison.current_execution_mode != comparison.baseline_execution_mode:
         mode_note = (
             f"{comparison.current_execution_mode} now vs "
@@ -22823,7 +22893,7 @@ def _prefill_change_blocks(
         ReportParagraph(
             f"Largest prefill changes outside {low:.2f}-{high:.2f}x (prefill seconds are "
             "prompt tokens divided by prefill tok/s; one timed generation per sweep, so "
-            "observations, not demonstrated speedups):"
+            "observations, not demonstrated speed changes):"
         ),
         ReportTable(
             ("Model", "Baseline prefill s", "Now prefill s", "Prefill tok/s ratio"),
@@ -24807,7 +24877,7 @@ def _run_issue_summary_artifacts_section(
         )
         for label, path in artifact_rows
     )
-    content: list[ReportBlock] = []
+    content: list[ReportBlock] = [ReportParagraph(_run_issue_summary_link_caveat())]
     if stale_names:
         omitted = ", ".join(f"`{name}`" for name in sorted(stale_names))
         content.append(
@@ -24970,7 +25040,6 @@ def generate_run_issue_summary_report(
     ]
     if (breakdown := _completion_breakdown_sentence(source.results)) is not None:
         blocks.append(ReportParagraph(breakdown))
-    blocks.append(ReportParagraph(_run_issue_summary_link_caveat()))
     if preflight_issues := source.metadata.get("preflight_issues"):
         blocks.extend(
             (
@@ -24983,12 +25052,6 @@ def generate_run_issue_summary_report(
         )
     blocks.extend(
         (
-            ReportParagraph(
-                "**What this run measures.** "
-                + _run_objective_statement(eval_mode)
-                + " Every locally cached MLX vision-language model got the same image and "
-                "prompt (reproduced below) through mlx-vlm's generation pipeline."
-            ),
             ReportSection(
                 "Run summary",
                 (
@@ -25019,6 +25082,12 @@ def generate_run_issue_summary_report(
                                 str(_count_observation(source.results, "repetition_abort")),
                             ),
                         )
+                    ),
+                    ReportParagraph(
+                        "**What this run measures.** "
+                        + _run_objective_statement(eval_mode)
+                        + " Every locally cached MLX vision-language model got the same image "
+                        "and prompt (reproduced below) through mlx-vlm's generation pipeline."
                     ),
                     ReportDetails(
                         "Exact prompt sent to every model",

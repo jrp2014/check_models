@@ -465,6 +465,8 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "0.8.9" in content
     assert "abc123" in content
     assert "**Evidence links**" in content
+    # Shown with the artifact links it qualifies, not above the run facts.
+    assert content.index("## Full artifacts") < content.index("**Evidence links**")
     # The link caveat is dynamic: pinned wording for a clean-worktree SHA ref,
     # mutable-branch wording otherwise.
     if re.fullmatch(r"[0-9a-f]{40}", check_models._github_blob_ref()):
@@ -1392,6 +1394,8 @@ def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
         pytest.fail("a clean run must still write the run summary entry point")
     content = summary.read_text(encoding="utf-8")
     assert "**What this run measures.**" in content
+    # Below the run facts, so the maintainer verdict is followed by numbers.
+    assert content.index("*Models attempted:*") < content.index("**What this run measures.**")
     assert "one shared image and prompt" in " ".join(content.split())
     assert "do not establish fitness for other tasks" in " ".join(content.split())
     assert "Exact prompt sent to every model" in content
@@ -8974,7 +8978,7 @@ def test_comparison_tabulates_the_largest_prefill_changes_in_seconds() -> None:
         )
     )
     assert "| Model | Baseline prefill s | Now prefill s | Prefill tok/s ratio |" in rendered
-    assert "not demonstrated speedups" in " ".join(rendered.split())
+    assert "not demonstrated speed changes" in " ".join(rendered.split())
 
 
 def test_run_summary_breakdown_says_why_only_some_need_native_reproduction() -> None:
@@ -9061,3 +9065,49 @@ def test_a_prefill_change_alone_counts_as_a_change() -> None:
     )
     assert comparison.has_changes
     assert not replace(comparison, prefill_changes=()).has_changes
+
+
+def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_path: Path) -> None:
+    """Any earlier run with the same mlx version counts; the current row is excluded."""
+    history = tmp_path / "results.history.jsonl"
+    rows = [
+        {"_type": "run", "library_versions": {"mlx": "0.32.4+old"}},
+        {"_type": "run", "library_versions": {"mlx": "0.32.4+new"}, "prompt_hash": "other"},
+        {"_type": "run", "library_versions": {}},
+        {"_type": "run", "library_versions": {"mlx": "0.32.4+new"}},  # the current run
+    ]
+    check_models._write_text_file(history, "".join(json.dumps(row) + "\n" for row in rows))
+    count = check_models._earlier_runs_on_version
+    assert count(history, "mlx", "0.32.4+new", exclude_last=True) == 1
+    assert count(history, "mlx", "0.32.4+new", exclude_last=False) == 2
+    assert count(history, "mlx", "0.32.4+newest", exclude_last=True) == 0
+    assert count(history, "mlx", None, exclude_last=True) is None
+    assert count(tmp_path / "missing.jsonl", "mlx", "0.32.4+new", exclude_last=True) is None
+
+    baseline = _comparison_baseline([_comparison_record("org/a")])
+    current_metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "library_versions": {"mlx": "0.32.4+newest"}},
+    )
+    kwargs = {**_verified_comparison_kwargs(baseline), "current_metadata": current_metadata}
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a"))],
+        baseline,
+        history_path=history,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison.earlier_runs_on_mlx_version == 0
+    rows_by_label = dict(check_models._comparison_view(comparison).summary_rows)
+    assert rows_by_label["Earlier retained runs on this mlx version"] == (
+        "none: first retained run on 0.32.4+newest"
+    )
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.earlier_runs_on_mlx_version == 0
+    assert restored.mlx_version == "0.32.4+newest"
+    # Without history the row is omitted rather than claiming a first run.
+    unknown = replace(comparison, earlier_runs_on_mlx_version=None)
+    assert "Earlier retained runs on this mlx version" not in dict(
+        check_models._comparison_view(unknown).summary_rows
+    )
