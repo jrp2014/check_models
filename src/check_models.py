@@ -20530,6 +20530,9 @@ class RunComparison:
     # first sweep on a freshly built mlx has repeatedly timed slower.
     mlx_version: str | None = None
     earlier_runs_on_mlx_version: int | None = None
+    # Earlier history records that could not be read or carry no mlx version:
+    # the count above says nothing about them.
+    mlx_version_history_unread: int = 0
     # (baseline, current) check_models versions when they differ: a phase
     # renamed between them changes a signature without changing the fault.
     harness_versions: tuple[str, ...] = ()
@@ -21052,12 +21055,14 @@ def _history_tps_bands(
 
 def _earlier_runs_on_version(
     history_path: Path | None, package: str, version: str | None, *, exclude_last: bool
-) -> int | None:
+) -> tuple[int, int] | None:
     """Count earlier retained runs whose recorded ``package`` version equals ``version``.
 
     Reads every run in the history file, whatever its prompt or image: the
-    count is about the installed build, not the workload. None when the
-    version or the history is unavailable.
+    count is about the installed build, not the workload. Returns the count
+    and how many records could not be read or name no ``package`` version,
+    so a zero is not mistaken for complete coverage. None when the version
+    or the history is unavailable.
     """
     if version is None or history_path is None or not history_path.is_file():
         return None
@@ -21067,15 +21072,32 @@ def _earlier_runs_on_version(
         return None
     if exclude_last and rows:
         rows = rows[:-1]
-    count = 0
+    count = unread = 0
     for line in rows:
         try:
             record = json.loads(line)
         except json.JSONDecodeError:
+            unread += 1
             continue
         versions = record.get("library_versions") if isinstance(record, dict) else None
-        count += isinstance(versions, dict) and versions.get(package) == version
-    return count
+        recorded = versions.get(package) if isinstance(versions, dict) else None
+        if not isinstance(recorded, str):
+            unread += 1
+        count += recorded == version
+    return count, unread
+
+
+def _mlx_version_history_fields(
+    history_path: Path | None, current_metadata: JsonlMetadataRecord | None, *, exclude_last: bool
+) -> dict[str, Any]:
+    """RunComparison's mlx version, earlier same-version count and unread records."""
+    version = _metadata_library_version(current_metadata, "mlx")
+    counted = _earlier_runs_on_version(history_path, "mlx", version, exclude_last=exclude_last)
+    return {
+        "mlx_version": version,
+        "earlier_runs_on_mlx_version": None if counted is None else counted[0],
+        "mlx_version_history_unread": 0 if counted is None else counted[1],
+    }
 
 
 def _current_model_revisions(
@@ -21801,12 +21823,8 @@ def compare_run_results(
         throughput_flags=tuple(flags),
         memory_changes=tuple(memory),
         history_runs_used=history_runs,
-        mlx_version=_metadata_library_version(current_metadata, "mlx"),
-        earlier_runs_on_mlx_version=_earlier_runs_on_version(
-            history_path,
-            "mlx",
-            _metadata_library_version(current_metadata, "mlx"),
-            exclude_last=history_excludes_current,
+        **_mlx_version_history_fields(
+            history_path, current_metadata, exclude_last=history_excludes_current
         ),
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
@@ -22164,6 +22182,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "history_runs_used": comparison.history_runs_used,
         "mlx_version": comparison.mlx_version,
         "earlier_runs_on_mlx_version": comparison.earlier_runs_on_mlx_version,
+        "mlx_version_history_unread": comparison.mlx_version_history_unread,
         "execution_mode": execution_mode,
         "hardware": hardware,
     }
@@ -22398,6 +22417,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
         mlx_version=_comparison_opt_str(value.get("mlx_version")),
         earlier_runs_on_mlx_version=_comparison_opt_int(value.get("earlier_runs_on_mlx_version")),
+        mlx_version_history_unread=_comparison_req_int(value.get("mlx_version_history_unread", 0)),
         unverified_facts=_comparison_str_items(value.get("unverified_facts") or []),
         incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
         models_removed_status=tuple(
@@ -22607,11 +22627,13 @@ def _mlx_version_history_rows(comparison: RunComparison) -> list[tuple[str, str]
     count = comparison.earlier_runs_on_mlx_version
     if count is None or comparison.mlx_version is None:
         return []
-    value = (
-        f"none: first retained run on {comparison.mlx_version}"
-        if count == 0
-        else f"{count} on {comparison.mlx_version}"
-    )
+    # "None recorded", never "first run": the history may be incomplete.
+    value = f"{count or 'none recorded'} on {comparison.mlx_version}"
+    if unread := comparison.mlx_version_history_unread:
+        value += (
+            f"; {_pluralized_count(unread, 'earlier record')} unreadable or without an mlx "
+            "version, so not counted"
+        )
     return [("Earlier retained runs on this mlx version", value)]
 
 

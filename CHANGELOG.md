@@ -21,7 +21,9 @@ Notable changes to this project will be documented in this file.
 
 - Run summary: the baseline comparison adds "Earlier retained runs on this
   mlx version", counted from `results.history.jsonl` across every retained
-  run ("none: first retained run on ..." for a fresh build). Four sweeps
+  run ("none recorded on ..." for a fresh build, never "first run": history
+  records that cannot be read or name no mlx version are counted and named as
+  not counted, since the history may be incomplete). Four sweeps
   (2026-09-26, 10-02, 10-08, 10-09) were each the first on a new mlx build and
   timed short-prompt prefill (and diffusiongemma's decode) far slower; an
   immediate rerun was back to normal each time.

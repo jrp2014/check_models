@@ -9078,9 +9078,10 @@ def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_pat
     ]
     check_models._write_text_file(history, "".join(json.dumps(row) + "\n" for row in rows))
     count = check_models._earlier_runs_on_version
-    assert count(history, "mlx", "0.32.4+new", exclude_last=True) == 1
-    assert count(history, "mlx", "0.32.4+new", exclude_last=False) == 2
-    assert count(history, "mlx", "0.32.4+newest", exclude_last=True) == 0
+    # The versionless row is counted as unread, not as another version.
+    assert count(history, "mlx", "0.32.4+new", exclude_last=True) == (1, 1)
+    assert count(history, "mlx", "0.32.4+new", exclude_last=False) == (2, 1)
+    assert count(history, "mlx", "0.32.4+newest", exclude_last=True) == (0, 1)
     assert count(history, "mlx", None, exclude_last=True) is None
     assert count(tmp_path / "missing.jsonl", "mlx", "0.32.4+new", exclude_last=True) is None
 
@@ -9097,17 +9098,63 @@ def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_pat
         **cast("dict[str, Any]", kwargs),
     )
     assert comparison.earlier_runs_on_mlx_version == 0
+    assert comparison.mlx_version_history_unread == 1
     rows_by_label = dict(check_models._comparison_view(comparison).summary_rows)
     assert rows_by_label["Earlier retained runs on this mlx version"] == (
-        "none: first retained run on 0.32.4+newest"
+        "none recorded on 0.32.4+newest; 1 earlier record unreadable or without an mlx "
+        "version, so not counted"
     )
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
     assert restored.earlier_runs_on_mlx_version == 0
+    assert restored.mlx_version_history_unread == 1
     assert restored.mlx_version == "0.32.4+newest"
     # Without history the row is omitted rather than claiming a first run.
     unknown = replace(comparison, earlier_runs_on_mlx_version=None)
     assert "Earlier retained runs on this mlx version" not in dict(
         check_models._comparison_view(unknown).summary_rows
+    )
+
+
+def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
+    tmp_path: Path,
+) -> None:
+    """Malformed and versionless history gives "none recorded", not "first retained run"."""
+    history = tmp_path / "results.history.jsonl"
+    check_models._write_text_file(
+        history,
+        "not json\n" + json.dumps({"_type": "run"}) + "\n" + json.dumps({"_type": "run"}) + "\n",
+    )
+    assert check_models._earlier_runs_on_version(history, "mlx", "0.32.4+x", exclude_last=True) == (
+        0,
+        2,
+    )
+    baseline = _comparison_baseline([_comparison_record("org/a")])
+    compared = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a"))],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert compared is not None
+    comparison = replace(
+        compared,
+        mlx_version="0.32.4+x",
+        earlier_runs_on_mlx_version=0,
+        mlx_version_history_unread=2,
+    )
+    row = dict(check_models._comparison_view(comparison).summary_rows)[
+        "Earlier retained runs on this mlx version"
+    ]
+    assert "first" not in row
+    assert row == (
+        "none recorded on 0.32.4+x; 2 earlier records unreadable or without an mlx "
+        "version, so not counted"
+    )
+    clean = replace(comparison, mlx_version_history_unread=0)
+    assert (
+        dict(check_models._comparison_view(clean).summary_rows)[
+            "Earlier retained runs on this mlx version"
+        ]
+        == "none recorded on 0.32.4+x"
     )
