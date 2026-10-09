@@ -1,5 +1,7 @@
 # Check Models Output Index
 
+Run: started 2026-10-09 23:21:34 BST; check_models 0.17.41 @ d04168248
+
 Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 
 This run records model responses to one shared image and prompt (evaluation
@@ -9,14 +11,14 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 11m 09s
+- Run duration: 10m 49s
 - Evaluation lane: assisted
 - Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - Input image: JPEG, 9,641 x 6,427 pixels (62.0 MP), 58.1 MB
 - Models attempted: 50 (completed 50, crashed 0, indeterminate 0)
-- Mechanical checks: no concerns detected 29, concerns detected 8, major concerns 13, not assessed 0
-- Top observations: Response repeats the same text (4), Generation was stopped early after sustained repeated output (3), Unrecognised model control tokens remain visible (2), Required labelled fields not detected (9), Response appears cut off at the token limit (2)
+- Mechanical checks: no concerns detected 28, concerns detected 9, major concerns 13 (generation 5, answer format 8), not assessed 0
+- Observations, most important first: Response repeats the same text (4), Generation was stopped early after sustained repeated output (3), Unrecognised model control tokens remain visible (2), Required labelled fields not detected (9), Response appears cut off at the token limit (2); 3 more kinds in diagnostics
 
 ## Start here
 

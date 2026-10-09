@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-10-08 22:45:53 BST
+Generated on: 2026-10-09 23:32:23 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -26,87 +26,87 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.03s   | 493 tok/s  | 0.64            | 1.9     | 2,103      | 58      | none                                                                                              |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 8.62s   | 78.7 tok/s | 5.60            | 8.7     | 6,339      | 98      | none                                                                                              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | 8.11s   | 35.4 tok/s | 1.81            | 18      | 2,601      | 130     | none                                                                                              |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 5.81s   | 56.9 tok/s | 2.03            | 10      | 2,091      | 113     | none                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 5.89s   | 37.5 tok/s | 1.47            | 17      | 2,091      | 80      | none                                                                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 19.27s  | 66.1 tok/s | 1.38            | 20      | 1,312      | 995     | none                                                                                              |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | 4.85s   | 302 tok/s  | 0.99            | 3.2     | 910        | 662     | none                                                                                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.18s   | 106 tok/s  | 0.76            | 7.0     | 369        | 88      | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 6.89s   | 66.2 tok/s | 2.81            | 13      | 2,905      | 140     | none                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 3.83s   | 188 tok/s  | 1.56            | 7.8     | 2,904      | 132     | none                                                                                              |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 5.24s   | 71.7 tok/s | 1.41            | 8.5     | 1,502      | 148     | none                                                                                              |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.24s   | 209 tok/s  | 2.73            | 3.9     | 4,065      | 148     | none                                                                                              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 5.69s   | 106 tok/s  | 1.21            | 24      | 1,267      | 129     | none                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 4.72s   | 59.1 tok/s | 0.82            | 9.3     | 1,115      | 144     | none                                                                                              |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | 27.35s  | 65.4 tok/s | 22.01           | 26      | 12,768     | 136     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 40.99s  | 83.0 tok/s | 36.42           | 23      | 16,525     | 133     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 41.11s  | 67.9 tok/s | 37.51           | 11      | 16,525     | 112     | none                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 38.57s  | 102 tok/s  | 33.60           | 25      | 16,541     | 152     | none                                                                                              |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 59.97s  | 27.4 tok/s | 52.44           | 21      | 16,541     | 121     | none                                                                                              |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 4.95s   | 102 tok/s  | 1.61            | 6.5     | 2,070      | 132     | none                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 8.74s   | 31.5 tok/s | 1.46            | 17      | 572        | 138     | none                                                                                              |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.08s   | 61.3 tok/s | 0.97            | 7.6     | 577        | 108     | none                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 4.84s   | 125 tok/s  | 1.01            | 16      | 577        | 106     | none                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 8.95s   | 26.3 tok/s | 1.69            | 20      | 577        | 107     | none                                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | 3.66s   | 126 tok/s  | 0.80            | 5.9     | 573        | 79      | none                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 7.68s   | 40.0 tok/s | 2.44            | 16      | 3,095      | 119     | none                                                                                              |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 4.61s   | 129 tok/s  | 2.18            | 5.4     | 4,188      | 118     | none                                                                                              |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 7.37s   | 36.8 tok/s | 1.94            | 18      | 1,251      | 114     | none                                                                                              |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 8.44s   | 156 tok/s  | 4.67            | 23      | 3,606      | 132     | none                                                                                              |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | 10.08s  | 30.5 tok/s | 3.50            | 23      | 2,372      | 117     | prompt hint repeated                                                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | 9.53s   | 126 tok/s  | 1.29            | 19      | 1,617      | 758     | duplicate keywords                                                                                |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 21.98s  | 45.3 tok/s | 12.41           | 78      | 6,339      | 106     | prompt hint repeated                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | 3.35s   | 213 tok/s  | 1.17            | 4.0     | 2,094      | 92      | prompt hint repeated                                                                              |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.51s   | 118 tok/s  | 1.14            | 5.6     | 1,407      | 114     | prompt hint repeated                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 39.52s  | 49.0 tok/s | 22.58           | 92      | 3,468      | 112     | prompt hint repeated                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | 6.21s   | 78.5 tok/s | 2.26            | 28      | 573        | 90      | prompt hint repeated                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | 3.22s   | 182 tok/s  | 1.21            | 4.8     | 1,366      | 104     | prompt hint repeated                                                                              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 2.85s   | 369 tok/s  | 1.17            | 2.2     | 312        | 44      | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | 2.66s   | 365 tok/s  | 0.89            | 2.1     | 2,094      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 38.49s  | 19.5 tok/s | 2.16            | 15      | 290        | 667     | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | 8.78s   | 32.2 tok/s | 2.95            | 13      | 3,104      | 113     | labelled fields not detected                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 55.17s  | 23.4 tok/s | 8.87            | 25      | 4,390      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | 40.66s  | 122 tok/s  | 37.11           | 9.4     | 16,536     | 225     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.29s   | 468 tok/s  | 1.00            | 1.1     | 1,186      | 22      | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 19.70s  | 58.9 tok/s | 14.17           | 14      | 16,536     | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 4.42s   | 98.9 tok/s | 0.87            | 7.2     | 571        | 132     | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 5.14s   | 145 tok/s  | 3.17            | 4.3     | 5,615      | 86      | labelled fields not detected; duplicate keywords                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.46s   | 108 tok/s  | 1.54            | 6.7     | 2,174      | 18      | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 5.02s   | 311 tok/s  | 0.71            | 1.8     | 308        | 1,000   | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | 4.57s   | 166 tok/s  | 0.98            | 4.8     | 1,011      | 48      | labelled fields not detected; prompt hint repeated                                                |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.36s   | 482 tok/s  | 0.92            | 1.9     | 2,103      | 58      | none                                                                                              |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 9.31s   | 79.5 tok/s | 6.30            | 8.7     | 6,339      | 98      | none                                                                                              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected`          | 8.94s   | 35.3 tok/s | 2.59            | 18      | 2,601      | 130     | none                                                                                              |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 7.07s   | 57.4 tok/s | 3.27            | 10      | 2,091      | 113     | none                                                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected`          | 6.26s   | 36.4 tok/s | 1.71            | 17      | 2,091      | 80      | none                                                                                              |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected`          | 23.02s  | 60.2 tok/s | 3.69            | 20      | 1,312      | 995     | none                                                                                              |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.37s   | 102 tok/s  | 0.87            | 7.0     | 369        | 88      | none                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.91s   | 64.5 tok/s | 2.74            | 13      | 2,905      | 140     | none                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 5.20s   | 181 tok/s  | 1.59            | 7.8     | 2,904      | 132     | none                                                                                              |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 7.57s   | 68.9 tok/s | 3.58            | 8.1     | 1,502      | 148     | none                                                                                              |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.27s   | 207 tok/s  | 2.75            | 3.9     | 4,065      | 148     | none                                                                                              |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected`          | 6.08s   | 104 tok/s  | 1.59            | 24      | 1,267      | 129     | none                                                                                              |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 4.94s   | 58.6 tok/s | 0.98            | 9.3     | 1,115      | 144     | none                                                                                              |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 22.56s  | 72.1 tok/s | 17.42           | 26      | 12,768     | 136     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 31.53s  | 87.0 tok/s | 26.06           | 23      | 16,525     | 133     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 32.36s  | 70.1 tok/s | 28.77           | 11      | 16,525     | 112     | none                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 32.01s  | 104 tok/s  | 27.15           | 25      | 16,541     | 152     | none                                                                                              |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 51.54s  | 29.4 tok/s | 44.12           | 21      | 16,541     | 121     | none                                                                                              |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 5.15s   | 97.9 tok/s | 1.68            | 6.5     | 2,070      | 132     | none                                                                                              |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 9.16s   | 30.7 tok/s | 1.63            | 17      | 572        | 138     | none                                                                                              |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.39s   | 61.2 tok/s | 1.16            | 7.6     | 577        | 108     | none                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.03s   | 120 tok/s  | 1.06            | 16      | 577        | 106     | none                                                                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected`          | 9.04s   | 26.3 tok/s | 1.68            | 20      | 577        | 107     | none                                                                                              |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 4.02s   | 122 tok/s  | 1.02            | 6.0     | 573        | 79      | none                                                                                              |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected`          | 7.44s   | 39.8 tok/s | 2.23            | 16      | 3,095      | 119     | none                                                                                              |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 4.66s   | 127 tok/s  | 2.17            | 5.4     | 4,188      | 118     | none                                                                                              |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 8.21s   | 36.2 tok/s | 2.19            | 18      | 1,251      | 114     | none                                                                                              |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 9.55s   | 155 tok/s  | 5.70            | 23      | 3,606      | 132     | none                                                                                              |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`             | 10.47s  | 30.5 tok/s | 4.00            | 23      | 2,372      | 117     | prompt hint repeated                                                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`             | 10.20s  | 125 tok/s  | 1.89            | 19      | 1,617      | 758     | duplicate keywords                                                                                |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`             | 24.15s  | 45.3 tok/s | 14.24           | 78      | 6,339      | 106     | prompt hint repeated                                                                              |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.81s   | 188 tok/s  | 1.51            | 4.0     | 2,094      | 92      | prompt hint repeated                                                                              |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`             | 6.19s   | 288 tok/s  | 2.63            | 3.2     | 910        | 527     | duplicate keywords                                                                                |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.85s   | 122 tok/s  | 1.36            | 5.6     | 1,407      | 114     | prompt hint repeated                                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`             | 39.75s  | 51.1 tok/s | 22.73           | 92      | 3,468      | 112     | prompt hint repeated                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`             | 8.15s   | 60.7 tok/s | 3.55            | 28      | 573        | 90      | prompt hint repeated                                                                              |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.72s   | 177 tok/s  | 1.67            | 4.8     | 1,366      | 104     | prompt hint repeated                                                                              |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 3.82s   | 367 tok/s  | 2.02            | 1.8     | 312        | 44      | labelled fields not detected                                                                      |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 2.78s   | 388 tok/s  | 1.01            | 2.1     | 2,094      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns: generation`    | 41.12s  | 18.4 tok/s | 2.71            | 15      | 290        | 667     | repeated text; duplicate keywords                                                                 |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: answer format` | 10.12s  | 30.4 tok/s | 4.04            | 12      | 3,104      | 113     | labelled fields not detected                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 54.07s  | 24.3 tok/s | 9.23            | 25      | 4,390      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 29.21s  | 125 tok/s  | 25.64           | 9.4     | 16,536     | 225     | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.58s   | 527 tok/s  | 1.01            | 1.1     | 1,186      | 22      | labelled fields not detected                                                                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns: generation`    | 20.06s  | 57.3 tok/s | 13.98           | 14      | 16,536     | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 5.42s   | 94.6 tok/s | 1.69            | 7.1     | 571        | 132     | labelled fields not detected                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: answer format` | 4.99s   | 143 tok/s  | 3.10            | 4.3     | 5,615      | 86      | labelled fields not detected; duplicate keywords                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.55s   | 103 tok/s  | 1.53            | 6.7     | 2,174      | 18      | control tokens visible; labelled fields not detected                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: generation`    | 4.76s   | 352 tok/s  | 0.72            | 1.8     | 308        | 1,000   | repeated text; labelled fields not detected; cut off at token limit                               |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 4.24s   | 162 tok/s  | 0.98            | 4.8     | 1,011      | 48      | labelled fields not detected; prompt hint repeated                                                |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.03s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.36s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
-## Avoid for This Run
+## Major Mechanical Concerns in This Run
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Mechanical checks | Observations                                                                                      |
-|--------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected; duplicate keywords                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns`  | labelled fields not detected; prompt hint repeated                                                |
+| Model                                                                                                        | Mechanical checks               | Observations                                                                                      |
+|--------------------------------------------------------------------------------------------------------------|---------------------------------|---------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns: answer format` | labelled fields not detected                                                                      |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns: generation`    | repeated text; duplicate keywords                                                                 |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                | `major concerns: answer format` | labelled fields not detected                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns: generation`    | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns: answer format` | labelled fields not detected                                                                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns: answer format` | labelled fields not detected                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns: answer format` | labelled fields not detected; duplicate keywords                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns: answer format` | control tokens visible; labelled fields not detected                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns: generation`    | repeated text; labelled fields not detected; cut off at token limit                               |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -123,7 +123,6 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Ramsgate Harbour Sunset with Patrol Boats \| Description: The image captures a serene sunset at Ramsgate Harbour, Kent, with several UK Border Security Comma... \| Keywords (19): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Sunset at Ramsgate Harbour \| Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside... \| Keywords (15): Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, ...                                                                               |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk \| Description: UK Border Security patrol boats, including the Defender and Volunteer,... \| Keywords (12): UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, ...[3,714 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Border Patrol Boats in Ramsgate Harbor at Sunset \| Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, ar... \| Keywords (18): border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, ...[2,120 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: Border security patrol vessels moored in Ramsgate Harbour, Kent, with dramatic sunset lighting reflec... \| Keywords (18): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **BSC Patrol Vessels at Ramsgate Harbour Sunset** \| Description: A fleet of UK Border Security Command patrol boats, including the *BSC Defender* and *BSC... \| Keywords (16): Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, patrol boats, maritime fleet, ...                                                                               |
 | [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Ramsgate Sunset: Border Patrol Boats at Dusk \| Description: At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *... \| Keywords (14): Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol boats, coastal town skyline, ...                                                                               |
@@ -150,6 +149,7 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Sunset over Ramsgate Harbour \| Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silh... \| Keywords (43): Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, ...[1,955 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | Title: Ramsgate Harbour Sunset with Patrol Vessels \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moore... \| Keywords (19): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
 | [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: Border security vessels docked in Ramsgate Harbour at sunset \| Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic s... \| Keywords (17): Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`    | Title: Border Patrol Vessels at Ramsgate Harbor Sunset \| Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a bea... \| Keywords (36): British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, ...[1,697 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Border Security Command Patrol Vessels in Ramsgate Harbour \| Description: Border Security Command patrol vessels, including the BSC Defender and BSC Voluntee... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
 | [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: UK Border Security Command vessels moored at Ramsgate Harbour at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                                |
 | [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: UK Border Security Patrol Vessels at Ramsgate Harbour at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and V... \| Keywords (15): Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, sunset, dusk, coast, maritime, mooring, ...                                                                               |
@@ -172,10 +172,10 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 ## Run Stamps
 
 - `mlx-vlm`: `0.7.7`
-- `mlx`: `0.32.4.dev20261008+3c40e8f92`
+- `mlx`: `0.32.4.dev20261009+99f109b56`
 - `transformers`: `5.19.0`
-- `tokenizers`: `0.23.2`
-- `huggingface-hub`: `1.33.0`
+- `tokenizers`: `0.23.3`
+- `huggingface-hub`: `2.2.0`
 - *Python Version:* 3.14.7
 - *OS:* Darwin 27.0.0
 - *macOS Version:* 27.0.1
@@ -257,17 +257,17 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.33s
-- *Generation time:* 0.76s
-- *Total time:* 2.03s
-- *Prompt preparation time:* 0.551
-- *First-token latency:* 0.108
-- *Cleanup time:* 0.0623
+- *Model load time:* 0.36s
+- *Generation time:* 1.05s
+- *Total time:* 2.36s
+- *Prompt preparation time:* 0.549
+- *First-token latency:* 0.394
+- *Cleanup time:* 0.0611
 - *Prompt tokens:* 2,103
 - *Generation tokens:* 58
 - *Total tokens:* 2,161
-- *Prompt throughput (raw):* 19,528 tok/s
-- *Generation throughput (raw):* 493 tok/s
+- *Prompt throughput (raw):* 5,344 tok/s
+- *Generation throughput (raw):* 482 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.08
@@ -319,16 +319,16 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
 - *Model load time:* 1.18s
-- *Generation time:* 6.85s
-- *Total time:* 8.62s
-- *Prompt preparation time:* 0.574
-- *First-token latency:* 5.06
-- *Cleanup time:* 0.0856
+- *Generation time:* 7.54s
+- *Total time:* 9.31s
+- *Prompt preparation time:* 0.588
+- *First-token latency:* 5.76
+- *Cleanup time:* 0.0844
 - *Prompt tokens:* 6,339
 - *Generation tokens:* 98
 - *Total tokens:* 6,437
-- *Prompt throughput (raw):* 1,252 tok/s
-- *Generation throughput (raw):* 78.7 tok/s
+- *Prompt throughput (raw):* 1,100 tok/s
+- *Generation throughput (raw):* 79.5 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
@@ -374,17 +374,17 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.86s
-- *Generation time:* 5.49s
-- *Total time:* 8.11s
-- *Prompt preparation time:* 0.756
-- *First-token latency:* 1.06
-- *Cleanup time:* 0.108
+- *Model load time:* 1.88s
+- *Generation time:* 6.28s
+- *Total time:* 8.94s
+- *Prompt preparation time:* 0.774
+- *First-token latency:* 1.86
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 2,601
 - *Generation tokens:* 130
 - *Total tokens:* 2,731
-- *Prompt throughput (raw):* 2,444 tok/s
-- *Generation throughput (raw):* 35.4 tok/s
+- *Prompt throughput (raw):* 1,396 tok/s
+- *Generation throughput (raw):* 35.3 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
@@ -432,17 +432,17 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.09s
-- *Generation time:* 4.02s
-- *Total time:* 5.81s
-- *Prompt preparation time:* 0.684
-- *First-token latency:* 1.37
-- *Cleanup time:* 0.113
+- *Model load time:* 1.13s
+- *Generation time:* 5.25s
+- *Total time:* 7.07s
+- *Prompt preparation time:* 0.685
+- *First-token latency:* 2.6
+- *Cleanup time:* 0.0975
 - *Prompt tokens:* 2,091
 - *Generation tokens:* 113
 - *Total tokens:* 2,204
-- *Prompt throughput (raw):* 1,531 tok/s
-- *Generation throughput (raw):* 56.9 tok/s
+- *Prompt throughput (raw):* 804 tok/s
+- *Generation throughput (raw):* 57.4 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
@@ -493,17 +493,17 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.58s
-- *Generation time:* 3.60s
-- *Total time:* 5.89s
-- *Prompt preparation time:* 0.7
-- *First-token latency:* 0.795
-- *Cleanup time:* 0.102
+- *Model load time:* 1.65s
+- *Generation time:* 3.91s
+- *Total time:* 6.26s
+- *Prompt preparation time:* 0.688
+- *First-token latency:* 1.02
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 2,091
 - *Generation tokens:* 80
 - *Total tokens:* 2,171
-- *Prompt throughput (raw):* 2,630 tok/s
-- *Generation throughput (raw):* 37.5 tok/s
+- *Prompt throughput (raw):* 2,050 tok/s
+- *Generation throughput (raw):* 36.4 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
@@ -528,7 +528,7 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 <pre class="model-output-readable">
 Title: Sunset at Ramsgate Harbour
 Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, Lifebuoy, Reflection, Coast, Fleet, Buildings
+Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, Lifebuoy, Reflection, Coast, Buildings, Pier
 </pre>
 
 </details>
@@ -549,17 +549,17 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.18s
-- *Generation time:* 16.42s
-- *Total time:* 19.27s
-- *Prompt preparation time:* 0.655
-- *First-token latency:* 0.665
-- *Cleanup time:* 0.151
+- *Model load time:* 2.15s
+- *Generation time:* 20.22s
+- *Total time:* 23.02s
+- *Prompt preparation time:* 0.64
+- *First-token latency:* 2.97
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 1,312
 - *Generation tokens:* 995
 - *Total tokens:* 2,307
-- *Prompt throughput (raw):* 1,974 tok/s
-- *Generation throughput (raw):* 66.1 tok/s
+- *Prompt throughput (raw):* 441 tok/s
+- *Generation throughput (raw):* 60.2 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 1.6
@@ -613,171 +613,6 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.88s
-- *Generation time:* 3.19s
-- *Total time:* 4.85s
-- *Prompt preparation time:* 0.768
-- *First-token latency:* 0.238
-- *Cleanup time:* 0.0923
-- *Prompt tokens:* 910
-- *Generation tokens:* 662
-- *Total tokens:* 1,572
-- *Prompt throughput (raw):* 3,823 tok/s
-- *Generation throughput (raw):* 302 tok/s
-- *Peak memory (GB):* 3.2
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00469
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1366
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
-
-For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored in Ramsgate Harbor at Sunset".
-
-Now description: Combine the context and visible details. Mention the vessels (border security), the name BSC Defender and Volunteer, location (Ramsgate Harbour, Kent), setting (dusk with sunset), and visible details like lifebuoys, buildings, etc.
-
-Keywords: need 10-18 unique, covering relevant context and visible details. Let's list: border, security, patrol, vessels, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, boats, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency, etc. Ensure they are unique and cover the context and visible details.
-
-Now, let's construct:
-
-Title: Border Patrol Boats in Ramsgate Harbor at Sunset
-
-Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
-
-Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency.
-
-Count the keywords: I'll list them and ensure they are 10-18 unique.
-
-Let me check:
-
-1. border
-2. security
-3. patrol
-4. boats
-5. Ramsgate
-6. harbor
-7. Kent
-8. dusk
-9. sunset
-10. lifebuoys
-11. mooring
-12. maritime
-13. reflected
-14. buildings
-15. cliffside
-16. command
-17. fleet
-18. waters
-
-That's 18 unique keywords. They cover relevant context and visible details.
-
-Now, ensure the title is 5-10 words: "Border Patrol Boats in Ramsgate Harbor at Sunset" is 5 words. Good.
-
-Finally, output exactly Title, Description, Keywords.
-&lt;/think&gt;
-
-Title: Border Patrol Boats in Ramsgate Harbor at Sunset
-
-Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
-
-Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
-
-For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored in Ramsgate Harbor at Sunset".
-
-Now description: Combine the context and visible details. Mention the vessels (border security), the name BSC Defender and Volunteer, location (Ramsgate Harbour, Kent), setting (dusk with sunset), and visible details like lifebuoys, buildings, etc.
-
-Keywords: need 10-18 unique, covering relevant context and visible details. Let's list: border, security, patrol, vessels, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, boats, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency, etc. Ensure they are unique and cover the context and visible details.
-
-Now, let's construct:
-
-Title: Border Patrol Boats in Ramsgate Harbor at Sunset
-
-Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
-
-Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency.
-
-Count the keywords: I'll list them and ensure they are 10-18 unique.
-
-Let me check:
-
-1. border
-2. security
-3. patrol
-4. boats
-5. Ramsgate
-6. harbor
-7. Kent
-8. dusk
-9. sunset
-10. lifebuoys
-11. mooring
-12. maritime
-13. reflected
-14. buildings
-15. cliffside
-16. command
-17. fleet
-18. waters
-
-That's 18 unique keywords. They cover relevant context and visible details.
-
-Now, ensure the title is 5-10 words: "Border Patrol Boats in Ramsgate Harbor at Sunset" is 5 words. Good.
-
-Finally, output exactly Title, Description, Keywords.
-</think>
-
-Title: Border Patrol Boats in Ramsgate Harbor at Sunset
-
-Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
-
-Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-minicpm-o-45-4bit"></a>
 
 ### mlx-community/MiniCPM-o-4_5-4bit
@@ -792,17 +627,17 @@ Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.01s
-- *Generation time:* 1.60s
-- *Total time:* 3.18s
-- *Prompt preparation time:* 0.569
-- *First-token latency:* 0.216
-- *Cleanup time:* 0.0936
+- *Model load time:* 1.05s
+- *Generation time:* 1.74s
+- *Total time:* 3.37s
+- *Prompt preparation time:* 0.57
+- *First-token latency:* 0.323
+- *Cleanup time:* 0.1
 - *Prompt tokens:* 369
 - *Generation tokens:* 88
 - *Total tokens:* 457
-- *Prompt throughput (raw):* 1,711 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Prompt throughput (raw):* 1,144 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
@@ -850,17 +685,17 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.34s
-- *Generation time:* 4.93s
-- *Total time:* 6.89s
-- *Prompt preparation time:* 0.603
-- *First-token latency:* 2.23
-- *Cleanup time:* 0.0916
+- *Model load time:* 1.37s
+- *Generation time:* 4.91s
+- *Total time:* 6.91s
+- *Prompt preparation time:* 0.615
+- *First-token latency:* 2.16
+- *Cleanup time:* 0.0977
 - *Prompt tokens:* 2,905
 - *Generation tokens:* 140
 - *Total tokens:* 3,045
-- *Prompt throughput (raw):* 1,300 tok/s
-- *Generation throughput (raw):* 66.2 tok/s
+- *Prompt throughput (raw):* 1,348 tok/s
+- *Generation throughput (raw):* 64.5 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.56
@@ -910,17 +745,17 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.96s
-- *Generation time:* 2.26s
-- *Total time:* 3.83s
-- *Prompt preparation time:* 0.602
-- *First-token latency:* 0.982
-- *Cleanup time:* 0.0853
+- *Model load time:* 2.23s
+- *Generation time:* 2.32s
+- *Total time:* 5.20s
+- *Prompt preparation time:* 0.63
+- *First-token latency:* 1.01
+- *Cleanup time:* 0.101
 - *Prompt tokens:* 2,904
 - *Generation tokens:* 132
 - *Total tokens:* 3,036
-- *Prompt throughput (raw):* 2,956 tok/s
-- *Generation throughput (raw):* 188 tok/s
+- *Prompt throughput (raw):* 2,877 tok/s
+- *Generation throughput (raw):* 181 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
@@ -970,18 +805,18 @@ Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.04s
-- *Generation time:* 3.48s
-- *Total time:* 5.24s
-- *Prompt preparation time:* 0.701
-- *First-token latency:* 0.742
-- *Cleanup time:* 0.0923
+- *Model load time:* 1.09s
+- *Generation time:* 5.73s
+- *Total time:* 7.57s
+- *Prompt preparation time:* 0.73
+- *First-token latency:* 2.89
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 1,502
 - *Generation tokens:* 148
 - *Total tokens:* 1,650
-- *Prompt throughput (raw):* 2,025 tok/s
-- *Generation throughput (raw):* 71.7 tok/s
-- *Peak memory (GB):* 8.5
+- *Prompt throughput (raw):* 519 tok/s
+- *Generation throughput (raw):* 68.9 tok/s
+- *Peak memory (GB):* 8.1
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.31
 - *Model-load active memory (GB):* 6.45
@@ -1028,17 +863,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.98s
-- *Generation time:* 3.44s
-- *Total time:* 5.24s
-- *Prompt preparation time:* 0.798
-- *First-token latency:* 1.97
-- *Cleanup time:* 0.0861
+- *Model load time:* 1.00s
+- *Generation time:* 3.47s
+- *Total time:* 5.27s
+- *Prompt preparation time:* 0.796
+- *First-token latency:* 1.99
+- *Cleanup time:* 0.0897
 - *Prompt tokens:* 4,065
 - *Generation tokens:* 148
 - *Total tokens:* 4,213
-- *Prompt throughput (raw):* 2,062 tok/s
-- *Generation throughput (raw):* 209 tok/s
+- *Prompt throughput (raw):* 2,044 tok/s
+- *Generation throughput (raw):* 207 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
@@ -1085,17 +920,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.57s
-- *Generation time:* 2.42s
-- *Total time:* 5.69s
-- *Prompt preparation time:* 0.685
-- *First-token latency:* 0.571
-- *Cleanup time:* 0.124
+- *Model load time:* 2.55s
+- *Generation time:* 2.83s
+- *Total time:* 6.08s
+- *Prompt preparation time:* 0.691
+- *First-token latency:* 0.939
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 1,267
 - *Generation tokens:* 129
 - *Total tokens:* 1,396
-- *Prompt throughput (raw):* 2,217 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Prompt throughput (raw):* 1,350 tok/s
+- *Generation throughput (raw):* 104 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.15
@@ -1142,17 +977,17 @@ Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.90s
-- *Generation time:* 3.26s
-- *Total time:* 4.72s
-- *Prompt preparation time:* 0.551
-- *First-token latency:* 0.288
-- *Cleanup time:* 0.0843
+- *Model load time:* 0.94s
+- *Generation time:* 3.44s
+- *Total time:* 4.94s
+- *Prompt preparation time:* 0.564
+- *First-token latency:* 0.439
+- *Cleanup time:* 0.0874
 - *Prompt tokens:* 1,115
 - *Generation tokens:* 144
 - *Total tokens:* 1,259
-- *Prompt throughput (raw):* 3,866 tok/s
-- *Generation throughput (raw):* 59.1 tok/s
+- *Prompt throughput (raw):* 2,541 tok/s
+- *Generation throughput (raw):* 58.6 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
@@ -1200,17 +1035,17 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.28s
-- *Generation time:* 24.09s
-- *Total time:* 27.35s
-- *Prompt preparation time:* 0.96
-- *First-token latency:* 21.1
-- *Cleanup time:* 0.14
+- *Model load time:* 2.29s
+- *Generation time:* 19.31s
+- *Total time:* 22.56s
+- *Prompt preparation time:* 0.942
+- *First-token latency:* 16.6
+- *Cleanup time:* 0.136
 - *Prompt tokens:* 12,768
 - *Generation tokens:* 136
 - *Total tokens:* 12,904
-- *Prompt throughput (raw):* 604 tok/s
-- *Generation throughput (raw):* 65.4 tok/s
+- *Prompt throughput (raw):* 771 tok/s
+- *Generation throughput (raw):* 72.1 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
@@ -1260,17 +1095,17 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.90s
-- *Generation time:* 38.02s
-- *Total time:* 40.99s
-- *Prompt preparation time:* 1.05
-- *First-token latency:* 35.5
-- *Cleanup time:* 0.135
+- *Model load time:* 2.91s
+- *Generation time:* 27.59s
+- *Total time:* 31.53s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 25.1
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 16,525
 - *Generation tokens:* 133
 - *Total tokens:* 16,658
-- *Prompt throughput (raw):* 466 tok/s
-- *Generation throughput (raw):* 83.0 tok/s
+- *Prompt throughput (raw):* 657 tok/s
+- *Generation throughput (raw):* 87.0 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
@@ -1317,17 +1152,17 @@ Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.89s
-- *Generation time:* 39.16s
-- *Total time:* 41.11s
+- *Model load time:* 0.93s
+- *Generation time:* 30.37s
+- *Total time:* 32.36s
 - *Prompt preparation time:* 1.05
-- *First-token latency:* 36.6
-- *Cleanup time:* 0.106
+- *First-token latency:* 27.8
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 16,525
 - *Generation tokens:* 112
 - *Total tokens:* 16,637
-- *Prompt throughput (raw):* 452 tok/s
-- *Generation throughput (raw):* 67.9 tok/s
+- *Prompt throughput (raw):* 593 tok/s
+- *Generation throughput (raw):* 70.1 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
@@ -1374,20 +1209,20 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.41s
-- *Generation time:* 35.09s
-- *Total time:* 38.57s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 32.7
-- *Cleanup time:* 0.132
+- *Model load time:* 2.36s
+- *Generation time:* 28.61s
+- *Total time:* 32.01s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 26.2
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 16,541
 - *Generation tokens:* 152
 - *Total tokens:* 16,693
-- *Prompt throughput (raw):* 506 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Prompt throughput (raw):* 630 tok/s
+- *Generation throughput (raw):* 104 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.91
+- *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
 - *Post-cleanup active memory (GB):* 0.00972
 - *Post-cleanup cache memory (GB):* 0.0
@@ -1431,17 +1266,17 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dov
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.01s
-- *Generation time:* 56.86s
-- *Total time:* 59.97s
-- *Prompt preparation time:* 1.08
-- *First-token latency:* 51.5
-- *Cleanup time:* 0.158
+- *Model load time:* 2.24s
+- *Generation time:* 48.25s
+- *Total time:* 51.54s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 43.2
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 16,541
 - *Generation tokens:* 121
 - *Total tokens:* 16,662
-- *Prompt throughput (raw):* 321 tok/s
-- *Generation throughput (raw):* 27.4 tok/s
+- *Prompt throughput (raw):* 383 tok/s
+- *Generation throughput (raw):* 29.4 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
@@ -1491,17 +1326,17 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.03s
-- *Generation time:* 2.91s
-- *Total time:* 4.95s
-- *Prompt preparation time:* 1
-- *First-token latency:* 0.712
-- *Cleanup time:* 0.103
+- *Model load time:* 1.11s
+- *Generation time:* 3.03s
+- *Total time:* 5.15s
+- *Prompt preparation time:* 0.989
+- *First-token latency:* 0.791
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 2,070
 - *Generation tokens:* 132
 - *Total tokens:* 2,202
-- *Prompt throughput (raw):* 2,906 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Prompt throughput (raw):* 2,618 tok/s
+- *Generation throughput (raw):* 97.9 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.34
@@ -1549,17 +1384,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.26s
-- *Generation time:* 5.85s
-- *Total time:* 8.74s
-- *Prompt preparation time:* 0.603
-- *First-token latency:* 0.885
-- *Cleanup time:* 0.125
+- *Model load time:* 2.39s
+- *Generation time:* 6.13s
+- *Total time:* 9.16s
+- *Prompt preparation time:* 0.614
+- *First-token latency:* 1.05
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 572
 - *Generation tokens:* 138
 - *Total tokens:* 710
-- *Prompt throughput (raw):* 646 tok/s
-- *Generation throughput (raw):* 31.5 tok/s
+- *Prompt throughput (raw):* 546 tok/s
+- *Generation throughput (raw):* 30.7 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.43
@@ -1607,17 +1442,17 @@ Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Voluntee
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.66s
-- *Generation time:* 2.74s
-- *Total time:* 5.08s
-- *Prompt preparation time:* 0.661
-- *First-token latency:* 0.353
-- *Cleanup time:* 0.105
+- *Model load time:* 1.76s
+- *Generation time:* 2.93s
+- *Total time:* 5.39s
+- *Prompt preparation time:* 0.675
+- *First-token latency:* 0.532
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 577
 - *Generation tokens:* 108
 - *Total tokens:* 685
-- *Prompt throughput (raw):* 1,635 tok/s
-- *Generation throughput (raw):* 61.3 tok/s
+- *Prompt throughput (raw):* 1,084 tok/s
+- *Generation throughput (raw):* 61.2 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.32
@@ -1668,17 +1503,17 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.32s
-- *Generation time:* 1.86s
-- *Total time:* 4.84s
-- *Prompt preparation time:* 0.635
-- *First-token latency:* 0.4
-- *Cleanup time:* 0.125
+- *Model load time:* 2.41s
+- *Generation time:* 1.94s
+- *Total time:* 5.03s
+- *Prompt preparation time:* 0.65
+- *First-token latency:* 0.437
+- *Cleanup time:* 0.127
 - *Prompt tokens:* 577
 - *Generation tokens:* 106
 - *Total tokens:* 683
-- *Prompt throughput (raw):* 1,441 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Prompt throughput (raw):* 1,319 tok/s
+- *Generation throughput (raw):* 120 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -1724,16 +1559,16 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.52s
-- *Generation time:* 5.77s
-- *Total time:* 8.95s
-- *Prompt preparation time:* 0.633
+- *Model load time:* 2.62s
+- *Generation time:* 5.74s
+- *Total time:* 9.04s
+- *Prompt preparation time:* 0.648
 - *First-token latency:* 1.06
-- *Cleanup time:* 0.128
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 577
 - *Generation tokens:* 107
 - *Total tokens:* 684
-- *Prompt throughput (raw):* 542 tok/s
+- *Prompt throughput (raw):* 547 tok/s
 - *Generation throughput (raw):* 26.3 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
@@ -1780,18 +1615,18 @@ Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.56s
-- *Generation time:* 1.43s
-- *Total time:* 3.66s
-- *Prompt preparation time:* 0.637
-- *First-token latency:* 0.174
-- *Cleanup time:* 0.0982
+- *Model load time:* 1.67s
+- *Generation time:* 1.67s
+- *Total time:* 4.02s
+- *Prompt preparation time:* 0.649
+- *First-token latency:* 0.398
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 573
 - *Generation tokens:* 79
 - *Total tokens:* 652
-- *Prompt throughput (raw):* 3,294 tok/s
-- *Generation throughput (raw):* 126 tok/s
-- *Peak memory (GB):* 5.9
+- *Prompt throughput (raw):* 1,440 tok/s
+- *Generation throughput (raw):* 122 tok/s
+- *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
@@ -1836,17 +1671,17 @@ Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coas
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.68s
-- *Generation time:* 5.42s
-- *Total time:* 7.68s
-- *Prompt preparation time:* 0.58
-- *First-token latency:* 1.88
-- *Cleanup time:* 0.103
+- *Model load time:* 1.63s
+- *Generation time:* 5.22s
+- *Total time:* 7.44s
+- *Prompt preparation time:* 0.578
+- *First-token latency:* 1.67
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 3,095
 - *Generation tokens:* 119
 - *Total tokens:* 3,214
-- *Prompt throughput (raw):* 1,648 tok/s
-- *Generation throughput (raw):* 40.0 tok/s
+- *Prompt throughput (raw):* 1,853 tok/s
+- *Generation throughput (raw):* 39.8 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
@@ -1896,17 +1731,17 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 3.10s
-- *Total time:* 4.61s
-- *Prompt preparation time:* 0.734
-- *First-token latency:* 1.47
-- *Cleanup time:* 0.0929
+- *Model load time:* 0.80s
+- *Generation time:* 3.11s
+- *Total time:* 4.66s
+- *Prompt preparation time:* 0.741
+- *First-token latency:* 1.48
+- *Cleanup time:* 0.0945
 - *Prompt tokens:* 4,188
 - *Generation tokens:* 118
 - *Total tokens:* 4,306
-- *Prompt throughput (raw):* 2,852 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 2,835 tok/s
+- *Generation throughput (raw):* 127 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.72
@@ -1951,17 +1786,17 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.75s
-- *Generation time:* 5.04s
-- *Total time:* 7.37s
-- *Prompt preparation time:* 0.573
-- *First-token latency:* 1.39
-- *Cleanup time:* 0.111
+- *Model load time:* 2.28s
+- *Generation time:* 5.35s
+- *Total time:* 8.21s
+- *Prompt preparation time:* 0.577
+- *First-token latency:* 1.63
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 1,251
 - *Generation tokens:* 114
 - *Total tokens:* 1,365
-- *Prompt throughput (raw):* 903 tok/s
-- *Generation throughput (raw):* 36.8 tok/s
+- *Prompt throughput (raw):* 766 tok/s
+- *Generation throughput (raw):* 36.2 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
@@ -2012,17 +1847,17 @@ Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside build
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.27s
-- *Generation time:* 5.52s
-- *Total time:* 8.44s
-- *Prompt preparation time:* 0.637
-- *First-token latency:* 4.07
+- *Model load time:* 2.33s
+- *Generation time:* 6.55s
+- *Total time:* 9.55s
+- *Prompt preparation time:* 0.645
+- *First-token latency:* 5.09
 - *Cleanup time:* 0.126
 - *Prompt tokens:* 3,606
 - *Generation tokens:* 132
 - *Total tokens:* 3,738
-- *Prompt throughput (raw):* 886 tok/s
-- *Generation throughput (raw):* 156 tok/s
+- *Prompt throughput (raw):* 708 tok/s
+- *Generation throughput (raw):* 155 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.15
@@ -2069,19 +1904,18 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.17s
-- *Generation time:* 7.34s
-- *Total time:* 10.08s
-- *Prompt preparation time:* 0.554
-- *First-token latency:* 2.87
-- *Cleanup time:* 0.0994
+- *Model load time:* 2.05s
+- *Generation time:* 7.84s
+- *Total time:* 10.47s
+- *Prompt preparation time:* 0.561
+- *First-token latency:* 3.38
+- *Cleanup time:* 0.0934
 - *Prompt tokens:* 2,372
 - *Generation tokens:* 117
 - *Total tokens:* 2,489
-- *Prompt throughput (raw):* 827 tok/s
+- *Prompt throughput (raw):* 702 tok/s
 - *Generation throughput (raw):* 30.5 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
@@ -2133,17 +1967,17 @@ UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffs
 - *Observations:* Duplicate keywords: kent, england, dusk, harbour town, royal
   navy boats, royal navy vessels, royal navy ships
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.59s
-- *Generation time:* 7.30s
-- *Total time:* 9.53s
+- *Model load time:* 1.62s
+- *Generation time:* 7.93s
+- *Total time:* 10.20s
 - *Prompt preparation time:* 0.631
-- *First-token latency:* 0.69
-- *Cleanup time:* 0.102
+- *First-token latency:* 1.29
+- *Cleanup time:* 0.0965
 - *Prompt tokens:* 1,617
 - *Generation tokens:* 758
 - *Total tokens:* 2,375
-- *Prompt throughput (raw):* 2,343 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Prompt throughput (raw):* 1,256 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.17
@@ -2233,19 +2067,18 @@ Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.58s
-- *Generation time:* 14.75s
-- *Total time:* 21.98s
-- *Prompt preparation time:* 0.632
-- *First-token latency:* 11.3
-- *Cleanup time:* 0.252
+- *Model load time:* 6.94s
+- *Generation time:* 16.59s
+- *Total time:* 24.15s
+- *Prompt preparation time:* 0.61
+- *First-token latency:* 12.7
+- *Cleanup time:* 0.262
 - *Prompt tokens:* 6,339
 - *Generation tokens:* 106
 - *Total tokens:* 6,445
-- *Prompt throughput (raw):* 562 tok/s
+- *Prompt throughput (raw):* 498 tok/s
 - *Generation throughput (raw):* 45.3 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
@@ -2290,20 +2123,19 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.97s
-- *Generation time:* 1.61s
-- *Total time:* 3.35s
-- *Prompt preparation time:* 0.754
-- *First-token latency:* 0.464
-- *Cleanup time:* 0.0818
+- *Model load time:* 1.03s
+- *Generation time:* 2.01s
+- *Total time:* 3.81s
+- *Prompt preparation time:* 0.765
+- *First-token latency:* 0.773
+- *Cleanup time:* 0.0971
 - *Prompt tokens:* 2,094
 - *Generation tokens:* 92
 - *Total tokens:* 2,186
-- *Prompt throughput (raw):* 4,514 tok/s
-- *Generation throughput (raw):* 213 tok/s
+- *Prompt throughput (raw):* 2,710 tok/s
+- *Generation throughput (raw):* 188 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
@@ -2335,6 +2167,109 @@ Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbo
 
 ---
 
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: details
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.95s
+- *Generation time:* 4.46s
+- *Total time:* 6.19s
+- *Prompt preparation time:* 0.765
+- *First-token latency:* 1.9
+- *Cleanup time:* 0.0981
+- *Prompt tokens:* 910
+- *Generation tokens:* 527
+- *Total tokens:* 1,437
+- *Prompt throughput (raw):* 480 tok/s
+- *Generation throughput (raw):* 288 tok/s
+- *Peak memory (GB):* 3.2
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00469
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1366
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+
+For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored at Ramsgate Harbor, Sunset Scene." That's 8 words.
+
+Now description: Combine the context and main visible subjects. Mention the patrol boats (BSC Defender and Volunteer), moored in Ramsgate Harbour, against the sunset, with buildings and cliffside.
+
+Keywords: Need 10-18 unique, covering relevant context and visible details. Let's list: British, English, catalogue, metadata, image, capture, date, time, authoritative, facts, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coast, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+
+We need to ensure they are unique and cover the context and visible details. Let's list them: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+
+We must ensure they are 10-18, unique, covering relevant context and visible details.
+
+Now, combine title, description, and keywords.
+&lt;/think&gt;
+
+Title: Border Patrol Vessels at Ramsgate Harbor Sunset
+
+Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a beautiful sunset.
+
+Keywords: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+
+For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored at Ramsgate Harbor, Sunset Scene." That's 8 words.
+
+Now description: Combine the context and main visible subjects. Mention the patrol boats (BSC Defender and Volunteer), moored in Ramsgate Harbour, against the sunset, with buildings and cliffside.
+
+Keywords: Need 10-18 unique, covering relevant context and visible details. Let's list: British, English, catalogue, metadata, image, capture, date, time, authoritative, facts, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coast, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+
+We need to ensure they are unique and cover the context and visible details. Let's list them: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+
+We must ensure they are 10-18, unique, covering relevant context and visible details.
+
+Now, combine title, description, and keywords.
+</think>
+
+Title: Border Patrol Vessels at Ramsgate Harbor Sunset
+
+Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a beautiful sunset.
+
+Keywords: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -2347,20 +2282,19 @@ Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbo
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.60s
-- *Generation time:* 2.11s
-- *Total time:* 3.51s
-- *Prompt preparation time:* 0.799
-- *First-token latency:* 0.385
-- *Cleanup time:* 0.0953
+- *Model load time:* 0.75s
+- *Generation time:* 2.30s
+- *Total time:* 3.85s
+- *Prompt preparation time:* 0.802
+- *First-token latency:* 0.596
+- *Cleanup time:* 0.0929
 - *Prompt tokens:* 1,407
 - *Generation tokens:* 114
 - *Total tokens:* 1,521
-- *Prompt throughput (raw):* 3,656 tok/s
-- *Generation throughput (raw):* 118 tok/s
+- *Prompt throughput (raw):* 2,363 tok/s
+- *Generation throughput (raw):* 122 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.35
@@ -2404,20 +2338,19 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 13.72s
-- *Generation time:* 24.87s
-- *Total time:* 39.52s
-- *Prompt preparation time:* 0.918
-- *First-token latency:* 20.9
-- *Cleanup time:* 0.291
+- *Model load time:* 13.89s
+- *Generation time:* 24.92s
+- *Total time:* 39.75s
+- *Prompt preparation time:* 0.917
+- *First-token latency:* 20.8
+- *Cleanup time:* 0.318
 - *Prompt tokens:* 3,468
 - *Generation tokens:* 112
 - *Total tokens:* 3,580
-- *Prompt throughput (raw):* 166 tok/s
-- *Generation throughput (raw):* 49.0 tok/s
+- *Prompt throughput (raw):* 167 tok/s
+- *Generation throughput (raw):* 51.1 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.39
@@ -2465,20 +2398,19 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.24s
-- *Generation time:* 2.27s
-- *Total time:* 6.21s
-- *Prompt preparation time:* 0.678
-- *First-token latency:* 0.315
-- *Cleanup time:* 0.124
+- *Model load time:* 3.87s
+- *Generation time:* 3.56s
+- *Total time:* 8.15s
+- *Prompt preparation time:* 0.689
+- *First-token latency:* 1.25
+- *Cleanup time:* 0.148
 - *Prompt tokens:* 573
 - *Generation tokens:* 90
 - *Total tokens:* 663
-- *Prompt throughput (raw):* 1,820 tok/s
-- *Generation throughput (raw):* 78.5 tok/s
+- *Prompt throughput (raw):* 459 tok/s
+- *Generation throughput (raw):* 60.7 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -2522,20 +2454,19 @@ Keywords: Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, su
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.57s
-- *Generation time:* 1.79s
-- *Total time:* 3.22s
-- *Prompt preparation time:* 0.845
-- *First-token latency:* 0.425
-- *Cleanup time:* 0.092
+- *Model load time:* 0.59s
+- *Generation time:* 2.27s
+- *Total time:* 3.72s
+- *Prompt preparation time:* 0.848
+- *First-token latency:* 0.873
+- *Cleanup time:* 0.0956
 - *Prompt tokens:* 1,366
 - *Generation tokens:* 104
 - *Total tokens:* 1,470
-- *Prompt throughput (raw):* 3,213 tok/s
-- *Generation throughput (raw):* 182 tok/s
+- *Prompt throughput (raw):* 1,564 tok/s
+- *Generation throughput (raw):* 177 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.23
@@ -2583,18 +2514,18 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.48s
-- *Generation time:* 1.29s
-- *Total time:* 2.85s
-- *Prompt preparation time:* 1.08
-- *First-token latency:* 0.1
-- *Cleanup time:* 0.0765
+- *Model load time:* 0.60s
+- *Generation time:* 2.15s
+- *Total time:* 3.82s
+- *Prompt preparation time:* 1.06
+- *First-token latency:* 0.995
+- *Cleanup time:* 0.0753
 - *Prompt tokens:* 312
 - *Generation tokens:* 44
 - *Total tokens:* 356
-- *Prompt throughput (raw):* 3,117 tok/s
-- *Generation throughput (raw):* 369 tok/s
-- *Peak memory (GB):* 2.2
+- *Prompt throughput (raw):* 313 tok/s
+- *Generation throughput (raw):* 367 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
@@ -2638,17 +2569,17 @@ A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer
 - *Observations:* Response repeats the same text; Generation was stopped early
   after sustained repeated output; Duplicate keywords: dover
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.52s
-- *Generation time:* 1.44s
-- *Total time:* 2.66s
-- *Prompt preparation time:* 0.691
-- *First-token latency:* 0.215
-- *Cleanup time:* 0.0861
+- *Model load time:* 0.54s
+- *Generation time:* 1.53s
+- *Total time:* 2.78s
+- *Prompt preparation time:* 0.701
+- *First-token latency:* 0.336
+- *Cleanup time:* 0.096
 - *Prompt tokens:* 2,094
 - *Generation tokens:* 200
 - *Total tokens:* 2,294
-- *Prompt throughput (raw):* 9,737 tok/s
-- *Generation throughput (raw):* 365 tok/s
+- *Prompt throughput (raw):* 6,229 tok/s
+- *Generation throughput (raw):* 388 tok/s
 - *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.1
 - *Cache memory (GB):* 0.29
@@ -2695,17 +2626,17 @@ Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Mar
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Response repeats the same text; Duplicate keywords: sea
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.52s
-- *Generation time:* 36.34s
-- *Total time:* 38.49s
-- *Prompt preparation time:* 0.62
-- *First-token latency:* 1.56
-- *Cleanup time:* 0.0993
+- *Model load time:* 1.59s
+- *Generation time:* 38.87s
+- *Total time:* 41.12s
+- *Prompt preparation time:* 0.645
+- *First-token latency:* 2.11
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 290
 - *Generation tokens:* 667
 - *Total tokens:* 957
-- *Prompt throughput (raw):* 186 tok/s
-- *Generation throughput (raw):* 19.5 tok/s
+- *Prompt throughput (raw):* 137 tok/s
+- *Generation throughput (raw):* 18.4 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.70
@@ -2754,18 +2685,18 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.43s
-- *Generation time:* 6.47s
-- *Total time:* 8.78s
-- *Prompt preparation time:* 0.863
-- *First-token latency:* 2.1
-- *Cleanup time:* 0.0946
+- *Model load time:* 1.46s
+- *Generation time:* 7.77s
+- *Total time:* 10.12s
+- *Prompt preparation time:* 0.879
+- *First-token latency:* 3.2
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 3,104
 - *Generation tokens:* 113
 - *Total tokens:* 3,217
-- *Prompt throughput (raw):* 1,480 tok/s
-- *Generation throughput (raw):* 32.2 tok/s
-- *Peak memory (GB):* 13
+- *Prompt throughput (raw):* 970 tok/s
+- *Generation throughput (raw):* 30.4 tok/s
+- *Peak memory (GB):* 12
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 3.9
 - *Model-load active memory (GB):* 7.23
@@ -2814,17 +2745,17 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
   labelled fields not detected: title, description; Response appears cut off
   at the token limit; Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.89s
-- *Generation time:* 51.53s
-- *Total time:* 55.17s
-- *Prompt preparation time:* 0.728
-- *First-token latency:* 8.18
-- *Cleanup time:* 0.145
+- *Model load time:* 2.96s
+- *Generation time:* 50.33s
+- *Total time:* 54.07s
+- *Prompt preparation time:* 0.758
+- *First-token latency:* 8.53
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 4,390
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,390
-- *Prompt throughput (raw):* 537 tok/s
-- *Generation throughput (raw):* 23.4 tok/s
+- *Prompt throughput (raw):* 515 tok/s
+- *Generation throughput (raw):* 24.3 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
@@ -2869,43 +2800,33 @@ Keywords:
 
 Need title 5-10 words.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
 
-We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town's cliffside skyline. Image shows multiple patrol boats, white vessels with "Border Security Command" markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
+Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
 
-Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
+Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let's check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
 
-We need 10-18 unique comma-separated keywords.
+Also note lifebuoys, white hulls, person in high-vis.
 
-Let's produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
+Need 10-18 unique comma-separated keywords.
 
-That's 14.
+Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
 
-Ensure unique.
+But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 
-Return exactly three sections.
+We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
 
-Title:
-Description:
-Keywords:
+We must ensure title 5-10 words.
 
-No extra text.
+Let's craft:
 
-Let's craft description: "UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky."
+Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
 
-That's one sentence? It's two sentences. Acceptable 1-2 sentence.
-
-Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
-
-It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add "Captured on 3 October 2026 at 18:18 BST". But that's metadata. Might be okay.
-
-Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
-
-I think include date not required but allowed. I'll include a brief
+Description: UK Border Security Command patrol vessels
 </pre>
 
 <details>
@@ -2935,43 +2856,33 @@ Keywords:
 
 Need title 5-10 words.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
 
-We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town's cliffside skyline. Image shows multiple patrol boats, white vessels with "Border Security Command" markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
+Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
 
-Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
+Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let's check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
 
-We need 10-18 unique comma-separated keywords.
+Also note lifebuoys, white hulls, person in high-vis.
 
-Let's produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
+Need 10-18 unique comma-separated keywords.
 
-That's 14.
+Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
 
-Ensure unique.
+But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 
-Return exactly three sections.
+We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
 
-Title:
-Description:
-Keywords:
+We must ensure title 5-10 words.
 
-No extra text.
+Let's craft:
 
-Let's craft description: "UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky."
+Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
 
-That's one sentence? It's two sentences. Acceptable 1-2 sentence.
-
-Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
-
-It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add "Captured on 3 October 2026 at 18:18 BST". But that's metadata. Might be okay.
-
-Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
-
-I think include date not required but allowed. I'll include a brief
+Description: UK Border Security Command patrol vessels
 ```
 
 </details>
@@ -2995,17 +2906,17 @@ I think include date not required but allowed. I'll include a brief
 - *Observations:* Generation was stopped early after sustained repeated
   output; Duplicate keywords: lifeboat station
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 38.96s
-- *Total time:* 40.66s
-- *Prompt preparation time:* 0.924
-- *First-token latency:* 36.2
-- *Cleanup time:* 0.098
+- *Model load time:* 0.82s
+- *Generation time:* 27.45s
+- *Total time:* 29.21s
+- *Prompt preparation time:* 0.937
+- *First-token latency:* 24.8
+- *Cleanup time:* 0.0936
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 225
 - *Total tokens:* 16,761
-- *Prompt throughput (raw):* 456 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Prompt throughput (raw):* 667 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory (GB):* 9.4
 - *Active memory (GB):* 4.4
 - *Cache memory (GB):* 1.3
@@ -3053,17 +2964,17 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.32s
+- *Model load time:* 0.61s
 - *Generation time:* 1.05s
-- *Total time:* 2.29s
-- *Prompt preparation time:* 0.914
-- *First-token latency:* 0.129
-- *Cleanup time:* 0.09
+- *Total time:* 2.58s
+- *Prompt preparation time:* 0.908
+- *First-token latency:* 0.137
+- *Cleanup time:* 0.0857
 - *Prompt tokens:* 1,186
 - *Generation tokens:* 22
 - *Total tokens:* 1,208
-- *Prompt throughput (raw):* 9,174 tok/s
-- *Generation throughput (raw):* 468 tok/s
+- *Prompt throughput (raw):* 8,663 tok/s
+- *Generation throughput (raw):* 527 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -3108,17 +3019,17 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Observations:* Response repeats the same text; Generation was stopped early
   after sustained repeated output; Duplicate keywords: horizon
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.14s
-- *Generation time:* 17.57s
-- *Total time:* 19.70s
-- *Prompt preparation time:* 0.985
-- *First-token latency:* 13.3
-- *Cleanup time:* 0.108
+- *Model load time:* 1.17s
+- *Generation time:* 17.48s
+- *Total time:* 20.06s
+- *Prompt preparation time:* 1.41
+- *First-token latency:* 13.1
+- *Cleanup time:* 0.109
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 200
 - *Total tokens:* 16,736
-- *Prompt throughput (raw):* 1,244 tok/s
-- *Generation throughput (raw):* 58.9 tok/s
+- *Prompt throughput (raw):* 1,265 tok/s
+- *Generation throughput (raw):* 57.3 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 2.4
@@ -3167,18 +3078,18 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.57s
-- *Generation time:* 2.21s
-- *Total time:* 4.42s
-- *Prompt preparation time:* 0.619
-- *First-token latency:* 0.289
-- *Cleanup time:* 0.102
+- *Model load time:* 1.69s
+- *Generation time:* 3.09s
+- *Total time:* 5.42s
+- *Prompt preparation time:* 0.612
+- *First-token latency:* 1.12
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 571
 - *Generation tokens:* 132
 - *Total tokens:* 703
-- *Prompt throughput (raw):* 1,977 tok/s
-- *Generation throughput (raw):* 98.9 tok/s
-- *Peak memory (GB):* 7.2
+- *Prompt throughput (raw):* 511 tok/s
+- *Generation throughput (raw):* 94.6 tok/s
+- *Peak memory (GB):* 7.1
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
@@ -3228,17 +3139,17 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 - *Observations:* Required labelled fields not detected: description;
   Duplicate keywords: patrol boats
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.53s
-- *Generation time:* 3.77s
-- *Total time:* 5.14s
-- *Prompt preparation time:* 0.833
-- *First-token latency:* 2.38
-- *Cleanup time:* 0.0846
+- *Model load time:* 0.42s
+- *Generation time:* 3.71s
+- *Total time:* 4.99s
+- *Prompt preparation time:* 0.854
+- *First-token latency:* 2.31
+- *Cleanup time:* 0.0925
 - *Prompt tokens:* 5,615
 - *Generation tokens:* 86
 - *Total tokens:* 5,701
-- *Prompt throughput (raw):* 2,359 tok/s
-- *Generation throughput (raw):* 145 tok/s
+- *Prompt throughput (raw):* 2,433 tok/s
+- *Generation throughput (raw):* 143 tok/s
 - *Peak memory (GB):* 4.3
 - *Active memory (GB):* 2.4
 - *Cache memory (GB):* 1.2
@@ -3284,17 +3195,17 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.04s
+- *Model load time:* 1.10s
 - *Generation time:* 1.71s
-- *Total time:* 3.46s
-- *Prompt preparation time:* 0.708
-- *First-token latency:* 0.815
-- *Cleanup time:* 0.149
+- *Total time:* 3.55s
+- *Prompt preparation time:* 0.727
+- *First-token latency:* 0.835
+- *Cleanup time:* 0.16
 - *Prompt tokens:* 2,174
 - *Generation tokens:* 18
 - *Total tokens:* 2,192
-- *Prompt throughput (raw):* 2,668 tok/s
-- *Generation throughput (raw):* 108 tok/s
+- *Prompt throughput (raw):* 2,603 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
@@ -3349,17 +3260,17 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
   detected: description, keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.45s
-- *Generation time:* 3.92s
-- *Total time:* 5.02s
-- *Prompt preparation time:* 0.646
-- *First-token latency:* 0.0877
-- *Cleanup time:* 0.0999
+- *Model load time:* 0.53s
+- *Generation time:* 3.57s
+- *Total time:* 4.76s
+- *Prompt preparation time:* 0.654
+- *First-token latency:* 0.0958
+- *Cleanup time:* 0.0945
 - *Prompt tokens:* 308
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,308
-- *Prompt throughput (raw):* 3,510 tok/s
-- *Generation throughput (raw):* 311 tok/s
+- *Prompt throughput (raw):* 3,214 tok/s
+- *Generation throughput (raw):* 352 tok/s
 - *Peak memory (GB):* 1.8
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.40
@@ -3402,21 +3313,20 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords; Repeats the prompt's hint instead of describing the image:
-  description
+  keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type moondream1 via
   moondream2)
-- *Model load time:* 2.52s
-- *Generation time:* 1.27s
-- *Total time:* 4.57s
-- *Prompt preparation time:* 0.765
-- *First-token latency:* 0.234
+- *Model load time:* 2.18s
+- *Generation time:* 1.28s
+- *Total time:* 4.24s
+- *Prompt preparation time:* 0.771
+- *First-token latency:* 0.23
 - *Cleanup time:* 0.0867
 - *Prompt tokens:* 1,011
 - *Generation tokens:* 48
 - *Total tokens:* 1,059
-- *Prompt throughput (raw):* 4,313 tok/s
-- *Generation throughput (raw):* 166 tok/s
+- *Prompt throughput (raw):* 4,405 tok/s
+- *Generation throughput (raw):* 162 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.8
 - *Cache memory (GB):* 0.27

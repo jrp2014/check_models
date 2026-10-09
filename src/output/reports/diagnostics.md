@@ -38,21 +38,21 @@ Mechanical-check counts
 | Mechanical checks    | Count |
 |----------------------|-------|
 | major concerns       | 13    |
-| no concerns detected | 29    |
-| concerns detected    | 8     |
+| no concerns detected | 28    |
+| concerns detected    | 9     |
 
 Observation counts
 
-| Observation                                                               | Count |
-|---------------------------------------------------------------------------|-------|
-| Response repeats the same text                                            | 4     |
-| Generation was stopped early after sustained repeated output              | 3     |
-| Unrecognised model control tokens remain visible                          | 2     |
-| Required labelled fields not detected                                     | 9     |
-| Response appears cut off at the token limit                               | 2     |
-| Conversation-role control tokens remain visible                           | 1     |
-| Repeated keyword entries                                                  | 6     |
-| Output repeats the prompt's own hint text instead of describing the image | 8     |
+| Observation                                                  | Count |
+|--------------------------------------------------------------|-------|
+| Response repeats the same text                               | 4     |
+| Generation was stopped early after sustained repeated output | 3     |
+| Unrecognised model control tokens remain visible             | 2     |
+| Required labelled fields not detected                        | 9     |
+| Response appears cut off at the token limit                  | 2     |
+| Conversation-role control tokens remain visible              | 1     |
+| Repeated keyword entries                                     | 7     |
+| Output repeats the prompt's own hint text                    | 8     |
 
 ## Triage
 
@@ -100,7 +100,7 @@ None.
 - *Processor class:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.891
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.013
 - *Peak memory at first token (GB):* 2.145
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -167,8 +167,8 @@ Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Mar
 - *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.158
-- *Peak memory at first token (GB):* 14.969
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.713
+- *Peak memory at first token (GB):* 14.697
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *EOS ids declared, by file:* {"config.json text_config": [128001, 128008,
@@ -234,7 +234,7 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 - *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.707
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.723
 - *Peak memory at first token (GB):* 1.781
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -297,7 +297,7 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 14.172
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 13.984
 - *Peak memory at first token (GB):* 14.286
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -366,7 +366,7 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 37.112
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 25.642
 - *Peak memory at first token (GB):* 9.361
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.1; top_p 0.001; top_k 1; repetition_penalty 1.05
@@ -435,7 +435,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.539
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.533
 - *Peak memory at first token (GB):* 6.729
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -501,7 +501,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 8.873
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.226
 - *Peak memory at first token (GB):* 25.465
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
@@ -561,43 +561,33 @@ Keywords:
 
 Need title 5-10 words.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
 
-We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town's cliffside skyline. Image shows multiple patrol boats, white vessels with "Border Security Command" markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
+Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
 
-Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
+Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let's check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
 
-We need 10-18 unique comma-separated keywords.
+Also note lifebuoys, white hulls, person in high-vis.
 
-Let's produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
+Need 10-18 unique comma-separated keywords.
 
-That's 14.
+Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
 
-Ensure unique.
+But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 
-Return exactly three sections.
+We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
 
-Title:
-Description:
-Keywords:
+We must ensure title 5-10 words.
 
-No extra text.
+Let's craft:
 
-Let's craft description: "UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky."
+Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
 
-That's one sentence? It's two sentences. Acceptable 1-2 sentence.
-
-Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
-
-It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add "Captured on 3 October 2026 at 18:18 BST". But that's metadata. Might be okay.
-
-Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
-
-I think include date not required but allowed. I'll include a brief
+Description: UK Border Security Command patrol vessels
 ```
 
 </details>
@@ -621,6 +611,7 @@ is in the model gallery.
 | mlx-community/SmolVLM-256M-Instruct-4bit              | major concerns    | labelled fields not detected                       |
 | vikhyatk/moondream2                                   | major concerns    | labelled fields not detected; prompt hint repeated |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit      | concerns detected | duplicate keywords                                 |
+| mlx-community/MiniCPM-V-4.6-4bit                      | concerns detected | duplicate keywords                                 |
 | mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | concerns detected | prompt hint repeated                               |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | concerns detected | prompt hint repeated                               |
 | mlx-community/GLM-4.6V-nvfp4                          | concerns detected | prompt hint repeated                               |
@@ -636,35 +627,34 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                          |
 |-------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2103 prompt / 58 generated; 493 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2070 prompt / 132 generated; 102 tok/s; 6.5 GB peak  |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 572 prompt / 138 generated; 31.5 tok/s; 17 GB peak   |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 577 prompt / 108 generated; 61.3 tok/s; 7.6 GB peak  |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 577 prompt / 106 generated; 125 tok/s; 16 GB peak    |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2103 prompt / 58 generated; 482 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2070 prompt / 132 generated; 97.9 tok/s; 6.5 GB peak |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 572 prompt / 138 generated; 30.7 tok/s; 17 GB peak   |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 577 prompt / 108 generated; 61.2 tok/s; 7.6 GB peak  |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 577 prompt / 106 generated; 120 tok/s; 16 GB peak    |
 | mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 577 prompt / 107 generated; 26.3 tok/s; 20 GB peak   |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 573 prompt / 79 generated; 126 tok/s; 5.9 GB peak    |
-| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6339 prompt / 98 generated; 78.7 tok/s; 8.7 GB peak  |
-| mlx-community/Idefics3-8B-Llama3-bf16                       | rev 8c2a30c48864; Idefics3Processor; stop completed          | 2601 prompt / 130 generated; 35.4 tok/s; 18 GB peak  |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2091 prompt / 113 generated; 56.9 tok/s; 10 GB peak  |
-| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2091 prompt / 80 generated; 37.5 tok/s; 17 GB peak   |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1312 prompt / 995 generated; 66.1 tok/s; 20 GB peak  |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 369 prompt / 88 generated; 106 tok/s; 7.0 GB peak    |
-| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 910 prompt / 662 generated; 302 tok/s; 3.2 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2905 prompt / 140 generated; 66.2 tok/s; 13 GB peak  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2904 prompt / 132 generated; 188 tok/s; 7.8 GB peak  |
-| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1502 prompt / 148 generated; 71.7 tok/s; 8.5 GB peak |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4065 prompt / 148 generated; 209 tok/s; 3.9 GB peak  |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1267 prompt / 129 generated; 106 tok/s; 24 GB peak   |
-| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1115 prompt / 144 generated; 59.1 tok/s; 9.3 GB peak |
-| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3095 prompt / 119 generated; 40.0 tok/s; 16 GB peak  |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12768 prompt / 136 generated; 65.4 tok/s; 26 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16525 prompt / 133 generated; 83.0 tok/s; 23 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16525 prompt / 112 generated; 67.9 tok/s; 11 GB peak |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16541 prompt / 152 generated; 102 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16541 prompt / 121 generated; 27.4 tok/s; 21 GB peak |
-| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4188 prompt / 118 generated; 129 tok/s; 5.4 GB peak  |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1251 prompt / 114 generated; 36.8 tok/s; 18 GB peak  |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3606 prompt / 132 generated; 156 tok/s; 23 GB peak   |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 573 prompt / 79 generated; 122 tok/s; 6.0 GB peak    |
+| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6339 prompt / 98 generated; 79.5 tok/s; 8.7 GB peak  |
+| mlx-community/Idefics3-8B-Llama3-bf16                       | rev 8c2a30c48864; Idefics3Processor; stop completed          | 2601 prompt / 130 generated; 35.3 tok/s; 18 GB peak  |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2091 prompt / 113 generated; 57.4 tok/s; 10 GB peak  |
+| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2091 prompt / 80 generated; 36.4 tok/s; 17 GB peak   |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1312 prompt / 995 generated; 60.2 tok/s; 20 GB peak  |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 369 prompt / 88 generated; 102 tok/s; 7.0 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2905 prompt / 140 generated; 64.5 tok/s; 13 GB peak  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2904 prompt / 132 generated; 181 tok/s; 7.8 GB peak  |
+| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1502 prompt / 148 generated; 68.9 tok/s; 8.1 GB peak |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4065 prompt / 148 generated; 207 tok/s; 3.9 GB peak  |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1267 prompt / 129 generated; 104 tok/s; 24 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1115 prompt / 144 generated; 58.6 tok/s; 9.3 GB peak |
+| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3095 prompt / 119 generated; 39.8 tok/s; 16 GB peak  |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12768 prompt / 136 generated; 72.1 tok/s; 26 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16525 prompt / 133 generated; 87.0 tok/s; 23 GB peak |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16525 prompt / 112 generated; 70.1 tok/s; 11 GB peak |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16541 prompt / 152 generated; 104 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16541 prompt / 121 generated; 29.4 tok/s; 21 GB peak |
+| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4188 prompt / 118 generated; 127 tok/s; 5.4 GB peak  |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1251 prompt / 114 generated; 36.2 tok/s; 18 GB peak  |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3606 prompt / 132 generated; 155 tok/s; 23 GB peak   |
 
 </details>
 
@@ -764,13 +754,13 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.7                                                                                                                                           |
-| mlx-vlm source revision    | 1cc6025432f61b146cb72c7516209f7259fd45d0                                                                                                        |
-| mlx                        | 0.32.4.dev20261008+3c40e8f92                                                                                                                    |
-| mlx source revision        | 3c40e8f92                                                                                                                                       |
+| mlx-vlm source revision    | 952d4f6bc65bd5095e74abe71c78038764ee08aa                                                                                                        |
+| mlx                        | 0.32.4.dev20261009+99f109b56                                                                                                                    |
+| mlx source revision        | 99f109b56                                                                                                                                       |
 | mlx-audio                  | 0.5.8                                                                                                                                           |
 | transformers               | 5.19.0                                                                                                                                          |
-| tokenizers                 | 0.23.2                                                                                                                                          |
-| huggingface-hub            | 1.33.0                                                                                                                                          |
+| tokenizers                 | 0.23.3                                                                                                                                          |
+| huggingface-hub            | 2.2.0                                                                                                                                           |
 | Python Version             | 3.14.7                                                                                                                                          |
 | OS                         | Darwin 27.0.0                                                                                                                                   |
 | macOS Version              | 27.0.1                                                                                                                                          |
@@ -794,7 +784,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (204,770,592 bytes, sha256=1fea48780ba22f210a1222a4933b92178daccb3c0c853ba855dece1030f4907a) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,720,080 bytes, sha256=7b5c77e837b904a2c1db1584804df9ae7fc417fbdd0427fffb823b9a61c951fa)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (215,965,088 bytes, sha256=46366f90fed6bb8ddd20e811c14cb991b791018d1e1556dae974bd5d33a610dc) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,036,720 bytes, sha256=f477ff16309b20e316f817b14dd9928c511577c51c7d83fffeb8a5dc7ced7c69)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->

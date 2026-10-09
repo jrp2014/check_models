@@ -37,7 +37,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
 <section id="runtime">
 <h2>Runtime</h2>
 <p><b>Runtime</b></p>
-<ul><li><b>Model sweep runtime:</b> 11m 07s</li><li><b>Generation total:</b> 8m 44s across 50 model(s); upstream model prefill / first-token split available for 50/50 model(s).</li><li><b>Phase totals:</b> model load=89.79s, local prompt prep=37.27s, upstream model prefill / first-token=5m 09s, input preparation + decode=3m 35s, cleanup=5.62s.</li><li><b>Validation overhead:</b> 0.39s total (avg 0.01s across 50 model(s)).</li><li><b>Upstream model prefill / first-token time:</b> Avg 6.18s | Min 0.09s | Max 51.51s across 50 model(s).</li></ul>
+<ul><li><b>Model sweep runtime:</b> 10m 46s</li><li><b>Generation total:</b> 8m 16s across 50 model(s); upstream model prefill / first-token split available for 50/50 model(s).</li><li><b>Phase totals:</b> model load=1m 35s, local prompt prep=37.86s, upstream model prefill / first-token=4m 38s, input preparation + decode=3m 37s, cleanup=5.68s.</li><li><b>Validation overhead:</b> 0.40s total (avg 0.01s across 50 model(s)).</li><li><b>Upstream model prefill / first-token time:</b> Avg 5.58s | Min 0.10s | Max 43.21s across 50 model(s).</li></ul>
 </section>
 <section id="current-run-chooser">
 <h2>Current-run Chooser</h2>
@@ -137,9 +137,9 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="2.032819375002873">2.03s</td>
-<td data-sort-value="493.3776805933761">493 tok/s</td>
-<td data-sort-value="0.6384707079996588">0.64</td>
+<td data-sort-value="2.3552061669906834">2.36s</td>
+<td data-sort-value="482.47609796068895">482 tok/s</td>
+<td data-sort-value="0.9234634580061538">0.92</td>
 <td data-sort-value="1.939804848">1.9</td>
 <td data-sort-value="2103">2,103</td>
 <td data-sort-value="58">58</td>
@@ -151,10 +151,10 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.619013541989261">8.62s</td>
-<td data-sort-value="78.70940667782322">78.7 tok/s</td>
-<td data-sort-value="5.598616540999501">5.60</td>
-<td data-sort-value="8.706315464">8.7</td>
+<td data-sort-value="9.314793208002811">9.31s</td>
+<td data-sort-value="79.54375165056283">79.5 tok/s</td>
+<td data-sort-value="6.298718624995672">6.30</td>
+<td data-sort-value="8.70631556">8.7</td>
 <td data-sort-value="6339">6,339</td>
 <td data-sort-value="98">98</td>
 <td data-sort-value="none">none</td>
@@ -165,9 +165,9 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.109766791007132">8.11s</td>
-<td data-sort-value="35.40144408654388">35.4 tok/s</td>
-<td data-sort-value="1.808233374991687">1.81</td>
+<td data-sort-value="8.940631624995149">8.94s</td>
+<td data-sort-value="35.297231306943544">35.3 tok/s</td>
+<td data-sort-value="2.594871291992604">2.59</td>
 <td data-sort-value="18.0643994">18</td>
 <td data-sort-value="2601">2,601</td>
 <td data-sort-value="130">130</td>
@@ -179,9 +179,9 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.807939374994021">5.81s</td>
-<td data-sort-value="56.90661196904937">56.9 tok/s</td>
-<td data-sort-value="2.032204584000283">2.03</td>
+<td data-sort-value="7.071460708000814">7.07s</td>
+<td data-sort-value="57.39690921474808">57.4 tok/s</td>
+<td data-sort-value="3.2710915409988957">3.27</td>
 <td data-sort-value="10.059846764">10</td>
 <td data-sort-value="2091">2,091</td>
 <td data-sort-value="113">113</td>
@@ -193,9 +193,9 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.893198416000814">5.89s</td>
-<td data-sort-value="37.50379872449411">37.5 tok/s</td>
-<td data-sort-value="1.4665111250069458">1.47</td>
+<td data-sort-value="6.262129834009102">6.26s</td>
+<td data-sort-value="36.36911378363489">36.4 tok/s</td>
+<td data-sort-value="1.705913292011246">1.71</td>
 <td data-sort-value="17.103732844">17</td>
 <td data-sort-value="2091">2,091</td>
 <td data-sort-value="80">80</td>
@@ -207,38 +207,23 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="19.273072333002347">19.27s</td>
-<td data-sort-value="66.14840939130865">66.1 tok/s</td>
-<td data-sort-value="1.3780745830008527">1.38</td>
-<td data-sort-value="20.046294124">20</td>
+<td data-sort-value="23.020815791009227">23.02s</td>
+<td data-sort-value="60.213122531691816">60.2 tok/s</td>
+<td data-sort-value="3.6924669589934638">3.69</td>
+<td data-sort-value="20.046204824">20</td>
 <td data-sort-value="1312">1,312</td>
 <td data-sort-value="995">995</td>
 <td data-sort-value="none">none</td>
 <td data-sort-value="Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk | Description: UK Border Security patrol boats, including the Defender and Volunteer,... | Keywords (12): UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, ...">Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk | Description: UK Border Security patrol boats, including the Defender and Volunteer,... | Keywords (12): UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, ...<details><summary>3,714 characters of reasoning omitted</summary><pre>◁think▷Okay, let&#x27;s tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are: UK Border Security Command patrol vessels (Defender and Volunteer) moored in Ramsgate Ha...</pre></details></td>
-</tr>
-<tr data-model="mlx-community/minicpm-v-4.6-4bit" data-execution="completed" data-usability="usable" data-maintainer-status="none" class="completed usable">
-<td data-sort-value="mlx-community/MiniCPM-V-4.6-4bit"><a href="#model-mlx-community-minicpm-v-46-4bit"><code>mlx-community/MiniCPM-V-4.6-4bit</code></a></td>
-<td data-sort-value="completed">completed</td>
-<td data-sort-value="usable">no concerns detected</td>
-<td data-sort-value="none">none</td>
-<td data-sort-value="4.8540039579966106">4.85s</td>
-<td data-sort-value="301.8643485972348">302 tok/s</td>
-<td data-sort-value="0.9887073749996489">0.99</td>
-<td data-sort-value="3.185622778">3.2</td>
-<td data-sort-value="910">910</td>
-<td data-sort-value="662">662</td>
-<td data-sort-value="none">none</td>
-<td data-sort-value="Title: Border Patrol Boats in Ramsgate Harbor at Sunset | Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, ar... | Keywords (18): border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, ...">Title: Border Patrol Boats in Ramsgate Harbor at Sunset | Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, ar... | Keywords (18): border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, ...<details><summary>2,120 characters of reasoning omitted</summary><pre>&lt;think&gt;
-We need to create a title, description, and keywords based on the image. First, let&#x27;s extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context...</pre></details></td>
 </tr>
 <tr data-model="mlx-community/minicpm-o-4_5-4bit" data-execution="completed" data-usability="usable" data-maintainer-status="none" class="completed usable">
 <td data-sort-value="mlx-community/MiniCPM-o-4_5-4bit"><a href="#model-mlx-community-minicpm-o-45-4bit"><code>mlx-community/MiniCPM-o-4_5-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.1830110829905607">3.18s</td>
-<td data-sort-value="106.18442847525566">106 tok/s</td>
-<td data-sort-value="0.7617434999992838">0.76</td>
+<td data-sort-value="3.371534290999989">3.37s</td>
+<td data-sort-value="101.96371395278244">102 tok/s</td>
+<td data-sort-value="0.8707532089902088">0.87</td>
 <td data-sort-value="7.046897072">7.0</td>
 <td data-sort-value="369">369</td>
 <td data-sort-value="88">88</td>
@@ -250,9 +235,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="6.88964333300828">6.89s</td>
-<td data-sort-value="66.22679068818047">66.2 tok/s</td>
-<td data-sort-value="2.8126848329993663">2.81</td>
+<td data-sort-value="6.910216874995967">6.91s</td>
+<td data-sort-value="64.47461917302707">64.5 tok/s</td>
+<td data-sort-value="2.7382111250044545">2.74</td>
 <td data-sort-value="13.055096645">13</td>
 <td data-sort-value="2905">2,905</td>
 <td data-sort-value="140">140</td>
@@ -264,9 +249,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.8327595840091817">3.83s</td>
-<td data-sort-value="188.03222387264088">188 tok/s</td>
-<td data-sort-value="1.5559320000029402">1.56</td>
+<td data-sort-value="5.196645499992883">5.20s</td>
+<td data-sort-value="181.29892422141683">181 tok/s</td>
+<td data-sort-value="1.5914967499993509">1.59</td>
 <td data-sort-value="7.799191764">7.8</td>
 <td data-sort-value="2904">2,904</td>
 <td data-sort-value="132">132</td>
@@ -278,10 +263,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.235990457993466">5.24s</td>
-<td data-sort-value="71.69650337227394">71.7 tok/s</td>
-<td data-sort-value="1.4124369170021964">1.41</td>
-<td data-sort-value="8.520071596">8.5</td>
+<td data-sort-value="7.569481667000218">7.57s</td>
+<td data-sort-value="68.88825469804225">68.9 tok/s</td>
+<td data-sort-value="3.579856042008032">3.58</td>
+<td data-sort-value="8.078365154">8.1</td>
 <td data-sort-value="1502">1,502</td>
 <td data-sort-value="148">148</td>
 <td data-sort-value="none">none</td>
@@ -292,9 +277,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.236909375002142">5.24s</td>
-<td data-sort-value="209.33192529554125">209 tok/s</td>
-<td data-sort-value="2.7341057080047904">2.73</td>
+<td data-sort-value="5.269924833002733">5.27s</td>
+<td data-sort-value="207.49330033113105">207 tok/s</td>
+<td data-sort-value="2.748935541996616">2.75</td>
 <td data-sort-value="3.866843075">3.9</td>
 <td data-sort-value="4065">4,065</td>
 <td data-sort-value="148">148</td>
@@ -306,10 +291,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.690725541004213">5.69s</td>
-<td data-sort-value="106.35828809298471">106 tok/s</td>
-<td data-sort-value="1.2078756249975413">1.21</td>
-<td data-sort-value="24.44106465">24</td>
+<td data-sort-value="6.084851916995831">6.08s</td>
+<td data-sort-value="104.04267626054778">104 tok/s</td>
+<td data-sort-value="1.5855839580035536">1.59</td>
+<td data-sort-value="24.440790848">24</td>
 <td data-sort-value="1267">1,267</td>
 <td data-sort-value="129">129</td>
 <td data-sort-value="none">none</td>
@@ -320,9 +305,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.715060625007027">4.72s</td>
-<td data-sort-value="59.14971870254281">59.1 tok/s</td>
-<td data-sort-value="0.8211930000106804">0.82</td>
+<td data-sort-value="4.943898666999303">4.94s</td>
+<td data-sort-value="58.626810478295766">58.6 tok/s</td>
+<td data-sort-value="0.9762237920076586">0.98</td>
 <td data-sort-value="9.295386061">9.3</td>
 <td data-sort-value="1115">1,115</td>
 <td data-sort-value="144">144</td>
@@ -334,10 +319,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="27.345337708989973">27.35s</td>
-<td data-sort-value="65.39345110865395">65.4 tok/s</td>
-<td data-sort-value="22.006621042004554">22.01</td>
-<td data-sort-value="25.70625256">26</td>
+<td data-sort-value="22.56456633399648">22.56s</td>
+<td data-sort-value="72.06826081876653">72.1 tok/s</td>
+<td data-sort-value="17.422118500006036">17.42</td>
+<td data-sort-value="25.706252532">26</td>
 <td data-sort-value="12768">12,768</td>
 <td data-sort-value="136">136</td>
 <td data-sort-value="none">none</td>
@@ -348,10 +333,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="40.98503895799513">40.99s</td>
-<td data-sort-value="83.02030361382646">83.0 tok/s</td>
-<td data-sort-value="36.41665387499961">36.42</td>
-<td data-sort-value="23.304729942">23</td>
+<td data-sort-value="31.528110500003095">31.53s</td>
+<td data-sort-value="86.95159002857349">87.0 tok/s</td>
+<td data-sort-value="26.05984316598915">26.06</td>
+<td data-sort-value="23.30472995">23</td>
 <td data-sort-value="16525">16,525</td>
 <td data-sort-value="133">133</td>
 <td data-sort-value="none">none</td>
@@ -362,9 +347,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="41.11364566600241">41.11s</td>
-<td data-sort-value="67.85580260951204">67.9 tok/s</td>
-<td data-sort-value="37.506126332998974">37.51</td>
+<td data-sort-value="32.357614292006474">32.36s</td>
+<td data-sort-value="70.08724583015473">70.1 tok/s</td>
+<td data-sort-value="28.7677671249985">28.77</td>
 <td data-sort-value="10.91815552">11</td>
 <td data-sort-value="16525">16,525</td>
 <td data-sort-value="112">112</td>
@@ -376,10 +361,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="38.56860416699783">38.57s</td>
-<td data-sort-value="102.217096695276">102 tok/s</td>
-<td data-sort-value="33.59986200000276">33.60</td>
-<td data-sort-value="25.017655234">25</td>
+<td data-sort-value="32.012647583003854">32.01s</td>
+<td data-sort-value="104.25451588549501">104 tok/s</td>
+<td data-sort-value="27.146825916992384">27.15</td>
+<td data-sort-value="25.017655078">25</td>
 <td data-sort-value="16541">16,541</td>
 <td data-sort-value="152">152</td>
 <td data-sort-value="none">none</td>
@@ -390,9 +375,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="59.971902124991175">59.97s</td>
-<td data-sort-value="27.407681535230942">27.4 tok/s</td>
-<td data-sort-value="52.43976566698984">52.44</td>
+<td data-sort-value="51.54279029199097">51.54s</td>
+<td data-sort-value="29.38976584464134">29.4 tok/s</td>
+<td data-sort-value="44.123108458996285">44.12</td>
 <td data-sort-value="20.88116871">21</td>
 <td data-sort-value="16541">16,541</td>
 <td data-sort-value="121">121</td>
@@ -404,9 +389,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.953410999994958">4.95s</td>
-<td data-sort-value="102.00517113290714">102 tok/s</td>
-<td data-sort-value="1.6084389169991482">1.61</td>
+<td data-sort-value="5.147157875006087">5.15s</td>
+<td data-sort-value="97.89982920451469">97.9 tok/s</td>
+<td data-sort-value="1.6776665420038626">1.68</td>
 <td data-sort-value="6.462162442">6.5</td>
 <td data-sort-value="2070">2,070</td>
 <td data-sort-value="132">132</td>
@@ -418,9 +403,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.738096542001585">8.74s</td>
-<td data-sort-value="31.45386546545394">31.5 tok/s</td>
-<td data-sort-value="1.4560031659930246">1.46</td>
+<td data-sort-value="9.159647959007998">9.16s</td>
+<td data-sort-value="30.670088937398535">30.7 tok/s</td>
+<td data-sort-value="1.6255099999980303">1.63</td>
 <td data-sort-value="16.963863836">17</td>
 <td data-sort-value="572">572</td>
 <td data-sort-value="138">138</td>
@@ -432,9 +417,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.081588957997155">5.08s</td>
-<td data-sort-value="61.32255575619521">61.3 tok/s</td>
-<td data-sort-value="0.9699592090037186">0.97</td>
+<td data-sort-value="5.3884073329973035">5.39s</td>
+<td data-sort-value="61.15832016847829">61.2 tok/s</td>
+<td data-sort-value="1.155686041995068">1.16</td>
 <td data-sort-value="7.582430446">7.6</td>
 <td data-sort-value="577">577</td>
 <td data-sort-value="108">108</td>
@@ -446,10 +431,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.8447921670012875">4.84s</td>
-<td data-sort-value="125.10507173703536">125 tok/s</td>
-<td data-sort-value="1.0078976249933476">1.01</td>
-<td data-sort-value="16.256065814">16</td>
+<td data-sort-value="5.030126457990264">5.03s</td>
+<td data-sort-value="120.19260860876864">120 tok/s</td>
+<td data-sort-value="1.059452458008309">1.06</td>
+<td data-sort-value="16.248297266">16</td>
 <td data-sort-value="577">577</td>
 <td data-sort-value="106">106</td>
 <td data-sort-value="none">none</td>
@@ -460,9 +445,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.953659167003934">8.95s</td>
-<td data-sort-value="26.255260102355958">26.3 tok/s</td>
-<td data-sort-value="1.687295499999891">1.69</td>
+<td data-sort-value="9.042979792007827">9.04s</td>
+<td data-sort-value="26.342407225740114">26.3 tok/s</td>
+<td data-sort-value="1.6757034579932224">1.68</td>
 <td data-sort-value="19.518212768">20</td>
 <td data-sort-value="577">577</td>
 <td data-sort-value="107">107</td>
@@ -474,10 +459,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.6602498330030357">3.66s</td>
-<td data-sort-value="126.34165542344581">126 tok/s</td>
-<td data-sort-value="0.8004824160016142">0.80</td>
-<td data-sort-value="5.94629511">5.9</td>
+<td data-sort-value="4.018638041001395">4.02s</td>
+<td data-sort-value="121.64714858776594">122 tok/s</td>
+<td data-sort-value="1.0182150000036927">1.02</td>
+<td data-sort-value="5.954491718">6.0</td>
 <td data-sort-value="573">573</td>
 <td data-sort-value="79">79</td>
 <td data-sort-value="none">none</td>
@@ -488,9 +473,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="7.68103212499409">7.68s</td>
-<td data-sort-value="39.99210967101442">40.0 tok/s</td>
-<td data-sort-value="2.4350522499880753">2.44</td>
+<td data-sort-value="7.442777375006699">7.44s</td>
+<td data-sort-value="39.7639951152602">39.8 tok/s</td>
+<td data-sort-value="2.2257133749953937">2.23</td>
 <td data-sort-value="15.622001473">16</td>
 <td data-sort-value="3095">3,095</td>
 <td data-sort-value="119">119</td>
@@ -502,9 +487,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.609864666999783">4.61s</td>
-<td data-sort-value="128.6514034848715">129 tok/s</td>
-<td data-sort-value="2.1756459580064984">2.18</td>
+<td data-sort-value="4.659262417000718">4.66s</td>
+<td data-sort-value="126.71755538410164">127 tok/s</td>
+<td data-sort-value="2.173264791010297">2.17</td>
 <td data-sort-value="5.387525224">5.4</td>
 <td data-sort-value="4188">4,188</td>
 <td data-sort-value="118">118</td>
@@ -516,9 +501,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="7.3731849169998895">7.37s</td>
-<td data-sort-value="36.80906122851154">36.8 tok/s</td>
-<td data-sort-value="1.9402897499967366">1.94</td>
+<td data-sort-value="8.214629374997457">8.21s</td>
+<td data-sort-value="36.17686776206481">36.2 tok/s</td>
+<td data-sort-value="2.1891332079976564">2.19</td>
 <td data-sort-value="17.521531037">18</td>
 <td data-sort-value="1251">1,251</td>
 <td data-sort-value="114">114</td>
@@ -530,10 +515,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">no concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.442566959012765">8.44s</td>
-<td data-sort-value="156.24243274609478">156 tok/s</td>
-<td data-sort-value="4.669947207992664">4.67</td>
-<td data-sort-value="23.153306812">23</td>
+<td data-sort-value="9.55148762499448">9.55s</td>
+<td data-sort-value="154.8853720526938">155 tok/s</td>
+<td data-sort-value="5.696925333992112">5.70</td>
+<td data-sort-value="23.153346744">23</td>
 <td data-sort-value="3606">3,606</td>
 <td data-sort-value="132">132</td>
 <td data-sort-value="none">none</td>
@@ -544,9 +529,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="10.08064299999387">10.08s</td>
-<td data-sort-value="30.51430557763158">30.5 tok/s</td>
-<td data-sort-value="3.495674917008728">3.50</td>
+<td data-sort-value="10.466259082997567">10.47s</td>
+<td data-sort-value="30.52265248771356">30.5 tok/s</td>
+<td data-sort-value="4.002200707996963">4.00</td>
 <td data-sort-value="23.014257868">23</td>
 <td data-sort-value="2372">2,372</td>
 <td data-sort-value="117">117</td>
@@ -558,10 +543,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="9.525998665994848">9.53s</td>
-<td data-sort-value="126.20340606449085">126 tok/s</td>
-<td data-sort-value="1.289917666988913">1.29</td>
-<td data-sort-value="18.798059981">19</td>
+<td data-sort-value="10.200773542004754">10.20s</td>
+<td data-sort-value="125.46623357926917">125 tok/s</td>
+<td data-sort-value="1.8912548340013018">1.89</td>
+<td data-sort-value="18.798059877">19</td>
 <td data-sort-value="1617">1,617</td>
 <td data-sort-value="758">758</td>
 <td data-sort-value="duplicate keywords">duplicate keywords</td>
@@ -572,10 +557,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="21.984355082997354">21.98s</td>
-<td data-sort-value="45.26995923403381">45.3 tok/s</td>
-<td data-sort-value="12.407578875005129">12.41</td>
-<td data-sort-value="77.685016162">78</td>
+<td data-sort-value="24.154779916992993">24.15s</td>
+<td data-sort-value="45.29510373711535">45.3 tok/s</td>
+<td data-sort-value="14.242539499988197">14.24</td>
+<td data-sort-value="77.685015996">78</td>
 <td data-sort-value="6339">6,339</td>
 <td data-sort-value="106">106</td>
 <td data-sort-value="prompt hint repeated">prompt hint repeated</td>
@@ -586,23 +571,38 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.3502421250013867">3.35s</td>
-<td data-sort-value="212.61643557778746">213 tok/s</td>
-<td data-sort-value="1.1721831250033574">1.17</td>
+<td data-sort-value="3.81374599999981">3.81s</td>
+<td data-sort-value="187.70035636102162">188 tok/s</td>
+<td data-sort-value="1.513360750002903">1.51</td>
 <td data-sort-value="3.972355226">4.0</td>
 <td data-sort-value="2094">2,094</td>
 <td data-sort-value="92">92</td>
 <td data-sort-value="prompt hint repeated">prompt hint repeated</td>
 <td data-sort-value="Title: Border security vessels docked in Ramsgate Harbour at sunset | Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic s... | Keywords (17): Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...">Title: Border security vessels docked in Ramsgate Harbour at sunset | Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic s... | Keywords (17): Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...</td>
 </tr>
+<tr data-model="mlx-community/minicpm-v-4.6-4bit" data-execution="completed" data-usability="usable_with_caveats" data-maintainer-status="none" class="completed usable_with_caveats">
+<td data-sort-value="mlx-community/MiniCPM-V-4.6-4bit"><a href="#model-mlx-community-minicpm-v-46-4bit"><code>mlx-community/MiniCPM-V-4.6-4bit</code></a></td>
+<td data-sort-value="completed">completed</td>
+<td data-sort-value="usable_with_caveats">concerns detected</td>
+<td data-sort-value="none">none</td>
+<td data-sort-value="6.188751333000255">6.19s</td>
+<td data-sort-value="288.19643512810705">288 tok/s</td>
+<td data-sort-value="2.6284473330015317">2.63</td>
+<td data-sort-value="3.18559001">3.2</td>
+<td data-sort-value="910">910</td>
+<td data-sort-value="527">527</td>
+<td data-sort-value="duplicate keywords">duplicate keywords</td>
+<td data-sort-value="Title: Border Patrol Vessels at Ramsgate Harbor Sunset | Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a bea... | Keywords (36): British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, ...">Title: Border Patrol Vessels at Ramsgate Harbor Sunset | Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a bea... | Keywords (36): British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, ...<details><summary>1,697 characters of reasoning omitted</summary><pre>&lt;think&gt;
+We need to create a title, description, and keywords based on the image. First, let&#x27;s extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context...</pre></details></td>
+</tr>
 <tr data-model="mlx-community/smolvlm2-2.2b-instruct-mlx" data-execution="completed" data-usability="usable_with_caveats" data-maintainer-status="none" class="completed usable_with_caveats">
 <td data-sort-value="mlx-community/SmolVLM2-2.2B-Instruct-mlx"><a href="#model-mlx-community-smolvlm2-22b-instruct-mlx"><code>mlx-community/SmolVLM2-2.2B-Instruct-mlx</code></a></td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.510979375001625">3.51s</td>
-<td data-sort-value="118.28425574233694">118 tok/s</td>
-<td data-sort-value="1.1404871250124415">1.14</td>
+<td data-sort-value="3.8494490000011865">3.85s</td>
+<td data-sort-value="121.81016313362004">122 tok/s</td>
+<td data-sort-value="1.3564808329974767">1.36</td>
 <td data-sort-value="5.563737616">5.6</td>
 <td data-sort-value="1407">1,407</td>
 <td data-sort-value="114">114</td>
@@ -614,10 +614,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="39.52147987499484">39.52s</td>
-<td data-sort-value="49.01124463435487">49.0 tok/s</td>
-<td data-sort-value="22.57977454199863">22.58</td>
-<td data-sort-value="91.893308196">92</td>
+<td data-sort-value="39.748180916998535">39.75s</td>
+<td data-sort-value="51.07343808266047">51.1 tok/s</td>
+<td data-sort-value="22.726516832990455">22.73</td>
+<td data-sort-value="91.893308032">92</td>
 <td data-sort-value="3468">3,468</td>
 <td data-sort-value="112">112</td>
 <td data-sort-value="prompt hint repeated">prompt hint repeated</td>
@@ -628,10 +628,10 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="6.211184540996328">6.21s</td>
-<td data-sort-value="78.47114945441305">78.5 tok/s</td>
-<td data-sort-value="2.2633177090028767">2.26</td>
-<td data-sort-value="28.315377038">28</td>
+<td data-sort-value="8.146514375010156">8.15s</td>
+<td data-sort-value="60.700809419421326">60.7 tok/s</td>
+<td data-sort-value="3.55085808300646">3.55</td>
+<td data-sort-value="28.315312895">28</td>
 <td data-sort-value="573">573</td>
 <td data-sort-value="90">90</td>
 <td data-sort-value="prompt hint repeated">prompt hint repeated</td>
@@ -642,9 +642,9 @@ We need to create a title, description, and keywords based on the image. First, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">concerns detected</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.2192559579998488">3.22s</td>
-<td data-sort-value="181.86951798581538">182 tok/s</td>
-<td data-sort-value="1.2127007090020925">1.21</td>
+<td data-sort-value="3.7230286659905687">3.72s</td>
+<td data-sort-value="176.77932722844656">177 tok/s</td>
+<td data-sort-value="1.673688625000068">1.67</td>
 <td data-sort-value="4.848462612">4.8</td>
 <td data-sort-value="1366">1,366</td>
 <td data-sort-value="104">104</td>
@@ -654,12 +654,12 @@ We need to create a title, description, and keywords based on the image. First, 
 <tr data-model="mlx-community/fastvlm-0.5b-bf16" data-execution="completed" data-usability="unusable" data-maintainer-status="none" class="completed unusable">
 <td data-sort-value="mlx-community/FastVLM-0.5B-bf16"><a href="#model-mlx-community-fastvlm-05b-bf16"><code>mlx-community/FastVLM-0.5B-bf16</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="2.853900458998396">2.85s</td>
-<td data-sort-value="368.95663294059636">369 tok/s</td>
-<td data-sort-value="1.1686085419933079">1.17</td>
-<td data-sort-value="2.15262788">2.2</td>
+<td data-sort-value="3.8157428330014227">3.82s</td>
+<td data-sort-value="366.84576074459227">367 tok/s</td>
+<td data-sort-value="2.0229961660079425">2.02</td>
+<td data-sort-value="1.849069198">1.8</td>
 <td data-sort-value="312">312</td>
 <td data-sort-value="44">44</td>
 <td data-sort-value="labelled fields not detected">labelled fields not detected</td>
@@ -668,11 +668,11 @@ We need to create a title, description, and keywords based on the image. First, 
 <tr data-model="mlx-community/internvl3_5-1b-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/InternVL3_5-1B-4bit"><a href="#model-mlx-community-internvl35-1b-4bit"><code>mlx-community/InternVL3_5-1B-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: generation</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="2.655339750010171">2.66s</td>
-<td data-sort-value="365.4890048088028">365 tok/s</td>
-<td data-sort-value="0.8914284579950618">0.89</td>
+<td data-sort-value="2.78124908299651">2.78s</td>
+<td data-sort-value="388.3509918004817">388 tok/s</td>
+<td data-sort-value="1.0125453750079032">1.01</td>
 <td data-sort-value="2.145020948">2.1</td>
 <td data-sort-value="2094">2,094</td>
 <td data-sort-value="200">200</td>
@@ -682,12 +682,12 @@ We need to create a title, description, and keywords based on the image. First, 
 <tr data-model="mlx-community/llama-3.2-11b-vision-instruct-8bit" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/Llama-3.2-11B-Vision-Instruct-8bit"><a href="#model-mlx-community-llama-32-11b-vision-instruct-8bit"><code>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: generation</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="38.488891333006904">38.49s</td>
-<td data-sort-value="19.521146495951808">19.5 tok/s</td>
-<td data-sort-value="2.157834208002896">2.16</td>
-<td data-sort-value="14.969086912">15</td>
+<td data-sort-value="41.119216915991274">41.12s</td>
+<td data-sort-value="18.44972348943351">18.4 tok/s</td>
+<td data-sort-value="2.712671458008117">2.71</td>
+<td data-sort-value="14.697490478">15</td>
 <td data-sort-value="290">290</td>
 <td data-sort-value="667">667</td>
 <td data-sort-value="repeated text; duplicate keywords">repeated text; duplicate keywords</td>
@@ -696,12 +696,12 @@ We need to create a title, description, and keywords based on the image. First, 
 <tr data-model="mlx-community/molmopoint-8b-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="none" class="completed unusable">
 <td data-sort-value="mlx-community/MolmoPoint-8B-4bit"><a href="#model-mlx-community-molmopoint-8b-4bit"><code>mlx-community/MolmoPoint-8B-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.77972612499434">8.78s</td>
-<td data-sort-value="32.19573410790998">32.2 tok/s</td>
-<td data-sort-value="2.9453338330058614">2.95</td>
-<td data-sort-value="12.747474536">13</td>
+<td data-sort-value="10.118728707995615">10.12s</td>
+<td data-sort-value="30.414980104503">30.4 tok/s</td>
+<td data-sort-value="4.040027499999269">4.04</td>
+<td data-sort-value="12.495730266">12</td>
 <td data-sort-value="3104">3,104</td>
 <td data-sort-value="113">113</td>
 <td data-sort-value="labelled fields not detected">labelled fields not detected</td>
@@ -714,11 +714,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/muse-glimmer-30b-optiq-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/Muse-Glimmer-30B-OptiQ-4bit"><a href="#model-mlx-community-muse-glimmer-30b-optiq-4bit"><code>mlx-community/Muse-Glimmer-30B-OptiQ-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="55.1693918749952">55.17s</td>
-<td data-sort-value="23.44546447428653">23.4 tok/s</td>
-<td data-sort-value="8.872506540996255">8.87</td>
+<td data-sort-value="54.07317800000601">54.07s</td>
+<td data-sort-value="24.32669700734636">24.3 tok/s</td>
+<td data-sort-value="9.22561508299259">9.23</td>
 <td data-sort-value="25.464962022">25</td>
 <td data-sort-value="4390">4,390</td>
 <td data-sort-value="1000">1,000</td>
@@ -728,11 +728,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/qwen2-vl-2b-mlx" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/Qwen2-VL-2B-mlx"><a href="#model-mlx-community-qwen2-vl-2b-mlx"><code>mlx-community/Qwen2-VL-2B-mlx</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: generation</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="40.66274704200623">40.66s</td>
-<td data-sort-value="122.17822599452501">122 tok/s</td>
-<td data-sort-value="37.11190124999848">37.11</td>
+<td data-sort-value="29.211130958006834">29.21s</td>
+<td data-sort-value="124.79135294778595">125 tok/s</td>
+<td data-sort-value="25.64202674999251">25.64</td>
 <td data-sort-value="9.361127486">9.4</td>
 <td data-sort-value="16536">16,536</td>
 <td data-sort-value="225">225</td>
@@ -742,11 +742,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/smolvlm-256m-instruct-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="none" class="completed unusable">
 <td data-sort-value="mlx-community/SmolVLM-256M-Instruct-4bit"><a href="#model-mlx-community-smolvlm-256m-instruct-4bit"><code>mlx-community/SmolVLM-256M-Instruct-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="2.2892009999923175">2.29s</td>
-<td data-sort-value="468.4065129023374">468 tok/s</td>
-<td data-sort-value="1.004210792001686">1.00</td>
+<td data-sort-value="2.575801541999681">2.58s</td>
+<td data-sort-value="526.8882573117793">527 tok/s</td>
+<td data-sort-value="1.0054481669940287">1.01</td>
 <td data-sort-value="1.06828266">1.1</td>
 <td data-sort-value="1186">1,186</td>
 <td data-sort-value="22">22</td>
@@ -756,11 +756,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/x-reasoner-7b-8bit" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/X-Reasoner-7B-8bit"><a href="#model-mlx-community-x-reasoner-7b-8bit"><code>mlx-community/X-Reasoner-7B-8bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: generation</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="19.696436083992012">19.70s</td>
-<td data-sort-value="58.94075939256444">58.9 tok/s</td>
-<td data-sort-value="14.172263875007047">14.17</td>
+<td data-sort-value="20.063854042004095">20.06s</td>
+<td data-sort-value="57.303422019098655">57.3 tok/s</td>
+<td data-sort-value="13.983909999995376">13.98</td>
 <td data-sort-value="14.28618937">14</td>
 <td data-sort-value="16536">16,536</td>
 <td data-sort-value="200">200</td>
@@ -770,12 +770,12 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/gemma-3n-e4b-it-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="none" class="completed unusable">
 <td data-sort-value="mlx-community/gemma-3n-E4B-it-4bit"><a href="#model-mlx-community-gemma-3n-e4b-it-4bit"><code>mlx-community/gemma-3n-E4B-it-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.417786875012098">4.42s</td>
-<td data-sort-value="98.85197221172572">98.9 tok/s</td>
-<td data-sort-value="0.8692009579972364">0.87</td>
-<td data-sort-value="7.154281079">7.2</td>
+<td data-sort-value="5.416941915987991">5.42s</td>
+<td data-sort-value="94.60872428362555">94.6 tok/s</td>
+<td data-sort-value="1.6931943750096252">1.69</td>
+<td data-sort-value="7.062060995">7.1</td>
 <td data-sort-value="571">571</td>
 <td data-sort-value="132">132</td>
 <td data-sort-value="labelled fields not detected">labelled fields not detected</td>
@@ -784,11 +784,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/granite-vision-3.2-2b-nvfp4" data-execution="completed" data-usability="unusable" data-maintainer-status="none" class="completed unusable">
 <td data-sort-value="mlx-community/granite-vision-3.2-2b-nvfp4"><a href="#model-mlx-community-granite-vision-32-2b-nvfp4"><code>mlx-community/granite-vision-3.2-2b-nvfp4</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="5.136386875004973">5.14s</td>
-<td data-sort-value="144.79489688432878">145 tok/s</td>
-<td data-sort-value="3.1690663329936797">3.17</td>
+<td data-sort-value="4.987451791996136">4.99s</td>
+<td data-sort-value="142.8692760654031">143 tok/s</td>
+<td data-sort-value="3.103522082994459">3.10</td>
 <td data-sort-value="4.32278105">4.3</td>
 <td data-sort-value="5615">5,615</td>
 <td data-sort-value="86">86</td>
@@ -798,11 +798,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/llm-jp-4-vl-9b-mlx-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/llm-jp-4-vl-9b-mlx-4bit"><a href="#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit"><code>mlx-community/llm-jp-4-vl-9b-mlx-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="3.462404999998398">3.46s</td>
-<td data-sort-value="108.16885158175026">108 tok/s</td>
-<td data-sort-value="1.5393860409967601">1.54</td>
+<td data-sort-value="3.5491739160061115">3.55s</td>
+<td data-sort-value="102.87411708568567">103 tok/s</td>
+<td data-sort-value="1.533156332996441">1.53</td>
 <td data-sort-value="6.729247106">6.7</td>
 <td data-sort-value="2174">2,174</td>
 <td data-sort-value="18">18</td>
@@ -812,11 +812,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="mlx-community/nanollava-1.5-4bit" data-execution="completed" data-usability="unusable" data-maintainer-status="observation_needs_reproduction" class="completed unusable">
 <td data-sort-value="mlx-community/nanoLLaVA-1.5-4bit"><a href="#model-mlx-community-nanollava-15-4bit"><code>mlx-community/nanoLLaVA-1.5-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: generation</td>
 <td data-sort-value="observation_needs_reproduction">observation needs reproduction</td>
-<td data-sort-value="5.016660833003698">5.02s</td>
-<td data-sort-value="311.3816775709906">311 tok/s</td>
-<td data-sort-value="0.7074429589993088">0.71</td>
+<td data-sort-value="4.758685291992151">4.76s</td>
+<td data-sort-value="351.79040284952015">352 tok/s</td>
+<td data-sort-value="0.7228455840086099">0.72</td>
 <td data-sort-value="1.780531232">1.8</td>
 <td data-sort-value="308">308</td>
 <td data-sort-value="1000">1,000</td>
@@ -826,11 +826,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tr data-model="vikhyatk/moondream2" data-execution="completed" data-usability="unusable" data-maintainer-status="none" class="completed unusable">
 <td data-sort-value="vikhyatk/moondream2"><a href="#model-vikhyatk-moondream2"><code>vikhyatk/moondream2</code></a></td>
 <td data-sort-value="completed">completed</td>
-<td data-sort-value="unusable">major concerns</td>
+<td data-sort-value="unusable">major concerns: answer format</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.569002541000373">4.57s</td>
-<td data-sort-value="165.79468563762126">166 tok/s</td>
-<td data-sort-value="0.9814612500049407">0.98</td>
+<td data-sort-value="4.24110883299727">4.24s</td>
+<td data-sort-value="161.7676256737482">162 tok/s</td>
+<td data-sort-value="0.9814633749920176">0.98</td>
 <td data-sort-value="4.754543674">4.8</td>
 <td data-sort-value="1011">1,011</td>
 <td data-sort-value="48">48</td>
@@ -841,12 +841,12 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 </table>
 </div>
 <h3>Resource Highlights</h3>
-<p>Quickest completion without detected concerns (end-to-end, including model load): <a href="#model-liquidai-lfm25-vl-450m-mlx-bf16"><code>LiquidAI/LFM2.5-VL-450M-MLX-bf16</code></a> at 2.03s.</p>
+<p>Quickest completion without detected concerns (end-to-end, including model load): <a href="#model-liquidai-lfm25-vl-450m-mlx-bf16"><code>LiquidAI/LFM2.5-VL-450M-MLX-bf16</code></a> at 2.36s.</p>
 <p>Lowest peak memory among completions without detected concerns: <a href="#model-liquidai-lfm25-vl-450m-mlx-bf16"><code>LiquidAI/LFM2.5-VL-450M-MLX-bf16</code></a> at 1.9 GB.</p>
 <p>Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.</p>
-<h3>Avoid for This Run</h3>
+<h3>Major Mechanical Concerns in This Run</h3>
 <table>
-<caption>Unusable and not-evaluated models</caption>
+<caption>Models with major concerns or not assessed</caption>
 <thead><tr>
 <th scope="col">Model</th>
 <th scope="col">Mechanical checks</th>
@@ -856,25 +856,25 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 <tbody>
 <tr>
 <td><a href="#model-mlx-community-fastvlm-05b-bf16"><code>mlx-community/FastVLM-0.5B-bf16</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>labelled fields not detected</td>
 <td>A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer patrol vessels stand side-by-side against a breathtaking sunset, with the town&#x27;s cliffside skyline softly illuminated by the fading light.</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-internvl35-1b-4bit"><code>mlx-community/InternVL3_5-1B-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: generation</td>
 <td>repeated text; stopped early: repeating; duplicate keywords</td>
 <td>Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset | Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC pat... | Keywords (59): Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-llama-32-11b-vision-instruct-8bit"><code>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: generation</td>
 <td>repeated text; duplicate keywords</td>
 <td>Title: Ramsgate Harbour Sunset with Border Security Vessels | Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security... | Keywords (45): Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-molmopoint-8b-4bit"><code>mlx-community/MolmoPoint-8B-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>labelled fields not detected</td>
 <td>Ramsgate Harbour Sunset: Border Security Vessels Moored
 
@@ -882,55 +882,55 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 </tr>
 <tr>
 <td><a href="#model-mlx-community-muse-glimmer-30b-optiq-4bit"><code>mlx-community/Muse-Glimmer-30B-OptiQ-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible</td>
 <td>Title: (not detected) | Description: (not detected) | Keywords (2): Need title 5-10 words., ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-qwen2-vl-2b-mlx"><code>mlx-community/Qwen2-VL-2B-mlx</code></a></td>
-<td>major concerns</td>
+<td>major concerns: generation</td>
 <td>stopped early: repeating; duplicate keywords</td>
 <td>Title: Border Security Command vessels in Ramsgate Harbour at sunset | Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moo... | Keywords (22): Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-smolvlm-256m-instruct-4bit"><code>mlx-community/SmolVLM-256M-Instruct-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>labelled fields not detected</td>
 <td>Brokewater, BSC, Dusk, England, Marina, Port, Ramsgate, Reflection</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-x-reasoner-7b-8bit"><code>mlx-community/X-Reasoner-7B-8bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: generation</td>
 <td>repeated text; stopped early: repeating; duplicate keywords</td>
 <td>Title: Dusk at Ramsgate: Border Security Vessels | Description: UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-... | Keywords (53): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-gemma-3n-e4b-it-4bit"><code>mlx-community/gemma-3n-E4B-it-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>labelled fields not detected</td>
 <td>Title: (not detected) | Description: A row of fishing boats, including the &quot;BOS Defender&quot; and &quot;BOS Volunteer,&quot; are moored side-by-side in the harbor of Ramsgate... | Keywords (20): fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-granite-vision-32-2b-nvfp4"><code>mlx-community/granite-vision-3.2-2b-nvfp4</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>labelled fields not detected; duplicate keywords</td>
 <td>Title: &quot;Ramsgate Harbour Patrol Boats at Dusk&quot; | Description: (not detected) | Keywords (18): Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coast, Dover, Horizon, Lifebuoy, Marina, ...</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit"><code>mlx-community/llm-jp-4-vl-9b-mlx-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>control tokens visible; labelled fields not detected</td>
 <td>&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a harbor with several boats docked in a row.</td>
 </tr>
 <tr>
 <td><a href="#model-mlx-community-nanollava-15-4bit"><code>mlx-community/nanoLLaVA-1.5-4bit</code></a></td>
-<td>major concerns</td>
+<td>major concerns: generation</td>
 <td>repeated text; labelled fields not detected; cut off at token limit</td>
 <td>Title: &quot;UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, E... | Description: (not detected) | Keywords: (not detected)</td>
 </tr>
 <tr>
 <td><a href="#model-vikhyatk-moondream2"><code>vikhyatk/moondream2</code></a></td>
-<td>major concerns</td>
+<td>major concerns: answer format</td>
 <td>labelled fields not detected; prompt hint repeated</td>
 <td>Ramsgate Harbour, Kent, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town&#x27;s cliffside skyline.</td>
 </tr>
@@ -976,27 +976,27 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.33s</td>
+<td>0.36s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>0.76s</td>
+<td>1.05s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>2.03s</td>
+<td>2.36s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.551</td>
+<td>0.549</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.108</td>
+<td>0.394</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0623</td>
+<td>0.0611</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1012,11 +1012,11 @@ Border security patrol boats, including BSC Defender and BSC Volunteer, are moor
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>19,528 tok/s</td>
+<td>5,344 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>493 tok/s</td>
+<td>482 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -1139,23 +1139,23 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
 </tr>
 <tr>
 <td>Generation time</td>
-<td>6.85s</td>
+<td>7.54s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.62s</td>
+<td>9.31s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.574</td>
+<td>0.588</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>5.06</td>
+<td>5.76</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0856</td>
+<td>0.0844</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1171,11 +1171,11 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,252 tok/s</td>
+<td>1,100 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>78.7 tok/s</td>
+<td>79.5 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -1289,27 +1289,27 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.86s</td>
+<td>1.88s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.49s</td>
+<td>6.28s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.11s</td>
+<td>8.94s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.756</td>
+<td>0.774</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.06</td>
+<td>1.86</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.108</td>
+<td>0.107</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1325,11 +1325,11 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,444 tok/s</td>
+<td>1,396 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>35.4 tok/s</td>
+<td>35.3 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -1445,27 +1445,27 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.09s</td>
+<td>1.13s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>4.02s</td>
+<td>5.25s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.81s</td>
+<td>7.07s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.684</td>
+<td>0.685</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.37</td>
+<td>2.6</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.113</td>
+<td>0.0975</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1481,11 +1481,11 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,531 tok/s</td>
+<td>804 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>56.9 tok/s</td>
+<td>57.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -1604,27 +1604,27 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.58s</td>
+<td>1.65s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.60s</td>
+<td>3.91s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.89s</td>
+<td>6.26s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.7</td>
+<td>0.688</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.795</td>
+<td>1.02</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.102</td>
+<td>0.11</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1640,11 +1640,11 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,630 tok/s</td>
+<td>2,050 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>37.5 tok/s</td>
+<td>36.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -1719,7 +1719,7 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 <p><b>Readable output:</b></p>
 <pre class="model-output-readable">Title: Sunset at Ramsgate Harbour
 Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town&#x27;s cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, Lifebuoy, Reflection, Coast, Fleet, Buildings</pre>
+Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, Lifebuoy, Reflection, Coast, Buildings, Pier</pre>
 </details>
 </article>
 <article id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit">
@@ -1758,27 +1758,27 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.18s</td>
+<td>2.15s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>16.42s</td>
+<td>20.22s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>19.27s</td>
+<td>23.02s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.655</td>
+<td>0.64</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.665</td>
+<td>2.97</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.151</td>
+<td>0.12</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1794,11 +1794,11 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,974 tok/s</td>
+<td>441 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>66.1 tok/s</td>
+<td>60.2 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -1878,209 +1878,6 @@ Description: UK Border Security patrol boats, including the Defender and Volunte
 Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet</pre>
 </details>
 </article>
-<article id="model-mlx-community-minicpm-v-46-4bit">
-<h3>mlx-community/MiniCPM-V-4.6-4bit</h3>
-<details><summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-<table>
-<caption>Captured facts for mlx-community/MiniCPM-V-4.6-4bit</caption>
-<thead><tr>
-<th scope="col">Fact</th>
-<th scope="col">Value</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>Execution</td>
-<td>completed</td>
-</tr>
-<tr>
-<td>Mechanical checks</td>
-<td>no concerns detected</td>
-</tr>
-<tr>
-<td>Assessment</td>
-<td>General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed</td>
-</tr>
-<tr>
-<td>Maintainer status</td>
-<td>none</td>
-</tr>
-<tr>
-<td>Observations</td>
-<td>none</td>
-</tr>
-<tr>
-<td>Arch supported by installed mlx-vlm</td>
-<td>yes (model_type minicpmv4_6)</td>
-</tr>
-<tr>
-<td>Model load time</td>
-<td>0.88s</td>
-</tr>
-<tr>
-<td>Generation time</td>
-<td>3.19s</td>
-</tr>
-<tr>
-<td>Total time</td>
-<td>4.85s</td>
-</tr>
-<tr>
-<td>Prompt preparation time</td>
-<td>0.768</td>
-</tr>
-<tr>
-<td>First-token latency</td>
-<td>0.238</td>
-</tr>
-<tr>
-<td>Cleanup time</td>
-<td>0.0923</td>
-</tr>
-<tr>
-<td>Prompt tokens</td>
-<td>910</td>
-</tr>
-<tr>
-<td>Generation tokens</td>
-<td>662</td>
-</tr>
-<tr>
-<td>Total tokens</td>
-<td>1,572</td>
-</tr>
-<tr>
-<td>Prompt throughput (raw)</td>
-<td>3,823 tok/s</td>
-</tr>
-<tr>
-<td>Generation throughput (raw)</td>
-<td>302 tok/s</td>
-</tr>
-<tr>
-<td>Peak memory (GB)</td>
-<td>3.2</td>
-</tr>
-<tr>
-<td>Active memory (GB)</td>
-<td>2.2</td>
-</tr>
-<tr>
-<td>Cache memory (GB)</td>
-<td>0.06</td>
-</tr>
-<tr>
-<td>Model-load active memory (GB)</td>
-<td>2.16</td>
-</tr>
-<tr>
-<td>Post-cleanup active memory (GB)</td>
-<td>0.00469</td>
-</tr>
-<tr>
-<td>Post-cleanup cache memory (GB)</td>
-<td>0.0</td>
-</tr>
-<tr>
-<td>Stop reason</td>
-<td>completed</td>
-</tr>
-<tr>
-<td>Requested maximum tokens</td>
-<td>1000</td>
-</tr>
-<tr>
-<td>Rendered prompt characters</td>
-<td>1366</td>
-</tr>
-<tr>
-<td>Image placeholders</td>
-<td>1</td>
-</tr>
-<tr>
-<td>Processor</td>
-<td>mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor</td>
-</tr>
-<tr>
-<td>Tokenizer</td>
-<td>transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</td>
-</tr>
-<tr>
-<td>Requested model revision</td>
-<td>not requested</td>
-</tr>
-<tr>
-<td>Resolved model revision</td>
-<td>86cd463d33a946e4481b77e3c10fc63121b60a19</td>
-</tr>
-<tr>
-<td>Resolved snapshot path</td>
-<td>~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19</td>
-</tr>
-<tr>
-<td>Generation settings</td>
-<td>{&quot;max_tokens&quot;: 1000, &quot;prefill_step_size&quot;: 2048, &quot;seed&quot;: 0, &quot;temperature&quot;: 0.7, &quot;top_k&quot;: 0, &quot;top_p&quot;: 1.0}</td>
-</tr>
-<tr>
-<td>EOS token</td>
-<td>&lt;|im_end|&gt;</td>
-</tr>
-</tbody>
-</table>
-<p><b>Readable output:</b></p>
-<pre class="model-output-readable">&lt;think&gt;
-We need to create a title, description, and keywords based on the image. First, let&#x27;s extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
-
-For the title, need to be concise, 5-10 words. Let&#x27;s brainstorm: &quot;Border Patrol Boats Moored in Ramsgate Harbor at Sunset&quot;.
-
-Now description: Combine the context and visible details. Mention the vessels (border security), the name BSC Defender and Volunteer, location (Ramsgate Harbour, Kent), setting (dusk with sunset), and visible details like lifebuoys, buildings, etc.
-
-Keywords: need 10-18 unique, covering relevant context and visible details. Let&#x27;s list: border, security, patrol, vessels, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, boats, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency, etc. Ensure they are unique and cover the context and visible details.
-
-Now, let&#x27;s construct:
-
-Title: Border Patrol Boats in Ramsgate Harbor at Sunset
-
-Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
-
-Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters, public, emergency.
-
-Count the keywords: I&#x27;ll list them and ensure they are 10-18 unique.
-
-Let me check:
-
-1. border
-2. security
-3. patrol
-4. boats
-5. Ramsgate
-6. harbor
-7. Kent
-8. dusk
-9. sunset
-10. lifebuoys
-11. mooring
-12. maritime
-13. reflected
-14. buildings
-15. cliffside
-16. command
-17. fleet
-18. waters
-
-That&#x27;s 18 unique keywords. They cover relevant context and visible details.
-
-Now, ensure the title is 5-10 words: &quot;Border Patrol Boats in Ramsgate Harbor at Sunset&quot; is 5 words. Good.
-
-Finally, output exactly Title, Description, Keywords.
-&lt;/think&gt;
-
-Title: Border Patrol Boats in Ramsgate Harbor at Sunset
-
-Description: British Border Security Command patrol boats, including BSC Defender and Volunteer, are moored in Ramsgate Harbour during dusk, with sunset lighting and distinctive lifebuoys.
-
-Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset, lifebuoys, mooring, maritime, reflected, buildings, cliffside, command, fleet, waters</pre>
-</details>
-</article>
 <article id="model-mlx-community-minicpm-o-45-4bit">
 <h3>mlx-community/MiniCPM-o-4_5-4bit</h3>
 <details><summary>Complete evidence: mlx-community/MiniCPM-o-4_5-4bit</summary>
@@ -2117,27 +1914,27 @@ Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset,
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.01s</td>
+<td>1.05s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.60s</td>
+<td>1.74s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.18s</td>
+<td>3.37s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.569</td>
+<td>0.57</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.216</td>
+<td>0.323</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0936</td>
+<td>0.1</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2153,11 +1950,11 @@ Keywords: border, security, patrol, boats, Ramsgate, harbor, Kent, dusk, sunset,
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,711 tok/s</td>
+<td>1,144 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>106 tok/s</td>
+<td>102 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -2273,27 +2070,27 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.34s</td>
+<td>1.37s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>4.93s</td>
+<td>4.91s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>6.89s</td>
+<td>6.91s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.603</td>
+<td>0.615</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.23</td>
+<td>2.16</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0916</td>
+<td>0.0977</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2309,11 +2106,11 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,300 tok/s</td>
+<td>1,348 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>66.2 tok/s</td>
+<td>64.5 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -2428,27 +2225,27 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.96s</td>
+<td>2.23s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.26s</td>
+<td>2.32s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.83s</td>
+<td>5.20s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.602</td>
+<td>0.63</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.982</td>
+<td>1.01</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0853</td>
+<td>0.101</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2464,11 +2261,11 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,956 tok/s</td>
+<td>2,877 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>188 tok/s</td>
+<td>181 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -2583,27 +2380,27 @@ Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.04s</td>
+<td>1.09s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.48s</td>
+<td>5.73s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.24s</td>
+<td>7.57s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.701</td>
+<td>0.73</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.742</td>
+<td>2.89</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0923</td>
+<td>0.121</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2619,15 +2416,15 @@ Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,025 tok/s</td>
+<td>519 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>71.7 tok/s</td>
+<td>68.9 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
-<td>8.5</td>
+<td>8.1</td>
 </tr>
 <tr>
 <td>Active memory (GB)</td>
@@ -2739,27 +2536,27 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.98s</td>
+<td>1.00s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.44s</td>
+<td>3.47s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.24s</td>
+<td>5.27s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.798</td>
+<td>0.796</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.97</td>
+<td>1.99</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0861</td>
+<td>0.0897</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2775,11 +2572,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,062 tok/s</td>
+<td>2,044 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>209 tok/s</td>
+<td>207 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -2891,27 +2688,27 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.57s</td>
+<td>2.55s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.42s</td>
+<td>2.83s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.69s</td>
+<td>6.08s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.685</td>
+<td>0.691</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.571</td>
+<td>0.939</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.124</td>
+<td>0.122</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2927,11 +2724,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,217 tok/s</td>
+<td>1,350 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>106 tok/s</td>
+<td>104 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3043,27 +2840,27 @@ Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast,
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.90s</td>
+<td>0.94s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.26s</td>
+<td>3.44s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.72s</td>
+<td>4.94s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.551</td>
+<td>0.564</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.288</td>
+<td>0.439</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0843</td>
+<td>0.0874</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3079,11 +2876,11 @@ Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast,
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,866 tok/s</td>
+<td>2,541 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>59.1 tok/s</td>
+<td>58.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3199,27 +2996,27 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.28s</td>
+<td>2.29s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>24.09s</td>
+<td>19.31s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>27.35s</td>
+<td>22.56s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.96</td>
+<td>0.942</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>21.1</td>
+<td>16.6</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.14</td>
+<td>0.136</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3235,11 +3032,11 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>604 tok/s</td>
+<td>771 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>65.4 tok/s</td>
+<td>72.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3354,27 +3151,27 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.90s</td>
+<td>2.91s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>38.02s</td>
+<td>27.59s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>40.99s</td>
+<td>31.53s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>1.05</td>
+<td>1.01</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>35.5</td>
+<td>25.1</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.135</td>
+<td>0.121</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3390,11 +3187,11 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>466 tok/s</td>
+<td>657 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>83.0 tok/s</td>
+<td>87.0 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3506,15 +3303,15 @@ Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.89s</td>
+<td>0.93s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>39.16s</td>
+<td>30.37s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>41.11s</td>
+<td>32.36s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
@@ -3522,11 +3319,11 @@ Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>36.6</td>
+<td>27.8</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.106</td>
+<td>0.102</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3542,11 +3339,11 @@ Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>452 tok/s</td>
+<td>593 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>67.9 tok/s</td>
+<td>70.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3658,27 +3455,27 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.41s</td>
+<td>2.36s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>35.09s</td>
+<td>28.61s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>38.57s</td>
+<td>32.01s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>1.06</td>
+<td>1.03</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>32.7</td>
+<td>26.2</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.132</td>
+<td>0.122</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3694,11 +3491,11 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>506 tok/s</td>
+<td>630 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>102 tok/s</td>
+<td>104 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3710,7 +3507,7 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 </tr>
 <tr>
 <td>Cache memory (GB)</td>
-<td>0.91</td>
+<td>0.90</td>
 </tr>
 <tr>
 <td>Model-load active memory (GB)</td>
@@ -3810,27 +3607,27 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dov
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.01s</td>
+<td>2.24s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>56.86s</td>
+<td>48.25s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>59.97s</td>
+<td>51.54s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>1.08</td>
+<td>1.04</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>51.5</td>
+<td>43.2</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.158</td>
+<td>0.131</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3846,11 +3643,11 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dov
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>321 tok/s</td>
+<td>383 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>27.4 tok/s</td>
+<td>29.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -3965,27 +3762,27 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.03s</td>
+<td>1.11s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.91s</td>
+<td>3.03s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.95s</td>
+<td>5.15s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>1</td>
+<td>0.989</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.712</td>
+<td>0.791</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.103</td>
+<td>0.104</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4001,11 +3798,11 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,906 tok/s</td>
+<td>2,618 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>102 tok/s</td>
+<td>97.9 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -4121,27 +3918,27 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.26s</td>
+<td>2.39s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.85s</td>
+<td>6.13s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.74s</td>
+<td>9.16s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.603</td>
+<td>0.614</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.885</td>
+<td>1.05</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.125</td>
+<td>0.126</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4157,11 +3954,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>646 tok/s</td>
+<td>546 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>31.5 tok/s</td>
+<td>30.7 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -4277,27 +4074,27 @@ Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Voluntee
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.66s</td>
+<td>1.76s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.74s</td>
+<td>2.93s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.08s</td>
+<td>5.39s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.661</td>
+<td>0.675</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.353</td>
+<td>0.532</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.105</td>
+<td>0.107</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4313,11 +4110,11 @@ Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Voluntee
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,635 tok/s</td>
+<td>1,084 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>61.3 tok/s</td>
+<td>61.2 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -4436,27 +4233,27 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.32s</td>
+<td>2.41s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.86s</td>
+<td>1.94s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.84s</td>
+<td>5.03s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.635</td>
+<td>0.65</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.4</td>
+<td>0.437</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.125</td>
+<td>0.127</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4472,11 +4269,11 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,441 tok/s</td>
+<td>1,319 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>125 tok/s</td>
+<td>120 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -4590,19 +4387,19 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.52s</td>
+<td>2.62s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.77s</td>
+<td>5.74s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.95s</td>
+<td>9.04s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.633</td>
+<td>0.648</td>
 </tr>
 <tr>
 <td>First-token latency</td>
@@ -4610,7 +4407,7 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.128</td>
+<td>0.132</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4626,7 +4423,7 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>542 tok/s</td>
+<td>547 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
@@ -4744,27 +4541,27 @@ Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.56s</td>
+<td>1.67s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.43s</td>
+<td>1.67s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.66s</td>
+<td>4.02s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.637</td>
+<td>0.649</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.174</td>
+<td>0.398</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0982</td>
+<td>0.103</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4780,15 +4577,15 @@ Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,294 tok/s</td>
+<td>1,440 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>126 tok/s</td>
+<td>122 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
-<td>5.9</td>
+<td>6.0</td>
 </tr>
 <tr>
 <td>Active memory (GB)</td>
@@ -4898,27 +4695,27 @@ Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coas
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.68s</td>
+<td>1.63s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.42s</td>
+<td>5.22s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.68s</td>
+<td>7.44s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.58</td>
+<td>0.578</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.88</td>
+<td>1.67</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.103</td>
+<td>0.102</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4934,11 +4731,11 @@ Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coas
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,648 tok/s</td>
+<td>1,853 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>40.0 tok/s</td>
+<td>39.8 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -5053,27 +4850,27 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.77s</td>
+<td>0.80s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.10s</td>
+<td>3.11s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.61s</td>
+<td>4.66s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.734</td>
+<td>0.741</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.47</td>
+<td>1.48</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0929</td>
+<td>0.0945</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5089,11 +4886,11 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,852 tok/s</td>
+<td>2,835 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>129 tok/s</td>
+<td>127 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -5203,27 +5000,27 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.75s</td>
+<td>2.28s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.04s</td>
+<td>5.35s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.37s</td>
+<td>8.21s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.573</td>
+<td>0.577</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.39</td>
+<td>1.63</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.111</td>
+<td>0.118</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5239,11 +5036,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>903 tok/s</td>
+<td>766 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>36.8 tok/s</td>
+<td>36.2 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -5358,23 +5155,23 @@ Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside build
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.27s</td>
+<td>2.33s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.52s</td>
+<td>6.55s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.44s</td>
+<td>9.55s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.637</td>
+<td>0.645</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>4.07</td>
+<td>5.09</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
@@ -5394,11 +5191,11 @@ Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside build
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>886 tok/s</td>
+<td>708 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>156 tok/s</td>
+<td>155 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -5507,7 +5304,7 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -5515,27 +5312,27 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.17s</td>
+<td>2.05s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>7.34s</td>
+<td>7.84s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>10.08s</td>
+<td>10.47s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.554</td>
+<td>0.561</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.87</td>
+<td>3.38</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0994</td>
+<td>0.0934</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5551,7 +5348,7 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>827 tok/s</td>
+<td>702 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
@@ -5670,15 +5467,15 @@ UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffs
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.59s</td>
+<td>1.62s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>7.30s</td>
+<td>7.93s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>9.53s</td>
+<td>10.20s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
@@ -5686,11 +5483,11 @@ UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffs
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.69</td>
+<td>1.29</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.102</td>
+<td>0.0965</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5706,11 +5503,11 @@ UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffs
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,343 tok/s</td>
+<td>1,256 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>126 tok/s</td>
+<td>125 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -5829,7 +5626,7 @@ Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -5837,27 +5634,27 @@ Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat
 </tr>
 <tr>
 <td>Model load time</td>
-<td>6.58s</td>
+<td>6.94s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>14.75s</td>
+<td>16.59s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>21.98s</td>
+<td>24.15s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.632</td>
+<td>0.61</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>11.3</td>
+<td>12.7</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.252</td>
+<td>0.262</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5873,7 +5670,7 @@ Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>562 tok/s</td>
+<td>498 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
@@ -5983,7 +5780,7 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -5991,27 +5788,27 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.97s</td>
+<td>1.03s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.61s</td>
+<td>2.01s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.35s</td>
+<td>3.81s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.754</td>
+<td>0.765</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.464</td>
+<td>0.773</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0818</td>
+<td>0.0971</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6027,11 +5824,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>4,514 tok/s</td>
+<td>2,710 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>213 tok/s</td>
+<td>188 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -6109,6 +5906,178 @@ Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against
 Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Patrol boat, Patrol boats, Pier, Port, Reflection</pre>
 </details>
 </article>
+<article id="model-mlx-community-minicpm-v-46-4bit">
+<h3>mlx-community/MiniCPM-V-4.6-4bit</h3>
+<details><summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+<table>
+<caption>Captured facts for mlx-community/MiniCPM-V-4.6-4bit</caption>
+<thead><tr>
+<th scope="col">Fact</th>
+<th scope="col">Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Execution</td>
+<td>completed</td>
+</tr>
+<tr>
+<td>Mechanical checks</td>
+<td>concerns detected</td>
+</tr>
+<tr>
+<td>Assessment</td>
+<td>General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed</td>
+</tr>
+<tr>
+<td>Maintainer status</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Observations</td>
+<td>Duplicate keywords: details</td>
+</tr>
+<tr>
+<td>Arch supported by installed mlx-vlm</td>
+<td>yes (model_type minicpmv4_6)</td>
+</tr>
+<tr>
+<td>Model load time</td>
+<td>0.95s</td>
+</tr>
+<tr>
+<td>Generation time</td>
+<td>4.46s</td>
+</tr>
+<tr>
+<td>Total time</td>
+<td>6.19s</td>
+</tr>
+<tr>
+<td>Prompt preparation time</td>
+<td>0.765</td>
+</tr>
+<tr>
+<td>First-token latency</td>
+<td>1.9</td>
+</tr>
+<tr>
+<td>Cleanup time</td>
+<td>0.0981</td>
+</tr>
+<tr>
+<td>Prompt tokens</td>
+<td>910</td>
+</tr>
+<tr>
+<td>Generation tokens</td>
+<td>527</td>
+</tr>
+<tr>
+<td>Total tokens</td>
+<td>1,437</td>
+</tr>
+<tr>
+<td>Prompt throughput (raw)</td>
+<td>480 tok/s</td>
+</tr>
+<tr>
+<td>Generation throughput (raw)</td>
+<td>288 tok/s</td>
+</tr>
+<tr>
+<td>Peak memory (GB)</td>
+<td>3.2</td>
+</tr>
+<tr>
+<td>Active memory (GB)</td>
+<td>2.2</td>
+</tr>
+<tr>
+<td>Cache memory (GB)</td>
+<td>0.06</td>
+</tr>
+<tr>
+<td>Model-load active memory (GB)</td>
+<td>2.16</td>
+</tr>
+<tr>
+<td>Post-cleanup active memory (GB)</td>
+<td>0.00469</td>
+</tr>
+<tr>
+<td>Post-cleanup cache memory (GB)</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>Stop reason</td>
+<td>completed</td>
+</tr>
+<tr>
+<td>Requested maximum tokens</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>Rendered prompt characters</td>
+<td>1366</td>
+</tr>
+<tr>
+<td>Image placeholders</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Processor</td>
+<td>mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor</td>
+</tr>
+<tr>
+<td>Tokenizer</td>
+<td>transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</td>
+</tr>
+<tr>
+<td>Requested model revision</td>
+<td>not requested</td>
+</tr>
+<tr>
+<td>Resolved model revision</td>
+<td>86cd463d33a946e4481b77e3c10fc63121b60a19</td>
+</tr>
+<tr>
+<td>Resolved snapshot path</td>
+<td>~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19</td>
+</tr>
+<tr>
+<td>Generation settings</td>
+<td>{&quot;max_tokens&quot;: 1000, &quot;prefill_step_size&quot;: 2048, &quot;seed&quot;: 0, &quot;temperature&quot;: 0.7, &quot;top_k&quot;: 0, &quot;top_p&quot;: 1.0}</td>
+</tr>
+<tr>
+<td>EOS token</td>
+<td>&lt;|im_end|&gt;</td>
+</tr>
+</tbody>
+</table>
+<p><b>Readable output:</b></p>
+<pre class="model-output-readable">&lt;think&gt;
+We need to create a title, description, and keywords based on the image. First, let&#x27;s extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+
+For the title, need to be concise, 5-10 words. Let&#x27;s brainstorm: &quot;Border Patrol Boats Moored at Ramsgate Harbor, Sunset Scene.&quot; That&#x27;s 8 words.
+
+Now description: Combine the context and main visible subjects. Mention the patrol boats (BSC Defender and Volunteer), moored in Ramsgate Harbour, against the sunset, with buildings and cliffside.
+
+Keywords: Need 10-18 unique, covering relevant context and visible details. Let&#x27;s list: British, English, catalogue, metadata, image, capture, date, time, authoritative, facts, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coast, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+
+We need to ensure they are unique and cover the context and visible details. Let&#x27;s list them: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+
+We must ensure they are 10-18, unique, covering relevant context and visible details.
+
+Now, combine title, description, and keywords.
+&lt;/think&gt;
+
+Title: Border Patrol Vessels at Ramsgate Harbor Sunset
+
+Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a beautiful sunset.
+
+Keywords: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow</pre>
+</details>
+</article>
 <article id="model-mlx-community-smolvlm2-22b-instruct-mlx">
 <h3>mlx-community/SmolVLM2-2.2B-Instruct-mlx</h3>
 <details><summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
@@ -6137,7 +6106,7 @@ Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbo
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -6145,27 +6114,27 @@ Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbo
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.60s</td>
+<td>0.75s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.11s</td>
+<td>2.30s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.51s</td>
+<td>3.85s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.799</td>
+<td>0.802</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.385</td>
+<td>0.596</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0953</td>
+<td>0.0929</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6181,11 +6150,11 @@ Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbo
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,656 tok/s</td>
+<td>2,363 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>118 tok/s</td>
+<td>122 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -6291,7 +6260,7 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -6299,27 +6268,27 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Model load time</td>
-<td>13.72s</td>
+<td>13.89s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>24.87s</td>
+<td>24.92s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>39.52s</td>
+<td>39.75s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.918</td>
+<td>0.917</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>20.9</td>
+<td>20.8</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.291</td>
+<td>0.318</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6335,11 +6304,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>166 tok/s</td>
+<td>167 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>49.0 tok/s</td>
+<td>51.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -6446,7 +6415,7 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -6454,27 +6423,27 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>3.24s</td>
+<td>3.87s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.27s</td>
+<td>3.56s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>6.21s</td>
+<td>8.15s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.678</td>
+<td>0.689</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.315</td>
+<td>1.25</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.124</td>
+<td>0.148</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6490,11 +6459,11 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,820 tok/s</td>
+<td>459 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>78.5 tok/s</td>
+<td>60.7 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -6600,7 +6569,7 @@ Keywords: Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, su
 </tr>
 <tr>
 <td>Observations</td>
-<td>Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -6608,27 +6577,27 @@ Keywords: Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, su
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.57s</td>
+<td>0.59s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.79s</td>
+<td>2.27s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.22s</td>
+<td>3.72s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.845</td>
+<td>0.848</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.425</td>
+<td>0.873</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.092</td>
+<td>0.0956</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6644,11 +6613,11 @@ Keywords: Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, su
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,213 tok/s</td>
+<td>1,564 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>182 tok/s</td>
+<td>177 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -6762,27 +6731,27 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.48s</td>
+<td>0.60s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.29s</td>
+<td>2.15s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>2.85s</td>
+<td>3.82s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>1.08</td>
+<td>1.06</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.1</td>
+<td>0.995</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0765</td>
+<td>0.0753</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6798,15 +6767,15 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,117 tok/s</td>
+<td>313 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>369 tok/s</td>
+<td>367 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
-<td>2.2</td>
+<td>1.8</td>
 </tr>
 <tr>
 <td>Active memory (GB)</td>
@@ -6914,27 +6883,27 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.52s</td>
+<td>0.54s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.44s</td>
+<td>1.53s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>2.66s</td>
+<td>2.78s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.691</td>
+<td>0.701</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.215</td>
+<td>0.336</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0861</td>
+<td>0.096</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6950,11 +6919,11 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>9,737 tok/s</td>
+<td>6,229 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>365 tok/s</td>
+<td>388 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -7066,27 +7035,27 @@ Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Mar
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.52s</td>
+<td>1.59s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>36.34s</td>
+<td>38.87s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>38.49s</td>
+<td>41.12s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.62</td>
+<td>0.645</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.56</td>
+<td>2.11</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0993</td>
+<td>0.104</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7102,11 +7071,11 @@ Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Mar
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>186 tok/s</td>
+<td>137 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>19.5 tok/s</td>
+<td>18.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -7222,27 +7191,27 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.43s</td>
+<td>1.46s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>6.47s</td>
+<td>7.77s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.78s</td>
+<td>10.12s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.863</td>
+<td>0.879</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.1</td>
+<td>3.2</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0946</td>
+<td>0.104</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7258,15 +7227,15 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,480 tok/s</td>
+<td>970 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>32.2 tok/s</td>
+<td>30.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
-<td>13</td>
+<td>12</td>
 </tr>
 <tr>
 <td>Active memory (GB)</td>
@@ -7378,27 +7347,27 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.89s</td>
+<td>2.96s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>51.53s</td>
+<td>50.33s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>55.17s</td>
+<td>54.07s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.728</td>
+<td>0.758</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>8.18</td>
+<td>8.53</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.145</td>
+<td>0.12</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7414,11 +7383,11 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>537 tok/s</td>
+<td>515 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>23.4 tok/s</td>
+<td>24.3 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -7510,43 +7479,33 @@ Keywords:
 
 Need title 5-10 words.
 
-Maybe &quot;Border Security Command Vessels Moored at Ramsgate Harbour Sunset&quot;. That&#x27;s 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Maybe &quot;Border Security Command Vessels Moored at Ramsgate Harbour Sunset&quot;. That&#x27;s 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. &quot;Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible.&quot; So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include &quot;on 3 October 2026&quot; as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. &quot;Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible.&quot; So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include &quot;on 3 October 2026&quot; as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
 
-We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town&#x27;s cliffside skyline. Image shows multiple patrol boats, white vessels with &quot;Border Security Command&quot; markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
+Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
 
-Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
+Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let&#x27;s check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
 
-We need 10-18 unique comma-separated keywords.
+Also note lifebuoys, white hulls, person in high-vis.
 
-Let&#x27;s produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
+Need 10-18 unique comma-separated keywords.
 
-That&#x27;s 14.
+Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
 
-Ensure unique.
+But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 
-Return exactly three sections.
+We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
 
-Title:
-Description:
-Keywords:
+We must ensure title 5-10 words.
 
-No extra text.
+Let&#x27;s craft:
 
-Let&#x27;s craft description: &quot;UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky.&quot;
+Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
 
-That&#x27;s one sentence? It&#x27;s two sentences. Acceptable 1-2 sentence.
-
-Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
-
-It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add &quot;Captured on 3 October 2026 at 18:18 BST&quot;. But that&#x27;s metadata. Might be okay.
-
-Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
-
-I think include date not required but allowed. I&#x27;ll include a brief</pre>
+Description: UK Border Security Command patrol vessels</pre>
 </details>
 </article>
 <article id="model-mlx-community-qwen2-vl-2b-mlx">
@@ -7585,27 +7544,27 @@ I think include date not required but allowed. I&#x27;ll include a brief</pre>
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.77s</td>
+<td>0.82s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>38.96s</td>
+<td>27.45s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>40.66s</td>
+<td>29.21s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.924</td>
+<td>0.937</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>36.2</td>
+<td>24.8</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.098</td>
+<td>0.0936</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7621,11 +7580,11 @@ I think include date not required but allowed. I&#x27;ll include a brief</pre>
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>456 tok/s</td>
+<td>667 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>122 tok/s</td>
+<td>125 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -7737,7 +7696,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.32s</td>
+<td>0.61s</td>
 </tr>
 <tr>
 <td>Generation time</td>
@@ -7745,19 +7704,19 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 </tr>
 <tr>
 <td>Total time</td>
-<td>2.29s</td>
+<td>2.58s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.914</td>
+<td>0.908</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.129</td>
+<td>0.137</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.09</td>
+<td>0.0857</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7773,11 +7732,11 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>9,174 tok/s</td>
+<td>8,663 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>468 tok/s</td>
+<td>527 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -7889,27 +7848,27 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.14s</td>
+<td>1.17s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>17.57s</td>
+<td>17.48s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>19.70s</td>
+<td>20.06s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.985</td>
+<td>1.41</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>13.3</td>
+<td>13.1</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.108</td>
+<td>0.109</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7925,11 +7884,11 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,244 tok/s</td>
+<td>1,265 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>58.9 tok/s</td>
+<td>57.3 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -8043,27 +8002,27 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.57s</td>
+<td>1.69s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.21s</td>
+<td>3.09s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.42s</td>
+<td>5.42s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.619</td>
+<td>0.612</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.289</td>
+<td>1.12</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.102</td>
+<td>0.108</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -8079,15 +8038,15 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,977 tok/s</td>
+<td>511 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>98.9 tok/s</td>
+<td>94.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
-<td>7.2</td>
+<td>7.1</td>
 </tr>
 <tr>
 <td>Active memory (GB)</td>
@@ -8201,27 +8160,27 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.53s</td>
+<td>0.42s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.77s</td>
+<td>3.71s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.14s</td>
+<td>4.99s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.833</td>
+<td>0.854</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.38</td>
+<td>2.31</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0846</td>
+<td>0.0925</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -8237,11 +8196,11 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,359 tok/s</td>
+<td>2,433 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>145 tok/s</td>
+<td>143 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -8354,7 +8313,7 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.04s</td>
+<td>1.10s</td>
 </tr>
 <tr>
 <td>Generation time</td>
@@ -8362,19 +8321,19 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.46s</td>
+<td>3.55s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.708</td>
+<td>0.727</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.815</td>
+<td>0.835</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.149</td>
+<td>0.16</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -8390,11 +8349,11 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,668 tok/s</td>
+<td>2,603 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>108 tok/s</td>
+<td>103 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -8506,27 +8465,27 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.45s</td>
+<td>0.53s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.92s</td>
+<td>3.57s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>5.02s</td>
+<td>4.76s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.646</td>
+<td>0.654</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.0877</td>
+<td>0.0958</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0999</td>
+<td>0.0945</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -8542,11 +8501,11 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,510 tok/s</td>
+<td>3,214 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>311 tok/s</td>
+<td>352 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -8650,7 +8609,7 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Observations</td>
-<td>Required labelled fields not detected: title, description, keywords; Repeats the prompt&#x27;s hint instead of describing the image: description</td>
+<td>Required labelled fields not detected: title, description, keywords; Repeats the prompt&#x27;s hint text: description</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -8658,23 +8617,23 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.52s</td>
+<td>2.18s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.27s</td>
+<td>1.28s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.57s</td>
+<td>4.24s</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.765</td>
+<td>0.771</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.234</td>
+<td>0.23</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
@@ -8694,11 +8653,11 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>4,313 tok/s</td>
+<td>4,405 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>166 tok/s</td>
+<td>162 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory (GB)</td>
@@ -8845,11 +8804,11 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>no concerns detected</td>
-<td>29</td>
+<td>28</td>
 </tr>
 <tr>
 <td>concerns detected</td>
-<td>8</td>
+<td>9</td>
 </tr>
 </tbody>
 </table>
@@ -8888,10 +8847,10 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 </tr>
 <tr>
 <td>Repeated keyword entries</td>
-<td>6</td>
+<td>7</td>
 </tr>
 <tr>
-<td>Output repeats the prompt&#x27;s own hint text instead of describing the image</td>
+<td>Output repeats the prompt&#x27;s own hint text</td>
 <td>8</td>
 </tr>
 </tbody>
@@ -8986,7 +8945,7 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 <li><b>Processor class:</b> mlx_vlm.models.internvl.processing_internvl.InternVLProcessor</li>
 <li><b>Tokenizer class:</b> transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</li>
 <li><b>Stop reason:</b> repetition_abort</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 0.891</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 1.013</li>
 <li><b>Peak memory at first token (GB):</b> 2.145</li>
 <li><b>Sampling settings source:</b> temperature: default; top_p: default; top_k: default; min_p: default; repetition_penalty: default</li>
 <li><b>EOS ids declared, by file:</b> {&quot;config.json text_config&quot;: 151645, &quot;generation_config.json&quot;: 151645}</li>
@@ -9037,8 +8996,8 @@ Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Mar
 <li><b>Processor class:</b> mlx_vlm.models.mllama.processing_mllama.MllamaProcessor</li>
 <li><b>Tokenizer class:</b> transformers.tokenization_utils_tokenizers.TokenizersBackend</li>
 <li><b>Stop reason:</b> completed</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 2.158</li>
-<li><b>Peak memory at first token (GB):</b> 14.969</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 2.713</li>
+<li><b>Peak memory at first token (GB):</b> 14.697</li>
 <li><b>Sampling settings source:</b> temperature: default; top_p: default; top_k: default; min_p: default; repetition_penalty: default</li>
 <li><b>EOS ids declared, by file:</b> {&quot;config.json text_config&quot;: [128001, 128008, 128009]}</li>
 <li><b>Chat template found in (the first is the one the processor uses):</b> chat_template.json, tokenizer_config.json</li>
@@ -9085,7 +9044,7 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 <li><b>Processor class:</b> transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</li>
 <li><b>Tokenizer class:</b> transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</li>
 <li><b>Stop reason:</b> max_tokens</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 0.707</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 0.723</li>
 <li><b>Peak memory at first token (GB):</b> 1.781</li>
 <li><b>Sampling settings source:</b> temperature: default; top_p: default; top_k: default; min_p: default; repetition_penalty: default</li>
 <li><b>EOS ids declared, by file:</b> {&quot;config.json&quot;: 151645}</li>
@@ -9132,7 +9091,7 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 <li><b>Processor class:</b> mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor</li>
 <li><b>Tokenizer class:</b> transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</li>
 <li><b>Stop reason:</b> repetition_abort</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 14.172</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 13.984</li>
 <li><b>Peak memory at first token (GB):</b> 14.286</li>
 <li><b>Sampling settings source:</b> temperature: default; top_p: default; top_k: default; min_p: default; repetition_penalty: default</li>
 <li><b>EOS ids declared, by file:</b> {&quot;config.json&quot;: 151645, &quot;generation_config.json&quot;: 151645}</li>
@@ -9184,7 +9143,7 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 <li><b>Processor class:</b> mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor</li>
 <li><b>Tokenizer class:</b> transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer</li>
 <li><b>Stop reason:</b> repetition_abort</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 37.112</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 25.642</li>
 <li><b>Peak memory at first token (GB):</b> 9.361</li>
 <li><b>Checkpoint-declared sampling (generation_config.json):</b> do_sample True; temperature 0.1; top_p 0.001; top_k 1; repetition_penalty 1.05</li>
 <li><b>Sampling settings source:</b> temperature: generation_config; top_p: generation_config; top_k: generation_config; min_p: default; repetition_penalty: default</li>
@@ -9233,7 +9192,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 <li><b>Processor class:</b> transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor</li>
 <li><b>Tokenizer class:</b> transformers.tokenization_utils_tokenizers.TokenizersBackend</li>
 <li><b>Stop reason:</b> completed</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 1.539</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 1.533</li>
 <li><b>Peak memory at first token (GB):</b> 6.729</li>
 <li><b>Sampling settings source:</b> temperature: default; top_p: default; top_k: default; min_p: default; repetition_penalty: default</li>
 <li><b>generation_config.json settings not applied (by mlx-vlm or the harness):</b> {&quot;max_new_tokens&quot;: 256}</li>
@@ -9281,7 +9240,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 <li><b>Processor class:</b> mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor</li>
 <li><b>Tokenizer class:</b> transformers.tokenization_utils_tokenizers.TokenizersBackend</li>
 <li><b>Stop reason:</b> max_tokens</li>
-<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 8.873</li>
+<li><b>Time to first token (s; measured: input preparation, prefill, first decode step):</b> 9.226</li>
 <li><b>Peak memory at first token (GB):</b> 25.465</li>
 <li><b>Checkpoint-declared sampling (generation_config.json):</b> do_sample True; temperature 1.0; top_p 0.95; top_k 64</li>
 <li><b>Sampling settings source:</b> temperature: generation_config; top_p: generation_config; top_k: generation_config; min_p: default; repetition_penalty: default</li>
@@ -9328,43 +9287,33 @@ Keywords:
 
 Need title 5-10 words.
 
-Maybe &quot;Border Security Command Vessels Moored at Ramsgate Harbour Sunset&quot;. That&#x27;s 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Maybe &quot;Border Security Command Vessels Moored at Ramsgate Harbour Sunset&quot;. That&#x27;s 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
 
 Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. &quot;Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible.&quot; So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include &quot;on 3 October 2026&quot; as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention sunset dusk.
+We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. &quot;Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible.&quot; So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include &quot;on 3 October 2026&quot; as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
 
-We have vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, against dramatic sunset and town&#x27;s cliffside skyline. Image shows multiple patrol boats, white vessels with &quot;Border Security Command&quot; markings, lifebuoys, one labeled DOVER on stern, BSC DEFENDER visible. Also buildings on cliff, white chalk cliff, water reflection golden.
+Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
 
-Keyword hints include Dover but image shows Dover on vessel maybe? The hint says Dover. Could be confusion. The harbour is Ramsgate. The vessel has DOVER. The keyword hints include Dover. Maybe keep.
+Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let&#x27;s check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
 
-We need 10-18 unique comma-separated keywords.
+Also note lifebuoys, white hulls, person in high-vis.
 
-Let&#x27;s produce keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, white cliffs, water reflection, lifebuoys, maritime, England
+Need 10-18 unique comma-separated keywords.
 
-That&#x27;s 14.
+Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
 
-Ensure unique.
+But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
 
-Return exactly three sections.
+We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
 
-Title:
-Description:
-Keywords:
+We must ensure title 5-10 words.
 
-No extra text.
+Let&#x27;s craft:
 
-Let&#x27;s craft description: &quot;UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden sunset reflecting on the water. The fleet is lined along the quay beneath the town’s cliffside terraced houses and white chalk cliffs under a dramatic orange-purple sky.&quot;
+Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
 
-That&#x27;s one sentence? It&#x27;s two sentences. Acceptable 1-2 sentence.
-
-Make sure not claim date visible. Might not mention date. Could mention capture date? Might be okay to not mention. The instruction says treat capture date/time as authoritative facts, but do not claim they are visible. Could incorporate in description? Maybe not needed. Safer to leave out? The context is authoritative, so maybe incorporate. Hmm.
-
-It says combining relevant context with main visible subject. Context includes capture date/time. Might be relevant. Could add &quot;Captured on 3 October 2026 at 18:18 BST&quot;. But that&#x27;s metadata. Might be okay.
-
-Better keep description about visual. Maybe we can include date in a separate way? Might be confusing.
-
-I think include date not required but allowed. I&#x27;ll include a brief</code></pre>
+Description: UK Border Security Command patrol vessels</code></pre>
 </details>
 <h2>Indeterminate Attempts</h2>
 <p>None.</p>
@@ -9411,6 +9360,11 @@ I think include date not required but allowed. I&#x27;ll include a brief</code><
 </tr>
 <tr>
 <td>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</td>
+<td>concerns detected</td>
+<td>duplicate keywords</td>
+</tr>
+<tr>
+<td>mlx-community/MiniCPM-V-4.6-4bit</td>
 <td>concerns detected</td>
 <td>duplicate keywords</td>
 </tr>
@@ -9466,27 +9420,27 @@ I think include date not required but allowed. I&#x27;ll include a brief</code><
 <tr>
 <td>LiquidAI/LFM2.5-VL-450M-MLX-bf16</td>
 <td>rev ed71acdae079; Lfm2VlProcessor; stop completed</td>
-<td>2103 prompt / 58 generated; 493 tok/s; 1.9 GB peak</td>
+<td>2103 prompt / 58 generated; 482 tok/s; 1.9 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/aya-vision-8b-4bit</td>
 <td>rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed</td>
-<td>2070 prompt / 132 generated; 102 tok/s; 6.5 GB peak</td>
+<td>2070 prompt / 132 generated; 97.9 tok/s; 6.5 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-3-27b-it-qat-4bit</td>
 <td>rev fc4e000f32af; Gemma3Processor; stop completed</td>
-<td>572 prompt / 138 generated; 31.5 tok/s; 17 GB peak</td>
+<td>572 prompt / 138 generated; 30.7 tok/s; 17 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-4-12B-it-4bit</td>
 <td>rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed</td>
-<td>577 prompt / 108 generated; 61.3 tok/s; 7.6 GB peak</td>
+<td>577 prompt / 108 generated; 61.2 tok/s; 7.6 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-4-26b-a4b-it-4bit</td>
 <td>rev 0d77464eeb23; Gemma4Processor; stop completed</td>
-<td>577 prompt / 106 generated; 125 tok/s; 16 GB peak</td>
+<td>577 prompt / 106 generated; 120 tok/s; 16 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-4-31b-it-4bit</td>
@@ -9496,117 +9450,112 @@ I think include date not required but allowed. I&#x27;ll include a brief</code><
 <tr>
 <td>mlx-community/gemma-4-e4b-it-4bit</td>
 <td>rev 475b9088d297; Gemma4Processor; stop completed</td>
-<td>573 prompt / 79 generated; 126 tok/s; 5.9 GB peak</td>
+<td>573 prompt / 79 generated; 122 tok/s; 6.0 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/GLM-4.6V-Flash-4bit</td>
 <td>rev bd7b20686e8c; Glm46VProcessor; stop completed</td>
-<td>6339 prompt / 98 generated; 78.7 tok/s; 8.7 GB peak</td>
+<td>6339 prompt / 98 generated; 79.5 tok/s; 8.7 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Idefics3-8B-Llama3-bf16</td>
 <td>rev 8c2a30c48864; Idefics3Processor; stop completed</td>
-<td>2601 prompt / 130 generated; 35.4 tok/s; 18 GB peak</td>
+<td>2601 prompt / 130 generated; 35.3 tok/s; 18 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/InternVL3-14B-4bit</td>
 <td>rev 26328eaab82c; InternVLChatProcessor; stop completed</td>
-<td>2091 prompt / 113 generated; 56.9 tok/s; 10 GB peak</td>
+<td>2091 prompt / 113 generated; 57.4 tok/s; 10 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/InternVL3-8B-bf16</td>
 <td>rev e0df3dd79263; InternVLChatProcessor; stop completed</td>
-<td>2091 prompt / 80 generated; 37.5 tok/s; 17 GB peak</td>
+<td>2091 prompt / 80 generated; 36.4 tok/s; 17 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</td>
 <td>rev e5abbe34cbfa; KimiVLProcessor; stop completed</td>
-<td>1312 prompt / 995 generated; 66.1 tok/s; 20 GB peak</td>
+<td>1312 prompt / 995 generated; 60.2 tok/s; 20 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/MiniCPM-o-4_5-4bit</td>
 <td>rev 592c09d85e7b; MiniCPMOProcessor; stop completed</td>
-<td>369 prompt / 88 generated; 106 tok/s; 7.0 GB peak</td>
-</tr>
-<tr>
-<td>mlx-community/MiniCPM-V-4.6-4bit</td>
-<td>rev 86cd463d33a9; MiniCPMVProcessor; stop completed</td>
-<td>910 prompt / 662 generated; 302 tok/s; 3.2 GB peak</td>
+<td>369 prompt / 88 generated; 102 tok/s; 7.0 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</td>
 <td>rev 7c992876448f; Mistral3Processor; stop completed</td>
-<td>2905 prompt / 140 generated; 66.2 tok/s; 13 GB peak</td>
+<td>2905 prompt / 140 generated; 64.5 tok/s; 13 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Ministral-3-3B-Instruct-2512-4bit</td>
 <td>rev a962dcb09eee; Mistral3Processor; stop completed</td>
-<td>2904 prompt / 132 generated; 188 tok/s; 7.8 GB peak</td>
+<td>2904 prompt / 132 generated; 181 tok/s; 7.8 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Molmo2-8B-4bit</td>
 <td>rev 4fcbe9265776; Molmo2Processor; stop completed</td>
-<td>1502 prompt / 148 generated; 71.7 tok/s; 8.5 GB peak</td>
+<td>1502 prompt / 148 generated; 68.9 tok/s; 8.1 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/North-Micro-Vision-Instruct-4bit</td>
 <td>rev 87466363e6c5; CohereCompassProcessor; stop completed</td>
-<td>4065 prompt / 148 generated; 209 tok/s; 3.9 GB peak</td>
+<td>4065 prompt / 148 generated; 207 tok/s; 3.9 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit</td>
 <td>rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed</td>
-<td>1267 prompt / 129 generated; 106 tok/s; 24 GB peak</td>
+<td>1267 prompt / 129 generated; 104 tok/s; 24 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Phi-3.5-vision-instruct-bf16</td>
 <td>rev d8da684308c2; Phi3VProcessor; stop completed</td>
-<td>1115 prompt / 144 generated; 59.1 tok/s; 9.3 GB peak</td>
+<td>1115 prompt / 144 generated; 58.6 tok/s; 9.3 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/pixtral-12b-8bit</td>
 <td>rev 79e24b66302d; PixtralProcessor; stop completed</td>
-<td>3095 prompt / 119 generated; 40.0 tok/s; 16 GB peak</td>
+<td>3095 prompt / 119 generated; 39.8 tok/s; 16 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit</td>
 <td>rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed</td>
-<td>12768 prompt / 136 generated; 65.4 tok/s; 26 GB peak</td>
+<td>12768 prompt / 136 generated; 72.1 tok/s; 26 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</td>
 <td>rev 0555d34cb1ed; Qwen3VLProcessor; stop completed</td>
-<td>16525 prompt / 133 generated; 83.0 tok/s; 23 GB peak</td>
+<td>16525 prompt / 133 generated; 87.0 tok/s; 23 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3-VL-8B-Instruct-4bit</td>
 <td>rev defcdea7cc7a; Qwen3VLProcessor; stop completed</td>
-<td>16525 prompt / 112 generated; 67.9 tok/s; 11 GB peak</td>
+<td>16525 prompt / 112 generated; 70.1 tok/s; 11 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3.5-35B-A3B-4bit</td>
 <td>rev 1e20fd8d4205; Qwen3VLProcessor; stop completed</td>
-<td>16541 prompt / 152 generated; 102 tok/s; 25 GB peak</td>
+<td>16541 prompt / 152 generated; 104 tok/s; 25 GB peak</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3.8-27B-nvfp4</td>
 <td>rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed</td>
-<td>16541 prompt / 121 generated; 27.4 tok/s; 21 GB peak</td>
+<td>16541 prompt / 121 generated; 29.4 tok/s; 21 GB peak</td>
 </tr>
 <tr>
 <td>nativ-community/Mage-VL-OptiQ-4bit</td>
 <td>rev 4f0a424370e5; MageVLProcessor; stop completed</td>
-<td>4188 prompt / 118 generated; 129 tok/s; 5.4 GB peak</td>
+<td>4188 prompt / 118 generated; 127 tok/s; 5.4 GB peak</td>
 </tr>
 <tr>
 <td>nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit</td>
 <td>rev bdbeb0d8c89e; Mistral3Processor; stop completed</td>
-<td>1251 prompt / 114 generated; 36.8 tok/s; 18 GB peak</td>
+<td>1251 prompt / 114 generated; 36.2 tok/s; 18 GB peak</td>
 </tr>
 <tr>
 <td>nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit</td>
 <td>rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed</td>
-<td>3606 prompt / 132 generated; 156 tok/s; 23 GB peak</td>
+<td>3606 prompt / 132 generated; 155 tok/s; 23 GB peak</td>
 </tr>
 </tbody>
 </table>
@@ -9729,15 +9678,15 @@ Keywords:&#x27; --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION
 </tr>
 <tr>
 <td>mlx-vlm source revision</td>
-<td>1cc6025432f61b146cb72c7516209f7259fd45d0</td>
+<td>952d4f6bc65bd5095e74abe71c78038764ee08aa</td>
 </tr>
 <tr>
 <td>mlx</td>
-<td>0.32.4.dev20261008+3c40e8f92</td>
+<td>0.32.4.dev20261009+99f109b56</td>
 </tr>
 <tr>
 <td>mlx source revision</td>
-<td>3c40e8f92</td>
+<td>99f109b56</td>
 </tr>
 <tr>
 <td>mlx-audio</td>
@@ -9749,11 +9698,11 @@ Keywords:&#x27; --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION
 </tr>
 <tr>
 <td>tokenizers</td>
-<td>0.23.2</td>
+<td>0.23.3</td>
 </tr>
 <tr>
 <td>huggingface-hub</td>
-<td>1.33.0</td>
+<td>2.2.0</td>
 </tr>
 <tr>
 <td>Python Version</td>
@@ -9849,11 +9798,11 @@ Keywords:&#x27; --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION
 </tr>
 <tr>
 <td>MLX Metallib</td>
-<td>~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (204,770,592 bytes, sha256=1fea48780ba22f210a1222a4933b92178daccb3c0c853ba855dece1030f4907a)</td>
+<td>~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (215,965,088 bytes, sha256=46366f90fed6bb8ddd20e811c14cb991b791018d1e1556dae974bd5d33a610dc)</td>
 </tr>
 <tr>
 <td>MLX libmlx.dylib</td>
-<td>~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,720,080 bytes, sha256=7b5c77e837b904a2c1db1584804df9ae7fc417fbdd0427fffb823b9a61c951fa)</td>
+<td>~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,036,720 bytes, sha256=f477ff16309b20e316f817b14dd9928c511577c51c7d83fffeb8a5dc7ced7c69)</td>
 </tr>
 <tr>
 <td>RAM</td>
