@@ -1,11 +1,11 @@
 # Model Output Gallery
 
-Generated on: 2026-10-09 23:32:23 BST
+Generated on: 2026-10-10 23:49:31 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,641 x 6,427 pixels (62.0 MP), 58.1 MB
+- *Input image:* JPEG, 5,800 x 8,389 pixels (48.7 MP), 40.8 MB
 
 This run records model responses to one shared image and prompt (evaluation
 lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
@@ -18,7 +18,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-c688458ce4ed66ce.jpg)
+![Reference image](assets/source-image-fa374f03acd127a3.jpg)
 
 ## Current-run Chooser
 
@@ -28,61 +28,64 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 | Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
 |-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.36s   | 482 tok/s  | 0.92            | 1.9     | 2,103      | 58      | none                                                                                              |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 9.31s   | 79.5 tok/s | 6.30            | 8.7     | 6,339      | 98      | none                                                                                              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected`          | 8.94s   | 35.3 tok/s | 2.59            | 18      | 2,601      | 130     | none                                                                                              |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 7.07s   | 57.4 tok/s | 3.27            | 10      | 2,091      | 113     | none                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected`          | 6.26s   | 36.4 tok/s | 1.71            | 17      | 2,091      | 80      | none                                                                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected`          | 23.02s  | 60.2 tok/s | 3.69            | 20      | 1,312      | 995     | none                                                                                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.37s   | 102 tok/s  | 0.87            | 7.0     | 369        | 88      | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.91s   | 64.5 tok/s | 2.74            | 13      | 2,905      | 140     | none                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 5.20s   | 181 tok/s  | 1.59            | 7.8     | 2,904      | 132     | none                                                                                              |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 7.57s   | 68.9 tok/s | 3.58            | 8.1     | 1,502      | 148     | none                                                                                              |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.27s   | 207 tok/s  | 2.75            | 3.9     | 4,065      | 148     | none                                                                                              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected`          | 6.08s   | 104 tok/s  | 1.59            | 24      | 1,267      | 129     | none                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 4.94s   | 58.6 tok/s | 0.98            | 9.3     | 1,115      | 144     | none                                                                                              |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 22.56s  | 72.1 tok/s | 17.42           | 26      | 12,768     | 136     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 31.53s  | 87.0 tok/s | 26.06           | 23      | 16,525     | 133     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 32.36s  | 70.1 tok/s | 28.77           | 11      | 16,525     | 112     | none                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 32.01s  | 104 tok/s  | 27.15           | 25      | 16,541     | 152     | none                                                                                              |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 51.54s  | 29.4 tok/s | 44.12           | 21      | 16,541     | 121     | none                                                                                              |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 5.15s   | 97.9 tok/s | 1.68            | 6.5     | 2,070      | 132     | none                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 9.16s   | 30.7 tok/s | 1.63            | 17      | 572        | 138     | none                                                                                              |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.39s   | 61.2 tok/s | 1.16            | 7.6     | 577        | 108     | none                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.03s   | 120 tok/s  | 1.06            | 16      | 577        | 106     | none                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected`          | 9.04s   | 26.3 tok/s | 1.68            | 20      | 577        | 107     | none                                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 4.02s   | 122 tok/s  | 1.02            | 6.0     | 573        | 79      | none                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected`          | 7.44s   | 39.8 tok/s | 2.23            | 16      | 3,095      | 119     | none                                                                                              |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 4.66s   | 127 tok/s  | 2.17            | 5.4     | 4,188      | 118     | none                                                                                              |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 8.21s   | 36.2 tok/s | 2.19            | 18      | 1,251      | 114     | none                                                                                              |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 9.55s   | 155 tok/s  | 5.70            | 23      | 3,606      | 132     | none                                                                                              |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`             | 10.47s  | 30.5 tok/s | 4.00            | 23      | 2,372      | 117     | prompt hint repeated                                                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`             | 10.20s  | 125 tok/s  | 1.89            | 19      | 1,617      | 758     | duplicate keywords                                                                                |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`             | 24.15s  | 45.3 tok/s | 14.24           | 78      | 6,339      | 106     | prompt hint repeated                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.81s   | 188 tok/s  | 1.51            | 4.0     | 2,094      | 92      | prompt hint repeated                                                                              |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`             | 6.19s   | 288 tok/s  | 2.63            | 3.2     | 910        | 527     | duplicate keywords                                                                                |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.85s   | 122 tok/s  | 1.36            | 5.6     | 1,407      | 114     | prompt hint repeated                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`             | 39.75s  | 51.1 tok/s | 22.73           | 92      | 3,468      | 112     | prompt hint repeated                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`             | 8.15s   | 60.7 tok/s | 3.55            | 28      | 573        | 90      | prompt hint repeated                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.72s   | 177 tok/s  | 1.67            | 4.8     | 1,366      | 104     | prompt hint repeated                                                                              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 3.82s   | 367 tok/s  | 2.02            | 1.8     | 312        | 44      | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 2.78s   | 388 tok/s  | 1.01            | 2.1     | 2,094      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns: generation`    | 41.12s  | 18.4 tok/s | 2.71            | 15      | 290        | 667     | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: answer format` | 10.12s  | 30.4 tok/s | 4.04            | 12      | 3,104      | 113     | labelled fields not detected                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 54.07s  | 24.3 tok/s | 9.23            | 25      | 4,390      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 29.21s  | 125 tok/s  | 25.64           | 9.4     | 16,536     | 225     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.58s   | 527 tok/s  | 1.01            | 1.1     | 1,186      | 22      | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns: generation`    | 20.06s  | 57.3 tok/s | 13.98           | 14      | 16,536     | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 5.42s   | 94.6 tok/s | 1.69            | 7.1     | 571        | 132     | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: answer format` | 4.99s   | 143 tok/s  | 3.10            | 4.3     | 5,615      | 86      | labelled fields not detected; duplicate keywords                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.55s   | 103 tok/s  | 1.53            | 6.7     | 2,174      | 18      | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: generation`    | 4.76s   | 352 tok/s  | 0.72            | 1.8     | 308        | 1,000   | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 4.24s   | 162 tok/s  | 0.98            | 4.8     | 1,011      | 48      | labelled fields not detected; prompt hint repeated                                                |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 1.77s   | 484 tok/s  | 0.52            | 1.9     | 2,144      | 83      | none                                                                                              |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 67.45s  | 36.2 tok/s | 59.75           | 17      | 16,586     | 182     | none                                                                                              |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 56.81s  | 30.7 tok/s | 49.16           | 21      | 16,586     | 137     | none                                                                                              |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected`          | 10.69s  | 30.1 tok/s | 3.63            | 23      | 2,498      | 134     | none                                                                                              |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected`          | 34.07s  | 44.1 tok/s | 19.45           | 78      | 6,445      | 145     | none                                                                                              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected`          | 9.93s   | 34.4 tok/s | 1.65            | 18      | 2,641      | 200     | none                                                                                              |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 6.11s   | 56.3 tok/s | 2.05            | 10      | 2,142      | 134     | none                                                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected`          | 6.33s   | 36.8 tok/s | 1.33            | 17      | 2,142      | 104     | none                                                                                              |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected`          | 4.91s   | 300 tok/s  | 0.75            | 3.2     | 963        | 826     | none                                                                                              |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 2.98s   | 104 tok/s  | 0.63            | 7.0     | 420        | 94      | none                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 8.28s   | 65.7 tok/s | 2.79            | 13      | 3,031      | 244     | none                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 3.87s   | 184 tok/s  | 1.45            | 8.1     | 3,030      | 166     | none                                                                                              |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected`          | 5.45s   | 101 tok/s  | 1.10            | 25      | 1,330      | 127     | none                                                                                              |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 4.71s   | 56.0 tok/s | 0.74            | 9.3     | 1,169      | 147     | none                                                                                              |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 24.63s  | 71.1 tok/s | 19.57           | 26      | 12,814     | 141     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 37.25s  | 68.9 tok/s | 34.24           | 11      | 16,570     | 87      | none                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 38.66s  | 108 tok/s  | 34.05           | 25      | 16,586     | 140     | none                                                                                              |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 59.46s  | 29.0 tok/s | 52.22           | 21      | 16,586     | 128     | none                                                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected`          | 48.27s  | 47.4 tok/s | 30.14           | 92      | 3,522      | 117     | none                                                                                              |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.76s   | 101 tok/s  | 1.51            | 6.5     | 2,123      | 125     | none                                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.79s   | 49.6 tok/s | 2.94            | 28      | 626        | 95      | none                                                                                              |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 9.64s   | 29.9 tok/s | 1.40            | 17      | 625        | 161     | none                                                                                              |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.13s   | 60.0 tok/s | 0.88            | 7.7     | 630        | 106     | none                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 4.93s   | 110 tok/s  | 0.93            | 16      | 630        | 104     | none                                                                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected`          | 8.92s   | 26.3 tok/s | 1.61            | 20      | 630        | 109     | none                                                                                              |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 3.58s   | 125 tok/s  | 0.65            | 6.0     | 626        | 104     | none                                                                                              |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected`          | 3.33s   | 174 tok/s  | 1.11            | 4.6     | 1,420      | 160     | none                                                                                              |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected`          | 8.70s   | 34.7 tok/s | 2.76            | 16      | 3,297      | 133     | none                                                                                              |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 5.34s   | 119 tok/s  | 2.20            | 5.4     | 4,188      | 198     | none                                                                                              |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 8.22s   | 35.1 tok/s | 2.01            | 18      | 1,353      | 136     | none                                                                                              |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`             | 11.08s  | 77.7 tok/s | 7.08            | 8.7     | 6,445      | 181     | duplicate keywords                                                                                |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 2.99s   | 211 tok/s  | 0.99            | 4.0     | 2,136      | 112     | prompt hint repeated; unsupplied place name                                                       |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `concerns detected`             | 13.42s  | 20.6 tok/s | 2.00            | 15      | 329        | 194     | duplicate keywords                                                                                |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`             | 5.38s   | 72.5 tok/s | 1.18            | 8.3     | 1,356      | 187     | duplicate keywords                                                                                |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `concerns detected`             | 4.93s   | 209 tok/s  | 2.70            | 3.9     | 4,093      | 126     | prompt hint repeated                                                                              |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `concerns detected`             | 36.59s  | 84.9 tok/s | 32.24           | 23      | 16,570     | 133     | unsupplied place name                                                                             |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.07s   | 121 tok/s  | 0.99            | 5.6     | 1,463      | 102     | prompt hint repeated                                                                              |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `concerns detected`             | 8.47s   | 152 tok/s  | 4.77            | 23      | 3,681      | 117     | duplicate keywords                                                                                |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 4.44s   | 104 tok/s  | 1.44            | 7.5     | 1,872      | 136     | prompt hint repeated                                                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `major concerns: answer format` | 15.65s  | 81.5 tok/s | 1.23            | 19      | 1,669      | 1,000   | cut off at token limit; duplicate keywords                                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 2.50s   | 367 tok/s  | 0.94            | 2.1     | 363        | 30      | labelled fields not detected                                                                      |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 2.23s   | 410 tok/s  | 0.72            | 2.1     | 2,145      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns: generation`    | 19.06s  | 65.6 tok/s | 1.23            | 20      | 1,326      | 1,000   | labelled fields not detected; cut off at token limit; incomplete thinking block                   |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: generation`    | 11.28s  | 31.5 tok/s | 2.87            | 13      | 3,174      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 51.69s  | 25.0 tok/s | 8.22            | 25      | 4,458      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 42.65s  | 123 tok/s  | 32.89           | 9.4     | 16,581     | 1,000   | repeated text; cut off at token limit                                                             |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 1.93s   | 506 tok/s  | 0.77            | 1.1     | 1,242      | 80      | labelled fields not detected                                                                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns: generation`    | 37.90s  | 52.8 tok/s | 15.51           | 14      | 16,581     | 1,000   | repeated text; cut off at token limit; duplicate keywords                                         |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 7.27s   | 83.5 tok/s | 0.81            | 7.2     | 624        | 352     | labelled fields not detected                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: answer format` | 5.70s   | 134 tok/s  | 3.95            | 4.4     | 5,877      | 85      | labelled fields not detected; duplicate keywords                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.30s   | 102 tok/s  | 1.39            | 6.7     | 2,234      | 26      | control tokens visible; labelled fields not detected                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: generation`    | 2.20s   | 328 tok/s  | 0.59            | 1.8     | 359        | 200     | repeated text; stopped early: repeating; labelled fields not detected                             |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 2.64s   | 160 tok/s  | 0.81            | 4.8     | 1,041      | 57      | labelled fields not detected                                                                      |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.36s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.77s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -94,19 +97,20 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 | Model                                                                                                        | Mechanical checks               | Observations                                                                                      |
 |--------------------------------------------------------------------------------------------------------------|---------------------------------|---------------------------------------------------------------------------------------------------|
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | `major concerns: answer format` | cut off at token limit; duplicate keywords                                                        |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns: answer format` | labelled fields not detected                                                                      |
 | [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns: generation`    | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                | `major concerns: answer format` | labelled fields not detected                                                                      |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)        | `major concerns: generation`    | labelled fields not detected; cut off at token limit; incomplete thinking block                   |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                       |
 | [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns: generation`    | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns: generation`    | repeated text; cut off at token limit                                                             |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns: answer format` | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns: generation`    | repeated text; cut off at token limit; duplicate keywords                                         |
 | [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns: answer format` | labelled fields not detected                                                                      |
 | [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns: answer format` | labelled fields not detected; duplicate keywords                                                  |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns: answer format` | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns: generation`    | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns: generation`    | repeated text; stopped early: repeating; labelled fields not detected                             |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns: answer format` | labelled fields not detected                                                                      |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -117,62 +121,65 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 | Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Harbor at Dusk \| Description: A serene harbor scene at sunset, with moored boats and a backdrop of a dramatic skyline. \| Keywords (10): Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflection                                                                                                                                                  |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent,... \| Keywords (12): Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, ...                                                                                |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | Title: UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent. \| Description: The BSC Defender and BSC Volunteer, two UK Border Security Command patrol vessels... \| Keywords (11): uk border security command, patrol vessels, ramsgate harbour, kent, bsc defender, bsc volunteer, ...                                                                               |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Ramsgate Harbour Sunset with Patrol Boats \| Description: The image captures a serene sunset at Ramsgate Harbour, Kent, with several UK Border Security Comma... \| Keywords (19): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Sunset at Ramsgate Harbour \| Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside... \| Keywords (15): Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, ...                                                                               |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk \| Description: UK Border Security patrol boats, including the Defender and Volunteer,... \| Keywords (12): UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, ...[3,714 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: Border security patrol vessels moored in Ramsgate Harbour, Kent, with dramatic sunset lighting reflec... \| Keywords (18): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **BSC Patrol Vessels at Ramsgate Harbour Sunset** \| Description: A fleet of UK Border Security Command patrol boats, including the *BSC Defender* and *BSC... \| Keywords (16): Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, patrol boats, maritime fleet, ...                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Ramsgate Sunset: Border Patrol Boats at Dusk \| Description: At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *... \| Keywords (14): Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol boats, coastal town skyline, ...                                                                               |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Ramsgate Harbour Sunset: Border Security Vessels Moored \| Description: At dusk in Ramsgate Harbour, Kent, a row of Border Security Command patrol vessels, in... \| Keywords (24): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset \| Description: At dusk, UK Border Security Command patrol vessels, including the BSC Defender an... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: Border Command Patrol Vessels Moored at Ramsgate at Dusk \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volun... \| Keywords (18): Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Sunset, Harbor, Marina, Port, ...                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Ramsgate Harbour Sunset with Border Security Vessels \| Description: The sun sets over Ramsgate Harbour, with Border Security Command patrol vessels, includi... \| Keywords (19): Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dusk, England, Coast, Fleet, Maritime, ...                                                                               |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Border Security Command vessels moored at Ramsgate Harbour \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunte... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Border Security Command Vessels at Ramsgate Harbour \| Description: At dusk on October 3, 2026, a fleet of UK Border Security Command patrol vessels, inclu... \| Keywords (19): Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, ...                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Border Security Boats at Sunset in Ramsgate Harbour \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, a... \| Keywords (16): Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: UK Border Vessels at Ramsgate Sunset \| Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security Command p... \| Keywords (18): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dover, Kent, Dusk, Sunset, Patrol boats, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: UK Border Security Command Vessels in Ramsgate Harbour \| Description: A fleet of Border Security Command patrol vessels, including the BSC Defender, is moored... \| Keywords (16): Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, BSC Volunteer, Sunset, ...                                                                                |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Border Security Command Patrols Kent's Ramsgate Harbour \| Description: At dusk, the UK Border Security Command's patrol vessels, including the BSC Defender a... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: Ramsgate Harbour: UK Border Security Vessels at Sunset \| Description: Captured on 3rd October 2026 at 18:18 UTC+01:00, UK Border Security Command patrol vesse... \| Keywords (18): Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Volunteer, patrol boats, harbour, marina, ...                                                                               |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Fishing vessels and town skyline at sunset in Ramsgate Harbour \| Description: Several fishing vessels are moored side-by-side in Ramsgate Harbour as a dramatic s... \| Keywords (18): Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, Sunset, Dusk, Coast, ...                                                                               |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Border Security Command patrol vessels moored at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC V... \| Keywords (15): Border security vessels, Kent, maritime, patrol boats, sunset, harbour, pier, reflection, England, dusk, boats, ...                                                                               |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: UK Border Security Command vessels in Ramsgate Harbour \| Description: UK Border Security Command patrol vessels, including the BSC Defender, are moore... \| Keywords (17): Border security vessels, BSC Defender, buildings, coast, dusk, England, fleet, harbor, horizon, Kent, lifebuoy, ...                                                                               |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Patrol Vessels Moored in Ramsgate Harbour Sunset \| Description: UK Border Security Command vessels are moored in Ramsgate Harbour, Kent, silhouetted ag... \| Keywords (15): Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coast, Maritime, Mooring, Skyline, Defender, ...                                                                               |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | Title: Border Security Vessels at Sunset in Ramsgate Harbour \| Description: Border security patrol vessels, including the BSC Defender and BSC Volunteer, are moored... \| Keywords (23): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: BSC Patrol Vessels Moored at Ramsgate Harbour at Dusk \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, a... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Border Security Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored i... \| Keywords (18): Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside buildings, Marina, Reflections, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: BSC Patrol Boats at Ramsgate Harbour Sunset \| Description: At 18:18 UTC+01:00 on October 3, 2026, UK Border Security Command patrol vessels, including th... \| Keywords (17): Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritime, Fleet, Coast, Buildings, Cliffside, ...                                                                               |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | Title: UK Border Security Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are m... \| Keywords (19): UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffside buildings, moored vessels, ...                                                                               |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Sunset over Ramsgate Harbour \| Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silh... \| Keywords (43): Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, ...[1,955 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | Title: Ramsgate Harbour Sunset with Patrol Vessels \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moore... \| Keywords (19): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: Border security vessels docked in Ramsgate Harbour at sunset \| Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic s... \| Keywords (17): Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`    | Title: Border Patrol Vessels at Ramsgate Harbor Sunset \| Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a bea... \| Keywords (36): British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, ...[1,697 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Border Security Command Patrol Vessels in Ramsgate Harbour \| Description: Border Security Command patrol vessels, including the BSC Defender and BSC Voluntee... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: UK Border Security Command vessels moored at Ramsgate Harbour at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                                |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: UK Border Security Patrol Vessels at Ramsgate Harbour at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and V... \| Keywords (15): Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, sunset, dusk, coast, maritime, mooring, ...                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: "Border Security Vessels at Sunset" \| Description: "Two patrol boats, the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour,... \| Keywords (15): Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, sunset, cliffside skyline, ...                                                                                |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer patrol vessels stand side-by-side against a breathtaking sunset, with the town's cliffside skyline softly illuminated by the fading light.                                                                                                                                                           |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset \| Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC pat... \| Keywords (59): Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, ...                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | Title: Ramsgate Harbour Sunset with Border Security Vessels \| Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security... \| Keywords (45): Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, ...                                                                               |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | Ramsgate Harbour Sunset: Border Security Vessels Moored<br><br>Border security patrol boats, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset. The scene captures the town's cliffside skyline and the reflective wat...                                                                                        |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (2): Need title 5-10 words., ...                                                                                                                                                                                                                                                                                     |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Border Security Command vessels in Ramsgate Harbour at sunset \| Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moo... \| Keywords (22): Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, ...                                                                               |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | Brokewater, BSC, Dusk, England, Marina, Port, Ramsgate, Reflection                                                                                                                                                                                                                                                                                                                    |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: Dusk at Ramsgate: Border Security Vessels \| Description: UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-... \| Keywords (53): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, ...                                                                               |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | Title: (not detected) \| Description: A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate... \| Keywords (20): fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, ...                                                                               |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Ramsgate Harbour Patrol Boats at Dusk" \| Description: (not detected) \| Keywords (18): Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coast, Dover, Horizon, Lifebuoy, Marina, ...                                                                                                                                                                        |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a harbor with several boats docked in a row.                                                                                                                                                                                                                                                                                      |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, E... \| Description: (not detected) \| Keywords: (not detected)                                                                                                                                                                                                                                    |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | Ramsgate Harbour, Kent, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.                                                                                                                                                       |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: The Shopkeeper Store \| Description: A charming brick building with a black-painted storefront and a red brick middle story, featuring a gabled roof with two dormers a... \| Keywords (14): brick building, black storefront, red brick, gable, entrance, shopfront, architecture, British, ...                                                                               |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: The Shopkeeper Boutique at Number 76 \| Description: A street-level view of The Shopkeeper boutique at No. 76, featuring a black-painted storefront with gol... \| Keywords (18): The Shopkeeper, boutique, storefront, red brick, sash window, gable, gold detailing, black paint, chimney, ...                                                                               |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: The Shopkeeper Store, No. 76, Black Shopfront with Gold Detailing \| Description: A street-level view of The Shopkeeper Store at No. 76, featuring a tradi... \| Keywords (20): Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, ...                                                                               |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | Title: The Shopkeeper Store, No. 76, UK \| Description: A traditional British boutique at No. 76, featuring a black-painted storefront with gold detailing, red brick m... \| Keywords (20): The Shopkeeper Store, No. 76, UK, boutique, black storefront, gold detailing, red brick, sash windows, ...                                                                               |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | Title: Traditional British Shopfront Exterior \| Description: A street-level architectural view of The Shopkeeper Store at No. 76, featuring a black-painted ground... \| Keywords (18): The Shopkeeper Store, No. 76, black-painted storefront, gold detailing, red brick building, sash windows, ...                                                                                |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | Title: Traditional British Shopfront with Red Brick Upper Story and Gabled Dormers. \| Description: The exterior of The Shopkeeper Store, located at No. 76, feat... \| Keywords (20): adobe stock, any vision, chimney, entrance, europe, gable, objects, red brick, roof, sash window, shopfront, ...                                                                               |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: British Architectural Boutique, No. 76 \| Description: The exterior of The Shopkeeper Store at No. 76, captured on 2026-10-10 at 17:21 UTC+01:00, features a... \| Keywords (19): Adobe Stock, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, ...                                                                                |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Traditional British Boutique Storefront \| Description: The Shopkeeper Store at No. 76 features a black-painted storefront with gold detailing, red bric... \| Keywords (15): British, architecture, boutique, brick building, brick wall, black storefront, gold detailing, gabled dormers, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Shopfront Storefront Display \| Description: The shopfront at No. 76 shows a traditional black-painted exterior with gold detailing, evident in the sas... \| Keywords (19): British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, ...[2,706 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Boutique Shopfront with Red Brick and Gabled Dormers \| Description: A historic British storefront at 76 features red brick, black trim, gold accents, and s... \| Keywords (16): boutique, shopfront, red brick, gable, dormer, sash window, black trim, gold detailing, chimney, entrance, ...                                                                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **The Shopkeeper Store, No. 76 – Traditional UK Boutique Exterior** \| Description: A street-level photograph of **The Shopkeeper Store** at **No. 76**, captured on **10 Octobe... \| Keywords (20): The Shopkeeper Store, No. 76, UK boutique, traditional shopfront, black-painted store, ...                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: **The Shopkeeper’s Last Hour: No. 76’s Retro Boutique** \| Description: A quaint UK brick storefront at No. 76, captured on 2026-10-10, shows a vintage... \| Keywords (14): red-brick sash windows, black-gold shopfront, gabled dormers, slate roof, vintage boutique, UK brick building, ...                                                                                |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: The Shopkeeper Store No. 76 Victorian Brick Shopfront \| Description: A street-level view of The Shopkeeper Store at No. 76, presenting a traditional black-painted... \| Keywords (19): shopfront, brick building, storefront, shop, sash window, gable, chimney, entrance, roof, signage, ...                                                                                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Traditional British Shopfront at No. 76 \| Description: The Shopkeeper Store at No. 76 showcases a classic black-painted facade with gold accents, set against a r... \| Keywords (22): British, Shopkeeper, Store, No. 76, black-painted, gold-accented, red brick, entrance, sash windows, ...                                                                               |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: The Shopkeeper boutique storefront in the UK \| Description: The exterior of 'The Shopkeeper' boutique at No. 76, a traditional British shop with a blac... \| Keywords (18): shopfront, boutique, red brick, gable, sash window, shopkeeper, storefront, building exterior, united kingdom, ...                                                                               |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Black-Framed Shopfront with Red Brick Facade \| Description: A boutique store at No. 76 in the UK, featuring a black-painted storefront with gold detailing,... \| Keywords (10): boutique, shopfront, red brick, black paint, gold detailing, sash window, gable, chimney, United Kingdom, ...                                                                                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: The Shopkeeper Boutique at No. 76 in UK \| Description: This image captures the traditional exterior of The Shopkeeper Store at No. 76, featuring a black-painted storefront wit... \| Keywords (18): shopfront, signage, red brick, black paint, gold detailing, sash windows, gabled roof, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: The Shopkeeper Storefront at No. 76, Red Brick Facade \| Description: A street-level view of a boutique storefront at No. 76, featuring a black-painted shop... \| Keywords (16): The Shopkeeper, shopfront, red brick, sash windows, gable, dormer, black facade, gold detailing, boutique, ...                                                                               |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected` | Title: The Shopkeeper Storefront at 76a, Norwich \| Description: A street-level view of the traditional black-painted storefront of The Shopkeeper at No. 76, fe... \| Keywords (18): Adobe Stock, Any Vision, boutique, brick building, brick wall, british, building exterior, chimney, entrance, ...                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Shopkeeper Store, No. 76, British Boutique \| Description: This image captures the exterior of The Shopkeeper Store, a boutique located at No. 76, showca... \| Keywords (13): British, boutique, architectural detail, brick building, brick wall, Europe, Gable, objects, red brick, roof, ...                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Exterior of The Shopkeeper Boutique at No. 76 \| Description: A street-level architectural view of a three-story brick building featuring a black-painted storefront w... \| Keywords (14): United Kingdom, architecture, brick building, shopfront, red brick, sash window, gable, chimney, ...                                                                               |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: The Shopkeeper Store, No. 76 – Norwich Street Architecture \| Description: Captured on 10th October 2026 at 17:21 UTC+01:00, this street-level view shows th... \| Keywords (20): The Shopkeeper Store, No. 76, Norwich, United Kingdom, architecture, architectural detail, brick building, ...                                                                               |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Architecture of The Shopkeeper Store in the United Kingdom \| Description: A street-level view of a traditional brick building featuring a black-painted storefront... \| Keywords (16): United Kingdom, architecture, boutique, shopfront, red brick, sash window, gable, signage, retail, ...                                                                                |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Traditional brick storefront with black wooden details \| Description: A street-level view of The Shopkeeper Store features a black-painted storefront wit... \| Keywords (16): architecture, boutique, brick building, building exterior, chimney, entrance, gable, red brick, sash window, ...                                                                               |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: Exterior of The Shopkeeper Store at No. 76 \| Description: A street-level view of The Shopkeeper Store featuring a black-painted storefront with gold det... \| Keywords (16): architecture, boutique, British, red brick, shopfront, sash window, gable, United Kingdom, building exterior, ...                                                                               |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Traditional British Shopfront Facade with Dormer Windows \| Description: A street-level view of The Shopkeeper's store, featuring a contrast between the gr... \| Keywords (15): shopfront, red brick, slate grey, dormer windows, facade, architecture, boutique, high street, traditional, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "The Shopkeeper Store Exterior" \| Description: "A street-level view of The Shopkeeper Store, No. 76, showcases a traditional black-painted storefront with go... \| Keywords (26): The Shopkeeper Store, No. 76, black-painted storefront, gold detailing, red brick, twin dormers, gabled, ...                                                                               |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | Title: Traditional Shopfront in Historic British Building \| Description: The image captures the exterior of The Shopkeeper Store at No. 76, showcasing a traditi... \| Keywords (24): Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, ...                                                                               |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: The Shopkeeper Storefront at No. 76, a traditional British brick building wit... \| Description: A street-level view of The Shopkeeper Store, located at No. 7... \| Keywords (19): Shopkeeper, No. 76, red brick, sash window, gable, dormer, black storefront, gold detailing, mannequins, ...                                                                               |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Traditional British Boutique Shopfront \| Description: A detailed view of The Shopkeeper Store at No. 76, captured on October 10, 2026, showcasing its orna... \| Keywords (18): United Kingdom, boutique, shopfront, red brick, sash windows, gabled dormers, gold detailing, black facade, ...                                                                               |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | Title: The Shopkeeper Store Exterior \| Description: The image shows the exterior of The Shopkeeper Store, located at No. 76, captured on 2026-10-10 17:21:00 UTC+01:00... \| Keywords (23): The Shopkeeper Store, No. 76, black-painted storefront, gold detailing, red brick, three sash windows, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: The Shopkeeper Store, No. 76, London \| Description: A traditional black-painted storefront with gold detailing, red brick middle story, and twin slate-gr... \| Keywords (19): Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, ...                                                                               |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `concerns detected`    | Title: Traditional British Shopfront with Gabled Dormers \| Description: The image captures a traditional British shopfront with gabled dormers, situated in a historic building with a re... \| Keywords (30): traditional british shopfront, gabled dormers, red brick façade, historic building, ...                                                                               |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`    | Title: Traditional British Shopfront at No. 76, London \| Description: A street-level view of The Shopkeeper Store at No. 76, London, captured on October 10, 2... \| Keywords (25): London, Shopkeeper Store, No. 76, British architecture, traditional shopfront, red brick, sash windows, gable, ...                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `concerns detected`    | Title: The Shopkeeper Store Entrance \| Description: A street-level architectural view of the exterior of The Shopkeeper Store, located at No. 7 6, featuring a tra... \| Keywords (19): Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Signage, ...                                                                               |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `concerns detected`    | Title: The Shopkeeper Store, 76, Brighton \| Description: The exterior of The Shopkeeper Store at No. 76 in Brighton, a boutique with a traditional black-painted storefro... \| Keywords (19): The Shopkeeper, No. 76, Brighton, shopfront, boutique, black storefront, gold detailing, red brick, ...                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: The Shopkeeper Store \| Description: A traditional black-painted storefront with gold detailing, a red brick middle story with three sash windows, and twi... \| Keywords (20): Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, ...                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `concerns detected`    | Title: The Shopkeeper Store Exterior \| Description: A street-level view of The Shopkeeper Store at No. 76, showcasing its traditional black-painted storefront with go... \| Keywords (17): The Shopkeeper Store, No. 76, black storefront, gold detailing, red brick facade, twin gabled dormers, ...                                                                               |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`    | Title: No. 76 The Shopkeeper Store \| Description: A street-level architectural view of the exterior of The Shopkeeper Store, located at No. 76, featuring a trad... \| Keywords (20): Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, ...                                                                               |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `major concerns`       | Title: The Shopkeeper Store, No. 76, St. Helier \| Description: A late afternoon street-level view of The Shopkeeper Store at No. 76, a traditional building w... \| Keywords (36): The Shopkeeper Store, No. 76, St. Helier, United Kingdom, British, Architecture, Shopfront, Street View, Brick, ...[2,638 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A detailed description of the image, including the main subject, setting, action, lighting, and distinctive details, along with relevant context and keywords.                                                                                                                                                                                                                        |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Architectural view of The Shopkeeper Store \| Description: The image showcases a traditional British brick building with a black-painted storefront fea... \| Keywords (49): The Shopkeeper Store, No. 76, black-painted, gold detailing, red brick, sash window, gable, entrance, European, ...                                                                               |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | Title: "Traditional British boutique shopfront at No. 76, featuring red brick facade... \| Description: "Street-level view of The Shopkeeper Store, a traditional British boutique located at No. 76, featuring a red brick facade, black storefront with gold detailing... \| Keywords: (not detected)                                                                               |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | Title: Traditional British Shopfront with Gold Detailing and Red Brick \| Description: A street-level view of The Shopkeeper Store at No. 76 in the United Kin... \| Keywords (37): United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, ...                                                                               |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (11): We need title 5-10 words. Concrete. Maybe "The Shopkeeper Store No 76 Exterior Norwich". Need check GPS 52...., ...                                                                                                                                                                                            |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: A Street-Level Architectural View of The Shopkeeper Store \| Description: A 5-10-word title that captures the essence of the image, focusing on the mai... \| Keywords (12): Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, ...                                                                               |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | The shop is a 5-10-word, 1-2-minute description, focusing on the exterior of The Shopkeeper Store, which is a 5-10-word, 1-2-minute description, focusing on the shop's architectural detail, and the details of the building, including the red brick, attic dormer, and two sash wi...                                                                                              |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: The Shopkeeper Store, No.76, UK \| Description: A traditional British storefront at No.76, featuring a black-painted ground floor with gold detailing, red... \| Keywords (223): The Shopkeeper Store, No.76, UK, closed sign, black storefront, gold detailing, red brick, gabled dormers, ...                                                                                |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | ```json<br>{<br>"title": "A street-level view of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and two slate-grey gabled dormers on the uppe...                                                                                        |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "The Shopkeeper's Storefront" \| Description: (not detected) \| Keywords (11): "Traditional Black-Painted Storefront", "Red Brick Middle Story", "Three Sash Windows", ...                                                                                                                                                                                                     |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a brick building with a black storefront and a grey upper level with two dormers.                                                                                                                                                                                                                                                 |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "The Shopkeeper Store: A Street-Level Architectural View of The Shopfront" \| Description: A detailed view of the shopfront of The Shopkeeper Store, featuring a traditional black-painted storefront with gold detailing on the ground floor, red brick middle s... \| Keywords: (not detected)                                                                               |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | Title: The Shopkeeper Store, located at No. 76, features a traditional black-painted... \| Description: (not detected) \| Keywords: (not detected)                                                                                                                                                                                                                                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
 - `mlx-vlm`: `0.7.7`
-- `mlx`: `0.32.4.dev20261009+99f109b56`
+- `mlx`: `0.32.4.dev20261010+06eb7483f`
 - `transformers`: `5.19.0`
 - `tokenizers`: `0.23.3`
 - `huggingface-hub`: `2.2.0`
@@ -188,19 +195,24 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Image Metadata
 
-- *Description:* UK Border Security Command patrol vessels, including the BSC
-  Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour,
-  Kent, against a dramatic sunset and the town's cliffside skyline.
-- *Keywords:* Border security vessels, Buildings, Coast, Dover, Dusk, England,
-  Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol
-  boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sea, Ships, Sky,
-  Sunset, Twilight, Vessel, Water reflection, Waterfront, architecture, boat,
-  border security, calm water, chalk cliff, cliffs, coastal, coastal town,
-  coastline, cutter, dawn, docked, english channel, evening, golden hour,
-  marine, moored, nautical, ocean, patrol, radar, scenic, seaside, security,
-  sunrise, townscape, transportation, united kingdom, water
-- *Date:* 2026-10-03 18:18:19 UTC+01:00
-- *Time:* 18:18:19
+- *Description:* A street-level architectural view of the exterior of The
+  Shopkeeper Store, located at No. 76, featuring a traditional black-painted
+  storefront adorned with gold detailing on the ground floor, a red brick
+  middle story with three sash windows, and twin slate-grey gabled dormers on
+  the upper level.
+- *Keywords:* Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable,
+  Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom,
+  architectural detail, architecture, boutique, brick building, brick wall,
+  british, building exterior, building facade, city, clothing display,
+  clothing store, cloudy sky, commercial, daytime, display window, english,
+  entrance door, exterior, facade, facade architecture, front door, gable
+  roof, gabled, heritage, historic, historic architecture, nobody, old town,
+  outdoors, pediment, quaint, residential building, retail, retail store,
+  shop, sidewalk, small business, store window, storefront, street, street
+  view, townhouse, traditional, urban, urban area, victorian, vintage
+- *Date:* 2026-10-10 17:21:00 UTC+01:00
+- *Time:* 17:21:00
+- *GPS:* 52.629112°N, 1.288265°E
 
 ## Prompt
 
@@ -216,15 +228,19 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+> &#45; Capture date/time: 2026-10-10 17:21:00 UTC+01:00
+> &#45; GPS: 52.629112°N, 1.288265°E
 >
 > &#8203;Descriptive hints:
-> &#45; Description hint: UK Border Security Command patrol vessels, including the
-> BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate
-> Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-> &#45; Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk,
-> England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring,
-> Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+> &#45; Description hint: A street-level architectural view of the exterior of The
+> Shopkeeper Store, located at No. 76, featuring a traditional black-painted
+> storefront adorned with gold detailing on the ground floor, a red brick
+> middle story with three sash windows, and twin slate-grey gabled dormers on
+> the upper level.
+> &#45; Keyword hints: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable,
+> Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom,
+> architectural detail, architecture, boutique, brick building, brick wall,
+> british, building exterior
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -257,17 +273,17 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.36s
-- *Generation time:* 1.05s
-- *Total time:* 2.36s
-- *Prompt preparation time:* 0.549
-- *First-token latency:* 0.394
-- *Cleanup time:* 0.0611
-- *Prompt tokens:* 2,103
-- *Generation tokens:* 58
-- *Total tokens:* 2,161
-- *Prompt throughput (raw):* 5,344 tok/s
-- *Generation throughput (raw):* 482 tok/s
+- *Model load time:* 0.38s
+- *Generation time:* 0.70s
+- *Total time:* 1.77s
+- *Prompt preparation time:* 0.407
+- *First-token latency:* 0.13
+- *Cleanup time:* 0.0672
+- *Prompt tokens:* 2,144
+- *Generation tokens:* 83
+- *Total tokens:* 2,227
+- *Prompt throughput (raw):* 16,502 tok/s
+- *Generation throughput (raw):* 484 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.08
@@ -276,7 +292,7 @@ Complete generated or crash evidence for every attempted model.
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 1520
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -291,25 +307,25 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-Harbor at Dusk
+The Shopkeeper Store
 
 Description:
-A serene harbor scene at sunset, with moored boats and a backdrop of a dramatic skyline.
+A charming brick building with a black-painted storefront and a red brick middle story, featuring a gabled roof with two dormers and a gable entrance.
 
 Keywords:
-Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflection
+brick building, black storefront, red brick, gable, entrance, shopfront, architecture, British, building exterior, shop, windows, doors, signage, United Kingdom
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-4bit"></a>
+<a id="model-technobaptist-ternary-bonsai-2-27b-mlx-2bit"></a>
 
-### mlx-community/GLM-4.6V-Flash-4bit
+### TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
+<summary>Complete evidence: TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -317,33 +333,206 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.18s
-- *Generation time:* 7.54s
-- *Total time:* 9.31s
-- *Prompt preparation time:* 0.588
-- *First-token latency:* 5.76
-- *Cleanup time:* 0.0844
-- *Prompt tokens:* 6,339
-- *Generation tokens:* 98
-- *Total tokens:* 6,437
-- *Prompt throughput (raw):* 1,100 tok/s
-- *Generation throughput (raw):* 79.5 tok/s
-- *Peak memory (GB):* 8.7
-- *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.00123
+- *Arch supported by installed mlx-vlm:* yes (model_type
+  prism_hadamard_qwen35)
+- *Model load time:* 1.61s
+- *Generation time:* 64.78s
+- *Total time:* 67.45s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 58.8
+- *Cleanup time:* 0.145
+- *Prompt tokens:* 16,586
+- *Generation tokens:* 182
+- *Total tokens:* 16,768
+- *Prompt throughput (raw):* 282 tok/s
+- *Generation throughput (raw):* 36.2 tok/s
+- *Peak memory (GB):* 17
+- *Active memory (GB):* 8.6
+- *Cache memory (GB):* 3.3
+- *Model-load active memory (GB):* 8.6
+- *Post-cleanup active memory (GB):* 0.00113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1379
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Rendered prompt characters:* 1560
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 498775b03b55d038f716fea2568bf6ae6b8e0b5e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--TechnoBaptist--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/498775b03b55d038f716fea2568bf6ae6b8e0b5e
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: The Shopkeeper Boutique at Number 76
+
+Description: A street-level view of The Shopkeeper boutique at No. 76, featuring a black-painted storefront with gold detailing and a "CLOSED" sign, set beneath a red brick middle story with three sash windows and twin slate-grey gabled dormers. The scene is captured on 10 October 2026 at 17:21 UTC+01:00 at 52.629112°N, 1.288265°E, with soft daylight illuminating the architectural details.
+
+Keywords: The Shopkeeper, boutique, storefront, red brick, sash window, gable, gold detailing, black paint, chimney, entrance, signage, architectural detail, brick building, United Kingdom, Europe, shopfront, roof, objects
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-arex-2-4bit"></a>
+
+### mlx-community/AREX-2-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/AREX-2-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 2.18s
+- *Generation time:* 53.63s
+- *Total time:* 56.81s
+- *Prompt preparation time:* 0.978
+- *First-token latency:* 48.4
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 16,586
+- *Generation tokens:* 137
+- *Total tokens:* 16,723
+- *Prompt throughput (raw):* 343 tok/s
+- *Generation throughput (raw):* 30.7 tok/s
+- *Peak memory (GB):* 21
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 1.9
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.00164
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1560
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 02551ee54839c7541ea5adb44b83c9aa86aeb4f5
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--AREX-2-4bit/snapshots/02551ee54839c7541ea5adb44b83c9aa86aeb4f5
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: The Shopkeeper Store, No. 76, Black Shopfront with Gold Detailing
+Description: A street-level view of The Shopkeeper Store at No. 76, featuring a traditional black-painted Victorian shopfront with gold detailing, a red brick middle story with three sash windows, and twin slate-grey gabled dormers above, captured on a partly cloudy day.
+Keywords: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+<details>
+<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 2.13s
+- *Generation time:* 8.10s
+- *Total time:* 10.69s
+- *Prompt preparation time:* 0.447
+- *First-token latency:* 3.22
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 2,498
+- *Generation tokens:* 134
+- *Total tokens:* 2,632
+- *Prompt throughput (raw):* 777 tok/s
+- *Generation throughput (raw):* 30.1 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 0.51
+- *Model-load active memory (GB):* 18
+- *Post-cleanup active memory (GB):* 0.0019
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1469
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.15, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+The Shopkeeper Store, No. 76, UK
+
+Description:
+A traditional British boutique at No. 76, featuring a black-painted storefront with gold detailing, red brick mid-level with sash windows, and slate-grey gabled dormers under a partly cloudy sky.
+
+Keywords:
+The Shopkeeper Store, No. 76, UK, boutique, black storefront, gold detailing, red brick, sash windows, gabled dormers, slate-grey roof, partly cloudy sky, architectural detail, brick building, British architecture, shopfront, signage, chimney, entrance, Europe, United Kingdom
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Model load time:* 10.81s
+- *Generation time:* 22.74s
+- *Total time:* 34.07s
+- *Prompt preparation time:* 0.511
+- *First-token latency:* 17.9
+- *Cleanup time:* 0.262
+- *Prompt tokens:* 6,445
+- *Generation tokens:* 145
+- *Total tokens:* 6,590
+- *Prompt throughput (raw):* 361 tok/s
+- *Generation throughput (raw):* 44.1 tok/s
+- *Peak memory (GB):* 78
+- *Active memory (GB):* 62
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 61.9
+- *Post-cleanup active memory (GB):* 0.00305
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1550
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
 - *EOS token:* <\|endoftext\|>
@@ -351,9 +540,11 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Patrol Boats at Sunset
-Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, during a dramatic sunset with the town's cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, UK Border Security Command, BSC Defender, Mooring, Maritime, Dusk, England
+Title: Traditional British Shopfront Exterior
+
+Description: A street-level architectural view of The Shopkeeper Store at No. 76, featuring a black-painted ground floor with gold detailing, red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level, captured on 2026-10-10 at 17:21 UTC+01:00.
+
+Keywords: The Shopkeeper Store, No. 76, black-painted storefront, gold detailing, red brick building, sash windows, slate-grey gabled dormers, traditional architecture, British shopfront, architectural detail, boutique, brick wall, entrance, signage, chimney, roof, United Kingdom, Europe
 </pre>
 
 </details>
@@ -374,26 +565,26 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.88s
-- *Generation time:* 6.28s
-- *Total time:* 8.94s
-- *Prompt preparation time:* 0.774
-- *First-token latency:* 1.86
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 2,601
-- *Generation tokens:* 130
-- *Total tokens:* 2,731
-- *Prompt throughput (raw):* 1,396 tok/s
-- *Generation throughput (raw):* 35.3 tok/s
+- *Model load time:* 1.86s
+- *Generation time:* 7.46s
+- *Total time:* 9.93s
+- *Prompt preparation time:* 0.596
+- *First-token latency:* 1.08
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 2,641
+- *Generation tokens:* 200
+- *Total tokens:* 2,841
+- *Prompt throughput (raw):* 2,448 tok/s
+- *Generation throughput (raw):* 34.4 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
-- *Cache memory (GB):* 0.43
+- *Cache memory (GB):* 0.46
 - *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.0018
+- *Post-cleanup active memory (GB):* 0.00331
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1335
+- *Rendered prompt characters:* 1506
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -407,11 +598,11 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, 
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent.
+ Title: Traditional British Shopfront with Red Brick Upper Story and Gabled Dormers.
 
-Description: The BSC Defender and BSC Volunteer, two UK Border Security Command patrol vessels, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The vessels are equipped with lifebuoys and are part of the maritime security fleet that patrols the English coast.
+Description: The exterior of The Shopkeeper Store, located at No. 76, features a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level. The building's architectural style is reminiscent of classic British design, with a focus on symmetry and attention to detail. The black-painted shopfront is a striking contrast to the red brick upper story, and the gabled dormers add a touch of elegance to the overall design. The building is well-maintained and appears to be in good condition.
 
-Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bsc defender, bsc volunteer, cliffside skyline, sunset, maritime security fleet, english coast, lifebuoys.
+Keywords: adobe stock, any vision, chimney, entrance, europe, gable, objects, red brick, roof, sash window, shopfront, signage, united kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior.
 </pre>
 
 </details>
@@ -433,25 +624,25 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
 - *Model load time:* 1.13s
-- *Generation time:* 5.25s
-- *Total time:* 7.07s
-- *Prompt preparation time:* 0.685
-- *First-token latency:* 2.6
-- *Cleanup time:* 0.0975
-- *Prompt tokens:* 2,091
-- *Generation tokens:* 113
-- *Total tokens:* 2,204
-- *Prompt throughput (raw):* 804 tok/s
-- *Generation throughput (raw):* 57.4 tok/s
+- *Generation time:* 4.44s
+- *Total time:* 6.11s
+- *Prompt preparation time:* 0.532
+- *First-token latency:* 1.54
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 2,142
+- *Generation tokens:* 134
+- *Total tokens:* 2,276
+- *Prompt throughput (raw):* 1,389 tok/s
+- *Generation throughput (raw):* 56.3 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
-- *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.00212
+- *Model-load active memory (GB):* 8.95
+- *Post-cleanup active memory (GB):* 0.00362
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1303
+- *Rendered prompt characters:* 1474
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -466,13 +657,13 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 
 <pre class="model-output-readable">
 Title:
-Ramsgate Harbour Sunset with Patrol Boats
+British Architectural Boutique, No. 76
 
 Description:
-The image captures a serene sunset at Ramsgate Harbour, Kent, with several UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, moored side-by-side against the backdrop of the town's cliffside skyline.
+The exterior of The Shopkeeper Store at No. 76, captured on 2026-10-10 at 17:21 UTC+01:00, features a traditional black-painted storefront with gold detailing, red brick middle story, and slate-grey gabled dormers.
 
 Keywords:
-Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Adobe Stock, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, British, building exterior
 </pre>
 
 </details>
@@ -493,26 +684,26 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.65s
-- *Generation time:* 3.91s
-- *Total time:* 6.26s
-- *Prompt preparation time:* 0.688
-- *First-token latency:* 1.02
-- *Cleanup time:* 0.11
-- *Prompt tokens:* 2,091
-- *Generation tokens:* 80
-- *Total tokens:* 2,171
-- *Prompt throughput (raw):* 2,050 tok/s
-- *Generation throughput (raw):* 36.4 tok/s
+- *Model load time:* 1.63s
+- *Generation time:* 4.16s
+- *Total time:* 6.33s
+- *Prompt preparation time:* 0.526
+- *First-token latency:* 0.818
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 2,142
+- *Generation tokens:* 104
+- *Total tokens:* 2,246
+- *Prompt throughput (raw):* 2,617 tok/s
+- *Generation throughput (raw):* 36.8 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00243
+- *Post-cleanup active memory (GB):* 0.00393
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1303
+- *Rendered prompt characters:* 1474
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -526,21 +717,23 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sunset at Ramsgate Harbour
-Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, Lifebuoy, Reflection, Coast, Buildings, Pier
+Title: Traditional British Boutique Storefront
+
+Description: The Shopkeeper Store at No. 76 features a black-painted storefront with gold detailing, red brick middle story, and slate-grey gabled dormers, captured in natural light on October 10, 2026.
+
+Keywords: British, architecture, boutique, brick building, brick wall, black storefront, gold detailing, gabled dormers, red brick, sash windows, shopfront, United Kingdom, storefront, traditional, window display
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
 
-### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
+### mlx-community/MiniCPM-V-4.6-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -548,63 +741,200 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.15s
-- *Generation time:* 20.22s
-- *Total time:* 23.02s
-- *Prompt preparation time:* 0.64
-- *First-token latency:* 2.97
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 1,312
-- *Generation tokens:* 995
-- *Total tokens:* 2,307
-- *Prompt throughput (raw):* 441 tok/s
-- *Generation throughput (raw):* 60.2 tok/s
-- *Peak memory (GB):* 20
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 1.6
-- *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00339
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.84s
+- *Generation time:* 3.51s
+- *Total time:* 4.91s
+- *Prompt preparation time:* 0.552
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.093
+- *Prompt tokens:* 963
+- *Generation tokens:* 826
+- *Total tokens:* 1,789
+- *Prompt throughput (raw):* 4,124 tok/s
+- *Generation throughput (raw):* 300 tok/s
+- *Peak memory (GB):* 3.2
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.0062
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1485
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 1537
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_p": 1.0}
-- *EOS token:* [EOS]
+  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are: UK Border Security Command patrol vessels (Defender and Volunteer) moored in Ramsgate Harbour, Kent, during dusk, with the town's cliffside buildings and sunset. The image shows several boats docked, a harbor scene at dusk, with buildings in the background. The capture date/time is 2026-10-03 18:18:19 UTC+01:00.
+&lt;think&gt;
+We have a task to create a concrete 5-10 word title, a 1-2 sentence factual description, and then 10-18 unique, comma-separated keywords. The context gives us authoritative facts and hints.
 
-For the title, I need a 5-10 word title that captures the main elements. Maybe something like "UK Border Patrol Vessels Moored at Ramsgate Harbour, Kent, at Dusk". That's concise and includes the key elements.
+First, let's craft the title. It should be concise, 5-10 words. Based on the image, the store is "The Shopkeeper Store" at No. 76. So title could be "Shopfront Storefront Display".
 
-Next, the description. It needs to be 1-2 sentences, combining context, subject, setting, action, lighting, and details. The vessels are moored, sunset, town skyline. So: "UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings in the background."
+Now, the description: combine relevant context with the main visible subject, setting, action, lighting, and distinctive details. We need to describe the building, the store, the style, and the surroundings.
 
-For keywords, list 10-18 unique ones. From the hints: Border security vessels, Buildings, Coast, Dover (though it's Ramsgate, maybe 'Harbor' is better), Dusk, England, Fleet, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Wait, Dover is mentioned in hints but the image is Ramsgate. Should I include Dover? The context says Ramsgate, but the keyword hints have Dover. Maybe check the image. The image shows Ramsgate, so maybe correct that. So replace Dover with Ramsgate. Also, check for other elements: "Lifebuoy" is in hints but not visible. Maybe include "Harbor" instead. "Maritime" is there, "Fleet" maybe "Fleet of boats" but not sure. Let's list the visible elements: Border security vessels, Buildings, Coast, Dusk, England, Marina, Patrol boat, Patrol boats, Harbor, Ramsgate, Reflection, Port, Sunset, Town skyline. That's 12 keywords. Need to check if they are all visible. The boats are patrol boats, so "Patrol boat" and "Patrol boats" are there. Buildings are visible in the background. Harbor and Port are the same. So maybe consolidate to avoid duplicates. Maybe "Harbor, Ramsgate, Dusk, UK Border Security vessels, Patrol boats, Maritime, Reflection, Town skyline, England, Coast, Marina". That's 10. Wait, "England" is implied by Kent, but maybe include. Let's check the hints: the keywords include England, so include. So final keywords: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England (wait, no, England is already there. Maybe "England" is redundant. Let me check the hints again. The hints have England, so include. So maybe: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England. Wait, England is already mentioned. Hmm. Maybe "UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England". But that's two England. Maybe just "England" once. Alternatively, check if "UK Border Security" is better. Let's see the context says "UK Border Security Command patrol vessels", so "UK Border Security vessels" is good. So keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection. That's 10 unique. Maybe add "Fleet" if visible. The image has a fleet of boats, so "Fleet" could be added. So: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet. That's 11. That works.◁/think▷Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk
-Description: UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings and coastal backdrop.
-Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet
+Keywords: we need 10-18 unique, covering relevant context and visible details. Let's list: British, commercial, storefront, shop, brick, gable, windows, entrance, signage, architecture, boutique, red brick, black, gold, sash, window, chimney, street, exterior. But need to ensure they are unique and cover the main details.
+
+We'll compile: British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, UK, architecture, exterior, chimney, street, windows, black, brick, signage.
+
+Count: let's list each keyword and ensure 10-18 distinct.
+
+Check for overlap: "British", "commercial", "shopfront", "store", "boutique", "red brick", "gable", "sash windows", "entrance", "gold detailing", "shopfront", "UK", "architecture", "exterior", "chimney", "street", "windows", "black", "brick", "signage".
+
+We can select 15 distinct keywords. Let's make sure they are unique and cover the main visible details.
+
+Final output must be exactly Title, Description, Keywords. So we'll write:
+
+Title: Shopfront Storefront Display
+
+Description: The shopfront at No. 76 shows a traditional black-painted exterior with gold detailing, evident in the sash windows and gabled dormers.
+
+Keywords: British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, UK, architecture, exterior, chimney, street, windows, black, brick, signage.
+
+I'll count the keywords: let's list them:
+
+1. British
+2. commercial
+3. storefront
+4. boutique
+5. red brick
+6. gable
+7. sash windows
+8. entrance
+9. gold detailing
+10. shopfront
+11. UK
+12. architecture
+13. exterior
+14. chimney
+15. street
+16. windows
+17. black
+18. brick
+19. signage
+
+Wait, that's more than 18. But we need 10-18 unique. Let's ensure each is unique. I'll list them:
+
+- British
+- commercial
+- storefront
+- boutique
+- red brick
+- gable
+- sash windows
+- entrance
+- gold detailing
+- shopfront
+- UK
+- architecture
+- exterior
+- chimney
+- street
+- windows
+- black
+- brick
+- signage
+
+That's 19 items. But we need 10-18, so we'll choose the top 18 unique.
+
+Now, combine everything.
+&lt;/think&gt;
+
+Title: Shopfront Storefront Display
+Description: The shopfront at No. 76 shows a traditional black-painted exterior with gold detailing, evident in the sash windows and gabled dormers.
+Keywords: British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, UK, architecture, exterior, chimney, street, windows, black, brick, signage
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are: UK Border Security Command patrol vessels (Defender and Volunteer) moored in Ramsgate Harbour, Kent, during dusk, with the town's cliffside buildings and sunset. The image shows several boats docked, a harbor scene at dusk, with buildings in the background. The capture date/time is 2026-10-03 18:18:19 UTC+01:00. 
+<think>
+We have a task to create a concrete 5-10 word title, a 1-2 sentence factual description, and then 10-18 unique, comma-separated keywords. The context gives us authoritative facts and hints. 
 
-For the title, I need a 5-10 word title that captures the main elements. Maybe something like "UK Border Patrol Vessels Moored at Ramsgate Harbour, Kent, at Dusk". That's concise and includes the key elements.
+First, let's craft the title. It should be concise, 5-10 words. Based on the image, the store is "The Shopkeeper Store" at No. 76. So title could be "Shopfront Storefront Display". 
 
-Next, the description. It needs to be 1-2 sentences, combining context, subject, setting, action, lighting, and details. The vessels are moored, sunset, town skyline. So: "UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings in the background."
+Now, the description: combine relevant context with the main visible subject, setting, action, lighting, and distinctive details. We need to describe the building, the store, the style, and the surroundings. 
 
-For keywords, list 10-18 unique ones. From the hints: Border security vessels, Buildings, Coast, Dover (though it's Ramsgate, maybe 'Harbor' is better), Dusk, England, Fleet, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Wait, Dover is mentioned in hints but the image is Ramsgate. Should I include Dover? The context says Ramsgate, but the keyword hints have Dover. Maybe check the image. The image shows Ramsgate, so maybe correct that. So replace Dover with Ramsgate. Also, check for other elements: "Lifebuoy" is in hints but not visible. Maybe include "Harbor" instead. "Maritime" is there, "Fleet" maybe "Fleet of boats" but not sure. Let's list the visible elements: Border security vessels, Buildings, Coast, Dusk, England, Marina, Patrol boat, Patrol boats, Harbor, Ramsgate, Reflection, Port, Sunset, Town skyline. That's 12 keywords. Need to check if they are all visible. The boats are patrol boats, so "Patrol boat" and "Patrol boats" are there. Buildings are visible in the background. Harbor and Port are the same. So maybe consolidate to avoid duplicates. Maybe "Harbor, Ramsgate, Dusk, UK Border Security vessels, Patrol boats, Maritime, Reflection, Town skyline, England, Coast, Marina". That's 10. Wait, "England" is implied by Kent, but maybe include. Let's check the hints: the keywords include England, so include. So final keywords: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England (wait, no, England is already there. Maybe "England" is redundant. Let me check the hints again. The hints have England, so include. So maybe: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England. Wait, England is already mentioned. Hmm. Maybe "UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England". But that's two England. Maybe just "England" once. Alternatively, check if "UK Border Security" is better. Let's see the context says "UK Border Security Command patrol vessels", so "UK Border Security vessels" is good. So keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection. That's 10 unique. Maybe add "Fleet" if visible. The image has a fleet of boats, so "Fleet" could be added. So: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet. That's 11. That works.◁/think▷Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk  
-Description: UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings and coastal backdrop.  
-Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet
+Keywords: we need 10-18 unique, covering relevant context and visible details. Let's list: British, commercial, storefront, shop, brick, gable, windows, entrance, signage, architecture, boutique, red brick, black, gold, sash, window, chimney, street, exterior. But need to ensure they are unique and cover the main details. 
+
+We'll compile: British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, UK, architecture, exterior, chimney, street, windows, black, brick, signage. 
+
+Count: let's list each keyword and ensure 10-18 distinct. 
+
+Check for overlap: "British", "commercial", "shopfront", "store", "boutique", "red brick", "gable", "sash windows", "entrance", "gold detailing", "shopfront", "UK", "architecture", "exterior", "chimney", "street", "windows", "black", "brick", "signage". 
+
+We can select 15 distinct keywords. Let's make sure they are unique and cover the main visible details. 
+
+Final output must be exactly Title, Description, Keywords. So we'll write:
+
+Title: Shopfront Storefront Display
+
+Description: The shopfront at No. 76 shows a traditional black-painted exterior with gold detailing, evident in the sash windows and gabled dormers.
+
+Keywords: British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, UK, architecture, exterior, chimney, street, windows, black, brick, signage. 
+
+I'll count the keywords: let's list them:
+
+1. British
+2. commercial
+3. storefront
+4. boutique
+5. red brick
+6. gable
+7. sash windows
+8. entrance
+9. gold detailing
+10. shopfront
+11. UK
+12. architecture
+13. exterior
+14. chimney
+15. street
+16. windows
+17. black
+18. brick
+19. signage
+
+Wait, that's more than 18. But we need 10-18 unique. Let's ensure each is unique. I'll list them:
+
+- British
+- commercial
+- storefront
+- boutique
+- red brick
+- gable
+- sash windows
+- entrance
+- gold detailing
+- shopfront
+- UK
+- architecture
+- exterior
+- chimney
+- street
+- windows
+- black
+- brick
+- signage
+
+That's 19 items. But we need 10-18, so we'll choose the top 18 unique. 
+
+Now, combine everything.
+</think>
+
+Title: Shopfront Storefront Display
+Description: The shopfront at No. 76 shows a traditional black-painted exterior with gold detailing, evident in the sash windows and gabled dormers.
+Keywords: British, commercial, storefront, boutique, red brick, gable, sash windows, entrance, gold detailing, shopfront, UK, architecture, exterior, chimney, street, windows, black, brick, signage
 ```
 
 </details>
@@ -627,26 +957,26 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.05s
-- *Generation time:* 1.74s
-- *Total time:* 3.37s
-- *Prompt preparation time:* 0.57
-- *First-token latency:* 0.323
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 369
-- *Generation tokens:* 88
-- *Total tokens:* 457
-- *Prompt throughput (raw):* 1,144 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Model load time:* 1.02s
+- *Generation time:* 1.53s
+- *Total time:* 2.98s
+- *Prompt preparation time:* 0.408
+- *First-token latency:* 0.239
+- *Cleanup time:* 0.0964
+- *Prompt tokens:* 420
+- *Generation tokens:* 94
+- *Total tokens:* 514
+- *Prompt throughput (raw):* 1,755 tok/s
+- *Generation throughput (raw):* 104 tok/s
 - *Peak memory (GB):* 7.0
-- *Active memory (GB):* 6.1
-- *Cache memory (GB):* 0.09
+- *Active memory (GB):* 6.2
+- *Cache memory (GB):* 0.13
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.005
+- *Post-cleanup active memory (GB):* 0.00651
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1353
+- *Rendered prompt characters:* 1524
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -660,11 +990,11 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Patrol Boats at Sunset
+Title: Boutique Shopfront with Red Brick and Gabled Dormers
 
-Description: Border security patrol vessels moored in Ramsgate Harbour, Kent, with dramatic sunset lighting reflecting on water and town skyline visible behind.
+Description: A historic British storefront at 76 features red brick, black trim, gold accents, and slate-grey gabled dormers under daylight, capturing traditional UK architecture.
 
-Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Pier, Port, Ramsgate, Reflection
+Keywords: boutique, shopfront, red brick, gable, dormer, sash window, black trim, gold detailing, chimney, entrance, United Kingdom, architecture, building exterior, brick wall, Europe, storefront
 </pre>
 
 </details>
@@ -685,26 +1015,26 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.37s
-- *Generation time:* 4.91s
-- *Total time:* 6.91s
-- *Prompt preparation time:* 0.615
-- *First-token latency:* 2.16
-- *Cleanup time:* 0.0977
-- *Prompt tokens:* 2,905
-- *Generation tokens:* 140
-- *Total tokens:* 3,045
-- *Prompt throughput (raw):* 1,348 tok/s
-- *Generation throughput (raw):* 64.5 tok/s
+- *Model load time:* 1.31s
+- *Generation time:* 6.51s
+- *Total time:* 8.28s
+- *Prompt preparation time:* 0.449
+- *First-token latency:* 2.36
+- *Cleanup time:* 0.0918
+- *Prompt tokens:* 3,031
+- *Generation tokens:* 244
+- *Total tokens:* 3,275
+- *Prompt throughput (raw):* 1,285 tok/s
+- *Generation throughput (raw):* 65.7 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.56
+- *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00526
+- *Post-cleanup active memory (GB):* 0.00677
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3736
+- *Rendered prompt characters:* 3907
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -718,13 +1048,13 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 
 <pre class="model-output-readable">
 Title:
-**BSC Patrol Vessels at Ramsgate Harbour Sunset**
+**The Shopkeeper Store, No. 76 – Traditional UK Boutique Exterior**
 
 Description:
-A fleet of UK Border Security Command patrol boats, including the *BSC Defender* and *BSC Volunteer*, is moored in Ramsgate Harbour, Kent, during a dramatic sunset. The scene captures the vessels’ reflections on calm waters, set against the town’s cliffside skyline and the fading golden-orange horizon.
+A street-level photograph of **The Shopkeeper Store** at **No. 76**, captured on **10 October 2026** in the UK (52.629112°N, 1.288265°E), showcasing its **black-painted ground-floor shopfront with gold detailing**, **red-brick mid-level with three sash windows**, and **slate-grey gabled dormers** under a partly cloudy sky. The storefront displays mannequins and accessories, while the adjacent entrance (No. 76a) features a black door with a small window.
 
 Keywords:
-Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, patrol boats, maritime fleet, sunset, cliffside skyline, harbour mooring, calm waters, reflection, UK coast, dusk lighting, maritime security, English coastline
+**The Shopkeeper Store, No. 76, UK boutique, traditional shopfront, black-painted store, gold architectural detailing, red brick building, sash windows, gabled dormers, slate-grey roof, chimney, street-level architecture, UK retail store, closed sign, mannequins, exterior view, 2026 photograph, European architecture, brickwork, UK location**
 </pre>
 
 </details>
@@ -745,26 +1075,26 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.23s
-- *Generation time:* 2.32s
-- *Total time:* 5.20s
-- *Prompt preparation time:* 0.63
-- *First-token latency:* 1.01
-- *Cleanup time:* 0.101
-- *Prompt tokens:* 2,904
-- *Generation tokens:* 132
-- *Total tokens:* 3,036
-- *Prompt throughput (raw):* 2,877 tok/s
-- *Generation throughput (raw):* 181 tok/s
-- *Peak memory (GB):* 7.8
+- *Model load time:* 1.05s
+- *Generation time:* 2.36s
+- *Total time:* 3.87s
+- *Prompt preparation time:* 0.449
+- *First-token latency:* 1.02
+- *Cleanup time:* 0.0924
+- *Prompt tokens:* 3,030
+- *Generation tokens:* 166
+- *Total tokens:* 3,196
+- *Prompt throughput (raw):* 2,976 tok/s
+- *Generation throughput (raw):* 184 tok/s
+- *Peak memory (GB):* 8.1
 - *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.38
+- *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00552
+- *Post-cleanup active memory (GB):* 0.00703
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3735
+- *Rendered prompt characters:* 3906
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -778,128 +1108,13 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 
 <pre class="model-output-readable">
 Title:
-Ramsgate Sunset: Border Patrol Boats at Dusk
+**The Shopkeeper’s Last Hour: No. 76’s Retro Boutique**
 
 Description:
-At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *BSC Volunteer*—moor side-by-side under a vibrant sunset, reflecting across the calm waters while the town’s cliff-top buildings loom in silhouette against the horizon.
+A quaint UK brick storefront at No. 76, captured on 2026-10-10, shows a vintage shop closed under clear blue skies, blending traditional red-brick sash windows with a striking black-and-gold shopfront. The gabled dormers and slate roof add historic charm, while mannequins and seasonal decor hint at a curated retail space.
 
 Keywords:
-Border Security Command, Kent, Ramsgate Harbour, sunset lighting, moored patrol boats, coastal town skyline, maritime scene, lifebuoy details, mooring lines, reflective water, cliffside buildings, dusk atmosphere, BSC Defender, BSC Volunteer.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
-
-### mlx-community/Molmo2-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.09s
-- *Generation time:* 5.73s
-- *Total time:* 7.57s
-- *Prompt preparation time:* 0.73
-- *First-token latency:* 2.89
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 1,502
-- *Generation tokens:* 148
-- *Total tokens:* 1,650
-- *Prompt throughput (raw):* 519 tok/s
-- *Generation throughput (raw):* 68.9 tok/s
-- *Peak memory (GB):* 8.1
-- *Active memory (GB):* 6.5
-- *Cache memory (GB):* 0.31
-- *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00584
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1336
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset: Border Security Vessels Moored
-
-Description: At dusk in Ramsgate Harbour, Kent, a row of Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side against a dramatic sunset. The scene features the town's cliffside skyline reflected in the water, with lifebuoys visible on the vessels.
-
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Town skyline, Vessels moored, Water reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
-
-### mlx-community/North-Micro-Vision-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/North-Micro-Vision-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.00s
-- *Generation time:* 3.47s
-- *Total time:* 5.27s
-- *Prompt preparation time:* 0.796
-- *First-token latency:* 1.99
-- *Cleanup time:* 0.0897
-- *Prompt tokens:* 4,065
-- *Generation tokens:* 148
-- *Total tokens:* 4,213
-- *Prompt throughput (raw):* 2,044 tok/s
-- *Generation throughput (raw):* 207 tok/s
-- *Peak memory (GB):* 3.9
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.65
-- *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00739
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1429
-- *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
-- *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 87466363e6c5f57adf91c18c3a62c3c74765f8df
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--North-Micro-Vision-Instruct-4bit/snapshots/87466363e6c5f57adf91c18c3a62c3c74765f8df
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
-- *EOS token:* <\|END_OF_TURN_TOKEN\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset
-
-Description: At dusk, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The vessels, with their distinctive markings and lifebuoy, reflect the maritime and security focus of the location. The tranquil water and the backdrop of the town enhance the scene's serene yet vigilant atmosphere.
-
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+red-brick sash windows, black-gold shopfront, gabled dormers, slate roof, vintage boutique, UK brick building, closed storefront, gold detailing, mannequin displays, historic architecture, European street scene, shop signage, brick wall, vintage lighting.
 </pre>
 
 </details>
@@ -920,26 +1135,26 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.55s
-- *Generation time:* 2.83s
-- *Total time:* 6.08s
-- *Prompt preparation time:* 0.691
-- *First-token latency:* 0.939
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 1,267
-- *Generation tokens:* 129
-- *Total tokens:* 1,396
-- *Prompt throughput (raw):* 1,350 tok/s
-- *Generation throughput (raw):* 104 tok/s
-- *Peak memory (GB):* 24
+- *Model load time:* 2.54s
+- *Generation time:* 2.36s
+- *Total time:* 5.45s
+- *Prompt preparation time:* 0.527
+- *First-token latency:* 0.626
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 1,330
+- *Generation tokens:* 127
+- *Total tokens:* 1,457
+- *Prompt throughput (raw):* 2,126 tok/s
+- *Generation throughput (raw):* 101 tok/s
+- *Peak memory (GB):* 25
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.0079
+- *Post-cleanup active memory (GB):* 0.00941
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1560
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -952,11 +1167,14 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Command Patrol Vessels Moored at Ramsgate at Dusk
+Title:
+The Shopkeeper Store No. 76 Victorian Brick Shopfront
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side by side in Ramsgate Harbour against a glowing sunset sky. The town's cliffside skyline of buildings rises behind the fleet, their forms and warm light reflected in the calm water of the harbour.
+Description:
+A street-level view of The Shopkeeper Store at No. 76, presenting a traditional black-painted storefront with gold detailing on the ground floor, a red brick middle storey with three sash windows, and twin slate-grey gabled dormers under a cloudy sky.
 
-Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Sunset, Harbor, Marina, Port, Mooring, Reflection, Lifebuoy, Maritime, Fleet, Buildings, Horizon
+Keywords:
+shopfront, brick building, storefront, shop, sash window, gable, chimney, entrance, roof, signage, architectural detail, exterior, british, boutique, United Kingdom, objects, Europe, Any Vision, Adobe Stock
 </pre>
 
 </details>
@@ -977,26 +1195,26 @@ Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.94s
-- *Generation time:* 3.44s
-- *Total time:* 4.94s
-- *Prompt preparation time:* 0.564
-- *First-token latency:* 0.439
-- *Cleanup time:* 0.0874
-- *Prompt tokens:* 1,115
-- *Generation tokens:* 144
-- *Total tokens:* 1,259
-- *Prompt throughput (raw):* 2,541 tok/s
-- *Generation throughput (raw):* 58.6 tok/s
+- *Model load time:* 0.92s
+- *Generation time:* 3.37s
+- *Total time:* 4.71s
+- *Prompt preparation time:* 0.419
+- *First-token latency:* 0.316
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 1,169
+- *Generation tokens:* 147
+- *Total tokens:* 1,316
+- *Prompt throughput (raw):* 3,697 tok/s
+- *Generation throughput (raw):* 56.0 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
-- *Cache memory (GB):* 0.52
+- *Cache memory (GB):* 0.62
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00797
+- *Post-cleanup active memory (GB):* 0.00947
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1319
+- *Rendered prompt characters:* 1490
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -1010,11 +1228,11 @@ Keywords: Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset with Border Security Vessels
+Title: Traditional British Shopfront at No. 76
 
-Description: The sun sets over Ramsgate Harbour, with Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, moored side-by-side. The dramatic skyline and calm waters reflect the vibrant colors of the sunset.
+Description: The Shopkeeper Store at No. 76 showcases a classic black-painted facade with gold accents, set against a red brick background, featuring a black entrance and sash windows.
 
-Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dusk, England, Coast, Fleet, Maritime, Mooring, Patrol Boat, Coast Guard, Harbor, Horizon, Kent, Lifebuoy, Marina
+Keywords: British, Shopkeeper, Store, No. 76, black-painted, gold-accented, red brick, entrance, sash windows, traditional, architecture, boutique, brick building, gabled dormers, street-level view, United Kingdom, black storefront, black door, black signage, twin gables, European style, traditional design
 </pre>
 
 </details>
@@ -1035,26 +1253,26 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.29s
-- *Generation time:* 19.31s
-- *Total time:* 22.56s
-- *Prompt preparation time:* 0.942
-- *First-token latency:* 16.6
-- *Cleanup time:* 0.136
-- *Prompt tokens:* 12,768
-- *Generation tokens:* 136
-- *Total tokens:* 12,904
-- *Prompt throughput (raw):* 771 tok/s
-- *Generation throughput (raw):* 72.1 tok/s
+- *Model load time:* 2.28s
+- *Generation time:* 21.55s
+- *Total time:* 24.63s
+- *Prompt preparation time:* 0.788
+- *First-token latency:* 18.9
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 12,814
+- *Generation tokens:* 141
+- *Total tokens:* 12,955
+- *Prompt throughput (raw):* 679 tok/s
+- *Generation throughput (raw):* 71.1 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
 - *Model-load active memory (GB):* 21.8
-- *Post-cleanup active memory (GB):* 0.00859
+- *Post-cleanup active memory (GB):* 0.0101
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
+- *Rendered prompt characters:* 1541
 - *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1067,71 +1285,11 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Border Security Command vessels moored at Ramsgate Harbour
+Title: The Shopkeeper boutique storefront in the UK
 
-Description:
-UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, England, during a dramatic sunset. The vessels are docked along a pier with the town's cliffside skyline and buildings visible in the background, reflecting the warm light on the water.
+Description: The exterior of 'The Shopkeeper' boutique at No. 76, a traditional British shop with a black-painted facade and gold detailing, is pictured on a street with red brick walls and a grey upper floor. The store features large display windows and a dark blue door with a 'CLOSED' sign, located in a historic-looking building with a gabled roof and brick chimney.
 
-Keywords:
-Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 2.91s
-- *Generation time:* 27.59s
-- *Total time:* 31.53s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 25.1
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 16,525
-- *Generation tokens:* 133
-- *Total tokens:* 16,658
-- *Prompt throughput (raw):* 657 tok/s
-- *Generation throughput (raw):* 87.0 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 2.3
-- *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.0089
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Border Security Command Vessels at Ramsgate Harbour
-
-Description: At dusk on October 3, 2026, a fleet of UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour. The boats are docked against a backdrop of the town's cliffside buildings, with the golden sunset reflecting on the water.
-
-Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, Mooring, Maritime, Coast, Buildings, Horizon, Fleet, Dover, Harbour, Port, Pier
+Keywords: shopfront, boutique, red brick, gable, sash window, shopkeeper, storefront, building exterior, united kingdom, british, architecture, architectural detail, brick building, brick wall, entrance, signage, chimney, roof
 </pre>
 
 </details>
@@ -1152,26 +1310,26 @@ Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.93s
-- *Generation time:* 30.37s
-- *Total time:* 32.36s
-- *Prompt preparation time:* 1.05
-- *First-token latency:* 27.8
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 16,525
-- *Generation tokens:* 112
-- *Total tokens:* 16,637
-- *Prompt throughput (raw):* 593 tok/s
-- *Generation throughput (raw):* 70.1 tok/s
+- *Model load time:* 0.85s
+- *Generation time:* 35.51s
+- *Total time:* 37.25s
+- *Prompt preparation time:* 0.876
+- *First-token latency:* 33.5
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 16,570
+- *Generation tokens:* 87
+- *Total tokens:* 16,657
+- *Prompt throughput (raw):* 495 tok/s
+- *Generation throughput (raw):* 68.9 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00921
+- *Post-cleanup active memory (GB):* 0.0107
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
+- *Rendered prompt characters:* 1541
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1184,11 +1342,11 @@ Keywords: Border security vessels, Patrol boats, Ramsgate Harbour, Kent, England
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Boats at Sunset in Ramsgate Harbour
+Title: Black-Framed Shopfront with Red Brick Facade
 
-Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, under a dramatic sunset. The scene features calm waters reflecting golden light, with cliffside town buildings in the background.
+Description: A boutique store at No. 76 in the UK, featuring a black-painted storefront with gold detailing, red brick walls, and slate-grey gabled dormers under a partly cloudy sky.
 
-Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, Lifebuoy, Coast, Marina, Maritime, Pier, Port, Horizon
+Keywords: boutique, shopfront, red brick, black paint, gold detailing, sash window, gable, chimney, United Kingdom, architectural detail
 </pre>
 
 </details>
@@ -1209,26 +1367,26 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.36s
-- *Generation time:* 28.61s
-- *Total time:* 32.01s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 26.2
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 16,541
-- *Generation tokens:* 152
-- *Total tokens:* 16,693
-- *Prompt throughput (raw):* 630 tok/s
-- *Generation throughput (raw):* 104 tok/s
+- *Model load time:* 2.42s
+- *Generation time:* 35.35s
+- *Total time:* 38.66s
+- *Prompt preparation time:* 0.874
+- *First-token latency:* 33.3
+- *Cleanup time:* 0.133
+- *Prompt tokens:* 16,586
+- *Generation tokens:* 140
+- *Total tokens:* 16,726
+- *Prompt throughput (raw):* 499 tok/s
+- *Generation throughput (raw):* 108 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00972
+- *Post-cleanup active memory (GB):* 0.0112
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1560
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1241,11 +1399,11 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Vessels at Ramsgate Sunset
+Title: The Shopkeeper Boutique at No. 76 in UK
 
-Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security Command patrol boats—including the BSC Defender and BSC Volunteer—are moored in formation at Ramsgate Harbour. The vessels are silhouetted against the dramatic orange sky and the iconic white cliffs of Kent, with their names and Union Jack flags clearly visible on the hulls.
+Description: This image captures the traditional exterior of The Shopkeeper Store at No. 76, featuring a black-painted storefront with ornate gold detailing, red brick walls, and sash windows under a slate-grey gabled roof. The scene is set during late autumn sunlight in the UK, highlighting the building's architectural details and boutique charm.
 
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dover, Kent, Dusk, Sunset, Patrol boats, Mooring, Maritime, Coast, Reflections, White cliffs, Buildings, Pier, Harbour, England
+Keywords: shopfront, signage, red brick, black paint, gold detailing, sash windows, gabled roof, traditional architecture, boutique, United Kingdom, street-level view, late autumn, architectural detail, brick wall, entrance, chimney, roof, building exterior
 </pre>
 
 </details>
@@ -1266,26 +1424,26 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dov
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.24s
-- *Generation time:* 48.25s
-- *Total time:* 51.54s
-- *Prompt preparation time:* 1.04
-- *First-token latency:* 43.2
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 16,541
-- *Generation tokens:* 121
-- *Total tokens:* 16,662
-- *Prompt throughput (raw):* 383 tok/s
-- *Generation throughput (raw):* 29.4 tok/s
+- *Model load time:* 1.92s
+- *Generation time:* 56.64s
+- *Total time:* 59.46s
+- *Prompt preparation time:* 0.871
+- *First-token latency:* 51.4
+- *Cleanup time:* 0.135
+- *Prompt tokens:* 16,586
+- *Generation tokens:* 128
+- *Total tokens:* 16,714
+- *Prompt throughput (raw):* 322 tok/s
+- *Generation throughput (raw):* 29.0 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0102
+- *Post-cleanup active memory (GB):* 0.0117
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1560
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1299,13 +1457,71 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate, Dov
 
 <pre class="model-output-readable">
 Title:
-UK Border Security Command Vessels in Ramsgate Harbour
+The Shopkeeper Storefront at No. 76, Red Brick Facade
 
 Description:
-A fleet of Border Security Command patrol vessels, including the BSC Defender, is moored in Ramsgate Harbour, Kent. The scene is illuminated by the golden light of a dramatic sunset reflecting on the water, with a cliffside town skyline in the background.
+A street-level view of a boutique storefront at No. 76, featuring a black-painted shopfront with gold floral detailing beneath three red brick sash windows. The upper level displays a slate-grey facade with twin gabled dormers and two chimney stacks under a blue sky.
 
 Keywords:
-Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, BSC Volunteer, Sunset, Reflection, Maritime, Dusk, Mooring, Fleet, Lifebuoy, Coast, England
+The Shopkeeper, shopfront, red brick, sash windows, gable, dormer, black facade, gold detailing, boutique, architecture, United Kingdom, brick building, roof, signage, entrance, Europe
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-step-37-flash-oq3e"></a>
+
+### mlx-community/Step-3.7-Flash-oQ3e
+
+<details>
+<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ3e</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Model load time:* 14.75s
+- *Generation time:* 32.61s
+- *Total time:* 48.27s
+- *Prompt preparation time:* 0.883
+- *First-token latency:* 27.8
+- *Cleanup time:* 0.605
+- *Prompt tokens:* 3,522
+- *Generation tokens:* 117
+- *Total tokens:* 3,639
+- *Prompt throughput (raw):* 127 tok/s
+- *Generation throughput (raw):* 47.4 tok/s
+- *Peak memory (GB):* 92
+- *Active memory (GB):* 85
+- *Cache memory (GB):* 0.41
+- *Model-load active memory (GB):* 85
+- *Post-cleanup active memory (GB):* 0.0122
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1547
+- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ3e/snapshots/41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+The Shopkeeper Storefront at 76a, Norwich
+Description:
+A street-level view of the traditional black-painted storefront of The Shopkeeper at No. 76, featuring gold detailing, a red brick upper story with sash windows, and twin slate-grey gabled dormers under a bright, partly cloudy sky.
+Keywords:
+Adobe Stock, Any Vision, boutique, brick building, brick wall, british, building exterior, chimney, entrance, Europe, gable, objects, red brick, roof, sash window, shopfront, signage, United Kingdom
 </pre>
 
 </details>
@@ -1326,26 +1542,26 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.11s
-- *Generation time:* 3.03s
-- *Total time:* 5.15s
-- *Prompt preparation time:* 0.989
-- *First-token latency:* 0.791
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 2,070
-- *Generation tokens:* 132
-- *Total tokens:* 2,202
-- *Prompt throughput (raw):* 2,618 tok/s
-- *Generation throughput (raw):* 97.9 tok/s
+- *Model load time:* 1.13s
+- *Generation time:* 2.76s
+- *Total time:* 4.76s
+- *Prompt preparation time:* 0.853
+- *First-token latency:* 0.758
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 2,123
+- *Generation tokens:* 125
+- *Total tokens:* 2,248
+- *Prompt throughput (raw):* 2,803 tok/s
+- *Generation throughput (raw):* 101 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.34
+- *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.46
-- *Post-cleanup active memory (GB):* 0.0116
+- *Post-cleanup active memory (GB):* 0.0131
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4236
+- *Rendered prompt characters:* 4407
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -1359,11 +1575,65 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command Patrols Kent's Ramsgate Harbour
+Title: Shopkeeper Store, No. 76, British Boutique
+Description: This image captures the exterior of The Shopkeeper Store, a boutique located at No. 76, showcasing its traditional British architecture. The storefront is painted black with gold detailing on the ground floor, while the middle story features red brick with three sash windows. Twin slate-grey gabled dormers adorn the upper level, adding to the building's charm.
+Keywords: British, boutique, architectural detail, brick building, brick wall, Europe, Gable, objects, red brick, roof, sash window, signage, United Kingdom
+</pre>
 
-Description: At dusk, the UK Border Security Command's patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The boats reflect the vibrant hues of the setting sun, creating a picturesque scene.
+</details>
 
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.27s
+- *Generation time:* 2.94s
+- *Total time:* 6.79s
+- *Prompt preparation time:* 0.543
+- *First-token latency:* 0.317
+- *Cleanup time:* 0.141
+- *Prompt tokens:* 626
+- *Generation tokens:* 95
+- *Total tokens:* 721
+- *Prompt throughput (raw):* 1,974 tok/s
+- *Generation throughput (raw):* 49.6 tok/s
+- *Peak memory (GB):* 28
+- *Active memory (GB):* 27
+- *Cache memory (GB):* 0.01
+- *Model-load active memory (GB):* 27.2
+- *Post-cleanup active memory (GB):* 0.0131
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1495
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Exterior of The Shopkeeper Boutique at No. 76
+Description: A street-level architectural view of a three-story brick building featuring a black-painted storefront with gold detailing, red brick, and twin slate-grey gabled dormers.
+Keywords: United Kingdom, architecture, brick building, shopfront, red brick, sash window, gable, chimney, building exterior, entrance, signage, architectural detail, urban, traditional
 </pre>
 
 </details>
@@ -1384,26 +1654,26 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.39s
-- *Generation time:* 6.13s
-- *Total time:* 9.16s
-- *Prompt preparation time:* 0.614
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 572
-- *Generation tokens:* 138
-- *Total tokens:* 710
-- *Prompt throughput (raw):* 546 tok/s
-- *Generation throughput (raw):* 30.7 tok/s
+- *Model load time:* 2.35s
+- *Generation time:* 6.78s
+- *Total time:* 9.64s
+- *Prompt preparation time:* 0.482
+- *First-token latency:* 0.948
+- *Cleanup time:* 0.137
+- *Prompt tokens:* 625
+- *Generation tokens:* 161
+- *Total tokens:* 786
+- *Prompt throughput (raw):* 660 tok/s
+- *Generation throughput (raw):* 29.9 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
-- *Cache memory (GB):* 0.43
+- *Cache memory (GB):* 0.48
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0121
+- *Post-cleanup active memory (GB):* 0.0136
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1353
+- *Rendered prompt characters:* 1524
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1417,11 +1687,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour: UK Border Security Vessels at Sunset
+Title: The Shopkeeper Store, No. 76 – Norwich Street Architecture
 
-Description: Captured on 3rd October 2026 at 18:18 UTC+01:00, UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, illuminated against a vibrant sunset and the town’s cliffside buildings. The calm water reflects the lights of the vessels and the colourful sky.
+Description: Captured on 10th October 2026 at 17:21 UTC+01:00, this street-level view shows the black and gold storefront of The Shopkeeper Store at No. 76, featuring a red brick middle story and slate-grey gabled dormers. The building is situated on a Norwich street, illuminated by daylight with a clear sky.
 
-Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Volunteer, patrol boats, harbour, marina, mooring, sunset, dusk, buildings, coast, maritime, reflection, fleet, horizon, pier
+Keywords: The Shopkeeper Store, No. 76, Norwich, United Kingdom, architecture, architectural detail, brick building, brick wall, shopfront, sash window, gable, roof, dormer, black paint, gold detailing, signage, entrance, boutique, daylight, street level
 </pre>
 
 </details>
@@ -1442,26 +1712,26 @@ Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Voluntee
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.76s
-- *Generation time:* 2.93s
-- *Total time:* 5.39s
-- *Prompt preparation time:* 0.675
-- *First-token latency:* 0.532
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 577
-- *Generation tokens:* 108
-- *Total tokens:* 685
-- *Prompt throughput (raw):* 1,084 tok/s
-- *Generation throughput (raw):* 61.2 tok/s
-- *Peak memory (GB):* 7.6
+- *Model load time:* 1.90s
+- *Generation time:* 2.65s
+- *Total time:* 5.13s
+- *Prompt preparation time:* 0.553
+- *First-token latency:* 0.395
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 630
+- *Generation tokens:* 106
+- *Total tokens:* 736
+- *Prompt throughput (raw):* 1,596 tok/s
+- *Generation throughput (raw):* 60.0 tok/s
+- *Peak memory (GB):* 7.7
 - *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.32
+- *Cache memory (GB):* 0.34
 - *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.0132
+- *Post-cleanup active memory (GB):* 0.0147
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
+- *Rendered prompt characters:* 1523
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1476,13 +1746,13 @@ Keywords: Ramsgate, Kent, UK Border Security Command, BSC Defender, BSC Voluntee
 
 <pre class="model-output-readable">
 Title:
-Fishing vessels and town skyline at sunset in Ramsgate Harbour
+Architecture of The Shopkeeper Store in the United Kingdom
 
 Description:
-Several fishing vessels are moored side-by-side in Ramsgate Harbour as a dramatic sunset reflects off the water and the town's cliffside buildings. The scene captures the maritime character of the Kent coast during the evening glow.
+A street-level view of a traditional brick building featuring a black-painted storefront with gold detailing and twin grey gabled dormers. The storefront displays merchandise for The Shopkeeper Store at No. 76.
 
 Keywords:
-Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, Sunset, Dusk, Coast, Reflection, Skyline, Buildings, Architecture, Sea, Water
+United Kingdom, architecture, boutique, shopfront, red brick, sash window, gable, signage, retail, building exterior, chimney, gold detailing, city street, Victorian style, commercial property, storefront window
 </pre>
 
 </details>
@@ -1503,26 +1773,26 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.41s
-- *Generation time:* 1.94s
-- *Total time:* 5.03s
-- *Prompt preparation time:* 0.65
-- *First-token latency:* 0.437
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 577
-- *Generation tokens:* 106
-- *Total tokens:* 683
-- *Prompt throughput (raw):* 1,319 tok/s
-- *Generation throughput (raw):* 120 tok/s
+- *Model load time:* 2.51s
+- *Generation time:* 1.88s
+- *Total time:* 4.93s
+- *Prompt preparation time:* 0.504
+- *First-token latency:* 0.442
+- *Cleanup time:* 0.155
+- *Prompt tokens:* 630
+- *Generation tokens:* 104
+- *Total tokens:* 734
+- *Prompt throughput (raw):* 1,426 tok/s
+- *Generation throughput (raw):* 110 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
-- *Cache memory (GB):* 0.22
+- *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 15.4
-- *Post-cleanup active memory (GB):* 0.0137
+- *Post-cleanup active memory (GB):* 0.0152
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
+- *Rendered prompt characters:* 1523
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1536,9 +1806,9 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command patrol vessels moored at sunset
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The evening light reflects off the water as the fleet rests in the port.
-Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour, pier, reflection, England, dusk, boats, mooring, coastal, fleet, marina
+Title: Traditional brick storefront with black wooden details
+Description: A street-level view of The Shopkeeper Store features a black-painted storefront with gold accents, red brick walls, and slate-grey gabled dormers. The building's traditional architecture showcases sash windows and classic design elements under soft daylight.
+Keywords: architecture, boutique, brick building, building exterior, chimney, entrance, gable, red brick, sash window, shopfront, signage, United Kingdom, Europe, street level, traditional, urban
 </pre>
 
 </details>
@@ -1559,26 +1829,26 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.62s
-- *Generation time:* 5.74s
-- *Total time:* 9.04s
-- *Prompt preparation time:* 0.648
-- *First-token latency:* 1.06
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 577
-- *Generation tokens:* 107
-- *Total tokens:* 684
-- *Prompt throughput (raw):* 547 tok/s
+- *Model load time:* 2.64s
+- *Generation time:* 5.76s
+- *Total time:* 8.92s
+- *Prompt preparation time:* 0.49
+- *First-token latency:* 1.14
+- *Cleanup time:* 0.133
+- *Prompt tokens:* 630
+- *Generation tokens:* 109
+- *Total tokens:* 739
+- *Prompt throughput (raw):* 551 tok/s
 - *Generation throughput (raw):* 26.3 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
-- *Cache memory (GB):* 0.78
+- *Cache memory (GB):* 0.82
 - *Model-load active memory (GB):* 18.4
-- *Post-cleanup active memory (GB):* 0.0142
+- *Post-cleanup active memory (GB):* 0.0157
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
+- *Rendered prompt characters:* 1523
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1592,9 +1862,9 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Security Command vessels in Ramsgate Harbour
-Description: UK Border Security Command patrol vessels, including the BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, during a dramatic sunset. The town's cliffside skyline is visible in the background under a colourful dusk sky.
-Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England, fleet, harbor, horizon, Kent, lifebuoy, marina, maritime, mooring, patrol boats, Ramsgate, sunset
+Title: Exterior of The Shopkeeper Store at No. 76
+Description: A street-level view of The Shopkeeper Store featuring a black-painted storefront with gold detailing, red brick walls, and twin slate-grey gabled dormers. The building is located in the United Kingdom and is captured under soft evening light.
+Keywords: architecture, boutique, British, red brick, shopfront, sash window, gable, United Kingdom, building exterior, storefront, signage, architectural detail, Europe, chimney, entrance, brick building
 </pre>
 
 </details>
@@ -1615,26 +1885,26 @@ Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.67s
-- *Generation time:* 1.67s
-- *Total time:* 4.02s
-- *Prompt preparation time:* 0.649
-- *First-token latency:* 0.398
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 573
-- *Generation tokens:* 79
-- *Total tokens:* 652
-- *Prompt throughput (raw):* 1,440 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Model load time:* 1.57s
+- *Generation time:* 1.49s
+- *Total time:* 3.58s
+- *Prompt preparation time:* 0.494
+- *First-token latency:* 0.185
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 626
+- *Generation tokens:* 104
+- *Total tokens:* 730
+- *Prompt throughput (raw):* 3,378 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0147
+- *Post-cleanup active memory (GB):* 0.0162
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1324
+- *Rendered prompt characters:* 1495
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1648,9 +1918,65 @@ Keywords: Border security vessels, BSC Defender, buildings, coast, dusk, England
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Patrol Vessels Moored in Ramsgate Harbour Sunset
-Description: UK Border Security Command vessels are moored in Ramsgate Harbour, Kent, silhouetted against a dramatic sunset over the town's skyline.
-Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coast, Maritime, Mooring, Skyline, Defender, Volunteer, England, Dusk, Fleet
+Title: Traditional British Shopfront Facade with Dormer Windows
+Description: A street-level view of The Shopkeeper's store, featuring a contrast between the ground floor's black facade and the upper stories of red brick and slate grey. The building exhibits classic British architectural details under natural lighting.
+Keywords: shopfront, red brick, slate grey, dormer windows, facade, architecture, boutique, high street, traditional, victorian, terraced, detail, urban, United Kingdom, building exterior
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
+
+### mlx-community/granite-4.0-3b-vision-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.57s
+- *Generation time:* 2.03s
+- *Total time:* 3.33s
+- *Prompt preparation time:* 0.705
+- *First-token latency:* 0.457
+- *Cleanup time:* 0.102
+- *Prompt tokens:* 1,420
+- *Generation tokens:* 160
+- *Total tokens:* 1,580
+- *Prompt throughput (raw):* 3,108 tok/s
+- *Generation throughput (raw):* 174 tok/s
+- *Peak memory (GB):* 4.6
+- *Active memory (GB):* 3.0
+- *Cache memory (GB):* 0.25
+- *Model-load active memory (GB):* 3.03
+- *Post-cleanup active memory (GB):* 0.0165
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1693
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "The Shopkeeper Store Exterior"
+Description: "A street-level view of The Shopkeeper Store, No. 76, showcases a traditional black-painted storefront with gold detailing, a red brick middle story, and twin slate-grey gabled dormers."
+Keywords: The Shopkeeper Store, No. 76, black-painted storefront, gold detailing, red brick, twin dormers, gabled, exterior, UK, architecture, boutique, brick building, British, storefront, signage, chimney, entrance, architectural detail, Europe, objects, lighting, capture date, 2026-10-10 17:21:00 UTC+01:00, GPS, 52.629112°N, 1.288265°E.
 </pre>
 
 </details>
@@ -1671,26 +1997,26 @@ Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coas
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.63s
-- *Generation time:* 5.22s
-- *Total time:* 7.44s
-- *Prompt preparation time:* 0.578
-- *First-token latency:* 1.67
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 3,095
-- *Generation tokens:* 119
-- *Total tokens:* 3,214
-- *Prompt throughput (raw):* 1,853 tok/s
-- *Generation throughput (raw):* 39.8 tok/s
+- *Model load time:* 1.65s
+- *Generation time:* 6.61s
+- *Total time:* 8.70s
+- *Prompt preparation time:* 0.432
+- *First-token latency:* 2.36
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 3,297
+- *Generation tokens:* 133
+- *Total tokens:* 3,430
+- *Prompt throughput (raw):* 1,400 tok/s
+- *Generation throughput (raw):* 34.7 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
-- *Cache memory (GB):* 0.59
+- *Cache memory (GB):* 0.63
 - *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0164
+- *Post-cleanup active memory (GB):* 0.0179
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
+- *Rendered prompt characters:* 1469
 - *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1703,14 +2029,14 @@ Keywords: Ramsgate, Kent, Border Security, Patrol Vessels, Sunset, Harbour, Coas
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Border Security Vessels at Sunset in Ramsgate Harbour
+### Title:
+Traditional Shopfront in Historic British Building
 
-Description:
-Border security patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, with the town's cliffside skyline and dramatic sunset in the background.
+### Description:
+The image captures the exterior of The Shopkeeper Store at No. 76, showcasing a traditional black-painted storefront with gold detailing, set against a backdrop of red brick and slate-grey gabled dormers.
 
-Keywords:
-Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Vessel, Vessels
+### Keywords:
+Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior, historic, traditional, storefront, window display
 </pre>
 
 </details>
@@ -1731,26 +2057,26 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.80s
-- *Generation time:* 3.11s
-- *Total time:* 4.66s
-- *Prompt preparation time:* 0.741
-- *First-token latency:* 1.48
-- *Cleanup time:* 0.0945
+- *Model load time:* 0.84s
+- *Generation time:* 3.87s
+- *Total time:* 5.34s
+- *Prompt preparation time:* 0.624
+- *First-token latency:* 1.64
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 4,188
-- *Generation tokens:* 118
-- *Total tokens:* 4,306
-- *Prompt throughput (raw):* 2,835 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Generation tokens:* 198
+- *Total tokens:* 4,386
+- *Prompt throughput (raw):* 2,548 tok/s
+- *Generation throughput (raw):* 119 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
-- *Cache memory (GB):* 0.72
-- *Model-load active memory (GB):* 3.93
-- *Post-cleanup active memory (GB):* 0.0167
+- *Cache memory (GB):* 0.76
+- *Model-load active memory (GB):* 3.94
+- *Post-cleanup active memory (GB):* 0.0182
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
+- *Rendered prompt characters:* 1599
 - *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1763,9 +2089,11 @@ Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: BSC Patrol Vessels Moored at Ramsgate Harbour at Dusk
-Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are docked side-by-side in Ramsgate Harbour, Kent, with the town's cliffside skyline and dramatic sunset in the background.
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Title: The Shopkeeper Storefront at No. 76, a traditional British brick building with ornate black and gold detailing
+
+Description: A street-level view of The Shopkeeper Store, located at No. 76, showcasing a red brick facade with three sash windows on the middle story, a black-painted storefront with gold decorative elements, and twin slate-grey gabled dormers on the upper level. The shopfront features large display windows with mannequins and merchandise, a black door with the number 76, and a "CLOSED" sign on the entrance. The building is set against a clear sky with a brick chimney visible on the left.
+
+Keywords: Shopkeeper, No. 76, red brick, sash window, gable, dormer, black storefront, gold detailing, mannequins, display windows, brick building, traditional architecture, boutique, United Kingdom, shopfront, signage, entrance, chimney, roof
 </pre>
 
 </details>
@@ -1786,26 +2114,26 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.28s
-- *Generation time:* 5.35s
-- *Total time:* 8.21s
-- *Prompt preparation time:* 0.577
-- *First-token latency:* 1.63
-- *Cleanup time:* 0.118
-- *Prompt tokens:* 1,251
-- *Generation tokens:* 114
-- *Total tokens:* 1,365
-- *Prompt throughput (raw):* 766 tok/s
-- *Generation throughput (raw):* 36.2 tok/s
+- *Model load time:* 1.86s
+- *Generation time:* 5.89s
+- *Total time:* 8.22s
+- *Prompt preparation time:* 0.452
+- *First-token latency:* 1.6
+- *Cleanup time:* 0.124
+- *Prompt tokens:* 1,353
+- *Generation tokens:* 136
+- *Total tokens:* 1,489
+- *Prompt throughput (raw):* 845 tok/s
+- *Generation throughput (raw):* 35.1 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 15.1
-- *Post-cleanup active memory (GB):* 0.0169
+- *Post-cleanup active memory (GB):* 0.0184
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
+- *Rendered prompt characters:* 1469
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1819,282 +2147,59 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 
 <pre class="model-output-readable">
 Title:
-Border Security Patrol Boats at Sunset
+Traditional British Boutique Shopfront
 
 Description:
-UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, during a dramatic sunset, with the town's cliffside buildings in the background.
+A detailed view of The Shopkeeper Store at No. 76, captured on October 10, 2026, showcasing its ornate black-painted shopfront with gold detailing, red brick middle story, and slate-grey gabled dormers under a partly cloudy sky.
 
 Keywords:
-Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside buildings, Marina, Reflections, Dusk, England, Kent, BSC Defender, BSC Volunteer, Waterfront, Lifebuoys, Mooring, Pier, Horizon, Maritime
+United Kingdom, boutique, shopfront, red brick, sash windows, gabled dormers, gold detailing, black facade, architectural detail, chimney, entrance, signage, street view, British architecture, urban scene, lighting, partly cloudy sky, 2026 capture
 </pre>
 
 </details>
 
 ---
 
-<a id="model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit"></a>
+<a id="model-mlx-community-glm-46v-flash-4bit"></a>
 
-### nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type
-  nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.33s
-- *Generation time:* 6.55s
-- *Total time:* 9.55s
-- *Prompt preparation time:* 0.645
-- *First-token latency:* 5.09
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 3,606
-- *Generation tokens:* 132
-- *Total tokens:* 3,738
-- *Prompt throughput (raw):* 708 tok/s
-- *Generation throughput (raw):* 155 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 20
-- *Cache memory (GB):* 0.15
-- *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.0172
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1380
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 75c89904e1c2a045098d9111e7cb250a4d8adcec
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit/snapshots/75c89904e1c2a045098d9111e7cb250a4d8adcec
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-
-Title: BSC Patrol Boats at Ramsgate Harbour Sunset
-
-Description: At 18:18 UTC+01:00 on October 3, 2026, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-
-Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritime, Fleet, Coast, Buildings, Cliffside, Mooring, Lifebuoy, Dusk, England, Horizon, Port, Reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+### mlx-community/GLM-4.6V-Flash-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.05s
-- *Generation time:* 7.84s
-- *Total time:* 10.47s
-- *Prompt preparation time:* 0.561
-- *First-token latency:* 3.38
-- *Cleanup time:* 0.0934
-- *Prompt tokens:* 2,372
-- *Generation tokens:* 117
-- *Total tokens:* 2,489
-- *Prompt throughput (raw):* 702 tok/s
-- *Generation throughput (raw):* 30.5 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
+- *Observations:* Duplicate keywords: red brick
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.19s
+- *Generation time:* 9.41s
+- *Total time:* 11.08s
+- *Prompt preparation time:* 0.459
+- *First-token latency:* 6.67
+- *Cleanup time:* 0.0925
+- *Prompt tokens:* 6,445
+- *Generation tokens:* 181
+- *Total tokens:* 6,626
+- *Prompt throughput (raw):* 966 tok/s
+- *Generation throughput (raw):* 77.7 tok/s
+- *Peak memory (GB):* 8.7
+- *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000396
+- *Model-load active memory (GB):* 7.08
+- *Post-cleanup active memory (GB):* 0.00274
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.15, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-UK Border Security Patrol Boats at Sunset
-
-Description:
-UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-
-Keywords:
-UK Border Security Command, patrol boats, Ramsgate Harbour, Kent, sunset, cliffside buildings, moored vessels, maritime, harbor, reflection, lifebuoy, maritime security, coastal town, dusk, patrol fleet, waterfront, mooring, horizon, maritime patrol
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: kent, england, dusk, harbour town, royal
-  navy boats, royal navy vessels, royal navy ships
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.62s
-- *Generation time:* 7.93s
-- *Total time:* 10.20s
-- *Prompt preparation time:* 0.631
-- *First-token latency:* 1.29
-- *Cleanup time:* 0.0965
-- *Prompt tokens:* 1,617
-- *Generation tokens:* 758
-- *Total tokens:* 2,375
-- *Prompt throughput (raw):* 1,256 tok/s
-- *Generation throughput (raw):* 125 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.17
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000609
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1488
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get this done. I need to create metadata for this image, a coastal scene with a sunset and boats. First, I'll break down the instructions. I'm working with an image of a port, a sunset, and some hints. The hints are a bit messy, but the "authoritative" ones are what matter.
-
-I need a title, a description, and keywords. The description needs to be factual. No guessing, just what I *see*. The hints give me a good starting point, but I have to be careful not to invent things. The hints mention a "UK Border Security Command patrol vessel," but the text itself doesn't *show* that. So, I'll focus on what's *actually* in the image. The "BSC Defender" and "BSC Volunteer" are in the hints, but I can't confirm those names.
-
-I'm seeing a sunset over a harbor with a prominent cliff face. The buildings are "row houses" and "terraced houses." There are boats, possibly from the "Royal Navy," with "lifebuoys" and "life rings." The water is calm, and there's a "dusk" sky.
-
-So, I'll start with a title. Something like "Sunset over Ramsgate Harbour" or "Dusk at the Kent Coast." I think "Sunset over Ramsgate Harbour" is perfect.
-
-The description needs to be concise. I'll start with the setting: "A panoramic view of Ramsgate Harbour in Kent, England, during sunset." Then I'll add the details: "Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below." That hits all the key elements.
-
-The keywords are next. I need to be comprehensive, but not too broad. I'll include the place, time, the main subject, the lighting, and the key features. I'll be sure to add things like "Ramsgate Harbour," "Kent," "sunset," "dusk," "harbour," "port," "coast," "sea," "boat," "lifeboat," "lifebuoy," "row houses," "cliffside," "harbour town," "marina," "harbor," "coastal," "maritime," and "dawn."
-
-I'm happy with that. Let's get it formatted correctly.
-&lt;/think&gt;
-
-Title: Sunset over Ramsgate Harbour
-
-Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below.
-
-Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, cliffside, harbour town, marina, harbor, coastal, maritime, dusk, evening, boats, mooring, reflection, cliffs, skyline, town, buildings, terraced houses, harbour town, Kent, coastal town, England, Royal Navy, Royal Navy boats, Royal Navy vessels, Royal Navy ships, Royal Navy lifeboat, Royal Navy lifeboats, Royal Navy vessels, Royal Navy boats, Royal Navy vessels, Royal Navy ships.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get this done. I need to create metadata for this image, a coastal scene with a sunset and boats. First, I'll break down the instructions. I'm working with an image of a port, a sunset, and some hints. The hints are a bit messy, but the "authoritative" ones are what matter.
-
-I need a title, a description, and keywords. The description needs to be factual. No guessing, just what I *see*. The hints give me a good starting point, but I have to be careful not to invent things. The hints mention a "UK Border Security Command patrol vessel," but the text itself doesn't *show* that. So, I'll focus on what's *actually* in the image. The "BSC Defender" and "BSC Volunteer" are in the hints, but I can't confirm those names.
-
-I'm seeing a sunset over a harbor with a prominent cliff face. The buildings are "row houses" and "terraced houses." There are boats, possibly from the "Royal Navy," with "lifebuoys" and "life rings." The water is calm, and there's a "dusk" sky.
-
-So, I'll start with a title. Something like "Sunset over Ramsgate Harbour" or "Dusk at the Kent Coast." I think "Sunset over Ramsgate Harbour" is perfect.
-
-The description needs to be concise. I'll start with the setting: "A panoramic view of Ramsgate Harbour in Kent, England, during sunset." Then I'll add the details: "Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below." That hits all the key elements.
-
-The keywords are next. I need to be comprehensive, but not too broad. I'll include the place, time, the main subject, the lighting, and the key features. I'll be sure to add things like "Ramsgate Harbour," "Kent," "sunset," "dusk," "harbour," "port," "coast," "sea," "boat," "lifeboat," "lifebuoy," "row houses," "cliffside," "harbour town," "marina," "harbor," "coastal," "maritime," and "dawn."
-
-I'm happy with that. Let's get it formatted correctly.
-</think>
-
-Title: Sunset over Ramsgate Harbour
-
-Description: A panoramic view of Ramsgate Harbour in Kent, England, during sunset. Terraced houses on cliffside cliffs are silhouetted against a dramatic dusk sky, with boats and a lifeboat moored in the calm, golden-hued water below.
-
-Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat, lifeboat, lifebuoy, row houses, cliffside, harbour town, marina, harbor, coastal, maritime, dusk, evening, boats, mooring, reflection, cliffs, skyline, town, buildings, terraced houses, harbour town, Kent, coastal town, England, Royal Navy, Royal Navy boats, Royal Navy vessels, Royal Navy ships, Royal Navy lifeboat, Royal Navy lifeboats, Royal Navy vessels, Royal Navy boats, Royal Navy vessels, Royal Navy ships.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.94s
-- *Generation time:* 16.59s
-- *Total time:* 24.15s
-- *Prompt preparation time:* 0.61
-- *First-token latency:* 12.7
-- *Cleanup time:* 0.262
-- *Prompt tokens:* 6,339
-- *Generation tokens:* 106
-- *Total tokens:* 6,445
-- *Prompt throughput (raw):* 498 tok/s
-- *Generation throughput (raw):* 45.3 tok/s
-- *Peak memory (GB):* 78
-- *Active memory (GB):* 62
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00154
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1379
+- *Rendered prompt characters:* 1550
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
 - *EOS token:* <\|endoftext\|>
@@ -2102,9 +2207,9 @@ Keywords: Ramsgate, Kent, England, sunset, dusk, harbour, port, sea, coast, boat
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset with Patrol Vessels
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Pier, Port, Ramsgate, Reflection
+Title: The Shopkeeper Store Exterior
+Description: The image shows the exterior of The Shopkeeper Store, located at No. 76, captured on 2026-10-10 17:21:00 UTC+01:00 at 52.629112°N, 1.288265°E. The traditional black-painted storefront with gold detailing features a red brick middle story with three sash windows and twin slate-grey gabled dormers on the upper level.
+Keywords: The Shopkeeper Store, No. 76, black-painted storefront, gold detailing, red brick, three sash windows, twin slate-grey gabled dormers, architectural exterior, boutique, brick building, British, building exterior, chimney, entrance, gable, red brick, roof, sash window, shopfront, signage, United Kingdom, architectural detail, architecture
 </pre>
 
 </details>
@@ -2123,28 +2228,29 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
+- *Observations:* Repeats the prompt's hint text: description; Names a place
+  the prompt did not supply: London
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.03s
-- *Generation time:* 2.01s
-- *Total time:* 3.81s
-- *Prompt preparation time:* 0.765
-- *First-token latency:* 0.773
-- *Cleanup time:* 0.0971
-- *Prompt tokens:* 2,094
-- *Generation tokens:* 92
-- *Total tokens:* 2,186
-- *Prompt throughput (raw):* 2,710 tok/s
-- *Generation throughput (raw):* 188 tok/s
+- *Model load time:* 0.91s
+- *Generation time:* 1.52s
+- *Total time:* 2.99s
+- *Prompt preparation time:* 0.546
+- *First-token latency:* 0.469
+- *Cleanup time:* 0.0815
+- *Prompt tokens:* 2,136
+- *Generation tokens:* 112
+- *Total tokens:* 2,248
+- *Prompt throughput (raw):* 4,555 tok/s
+- *Generation throughput (raw):* 211 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 2.82
-- *Post-cleanup active memory (GB):* 0.00366
+- *Post-cleanup active memory (GB):* 0.00516
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 1520
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2158,113 +2264,240 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border security vessels docked in Ramsgate Harbour at sunset
-Description: Patrol boats moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-Keywords: Border security vessels, UK, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Patrol boat, Patrol boats, Pier, Port, Reflection
+Title: The Shopkeeper Store, No. 76, London
+Description: A traditional black-painted storefront with gold detailing, red brick middle story, and twin slate-grey gabled dormers on the upper level, located at No. 76 in London.
+Keywords: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architecture, boutique, brick building, brick wall, british, building exterior
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
-### mlx-community/MiniCPM-V-4.6-4bit
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: details
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.95s
-- *Generation time:* 4.46s
-- *Total time:* 6.19s
-- *Prompt preparation time:* 0.765
-- *First-token latency:* 1.9
-- *Cleanup time:* 0.0981
-- *Prompt tokens:* 910
-- *Generation tokens:* 527
-- *Total tokens:* 1,437
-- *Prompt throughput (raw):* 480 tok/s
-- *Generation throughput (raw):* 288 tok/s
-- *Peak memory (GB):* 3.2
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00469
+- *Observations:* Duplicate keywords: historic building, dormer windows,
+  traditional architecture, brick fa ade, modern architecture, classic
+  architecture, quiet street scene, warm tones, black and gold accents
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.50s
+- *Generation time:* 11.45s
+- *Total time:* 13.42s
+- *Prompt preparation time:* 0.462
+- *First-token latency:* 1.57
+- *Cleanup time:* 0.0992
+- *Prompt tokens:* 329
+- *Generation tokens:* 194
+- *Total tokens:* 523
+- *Prompt throughput (raw):* 210 tok/s
+- *Generation throughput (raw):* 20.6 tok/s
+- *Peak memory (GB):* 15
+- *Active memory (GB):* 11
+- *Cache memory (GB):* 0.66
+- *Model-load active memory (GB):* 11.4
+- *Post-cleanup active memory (GB):* 0.00569
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1366
+- *Rendered prompt characters:* 1573
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Traditional British Shopfront with Gabled Dormers
+
+Description: The image captures a traditional British shopfront with gabled dormers, situated in a historic building with a red brick façade, showcasing a mix of modern and classic architectural elements. The scene is set in a quiet street, with the shopfront's black and gold details standing out against the warm brick tones.
+
+Keywords: traditional british shopfront, gabled dormers, red brick façade, historic building, modern and classic architecture, quiet street, black and gold details, warm brick tones, shopfront, gabled roof, dormer windows, traditional architecture, historic building, brick façade, modern architecture, classic architecture, quiet street scene, warm tones, black and gold accents, traditional shopfront, gabled roofline, dormer windows, traditional architecture, historic building, brick façade, modern architecture, classic architecture, quiet street scene, warm tones, black and gold accents.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
+
+### mlx-community/Molmo2-8B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: chimney, united kingdom
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 1.06s
+- *Generation time:* 3.77s
+- *Total time:* 5.38s
+- *Prompt preparation time:* 0.544
+- *First-token latency:* 0.665
+- *Cleanup time:* 0.0891
+- *Prompt tokens:* 1,356
+- *Generation tokens:* 187
+- *Total tokens:* 1,543
+- *Prompt throughput (raw):* 2,039 tok/s
+- *Generation throughput (raw):* 72.5 tok/s
+- *Peak memory (GB):* 8.3
+- *Active memory (GB):* 6.5
+- *Cache memory (GB):* 0.30
+- *Model-load active memory (GB):* 6.45
+- *Post-cleanup active memory (GB):* 0.00734
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1507
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;
-We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+Title: Traditional British Shopfront at No. 76, London
 
-For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored at Ramsgate Harbor, Sunset Scene." That's 8 words.
+Description: A street-level view of The Shopkeeper Store at No. 76, London, captured on October 10, 2026. The building features a black-painted storefront with gold detailing, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level. The scene is set against a clear blue sky with scattered clouds, showcasing the architectural details and traditional design of this boutique shop.
 
-Now description: Combine the context and main visible subjects. Mention the patrol boats (BSC Defender and Volunteer), moored in Ramsgate Harbour, against the sunset, with buildings and cliffside.
-
-Keywords: Need 10-18 unique, covering relevant context and visible details. Let's list: British, English, catalogue, metadata, image, capture, date, time, authoritative, facts, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coast, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
-
-We need to ensure they are unique and cover the context and visible details. Let's list them: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
-
-We must ensure they are 10-18, unique, covering relevant context and visible details.
-
-Now, combine title, description, and keywords.
-&lt;/think&gt;
-
-Title: Border Patrol Vessels at Ramsgate Harbor Sunset
-
-Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a beautiful sunset.
-
-Keywords: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow
+Keywords: London, Shopkeeper Store, No. 76, British architecture, traditional shopfront, red brick, sash windows, gable, chimney, gold detailing, black storefront, boutique, street-level view, architectural detail, United Kingdom, Adobe Stock, Any Vision, Chimney, Entrance, Europe, Roof, Shopfront, Signage, United Kingdom, building exterior
 </pre>
 
+</details>
+
+---
+
+<a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
+
+### mlx-community/North-Micro-Vision-Instruct-4bit
+
 <details>
-<summary>Exact raw output</summary>
+<summary>Complete evidence: mlx-community/North-Micro-Vision-Instruct-4bit</summary>
 
-```text
-<think>
-We need to create a title, description, and keywords based on the image. First, let's extract the key elements: British-English catalogue metadata, capture date/time given as authoritative (2026-10-03 18:18:19 UTC+01:00), and description should combine relevant context (border security vessels, BSC Defender and Volunteer, Ramsgate Harbour, Kent, setting, action, lighting, distinctive details).
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
+- *Model load time:* 0.94s
+- *Generation time:* 3.31s
+- *Total time:* 4.93s
+- *Prompt preparation time:* 0.67
+- *First-token latency:* 2.08
+- *Cleanup time:* 0.0884
+- *Prompt tokens:* 4,093
+- *Generation tokens:* 126
+- *Total tokens:* 4,219
+- *Prompt throughput (raw):* 1,969 tok/s
+- *Generation throughput (raw):* 209 tok/s
+- *Peak memory (GB):* 3.9
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.65
+- *Model-load active memory (GB):* 2.18
+- *Post-cleanup active memory (GB):* 0.0089
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1600
+- *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
+- *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 87466363e6c5f57adf91c18c3a62c3c74765f8df
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--North-Micro-Vision-Instruct-4bit/snapshots/87466363e6c5f57adf91c18c3a62c3c74765f8df
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+- *EOS token:* <\|END_OF_TURN_TOKEN\|>
 
-For the title, need to be concise, 5-10 words. Let's brainstorm: "Border Patrol Boats Moored at Ramsgate Harbor, Sunset Scene." That's 8 words.
+*Readable output:*
 
-Now description: Combine the context and main visible subjects. Mention the patrol boats (BSC Defender and Volunteer), moored in Ramsgate Harbour, against the sunset, with buildings and cliffside.
+<pre class="model-output-readable">
+Title: The Shopkeeper Store Entrance
 
-Keywords: Need 10-18 unique, covering relevant context and visible details. Let's list: British, English, catalogue, metadata, image, capture, date, time, authoritative, facts, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coast, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
+Description: A street-level architectural view of the exterior of The Shopkeeper Store, located at No. 7 6, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and twin slate- grey gabled dormers on the upper level.
 
-We need to ensure they are unique and cover the context and visible details. Let's list them: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow.
-
-We must ensure they are 10-18, unique, covering relevant context and visible details.
-
-Now, combine title, description, and keywords.
-</think>
-
-Title: Border Patrol Vessels at Ramsgate Harbor Sunset
-
-Description: British Border Security Command patrol boats are moored in Ramsgate Harbour during a beautiful sunset.
-
-Keywords: British, English, metadata, image, capture, date, time, facts, authoritative, description, descriptive, hints, details, visible, details, boats, harbor, Kent, border, security, patrol, vessels, lifebuoy, reflection, skyline, buildings, coastal, maritime, dock, mooring, pier, port, sunset, vivid, orange, yellow
-```
+Keywords: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior
+</pre>
 
 </details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Names a place the prompt did not supply: Brighton
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
+- *Model load time:* 1.87s
+- *Generation time:* 33.81s
+- *Total time:* 36.59s
+- *Prompt preparation time:* 0.894
+- *First-token latency:* 31.5
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 16,570
+- *Generation tokens:* 133
+- *Total tokens:* 16,703
+- *Prompt throughput (raw):* 527 tok/s
+- *Generation throughput (raw):* 84.9 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 2.3
+- *Model-load active memory (GB):* 18.3
+- *Post-cleanup active memory (GB):* 0.0104
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1541
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: The Shopkeeper Store, 76, Brighton
+Description: The exterior of The Shopkeeper Store at No. 76 in Brighton, a boutique with a traditional black-painted storefront and gold detailing. The building features a red brick facade, sash windows, and twin grey gabled dormers under a blue sky. The shop is currently closed.
+Keywords: The Shopkeeper, No. 76, Brighton, shopfront, boutique, black storefront, gold detailing, red brick, sash window, gabled dormers, United Kingdom, architecture, building exterior, retail, door, signage, closed, shopkeeper, brick building
+</pre>
 
 </details>
 
@@ -2284,26 +2517,26 @@ Keywords: British, English, metadata, image, capture, date, time, facts, authori
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.75s
-- *Generation time:* 2.30s
-- *Total time:* 3.85s
-- *Prompt preparation time:* 0.802
-- *First-token latency:* 0.596
-- *Cleanup time:* 0.0929
-- *Prompt tokens:* 1,407
-- *Generation tokens:* 114
-- *Total tokens:* 1,521
-- *Prompt throughput (raw):* 2,363 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Model load time:* 0.59s
+- *Generation time:* 1.84s
+- *Total time:* 3.07s
+- *Prompt preparation time:* 0.631
+- *First-token latency:* 0.395
+- *Cleanup time:* 0.0988
+- *Prompt tokens:* 1,463
+- *Generation tokens:* 102
+- *Total tokens:* 1,565
+- *Prompt throughput (raw):* 3,706 tok/s
+- *Generation throughput (raw):* 121 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0105
+- *Cache memory (GB):* 0.40
+- *Model-load active memory (GB):* 4.51
+- *Post-cleanup active memory (GB):* 0.012
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1330
+- *Rendered prompt characters:* 1501
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2317,21 +2550,81 @@ Keywords: British, English, metadata, image, capture, date, time, facts, authori
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Border Security Command Patrol Vessels in Ramsgate Harbour
-Description: Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+ Title: The Shopkeeper Store
+Description: A traditional black-painted storefront with gold detailing, a red brick middle story with three sash windows, and twin slate-grey gabled dormers.
+Keywords: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-step-37-flash-oq3e"></a>
+<a id="model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit"></a>
 
-### mlx-community/Step-3.7-Flash-oQ3e
+### nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ3e</summary>
+<summary>Complete evidence: nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: united kingdom
+- *Arch supported by installed mlx-vlm:* yes (model_type
+  nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
+- *Model load time:* 2.39s
+- *Generation time:* 5.54s
+- *Total time:* 8.47s
+- *Prompt preparation time:* 0.51
+- *First-token latency:* 4.3
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 3,681
+- *Generation tokens:* 117
+- *Total tokens:* 3,798
+- *Prompt throughput (raw):* 856 tok/s
+- *Generation throughput (raw):* 152 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 20
+- *Cache memory (GB):* 0.15
+- *Model-load active memory (GB):* 19.7
+- *Post-cleanup active memory (GB):* 0.0187
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1551
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 75c89904e1c2a045098d9111e7cb250a4d8adcec
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit/snapshots/75c89904e1c2a045098d9111e7cb250a4d8adcec
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.6, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+
+Title: The Shopkeeper Store Exterior
+
+Description: A street-level view of The Shopkeeper Store at No. 76, showcasing its traditional black-painted storefront with gold detailing, red brick facade, and twin grey gabled dormers under a blue sky.
+
+Keywords: The Shopkeeper Store, No. 76, black storefront, gold detailing, red brick facade, twin gabled dormers, sash windows, shopfront, boutique, United Kingdom, architectural detail, brick building, entrance, signage, United Kingdom, architecture, british
+</pre>
+
+</details>
+
+---
+
+<a id="model-sahilchachra-lensvlm-9b-mxfp4"></a>
+
+### sahilchachra/LensVLM-9B-MXFP4
+
+<details>
+<summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
@@ -2339,32 +2632,32 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 13.89s
-- *Generation time:* 24.92s
-- *Total time:* 39.75s
-- *Prompt preparation time:* 0.917
-- *First-token latency:* 20.8
-- *Cleanup time:* 0.318
-- *Prompt tokens:* 3,468
-- *Generation tokens:* 112
-- *Total tokens:* 3,580
-- *Prompt throughput (raw):* 167 tok/s
-- *Generation throughput (raw):* 51.1 tok/s
-- *Peak memory (GB):* 92
-- *Active memory (GB):* 85
-- *Cache memory (GB):* 0.39
-- *Model-load active memory (GB):* 85
-- *Post-cleanup active memory (GB):* 0.0107
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.13s
+- *Generation time:* 2.75s
+- *Total time:* 4.44s
+- *Prompt preparation time:* 0.54
+- *First-token latency:* 0.916
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 1,872
+- *Generation tokens:* 136
+- *Total tokens:* 2,008
+- *Prompt throughput (raw):* 2,043 tok/s
+- *Generation throughput (raw):* 104 tok/s
+- *Peak memory (GB):* 7.5
+- *Active memory (GB):* 5.7
+- *Cache memory (GB):* 0.20
+- *Model-load active memory (GB):* 5.69
+- *Post-cleanup active memory (GB):* 0.0192
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1376
-- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 1560
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ3e/snapshots/41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Resolved model revision:* 23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--sahilchachra--LensVLM-9B-MXFP4/snapshots/23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -2373,126 +2666,101 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 
 <pre class="model-output-readable">
 Title:
-UK Border Security Command vessels moored at Ramsgate Harbour at sunset
+No. 76 The Shopkeeper Store
 
 Description:
-UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
+A street-level architectural view of the exterior of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level.
 
 Keywords:
-Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
 
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* concerns detected
+- *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.87s
-- *Generation time:* 3.56s
-- *Total time:* 8.15s
-- *Prompt preparation time:* 0.689
-- *First-token latency:* 1.25
-- *Cleanup time:* 0.148
-- *Prompt tokens:* 573
-- *Generation tokens:* 90
-- *Total tokens:* 663
-- *Prompt throughput (raw):* 459 tok/s
-- *Generation throughput (raw):* 60.7 tok/s
-- *Peak memory (GB):* 28
-- *Active memory (GB):* 27
-- *Cache memory (GB):* 0.01
-- *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0116
+- *Observations:* Response appears cut off at the token limit; Duplicate
+  keywords: no 76, st helier
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.59s
+- *Generation time:* 13.51s
+- *Total time:* 15.65s
+- *Prompt preparation time:* 0.541
+- *First-token latency:* 0.747
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 1,669
+- *Generation tokens:* 1,000
+- *Total tokens:* 2,669
+- *Prompt throughput (raw):* 2,234 tok/s
+- *Generation throughput (raw):* 81.5 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.17
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.00212
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1324
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Rendered prompt characters:* 1659
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Security Patrol Vessels at Ramsgate Harbour at Sunset
-Description: UK Border Security Command patrol vessels, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour against a dramatic sunset and town skyline.
-Keywords: Ramsgate, Kent, Border security, patrol boats, harbor, harborfront, sunset, dusk, coast, maritime, mooring, reflection, cliffs, skyline, England
+Alright, let's get this done. I need to create some metadata for this image of a shop front, something that will be useful for a stock photo site or archive. First things first, I'll need a title. I want something short and sweet, but descriptive. "The Shopkeeper Store, No. 76, St. Helier" sounds good. It's specific, and the location is important.
+
+Next, the description. I need to weave in all the important details. I'll start with the basics: the store, the address, the architectural style. The image is a street-level shot, so I'll mention the traditional black storefront with gold detailing. The middle section has red brick, and the upper level has the dormers. I'll mention the time of day, which is late afternoon, with the sun low. Then I'll add the specifics of the store's goods, like the leather and homewares. I'll make sure it's concise, factual, and grabs the eye. Okay, here we go: "A late afternoon street-level shot of The Shopkeeper Store at No. 76, a traditional brick and stone building with a black-painted shopfront, featuring a red brick middle section, twin gabled dormers, and a welcome sign for a shop selling leather goods and homewares."
+
+Finally, the keywords. I need a solid list. I'll start with the essentials: "The Shopkeeper Store", "No. 76", "St. Helier", "United Kingdom", "British", "Architecture", "Shopfront", "Street View", "Brick", "Red Brick", "Gable", "Dormer", "Shopkeeper", "Store", "Retail", "Boutique", "Traditional", "Storefront", "Building Exterior", "Shopkeeper Store", "No 76", "St Helier", "UK", "England", "Town", "Cobblestone", "Sash Window", "Street Scene", "Urban", "Architectural Detail", "Vintage", "Heritage", "Victorian", "Edwardian", "Chimney", "Roof", "Signage", "Black", "Gold", "Leather", "Homeware", "Goods", "Textiles", "Shoes", "Handbags", "Furniture", "Rug", "Vintage", "Antique", "Handmade", "Artisan", "Craft", "Gothic Revival", "Neoclassical", "Estate", "Building", "Street", "Building Exterior", "Shopkeeper", "Shopkeeper Store", "No 76", "St Helier", "UK", "England", "British", "Architecture", "Shopfront", "Street View", "Brick", "Red Brick", "Gable", "Dormer", "Shopkeeper", "Store", "Retail", "Boutique", "Traditional", "Storefront", "Building Exterior", "Shopkeeper Store", "No 76", "St Helier", "UK", "England", "Town", "Cobblestone", "Sash Window", "Street Scene", "Urban", "Architectural Detail", "Vintage", "Heritage", "Victorian", "Edwardian", "Chimney", "Roof", "Signage", "Black", "Gold", "Leather", "Homeware", "Goods", "Textiles", "Shoes", "Handbags", "Furniture", "Rug", "Vintage", "Antique", "Handmade", "Artisan", "Craft", "Gothic Rev
+&lt;/think&gt;
+
+Title: The Shopkeeper Store, No. 76, St. Helier
+
+Description: A late afternoon street-level view of The Shopkeeper Store at No. 76, a traditional building with a black-painted shopfront, featuring red brick, gabled dormers, and a welcome sign for a shop selling leather goods and homewares.
+
+Keywords: The Shopkeeper Store, No. 76, St. Helier, United Kingdom, British, Architecture, Shopfront, Street View, Brick, Red Brick, Gable, Dormer, Shopkeeper, Store, Retail, Boutique, Traditional, Building Exterior, Shopkeeper Store, No 76, St Helier, UK, England, Town, Cobblestone, Sash Window, Street Scene, Urban, Architectural Detail, Vintage, Heritage, Victorian, Edwardian, Chimney, Roof, Signage,
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get this done. I need to create some metadata for this image of a shop front, something that will be useful for a stock photo site or archive. First things first, I'll need a title. I want something short and sweet, but descriptive. "The Shopkeeper Store, No. 76, St. Helier" sounds good. It's specific, and the location is important.
+
+Next, the description. I need to weave in all the important details. I'll start with the basics: the store, the address, the architectural style. The image is a street-level shot, so I'll mention the traditional black storefront with gold detailing. The middle section has red brick, and the upper level has the dormers. I'll mention the time of day, which is late afternoon, with the sun low. Then I'll add the specifics of the store's goods, like the leather and homewares. I'll make sure it's concise, factual, and grabs the eye. Okay, here we go: "A late afternoon street-level shot of The Shopkeeper Store at No. 76, a traditional brick and stone building with a black-painted shopfront, featuring a red brick middle section, twin gabled dormers, and a welcome sign for a shop selling leather goods and homewares."
+
+Finally, the keywords. I need a solid list. I'll start with the essentials: "The Shopkeeper Store", "No. 76", "St. Helier", "United Kingdom", "British", "Architecture", "Shopfront", "Street View", "Brick", "Red Brick", "Gable", "Dormer", "Shopkeeper", "Store", "Retail", "Boutique", "Traditional", "Storefront", "Building Exterior", "Shopkeeper Store", "No 76", "St Helier", "UK", "England", "Town", "Cobblestone", "Sash Window", "Street Scene", "Urban", "Architectural Detail", "Vintage", "Heritage", "Victorian", "Edwardian", "Chimney", "Roof", "Signage", "Black", "Gold", "Leather", "Homeware", "Goods", "Textiles", "Shoes", "Handbags", "Furniture", "Rug", "Vintage", "Antique", "Handmade", "Artisan", "Craft", "Gothic Revival", "Neoclassical", "Estate", "Building", "Street", "Building Exterior", "Shopkeeper", "Shopkeeper Store", "No 76", "St Helier", "UK", "England", "British", "Architecture", "Shopfront", "Street View", "Brick", "Red Brick", "Gable", "Dormer", "Shopkeeper", "Store", "Retail", "Boutique", "Traditional", "Storefront", "Building Exterior", "Shopkeeper Store", "No 76", "St Helier", "UK", "England", "Town", "Cobblestone", "Sash Window", "Street Scene", "Urban", "Architectural Detail", "Vintage", "Heritage", "Victorian", "Edwardian", "Chimney", "Roof", "Signage", "Black", "Gold", "Leather", "Homeware", "Goods", "Textiles", "Shoes", "Handbags", "Furniture", "Rug", "Vintage", "Antique", "Handmade", "Artisan", "Craft", "Gothic Rev
+</think>
+
+Title: The Shopkeeper Store, No. 76, St. Helier
+
+Description: A late afternoon street-level view of The Shopkeeper Store at No. 76, a traditional building with a black-painted shopfront, featuring red brick, gabled dormers, and a welcome sign for a shop selling leather goods and homewares.
+
+Keywords: The Shopkeeper Store, No. 76, St. Helier, United Kingdom, British, Architecture, Shopfront, Street View, Brick, Red Brick, Gable, Dormer, Shopkeeper, Store, Retail, Boutique, Traditional, Building Exterior, Shopkeeper Store, No 76, St Helier, UK, England, Town, Cobblestone, Sash Window, Street Scene, Urban, Architectural Detail, Vintage, Heritage, Victorian, Edwardian, Chimney, Roof, Signage,
+```
 
 </details>
-
----
-
-<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
-
-### mlx-community/granite-4.0-3b-vision-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.59s
-- *Generation time:* 2.27s
-- *Total time:* 3.72s
-- *Prompt preparation time:* 0.848
-- *First-token latency:* 0.873
-- *Cleanup time:* 0.0956
-- *Prompt tokens:* 1,366
-- *Generation tokens:* 104
-- *Total tokens:* 1,470
-- *Prompt throughput (raw):* 1,564 tok/s
-- *Generation throughput (raw):* 177 tok/s
-- *Peak memory (GB):* 4.8
-- *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.23
-- *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0149
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1522
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Border Security Vessels at Sunset"
-Description: "Two patrol boats, the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline."
-Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, sunset, cliffside skyline, maritime, mooring, reflection, lifebuoy, buildings, coast, England.
-</pre>
 
 </details>
 
@@ -2515,25 +2783,25 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
 - *Model load time:* 0.60s
-- *Generation time:* 2.15s
-- *Total time:* 3.82s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 0.995
-- *Cleanup time:* 0.0753
-- *Prompt tokens:* 312
-- *Generation tokens:* 44
-- *Total tokens:* 356
-- *Prompt throughput (raw):* 313 tok/s
+- *Generation time:* 1.03s
+- *Total time:* 2.50s
+- *Prompt preparation time:* 0.867
+- *First-token latency:* 0.109
+- *Cleanup time:* 0.0811
+- *Prompt tokens:* 363
+- *Generation tokens:* 30
+- *Total tokens:* 393
+- *Prompt throughput (raw):* 3,330 tok/s
 - *Generation throughput (raw):* 367 tok/s
-- *Peak memory (GB):* 1.8
+- *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
-- *Post-cleanup active memory (GB):* 0.00092
+- *Post-cleanup active memory (GB):* 0.00243
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1393
+- *Rendered prompt characters:* 1564
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2547,7 +2815,7 @@ Keywords: Border security, patrol boats, BSC Defender, BSC Volunteer, Ramsgate H
 *Readable output:*
 
 <pre class="model-output-readable">
-A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer patrol vessels stand side-by-side against a breathtaking sunset, with the town's cliffside skyline softly illuminated by the fading light.
+A detailed description of the image, including the main subject, setting, action, lighting, and distinctive details, along with relevant context and keywords.
 </pre>
 
 </details>
@@ -2567,28 +2835,28 @@ A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: dover
+  after sustained repeated output; Duplicate keywords: signage, photo
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.54s
-- *Generation time:* 1.53s
-- *Total time:* 2.78s
-- *Prompt preparation time:* 0.701
-- *First-token latency:* 0.336
-- *Cleanup time:* 0.096
-- *Prompt tokens:* 2,094
+- *Model load time:* 0.50s
+- *Generation time:* 1.21s
+- *Total time:* 2.23s
+- *Prompt preparation time:* 0.516
+- *First-token latency:* 0.223
+- *Cleanup time:* 0.0857
+- *Prompt tokens:* 2,145
 - *Generation tokens:* 200
-- *Total tokens:* 2,294
-- *Prompt throughput (raw):* 6,229 tok/s
-- *Generation throughput (raw):* 388 tok/s
+- *Total tokens:* 2,345
+- *Prompt throughput (raw):* 9,612 tok/s
+- *Generation throughput (raw):* 410 tok/s
 - *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.1
-- *Cache memory (GB):* 0.29
-- *Model-load active memory (GB):* 1.08
-- *Post-cleanup active memory (GB):* 0.00274
+- *Cache memory (GB):* 0.61
+- *Model-load active memory (GB):* 1.09
+- *Post-cleanup active memory (GB):* 0.00425
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1341
+- *Rendered prompt characters:* 1512
 - *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2601,70 +2869,112 @@ A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset
+Title: Architectural view of The Shopkeeper Store
 
-Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC patrol vessels, including the BSC Defender and BSC Volunteer, moored alongside other boats, with a dramatic skyline of buildings and a lifeguard lifebuoy visible.
+Description: The image showcases a traditional British brick building with a black-painted storefront featuring gold detailing, located at No. 76, with a middle story and three sash windows, and a gabled dormer on the upper level.
 
-Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, Marina, Patrol boats, Pier, Port, Dover, Horizon, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover, Dover,
+Keywords: The Shopkeeper Store, No. 76, black-painted, gold detailing, red brick, sash window, gable, entrance, European, boutique, signage, British, architectural detail, building exterior, store, clock, GPS, 52.629112°N, 1.288265°E, photo, photo editing, vintage, UK, street view, signage, shop, signage, building, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo, photo,
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
 
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Duplicate keywords: sea
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.59s
-- *Generation time:* 38.87s
-- *Total time:* 41.12s
-- *Prompt preparation time:* 0.645
-- *First-token latency:* 2.11
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 290
-- *Generation tokens:* 667
-- *Total tokens:* 957
-- *Prompt throughput (raw):* 137 tok/s
-- *Generation throughput (raw):* 18.4 tok/s
-- *Peak memory (GB):* 15
-- *Active memory (GB):* 11
-- *Cache memory (GB):* 0.70
-- *Model-load active memory (GB):* 11.4
-- *Post-cleanup active memory (GB):* 0.00418
+- *Observations:* Required labelled fields not detected: keywords; Response
+  appears cut off at the token limit; Internal reasoning block appears
+  incomplete
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Model load time:* 2.10s
+- *Generation time:* 16.47s
+- *Total time:* 19.06s
+- *Prompt preparation time:* 0.48
+- *First-token latency:* 0.649
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 1,326
+- *Generation tokens:* 1,000
+- *Total tokens:* 2,326
+- *Prompt throughput (raw):* 2,043 tok/s
+- *Generation throughput (raw):* 65.6 tok/s
+- *Peak memory (GB):* 20
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 17.8
+- *Post-cleanup active memory (GB):* 0.0049
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1402
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Rendered prompt characters:* 1656
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
+  "seed": 0, "temperature": 0.6, "top_p": 1.0}
+- *EOS token:* [EOS]
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset with Border Security Vessels
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key is to stay true to the authoritative information and the descriptive hints while also incorporating visible details from the image.
 
-Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security vessels, including the BSC Defender and BSC Volunteer, moored alongside each other. The vessels are situated in the foreground, with the town's cliffside skyline and buildings visible in the background.
+Starting with the title: The image shows a street-level view of a building at No. 76, which is "The Shopkeeper Store" as indicated by the signage. The building has a traditional black storefront with gold detailing, red brick, slate grey upper floors, and dormers. The date is 2026-10-10 17:21:00 UTC+01:00, and the location is 52.629112°N, 1.288265°E in the UK. The keywords include elements like chimney, entrance, sash windows, brick, etc.
 
-Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, cliffside skyline, buildings, harbour, sea, boats, vessels, security, maritime, port, marina, water, reflection, sky, clouds, sun, sea, seafront, sea view, sea and sky, sea and sky view, sea and sky view at sunset, sea and sky view at sunset with boats, sea and sky view at sunset with boats and buildings, sea and sky view at sunset with boats and buildings and cliffside, sea and sky view at sunset with boats and buildings and cliffside and harbour, sea and sky view at sunset with boats and buildings and cliffside and harbour and security, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view and sea and sky, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view and sea and sky and sea and sky view.
+For the description, I need to combine the context with visible details. The store is a boutique shop with a black storefront and red brick facade. The building has three sash windows, a chimney, and is in the UK. The storefront is closed, and there are display windows with items inside. The lighting is bright, suggesting it's daytime. Also, the architectural style is traditional British.
+
+Now, the keywords should be 10-18 unique terms. Let's list them: "Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick wall, british, building exterior, closed, display windows, daylight, timber door." Wait, but "Adobe Stock" and "Any Vision" are probably watermarks, but the user said to treat capture date/time and GPS as authoritative, but not claim they are visible. Maybe include "Adobe Stock" as a keyword if it's part of the watermark, but perhaps they are not visible. Wait, the user's instructions say to omit uncertain details. So maybe exclude those watermarks. Let me check the hints again. The hints include "Adobe Stock, Any Vision" as keywords but the image might have watermarks. Since the user says to omit uncertain details, maybe exclude those. So adjust keywords to visible elements: "Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick wall, british, building exterior, closed, display windows, daylight."
+
+Wait, the user's instructions say to prefer image evidence over hints. The image shows "No 76" on the door and the store name "The Shopkeeper". So include "No 76" and "The Shopkeeper Store" as visible details. Also, the store is closed (sign says "CLOSED"). So update keywords to include those. Let's check: "Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick wall, british, building exterior, closed, display windows, daylight, No 76, The Shopkeeper Store". That's 18 keywords.
+
+Title: "Traditional British boutique shopfront at No. 76, featuring red brick facade, black storefront with gold detailing, and gabled roof". Wait, the roof is slate grey, not sure if "gabled roof" is correct. The upper part is slate grey, so maybe "slate-tiled roof". But the hints mention "Gable" and "Roof". The image has dormers on the upper level, so "gabled dormers" might be better. Let me check the image again. The upper part is a grey slate roof with dormers. So "Gabled dormers on slate roof" could be accurate. But the user's hints mention "Roof" and "Gable". So maybe "Gabled dormers on slate roof". But the hints say to retain details supported by the image. The dormers are part of the upper floor, so "Gabled dormers" is correct.
+
+Title: "Traditional British boutique shopfront at No. 76 with red brick facade, black storefront, and gabled dormers on slate roof". Then the description should mention the store being closed, the entrance, sash windows, etc.
+
+Putting it all together:
+
+Title: "Traditional British boutique shopfront at No. 76 with red brick facade, black storefront, and gabled dormers on slate roof"
+
+Description: "Street-level view of The Shopkeeper Store, a traditional British boutique located at No. 76, featuring a red brick facade, black storefront with gold detailing, three sash windows, a timber door, and gabled dormers on a slate roof, captured on 2026-10-10 at 17:
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key is to stay true to the authoritative information and the descriptive hints while also incorporating visible details from the image.
+
+Starting with the title: The image shows a street-level view of a building at No. 76, which is "The Shopkeeper Store" as indicated by the signage. The building has a traditional black storefront with gold detailing, red brick, slate grey upper floors, and dormers. The date is 2026-10-10 17:21:00 UTC+01:00, and the location is 52.629112°N, 1.288265°E in the UK. The keywords include elements like chimney, entrance, sash windows, brick, etc.
+
+For the description, I need to combine the context with visible details. The store is a boutique shop with a black storefront and red brick facade. The building has three sash windows, a chimney, and is in the UK. The storefront is closed, and there are display windows with items inside. The lighting is bright, suggesting it's daytime. Also, the architectural style is traditional British.
+
+Now, the keywords should be 10-18 unique terms. Let's list them: "Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick wall, british, building exterior, closed, display windows, daylight, timber door." Wait, but "Adobe Stock" and "Any Vision" are probably watermarks, but the user said to treat capture date/time and GPS as authoritative, but not claim they are visible. Maybe include "Adobe Stock" as a keyword if it's part of the watermark, but perhaps they are not visible. Wait, the user's instructions say to omit uncertain details. So maybe exclude those watermarks. Let me check the hints again. The hints include "Adobe Stock, Any Vision" as keywords but the image might have watermarks. Since the user says to omit uncertain details, maybe exclude those. So adjust keywords to visible elements: "Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick wall, british, building exterior, closed, display windows, daylight."
+
+Wait, the user's instructions say to prefer image evidence over hints. The image shows "No 76" on the door and the store name "The Shopkeeper". So include "No 76" and "The Shopkeeper Store" as visible details. Also, the store is closed (sign says "CLOSED"). So update keywords to include those. Let's check: "Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick wall, british, building exterior, closed, display windows, daylight, No 76, The Shopkeeper Store". That's 18 keywords. 
+
+Title: "Traditional British boutique shopfront at No. 76, featuring red brick facade, black storefront with gold detailing, and gabled roof". Wait, the roof is slate grey, not sure if "gabled roof" is correct. The upper part is slate grey, so maybe "slate-tiled roof". But the hints mention "Gable" and "Roof". The image has dormers on the upper level, so "gabled dormers" might be better. Let me check the image again. The upper part is a grey slate roof with dormers. So "Gabled dormers on slate roof" could be accurate. But the user's hints mention "Roof" and "Gable". So maybe "Gabled dormers on slate roof". But the hints say to retain details supported by the image. The dormers are part of the upper floor, so "Gabled dormers" is correct. 
+
+Title: "Traditional British boutique shopfront at No. 76 with red brick facade, black storefront, and gabled dormers on slate roof". Then the description should mention the store being closed, the entrance, sash windows, etc. 
+
+Putting it all together:
+
+Title: "Traditional British boutique shopfront at No. 76 with red brick facade, black storefront, and gabled dormers on slate roof"
+
+Description: "Street-level view of The Shopkeeper Store, a traditional British boutique located at No. 76, featuring a red brick facade, black storefront with gold detailing, three sash windows, a timber door, and gabled dormers on a slate roof, captured on 2026-10-10 at 17:
+```
+
+</details>
 
 </details>
 
@@ -2681,30 +2991,30 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: title, description,
-  keywords
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: united kingdom
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.46s
-- *Generation time:* 7.77s
-- *Total time:* 10.12s
-- *Prompt preparation time:* 0.879
-- *First-token latency:* 3.2
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 3,104
-- *Generation tokens:* 113
-- *Total tokens:* 3,217
-- *Prompt throughput (raw):* 970 tok/s
-- *Generation throughput (raw):* 30.4 tok/s
-- *Peak memory (GB):* 12
+- *Model load time:* 1.40s
+- *Generation time:* 9.21s
+- *Total time:* 11.28s
+- *Prompt preparation time:* 0.653
+- *First-token latency:* 2.23
+- *Cleanup time:* 0.0968
+- *Prompt tokens:* 3,174
+- *Generation tokens:* 200
+- *Total tokens:* 3,374
+- *Prompt throughput (raw):* 1,425 tok/s
+- *Generation throughput (raw):* 31.5 tok/s
+- *Peak memory (GB):* 13
 - *Active memory (GB):* 8.6
-- *Cache memory (GB):* 3.9
+- *Cache memory (GB):* 6.8
 - *Model-load active memory (GB):* 7.23
-- *Post-cleanup active memory (GB):* 0.00646
+- *Post-cleanup active memory (GB):* 0.00797
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1336
+- *Rendered prompt characters:* 1507
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2718,11 +3028,11 @@ Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC V
 *Readable output:*
 
 <pre class="model-output-readable">
-Ramsgate Harbour Sunset: Border Security Vessels Moored
+Title: Traditional British Shopfront with Gold Detailing and Red Brick
 
-Border security patrol boats, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset. The scene captures the town's cliffside skyline and the reflective waters of the harbour.
+Description: A street-level view of The Shopkeeper Store at No. 76 in the United Kingdom, featuring a black-painted ground floor with gold detailing, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level. The image captures the building's traditional architecture and boutique aesthetic on a clear day.
 
-Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Keywords: United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United Kingdom, United
 </pre>
 
 </details>
@@ -2745,26 +3055,26 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
   labelled fields not detected: title, description; Response appears cut off
   at the token limit; Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.96s
-- *Generation time:* 50.33s
-- *Total time:* 54.07s
-- *Prompt preparation time:* 0.758
-- *First-token latency:* 8.53
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 4,390
+- *Model load time:* 2.93s
+- *Generation time:* 48.17s
+- *Total time:* 51.69s
+- *Prompt preparation time:* 0.563
+- *First-token latency:* 7.7
+- *Cleanup time:* 0.13
+- *Prompt tokens:* 4,458
 - *Generation tokens:* 1,000
-- *Total tokens:* 5,390
-- *Prompt throughput (raw):* 515 tok/s
-- *Generation throughput (raw):* 24.3 tok/s
+- *Total tokens:* 5,458
+- *Prompt throughput (raw):* 579 tok/s
+- *Generation throughput (raw):* 25.0 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00687
+- *Post-cleanup active memory (GB):* 0.00838
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1536
+- *Rendered prompt characters:* 1707
 - *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2782,11 +3092,12 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 17:21:00 UTC+01:00
+- GPS: 52.629112°N, 1.288265°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A street-level architectural view of the exterior of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level.
+- Keyword hints: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior
 
 Write:
 - a concrete 5-10-word title;
@@ -2798,35 +3109,41 @@ Title:
 Description:
 Keywords:
 
-Need title 5-10 words.
+We need title 5-10 words. Concrete. Maybe "The Shopkeeper Store No 76 Exterior Norwich". Need check GPS 52.629112°N, 1.288265°E. That's Norwich, England. The Shopkeeper at 76? Possibly 76a entrance left. The store is The Shopkeeper, No 76. Upper twin gabled dormers slate-grey. Red brick middle story with three windows. Black storefront with gold detailing. Closed sign on door. Entrance 76a to left.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time 2026-10-10 17:21:00 UTC+01:00. GPS given. Don't claim visible. Should mention street-level architectural view of exterior of The Shopkeeper at No.76, etc. Daylight, partly cloudy sky. No people visible? Possibly none. Should mention closed sign.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Keywords: 10-18 unique comma-separated. Include Adobe Stock, Any Vision? Maybe those are hints for source? Probably include. Keywords hints list includes Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
+We should include relevant visible details: dormer, gable, chimneys, 76a door, bay windows, display, etc.
 
-Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
+Make sure keywords unique comma-separated.
 
-Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let's check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
+Title: maybe 7 words: "The Shopkeeper Store Exterior No 76 Norwich". That's 7? The(1) Shopkeeper(2) Store(3) Exterior(4) No(5) 76(6) Norwich(7). Good.
 
-Also note lifebuoys, white hulls, person in high-vis.
+Description: Street-level view of the exterior of The Shopkeeper boutique at No. 76, captured on 2026-10-10 at 17:21 UTC+01:00 at GPS 52.629112°N, 1.288265°E. The three-storey red-brick building has a black-painted shopfront with gold detailing, large bow windows displaying clothing and accessories, a central door marked Closed, and twin slate-grey gabled dormers above three sash windows under a partly cloudy sky.
 
-Need 10-18 unique comma-separated keywords.
+That's one sentence? Could be two sentences. Keep 1-2 sentences.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
+Make sure not claim capture date/time visible. It's okay to state captured on... Might be okay.
 
-But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Keywords list: maybe 15 items.
 
-We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
+Keywords: The Shopkeeper, No 76, Norwich, United Kingdom, building exterior, red brick, sash window, shopfront, boutique, gabled dormer, chimney, black facade, gold detailing, signage, entrance, architectural detail
 
-We must ensure title 5-10 words.
+Need comma-separated. Ensure 10-18 unique.
 
-Let's craft:
+Maybe include Adobe Stock, Any Vision? Hints include them maybe as source metadata. Might be appropriate to include. But keywords should cover relevant context and visible details. Might include Adobe Stock as per hint. Could include. Safer to follow hints.
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+The hint list includes Adobe Stock, Any Vision. Could include both.
 
-Description: UK Border Security Command patrol vessels
+Let's produce:
+
+Title:
+The Shopkeeper Store Exterior No 76 Norwich
+
+Description:
+Street-level view of the exterior of The Shopkeeper boutique at No.
 </pre>
 
 <details>
@@ -2838,11 +3155,12 @@ Description: UK Border Security Command patrol vessels
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 17:21:00 UTC+01:00
+- GPS: 52.629112°N, 1.288265°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A street-level architectural view of the exterior of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level.
+- Keyword hints: Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior
 
 Write:
 - a concrete 5-10-word title;
@@ -2854,35 +3172,41 @@ Title:
 Description:
 Keywords:
 
-Need title 5-10 words.
+We need title 5-10 words. Concrete. Maybe "The Shopkeeper Store No 76 Exterior Norwich". Need check GPS 52.629112°N, 1.288265°E. That's Norwich, England. The Shopkeeper at 76? Possibly 76a entrance left. The store is The Shopkeeper, No 76. Upper twin gabled dormers slate-grey. Red brick middle story with three windows. Black storefront with gold detailing. Closed sign on door. Entrance 76a to left.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 8 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time 2026-10-10 17:21:00 UTC+01:00. GPS given. Don't claim visible. Should mention street-level architectural view of exterior of The Shopkeeper at No.76, etc. Daylight, partly cloudy sky. No people visible? Possibly none. Should mention closed sign.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Keywords: 10-18 unique comma-separated. Include Adobe Stock, Any Vision? Maybe those are hints for source? Probably include. Keywords hints list includes Adobe Stock, Any Vision, Chimney, Entrance, Europe, Gable, Objects, Red brick, Roof, Sash Window, Shopfront, Signage, United Kingdom, architectural detail, architecture, boutique, brick building, brick wall, british, building exterior.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not mention date as visible. Could just describe scene. Maybe include "on 3 October 2026" as authoritative fact. Hmm instruction: Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention capture date in description? Might be okay. Probably include as context. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Could mention the date as when captured.
+We should include relevant visible details: dormer, gable, chimneys, 76a door, bay windows, display, etc.
 
-Better to keep description focused on visual: UK Border Security Command patrol vessels including BSC Defender and BSC Volunteer moored side-by-side in Ramsgate Harbour, Kent, at dusk with sunset sky reflecting on water, cliffside town buildings behind.
+Make sure keywords unique comma-separated.
 
-Also note Dover? Hint mentions Dover. The boat says DOVER on stern. Wait the boat on right says DOVER. Might be Dover? The hint says Ramsgate Harbour, Kent. Image shows buildings on cliff. Might be Ramsgate. The hint says UK Border Security Command patrol vessels... are moored side-by-side in Ramsgate Harbour, Kent. Could be correct. The vessel has DOVER marking. Possibly the fleet is based in Dover but photo in Ramsgate? Hmm conflict? The hint says Ramsgate Harbour. The visible details: one boat stern says DOVER. So maybe the location is Dover? Let's check: Ramsgate Harbour is in Kent, has white cliffs. The buildings look like Ramsgate? Or Dover? Dover harbour has different skyline. Might be Ramsgate. The DOVER marking on vessel could be home port. So location is Ramsgate. So keep Ramsgate.
+Title: maybe 7 words: "The Shopkeeper Store Exterior No 76 Norwich". That's 7? The(1) Shopkeeper(2) Store(3) Exterior(4) No(5) 76(6) Norwich(7). Good.
 
-Also note lifebuoys, white hulls, person in high-vis.
+Description: Street-level view of the exterior of The Shopkeeper boutique at No. 76, captured on 2026-10-10 at 17:21 UTC+01:00 at GPS 52.629112°N, 1.288265°E. The three-storey red-brick building has a black-painted shopfront with gold detailing, large bow windows displaying clothing and accessories, a central door marked Closed, and twin slate-grey gabled dormers above three sash windows under a partly cloudy sky.
 
-Need 10-18 unique comma-separated keywords.
+That's one sentence? Could be two sentences. Keep 1-2 sentences.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, dusk, harbour, moored boats, cliffside buildings, water reflection, lifebuoys, BSC Defender, BSC Volunteer, maritime, England
+Make sure not claim capture date/time visible. It's okay to state captured on... Might be okay.
 
-But keyword hints include: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Keywords list: maybe 15 items.
 
-We need unique comma-separated. Prefer use those. Maybe include Dover as marking. Should we include Dover? Hint includes Dover. Could be confusing but include as visible marking. Might be okay.
+Keywords: The Shopkeeper, No 76, Norwich, United Kingdom, building exterior, red brick, sash window, shopfront, boutique, gabled dormer, chimney, black facade, gold detailing, signage, entrance, architectural detail
 
-We must ensure title 5-10 words.
+Need comma-separated. Ensure 10-18 unique.
 
-Let's craft:
+Maybe include Adobe Stock, Any Vision? Hints include them maybe as source metadata. Might be appropriate to include. But keywords should cover relevant context and visible details. Might include Adobe Stock as per hint. Could include. Safer to follow hints.
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+The hint list includes Adobe Stock, Any Vision. Could include both.
 
-Description: UK Border Security Command patrol vessels
+Let's produce:
+
+Title:
+The Shopkeeper Store Exterior No 76 Norwich
+
+Description:
+Street-level view of the exterior of The Shopkeeper boutique at No. 
 ```
 
 </details>
@@ -2903,29 +3227,29 @@ Description: UK Border Security Command patrol vessels
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Duplicate keywords: lifeboat station
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.82s
-- *Generation time:* 27.45s
-- *Total time:* 29.21s
-- *Prompt preparation time:* 0.937
-- *First-token latency:* 24.8
-- *Cleanup time:* 0.0936
-- *Prompt tokens:* 16,536
-- *Generation tokens:* 225
-- *Total tokens:* 16,761
-- *Prompt throughput (raw):* 667 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Model load time:* 0.78s
+- *Generation time:* 41.00s
+- *Total time:* 42.65s
+- *Prompt preparation time:* 0.852
+- *First-token latency:* 32.1
+- *Cleanup time:* 0.0909
+- *Prompt tokens:* 16,581
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,581
+- *Prompt throughput (raw):* 516 tok/s
+- *Generation throughput (raw):* 123 tok/s
 - *Peak memory (GB):* 9.4
 - *Active memory (GB):* 4.4
-- *Cache memory (GB):* 1.3
+- *Cache memory (GB):* 0.81
 - *Model-load active memory (GB):* 4.43
-- *Post-cleanup active memory (GB):* 0.00828
+- *Post-cleanup active memory (GB):* 0.00978
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
+- *Rendered prompt characters:* 1599
 - *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2938,11 +3262,83 @@ Description: UK Border Security Command patrol vessels
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command vessels in Ramsgate Harbour at sunset
+Title: A Street-Level Architectural View of The Shopkeeper Store
 
-Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moored in the harbour, including Border Security Command vessels such as the BSC Defender and BSC Volunteer. The boats are moored alongside each other, with the harbour in the foreground and the town skyline in the background. The sky is illuminated by the setting sun, creating a dramatic and colourful sunset over the buildings and the harbour. The boats are silhouetted against the sunset, with the reflection of the water on the water surface adding to the overall composition. The image captures the contrast between the modern, high-tech vessels and the traditional, historic buildings in the background.
+Description: A 5-10-word title that captures the essence of the image, focusing on the main subject and setting.
 
-Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, harbour, mooring, lifebuoy, pier, lifeboat, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station,
+Keywords: Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 5-10-word title that captures the essence of the image, focusing on the main subject and setting.
+
+Keywords: Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 5-10-word title that captures the essence of the image, focusing on the main subject and setting.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 5-10-word title that captures the essence of the image, focusing on the main subject and setting.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick, Sash window, Twin dormers, Closed, Shopfront, Signage, United Kingdom
+
+Title: A Street-Level View of The Shopkeeper Store
+
+Description: A 5-10-word title that captures the essence of the image, focusing on the main subject and setting.
+
+Keywords: Street-level, Exterior, Traditional, Black-painted, Gold detailing, Brick wall, Red brick,
 </pre>
 
 </details>
@@ -2964,26 +3360,26 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.61s
-- *Generation time:* 1.05s
-- *Total time:* 2.58s
-- *Prompt preparation time:* 0.908
-- *First-token latency:* 0.137
+- *Model load time:* 0.29s
+- *Generation time:* 0.93s
+- *Total time:* 1.93s
+- *Prompt preparation time:* 0.702
+- *First-token latency:* 0.124
 - *Cleanup time:* 0.0857
-- *Prompt tokens:* 1,186
-- *Generation tokens:* 22
-- *Total tokens:* 1,208
-- *Prompt throughput (raw):* 8,663 tok/s
-- *Generation throughput (raw):* 527 tok/s
+- *Prompt tokens:* 1,242
+- *Generation tokens:* 80
+- *Total tokens:* 1,322
+- *Prompt throughput (raw):* 10,010 tok/s
+- *Generation throughput (raw):* 506 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
-- *Cache memory (GB):* 0.10
-- *Model-load active memory (GB):* 0.16
-- *Post-cleanup active memory (GB):* 0.0103
+- *Cache memory (GB):* 0.11
+- *Model-load active memory (GB):* 0.161
+- *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1330
+- *Rendered prompt characters:* 1501
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -2997,7 +3393,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 *Readable output:*
 
 <pre class="model-output-readable">
- Brokewater, BSC, Dusk, England, Marina, Port, Ramsgate, Reflection
+ The shop is a 5-10-word, 1-2-minute description, focusing on the exterior of The Shopkeeper Store, which is a 5-10-word, 1-2-minute description, focusing on the shop's architectural detail, and the details of the building, including the red brick, attic dormer, and two sash windows.
 </pre>
 
 </details>
@@ -3016,29 +3412,35 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: horizon
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Duplicate keywords: closed sign, boutique, traditional,
+  entrance, building, closed, closed boutique, closed building front door,
+  closed shop front door, closed store front door, closed boutique front door,
+  closed building entrance door, closed shop entrance door, closed store
+  entrance door, closed boutique entrance door, closed building exterior door,
+  closed shop exterior door, closed store exterior door, closed boutique
+  exterior door
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.17s
-- *Generation time:* 17.48s
-- *Total time:* 20.06s
-- *Prompt preparation time:* 1.41
-- *First-token latency:* 13.1
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 16,536
-- *Generation tokens:* 200
-- *Total tokens:* 16,736
-- *Prompt throughput (raw):* 1,265 tok/s
-- *Generation throughput (raw):* 57.3 tok/s
+- *Model load time:* 1.32s
+- *Generation time:* 34.44s
+- *Total time:* 37.90s
+- *Prompt preparation time:* 2.13
+- *First-token latency:* 14.6
+- *Cleanup time:* 0.18
+- *Prompt tokens:* 16,581
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,581
+- *Prompt throughput (raw):* 1,132 tok/s
+- *Generation throughput (raw):* 52.8 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
-- *Cache memory (GB):* 2.4
+- *Cache memory (GB):* 1.3
 - *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.011
+- *Post-cleanup active memory (GB):* 0.0125
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
+- *Rendered prompt characters:* 1599
 - *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -3052,12 +3454,12 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 
 <pre class="model-output-readable">
 Title:
-Dusk at Ramsgate: Border Security Vessels
+The Shopkeeper Store, No.76, UK
 
 Description:
-UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline, with reflections on the water and a mix of warm and cool lighting.
+A traditional British storefront at No.76, featuring a black-painted ground floor with gold detailing, red brick middle story, and twin slate-grey gabled dormers, with closed signage and merchandise displayed in the windows. The setting is a street-level view under a partly cloudy sky, with the GPS coordinates provided.
 
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, Buildings, Marina, Mooring, Patrol boats, Lifebuoys, Reflections, Water, Horizon, England, Coast, Port, Maritime, Horizon, Pier, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon, Horizon,
+Keywords: The Shopkeeper Store, No.76, UK, closed sign, black storefront, gold detailing, red brick, gabled dormers, sash windows, street-level view, partly cloudy, GPS coordinates, architectural detail, boutique, brick building, building exterior, United Kingdom, Europe, architectural, traditional, shopfront, signage, merchandise, entrance, chimney, roof, red brick wall, boutique, shop, store, exterior, building, architecture, street, closed, day, lighting, windows, doors, door, entrance, facade, gable, dormer, slate, grey, brick, red, black, gold, traditional, European, architectural style, building, structure, exterior detail, shop window, display, closed, sign, closed sign, closed door, closed storefront, closed shop, closed business, closed store, closed boutique, closed shopfront, closed building, closed structure, closed architecture, closed building exterior, closed shop exterior, closed store exterior, closed boutique exterior, closed building front, closed shop front, closed store front, closed boutique front, closed building facade, closed shop facade, closed store facade, closed boutique facade, closed building exterior detail, closed shop exterior detail, closed store exterior detail, closed boutique exterior detail, closed building architectural detail, closed shop architectural detail, closed store architectural detail, closed boutique architectural detail, closed building window, closed shop window, closed store window, closed boutique window, closed building door, closed shop door, closed store door, closed boutique door, closed building entrance, closed shop entrance, closed store entrance, closed boutique entrance, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique exterior door, closed building front door, closed shop front door, closed store front door, closed boutique front door, closed building entrance door, closed shop entrance door, closed store entrance door, closed boutique entrance door, closed building exterior door, closed shop exterior door, closed store exterior door, closed boutique
 </pre>
 
 </details>
@@ -3076,28 +3478,29 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: title
+- *Observations:* Required labelled fields not detected: title, description,
+  keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.69s
-- *Generation time:* 3.09s
-- *Total time:* 5.42s
-- *Prompt preparation time:* 0.612
-- *First-token latency:* 1.12
-- *Cleanup time:* 0.108
-- *Prompt tokens:* 571
-- *Generation tokens:* 132
-- *Total tokens:* 703
-- *Prompt throughput (raw):* 511 tok/s
-- *Generation throughput (raw):* 94.6 tok/s
-- *Peak memory (GB):* 7.1
+- *Model load time:* 1.70s
+- *Generation time:* 5.02s
+- *Total time:* 7.27s
+- *Prompt preparation time:* 0.511
+- *First-token latency:* 0.347
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 624
+- *Generation tokens:* 352
+- *Total tokens:* 976
+- *Prompt throughput (raw):* 1,800 tok/s
+- *Generation throughput (raw):* 83.5 tok/s
+- *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
-- *Post-cleanup active memory (GB):* 0.0126
+- *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1355
+- *Rendered prompt characters:* 1526
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -3111,14 +3514,85 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 *Readable output:*
 
 <pre class="model-output-readable">
-**Description:**
-
-A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate, Kent. The boats are lined up along a pier, with a colorful cityscape visible in the background under a vibrant sunset sky. The water reflects the warm hues of the sunset, creating a serene and picturesque scene.
-
-**Keywords:**
-
-fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, water, reflection, UK, coastal, maritime, fishing, harbor scene, sunset view, coastal town.
+&#96;&#96;&#96;json
+{
+  "title": "A street-level view of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and two slate-grey gabled dormers on the upper level.",
+  "date": "2026-10-10 17:21:00 UTC+01:00",
+  "location": {
+    "latitude": 52.629112,
+    "longitude": 1.288265
+  },
+  "description": "A street-level view of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and two slate-grey gabled dormers on the upper level.",
+  "keywords": [
+    "Adobe Stock",
+    "Any Vision",
+    "Chimney",
+    "Entrance",
+    "Europe",
+    "Gable",
+    "Shopfront",
+    "Signage",
+    "United Kingdom",
+    "Architectural Detail",
+    "Architecture",
+    "Building Exterior",
+    "Brick Building",
+    "Sash Window",
+    "Shopfront",
+    "Signage",
+    "United Kingdom",
+    "Architectural Detail",
+    "Architecture",
+    "Building Exterior",
+    "Brick Building",
+    "Sash Window"
+  ]
+}
+&#96;&#96;&#96;
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+````text
+```json
+{
+  "title": "A street-level view of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and two slate-grey gabled dormers on the upper level.",
+  "date": "2026-10-10 17:21:00 UTC+01:00",
+  "location": {
+    "latitude": 52.629112,
+    "longitude": 1.288265
+  },
+  "description": "A street-level view of The Shopkeeper Store, located at No. 76, featuring a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and two slate-grey gabled dormers on the upper level.",
+  "keywords": [
+    "Adobe Stock",
+    "Any Vision",
+    "Chimney",
+    "Entrance",
+    "Europe",
+    "Gable",
+    "Shopfront",
+    "Signage",
+    "United Kingdom",
+    "Architectural Detail",
+    "Architecture",
+    "Building Exterior",
+    "Brick Building",
+    "Sash Window",
+    "Shopfront",
+    "Signage",
+    "United Kingdom",
+    "Architectural Detail",
+    "Architecture",
+    "Building Exterior",
+    "Brick Building",
+    "Sash Window"
+  ]
+}
+```
+````
+
+</details>
 
 </details>
 
@@ -3137,28 +3611,28 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: description;
-  Duplicate keywords: patrol boats
+  Duplicate keywords: brick wall
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.42s
-- *Generation time:* 3.71s
-- *Total time:* 4.99s
-- *Prompt preparation time:* 0.854
-- *First-token latency:* 2.31
-- *Cleanup time:* 0.0925
-- *Prompt tokens:* 5,615
-- *Generation tokens:* 86
-- *Total tokens:* 5,701
-- *Prompt throughput (raw):* 2,433 tok/s
-- *Generation throughput (raw):* 143 tok/s
-- *Peak memory (GB):* 4.3
+- *Model load time:* 0.40s
+- *Generation time:* 4.59s
+- *Total time:* 5.70s
+- *Prompt preparation time:* 0.705
+- *First-token latency:* 3.26
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 5,877
+- *Generation tokens:* 85
+- *Total tokens:* 5,962
+- *Prompt throughput (raw):* 1,802 tok/s
+- *Generation throughput (raw):* 134 tok/s
+- *Peak memory (GB):* 4.4
 - *Active memory (GB):* 2.4
-- *Cache memory (GB):* 1.2
+- *Cache memory (GB):* 1.3
 - *Model-load active memory (GB):* 2.36
-- *Post-cleanup active memory (GB):* 0.0151
+- *Post-cleanup active memory (GB):* 0.0166
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1475
+- *Rendered prompt characters:* 1646
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -3172,8 +3646,8 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Ramsgate Harbour Patrol Boats at Dusk"
-Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coast, Dover, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol Boats, Patrol Boats, Pier, Port, Ramsgate, Reflection
+Title: "The Shopkeeper's Storefront"
+Keywords: "Traditional Black-Painted Storefront", "Red Brick Middle Story", "Three Sash Windows", "Twin Slate-Grey Gabled Dormers", "Brick Wall", "British Building Exterior", "Architectural Detail", "Architecture", "Boutique", "Brick Building", "Brick Wall"
 </pre>
 
 </details>
@@ -3195,26 +3669,26 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.10s
-- *Generation time:* 1.71s
-- *Total time:* 3.55s
-- *Prompt preparation time:* 0.727
-- *First-token latency:* 0.835
-- *Cleanup time:* 0.16
-- *Prompt tokens:* 2,174
-- *Generation tokens:* 18
-- *Total tokens:* 2,192
-- *Prompt throughput (raw):* 2,603 tok/s
-- *Generation throughput (raw):* 103 tok/s
+- *Model load time:* 1.08s
+- *Generation time:* 1.65s
+- *Total time:* 3.30s
+- *Prompt preparation time:* 0.567
+- *First-token latency:* 0.857
+- *Cleanup time:* 0.167
+- *Prompt tokens:* 2,234
+- *Generation tokens:* 26
+- *Total tokens:* 2,260
+- *Prompt throughput (raw):* 2,607 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.7
-- *Post-cleanup active memory (GB):* 0.0155
+- *Post-cleanup active memory (GB):* 0.017
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1557
+- *Rendered prompt characters:* 1728
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -3228,14 +3702,14 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a harbor with several boats docked in a row.
+&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a brick building with a black storefront and a grey upper level with two dormers.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The image shows a harbor with several boats docked in a row.
+<|channel|> analysis<|message|> The image shows a brick building with a black storefront and a grey upper level with two dormers.
 ```
 
 </details>
@@ -3256,30 +3730,31 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Required labelled fields not
-  detected: description, keywords; Response appears cut off at the token limit
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Required labelled fields not detected:
+  keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.53s
-- *Generation time:* 3.57s
-- *Total time:* 4.76s
-- *Prompt preparation time:* 0.654
-- *First-token latency:* 0.0958
-- *Cleanup time:* 0.0945
-- *Prompt tokens:* 308
-- *Generation tokens:* 1,000
-- *Total tokens:* 1,308
-- *Prompt throughput (raw):* 3,214 tok/s
-- *Generation throughput (raw):* 352 tok/s
+- *Model load time:* 0.47s
+- *Generation time:* 1.20s
+- *Total time:* 2.20s
+- *Prompt preparation time:* 0.526
+- *First-token latency:* 0.0898
+- *Cleanup time:* 0.097
+- *Prompt tokens:* 359
+- *Generation tokens:* 200
+- *Total tokens:* 559
+- *Prompt throughput (raw):* 3,996 tok/s
+- *Generation throughput (raw):* 328 tok/s
 - *Peak memory (GB):* 1.8
-- *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.40
-- *Model-load active memory (GB):* 0.614
-- *Post-cleanup active memory (GB):* 0.0161
+- *Active memory (GB):* 0.62
+- *Cache memory (GB):* 0.63
+- *Model-load active memory (GB):* 0.616
+- *Post-cleanup active memory (GB):* 0.0176
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1384
+- *Rendered prompt characters:* 1555
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -3293,7 +3768,8 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, England, Fleet, Harbor, Maritime, Mooring, Patrol Boat, Pier, Port, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor
+Title: "The Shopkeeper Store: A Street-Level Architectural View of The Shopfront"
+Description: A detailed view of the shopfront of The Shopkeeper Store, featuring a traditional black-painted storefront with gold detailing on the ground floor, red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level. The building is situated at No. 76, located at No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76, No. 76,
 </pre>
 
 </details>
@@ -3312,30 +3788,29 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: title, description,
-  keywords; Repeats the prompt's hint text: description
+- *Observations:* Required labelled fields not detected: description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type moondream1 via
   moondream2)
-- *Model load time:* 2.18s
-- *Generation time:* 1.28s
-- *Total time:* 4.24s
-- *Prompt preparation time:* 0.771
-- *First-token latency:* 0.23
-- *Cleanup time:* 0.0867
-- *Prompt tokens:* 1,011
-- *Generation tokens:* 48
-- *Total tokens:* 1,059
-- *Prompt throughput (raw):* 4,405 tok/s
-- *Generation throughput (raw):* 162 tok/s
+- *Model load time:* 0.88s
+- *Generation time:* 1.16s
+- *Total time:* 2.64s
+- *Prompt preparation time:* 0.583
+- *First-token latency:* 0.245
+- *Cleanup time:* 0.111
+- *Prompt tokens:* 1,041
+- *Generation tokens:* 57
+- *Total tokens:* 1,098
+- *Prompt throughput (raw):* 4,253 tok/s
+- *Generation throughput (raw):* 160 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.8
 - *Cache memory (GB):* 0.27
 - *Model-load active memory (GB):* 3.75
-- *Post-cleanup active memory (GB):* 0.0173
+- *Post-cleanup active memory (GB):* 0.0193
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1277
+- *Rendered prompt characters:* 1448
 - *Processor:* mlx_vlm.models.moondream2.processing_moondream2.Moondream2Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -3348,7 +3823,7 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
 *Readable output:*
 
 <pre class="model-output-readable">
-Ramsgate Harbour, Kent, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
+Title: The Shopkeeper Store, located at No. 76, features a traditional black-painted storefront adorned with gold detailing on the ground floor, a red brick middle story with three sash windows, and twin slate-grey gabled dormers on the upper level. The shopfront displays clothing and accessories in its windows.
 </pre>
 
 </details>
