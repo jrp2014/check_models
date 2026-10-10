@@ -9099,7 +9099,7 @@ def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_pat
     )
     assert comparison.earlier_runs_on_mlx_version == 0
     assert comparison.mlx_version_history_unread == 1
-    rows_by_label = dict(check_models._comparison_view(comparison).summary_rows)
+    rows_by_label = dict(check_models._comparison_view(comparison).run_fact_rows)
     assert rows_by_label["Earlier retained runs on this mlx version"] == (
         "none recorded on 0.32.4+newest; 1 earlier record unreadable or without an mlx "
         "version, so not counted"
@@ -9113,8 +9113,21 @@ def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_pat
     # Without history the row is omitted rather than claiming a first run.
     unknown = replace(comparison, earlier_runs_on_mlx_version=None)
     assert "Earlier retained runs on this mlx version" not in dict(
-        check_models._comparison_view(unknown).summary_rows
+        check_models._comparison_view(unknown).run_fact_rows
     )
+    # A fact about this run, so it stays when a changed image withholds the diff.
+    incomparable = replace(
+        comparison, comparability="incomparable", incomparable_reasons=("image differs",)
+    )
+    view = check_models._comparison_view(incomparable)
+    assert view.summary_rows == ()
+    assert "Earlier retained runs on this mlx version" in dict(view.run_fact_rows)
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(incomparable),)
+        )
+    )
+    assert "*Earlier retained runs on this mlx version:* none recorded" in rendered
 
 
 def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
@@ -9143,7 +9156,7 @@ def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
         earlier_runs_on_mlx_version=0,
         mlx_version_history_unread=2,
     )
-    row = dict(check_models._comparison_view(comparison).summary_rows)[
+    row = dict(check_models._comparison_view(comparison).run_fact_rows)[
         "Earlier retained runs on this mlx version"
     ]
     assert "first" not in row
@@ -9153,7 +9166,7 @@ def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
     )
     clean = replace(comparison, mlx_version_history_unread=0)
     assert (
-        dict(check_models._comparison_view(clean).summary_rows)[
+        dict(check_models._comparison_view(clean).run_fact_rows)[
             "Earlier retained runs on this mlx version"
         ]
         == "none recorded on 0.32.4+x"

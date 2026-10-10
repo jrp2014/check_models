@@ -19,6 +19,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Run summary: "Earlier retained runs on this mlx version" is a fact about
+  the run, so it now shows (and is logged) even when a changed image or
+  prompt withholds the comparison; the 2026-10-10 sweep on a new photo had
+  recorded the count but hidden it.
 - Run summary: the baseline comparison adds "Earlier retained runs on this
   mlx version", counted from `results.history.jsonl` across every retained
   run ("none recorded on ..." for a fresh build, never "first run": history

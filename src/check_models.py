@@ -22548,6 +22548,8 @@ class _ComparisonView:
     continuity_rows: tuple[tuple[str, str], ...] = ()
     continuity_note: str | None = None
     text_change_rows: tuple[tuple[str, ...], ...] = ()
+    # Facts about this run itself, shown even when the runs are not comparable.
+    run_fact_rows: tuple[tuple[str, str], ...] = ()
     prefill_rows: tuple[tuple[str, str, str, str], ...] = ()
 
 
@@ -22720,7 +22722,6 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     ]
     summary_rows[2:2] = _changed_text_summary_rows(comparison)
     summary_rows[-1:-1] = _prefill_summary_rows(comparison)
-    summary_rows.extend(_mlx_version_history_rows(comparison))
     if comparison.current_execution_mode != comparison.baseline_execution_mode:
         mode_note = (
             f"{comparison.current_execution_mode} now vs "
@@ -22818,6 +22819,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         ),
         continuity_note=_continuity_note(comparison),
         text_change_rows=_text_change_rows(comparison),
+        run_fact_rows=tuple(_mlx_version_history_rows(comparison)),
         prefill_rows=_prefill_rows(comparison.prefill_changes),
     )
 
@@ -22913,7 +22915,9 @@ def _prefill_change_blocks(
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
     view = _comparison_view(comparison)
-    blocks: list[ReportBlock] = [ReportKeyValues(view.identity_rows + view.summary_rows)]
+    blocks: list[ReportBlock] = [
+        ReportKeyValues(view.identity_rows + view.run_fact_rows + view.summary_rows)
+    ]
     if view.banner is not None:
         blocks.append(ReportParagraph(view.banner))
     if view.revision_note is not None:
@@ -23056,7 +23060,7 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
     logger.info("Baseline: %s", comparison.baseline_label)
     if view.banner is not None:
         logger.warning("%s", _plain_log_text(view.banner))
-    for label, value in view.summary_rows:
+    for label, value in (*view.run_fact_rows, *view.summary_rows):
         logger.info("%s: %s", label, value)
     if view.revision_note is not None:
         logger.info("%s", _plain_log_text(view.revision_note))
