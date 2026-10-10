@@ -7262,7 +7262,7 @@ _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
 _RUNTIME_PHASE_LABELS: Final[dict[RuntimePhaseName, str]] = {
     "model_load": "model load",
     "prompt_prep": "local prompt prep",
-    "upstream_prefill_first_token": "upstream model prefill / first-token",  # skylos: ignore[SKY-S101] - phase-name key, not a secret; 4.33.2 entropy scanner misreads snake_case identifiers
+    "upstream_prefill_first_token": "upstream model prefill / first-token",  # skylos: ignore[SKY-S101] - a label, not a secret; since 4.33.2 any quoted value under a key containing 'token' is entropy-checked (still on 4.47.2)
     "input_preparation_and_decode": "input preparation + decode",
     "decode": "generation call total (unsplit)",
     "cleanup": "cleanup",

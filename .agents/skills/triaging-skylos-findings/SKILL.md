@@ -92,7 +92,7 @@ new defects. Run the gate on the old and new versions against the same
 commit to confirm, then triage each new rule as above. Also re-test the
 version-pinned workarounds: delete each suppression or filter that names an
 older Skylos version, rerun its narrow command, and drop it if the finding no
-longer appears (current ones: SKY-S101 for 4.33.2, still needed on 4.47.1;
+longer appears (current ones: SKY-S101 for 4.33.2, still needed on 4.47.2;
 and the `.worktrees/` danger filter for 4.33.x). A workaround for an
 editable install only reproduces with that package installed editable, as on
 john's Mac: CI installs wheels and never sees it.
