@@ -1106,6 +1106,14 @@ class SystemTelemetryRecord(TypedDict, total=False):
     thermal_samples: int
     thermal_state_max: int
     thermal_elevated_samples: int
+    # GPU "Device Utilization %" (IOAccelerator PerformanceStatistics) per
+    # snapshot probe. Both probes sit outside this process's GPU work and the
+    # reading falls to 0 within ~50 ms of it ending, so a non-zero value is
+    # another process using the GPU. Continuous samples overlap inference and
+    # never carry it.
+    gpu_samples: int
+    gpu_utilization_max_pct: int
+    gpu_busy_samples: int
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -15752,22 +15760,58 @@ def _sample_thermal_state() -> int | None:
     return state if 0 <= state < len(_THERMAL_STATE_LABELS) else None
 
 
+_GPU_UTILIZATION_RE: Final[re.Pattern[str]] = re.compile(r'"Device Utilization %"=(\d+)')
+
+
+def _sample_gpu_utilization_pct() -> int | None:
+    """Read the GPU's "Device Utilization %" from IOAccelerator (no root needed).
+
+    The highest value when several accelerators report; None when ioreg is
+    unavailable or reports none.
+    """
+    output = _run_macos_toolchain_command(("ioreg", "-r", "-d", "1", "-c", "IOAccelerator"))
+    if output is None:
+        return None
+    values = [int(value) for value in _GPU_UTILIZATION_RE.findall(output)]
+    return max(values) if values else None
+
+
 class _TelemetryProbe(NamedTuple):
-    """One telemetry sample; the power and thermal fields default to unavailable."""
+    """One telemetry sample; the power, thermal and GPU fields default to unavailable."""
 
     cpu_speed_limit_pct: float | None
     memory_pressure_level: int | None
     power_source: str | None = None
     power_mode: int | None = None
     thermal_state: int | None = None
+    gpu_utilization_pct: int | None = None
 
 
 def _system_telemetry_probe() -> _TelemetryProbe:
-    """Take one probe: thermal CPU limit, memory pressure, power, thermal state."""
+    """Take one snapshot probe: CPU limit, memory pressure, power, thermal state, GPU use."""
     cpu_limit = _sample_thermal_cpu_speed_limit_pct()
     pressure = _sample_memory_pressure_level()
     source, mode = _sample_power_state()
-    return _TelemetryProbe(cpu_limit, pressure, source, mode, _sample_thermal_state())
+    return _TelemetryProbe(
+        cpu_limit,
+        pressure,
+        source,
+        mode,
+        _sample_thermal_state(),
+        _sample_gpu_utilization_pct(),
+    )
+
+
+def _gpu_telemetry_fields(probes: Sequence[_TelemetryProbe]) -> SystemTelemetryRecord:
+    """GPU-use counts over the probes that carry a reading; empty when none do."""
+    gpu = [p.gpu_utilization_pct for p in probes if p.gpu_utilization_pct is not None]
+    if not gpu:
+        return {}
+    return {
+        "gpu_samples": len(gpu),
+        "gpu_utilization_max_pct": max(gpu),
+        "gpu_busy_samples": sum(value > 0 for value in gpu),
+    }
 
 
 def _system_telemetry_record_from_probes(
@@ -15815,6 +15859,7 @@ def _system_telemetry_record_from_probes(
     if thermal:
         record["thermal_state_max"] = max(thermal)
         record["thermal_elevated_samples"] = sum(state > 0 for state in thermal)
+    record.update(_gpu_telemetry_fields(probes))
     return record
 
 
@@ -15969,6 +16014,12 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
                 telemetry.get("thermal_samples", 0),
             )
         )
+    if busy := telemetry.get("gpu_busy_samples", 0):
+        notes.append(
+            f"GPU in use by other processes (up to "
+            f"{telemetry.get('gpu_utilization_max_pct', 0)}%) "
+            + _telemetry_checks_phrase(telemetry, busy, telemetry.get("gpu_samples", 0))
+        )
     gap = telemetry.get("wall_clock_gap_s")
     if gap is not None:
         notes.append(
@@ -16027,6 +16078,11 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
         )
     else:
         parts.append("thermal-state probe unavailable")
+    if gpu_samples := telemetry.get("gpu_samples", 0):
+        parts.append(
+            f"GPU utilisation by other processes max "
+            f"{telemetry.get('gpu_utilization_max_pct', 0)}% over {gpu_samples} sample(s)"
+        )
     if (gap := telemetry.get("wall_clock_gap_s")) is not None:
         parts.append(f"wall-clock gap {gap:.0f}s (sleep/suspend; timings untrustworthy)")
     parts.append(f"mode {telemetry.get('mode', 'unknown')}")
@@ -21420,6 +21476,17 @@ def _record_timing_untrusted(record: JsonlResultRecord) -> bool:
     return _record_wall_clock_gap(record) or _record_thermal_throttled(record)
 
 
+def _records_gpu_busy(records: Sequence[JsonlResultRecord]) -> tuple[int, int] | None:
+    """(models with another process on the GPU at a snapshot check, peak %), or None."""
+    busy = [
+        telemetry.get("gpu_utilization_max_pct", 0)
+        for record in records
+        if isinstance(telemetry := record.get("system_telemetry"), dict)
+        and telemetry.get("gpu_busy_samples", 0)
+    ]
+    return (len(busy), max(busy)) if busy else None
+
+
 def _record_on_battery(record: JsonlResultRecord) -> bool:
     """Return whether any power probe around this model read battery power."""
     telemetry = record.get("system_telemetry")
@@ -21459,6 +21526,12 @@ def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> 
     on_battery = sum(_record_on_battery(record) for record in records)
     if on_battery:
         notes.append(f"{label} run on battery power for {on_battery} of {len(records)} models")
+    if gpu_busy := _records_gpu_busy(records):
+        count, peak = gpu_busy
+        notes.append(
+            f"{label} run found the GPU in use by other processes before or after {count} of "
+            f"{len(records)} models (up to {peak}%)"
+        )
     gaps = [record["model"] for record in records if _record_wall_clock_gap(record)]
     if gaps:
         notes.append(

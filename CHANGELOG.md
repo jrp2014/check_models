@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- System telemetry: each snapshot check (before load and after cleanup) also
+  reads the GPU's "Device Utilization %" from `ioreg` (IOAccelerator, no root).
+  Both checks sit outside check_models' own GPU work, and the reading drops
+  to 0 within about 50 ms of that work ending, so a non-zero value is another
+  process on the GPU. Records gain `gpu_samples`, `gpu_utilization_max_pct`
+  and `gpu_busy_samples`; diagnostics state it per model, and the comparison's
+  run-environment note counts the models affected. It is a recorded fact and
+  does not exclude timings. The 2026-10-11 00:22 sweep ran while DxO PhotoLab
+  exported photos and decoded at about half speed, with every other recorded
+  reading unchanged. Continuous sampling, which overlaps inference, does not
+  take the reading.
 - `tools/update.sh` ends every run, including one stopped by a failed step,
   with a table of what changed: each Python package (pip-installed), conda
   env, conda base, Homebrew and markdownlint-cli2 version that moved, was

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import io
 import json
 import logging
@@ -1811,6 +1812,65 @@ def test_telemetry_record_aggregates_power_per_probe() -> None:
     )
     assert bare["power_samples"] == 0
     assert "power probe unavailable" in check_models._telemetry_status_line(bare)
+
+
+def test_gpu_utilization_sample_parses_ioreg_output(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The highest "Device Utilization %" across accelerators; None when ioreg says nothing."""
+    outputs: list[str | None] = [
+        (
+            '"PerformanceStatistics" = {"Tiler Utilization %"=9,"Device Utilization %"=37}\n'
+            '"PerformanceStatistics" = {"Device Utilization %"=5}'
+        ),
+        '"PerformanceStatistics" = {"In use system memory"=1}',
+        None,
+    ]
+    monkeypatch.setattr(
+        check_models, "_run_macos_toolchain_command", lambda *_args, **_kwargs: outputs.pop(0)
+    )
+    assert check_models._sample_gpu_utilization_pct() == 37
+    assert check_models._sample_gpu_utilization_pct() is None
+    assert check_models._sample_gpu_utilization_pct() is None
+
+
+def test_telemetry_records_other_processes_on_the_gpu() -> None:
+    """Snapshot GPU readings aggregate per probe; any non-zero reading is another process."""
+    probe = functools.partial(check_models._TelemetryProbe, 100.0, 1, "ac", 0, 0)
+    record = check_models._system_telemetry_record_from_probes(
+        [probe(gpu_utilization_pct=0), probe(gpu_utilization_pct=37)], mode="snapshot"
+    )
+    assert record["gpu_samples"] == 2
+    assert record["gpu_utilization_max_pct"] == 37
+    assert record["gpu_busy_samples"] == 1
+    assert "GPU utilisation by other processes max 37% over 2 sample(s)" in (
+        check_models._telemetry_status_line(record)
+    )
+    assert check_models._telemetry_degradation_note(record) == (
+        "GPU in use by other processes (up to 37%) at 1 of 2 checks (before load and after cleanup)"
+    )
+    # A recorded fact: it does not by itself exclude the model from timing comparisons.
+    assert not check_models._telemetry_degrades_timings(record)
+    idle = check_models._system_telemetry_record_from_probes(
+        [probe(gpu_utilization_pct=0), probe(gpu_utilization_pct=0)], mode="snapshot"
+    )
+    assert idle["gpu_busy_samples"] == 0
+    assert check_models._telemetry_degradation_note(idle) is None
+    # Continuous samples overlap inference and never carry a GPU reading.
+    unread = check_models._system_telemetry_record_from_probes([probe()], mode="continuous")
+    assert "gpu_samples" not in unread
+
+    def result(model: str, telemetry: check_models.SystemTelemetryRecord) -> object:
+        return {"model": model, "system_telemetry": telemetry}
+
+    records = cast(
+        "list[check_models.JsonlResultRecord]",
+        [result("org/a", record), result("org/b", idle), result("org/c", unread)],
+    )
+    assert check_models._run_environment_notes("current", records) == [
+        (
+            "current run found the GPU in use by other processes before or after 1 of 3 "
+            "models (up to 37%)"
+        )
+    ]
 
 
 def test_wall_clock_gap_is_attached_only_beyond_the_threshold() -> None:
