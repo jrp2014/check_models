@@ -7688,6 +7688,33 @@ def test_diagnostics_facts_show_measured_first_token_and_declared_sampling() -> 
     )
 
 
+def test_diagnostics_facts_show_text_delivery_only_after_a_long_empty_stretch() -> None:
+    """Held-back text is stated as counts once a long stretch released nothing."""
+
+    def facts_for(delivery: check_models.TextDelivery) -> dict[str, str]:
+        result = replace(
+            _make_success(),
+            runtime_diagnostics=RuntimeDiagnostics(stop_reason="completed", text_delivery=delivery),
+        )
+        return dict(
+            check_models._diagnostics_result_facts(
+                result, check_models._assess_result(result), run_args=None, model_provenance=None
+            )
+        )
+
+    held_back = check_models.TextDelivery(
+        chunks=1001, empty_text_chunks=970, longest_empty_text_run=970, final_chunk_chars=5830
+    )
+    assert facts_for(held_back)["Text delivery"] == (
+        "970 of 1,001 streamed chunks released no text (longest consecutive stretch 970); "
+        "the last released 5,830 characters"
+    )
+    ordinary = check_models.TextDelivery(
+        chunks=400, empty_text_chunks=60, longest_empty_text_run=4, final_chunk_chars=6
+    )
+    assert "Text delivery" not in facts_for(ordinary)
+
+
 def test_comparison_excludes_slept_models_from_throughput_and_notes_environment() -> None:
     """A wall-clock gap drops that model from ratios; power state is a note, not a withhold."""
     baseline = _comparison_baseline(

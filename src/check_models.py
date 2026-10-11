@@ -1059,6 +1059,15 @@ class JsonlTimingRecord(TypedDict):
     stop_reason: str | None
 
 
+class TextDeliveryRecord(TypedDict):
+    """Streamed-chunk text release counts (see ``TextDelivery``)."""
+
+    chunks: int
+    empty_text_chunks: int
+    longest_empty_text_run: int
+    final_chunk_chars: int
+
+
 class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     """Performance metrics emitted for successful generations."""
 
@@ -1067,6 +1076,7 @@ class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     model_weight_buffer_gb: float
     peak_memory_delta_gb: float
     first_token_peak_memory_gb: float
+    text_delivery: TextDeliveryRecord
     post_cleanup_active_memory_gb: float
     post_cleanup_cache_memory_gb: float
 
@@ -2086,6 +2096,21 @@ class RerunEvidence:
 
 
 @dataclass(frozen=True)
+class TextDelivery:
+    """How the streamed chunks released text: measured counts, no judgment.
+
+    A chunk carries one generated token; its text is empty while the
+    detokenizer holds text back (a BPE detokenizer waits for a token that
+    starts with a space), so a long empty stretch ends in a large final flush.
+    """
+
+    chunks: int
+    empty_text_chunks: int
+    longest_empty_text_run: int
+    final_chunk_chars: int
+
+
+@dataclass(frozen=True)
 class RuntimeDiagnostics:
     """Detailed runtime attribution and termination diagnostics for one run."""
 
@@ -2109,6 +2134,7 @@ class RuntimeDiagnostics:
     # peak), against the final peak which also covers decode.
     first_token_peak_memory_gb: float | None = None
     stop_reason: str | None = None
+    text_delivery: TextDelivery | None = None
     # Allocator residue sampled after the per-model cleanup sequence.
     post_cleanup_active_memory_gb: float | None = None
     post_cleanup_cache_memory_gb: float | None = None
@@ -10361,6 +10387,23 @@ def _runtime_termination_facts(
             runtime.time_to_first_token_s,
         ),
         ("Peak memory at first token (GB)", runtime.first_token_peak_memory_gb),
+        ("Text delivery", _notable_text_delivery_fact(runtime.text_delivery)),
+    )
+
+
+# A stretch this long of chunks releasing no text is shown in diagnostics;
+# ordinary words hold back a few tokens at most.
+_TEXT_DELIVERY_NOTABLE_EMPTY_RUN: Final[int] = 32
+
+
+def _notable_text_delivery_fact(delivery: TextDelivery | None) -> str | None:
+    """State the text-delivery counts when a long stretch of chunks released no text."""
+    if delivery is None or delivery.longest_empty_text_run < _TEXT_DELIVERY_NOTABLE_EMPTY_RUN:
+        return None
+    return (
+        f"{delivery.empty_text_chunks:,} of {delivery.chunks:,} streamed chunks released "
+        f"no text (longest consecutive stretch {delivery.longest_empty_text_run:,}); "
+        f"the last released {delivery.final_chunk_chars:,} characters"
     )
 
 
@@ -14378,6 +14421,7 @@ def _build_runtime_diagnostics(
     first_token_latency_s: float | None = None,
     time_to_first_token_s: float | None = None,
     first_token_peak_memory_gb: float | None = None,
+    text_delivery: TextDelivery | None = None,
     model_load_active_memory_gb: float | None = None,
     model_weight_buffer_gb: float | None = None,
     post_cleanup_active_memory_gb: float | None = None,
@@ -14396,6 +14440,7 @@ def _build_runtime_diagnostics(
         time_to_first_token_s=time_to_first_token_s,
         first_token_peak_memory_gb=first_token_peak_memory_gb,
         stop_reason=stop_reason,
+        text_delivery=text_delivery,
         post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
         post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
@@ -14768,6 +14813,10 @@ class StreamObservations:
     experiences it (input preparation, prefill and the first decode step).
     ``token_ids`` are the retained (non-draft) generated ids, from which
     special tokens are detected by id rather than by regex on the text.
+    The text-delivery counts say how the detokenizer released that text:
+    retained chunks, those that released none, the longest consecutive
+    stretch of them, and the characters in the last retained chunk (upstream's
+    final flush when the stream ran to its end).
     """
 
     started_at: float | None = None
@@ -14776,6 +14825,34 @@ class StreamObservations:
     first_token_peak_memory_gb: float | None = None
     token_ids: list[int] = dataclass_field(default_factory=list)
     special_tokens: tuple[str, ...] = ()
+    text_chunks: int = 0
+    empty_text_chunks: int = 0
+    longest_empty_text_run: int = 0
+    final_chunk_chars: int = 0
+    _empty_text_run: int = dataclass_field(default=0, repr=False)
+
+    def observe_text(self, text: str) -> None:
+        """Count one retained chunk's released text."""
+        self.text_chunks += 1
+        self.final_chunk_chars = len(text)
+        if text:
+            self._empty_text_run = 0
+            return
+        self.empty_text_chunks += 1
+        self._empty_text_run += 1
+        self.longest_empty_text_run = max(self.longest_empty_text_run, self._empty_text_run)
+
+    @property
+    def text_delivery(self) -> TextDelivery | None:
+        """The text-delivery counts, or None when no retained chunk arrived."""
+        if not self.text_chunks:
+            return None
+        return TextDelivery(
+            chunks=self.text_chunks,
+            empty_text_chunks=self.empty_text_chunks,
+            longest_empty_text_run=self.longest_empty_text_run,
+            final_chunk_chars=self.final_chunk_chars,
+        )
 
     @property
     def time_to_first_token_s(self) -> float | None:
@@ -15016,6 +15093,8 @@ def _generate_with_repetition_guard(
                 if on_first_token is not None:
                     on_first_token()
             _observe_token(observations, chunk)
+            if observations is not None:
+                observations.observe_text(chunk.text)
             pieces.append(chunk.text)
             if (
                 echo is not None
@@ -15456,6 +15535,7 @@ def _build_success_process_result(
             first_token_latency_s=first_token_latency_s,
             time_to_first_token_s=observations.time_to_first_token_s,
             first_token_peak_memory_gb=observations.first_token_peak_memory_gb,
+            text_delivery=observations.text_delivery,
             model_load_active_memory_gb=run.model_load_active_memory_gb,
             model_weight_buffer_gb=run.model_weight_buffer_gb,
             stop_reason=stop_reason,
@@ -19858,6 +19938,13 @@ def _build_jsonl_metrics_record(
     first_token_peak = runtime.first_token_peak_memory_gb if runtime is not None else None
     if first_token_peak is not None:
         metrics["first_token_peak_memory_gb"] = first_token_peak
+    if runtime is not None and (delivery := runtime.text_delivery) is not None:
+        metrics["text_delivery"] = {
+            "chunks": delivery.chunks,
+            "empty_text_chunks": delivery.empty_text_chunks,
+            "longest_empty_text_run": delivery.longest_empty_text_run,
+            "final_chunk_chars": delivery.final_chunk_chars,
+        }
     working_set_pct = _peak_memory_working_set_pct(
         facts.get("peak_memory_gb"),
         recommended_working_set_bytes,

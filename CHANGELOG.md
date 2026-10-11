@@ -14,6 +14,15 @@ Notable changes to this project will be documented in this file.
   2026-10-11 19:53 sweep's "Dusk" place name) or wording since corrected; the
   row explains why. It is absent when the version and revision match, which
   includes every summary written during a run.
+- Streaming boundary: each generation records how its chunks released text:
+  retained chunks, those that released none, the longest consecutive stretch
+  of them, and the characters in the last chunk. A BPE detokenizer holds text
+  back until a token starting with a space arrives, so Qwen2-VL's 265 repeats
+  of `<|im_start|>assistant` on 2026-10-11 came as about 970 empty chunks and
+  one large final flush. Results carry the counts as `metrics.text_delivery`
+  in `results.jsonl`; diagnostics show them only after a stretch of 32 or
+  more empty chunks, as counts with no quality judgment. Generation and its
+  text are unchanged.
 - E2E smoke: `test_full_inference_with_tiny_local_checkpoint` writes a
   random-weight Qwen2-VL checkpoint of about 150 KB (tokenizer, chat template,
   image-processor config, safetensors) to a temp directory and runs it

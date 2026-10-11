@@ -1457,7 +1457,12 @@ class TestIsolatedExecution:
                     exception_type="ValueError", module="builtins", message="x"
                 ),
             ),
-            runtime_diagnostics=check_models.RuntimeDiagnostics(stop_reason="completed"),
+            runtime_diagnostics=check_models.RuntimeDiagnostics(
+                stop_reason="completed",
+                text_delivery=check_models.TextDelivery(
+                    chunks=40, empty_text_chunks=3, longest_empty_text_run=2, final_chunk_chars=5
+                ),
+            ),
             completed_at="2026-08-23 12:00:00 BST",
         )
         payload = json.loads(json.dumps(check_models._performance_result_to_json(result)))
@@ -1787,17 +1792,26 @@ class TestRepetitionGuard:
             )
         )
         monkeypatch.setattr(check_models, "stream_generate", lambda **_kwargs: iter(chunks))
+        observations = check_models.StreamObservations()
         result = check_models._generate_with_repetition_guard(
             model=cast("Any", object()),
             processor=_FakeProcessor(),
             prompt="p",
             image="i.jpg",
+            observations=observations,
         )
         assert result.finish_reason == "length"
         text = result.text
         assert text is not None
         assert text.endswith(flushed)
         assert text.count("<|im_start|>assistant") == 265
+        # The streaming boundary records how the text arrived.
+        assert observations.text_delivery == check_models.TextDelivery(
+            chunks=1001,
+            empty_text_chunks=970,
+            longest_empty_text_run=970,
+            final_chunk_chars=len(flushed),
+        )
 
     def test_wrapper_aborts_repeating_stream_and_marks_finish_reason(
         self, monkeypatch: pytest.MonkeyPatch
@@ -2739,6 +2753,8 @@ class TestStreamObservations:
             started_at=10.0, first_token_at=10.75, first_token_peak_memory_gb=3.25
         )
         observations.special_tokens = ("<|box|>",)
+        for text in ("Hello ", "", "", "world"):
+            observations.observe_text(text)
         phase_timer = check_models.PhaseTimer()
         result, _stop = check_models._build_success_process_result(
             params=_build_params(test_image),
@@ -2750,6 +2766,9 @@ class TestStreamObservations:
         assert result.runtime_diagnostics is not None
         assert result.runtime_diagnostics.time_to_first_token_s == 0.75
         assert result.runtime_diagnostics.first_token_peak_memory_gb == 3.25
+        assert result.runtime_diagnostics.text_delivery == check_models.TextDelivery(
+            chunks=4, empty_text_chunks=2, longest_empty_text_run=2, final_chunk_chars=5
+        )
         assert result.emitted_special_tokens == ("<|box|>",)
         assert result.quality_analysis is not None
         assert "<|box|>" in result.quality_analysis.unexpected_special_tokens
