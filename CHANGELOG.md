@@ -12,8 +12,11 @@ Notable changes to this project will be documented in this file.
   assessments retained". Regeneration keeps each model's recorded assessment,
   so a newer report can still show an observation since retired (the
   2026-10-11 19:53 sweep's "Dusk" place name) or wording since corrected; the
-  row explains why. It is absent when the version and revision match, which
-  includes every summary written during a run.
+  row explains why. It is absent when the version and revision match and
+  neither tree had uncommitted changes. A dirty tree's revision does not
+  identify its code, so a dirty capture or render always shows the row,
+  marking that side "(uncommitted changes)", including a summary written
+  during a run from a dirty tree.
 - Streaming boundary: each generation records how its chunks released text:
   retained chunks, those that released none, the longest consecutive stretch
   of them, and the characters in the last chunk. A BPE detokenizer holds text

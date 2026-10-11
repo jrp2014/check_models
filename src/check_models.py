@@ -24521,27 +24521,38 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
 def _run_issue_summary_provenance_rows(
     producer: CheckModelsProvenanceRecord | None,
 ) -> tuple[tuple[str, str], ...]:
-    """Name the check_models that rendered this summary when it is not the run's own.
+    """Name the check_models that rendered this summary when it may not be the run's own.
 
     A regenerated summary re-renders the retained results: each model's
     assessment is the one recorded at run time, so it can carry observations
-    since retired or wording since corrected. Silent when the code matches.
+    since retired or wording since corrected. Silent only when version and
+    revision match and neither tree had uncommitted changes, since a dirty
+    tree's revision does not identify the code that ran.
     """
     if producer is None:
         return ()
     renderer = _collect_check_models_provenance()
     captured_revision, rendered_revision = producer["git_revision"], renderer["git_revision"]
-    if producer["version"] == renderer["version"] and (
-        captured_revision is None
-        or rendered_revision is None
-        or captured_revision == rendered_revision
+    dirty = bool(producer.get("dirty")) or bool(renderer.get("dirty"))
+    if (
+        not dirty
+        and producer["version"] == renderer["version"]
+        and (
+            captured_revision is None
+            or rendered_revision is None
+            or captured_revision == rendered_revision
+        )
     ):
         return ()
-    captured = producer["version"] + (f" @ {captured_revision[:9]}" if captured_revision else "")
-    rendered = renderer["version"] + (f" @ {rendered_revision[:9]}" if rendered_revision else "")
+
+    def label(record: CheckModelsProvenanceRecord) -> str:
+        revision = record["git_revision"]
+        text = record["version"] + (f" @ {revision[:9]}" if revision else "")
+        return text + (" (uncommitted changes)" if record.get("dirty") else "")
+
     text = (
-        f"run captured by check_models {captured}; report rendered by {rendered}; "
-        "original assessments retained"
+        f"run captured by check_models {label(producer)}; report rendered by "
+        f"{label(renderer)}; original assessments retained"
     )
     return (("Provenance", text),)
 

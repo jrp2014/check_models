@@ -1792,6 +1792,46 @@ def test_regenerated_summary_names_the_rendering_check_models(tmp_path: Path) ->
         assert same is not None
         assert "Provenance" not in same.read_text(encoding="utf-8")
 
+        # A dirty tree's revision does not identify its code, so a match is unproven.
+        renderer["dirty"] = True
+        dirty = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+        assert dirty is not None
+        assert (
+            "*Provenance:* run captured by check_models 0.8.9 @ abc123; report rendered by "
+            "0.8.9 @ abc123 (uncommitted changes); original assessments retained"
+        ) in " ".join(dirty.read_text(encoding="utf-8").split())
+
+
+def test_summary_from_a_dirty_capture_names_it_even_when_the_revision_matches(
+    tmp_path: Path,
+) -> None:
+    """A run captured with uncommitted changes is not proven to match a clean renderer."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/clean"),))
+    rows = [
+        json.loads(line) for line in output_paths.jsonl.read_text(encoding="utf-8").splitlines()
+    ]
+    rows[0]["producer"]["dirty"] = True
+    check_models._write_text_file(
+        output_paths.jsonl, "".join(json.dumps(row) + "\n" for row in rows)
+    )
+    renderer: check_models.CheckModelsProvenanceRecord = {
+        "name": "check_models",
+        "version": "0.8.9",
+        "git_revision": "abc123",
+        "install_type": "source-tree",
+        "dirty": False,
+    }
+
+    with patch.object(check_models, "_collect_check_models_provenance", return_value=renderer):
+        summary = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+
+    assert summary is not None
+    assert (
+        "*Provenance:* run captured by check_models 0.8.9 @ abc123 (uncommitted changes); "
+        "report rendered by 0.8.9 @ abc123; original assessments retained"
+    ) in " ".join(summary.read_text(encoding="utf-8").split())
+
 
 @pytest.mark.parametrize(
     ("replacement", "expected"),
