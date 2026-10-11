@@ -888,6 +888,21 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The quality table's intro now says "tokens in count the image's tokens
+  too ...; tokens out are those generated". Skylos 4.47.2 flagged the
+  previous wording of that sentence as a prompt-injection pattern (SKY-D260)
+  in the 2026-10-11 19:53 run summary, although earlier summaries with the
+  identical sentence passed, so the detector weighs surrounding text. The
+  meaning is unchanged; the retained summary was regenerated with the new
+  wording.
+- The snapshot GPU reading no longer reports check_models' own work as
+  outside activity. The first `ioreg` read after a long gap returns a stale
+  figure: in the 2026-10-11 19:53 sweep the after-cleanup check showed this
+  process's finished inference at 47-99% for 36 of 47 models, while a read a
+  moment later gave 0. Each sample now discards one read, waits 50 ms and
+  keeps the next, and the after-cleanup check first synchronizes MLX. A trace
+  of six models then read 0 at all twelve checks, while a separate
+  GPU-loading process still showed 24-26%.
 - `update.sh`'s end-of-run change table listed every pip-installed package
   twice, once as `pip` and again as `conda`: `conda list` ignores `--no-pip`
   and always includes site-packages installs (channel `pypi`, or `<develop>`

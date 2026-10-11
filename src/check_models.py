@@ -15729,17 +15729,31 @@ def _sample_thermal_state() -> int | None:
 _GPU_UTILIZATION_RE: Final[re.Pattern[str]] = re.compile(r'"Device Utilization %"=(\d+)')
 
 
-def _sample_gpu_utilization_pct() -> int | None:
-    """Read the GPU's "Device Utilization %" from IOAccelerator (no root needed).
-
-    The highest value when several accelerators report; None when ioreg is
-    unavailable or reports none.
-    """
+def _read_gpu_utilization_pct() -> int | None:
+    """One ioreg read of "Device Utilization %"; the highest when several GPUs report."""
     output = _run_macos_toolchain_command(("ioreg", "-r", "-d", "1", "-c", "IOAccelerator"))
     if output is None:
         return None
     values = [int(value) for value in _GPU_UTILIZATION_RE.findall(output)]
     return max(values) if values else None
+
+
+# The first read after a long gap returns a stale figure (on 2026-10-11 it
+# showed this process's finished inference at 55-92% while a read a moment
+# later gave 0), so each sample discards one read and takes the next.
+_GPU_REREAD_DELAY_S: Final[float] = 0.05
+
+
+def _sample_gpu_utilization_pct() -> int | None:
+    """Read the GPU's "Device Utilization %" from IOAccelerator (no root needed).
+
+    Discards a first, possibly stale read and returns a second one taken
+    shortly after; None when ioreg is unavailable or reports none.
+    """
+    if _read_gpu_utilization_pct() is None:
+        return None
+    time.sleep(_GPU_REREAD_DELAY_S)
+    return _read_gpu_utilization_pct()
 
 
 class _TelemetryProbe(NamedTuple):
@@ -16089,6 +16103,13 @@ def _start_system_telemetry(
         return None, []
 
 
+def _settle_own_gpu_work() -> None:
+    """Drain this process's MLX queue so the trailing GPU reading excludes its own work."""
+    synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
+    if synchronize_fn is not None:
+        synchronize_fn()
+
+
 def _finish_system_telemetry(
     sampler: _SystemTelemetrySampler | None,
     probes: list[_TelemetryProbe],
@@ -16104,6 +16125,7 @@ def _finish_system_telemetry(
             sampler.stop()
             return sampler.snapshot()
         if probes:
+            _settle_own_gpu_work()
             probes.append(_system_telemetry_probe())
             return _system_telemetry_record_from_probes(probes, mode="snapshot")
     except Exception:
@@ -24538,8 +24560,9 @@ def _run_issue_summary_quality_section(
         '"No concerns detected" is not an accuracy verdict: read the final answers in the '
         'gallery. "Major concerns: generation" means generation itself failed (no text, '
         'repeated text, or no final answer); "major concerns: answer format" means an '
-        "answer was generated but missed the requested form. Prompt tokens include the image tokens, which drive prefill time; output "
-        f"tokens are the tokens generated{limit_note}."
+        "answer was generated but missed the requested form. Tokens in count the image's "
+        "tokens too, which drive prefill time; tokens out are those generated"
+        f"{limit_note}."
     )
     if show_keywords:
         intro += " Keywords are counted from the answer's Keywords field" + (

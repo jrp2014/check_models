@@ -1815,22 +1815,30 @@ def test_telemetry_record_aggregates_power_per_probe() -> None:
     assert "power probe unavailable" in check_models._telemetry_status_line(bare)
 
 
-def test_gpu_utilization_sample_parses_ioreg_output(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The highest "Device Utilization %" across accelerators; None when ioreg says nothing."""
+def test_gpu_utilization_sample_discards_the_stale_first_read(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Each sample takes two ioreg reads and keeps the second: the first can be stale."""
     outputs: list[str | None] = [
+        # A stale first read (finished inference) followed by the current one.
+        '"PerformanceStatistics" = {"Device Utilization %"=92}',
         (
             '"PerformanceStatistics" = {"Tiler Utilization %"=9,"Device Utilization %"=37}\n'
             '"PerformanceStatistics" = {"Device Utilization %"=5}'
         ),
+        '"PerformanceStatistics" = {"Device Utilization %"=0}',
         '"PerformanceStatistics" = {"In use system memory"=1}',
         None,
     ]
+    monkeypatch.setattr(check_models, "_GPU_REREAD_DELAY_S", 0.0)
     monkeypatch.setattr(
         check_models, "_run_macos_toolchain_command", lambda *_args, **_kwargs: outputs.pop(0)
     )
     assert check_models._sample_gpu_utilization_pct() == 37
     assert check_models._sample_gpu_utilization_pct() is None
+    # An unavailable first read ends the sample without a second one.
     assert check_models._sample_gpu_utilization_pct() is None
+    assert outputs == []
 
 
 def test_telemetry_records_other_processes_on_the_gpu() -> None:

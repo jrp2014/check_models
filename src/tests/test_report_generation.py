@@ -8635,7 +8635,7 @@ def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
     # An answer with no labelled field is measured whole, and says so.
     assert "| 97% of answer |" in content
     prose = " ".join(content.split())
-    assert "output tokens are the tokens generated (limit 500)" in prose
+    assert "tokens out are those generated (limit 500)" in prose
     assert "rounded down; 80% or more is reported as a repeated prompt hint" in prose
 
     # A custom --prompt has no Keywords field or hint: no columns, no wording.
