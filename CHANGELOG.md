@@ -43,6 +43,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Removed the `unverified_place_name` observation (added in 0.17.29). It was
+  a heuristic: any capitalised word after "in", "at", "near", "outside" or
+  "around", or beside a feature word such as "River", that the prompt lacked.
+  The 2026-10-11 19:53 sweep flagged "Dusk", "Sunset" and "UK" (the hints
+  said "United Kingdom"), and telling places from other words would need an
+  ever-growing exception list or a gazetteer. Retained records with the code
+  still render, names included. `prompt_hint_echoed`, a counted overlap with
+  the prompt's own hint, stays.
 - CLI declarations: the KV quantization schemes are one `KvQuantScheme`
   alias, and the `--kv-*-scheme` and `--assessment-profile` choices are read
   from their aliases instead of repeating the values. Options no longer

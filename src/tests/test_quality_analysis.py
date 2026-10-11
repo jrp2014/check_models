@@ -1863,39 +1863,23 @@ def test_unlabelled_answer_that_is_the_hint_is_flagged_as_an_echo() -> None:
     assert labelled_elsewhere.description_hint_percent is None
 
 
-def test_place_names_the_prompt_never_supplied_are_flagged() -> None:
-    """A place inferred from GPS or guessed outright is reported; supplied and visible facts are not."""
-    inferred = _assisted(
-        "Title: Swan on River Cam, Cambridge\nDescription: A white swan swims on the River Cam "
-        "at dusk; moored boats line the bank near Lambeth.\nKeywords: swan, river"
+def test_place_names_are_no_longer_guessed_but_old_evidence_still_renders() -> None:
+    """The capitalised-word place heuristic is gone; retained records keep their label."""
+    analysis = _assisted(
+        "Title: Swan on River Cam\nDescription: A white swan swims on the River Cam at Dusk; "
+        "moored boats line the bank near Lambeth.\nKeywords: swan, river"
     )
-    assert inferred.unverified_place_names == ["River Cam", "Lambeth"]
-    observations = check_models._quality_observations(text="Title: Swan", analysis=inferred)
-    assert "unverified_place_name" in observations
-    assert "River Cam" in check_models._human_observation_labels(
-        observations, details={"unverified_place_names": ["River Cam", "Lambeth"]}
-    )
-
-    places = check_models._unverified_place_names
-    bath_prompt = "Describe this photograph taken in Bath, Somerset, in September."
-    # Supplied names (even possessive), months, adjectives and Title Case headings stay silent.
-    assert places("The abbey dominates Bath's skyline in September.", bath_prompt) == []
-    assert places("Terraces in Georgian style line the crescent in Bath.", bath_prompt) == []
-    assert places("A sign reads New Road and Road Ahead Closed.", bath_prompt) == []
-    # A Title Case heading would match, which is why only sentence-case prose
-    # (the Description) is scanned and never the Title.
-    assert places("Serene River Scene with a Majestic White Swan", _ASSISTED_PROMPT) != []
+    observations = check_models._quality_observations(text="Title: Swan", analysis=analysis)
+    assert "unverified_place_name" not in observations
+    assert not hasattr(analysis, "unverified_place_names")
+    # A record written by 0.17.29-0.17.47 still renders its names.
+    legacy = cast("tuple[check_models.ObservationCode, ...]", ("unverified_place_name",))
     assert (
-        _assisted(
-            "Title: Serene River Scene\nDescription: A swan swims.\nKeywords: swan"
-        ).unverified_place_names
-        == []
+        check_models._human_observation_labels(
+            legacy, details={"unverified_place_names": ["River Cam", "Lambeth"]}
+        )
+        == "Names a place the prompt did not supply: River Cam, Lambeth"
     )
-    assert places("Boats moored near Ely on the Great Ouse River.", bath_prompt) == [
-        "Great Ouse River",
-        "Ely",
-    ]
-    assert places("A swan on the River Cam.", None) == []
 
 
 def test_checkpoint_file_facts_record_what_each_file_declares(tmp_path: Path) -> None:

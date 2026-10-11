@@ -4548,103 +4548,6 @@ def _echoed_hint_fields(
     return _dedupe_preserve_order(echoed)
 
 
-# Natural and landmark features only: street furniture ("New Road", "Road
-# Ahead") is as often sign text the model legitimately read.
-_PLACE_FEATURE: Final[str] = r"(?:River|Lake|Loch|Mount|Mt|Isle|Cathedral|Castle|Abbey)"
-_PLACE_NAME: Final[str] = r"[A-Z][a-zA-Z'\u2019-]+"
-_PLACE_FEATURE_FIRST_RE: Final[re.Pattern[str]] = re.compile(
-    rf"\b({_PLACE_FEATURE})\s+({_PLACE_NAME}(?:\s+{_PLACE_NAME})?)"
-)
-_PLACE_NAME_FIRST_RE: Final[re.Pattern[str]] = re.compile(
-    rf"\b({_PLACE_NAME}(?:\s+{_PLACE_NAME})?)\s+({_PLACE_FEATURE})\b"
-)
-_PLACE_AFTER_PREPOSITION_RE: Final[re.Pattern[str]] = re.compile(
-    rf"\b(?:in|at|near|outside|around)\s+({_PLACE_NAME}(?:[ ,]+{_PLACE_NAME}){{0,2}})"
-)
-_PLACE_STOPWORDS: Final[frozenset[str]] = frozenset(
-    {
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-        "UTC",
-        "BST",
-        "GMT",
-        "The",
-        "A",
-        "An",
-        "I",
-        "It",
-        "Title",
-        "Description",
-        "Keywords",
-    }
-)
-# Demonyms and styles ("in Victorian dress", "in Gothic style") are adjectives.
-_PLACE_ADJECTIVE_SUFFIXES: Final[tuple[str, ...]] = ("ian", "ean", "ish", "ese", "ic")
-
-
-def _answer_place_names(sections: Mapping[str, str], text: str, prompt: str | None) -> list[str]:
-    """Scan the Description when the answer has one, else the whole text (both sentence case)."""
-    return _unverified_place_names(sections.get("description") or text, prompt)
-
-
-def _unverified_place_names(prose: str, prompt: str | None) -> list[str]:
-    """Return proper place names in the prose that the prompt never supplied.
-
-    A model given GPS coordinates or nothing at all can only *infer* a place
-    name, and sweeps show it guessing wrong (a river in Ely captioned "River
-    Cam, Cambridge" and, by another model, "River Thames, Lambeth"). Mechanical
-    and gazetteer-free: a capitalised name beside a natural or landmark feature
-    word, or after a locative preposition, none of whose words occur in the
-    prompt. Sentence-case prose only, so Title Case headings cannot match.
-    """
-    if not prompt or not prose:
-        return []
-    prompt_words = set(_match_words(prompt))
-
-    def _unsupplied(name: str) -> str | None:
-        tokens = [re.sub(r"['\u2019]s$", "", token) for token in re.split(r"[ ,]+", name)]
-        kept = [
-            token
-            for token in tokens
-            if token
-            and token not in _PLACE_STOPWORDS
-            and not token.lower().endswith(_PLACE_ADJECTIVE_SUFFIXES)
-            and token.lower() not in prompt_words
-        ]
-        return " ".join(kept) if kept else None
-
-    # (pattern, name group, rendering of the kept name) for the three constructions.
-    constructions: tuple[tuple[re.Pattern[str], int, Callable[[re.Match[str], str], str]], ...] = (
-        (_PLACE_FEATURE_FIRST_RE, 2, lambda match, name: f"{match.group(1)} {name}"),
-        (_PLACE_NAME_FIRST_RE, 1, lambda match, name: f"{name} {match.group(2)}"),
-        (_PLACE_AFTER_PREPOSITION_RE, 1, lambda _match, name: name),
-    )
-    found = [
-        render(match, name)
-        for pattern, group, render in constructions
-        for match in pattern.finditer(prose)
-        if (name := _unsupplied(match.group(group))) is not None
-    ]
-    return _dedupe_preserve_order(found)
-
-
 # =============================================================================
 # SECTION: METRICS, SCORING & FIELD FORMATTING
 # =============================================================================
@@ -4742,8 +4645,6 @@ class GenerationQualityAnalysis:
     # labelled) inside four-word runs copied from the description hint.
     description_hint_percent: int | None = None
     description_hint_scope: Literal["description", "answer"] | None = None
-    # Proper place names in the prose that the prompt never supplied.
-    unverified_place_names: list[str] = dataclass_field(default_factory=list)
 
 
 _DUPLICATED_ANSWER_MIN_CHARS: Final[int] = 80
@@ -4997,7 +4898,6 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         echoed_hint_fields=_echoed_hint_fields(
             prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
         ),
-        unverified_place_names=_answer_place_names(sections, analysis_text, prompt),
     )
 
 
@@ -8650,12 +8550,14 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         "Output repeats the prompt's own hint text",
         "prompt hint repeated",
     ),
+    # Legacy codes remain renderable for retained pre-0.17 evidence.
+    # unverified_place_name: emitted 0.17.29-0.17.47; dropped as a heuristic
+    # (capitalised words after "in"/"at" flagged "Dusk" and "Sunset").
     ObservationDisplaySpec(
         "unverified_place_name",
         "Names a place the prompt did not supply",
         "unsupplied place name",
     ),
-    # Legacy codes remain renderable for retained pre-0.17 evidence.
     ObservationDisplaySpec(
         "catalog_constraint_violation",
         "Title, description or keywords do not meet requested constraints",
@@ -9333,7 +9235,6 @@ def _quality_observations(
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
         (bool(analysis.duplicate_keywords), "duplicate_keywords"),
         (bool(analysis.echoed_hint_fields), "prompt_hint_echoed"),
-        (bool(analysis.unverified_place_names), "unverified_place_name"),
     )
     observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
@@ -9415,8 +9316,6 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
     if analysis.echoed_hint_fields:
         details["echoed_hint_fields"] = list(analysis.echoed_hint_fields)
-    if analysis.unverified_place_names:
-        details["unverified_place_names"] = list(analysis.unverified_place_names)
     details.update(_catalog_constraint_observation_details(analysis))
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
