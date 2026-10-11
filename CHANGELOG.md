@@ -888,6 +888,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `update.sh`'s end-of-run change table listed every pip-installed package
+  twice, once as `pip` and again as `conda`: `conda list` ignores `--no-pip`
+  and always includes site-packages installs (channel `pypi`, or `<develop>`
+  for an editable install). The conda and conda-base rows now drop those
+  records, so each package appears under the manager that installed it.
+
 - A machine with no Hugging Face cache directory crashed on any explicit
   `--models` run, local paths included: huggingface_hub's `CacheNotFound` is
   a bare `Exception`, so it escaped the cache-scan handlers. The scan now

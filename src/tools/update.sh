@@ -1605,12 +1605,15 @@ except (OSError, ValueError, KeyError):
     sys.exit(0)  # unreadable: no marker
 print("npm\t\t")
 PY
+	# conda list ignores --no-pip (it always reads site-packages), so the rows
+	# pip installed, channel pypi or <develop> for an editable install, are
+	# dropped here; the pip source above already lists them.
 	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]] && command -v conda >/dev/null 2>&1; then
 		if [[ "$UPDATE_ENV_TYPE" == "conda" ]] && listing="$(conda list -n "$CONDA_ENV" --no-pip 2>/dev/null)"; then
-			awk '!/^#/ && NF >= 2 {print "conda\t" $1 "\t" $2} END {print "conda\t\t"}' <<< "$listing"
+			awk '!/^#/ && NF >= 2 && $4 != "pypi" && $4 != "<develop>" {print "conda\t" $1 "\t" $2} END {print "conda\t\t"}' <<< "$listing"
 		fi
 		if listing="$(conda list -n base --no-pip 2>/dev/null)"; then
-			awk '!/^#/ && NF >= 2 {print "conda base\t" $1 "\t" $2} END {print "conda base\t\t"}' <<< "$listing"
+			awk '!/^#/ && NF >= 2 && $4 != "pypi" && $4 != "<develop>" {print "conda base\t" $1 "\t" $2} END {print "conda base\t\t"}' <<< "$listing"
 		fi
 	fi
 	if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]] && command -v brew >/dev/null 2>&1; then
