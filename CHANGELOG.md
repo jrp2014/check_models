@@ -60,6 +60,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Diagnostics partitioning is one pass: each result goes into the first named
+  bucket its cached assessment selects (actionable, observations,
+  indeterminate, compliance, clean), and each bucket keeps the actionability
+  order. It replaces five filter-and-sort passes. The diagnostics Markdown
+  and the HTML report each partition once and pass the result to both the
+  evidence blocks and the provenance section, which had partitioned again.
+  Output is unchanged; a test checks the buckets on a mixed run.
 - Removed the `unverified_place_name` observation (added in 0.17.29). It was
   a heuristic: any capitalised word after "in", "at", "near", "outside" or
   "around", or beside a feature word such as "River", that the prompt lacked.

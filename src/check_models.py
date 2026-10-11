@@ -10001,8 +10001,29 @@ class DiagnosticsPartitions:
 
 
 def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
-    """Partition maintainer evidence using only cached current-run assessments."""
+    """Partition maintainer evidence using only cached current-run assessments.
+
+    One pass places each result in the first bucket its assessment names; the
+    legal outcome axes make the buckets disjoint. Each bucket keeps the shared
+    actionability order.
+    """
     assessments = dict(context.assessments)
+    buckets: dict[str, list[PerformanceResult]] = {
+        name: [] for name in ("actionable", "observations", "indeterminate", "compliance", "clean")
+    }
+    for result in context.result_set.results:
+        assessment = assessments[result.model_name]
+        if assessment.maintainer_status == "actionable_failure":
+            bucket = "actionable"
+        elif assessment.maintainer_status == "observation_needs_reproduction":
+            bucket = "observations"
+        elif assessment.execution == "indeterminate":
+            bucket = "indeterminate"
+        elif assessment.execution != "completed":
+            continue
+        else:
+            bucket = "compliance" if assessment.observations else "clean"
+        buckets[bucket].append(result)
 
     def sort_key(result: PerformanceResult) -> tuple[int, int, str]:
         assessment = assessments[result.model_name]
@@ -10012,61 +10033,9 @@ def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
             assessment.observations,
         )
 
-    actionable = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].maintainer_status == "actionable_failure"
-            ),
-            key=sort_key,
-        )
+    return DiagnosticsPartitions(
+        **{name: tuple(sorted(results, key=sort_key)) for name, results in buckets.items()}
     )
-    observations = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].maintainer_status
-                == "observation_needs_reproduction"
-            ),
-            key=sort_key,
-        )
-    )
-    indeterminate = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].execution == "indeterminate"
-            ),
-            key=sort_key,
-        )
-    )
-    compliance = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].execution == "completed"
-                and assessments[result.model_name].maintainer_status == "none"
-                and assessments[result.model_name].observations
-            ),
-            key=sort_key,
-        )
-    )
-    clean = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].execution == "completed"
-                and not assessments[result.model_name].observations
-            ),
-            key=sort_key,
-        )
-    )
-    return DiagnosticsPartitions(actionable, observations, indeterminate, compliance, clean)
 
 
 def _diagnostics_fact(value: object | None) -> str:
@@ -10679,6 +10648,7 @@ def _run_input_rows_for_context(
 
 def _diagnostics_evidence_blocks(
     report_context: HtmlReportContext,
+    partitions: DiagnosticsPartitions,
     *,
     run_args: argparse.Namespace | None,
     image_path: Path | None = None,
@@ -10689,7 +10659,6 @@ def _diagnostics_evidence_blocks(
     # The canonical HTML context carries no image profile; the capacity rows
     # then simply omit the input-image line rather than re-reading the file.
     image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
-    partitions = _partition_diagnostics(report_context)
     triage_rows = tuple(
         (
             ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
@@ -10857,12 +10826,15 @@ def generate_diagnostics_report(
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
+    partitions = _partition_diagnostics(report_context)
     blocks = (
         ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
-        *_diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path),
+        *_diagnostics_evidence_blocks(
+            report_context, partitions, run_args=run_args, image_path=image_path
+        ),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
-            highlighted_results=_partition_diagnostics(report_context).highlighted,
+            highlighted_results=partitions.highlighted,
             model_provenance=_model_provenance_by_model(report_context),
             library_versions=library_versions,
             system_info=system_info,
@@ -11214,6 +11186,7 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
 
 def _html_maintainer_diagnostics(
     report_context: HtmlReportContext,
+    partitions: DiagnosticsPartitions,
     *,
     run_args: argparse.Namespace | None,
     image_path: Path | None,
@@ -11223,7 +11196,9 @@ def _html_maintainer_diagnostics(
         '<section id="maintainer-diagnostics">',
         "<h2>Maintainer Diagnostics</h2>",
         *render_report_html(
-            _diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path)
+            _diagnostics_evidence_blocks(
+                report_context, partitions, run_args=run_args, image_path=image_path
+            )
         ),
         "</section>",
     ]
@@ -11266,6 +11241,7 @@ def _html_runtime_facts(
 def _html_provenance(
     *,
     report_context: HtmlReportContext,
+    highlighted_results: Sequence[PerformanceResult],
     versions: LibraryVersionDict,
     prompt: str,
     image_path: Path | None,
@@ -11274,7 +11250,7 @@ def _html_provenance(
     """Render the same single-copy reproduction context used by Markdown."""
     blocks = _diagnostics_shared_context_blocks(
         prompt=prompt,
-        highlighted_results=_partition_diagnostics(report_context).highlighted,
+        highlighted_results=highlighted_results,
         model_provenance=_model_provenance_by_model(report_context),
         library_versions=versions,
         system_info=report_context.system_info,
@@ -11323,6 +11299,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
 .embedded-image { border: 1px solid #ccc; max-width: min(100%, 600px); }
 </style>
 """
+    partitions = _partition_diagnostics(report_context)
     return "\n".join(
         (
             "<!DOCTYPE html>",
@@ -11355,11 +11332,13 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
             _html_complete_gallery(report_context),
             _html_maintainer_diagnostics(
                 report_context,
+                partitions,
                 run_args=run_args,
                 image_path=image_path,
             ),
             _html_provenance(
                 report_context=report_context,
+                highlighted_results=partitions.highlighted,
                 versions=versions,
                 prompt=prompt,
                 image_path=image_path,

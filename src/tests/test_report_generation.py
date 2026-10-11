@@ -2861,6 +2861,49 @@ def _make_quality_success(
     )
 
 
+def test_diagnostics_partitions_are_disjoint_named_buckets_in_actionability_order() -> None:
+    """Each result lands in exactly one bucket, chosen by its cached assessment."""
+    results = [
+        _make_success("org/clean-b"),
+        _make_quality_success("org/leak", with_quality_issue=True),
+        _make_failure("org/crash"),
+        _make_success("org/clean-a"),
+        _make_failure_with_details(
+            "org/offline", error_msg="502 Bad Gateway", failure_phase="model_load"
+        ),
+        replace(
+            _make_success("org/unlabelled"),
+            generation=_MockGeneration(text="A shopfront.", prompt_tokens=5, generation_tokens=3),
+            assessment_profile="metadata",
+        ),
+    ]
+    context = _build_report_render_context(results=results, prompt="p", system_info={})
+    assessments = dict(context.assessments)
+
+    partitions = check_models._partition_diagnostics(context)
+
+    buckets = {
+        "actionable": partitions.actionable,
+        "observations": partitions.observations,
+        "indeterminate": partitions.indeterminate,
+        "compliance": partitions.compliance,
+        "clean": partitions.clean,
+    }
+    assert {name: [r.model_name for r in rs] for name, rs in buckets.items()} == {
+        "actionable": ["org/crash"],
+        "observations": ["org/leak"],
+        "indeterminate": ["org/offline"],
+        "compliance": ["org/unlabelled"],
+        "clean": ["org/clean-a", "org/clean-b"],
+    }
+    assert assessments["org/unlabelled"].observations
+    assert partitions.highlighted == (
+        *partitions.actionable,
+        *partitions.observations,
+        *partitions.indeterminate,
+    )
+
+
 def test_report_context_caches_only_live_cross_artifact_views() -> None:
     """The shared context should retain only current-run factual assessments."""
     failed = _make_failure("org/crashed")
