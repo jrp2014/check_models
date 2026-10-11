@@ -73,6 +73,10 @@ Notable changes to this project will be documented in this file.
   and detection is unchanged; tests pin the abort to the first check past the
   200-token floor and show a unit whose four repeats overflow the tail never
   trips it. The saving is small, not seconds off a sweep.
+- Docs: the implementation guide records the deferred plan to store
+  run-level comparison notes as stable codes with factual fields at the next
+  retained-schema change, replacing regeneration's match on the GPU note's
+  English prefix while keeping that reader for older runs.
 - Removed the `unverified_place_name` observation (added in 0.17.29). It was
   a heuristic: any capitalised word after "in", "at", "near", "outside" or
   "around", or beside a feature word such as "River", that the prompt lacked.

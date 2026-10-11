@@ -25287,6 +25287,10 @@ def _check_rendered_comparison(comparison: RunComparison) -> RunComparison:
     return comparison
 
 
+# Recognising stored notes by their English wording is a stopgap; stable note
+# codes are planned for the next retained-schema change (see
+# docs/IMPLEMENTATION_GUIDE.md, "Assembly and presentation"). Keep this reader
+# for runs that predate them.
 _CURRENT_GPU_NOTE_PREFIXES: Final[tuple[str, ...]] = (
     "current run detected GPU activity",
     "current run's GPU readings",
