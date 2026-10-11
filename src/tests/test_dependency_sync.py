@@ -3747,7 +3747,11 @@ def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
     fake_bin.mkdir()
     safe_io.write_text_no_follow(
         fake_bin / "conda",
-        '#!/bin/bash\necho "# packages in environment"\necho "python 3.14.7 h0 conda-forge"\n',
+        "#!/bin/bash\n"
+        'echo "# packages in environment"\n'
+        'echo "python 3.14.7 h0 conda-forge"\n'
+        'echo "pydantic 2.14.1 pypi_0 pypi"\n'
+        'echo "check-models 0.17.46 dev_0 <develop>"\n',
         mode=0o755,
     )
     safe_io.write_text_no_follow(
@@ -3779,10 +3783,37 @@ def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
     assert "npm\tmarkdownlint-cli2\t0.18.1" in lines
     assert "conda\tpython\t3.14.7" in lines
     assert "conda base\tpython\t3.14.7" in lines
+    # conda list shows pip installs despite --no-pip; only the pip source keeps them.
+    assert not [line for line in lines if line.startswith("conda") and "pydantic" in line]
+    assert not [line for line in lines if line.startswith("conda") and "check-models" in line]
     assert "brew\tcmake\t4.1.0" in lines
     assert "cask\tghostty\t1.2.0" in lines
     markers = {line.split("\t", 1)[0] for line in lines if line.endswith("\t\t")}
     assert markers == {"git", "pip", "npm", "conda", "conda base", "brew", "cask"}
+
+
+@pytest.mark.subprocess
+def test_update_state_snapshot_leaves_an_unreadable_checkout_unmarked(tmp_path: Path) -> None:
+    """A checkout whose HEAD cannot be read is not compared, so it never looks removed."""
+    script = _copy_update_script_layout(tmp_path)
+    (tmp_path / "work" / "mlx" / ".git").mkdir(parents=True)
+    driver = (
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\nPROJECT_ROOT={script.parent.parent}\n"
+        f"UPDATE_PYTHON={sys.executable}\nUPDATE_SYSTEM_PACKAGES=0\n"
+        f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", driver],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={key: value for key, value in os.environ.items() if key != "CONDA_DEFAULT_ENV"},
+        cwd=tmp_path,
+    )
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.splitlines()
+    assert not [line for line in lines if line.startswith("git\t")]
+    assert "pip\t\t" in lines
 
 
 @pytest.mark.subprocess

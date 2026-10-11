@@ -1561,13 +1561,21 @@ report_update_plan() {
 # found empty (nothing installed yet) is told apart from one that could not
 # be read: only a read source's lines are compared. Prints the snapshot.
 snapshot_update_state() {
-	local repo_parent repo listing
+	local repo_parent repo listing revision git_read=1
 	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-	printf 'git\t\t\n'
+	# A missing checkout is read as absent; one whose HEAD cannot be read
+	# leaves git unmarked rather than looking removed.
 	for repo in mlx mlx-vlm; do
 		[[ -d "$repo_parent/$repo/.git" ]] || continue
-		git -C "$repo_parent/$repo" rev-parse HEAD 2>/dev/null | awk -v r="$repo" 'NF {print "git\t" r "\t" $1}'
+		if revision="$(git -C "$repo_parent/$repo" rev-parse HEAD 2>/dev/null)"; then
+			printf 'git\t%s\t%s\n' "$repo" "$revision"
+		else
+			git_read=0
+		fi
 	done
+	if [[ "$git_read" == 1 ]]; then
+		printf 'git\t\t\n'
+	fi
 	# -P keeps the caller's working directory off sys.path. The markers come
 	# last, so a probe that dies part-way marks nothing as read.
 	"$UPDATE_PYTHON" -P - "$PROJECT_ROOT/node_modules/markdownlint-cli2/package.json" <<'PY' 2>/dev/null || true
@@ -1597,12 +1605,15 @@ except (OSError, ValueError, KeyError):
     sys.exit(0)  # unreadable: no marker
 print("npm\t\t")
 PY
+	# conda list ignores --no-pip (it always reads site-packages), so the rows
+	# pip installed, channel pypi or <develop> for an editable install, are
+	# dropped here; the pip source above already lists them.
 	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]] && command -v conda >/dev/null 2>&1; then
 		if [[ "$UPDATE_ENV_TYPE" == "conda" ]] && listing="$(conda list -n "$CONDA_ENV" --no-pip 2>/dev/null)"; then
-			awk '!/^#/ && NF >= 2 {print "conda\t" $1 "\t" $2} END {print "conda\t\t"}' <<< "$listing"
+			awk '!/^#/ && NF >= 2 && $4 != "pypi" && $4 != "<develop>" {print "conda\t" $1 "\t" $2} END {print "conda\t\t"}' <<< "$listing"
 		fi
 		if listing="$(conda list -n base --no-pip 2>/dev/null)"; then
-			awk '!/^#/ && NF >= 2 {print "conda base\t" $1 "\t" $2} END {print "conda base\t\t"}' <<< "$listing"
+			awk '!/^#/ && NF >= 2 && $4 != "pypi" && $4 != "<develop>" {print "conda base\t" $1 "\t" $2} END {print "conda base\t\t"}' <<< "$listing"
 		fi
 	fi
 	if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]] && command -v brew >/dev/null 2>&1; then
@@ -1696,7 +1707,7 @@ report_update_changes() {
 			}
 		' | sed 's/[[:space:]]*$//'
 	else
-		echo "[update.sh] Nothing changed in what could be read after the run."
+		echo "[update.sh] Nothing changed in the sources read both before and after the run."
 	fi
 	if [[ -n "$unread_before" ]]; then
 		echo "   Not compared (could not be read before the run): $unread_before"

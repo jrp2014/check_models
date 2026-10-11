@@ -6,6 +6,30 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- E2E smoke: `test_full_inference_with_tiny_local_checkpoint` writes a
+  random-weight Qwen2-VL checkpoint of about 150 KB (tokenizer, chat template,
+  image-processor config, safetensors) to a temp directory and runs it
+  through the full CLI, so CI exercises the real mlx-vlm `load` →
+  `apply_chat_template` → `stream_generate` path without a download. Before,
+  every CI test of that path was mocked and the cached-model e2e tests
+  skipped. The language head is zeroed, so greedy output is a deterministic
+  "a a a a". The technique comes from upstream mlx-vlm's
+  `test_extraction_models`; the rest of upstream's suite tests mlx-vlm
+  internals and was not adopted.
+- System telemetry: each snapshot check (before load and after cleanup) also
+  reads the GPU's "Device Utilization %" from `ioreg` (IOAccelerator, no root).
+  Both checks sit outside check_models' own GPU work, and the reading drops
+  to 0 within about 50 ms of that work ending, so a non-zero value is reported
+  as "GPU activity detected outside harness inference". Each check is one
+  instant, so zero readings do not show an uncontended run: activity between
+  checks is never observed, and the diagnostics line says so. Records gain
+  `gpu_samples`, `gpu_utilization_max_pct` and `gpu_busy_samples`;
+  diagnostics state it per model, and the comparison's run-environment note
+  counts the models affected. It is a recorded fact and does not exclude
+  timings. The 2026-10-11 00:22 sweep ran while DxO PhotoLab
+  exported photos and decoded at about half speed, with every other recorded
+  reading unchanged. Continuous sampling, which overlaps inference, does not
+  take the reading.
 - Python 3.15 readiness checks, with no change to the CLI's behaviour:
   - CI's static-quality matrix gains a 3.15 lane (`next-python`, pre-releases
     allowed). mlx has no cp315 wheel or sdist yet, so `pip install -e
@@ -43,6 +67,116 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Removed the `unverified_place_name` observation (added in 0.17.29). It was
+  a heuristic: any capitalised word after "in", "at", "near", "outside" or
+  "around", or beside a feature word such as "River", that the prompt lacked.
+  The 2026-10-11 19:53 sweep flagged "Dusk", "Sunset" and "UK" (the hints
+  said "United Kingdom"), and telling places from other words would need an
+  ever-growing exception list or a gazetteer. Retained records with the code
+  still render, names included. `prompt_hint_echoed`, a counted overlap with
+  the prompt's own hint, stays.
+- CLI declarations: the KV quantization schemes are one `KvQuantScheme`
+  alias, and the `--kv-*-scheme` and `--assessment-profile` choices are read
+  from their aliases instead of repeating the values. Options no longer
+  restate argparse's own defaults (`default=None`, `default=False` on
+  `store_true`, `type=str`), `--repetition-context-size` uses
+  `DEFAULT_PENALTY_CONTEXT_SIZE`, and the presence/frequency context-size
+  checks share one loop. Every option parses as before and keeps its flags,
+  default, choices and help (compared before and after, including `--help`).
+- Comparison serialization: `_run_comparison_to_json` builds its lists and
+  mappings with checked `list[JsonLike](...)`/`dict[str, JsonLike](...)`
+  constructors instead of casts, and `_run_comparison_from_json` passes the
+  baseline identity fields straight to `RunComparison` instead of through an
+  untyped dict, so the type checkers now verify those names and types. The
+  retained JSON is unchanged.
+- Report construction: the HTML and Markdown galleries take their per-model
+  evidence entries, in usable-first order, from one
+  `_gallery_evidence_entries` helper; the Markdown gallery's run-input lines
+  use the same `_run_input_rows_for_context` as HTML; and
+  `DiagnosticsPartitions.highlighted` names the maintainer lane (actionable,
+  observations, indeterminate) that three call sites assembled by hand. HTML,
+  gallery and diagnostics output are byte-identical on a fixed fixture.
+- Run summary: "Earlier retained runs on this mlx version" is a fact about
+  the run, so it now shows (and is logged) even when a changed image or
+  prompt withholds the comparison; the 2026-10-10 sweep on a new photo had
+  recorded the count but hidden it.
+- Run summary: the baseline comparison adds "Earlier retained runs on this
+  mlx version", counted from `results.history.jsonl` across every retained
+  run ("none recorded on ..." for a fresh build, never "first run": history
+  records that cannot be read or name no mlx version are counted and named as
+  not counted, since the history may be incomplete). Four sweeps
+  (2026-09-26, 10-02, 10-08, 10-09) were each the first on a new mlx build and
+  timed short-prompt prefill (and diffusiongemma's decode) far slower; an
+  immediate rerun was back to normal each time.
+- Run summary: the prefill-change caption says "not demonstrated speed
+  changes" (it covers slowdowns too); the evidence-links caveat moves to the
+  Full artifacts section and "What this run measures" below the run facts, so
+  the maintainer verdict is followed directly by the numbers.
+- Run summary, from john's review of the warm-rerun report:
+  - A "Largest prefill changes" table lists up to five models whose prefill
+    tok/s left the fixed 0.85-1.15x band, as baseline and current prefill
+    seconds (prompt tokens divided by prefill tok/s) with the ratio, retained
+    as `prefill_changes` in the comparison block and logged. A prefill change
+    alone counts as a change, so the log no longer follows such a table with
+    "No changes beyond noise".
+  - The opening now says how the completions split (no observations,
+    prompt-compliance only, native-reproduction candidates) and carries the
+    evidence-link caveat, which moved up from Run context.
+  - "Model quality at a glance" is now "Mechanical checks at a glance", with a
+    "Native repro" column; the gallery's "Avoid for This Run" is now "Major
+    Mechanical Concerns in This Run".
+  - The baseline caveat no longer weighs single-model against broad changes:
+    a difference shows that outputs or timings differ, not why.
+  - Review rows show a compact history (the longest-running observation and
+    how many others, with the newest start); every observation's dates are in
+    a collapsed "History by observation" table below.
+  - Observation clusters list only signatures shared by two or more models,
+    with each model linked to its diagnostics.
+- `index.md` names the run's start time and the check_models version and
+  revision that produced it.
+- Baseline comparison: the generation and prefill tok/s ratio rows name the
+  model at each end of the range ("lowest 0.12 (model), highest 8.73
+  (model)"), kept as `min_model`/`max_model` in the retained comparison block;
+  older records still show the bare range. The caveat under the comparison
+  says each sweep makes one generation per model, with no warm-up or repeats.
+- "Major concerns" now says which kind: "generation" when generation itself
+  failed (no text, repeated text, no final answer, incomplete reasoning) and
+  "answer format" when an answer was generated but missed the requested form
+  (labels, extra text, echoed instructions, token limit). Shown in the
+  run-summary tables, both gallery choosers and `index.md`'s counts; within
+  major concerns the at-a-glance table lists answer-format rows first.
+- The run summary's History column puts each observation on its own line,
+  with its first date after a comma rather than a second semicolon.
+- Report wording now states what was measured, not why: the prompt-hint
+  observation reads "Output repeats the prompt's own hint text" (it no longer
+  adds "instead of describing the image", which an accurate hint does not
+  show), and the baseline caveat drops "usually run-to-run variance".
+  `index.md`'s top
+  observations line is now "Observations, most important first" and says how
+  many kinds it left out, so an unlisted observation is not read as absent.
+  The changed-text table shows "not recorded" for missing quantization and
+  prompt token counts, matching its decoding column, instead of "-".
+- `tools/update.sh`: a local `mlx`/`mlx-vlm` checkout whose HEAD cannot be
+  read leaves the checkouts unmarked in that snapshot, so it is named as not
+  compared instead of listed as removed. An all-unreadable change list now
+  says "Nothing changed in the sources read both before and after the run".
+- Tooling: `[tool.pyrefly]` now sets `search-path = ["."]`, so editor
+  Pyrefly (1.3.2) finds `check_models` and `check_models_data` instead of
+  inferring an import root of `src/src`; the gate's generated config already
+  led with that directory.
+- Baseline comparison: the changed-text models moved from one long summary
+  line into a collapsed table (decoding, checkpoint quantization, shared
+  prefix, length, prompt token count); the summary now states only the count.
+  A new "Greedy text changed, by checkpoint quantization" row counts greedy
+  pairs by this run's `config.json` quantization (quantized, not quantized,
+  unknown). The 2026-10-08 sweep showed why: 10 of 22 quantized greedy models
+  changed text and 0 of 7 unquantized ones did, while mlx changed its
+  quantized matmul accumulation.
+- Baseline comparison: the per-model mlx-vlm commit list now also covers the
+  sibling model packages and modules each architecture imports directly (one
+  level, read at the current revision) and names them. Before, `qwen3_5_moe`
+  models showed "no commits touched" although mlx-vlm #2442 changed the
+  `qwen3_5` code they import.
 - Tooling: the Skylos floor is now 4.47.1, which also reads module lists
   from platform wheels, so an editable mlx build is verified and the two
   `skylos: ignore[SKY-D223]` comments on the first `mlx` imports are gone.
@@ -786,6 +920,60 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The repetition guard's token-id check (0.17.49) is reverted. It stopped a
+  loop that the BPE detokenizer was holding back, as with Qwen2-VL's 265
+  repeats of `<|im_start|>assistant` on 2026-10-11, but the early stop
+  discarded the held-back text, which was the evidence of the loop.
+  Reconstructing that text would mean decoding outside mlx-vlm. Such a loop
+  now runs to the token cap again and keeps mlx-vlm's own finalised text; a
+  comment at the guard records the limit, and a test streams the case and
+  checks all 265 repeats survive.
+- Regenerating a run summary recomputes the current run's GPU note from the
+  records instead of replaying the stored run-time string. Regenerating the
+  2026-10-11 19:53 sweep had restored its stale "detected GPU activity ...
+  36 of 47 models" claim; it now gives the unreliable-reading note. A
+  regression test regenerates a retained run carrying the stale note.
+- GPU readings from before the 0.17.47 stale-read fix are marked unreliable
+  wherever they are shown, with the raw numbers kept. New telemetry records
+  carry `gpu_sample_method: "reread"`, and readers treat records without it
+  (0.17.44-0.17.46) as unreliable: never "GPU activity detected outside
+  harness inference". The retained 2026-10-11 19:53 summary, diagnostics and
+  HTML report now say its non-zero readings are unreliable and not evidence
+  of other GPU work; `results.jsonl` is unchanged.
+- The quality table's intro now says "tokens in count the image's tokens
+  too ...; tokens out are those generated". Skylos 4.47.2 flagged the
+  previous wording of that sentence as a prompt-injection pattern (SKY-D260)
+  in the 2026-10-11 19:53 run summary, although earlier summaries with the
+  identical sentence passed, so the detector weighs surrounding text. The
+  meaning is unchanged; the retained summary was regenerated with the new
+  wording.
+- The snapshot GPU reading no longer reports check_models' own work as
+  outside activity. The first `ioreg` read after a long gap returns a stale
+  figure: in the 2026-10-11 19:53 sweep the after-cleanup check showed this
+  process's finished inference at 47-99% for 36 of 47 models, while a read a
+  moment later gave 0. Each sample now discards one read, waits 50 ms and
+  keeps the next, and the after-cleanup check first synchronizes MLX. A trace
+  of six models then read 0 at all twelve checks, while a separate
+  GPU-loading process still showed 24-26%.
+- `update.sh`'s end-of-run change table listed every pip-installed package
+  twice, once as `pip` and again as `conda`: `conda list` ignores `--no-pip`
+  and always includes site-packages installs (channel `pypi`, or `<develop>`
+  for an editable install). The conda and conda-base rows now drop those
+  records, so each package appears under the manager that installed it.
+
+- A machine with no Hugging Face cache directory crashed on any explicit
+  `--models` run, local paths included: huggingface_hub's `CacheNotFound` is
+  a bare `Exception`, so it escaped the cache-scan handlers. The scan now
+  reports it as `FileNotFoundError`, and a failed scan warns once rather
+  than at every caller. The tests had hidden this by always creating a cache
+  directory.
+- ty 0.0.86 added `invalid-property-type-override`, which ignores mypy's
+  `# type: ignore[override]`, so CI failed on the `_TeeCaptureStream`
+  `encoding` and `errors` properties. Each now also carries a
+  `# ty: ignore[invalid-property-type-override]`: typeshed declares both as
+  writable attributes, but CPython's are read-only descriptors, so the
+  property is correct. The dev extra now requires `ty>=0.0.86`, because older
+  ty warns that the rule is unknown.
 - Crash attribution no longer reads the interpreter's environment path as
   a package: with a conda environment named `mlx-vlm`, every frame under
   `envs/mlx-vlm/…/site-packages/` matched mlx-vlm, so a crash raised in
@@ -1026,6 +1214,10 @@ Notable changes to this project will be documented in this file.
 - The crash section of the run summary no longer guards a `model_provenance`
   the JSONL validator already requires; ty 0.0.80 flags that guard as a
   redundant condition and exits non-zero, which turned the gate red.
+- The text-divergence shared prefix is counted with a plain character
+  comparison instead of `os.path.commonprefix`, which Ruff's new RUF071 flags.
+  Ruff's suggested `commonpath` would compare path components, not text, so it
+  was not applied; the counts are unchanged.
 
 ## [0.17.0] - 2026-09-05
 

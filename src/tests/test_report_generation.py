@@ -442,7 +442,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     # repeat the review tables.
     assert "## Observation clusters" not in content
     assert (
-        "| org/observed | major concerns | Response repeats the same text; "
+        "| org/observed | major concerns: generation | Response repeats the same text; "
         "Required labelled fields not detected: title, keywords |"
     ) in content
     crashed_table = _extract_markdown_subsection(
@@ -464,11 +464,13 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "check_models" in content
     assert "0.8.9" in content
     assert "abc123" in content
-    assert "GitHub links" in content
+    assert "**Evidence links**" in content
+    # Shown with the artifact links it qualifies, not above the run facts.
+    assert content.index("## Full artifacts") < content.index("**Evidence links**")
     # The link caveat is dynamic: pinned wording for a clean-worktree SHA ref,
     # mutable-branch wording otherwise.
     if re.fullmatch(r"[0-9a-f]{40}", check_models._github_blob_ref()):
-        assert "pinned to producer commit" in content
+        assert "pinned to commit" in content
     else:
         assert "mutable" in content
     # Clean models appear only in the at-a-glance table and the named clean
@@ -1392,12 +1394,14 @@ def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
         pytest.fail("a clean run must still write the run summary entry point")
     content = summary.read_text(encoding="utf-8")
     assert "**What this run measures.**" in content
+    # Below the run facts, so the maintainer verdict is followed by numbers.
+    assert content.index("*Models attempted:*") < content.index("**What this run measures.**")
     assert "one shared image and prompt" in " ".join(content.split())
     assert "do not establish fitness for other tasks" in " ".join(content.split())
     assert "Exact prompt sent to every model" in content
     assert "full prompt that must not be copied" in content
     assert '"No concerns detected" is not an accuracy verdict' in " ".join(content.split())
-    assert "## Model quality at a glance" in content
+    assert "## Mechanical checks at a glance" in content
     assert "org/clean" in content
     assert "## Crashes requiring action" not in content
     assert "| org/clean | no concerns detected |" in content  # named in the quality table
@@ -1432,7 +1436,7 @@ def test_run_issue_summary_quality_table_ranks_all_models(tmp_path: Path) -> Non
     if summary is None:
         pytest.fail("the fixture run must produce a run summary")
     content = summary.read_text(encoding="utf-8")
-    assert "## Model quality at a glance" in content
+    assert "## Mechanical checks at a glance" in content
     # Sorted usable -> caveats -> crashed, and the crash names its phase.
     assert (
         content.index("org/clean")
@@ -1717,6 +1721,46 @@ def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path
     assert "results.jsonl @ HEAD" in content
     assert "org/clean" in content
     assert "0.980" in content
+
+
+def test_regeneration_requalifies_stale_gpu_notes_from_the_records(tmp_path: Path) -> None:
+    """A retained "detected GPU activity" note from stale reads is recomputed, not replayed.
+
+    The 2026-10-11 19:53 sweep (0.17.46) stored that note for 36 of 47 models;
+    its records lack the reread marker, so regeneration must call the readings
+    unreliable while keeping the raw numbers.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    comparison_payload = _retained_comparison_payload()
+    comparison_payload["environment_notes"] = [
+        "current run on battery power for 1 of 1 models",
+        (
+            "current run detected GPU activity outside harness inference at the checks "
+            "around 1 of 1 models (up to 99%)"
+        ),
+    ]
+    stale = _issue_summary_result("org/clean")
+    stale["system_telemetry"] = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "gpu_samples": 2,
+        "gpu_utilization_max_pct": 99,
+        "gpu_busy_samples": 1,
+    }
+    _write_issue_summary_fixture(output_paths, results=(stale,), comparison=comparison_payload)
+
+    generated = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+
+    if generated is None:
+        pytest.fail("the retained run must regenerate an issue summary")
+    prose = " ".join(generated.read_text(encoding="utf-8").split())
+    assert "detected GPU activity" not in prose
+    assert (
+        "current run on battery power for 1 of 1 models; current run's GPU readings were "
+        "non-zero around 1 of 1 models (up to 99%), but were taken before the 0.17.47 "
+        "stale-read fix"
+    ) in prose
 
 
 @pytest.mark.parametrize(
@@ -2182,7 +2226,7 @@ def test_output_index_renders_run_dashboard(tmp_path: Path) -> None:
     )
     assert "- Usability:" not in content
     minimal_label = check_models._OBSERVATION_DISPLAY_LABELS["minimal_output"]
-    assert f"- Top observations: {minimal_label} (1)" in content
+    assert f"- Observations, most important first: {minimal_label} (1)" in content
     assert "## Artifacts" in content
     assert content.index("## Run at a glance") < content.index("## Artifacts")
 
@@ -2208,7 +2252,7 @@ def test_run_issue_summary_link_caveat_reflects_blob_ref(tmp_path: Path) -> None
         summary = check_models.generate_run_issue_summary_report(output_paths)
     assert summary is not None
     pinned_content = summary.read_text(encoding="utf-8")
-    assert f"pinned to producer commit `{pinned_sha[:12]}`" in pinned_content
+    assert f"pinned to commit `{pinned_sha[:12]}`" in pinned_content
     assert "mutable" not in pinned_content
 
     with patch.object(check_models, "_GITHUB_REF_OVERRIDE", "main"):
@@ -2216,7 +2260,7 @@ def test_run_issue_summary_link_caveat_reflects_blob_ref(tmp_path: Path) -> None
     assert summary is not None
     branch_content = summary.read_text(encoding="utf-8")
     assert "mutable main branch" in branch_content
-    assert "pinned to producer commit" not in branch_content
+    assert "pinned to commit" not in branch_content
 
 
 def _report_outcome(
@@ -4922,7 +4966,7 @@ class TestMarkdownGalleryReport:
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
         assert "## Current-run Chooser" in content
-        assert "## Avoid for This Run" in content
+        assert "## Major Mechanical Concerns in This Run" in content
         assert "## Resource Highlights" in content
         assert "## Lowest-memory Usable Models (Including Caveats)" not in content
         assert "## Fastest Usable Models (Including Caveats)" not in content
@@ -5105,7 +5149,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "Output preview" not in chooser
         assert "[`org/good`](#model-org-good)" in chooser
@@ -5120,7 +5164,7 @@ class TestMarkdownGalleryReport:
         assert "boom" not in chooser
         avoid = _extract_markdown_subsection(
             content,
-            "## Avoid for This Run",
+            "## Major Mechanical Concerns in This Run",
             end_headings=("## Output at a Glance",),
         )
         assert "Output preview" not in avoid
@@ -5165,7 +5209,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
@@ -5233,7 +5277,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "Output preview" not in chooser
         assert "Peak GB" in chooser
@@ -5312,7 +5356,7 @@ class TestMarkdownGalleryReport:
         headings = [
             "## Current-run Chooser",
             "## Resource Highlights",
-            "## Avoid for This Run",
+            "## Major Mechanical Concerns in This Run",
             "## Complete Per-model Evidence",
         ]
         assert [content.index(heading) for heading in headings] == sorted(
@@ -5440,7 +5484,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "## Title<br><br>Two cats resting" not in chooser
         assert '<pre class="model-output-readable">' in content
@@ -5500,7 +5544,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         short_row = next(line for line in chooser.splitlines() if "org/short" in line)
         assert "no concerns detected" in short_row
@@ -5605,10 +5649,12 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert "Output preview" not in chooser
-        assert content.index("## Avoid for This Run") < content.index("## Output at a Glance")
+        assert content.index("## Major Mechanical Concerns in This Run") < content.index(
+            "## Output at a Glance"
+        )
 
     def test_gallery_resource_policies_are_deterministic(self, tmp_path: Path) -> None:
         """Avoid, memory, and speed policies should have explicit stable ordering."""
@@ -5681,13 +5727,13 @@ class TestMarkdownGalleryReport:
         content = out.read_text(encoding="utf-8")
         avoid = _extract_markdown_subsection(
             content,
-            "## Avoid for This Run",
+            "## Major Mechanical Concerns in This Run",
             end_headings=("## Output at a Glance",),
         )
         highlights = _extract_markdown_subsection(
             content,
             "## Resource Highlights",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Major Mechanical Concerns in This Run",),
         )
         assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
         assert avoid.index("org/z-unusable") < avoid.index("org/a-not-evaluated")
@@ -6425,7 +6471,7 @@ def test_observation_history_dates_each_problem_from_head_runs(tmp_path: Path) -
     assert cells == {
         "org/loop": "repeated text: last 3+ runs (since 2026-07-11 or earlier); "
         "control tokens visible: not in earlier runs read",
-        "org/back": "repeated text: back this run; first 2026-07-11 or earlier",
+        "org/back": "repeated text: back this run, first 2026-07-11 or earlier",
         "org/new": "crash: not in earlier runs read",
         "org/late": "repeated text: last 3+ runs (since 2026-07-18 or earlier)",
         "org/clean": "-",
@@ -6534,7 +6580,9 @@ def test_run_summary_shows_observation_history_from_retained_metadata(tmp_path: 
     assert "4 earlier retained runs from git `HEAD:src/output/results.jsonl`" in prose
     assert "back to 2026-07-04" in prose
     assert "older runs were not read" not in prose
-    assert "| repeated text: last 3 runs (since 2026-07-18); first 2026-07-11 |" in content
+    # The review row is compact; the collapsed chronology keeps the first date.
+    assert "| repeated text: 3 runs since 2026-07-18 |" in content
+    assert "| repeated text | last 3 runs (since 2026-07-18), first 2026-07-11 |" in content
 
 
 def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_lists() -> None:
@@ -7800,9 +7848,22 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
             check_models.ComponentChange("mlx-vlm", "45d6e125a", "4774f3d7b", 33, ("abc fix x",)),
         ),
     )
-    rows = dict(check_models._comparison_view(comparison).summary_rows)
-    assert rows["Generated text changed"].startswith("org/a (shared prefix ")
-    assert rows["Prefill tok/s ratio (now/baseline)"].startswith("0.750")
+    view = check_models._comparison_view(comparison)
+    rows = dict(view.summary_rows)
+    assert rows["Generated text changed"] == "1 models (listed below)"
+    assert view.text_change_rows == (
+        ("org/a", "not recorded", "not recorded", "0", "9 \u2192 14", "not recorded"),
+    )
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "Generated text changed for 1 models" in rendered
+    # Each end of the range names its model, so an extreme can be traced.
+    assert rows["Prefill tok/s ratio (now/baseline)"] == (
+        "0.750 over 2 models; lowest 0.50 (org/a), highest 1.00 (org/b)"
+    )
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
@@ -7810,6 +7871,41 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
     assert restored.text_divergence == comparison.text_divergence
     assert restored.component_changes == comparison.component_changes
     assert restored.prompt_tps_ratio_median == pytest.approx(0.75)
+    assert restored.prompt_tps_ratio_end_models == ("org/a", "org/b")
+    # A record written before the end models were kept renders the bare range.
+    prefill = cast("dict[str, Any]", payload["prompt_tps_ratio"])
+    del prefill["min_model"], prefill["max_model"]
+    older = check_models._run_comparison_from_json(payload)
+    assert older.prompt_tps_ratio_end_models is None
+    assert (
+        dict(check_models._comparison_view(older).summary_rows)[
+            "Prefill tok/s ratio (now/baseline)"
+        ]
+        == "0.750 (range 0.50-1.00, 2 models)"
+    )
+
+
+@pytest.mark.parametrize(
+    ("usability", "observations", "expected"),
+    [
+        (
+            "unusable",
+            ("repeated_output", "missing_requested_sections"),
+            "major concerns: generation",
+        ),
+        (
+            "unusable",
+            ("missing_requested_sections", "unexpected_special_token"),
+            "major concerns: answer format",
+        ),
+        ("usable_with_caveats", ("duplicate_keywords",), "concerns detected"),
+    ],
+)
+def test_major_concerns_name_broken_generation_apart_from_answer_format(
+    usability: str, observations: tuple[str, ...], expected: str
+) -> None:
+    """A missing label and a degenerate generation are both major, but not the same problem."""
+    assert check_models._usability_label(usability, observations) == expected
 
 
 def test_incomparable_runs_keep_roster_and_say_why_a_model_is_absent() -> None:
@@ -7956,13 +8052,23 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         record["prompt_diagnostics"] = {"generate_kwargs": {"seed": 0, **settings}}
         return record
 
+    def weighted(record: dict[str, object], **burden: object) -> dict[str, object]:
+        record["model_burden"] = burden
+        return record
+
     before = [
+        weighted(decoded("org/q4", "q", temperature=0.0), quantization_bits=4),
+        weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
         decoded("org/sampled", "b", temperature=0.7, top_p=0.8),
         decoded("org/reseeded", "c", temperature=0.7, top_p=0.8),
         _comparison_record("org/unrecorded", text="d"),
     ]
     now = [
+        weighted(
+            decoded("org/q4", "Q", temperature=0.0), quantization_bits=4, quantization_mode="affine"
+        ),
+        weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
         decoded("org/sampled", "B", temperature=0.7, top_p=0.8),
         decoded("org/reseeded", "C", temperature=0.7, top_p=0.8, seed=1),
@@ -7975,24 +8081,40 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     )
     assert comparison.text_changes_by_decoding == (
-        ("greedy", 0, 1),
+        ("greedy", 1, 3),
         ("sampled", 1, 1),
         ("changed", 1, 1),
         ("unknown", 0, 1),
     )
-    rows = dict(check_models._comparison_view(comparison).summary_rows)
+    # Greedy pairs only, by this run's config.json quantization; a record
+    # without model_burden facts is "unknown", not "not quantized".
+    assert comparison.greedy_text_changes_by_weights == (
+        ("quantized", 1, 1),
+        ("not quantized", 0, 1),
+        ("unknown", 0, 1),
+    )
+    view = check_models._comparison_view(comparison)
+    rows = dict(view.summary_rows)
     assert rows["Text changed, by decoding"] == (
-        "greedy 0 of 1; sampled, same settings and seed 1 of 1; "
+        "greedy 1 of 3; sampled, same settings and seed 1 of 1; "
         "decoding mode or settings changed 1 of 1; settings not recorded 0 of 1"
     )
+    assert rows["Greedy text changed, by checkpoint quantization"] == (
+        "quantized 1 of 1; not quantized 0 of 1; unknown 0 of 1"
+    )
+    by_model = {row[0]: row[1:3] for row in view.text_change_rows}
+    assert by_model["org/q4"] == ("greedy", "4-bit affine")
+    assert by_model["org/reseeded"] == ("settings changed", "not recorded")
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
     assert restored.text_changes_by_decoding == comparison.text_changes_by_decoding
+    assert restored.greedy_text_changes_by_weights == comparison.greedy_text_changes_by_weights
+    assert restored.text_divergence == comparison.text_divergence
 
 
-def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_path: Path) -> None:
-    """Path-limited git history per affected model; an empty log is "none", not "unknown"."""
+def _architecture_history_repo(tmp_path: Path) -> tuple[Path, str, str]:
+    """A temp mlx-vlm checkout: alpha changes, beta is untouched, gamma imports alpha."""
     repo = tmp_path / "mlx-vlm"
     package = repo / "mlx_vlm" / "models" / "alpha"
     package.mkdir(parents=True)
@@ -8009,6 +8131,14 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
     git("config", "user.email", "t@example.invalid")
     git("config", "user.name", "t")
     check_models._write_text_file(repo / "README.md", "base\n")
+    # gamma reuses alpha's code and a shared module, so alpha's commits concern it too.
+    gamma = repo / "mlx_vlm" / "models" / "gamma"
+    gamma.mkdir(parents=True)
+    check_models._write_text_file(
+        gamma / "gamma.py",
+        "from ..alpha.model import x\nfrom ..base import y\nfrom ...utils import z\n",
+    )
+    check_models._write_text_file(repo / "mlx_vlm" / "models" / "base.py", "y = 0\n")
     git("add", ".")
     git("commit", "-qm", "base")
     before = git("rev-parse", "HEAD")
@@ -8019,11 +8149,18 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
     git("add", ".")
     git("commit", "-qm", "shared sampler change")
     after = git("rev-parse", "HEAD")
+    return repo, before, after
+
+
+def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_path: Path) -> None:
+    """Path-limited git history per affected model; an empty log is "none", not "unknown"."""
+    repo, before, after = _architecture_history_repo(tmp_path)
 
     assert (
-        check_models._git_log_subjects(str(repo), before, after, path="mlx_vlm/models/beta") == ()
+        check_models._git_log_subjects(str(repo), before, after, paths=["mlx_vlm/models/beta"])
+        == ()
     )
-    alpha = check_models._git_log_subjects(str(repo), before, after, path="mlx_vlm/models/alpha")
+    alpha = check_models._git_log_subjects(str(repo), before, after, paths=["mlx_vlm/models/alpha"])
     assert alpha is not None
     assert [subject.split(" ", 1)[1] for subject in alpha] == ["alpha: fix sanitize"]
 
@@ -8042,13 +8179,19 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
         return record
 
     baseline = _comparison_baseline(
-        [affected("org/a", "alpha"), affected("org/b", "beta"), _comparison_record("org/c")]
+        [
+            affected("org/a", "alpha"),
+            affected("org/b", "beta"),
+            affected("org/g", "gamma"),
+            _comparison_record("org/c"),
+        ]
     )
     current = [
         cast("check_models.JsonlResultRecord", record)
         for record in (
             affected("org/a", "alpha"),
             affected("org/b", "beta"),
+            affected("org/g", "gamma"),
             _comparison_record("org/c"),
         )
     ]
@@ -8064,9 +8207,27 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
         {**baseline.metadata, "component_provenance": provenance(after)},
     )
     entries = check_models._architecture_commits(comparison, current, before_meta, after_meta)
-    assert {(e.model, e.status) for e in entries} == {("org/a", "commits"), ("org/b", "none")}
+    assert {(e.model, e.status) for e in entries} == {
+        ("org/a", "commits"),
+        ("org/b", "none"),
+        ("org/g", "commits"),
+    }
+    by_model = {entry.model: entry for entry in entries}
+    # One level of imports, mapped to the package or module path git logs.
+    assert by_model["org/g"].imports == ("alpha", "base.py")
+    assert [subject.split(" ", 1)[1] for subject in by_model["org/g"].subjects] == [
+        "alpha: fix sanitize"
+    ]
     items = [check_models._architecture_commit_item(entry) for entry in entries]
     assert any("no commits touched `mlx_vlm/models/beta/`" in item for item in items)
+    assert check_models._architecture_commit_item(by_model["org/g"]).startswith(
+        "`org/g` (`gamma`; imports `alpha`, `base.py`): "
+    )
+    payload = check_models._run_comparison_to_json(
+        replace(comparison, architecture_commits=entries)
+    )
+    assert payload is not None
+    assert check_models._run_comparison_from_json(payload).architecture_commits == entries
     # A wheel install has no history to read: said as such, never as "no commits".
     wheel = cast(
         "check_models.JsonlMetadataRecord",
@@ -8511,10 +8672,10 @@ def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
     assert "| Prompt / output tok | Keywords | Hint text |" in content
     # Output tokens sit beside the run's limit so a near-cap answer is visible.
     assert "| 16,525 / 495 | 36 (20 from hints) | 56% |" in content
-    assert "output tokens are the tokens generated (limit 500)" in content
     # An answer with no labelled field is measured whole, and says so.
     assert "| 97% of answer |" in content
     prose = " ".join(content.split())
+    assert "tokens out are those generated (limit 500)" in prose
     assert "rounded down; 80% or more is reported as a repeated prompt hint" in prose
 
     # A custom --prompt has no Keywords field or hint: no columns, no wording.
@@ -8537,9 +8698,25 @@ def test_observation_clusters_render_only_for_shared_signatures() -> None:
         "check_models.JsonlResultRecord",
         _issue_summary_result("org/b", observations=["repeated_output"]),
     )
+
+    def link(model: str) -> check_models.ReportTargetLink:
+        return check_models.ReportTargetLink(model, f"diagnostics.md#{model}")
+
     section = check_models._run_issue_summary_observation_cluster_section
-    assert section((one,)) is None
-    assert section((one, two)) is not None
+    assert section((one,), link=link) is None
+    shared = section((one, two), link=link)
+    assert shared is not None
+    rendered = "\n".join(check_models.render_report_markdown((shared,)))
+    # Shared groups name their models, linked to the evidence.
+    assert "[org/a](diagnostics.md#org/a), [org/b](diagnostics.md#org/b)" in rendered
+    # A one-model signature beside a shared one is left to its review row.
+    three = cast(
+        "check_models.JsonlResultRecord",
+        _issue_summary_result("org/c", observations=["empty_output"]),
+    )
+    mixed = section((one, two, three), link=link)
+    assert mixed is not None
+    assert "org/c" not in "\n".join(check_models.render_report_markdown((mixed,)))
 
 
 def test_mlx_environment_variables_are_recorded_and_split_throughput(
@@ -8621,6 +8798,18 @@ def _divergence(
     return check_models._generated_text_changes(pairs)
 
 
+def _divergence_comparison(entry: check_models.TextDivergence) -> check_models.RunComparison:
+    """A one-model comparison carrying a single text divergence."""
+    baseline = _comparison_baseline([_comparison_record("org/a", text="old")])
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a", text="new"))],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    return replace(comparison, text_changed_models=("org/a",), text_divergence=(entry,))
+
+
 def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
     """Counts only: shared prefix, both lengths, and whether the prompt token count changed."""
     shared = "Title: Blue cabin cruiser\nDescription: A blue boat "
@@ -8631,11 +8820,21 @@ def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
     assert entry == check_models.TextDivergence(
         "org/a", len(shared), len(shared) + 14, len(shared) + 17, prompt_token_count_unchanged=True
     )
-    assert check_models._text_change_label("org/a", entry) == (
-        f"org/a (shared prefix {len(shared)} characters; length {len(shared) + 14} \u2192 "
-        f"{len(shared) + 17}; same prompt token count)"
+    comparison = _divergence_comparison(entry)
+    assert check_models._text_change_rows(comparison) == (
+        (
+            "org/a",
+            "not recorded",
+            "not recorded",
+            f"{len(shared)}",
+            f"{len(shared) + 14} \u2192 {len(shared) + 17}",
+            "same",
+        ),
     )
-    assert check_models._text_change_label("org/a", None) == "org/a"
+    # A changed model without a divergence record keeps its row, with no counts.
+    assert check_models._text_change_rows(replace(comparison, text_divergence=())) == (
+        ("org/a", "-", "-", "-", "-", "-"),
+    )
 
 
 @pytest.mark.parametrize(
@@ -8651,6 +8850,8 @@ def test_text_divergence_counts_the_shared_prefix_and_prompt_tokens() -> None:
         ("Blue boat.", "A boat.", (10, 10), (0, 10, 7, True)),
         # A missing token count leaves the prompt comparison unstated.
         ("x1", "x2", (None, 10), (1, 2, 2, None)),
+        # Slashes are plain characters: the prefix is not cut at a path separator.
+        ("cabin/cruiser", "cabin/crew", (10, 10), (8, 13, 10, True)),
     ],
 )
 def test_text_divergence_boundaries(
@@ -8671,12 +8872,8 @@ def test_text_divergence_boundaries(
         entry.current_chars,
         entry.prompt_token_count_unchanged,
     ) == expected
-    label = check_models._text_change_label("org/a", entry)
-    assert label.endswith(
-        {True: "; same prompt token count)", False: "; prompt token count changed)", None: ")"}[
-            expected[3]
-        ]
-    )
+    (row,) = check_models._text_change_rows(_divergence_comparison(entry))
+    assert row[-1] == {True: "same", False: "changed", None: "not recorded"}[expected[3]]
 
 
 def test_text_divergence_is_withheld_for_incomparable_runs() -> None:
@@ -8784,4 +8981,233 @@ def test_maintainer_verdict_keeps_crashes_raised_in_libraries_in_mlx_vlm_count()
     )
     assert mixed == (
         "**For mlx-vlm maintainers:** 2 crashes need action (see *Crashes requiring action*)."
+    )
+
+
+def test_comparison_tabulates_the_largest_prefill_changes_in_seconds() -> None:
+    """Prefill changes outside the band are listed as seconds, largest first."""
+    rates = {"org/fast": (357.0, 3117.0), "org/slow": (1000.0, 500.0), "org/same": (1000.0, 1050.0)}
+    records: dict[str, list[dict[str, object]]] = {"before": [], "now": []}
+    for model, pair in rates.items():
+        for side, rate in zip(("before", "now"), pair, strict=True):
+            record = _comparison_record(model)
+            cast("dict[str, Any]", record["metrics"]).update(prompt_tps=rate, prompt_tokens=312)
+            records[side].append(record)
+    baseline = _comparison_baseline(records["before"])
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", r) for r in records["now"]],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    assert [change.model for change in comparison.prefill_changes] == ["org/fast", "org/slow"]
+    assert comparison.has_changes
+    assert check_models._comparison_view(comparison).prefill_rows == (
+        ("org/fast", "0.87", "0.10", "8.73"),
+        ("org/slow", "0.31", "0.62", "0.50"),
+    )
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert check_models._comparison_view(restored).prefill_rows == (
+        check_models._comparison_view(comparison).prefill_rows
+    )
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "| Model | Baseline prefill s | Now prefill s | Prefill tok/s ratio |" in rendered
+    assert "not demonstrated speed changes" in " ".join(rendered.split())
+
+
+def test_run_summary_breakdown_says_why_only_some_need_native_reproduction() -> None:
+    """Clear, compliance-only and repro-candidate counts add up to the completions."""
+    results = [
+        _issue_summary_result("org/clear", usability="usable", observations=[]),
+        _issue_summary_result(
+            "org/labels", usability="unusable", observations=["missing_requested_sections"]
+        ),
+        _issue_summary_result(
+            "org/loop",
+            usability="unusable",
+            observations=["repeated_output"],
+            maintainer_status="observation_needs_reproduction",
+        ),
+    ]
+    sentence = check_models._completion_breakdown_sentence(
+        cast("list[check_models.JsonlResultRecord]", results)
+    )
+    assert sentence is not None
+    assert "1 with no mechanical observations, 1 with prompt-compliance" in sentence
+    assert "only those 1 are candidates for native reproduction" in sentence
+
+
+def test_history_summary_keeps_the_longest_streak_and_counts_the_rest() -> None:
+    """The review table gets one compact clause; the chronology keeps every date."""
+    entry = functools.partial(
+        check_models.ObservationHistory, "org/x", first_observed_open_ended=False
+    )
+    entries = (
+        entry(
+            code="duplicate_keywords",
+            first_observed="2026-09-06 x",
+            consecutive_runs=15,
+            consecutive_since="2026-09-25 x",
+            consecutive_open_ended=False,
+        ),
+        entry(
+            code="repetition_abort",
+            first_observed="2026-09-06 x",
+            consecutive_runs=1,
+            consecutive_since="2026-10-08 x",
+            consecutive_open_ended=False,
+        ),
+    )
+    assert check_models._observation_history_summary("org/x", entries) == (
+        "duplicate keywords: 15 runs since 2026-09-25; +1 more, newest back this run"
+    )
+    assert check_models._observation_history_summary("org/other", entries) == "-"
+
+
+def test_output_index_names_the_run_and_its_producer() -> None:
+    """index.md says when the run started and which check_models source wrote it."""
+    metadata = {
+        "started_at": "2026-10-08 21:48:10 BST",
+        "producer": {
+            "name": "check_models",
+            "version": "0.17.41",
+            "git_revision": "7a23a9a8c0ffee",
+            "install_type": "editable",
+            "dirty": False,
+        },
+    }
+    assert check_models._run_identity_text(metadata) == (
+        "started 2026-10-08 21:48:10 BST; check_models 0.17.41 @ 7a23a9a8c"
+    )
+    assert check_models._run_identity_text(None) is None
+
+
+def test_a_prefill_change_alone_counts_as_a_change() -> None:
+    """A 1 -> 5 s prefill slowdown must not end with "No changes beyond noise"."""
+    before, now = _comparison_record("org/a"), _comparison_record("org/a")
+    for record, rate in ((before, 100.0), (now, 20.0)):
+        cast("dict[str, Any]", record["metrics"]).update(prompt_tps=rate, prompt_tokens=100)
+    baseline = _comparison_baseline([before])
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", now)],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    assert check_models._comparison_view(comparison).prefill_rows == (
+        ("org/a", "1.00", "5.00", "0.20"),
+    )
+    assert comparison.has_changes
+    assert not replace(comparison, prefill_changes=()).has_changes
+
+
+def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_path: Path) -> None:
+    """Any earlier run with the same mlx version counts; the current row is excluded."""
+    history = tmp_path / "results.history.jsonl"
+    rows = [
+        {"_type": "run", "library_versions": {"mlx": "0.32.4+old"}},
+        {"_type": "run", "library_versions": {"mlx": "0.32.4+new"}, "prompt_hash": "other"},
+        {"_type": "run", "library_versions": {}},
+        {"_type": "run", "library_versions": {"mlx": "0.32.4+new"}},  # the current run
+    ]
+    check_models._write_text_file(history, "".join(json.dumps(row) + "\n" for row in rows))
+    count = check_models._earlier_runs_on_version
+    # The versionless row is counted as unread, not as another version.
+    assert count(history, "mlx", "0.32.4+new", exclude_last=True) == (1, 1)
+    assert count(history, "mlx", "0.32.4+new", exclude_last=False) == (2, 1)
+    assert count(history, "mlx", "0.32.4+newest", exclude_last=True) == (0, 1)
+    assert count(history, "mlx", None, exclude_last=True) is None
+    assert count(tmp_path / "missing.jsonl", "mlx", "0.32.4+new", exclude_last=True) is None
+
+    baseline = _comparison_baseline([_comparison_record("org/a")])
+    current_metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "library_versions": {"mlx": "0.32.4+newest"}},
+    )
+    kwargs = {**_verified_comparison_kwargs(baseline), "current_metadata": current_metadata}
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a"))],
+        baseline,
+        history_path=history,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison.earlier_runs_on_mlx_version == 0
+    assert comparison.mlx_version_history_unread == 1
+    rows_by_label = dict(check_models._comparison_view(comparison).run_fact_rows)
+    assert rows_by_label["Earlier retained runs on this mlx version"] == (
+        "none recorded on 0.32.4+newest; 1 earlier record unreadable or without an mlx "
+        "version, so not counted"
+    )
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.earlier_runs_on_mlx_version == 0
+    assert restored.mlx_version_history_unread == 1
+    assert restored.mlx_version == "0.32.4+newest"
+    # Without history the row is omitted rather than claiming a first run.
+    unknown = replace(comparison, earlier_runs_on_mlx_version=None)
+    assert "Earlier retained runs on this mlx version" not in dict(
+        check_models._comparison_view(unknown).run_fact_rows
+    )
+    # A fact about this run, so it stays when a changed image withholds the diff.
+    incomparable = replace(
+        comparison, comparability="incomparable", incomparable_reasons=("image differs",)
+    )
+    view = check_models._comparison_view(incomparable)
+    assert view.summary_rows == ()
+    assert "Earlier retained runs on this mlx version" in dict(view.run_fact_rows)
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(incomparable),)
+        )
+    )
+    assert "*Earlier retained runs on this mlx version:* none recorded" in rendered
+
+
+def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
+    tmp_path: Path,
+) -> None:
+    """Malformed and versionless history gives "none recorded", not "first retained run"."""
+    history = tmp_path / "results.history.jsonl"
+    check_models._write_text_file(
+        history,
+        "not json\n" + json.dumps({"_type": "run"}) + "\n" + json.dumps({"_type": "run"}) + "\n",
+    )
+    assert check_models._earlier_runs_on_version(history, "mlx", "0.32.4+x", exclude_last=True) == (
+        0,
+        2,
+    )
+    baseline = _comparison_baseline([_comparison_record("org/a")])
+    compared = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/a"))],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert compared is not None
+    comparison = replace(
+        compared,
+        mlx_version="0.32.4+x",
+        earlier_runs_on_mlx_version=0,
+        mlx_version_history_unread=2,
+    )
+    row = dict(check_models._comparison_view(comparison).run_fact_rows)[
+        "Earlier retained runs on this mlx version"
+    ]
+    assert "first" not in row
+    assert row == (
+        "none recorded on 0.32.4+x; 2 earlier records unreadable or without an mlx "
+        "version, so not counted"
+    )
+    clean = replace(comparison, mlx_version_history_unread=0)
+    assert (
+        dict(check_models._comparison_view(clean).run_fact_rows)[
+            "Earlier retained runs on this mlx version"
+        ]
+        == "none recorded on 0.32.4+x"
     )

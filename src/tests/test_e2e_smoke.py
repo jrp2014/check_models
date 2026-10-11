@@ -133,6 +133,106 @@ def _check_model_cached(model_id: str) -> bool:
         return model_id in repo_ids
 
 
+def _write_tiny_qwen2_vl_checkpoint(root: Path) -> Path:
+    """Write a random-weight Qwen2-VL checkpoint of about 150 KB, then return its path.
+
+    Borrowed from upstream mlx-vlm's tests (``test_extraction_models``): a
+    tiny checkpoint written to disk lets the real ``load`` →
+    ``apply_chat_template`` → ``stream_generate`` path run without a download.
+    The language head is zeroed, so greedy decoding repeats vocabulary id 0
+    ("a") and the output is deterministic.
+    """
+    import mlx.core as mx  # noqa: PLC0415 - runtime deps are checked by the class skip
+    from mlx.utils import tree_flatten  # noqa: PLC0415 - as above
+    from mlx_vlm.models import qwen2_vl  # noqa: PLC0415 - as above
+    from tokenizers import Tokenizer, decoders, models, pre_tokenizers  # noqa: PLC0415 - as above
+    from transformers import PreTrainedTokenizerFast  # noqa: PLC0415 - as above
+
+    root.mkdir(parents=True)
+    filler, end_of_turn = "<|endoftext|>", "<|im_end|>"
+    specials = [
+        filler,
+        "<|im_start|>",
+        end_of_turn,
+        "<|vision_start|>",
+        "<|vision_end|>",
+        "<|image_pad|>",
+        "<|video_pad|>",
+    ]
+    words = [*"abcdefghijklmnopqrstuvwxyz", "user", "assistant", "describe", "image"]
+    vocab = {token: index for index, token in enumerate([*words, *specials])}
+    backend = Tokenizer(models.WordLevel(vocab, unk_token=filler))
+    backend.pre_tokenizer = pre_tokenizers.Whitespace()
+    backend.decoder = decoders.WordPiece(prefix="##")
+    chat_template = (
+        "{% for m in messages %}<|im_start|>{{ m['role'] }} "
+        "{% if m['content'] is string %}{{ m['content'] }}{% else %}"
+        "{% for c in m['content'] %}{% if c['type'] == 'image' %}"
+        "<|vision_start|><|image_pad|><|vision_end|>"
+        "{% elif c['type'] == 'text' %}{{ c['text'] }}{% endif %}{% endfor %}{% endif %}"
+        "<|im_end|> {% endfor %}{% if add_generation_prompt %}<|im_start|>assistant {% endif %}"
+    )
+    PreTrainedTokenizerFast(
+        tokenizer_object=backend,
+        eos_token=end_of_turn,
+        pad_token=filler,
+        unk_token=filler,
+        additional_special_tokens=specials,
+        chat_template=chat_template,
+    ).save_pretrained(root)
+    # One 56x56 image: 4x4 patches of 14 px, merged 2x2 into 4 image tokens.
+    safe_io.write_text_no_follow(
+        root / "preprocessor_config.json",
+        json.dumps(
+            {
+                "image_processor_type": "Qwen2VLImageProcessor",
+                "processor_class": "Qwen2VLProcessor",
+                "patch_size": 14,
+                "merge_size": 2,
+                "temporal_patch_size": 2,
+                "min_pixels": 56 * 56,
+                "max_pixels": 56 * 56,
+                "image_mean": [0.5, 0.5, 0.5],
+                "image_std": [0.5, 0.5, 0.5],
+            },
+        ),
+    )
+    config = {
+        "model_type": "qwen2_vl",
+        "hidden_size": 16,
+        "num_hidden_layers": 1,
+        "intermediate_size": 32,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 1,
+        "rms_norm_eps": 1e-6,
+        "vocab_size": len(vocab),
+        "max_position_embeddings": 256,
+        "rope_scaling": {"type": "mrope", "mrope_section": [2, 1, 1]},
+        "eos_token_id": [vocab[end_of_turn]],
+        "image_token_id": vocab["<|image_pad|>"],
+        "video_token_id": vocab["<|video_pad|>"],
+        "vision_start_token_id": vocab["<|vision_start|>"],
+        "vision_config": {
+            "depth": 1,
+            "embed_dim": 16,
+            "hidden_size": 16,
+            "num_heads": 2,
+            "patch_size": 14,
+            "spatial_merge_size": 2,
+            "temporal_patch_size": 2,
+        },
+    }
+    safe_io.write_text_no_follow(root / "config.json", json.dumps(config))
+    model_config = qwen2_vl.ModelConfig.from_dict(dict(config))
+    model_config.text_config = qwen2_vl.TextConfig.from_dict(model_config.text_config)
+    model_config.vision_config = qwen2_vl.VisionConfig.from_dict(config["vision_config"])
+    model = qwen2_vl.Model(model_config)
+    lm_head = model.language_model.lm_head
+    lm_head.weight = mx.zeros_like(lm_head.weight)
+    mx.save_safetensors(str(root / "model.safetensors"), dict(tree_flatten(model.parameters())))
+    return root
+
+
 def _check_runtime_dependencies_ready() -> bool:
     """Check whether core runtime deps are currently usable for real inference."""
     required_runtime = {"mlx", "mlx-vlm"}
@@ -176,6 +276,44 @@ class TestE2ESmoke:
         assert "dry run" in output.lower()
         assert FIXTURE_MODEL in output
         assert "Describe this image" in output
+
+    def test_full_inference_with_tiny_local_checkpoint(
+        self,
+        tmp_path: Path,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """The real mlx-vlm call path runs end to end with no download (runs in CI)."""
+        model_dir = _write_tiny_qwen2_vl_checkpoint(tmp_path / "tiny-qwen2-vl")
+        args = [
+            *_get_e2e_output_args(e2e_output_dir),
+            "--image",
+            str(e2e_test_image),
+            "--models",
+            str(model_dir),
+            "--prompt",
+            "Describe this image.",
+            "--max-tokens",
+            "4",
+            "--temperature",
+            "0",
+            "--timeout",
+            "120",
+        ]
+        result = _run_cli(args, capsys)
+        assert result.exit_code == 0, result.stdout + result.stderr
+
+        jsonl_path = check_models.ReportOutputPaths.from_root(e2e_output_dir).jsonl
+        records = [
+            json.loads(line)
+            for line in safe_io.read_text_no_follow(jsonl_path).splitlines()
+            if line.strip()
+        ]
+        record = records[1]
+        assert record["model"] == str(model_dir)
+        assert record["assessment"]["execution"] == "completed"
+        assert record["generated_text"] == "a a a a"
 
     @pytest.mark.skipif(
         not _check_model_cached(FIXTURE_MODEL),

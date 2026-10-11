@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import io
 import json
 import logging
+import re
 import time
 from contextlib import ExitStack
 from dataclasses import replace
@@ -1811,6 +1813,108 @@ def test_telemetry_record_aggregates_power_per_probe() -> None:
     )
     assert bare["power_samples"] == 0
     assert "power probe unavailable" in check_models._telemetry_status_line(bare)
+
+
+def test_gpu_utilization_sample_discards_the_stale_first_read(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Each sample takes two ioreg reads and keeps the second: the first can be stale."""
+    outputs: list[str | None] = [
+        # A stale first read (finished inference) followed by the current one.
+        '"PerformanceStatistics" = {"Device Utilization %"=92}',
+        (
+            '"PerformanceStatistics" = {"Tiler Utilization %"=9,"Device Utilization %"=37}\n'
+            '"PerformanceStatistics" = {"Device Utilization %"=5}'
+        ),
+        '"PerformanceStatistics" = {"Device Utilization %"=0}',
+        '"PerformanceStatistics" = {"In use system memory"=1}',
+        None,
+    ]
+    monkeypatch.setattr(check_models, "_GPU_REREAD_DELAY_S", 0.0)
+    monkeypatch.setattr(
+        check_models, "_run_macos_toolchain_command", lambda *_args, **_kwargs: outputs.pop(0)
+    )
+    assert check_models._sample_gpu_utilization_pct() == 37
+    assert check_models._sample_gpu_utilization_pct() is None
+    # An unavailable first read ends the sample without a second one.
+    assert check_models._sample_gpu_utilization_pct() is None
+    assert outputs == []
+
+
+def test_telemetry_records_other_processes_on_the_gpu() -> None:
+    """Snapshot GPU readings aggregate per probe; zero readings never claim an idle GPU."""
+    probe = functools.partial(check_models._TelemetryProbe, 100.0, 1, "ac", 0, 0)
+    record = check_models._system_telemetry_record_from_probes(
+        [probe(gpu_utilization_pct=0), probe(gpu_utilization_pct=37)], mode="snapshot"
+    )
+    assert record["gpu_samples"] == 2
+    assert record["gpu_utilization_max_pct"] == 37
+    assert record["gpu_busy_samples"] == 1
+    assert record["gpu_sample_method"] == "reread"
+    assert (
+        "GPU activity outside harness inference: max 37% at 2 instantaneous check(s); "
+        "activity between checks is not observed"
+    ) in (check_models._telemetry_status_line(record))
+    assert check_models._telemetry_degradation_note(record) == (
+        "GPU activity detected outside harness inference (up to 37%) at 1 of 2 checks "
+        "(before load and after cleanup)"
+    )
+    # A recorded fact: it does not by itself exclude the model from timing comparisons.
+    assert not check_models._telemetry_degrades_timings(record)
+    idle = check_models._system_telemetry_record_from_probes(
+        [probe(gpu_utilization_pct=0), probe(gpu_utilization_pct=0)], mode="snapshot"
+    )
+    assert idle["gpu_busy_samples"] == 0
+    assert check_models._telemetry_degradation_note(idle) is None
+    # Zero at both instants is stated with its limit, never as an uncontended GPU.
+    idle_status = check_models._telemetry_status_line(idle)
+    assert "max 0% at 2 instantaneous check(s); activity between checks is not observed" in (
+        idle_status
+    )
+    assert not re.search(r"idle|uncontended|no other", idle_status)
+    # Continuous samples overlap inference and never carry a GPU reading.
+    unread = check_models._system_telemetry_record_from_probes([probe()], mode="continuous")
+    assert "gpu_samples" not in unread
+
+    def result(model: str, telemetry: check_models.SystemTelemetryRecord) -> object:
+        return {"model": model, "system_telemetry": telemetry}
+
+    records = cast(
+        "list[check_models.JsonlResultRecord]",
+        [result("org/a", record), result("org/b", idle), result("org/c", unread)],
+    )
+    assert check_models._run_environment_notes("current", records) == [
+        (
+            "current run detected GPU activity outside harness inference at the checks "
+            "around 1 of 3 models (up to 37%)"
+        )
+    ]
+
+
+def test_gpu_readings_from_before_the_stale_read_fix_are_marked_unreliable() -> None:
+    """Records without the reread marker keep their numbers but never claim other GPU work."""
+    legacy: check_models.SystemTelemetryRecord = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "gpu_samples": 2,
+        "gpu_utilization_max_pct": 99,
+        "gpu_busy_samples": 1,
+    }
+    assert check_models._telemetry_degradation_note(legacy) is None
+    status = check_models._telemetry_status_line(legacy)
+    assert "GPU reading max 99% at 2 check(s), taken before the 0.17.47 stale-read fix" in status
+    assert "outside harness inference" not in status
+    records = cast(
+        "list[check_models.JsonlResultRecord]",
+        [{"model": "org/a", "system_telemetry": legacy}],
+    )
+    (note,) = check_models._run_environment_notes("current", records)
+    assert note.startswith(
+        "current run's GPU readings were non-zero around 1 of 1 models (up to 99%), but were "
+        "taken before the 0.17.47 stale-read fix"
+    )
+    assert "not evidence of other GPU work" in note
 
 
 def test_wall_clock_gap_is_attached_only_beyond_the_threshold() -> None:

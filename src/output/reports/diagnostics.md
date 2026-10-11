@@ -14,15 +14,15 @@ establish fitness for other tasks.
   the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,641 x 6,427 pixels (62.0 MP), 58.1 MB
+- *Input image:* JPEG, 6,213 x 9,320 pixels (57.9 MP), 52.1 MB
 
 Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 50    |
-| Conclusive outcomes | 50    |
-| Completed           | 50    |
+| Attempted           | 47    |
+| Conclusive outcomes | 47    |
+| Completed           | 47    |
 | Crashed             | 0     |
 | Indeterminate       | 0     |
 
@@ -31,42 +31,39 @@ Maintainer status counts
 | Maintainer status              | Count |
 |--------------------------------|-------|
 | none                           | 42    |
-| observation needs reproduction | 8     |
+| observation needs reproduction | 5     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| major concerns       | 14    |
-| no concerns detected | 31    |
-| concerns detected    | 5     |
+| major concerns       | 11    |
+| no concerns detected | 26    |
+| concerns detected    | 10    |
 
 Observation counts
 
-| Observation                                                               | Count |
-|---------------------------------------------------------------------------|-------|
-| Response repeats the same text                                            | 4     |
-| Generation was stopped early after sustained repeated output              | 2     |
-| Unrecognised model control tokens remain visible                          | 2     |
-| Required labelled fields not detected                                     | 9     |
-| Response appears cut off at the token limit                               | 3     |
-| Internal reasoning block appears incomplete                               | 1     |
-| Conversation-role control tokens remain visible                           | 1     |
-| Repeated keyword entries                                                  | 5     |
-| Output repeats the prompt's own hint text instead of describing the image | 5     |
+| Observation                                                  | Count |
+|--------------------------------------------------------------|-------|
+| Response repeats the same text                               | 3     |
+| Generation was stopped early after sustained repeated output | 2     |
+| Unrecognised model control tokens remain visible             | 3     |
+| Required labelled fields not detected                        | 10    |
+| Response appears cut off at the token limit                  | 2     |
+| Conversation-role control tokens remain visible              | 1     |
+| Repeated keyword entries                                     | 4     |
+| Output repeats the prompt's own hint text                    | 12    |
+| Names a place the prompt did not supply                      | 3     |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                      |
-|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------------|
-| [mlx-community/InternVL3_5-1B-4bit](#diagnostic-mlx-community-internvl35-1b-4bit)                               | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation needs reproduction | repeated text; duplicate keywords                                                                 |
-| [mlx-community/nanoLLaVA-1.5-4bit](#diagnostic-mlx-community-nanollava-15-4bit)                                 | completed | major concerns    | observation needs reproduction | repeated text; labelled fields not detected; cut off at token limit                               |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | major concerns    | observation needs reproduction | repeated text; cut off at token limit; duplicate keywords                                         |
-| [mlx-community/Qwen2-VL-2B-mlx](#diagnostic-mlx-community-qwen2-vl-2b-mlx)                                      | completed | major concerns    | observation needs reproduction | stopped early: repeating; duplicate keywords                                                      |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                              |
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)              | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                                 | completed | major concerns    | observation needs reproduction | incomplete thinking block                                                                         |
+| Model                                                                                               | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                             |
+|-----------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/granite-vision-3.2-2b-nvfp4](#diagnostic-mlx-community-granite-vision-32-2b-nvfp4)   | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
+| [mlx-community/Phi-3.5-vision-instruct-bf16](#diagnostic-mlx-community-phi-35-vision-instruct-bf16) | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [mlx-community/Qwen2-VL-2B-mlx](#diagnostic-mlx-community-qwen2-vl-2b-mlx)                          | completed | major concerns    | observation needs reproduction | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                                     |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)  | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
 
 ## Crashes requiring action
 
@@ -74,12 +71,79 @@ None.
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-internvl35-1b-4bit"></a>
+<a id="diagnostic-mlx-community-granite-vision-32-2b-nvfp4"></a>
 
 <details>
-<summary>mlx-community/InternVL3_5-1B-4bit — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/granite-vision-3.2-2b-nvfp4 — major concerns — repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords</summary>
 
-### mlx-community/InternVL3_5-1B-4bit
+### mlx-community/granite-vision-3.2-2b-nvfp4
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* repeated_output, repetition_abort,
+  missing_requested_sections, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
+- *Family README in installed mlx-vlm:* mlx_vlm/models/granite_vision/README.md
+  (read before filing)
+- *Labelled fields not detected:* ["description"]
+- *Repeated fragment:* keyword: "trees"
+- *Title word count:* 12
+- *Keyword count:* 48
+- *Keywords taken verbatim from the prompt's keyword hints:* 14
+- *Duplicate keywords:* ["norwich", "trees"]
+- *Resolved model revision:* f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Processor class:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
+- *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Stop reason:* repetition_abort
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 3.012
+- *Peak memory at first token (GB):* 4.322
+- *Sampling settings source:* temperature: default; top_p: default; top_k:
+  default; min_p: default; repetition_penalty: default
+- *EOS ids declared, by file:* {"config.json text_config": 0,
+  "generation_config.json": 0}
+- *Chat template found in (the first is the one the processor uses):* chat_template.json,
+  chat_template.jinja, tokenizer_config.json
+- *Post-cleanup active memory (GB):* 0.014
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 5688
+- *Prompt composition:* 5,688 = 449 text/template + 5,239 image tokens (92%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 2.35
+- *Parameter count:* 2.00B (name-estimate)
+- *Quantization:* 4-bit, group 16, nvfp4
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.01x (2.36 GB vs 2.35 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 2.35 GB; other
+  load-time allocations 0.01 GB
+- *Generation tokens:* 200
+- *Configured EOS token ID:* 0
+- *Configured EOS token:* &lt;|end_of_text|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
+  2 sample(s); GPU reading max 79% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
+  snapshot
+
+#### Complete output
+
+```text
+Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow"
+Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, Stone facade, Trees, United Kingdom, Walking, Evening Light, Norwich, England, Church Tower, Bell Tower, St Peter Mancroft, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees,
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+<details>
+<summary>mlx-community/Phi-3.5-vision-instruct-bf16 — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
 
 #### Execution and provenance
 
@@ -89,252 +153,52 @@ None.
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
 - *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "time"
+- *Repeated fragment:* keyword: "stone architecture"
 - *Title word count:* 9
-- *Keyword count:* 55
+- *Keyword count:* 37
 - *Keywords taken verbatim from the prompt's keyword hints:* 16
-- *Duplicate keywords:* ["dover", "horizon", "time", "date", "timezone"]
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Processor class:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9
-- *Peak memory at first token (GB):* 2.145
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json text_config": 151645,
-  "generation_config.json": 151645}
-- *Chat template found in (the first is the one the processor uses):* chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.003
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2094
-- *Prompt composition:* 2,094 = 302 text/template + 1,792 image tokens (86%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 1.08
-- *Parameter count:* 1.00B (name-estimate)
-- *Quantization:* 4-bit, group 32, affine
-- *Declared context length:* 40,960 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (1.08 GB vs 1.08 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 1.08 GB; other
-  load-time allocations 0.00 GB
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
-  over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset
-
-Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC patrol vessels, including the BSC Defender and BSC Volunteer, moored alongside other boats, with a dramatic skyline of buildings and a lifeguard lifebuoy visible.
-
-Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, Marina, Patrol boats, Pier, Port, Dover, Horizon, Building, Dover, Patrol vessels, British, Coastal, Skyline, Vessel, Defense, Horizon, Distant, Sky, Time, Date, Capture, Timezone, Location, Capture date, Time, Timezone, Time, Date, Timezone, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-<details>
-<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — major concerns — repeated text; duplicate keywords</summary>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* phrase: "sea and sky view..."
-- *Title word count:* 7
-- *Keyword count:* 45
-- *Keywords taken verbatim from the prompt's keyword hints:* 6
-- *Duplicate keywords:* ["sea"]
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Percent of words in four-word runs copied from the description hint:* 50
+- *Text compared with the description hint:* description
+- *Duplicate keywords:* ["historic architecture", "stone architecture"]
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Processor class:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.159
-- *Peak memory at first token (GB):* 14.969
+- *Stop reason:* repetition_abort
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.8
+- *Peak memory at first token (GB):* 9.311
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json text_config": [128001, 128008,
-  128009]}
-- *Chat template found in (the first is the one the processor uses):* chat_template.json,
-  tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.004
+- *EOS ids declared, by file:* {"config.json": [2, 32000, 32007]}
+- *Chat template found in (the first is the one the processor uses):* tokenizer_config.json
+- *Post-cleanup active memory (GB):* 0.008
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 290
-- *Prompt composition:* 290 = 289 text/template + 1 image tokens (0%; exact,
-  counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 11.34
-- *Parameter count:* 11.00B (name-estimate)
-- *Quantization:* 8-bit, group 64
-- *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (11.35 GB vs 11.34 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 11.35 GB; other
-  load-time allocations 0.00 GB
-- *Generation tokens:* 667
-- *Configured EOS token ID:* 128009
-- *Configured EOS token:* &lt;|eot_id|&gt;
+- *Prompt tokens:* 1151
+- *Prompt composition:* 1,151 = 1,151 text/template + 0 image tokens (0%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 8.29
+- *Declared context length:* 131,072 (max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (8.30 GB vs 8.29 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 8.29 GB; other
+  load-time allocations 0.01 GB
+- *Generation tokens:* 200
+- *Configured EOS token ID:* 32000
+- *Configured EOS token:* &lt;|endoftext|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
-  over 2 sample(s); mode snapshot
+  over 2 sample(s); GPU reading max 95% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: Ramsgate Harbour Sunset with Border Security Vessels
+Title: Gothic Church Tower of St Peter Mancroft in Norwich
 
-Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security vessels, including the BSC Defender and BSC Volunteer, moored alongside each other. The vessels are situated in the foreground, with the town's cliffside skyline and buildings visible in the background.
+Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with its Victorian lead flèche illuminated in the evening light, as pedestrians walk along the street below.
 
-Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, cliffside skyline, buildings, harbour, sea, boats, vessels, security, maritime, port, marina, water, reflection, sky, clouds, sun, sea, seafront, sea view, sea and sky, sea and sky view, sea and sky view at sunset, sea and sky view at sunset with boats, sea and sky view at sunset with boats and buildings, sea and sky view at sunset with boats and buildings and cliffside, sea and sky view at sunset with boats and buildings and cliffside and harbour, sea and sky view at sunset with boats and buildings and cliffside and harbour and security, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view and sea and sky, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view and sea and sky and sea and sky view.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-nanollava-15-4bit"></a>
-
-<details>
-<summary>mlx-community/nanoLLaVA-1.5-4bit — major concerns — repeated text; labelled fields not detected; cut off at token limit</summary>
-
-### mlx-community/nanoLLaVA-1.5-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation
-- *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
-  llava_bunny)
-- *Family README in installed mlx-vlm:* none
-- *Labelled fields not detected:* ["description", "keywords"]
-- *Repeated fragment:* phrase: "dusk, england, fleet, harbor,..."
-- *Title word count:* 447
-- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail"]
-- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
-- *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.686
-- *Peak memory at first token (GB):* 1.781
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json": 151645}
-- *Chat template found in (the first is the one the processor uses):* tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.016
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 308
-- *Prompt composition:* 308 = 307 text/template + 1 image tokens (0%; exact,
-  counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 0.59
-- *Quantization:* 4-bit, group 64
-- *Declared context length:* 32,768 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.03x (0.61 GB vs 0.59 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 0.60 GB; other
-  load-time allocations 0.02 GB
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *Snapshot notes (neutral):* processor config missing from snapshot
-  (preprocessor_config.json, processor_config.json)
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, England, Fleet, Harbor, Maritime, Mooring, Patrol Boat, Pier, Port, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-x-reasoner-7b-8bit"></a>
-
-<details>
-<summary>mlx-community/X-Reasoner-7B-8bit — major concerns — repeated text; cut off at token limit; duplicate keywords</summary>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, token_cap_truncation, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "horizon"
-- *Title word count:* 6
-- *Keyword count:* 390
-- *Keywords taken verbatim from the prompt's keyword hints:* 19
-- *Duplicate keywords:* ["sunset", "buildings", "marina", "mooring", "patrol
-  boats", "water", "horizon", "england", "maritime", "port", "pier", "coast",
-  "dover", "fleet", "harbor", "lifebuoy", "patrol boat", "ramsgate",
-  "reflection"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 13.101
-- *Peak memory at first token (GB):* 14.286
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json": 151645,
-  "generation_config.json": 151645}
-- *Chat template found in (the first is the one the processor uses):* chat_template.json,
-  chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.011
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16536
-- *Prompt composition:* 16,536 = 312 text/template + 16,224 image tokens (98%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 9.45
-- *Parameter count:* 7.00B (name-estimate)
-- *Quantization:* 8-bit, group 64
-- *Declared context length:* 128,000 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (9.46 GB vs 9.45 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 9.45 GB; other
-  load-time allocations 0.01 GB
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title:
-Dusk at Ramsgate: Border Security Vessels
-
-Description:
-UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline, with reflections on the water and a mix of warm and cool lighting.
-
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, Buildings, Marina, Mooring, Patrol boats, Lifebuoys, Reflections, Water, Horizon, England, Maritime, Port, Pier, Horizon, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime,
+Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, historic landmark, stone masonry, stone facade, clear sky, twilight, United Kingdom, walking, pedestrians, perpendicular gothic, spire, historic architecture, historic architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone
 ```
 
 </details>
@@ -342,7 +206,7 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 <a id="diagnostic-mlx-community-qwen2-vl-2b-mlx"></a>
 
 <details>
-<summary>mlx-community/Qwen2-VL-2B-mlx — major concerns — stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/Qwen2-VL-2B-mlx — major concerns — repeated text; control tokens visible; labelled fields not detected; cut off at token limit</summary>
 
 ### mlx-community/Qwen2-VL-2B-mlx
 
@@ -353,18 +217,23 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* repetition_abort, duplicate_keywords
+- *Observations:* repeated_output, missing_requested_sections,
+  token_cap_truncation, unexpected_special_token
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
 - *Family README in installed mlx-vlm:* none
-- *Title word count:* 9
-- *Keyword count:* 22
-- *Keywords taken verbatim from the prompt's keyword hints:* 6
-- *Duplicate keywords:* ["lifeboat station"]
+- *Labelled fields not detected:* ["keywords"]
+- *Repeated fragment:* phrase: "assistant assistant assistant ..."
+- *Unexpected special tokens:* ["&lt;|im_start|&gt;"]
+- *Title word count:* 32
+- *Percent of words in four-word runs copied from the description hint:* 9
+- *Text compared with the description hint:* description
+- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail"]
+- *Special tokens emitted (by token id):* ["&lt;|im_start|&gt;"]
 - *Resolved model revision:* d8c7c767e2e2c62cda8a51943276458ea6ad43bc
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 33.641
+- *Stop reason:* max_tokens
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 40.563
 - *Peak memory at first token (GB):* 9.361
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.1; top_p 0.001; top_k 1; repetition_penalty 1.05
@@ -379,8 +248,8 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
   chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.008
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16536
-- *Prompt composition:* 16,536 = 312 text/template + 16,224 image tokens (98%;
+- *Prompt tokens:* 16577
+- *Prompt composition:* 16,577 = 353 text/template + 16,224 image tokens (98%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 4.42
 - *Parameter count:* 2.00B (name-estimate)
@@ -388,22 +257,288 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Load active memory vs checkpoint:* 1.00x (4.43 GB vs 4.42 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 4.42 GB; other
   load-time allocations 0.01 GB
-- *Generation tokens:* 225
+- *Generation tokens:* 1000
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); mode snapshot
+  2 sample(s); GPU reading max 47% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: Border Security Command vessels in Ramsgate Harbour at sunset
+Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 
-Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moored in the harbour, including Border Security Command vessels such as the BSC Defender and BSC Volunteer. The boats are moored alongside each other, with the harbour in the foreground and the town skyline in the background. The sky is illuminated by the setting sun, creating a dramatic and colourful sunset over the buildings and the harbour. The boats are silhouetted against the sunset, with the reflection of the water on the water surface adding to the overall composition. The image captures the contrast between the modern, high-tech vessels and the traditional, historic buildings in the background.
+Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
 
-Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, harbour, mooring, lifebuoy, pier, lifeboat, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station,
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+
 ```
 
 </details>
@@ -427,11 +562,13 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description", "keywords"]
 - *Unexpected special tokens:* ["&lt;|channel|&gt;", "&lt;|message|&gt;"]
+- *Percent of words in four-word runs copied from the description hint:* 0
+- *Text compared with the description hint:* answer
 - *Resolved model revision:* 9c056d48b1e611dc586139a5deb927ae363cfe6f
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.496
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.478
 - *Peak memory at first token (GB):* 6.729
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -442,27 +579,28 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Chat template found in (the first is the one the processor uses):* chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.015
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2174
-- *Prompt composition:* 2,174 = 382 text/template + 1,792 image tokens (82%;
+- *Prompt tokens:* 2211
+- *Prompt composition:* 2,211 = 419 text/template + 1,792 image tokens (81%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 5.68
 - *Parameter count:* 9.00B (name-estimate)
 - *Quantization:* 4-bit, group 64, affine
-- *Load active memory vs checkpoint:* 1.00x (5.70 GB vs 5.68 GB on disk)
+- *Load active memory vs checkpoint:* 1.00x (5.69 GB vs 5.68 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 5.68 GB; other
-  load-time allocations 0.02 GB
-- *Generation tokens:* 18
+  load-time allocations 0.01 GB
+- *Generation tokens:* 19
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;|return|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); mode snapshot
+  2 sample(s); GPU reading max 97% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
+  snapshot
 
 #### Complete output
 
 ```text
-<|channel|> analysis<|message|> The image shows a harbor with several boats docked in a row.
+<|channel|> analysis<|message|> The image shows a large church tower with a spire and a pointed roof.
 ```
 
 </details>
@@ -470,7 +608,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 <a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
 <details>
-<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — major concerns — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible</summary>
+<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — major concerns — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name</summary>
 
 ### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
@@ -482,14 +620,15 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_special_token, role_boundary_token_present
+  unexpected_special_token, role_boundary_token_present, unverified_place_name
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description"]
 - *Unexpected special tokens:* ["&lt;|message|&gt;"]
 - *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
+- *Place names the prompt did not supply:* ["Dusk"]
 - *Title word count:* 0
-- *Keyword count:* 2
+- *Keyword count:* 1
 - *Keywords taken verbatim from the prompt's keyword hints:* 0
 - *Token-cap degradation evidence:* ["missing_sections", "unfinished_list"]
 - *Special tokens emitted (by token id):* ["&lt;|message|&gt;"]
@@ -497,8 +636,8 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 8.768
-- *Peak memory at first token (GB):* 25.465
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 7.502
+- *Peak memory at first token (GB):* 25.466
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
@@ -511,8 +650,8 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 - *Chat template found in (the first is the one the processor uses):* chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.007
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4390
-- *Prompt composition:* 4,390 = 334 text/template + 4,056 image tokens (92%;
+- *Prompt tokens:* 4418
+- *Prompt composition:* 4,418 = 362 text/template + 4,056 image tokens (92%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 23.85
 - *Parameter count:* 30.00B (name-estimate)
@@ -528,8 +667,9 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
   (preprocessor_config.json, processor_config.json)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU reading max 77% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
+  snapshot
 
 #### Complete output
 
@@ -539,11 +679,12 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -555,117 +696,41 @@ Title:
 Description:
 Keywords:
 
-Need title 5-10 words.
+We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not claim visible. Might just describe scene. The instruction says combining relevant context with main visible subject... Context includes capture date/time. Hmm "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." Means we can use them as facts but not say they are visible in image. Could mention "Captured on 2026-10-03 at 18:18:19 UTC+01:00" but that's meta. Might be okay. Might be better to keep description about visual.
+Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
 
-Let's make description: UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a sunset sky reflecting on the water and the town’s cliffside terraces beyond. The fleet shows lifebuoys, wheelhouses and mooring lines along the quay under a golden-orange sky.
+Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
 
-That's one sentence? It's two. Need 1-2 sentences.
-
-Keywords: 10-18 unique comma-separated. Must cover relevant context and visible details. Include Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina? maybe mooring. Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Also Dover appears in image? The hint mentions Dover, and a vessel has DOVER on it. Image shows "DOVER" on a vessel. Also maybe sunset. Also white cliffs. Could include sunset, white cliffs, etc.
-
-Need unique keywords. Provide 10-18.
-
-Let's list: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, England, dusk, sunset, harbour, mooring, fleet, lifebuoy, cliffside buildings, water reflection, maritime, patrol boat, BSC Defender
-
-But need comma-separated.
-
-Let's craft ~15 keywords.
-
-Ensure British English: Harbour not Harbor? Hint says Harbor. Might use Harbour. Use British spelling.
-
-Provide:
+Output exactly three sections with headings.
 
 Title:
 Description:
 Keywords:
 
-Make sure exactly those sections.
+No extra text.
 
-Probably output:
+Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden-orange sunset reflecting on the water and the town’s cliffside terraces in the background. The fleet shows lifebuoys, wheelhouses, radar domes and mooring lines along the quay beneath a dramatic evening sky.
+Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
-```
+Probably keep simple.
 
-</details>
+Keywords list comma-separated. Ensure unique.
 
-<a id="diagnostic-mlx-community-minicpm-v-46-4bit"></a>
+Let's produce:
 
-<details>
-<summary>mlx-community/MiniCPM-V-4.6-4bit — major concerns — incomplete thinking block</summary>
+Title: St Peter Mancroft Tower at Dusk Norwich
 
-### mlx-community/MiniCPM-V-4.6-4bit
+Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
 
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Family README in installed mlx-vlm:* mlx_vlm/models/minicpmv4_6/README.md
-  (read before filing)
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 6
-- *Keyword count:* 15
-- *Keywords taken verbatim from the prompt's keyword hints:* 8
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.97
-- *Peak memory at first token (GB):* 3.186
-- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
-- *Sampling settings source:* temperature: generation_config; top_p:
-  generation_config; top_k: generation_config; min_p: default;
-  repetition_penalty: default
-- *generation_config.json settings not applied (by mlx-vlm or the harness):* {"repetition_penalty":
-  1.0}
-- *EOS ids declared, by file:* {"config.json": [248044, 248046],
-  "generation_config.json": [248044, 248046]}
-- *Chat template found in (the first is the one the processor uses):* chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.005
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 910
-- *Prompt composition:* 910 = 321 text/template (tokenizer-exact) + 589
-  non-text (65%, image/audio expansion)
-- *Checkpoint weights (GB):* 2.16
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 262,144 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (2.16 GB vs 2.16 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 2.16 GB; other
-  load-time allocations 0.00 GB
-- *Generation tokens:* 104
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
-  over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<think>
-Here's the response following the instructions:
-
-Title: Ramsgate Harbour Patrol Vessels at Sunset
-
-Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsgate Harbour during dusk. The scene is illuminated by the sunset, highlighting the harbor and surrounding buildings.
-
-Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, buildings, reflection
+Keywords: St Peter Manc
 ```
 
 </details>
@@ -680,19 +745,24 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                         | Mechanical checks | Observations                                     |
-|-----------------------------------------------|-------------------|--------------------------------------------------|
-| mlx-community/FastVLM-0.5B-bf16               | major concerns    | labelled fields not detected                     |
-| mlx-community/gemma-3n-E4B-it-4bit            | major concerns    | labelled fields not detected                     |
-| mlx-community/granite-vision-3.2-2b-nvfp4     | major concerns    | labelled fields not detected; duplicate keywords |
-| mlx-community/MolmoPoint-8B-4bit              | major concerns    | labelled fields not detected                     |
-| mlx-community/SmolVLM-256M-Instruct-4bit      | major concerns    | labelled fields not detected                     |
-| vikhyatk/moondream2                           | major concerns    | labelled fields not detected                     |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | concerns detected | prompt hint repeated                             |
-| mlx-community/gemma-4-e4b-it-4bit             | concerns detected | prompt hint repeated                             |
-| mlx-community/GLM-4.6V-nvfp4                  | concerns detected | prompt hint repeated                             |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx      | concerns detected | prompt hint repeated                             |
-| mlx-community/Step-3.7-Flash-oQ3e             | concerns detected | prompt hint repeated                             |
+| Model                                                    | Mechanical checks | Observations                                        |
+|----------------------------------------------------------|-------------------|-----------------------------------------------------|
+| mlx-community/FastVLM-0.5B-bf16                          | major concerns    | labelled fields not detected; prompt hint repeated  |
+| mlx-community/gemma-3n-E4B-it-4bit                       | major concerns    | labelled fields not detected; unsupplied place name |
+| mlx-community/MolmoPoint-8B-4bit                         | major concerns    | labelled fields not detected; unsupplied place name |
+| mlx-community/nanoLLaVA-1.5-4bit                         | major concerns    | labelled fields not detected                        |
+| mlx-community/SmolVLM-256M-Instruct-4bit                 | major concerns    | labelled fields not detected; prompt hint repeated  |
+| vikhyatk/moondream2                                      | major concerns    | labelled fields not detected; prompt hint repeated  |
+| mlx-community/Molmo2-8B-4bit                             | concerns detected | duplicate keywords                                  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx                 | concerns detected | duplicate keywords; prompt hint repeated            |
+| mlx-community/GLM-4.6V-Flash-4bit                        | concerns detected | prompt hint repeated                                |
+| mlx-community/granite-4.0-3b-vision-4bit                 | concerns detected | prompt hint repeated                                |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                    | concerns detected | prompt hint repeated                                |
+| mlx-community/pixtral-12b-8bit                           | concerns detected | prompt hint repeated                                |
+| mlx-community/Step-3.7-Flash-oQ3e                        | concerns detected | prompt hint repeated                                |
+| nativ-community/Mage-VL-OptiQ-4bit                       | concerns detected | prompt hint repeated                                |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit | concerns detected | prompt hint repeated                                |
+| sahilchachra/LensVLM-9B-MXFP4                            | concerns detected | prompt hint repeated                                |
 
 ## Context for completions without detected concerns
 
@@ -701,37 +771,32 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                          |
 |-------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2103 prompt / 58 generated; 481 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2070 prompt / 132 generated; 102 tok/s; 6.5 GB peak  |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit       | rev 0a970d20ad7d; Mistral3Processor; stop completed          | 2372 prompt / 123 generated; 30.0 tok/s; 23 GB peak  |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1617 prompt / 617 generated; 125 tok/s; 19 GB peak   |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 572 prompt / 135 generated; 31.2 tok/s; 17 GB peak   |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 577 prompt / 108 generated; 61.1 tok/s; 7.6 GB peak  |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 577 prompt / 106 generated; 122 tok/s; 16 GB peak    |
-| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 577 prompt / 103 generated; 26.2 tok/s; 20 GB peak   |
-| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6339 prompt / 89 generated; 78.7 tok/s; 8.7 GB peak  |
-| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1366 prompt / 107 generated; 178 tok/s; 4.8 GB peak  |
-| mlx-community/Idefics3-8B-Llama3-bf16                       | rev 8c2a30c48864; Idefics3Processor; stop completed          | 2601 prompt / 130 generated; 34.3 tok/s; 18 GB peak  |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2091 prompt / 113 generated; 57.2 tok/s; 10 GB peak  |
-| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2091 prompt / 80 generated; 37.3 tok/s; 17 GB peak   |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1312 prompt / 995 generated; 65.0 tok/s; 20 GB peak  |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                       | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed            | 2094 prompt / 91 generated; 210 tok/s; 4.0 GB peak   |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 369 prompt / 88 generated; 106 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2905 prompt / 140 generated; 66.0 tok/s; 13 GB peak  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2904 prompt / 134 generated; 186 tok/s; 7.8 GB peak  |
-| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1502 prompt / 148 generated; 71.4 tok/s; 8.1 GB peak |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4065 prompt / 158 generated; 208 tok/s; 3.9 GB peak  |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1267 prompt / 133 generated; 103 tok/s; 24 GB peak   |
-| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1115 prompt / 144 generated; 58.4 tok/s; 9.3 GB peak |
-| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3095 prompt / 119 generated; 39.8 tok/s; 16 GB peak  |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12768 prompt / 138 generated; 72.8 tok/s; 26 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16525 prompt / 143 generated; 85.3 tok/s; 23 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16525 prompt / 112 generated; 69.6 tok/s; 11 GB peak |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16541 prompt / 151 generated; 106 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16541 prompt / 121 generated; 29.3 tok/s; 21 GB peak |
-| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4188 prompt / 118 generated; 127 tok/s; 5.4 GB peak  |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1251 prompt / 114 generated; 36.6 tok/s; 18 GB peak  |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3606 prompt / 132 generated; 156 tok/s; 23 GB peak   |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2131 prompt / 83 generated; 481 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2108 prompt / 102 generated; 103 tok/s; 6.5 GB peak  |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 611 prompt / 92 generated; 74.4 tok/s; 28 GB peak    |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1656 prompt / 617 generated; 126 tok/s; 19 GB peak   |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 610 prompt / 145 generated; 31.4 tok/s; 17 GB peak   |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 615 prompt / 118 generated; 62.7 tok/s; 7.6 GB peak  |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 615 prompt / 105 generated; 124 tok/s; 16 GB peak    |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 611 prompt / 108 generated; 125 tok/s; 6.0 GB peak   |
+| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6372 prompt / 112 generated; 45.0 tok/s; 78 GB peak  |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2132 prompt / 98 generated; 57.4 tok/s; 10 GB peak   |
+| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2135 prompt / 126 generated; 421 tok/s; 2.1 GB peak  |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1342 prompt / 750 generated; 66.6 tok/s; 20 GB peak  |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 320 prompt / 101 generated; 22.0 tok/s; 15 GB peak   |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 410 prompt / 104 generated; 106 tok/s; 7.1 GB peak   |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 950 prompt / 333 generated; 304 tok/s; 3.2 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2959 prompt / 122 generated; 66.3 tok/s; 13 GB peak  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2958 prompt / 113 generated; 188 tok/s; 7.8 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4101 prompt / 158 generated; 210 tok/s; 3.9 GB peak  |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12809 prompt / 120 generated; 73.4 tok/s; 26 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16566 prompt / 144 generated; 86.9 tok/s; 23 GB peak |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16566 prompt / 91 generated; 69.5 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16579 prompt / 130 generated; 110 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16579 prompt / 133 generated; 30.2 tok/s; 21 GB peak |
+| mlx-community/X-Reasoner-7B-8bit                            | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed        | 16577 prompt / 127 generated; 60.0 tok/s; 14 GB peak |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3642 prompt / 101 generated; 159 tok/s; 23 GB peak   |
+| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16579 prompt / 123 generated; 36.3 tok/s; 17 GB peak |
 
 </details>
 
@@ -740,9 +805,9 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,641 x 6,427 pixels
-- *Image size:* 58,125,687 bytes
-- *Image SHA-256:* 9f0e8d795514c6c4d18ec033dde42b6865c30a5c45ad85343e85dc24b75bcb63
+- *Image dimensions:* 6,213 x 9,320 pixels
+- *Image size:* 52,096,760 bytes
+- *Image SHA-256:* 5526381f05071b9832b086adc634888de171e314a3d5d1acc4c80c3afc95a8a4
 
 <details>
 <summary>Exact prompt</summary>
@@ -753,11 +818,12 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -776,10 +842,10 @@ The original local input is not published, so this report does not claim a
 complete reproduction command. Use a shareable equivalent image or add the
 original image before filing.
 
-- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-c688458ce4ed66ce.jpg>
-- *Preview dimensions:* 1,024 x 683 pixels
-- *Preview size:* 117,105 bytes
-- *Preview SHA-256:* c688458ce4ed66ce78ed6e7bbc72fbfd28edfce5f0d1160bdf3322c4edc910be
+- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-f00ae35004e26a90.jpg>
+- *Preview dimensions:* 683 x 1,024 pixels
+- *Preview size:* 99,535 bytes
+- *Preview SHA-256:* f00ae35004e26a90c102e7357a69f13b84009d2416fe3bdb9ba7d7c4b3a6ee3b
 
 Shareable stand-in: the retained gallery preview is a downscaled re-encoding
 of the original, so an observation reproduced on it must be reported as
@@ -790,18 +856,19 @@ native mlx-vlm process.
 
 ```bash
 set -euo pipefail
-curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-c688458ce4ed66ce.jpg
-printf '%s\n' 'c688458ce4ed66ce78ed6e7bbc72fbfd28edfce5f0d1160bdf3322c4edc910be  repro-image.jpg' | shasum -a 256 --check
+curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-f00ae35004e26a90.jpg
+printf '%s\n' 'f00ae35004e26a90c102e7357a69f13b84009d2416fe3bdb9ba7d7c4b3a6ee3b  repro-image.jpg' | shasum -a 256 --check
 python -m mlx_vlm.generate --verbose --model MODEL_ID --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town'"'"'s cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -816,29 +883,26 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 ### Highlighted model revisions
 
-| Model                                            | Resolved revision                        |
-|--------------------------------------------------|------------------------------------------|
-| mlx-community/InternVL3_5-1B-4bit                | f9d179a8be8ac53e96c6ee5cce8493856d4b8f09 |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
-| mlx-community/nanoLLaVA-1.5-4bit                 | 5240204744963d72823e5de933c528c4aa82dfca |
-| mlx-community/X-Reasoner-7B-8bit                 | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
-| mlx-community/Qwen2-VL-2B-mlx                    | d8c7c767e2e2c62cda8a51943276458ea6ad43bc |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit            | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit        | 98377360cbc84f982e90336f956b08adb46cad88 |
-| mlx-community/MiniCPM-V-4.6-4bit                 | 86cd463d33a946e4481b77e3c10fc63121b60a19 |
+| Model                                      | Resolved revision                        |
+|--------------------------------------------|------------------------------------------|
+| mlx-community/granite-vision-3.2-2b-nvfp4  | f0c70965cdae87ebf38e84ff958e841ad943e8e6 |
+| mlx-community/Phi-3.5-vision-instruct-bf16 | d8da684308c275a86659e2b36a9189b2f4aec8ea |
+| mlx-community/Qwen2-VL-2B-mlx              | d8c7c767e2e2c62cda8a51943276458ea6ad43bc |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit      | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit  | 98377360cbc84f982e90336f956b08adb46cad88 |
 
 ### Components and system
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.7.4                                                                                                                                           |
-| mlx-vlm source revision    | 6ecadd767ca1c7c54763289c750dd180d7945037                                                                                                        |
-| mlx                        | 0.32.4.dev20261004+65be04707                                                                                                                    |
-| mlx source revision        | 65be04707                                                                                                                                       |
-| mlx-audio                  | 0.5.7                                                                                                                                           |
-| transformers               | 5.18.0                                                                                                                                          |
-| tokenizers                 | 0.23.2                                                                                                                                          |
-| huggingface-hub            | 1.33.0                                                                                                                                          |
+| mlx-vlm                    | 0.7.7                                                                                                                                           |
+| mlx-vlm source revision    | 952d4f6bc65bd5095e74abe71c78038764ee08aa                                                                                                        |
+| mlx                        | 0.32.4.dev20261010+06eb7483f                                                                                                                    |
+| mlx source revision        | 06eb7483f                                                                                                                                       |
+| mlx-audio                  | 0.5.8                                                                                                                                           |
+| transformers               | 5.19.0                                                                                                                                          |
+| tokenizers                 | 0.23.3                                                                                                                                          |
+| huggingface-hub            | 2.2.0                                                                                                                                           |
 | Python Version             | 3.14.7                                                                                                                                          |
 | OS                         | Darwin 27.0.0                                                                                                                                   |
 | macOS Version              | 27.0.1                                                                                                                                          |
@@ -862,7 +926,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (202,809,136 bytes, sha256=9035ea7612ee7a9cdfc9676a52df58f4f567c68ca26337e39cbcd59908dcb332) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,569,328 bytes, sha256=4df6bf822f9e9825a7899a5ba704b054797e711390dad51d55f9ecfee6241d79)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (215,965,088 bytes, sha256=46366f90fed6bb8ddd20e811c14cb991b791018d1e1556dae974bd5d33a610dc) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,056,416 bytes, sha256=7d6f4829617d878663d8366327b36d3ca3e41cfb4399b59df5524069534978ca)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->

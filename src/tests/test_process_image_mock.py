@@ -1751,6 +1751,54 @@ class TestRepetitionGuard:
         cycle = "boathouse, pond, foliage, "
         assert check_models._detect_streaming_repetition("intro " + cycle * 4) is True
 
+    def test_a_loop_the_detokenizer_holds_back_runs_to_the_cap_with_its_text(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A held-back loop is not stopped early, so mlx-vlm's finalised text survives.
+
+        Qwen2-VL repeated "<|im_start|>assistant" 265 times on 2026-10-11 with
+        every chunk's text empty until upstream's final flush. Stopping by token
+        id would discard that flush, the only evidence of the loop.
+        """
+        cycle = [151644, 77091, 198]
+        flushed = "<|im_start|>assistant\n" * 265
+        chunks = [
+            types.SimpleNamespace(
+                text="" if i >= 30 else f"word{i} ",
+                token=cycle[i % 3] if i >= 30 else 1000 + i,
+                generation_tokens=i + 1,
+                finish_reason=None,
+                prompt_tokens=5,
+                generation_tps=10.0,
+                peak_memory=1.0,
+            )
+            for i in range(1000)
+        ]
+        # Upstream finalises its detokenizer and yields the held-back text last.
+        chunks.append(
+            types.SimpleNamespace(
+                text=flushed,
+                token=None,
+                generation_tokens=1000,
+                finish_reason="length",
+                prompt_tokens=5,
+                generation_tps=10.0,
+                peak_memory=1.0,
+            )
+        )
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kwargs: iter(chunks))
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+        )
+        assert result.finish_reason == "length"
+        text = result.text
+        assert text is not None
+        assert text.endswith(flushed)
+        assert text.count("<|im_start|>assistant") == 265
+
     def test_wrapper_aborts_repeating_stream_and_marks_finish_reason(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

@@ -326,7 +326,9 @@ Every current-run row uses one immutable assessment with three independent field
 
 These machine codes are retained for compatibility. Human reports describe them as
 "no concerns detected", "concerns detected", "major concerns", and "not assessed";
-none is a semantic accuracy score. The selected assessment profile is recorded in
+none is a semantic accuracy score. Report tables name the kind of major concern:
+"generation" when generation itself failed (no text, repeated text, no final
+answer) and "answer format" when an answer missed the requested form. The selected assessment profile is recorded in
 the JSONL header and each result's assessment.
 
 Assessment is independent of the evaluation lane and prompt wording:
@@ -366,14 +368,14 @@ content, its exact token is retained as a separate role-boundary observation.
 Control-wrapper syntax that appears in output without any of those declarations is
 retained as an `unexpected_special_token` observation; no model-name allowlist is
 used.
-Two observations compare the answer with the prompt itself. `prompt_hint_echoed`
+One observation compares the answer with the prompt itself. `prompt_hint_echoed`
 flags a Description that hands back the prompt's own "Description hint" (the
 assisted lane supplies one): such an answer passes every structural check
-without showing that the model looked at the image. `unverified_place_name`
-flags a place name in the prose that the prompt never supplied, which a model
-can only have inferred (from GPS coordinates, say) or guessed; the matched names
-are retained as evidence. Both are caveats, use no gazetteer or model-specific
-rule, and are silent when no prompt is available.
+without showing that the model looked at the image. It is a caveat, counted
+from word overlap with the hint, and silent when no prompt is available.
+(Versions 0.17.29-0.17.47 also guessed at unsupplied place names from
+capitalised words; that heuristic was removed, and its retained observations
+still render.)
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
 
@@ -848,15 +850,17 @@ The `src/tools/` directory contains scripts useful for development and verificat
 - **Smoke Testing**: For quick verification, you can use the standard `mlx-vlm` CLI:
 
   ```bash
-  python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image test.jpg
+  python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image test.jpg
   ```
 
-  Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
-
-- **E2E Smoke Tests**: The test suite includes end-to-end tests that run actual model inference:
+- **E2E Smoke Tests**: `tests/test_e2e_smoke.py` runs real inference through
+  the full CLI. One test writes a tiny random-weight Qwen2-VL checkpoint
+  (about 150 KB) to a temp directory and runs it, so the real mlx-vlm load,
+  chat-template and generate path is exercised in CI with no download. The
+  others need `LiquidAI/LFM2.5-VL-450M-MLX-bf16` cached and skip without it.
 
   ```bash
-  # Run E2E tests (requires cached model: mlx-community/nanoLLaVA-1.5-4bit)
+  # Run E2E tests
   pytest tests/test_e2e_smoke.py -v
 
   # Skip slow tests for quick iteration
@@ -865,10 +869,6 @@ The `src/tools/` directory contains scripts useful for development and verificat
   # Run all tests including E2E
   pytest tests/ -v
   ```
-
-  > [!NOTE]
-  > E2E tests require `mlx-community/nanoLLaVA-1.5-4bit` to be cached. Run a quick inference first to download it:
-  > `python -m check_models --models mlx-community/nanoLLaVA-1.5-4bit --max-tokens 10`
 
 - **`validate_env.py`**: Checks your environment for required dependencies and configuration.
 

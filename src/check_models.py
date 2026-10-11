@@ -65,7 +65,7 @@ import time
 import tomllib
 import traceback
 import types
-from collections import Counter
+from collections import Counter, defaultdict
 from collections.abc import (
     Callable,
     Collection,
@@ -134,7 +134,7 @@ from urllib.request import urlopen
 import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
-from huggingface_hub.errors import HFValidationError
+from huggingface_hub.errors import CacheNotFound, HFValidationError
 from jinja2 import Environment as JinjaEnvironment
 from jinja2 import TemplateSyntaxError as JinjaTemplateSyntaxError
 from jinja2 import meta as jinja_meta
@@ -271,7 +271,8 @@ IMPORT_PROBE_SKIP_ENV: Final[str] = "CHECK_MODELS_SKIP_IMPORT_PROBE"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 IMPORT_PROBE_OUTPUT_EXCERPT_CHARS: Final[int] = 220
 IMPORT_PROBE_MIN_TAIL_CHARS: Final[int] = 10
-DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
+type KvQuantScheme = Literal["uniform", "turboquant"]
+DEFAULT_KV_QUANT_SCHEME: Final[KvQuantScheme] = "uniform"
 DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
@@ -1107,6 +1108,20 @@ class SystemTelemetryRecord(TypedDict, total=False):
     thermal_samples: int
     thermal_state_max: int
     thermal_elevated_samples: int
+    # GPU "Device Utilization %" (IOAccelerator PerformanceStatistics) per
+    # snapshot probe. Both probes sit outside this process's GPU work and the
+    # reading falls to 0 within ~50 ms of it ending, so a non-zero value is GPU
+    # activity detected outside harness inference. Each probe is one instant:
+    # zero readings do not show an uncontended run, because activity between
+    # probes is never observed. Continuous samples overlap inference and never
+    # carry it.
+    gpu_samples: int
+    gpu_utilization_max_pct: int
+    gpu_busy_samples: int
+    # "reread" (0.17.49+): each reading discarded a stale first ioreg read.
+    # Records without it (0.17.44-0.17.46) could count this process's own
+    # finished inference, so their GPU readings are shown as unreliable.
+    gpu_sample_method: str
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -2427,12 +2442,15 @@ class _TeeCaptureStream(io.TextIOBase):
     # and without a file descriptor they cannot size themselves to the
     # terminal, so every bar came out a ragged ten characters wide. Forwarding
     # both makes a captured bar render exactly as an uncaptured one.
+    # Typeshed declares TextIOBase.encoding and .errors as writable attributes,
+    # but CPython's are read-only descriptors, so a property is the only way to
+    # forward them. mypy and pyrefly honour the type: ignore; ty (0.0.86+) needs its own.
     @property
-    def encoding(self) -> str:  # type: ignore[override]  # TextIOBase declares a plain attribute
+    def encoding(self) -> str:  # type: ignore[override]  # ty: ignore[invalid-property-type-override]  # inaccurate stub
         return getattr(self._stream, "encoding", None) or "utf-8"
 
     @property
-    def errors(self) -> str | None:  # type: ignore[override]  # as encoding, above
+    def errors(self) -> str | None:  # type: ignore[override]  # ty: ignore[invalid-property-type-override]  # as encoding
         return getattr(self._stream, "errors", None)
 
     def fileno(self) -> int:
@@ -3322,13 +3340,13 @@ class ProcessImageParams:
     lazy: bool
     max_kv_size: int | None
     kv_bits: float | None
-    kv_quant_scheme: Literal["uniform", "turboquant"]
+    kv_quant_scheme: KvQuantScheme
     kv_group_size: int
     quantized_kv_start: int
     kv_key_bits: float | None = None
     kv_value_bits: float | None = None
-    kv_key_scheme: Literal["uniform", "turboquant"] | None = None
-    kv_value_scheme: Literal["uniform", "turboquant"] | None = None
+    kv_key_scheme: KvQuantScheme | None = None
+    kv_value_scheme: KvQuantScheme | None = None
     seed: int | None = None
     # Sampling dests the user gave explicitly (CLI or a per-run override);
     # everything else may be filled from the checkpoint's generation_config.json.
@@ -4535,103 +4553,6 @@ def _echoed_hint_fields(
     return _dedupe_preserve_order(echoed)
 
 
-# Natural and landmark features only: street furniture ("New Road", "Road
-# Ahead") is as often sign text the model legitimately read.
-_PLACE_FEATURE: Final[str] = r"(?:River|Lake|Loch|Mount|Mt|Isle|Cathedral|Castle|Abbey)"
-_PLACE_NAME: Final[str] = r"[A-Z][a-zA-Z'\u2019-]+"
-_PLACE_FEATURE_FIRST_RE: Final[re.Pattern[str]] = re.compile(
-    rf"\b({_PLACE_FEATURE})\s+({_PLACE_NAME}(?:\s+{_PLACE_NAME})?)"
-)
-_PLACE_NAME_FIRST_RE: Final[re.Pattern[str]] = re.compile(
-    rf"\b({_PLACE_NAME}(?:\s+{_PLACE_NAME})?)\s+({_PLACE_FEATURE})\b"
-)
-_PLACE_AFTER_PREPOSITION_RE: Final[re.Pattern[str]] = re.compile(
-    rf"\b(?:in|at|near|outside|around)\s+({_PLACE_NAME}(?:[ ,]+{_PLACE_NAME}){{0,2}})"
-)
-_PLACE_STOPWORDS: Final[frozenset[str]] = frozenset(
-    {
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-        "UTC",
-        "BST",
-        "GMT",
-        "The",
-        "A",
-        "An",
-        "I",
-        "It",
-        "Title",
-        "Description",
-        "Keywords",
-    }
-)
-# Demonyms and styles ("in Victorian dress", "in Gothic style") are adjectives.
-_PLACE_ADJECTIVE_SUFFIXES: Final[tuple[str, ...]] = ("ian", "ean", "ish", "ese", "ic")
-
-
-def _answer_place_names(sections: Mapping[str, str], text: str, prompt: str | None) -> list[str]:
-    """Scan the Description when the answer has one, else the whole text (both sentence case)."""
-    return _unverified_place_names(sections.get("description") or text, prompt)
-
-
-def _unverified_place_names(prose: str, prompt: str | None) -> list[str]:
-    """Return proper place names in the prose that the prompt never supplied.
-
-    A model given GPS coordinates or nothing at all can only *infer* a place
-    name, and sweeps show it guessing wrong (a river in Ely captioned "River
-    Cam, Cambridge" and, by another model, "River Thames, Lambeth"). Mechanical
-    and gazetteer-free: a capitalised name beside a natural or landmark feature
-    word, or after a locative preposition, none of whose words occur in the
-    prompt. Sentence-case prose only, so Title Case headings cannot match.
-    """
-    if not prompt or not prose:
-        return []
-    prompt_words = set(_match_words(prompt))
-
-    def _unsupplied(name: str) -> str | None:
-        tokens = [re.sub(r"['\u2019]s$", "", token) for token in re.split(r"[ ,]+", name)]
-        kept = [
-            token
-            for token in tokens
-            if token
-            and token not in _PLACE_STOPWORDS
-            and not token.lower().endswith(_PLACE_ADJECTIVE_SUFFIXES)
-            and token.lower() not in prompt_words
-        ]
-        return " ".join(kept) if kept else None
-
-    # (pattern, name group, rendering of the kept name) for the three constructions.
-    constructions: tuple[tuple[re.Pattern[str], int, Callable[[re.Match[str], str], str]], ...] = (
-        (_PLACE_FEATURE_FIRST_RE, 2, lambda match, name: f"{match.group(1)} {name}"),
-        (_PLACE_NAME_FIRST_RE, 1, lambda match, name: f"{name} {match.group(2)}"),
-        (_PLACE_AFTER_PREPOSITION_RE, 1, lambda _match, name: name),
-    )
-    found = [
-        render(match, name)
-        for pattern, group, render in constructions
-        for match in pattern.finditer(prose)
-        if (name := _unsupplied(match.group(group))) is not None
-    ]
-    return _dedupe_preserve_order(found)
-
-
 # =============================================================================
 # SECTION: METRICS, SCORING & FIELD FORMATTING
 # =============================================================================
@@ -4729,8 +4650,6 @@ class GenerationQualityAnalysis:
     # labelled) inside four-word runs copied from the description hint.
     description_hint_percent: int | None = None
     description_hint_scope: Literal["description", "answer"] | None = None
-    # Proper place names in the prose that the prompt never supplied.
-    unverified_place_names: list[str] = dataclass_field(default_factory=list)
 
 
 _DUPLICATED_ANSWER_MIN_CHARS: Final[int] = 80
@@ -4984,7 +4903,6 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         echoed_hint_fields=_echoed_hint_fields(
             prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
         ),
-        unverified_place_names=_answer_place_names(sections, analysis_text, prompt),
     )
 
 
@@ -7261,7 +7179,7 @@ _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
 _RUNTIME_PHASE_LABELS: Final[dict[RuntimePhaseName, str]] = {
     "model_load": "model load",
     "prompt_prep": "local prompt prep",
-    "upstream_prefill_first_token": "upstream model prefill / first-token",  # skylos: ignore[SKY-S101] - phase-name key, not a secret; 4.33.2 entropy scanner misreads snake_case identifiers
+    "upstream_prefill_first_token": "upstream model prefill / first-token",  # skylos: ignore[SKY-S101] - a label, not a secret; since 4.33.2 any quoted value under a key containing 'token' is entropy-checked (still on 4.47.2)
     "input_preparation_and_decode": "input preparation + decode",
     "decode": "generation call total (unsplit)",
     "cleanup": "cleanup",
@@ -8635,15 +8553,17 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
     ObservationDisplaySpec("duplicate_keywords", "Repeated keyword entries", "duplicate keywords"),
     ObservationDisplaySpec(
         "prompt_hint_echoed",
-        "Output repeats the prompt's own hint text instead of describing the image",
+        "Output repeats the prompt's own hint text",
         "prompt hint repeated",
     ),
+    # Legacy codes remain renderable for retained pre-0.17 evidence.
+    # unverified_place_name: emitted 0.17.29-0.17.47; dropped as a heuristic
+    # (capitalised words after "in"/"at" flagged "Dusk" and "Sunset").
     ObservationDisplaySpec(
         "unverified_place_name",
         "Names a place the prompt did not supply",
         "unsupplied place name",
     ),
-    # Legacy codes remain renderable for retained pre-0.17 evidence.
     ObservationDisplaySpec(
         "catalog_constraint_violation",
         "Title, description or keywords do not meet requested constraints",
@@ -8704,6 +8624,28 @@ _USABILITY_GLOSS: Final[dict[str, str]] = {
 }
 
 
+# Major concerns split by where the failure lies: generation itself broke
+# (empty, repeating, no final answer) or a generated answer missed the
+# requested form (labels, extra text, echoed instructions, token limit).
+_GENERATION_FAILURE_OBSERVATIONS: Final[frozenset[ObservationCode]] = (
+    _UNUSABLE_OBSERVATIONS & _INTEGRATION_SIGNAL_OBSERVATIONS
+)
+
+
+def _major_concern_kind(usability: str, observations: Iterable[str]) -> str | None:
+    """Name a major-concerns result's kind ("generation" or "answer format"), else None."""
+    if usability != "unusable":
+        return None
+    return "generation" if _GENERATION_FAILURE_OBSERVATIONS & set(observations) else "answer format"
+
+
+def _usability_label(usability: str, observations: Iterable[str]) -> str:
+    """The usability gloss, naming the kind of major concern when there is one."""
+    kind = _major_concern_kind(usability, observations)
+    label = _human_status_label(usability)
+    return f"{label}: {kind}" if kind else label
+
+
 def _usability_rank(usability: str) -> int:
     """Best-first position in the canonical order; foreign values sort last."""
     return (
@@ -8721,10 +8663,14 @@ def _usability_severity(usability: ModelUsability) -> int:
     return len(assessed) - 1 - assessed.index(usability)
 
 
+def _literal_choices(alias: object) -> tuple[str, ...]:
+    """Return the members of a PEP 695 `type X = Literal[...]` alias in declaration order."""
+    return cast("tuple[str, ...]", get_args(getattr(alias, "__value__", alias)))
+
+
 def _literal_values(alias: object) -> frozenset[str]:
     """Return the string members of a PEP 695 `type X = Literal[...]` alias."""
-    value = getattr(alias, "__value__", alias)
-    return frozenset(cast("tuple[str, ...]", get_args(value)))
+    return frozenset(_literal_choices(alias))
 
 
 _EXECUTION_STATUS_VALUES: Final[frozenset[str]] = _literal_values(ExecutionStatus)
@@ -8837,7 +8783,8 @@ def _human_observation_labels(
                 label = f"Final answer emitted twice, around {separator}"
         elif code == "prompt_hint_echoed" and details is not None:
             if echoed := details.get("echoed_hint_fields"):
-                label = f"Repeats the prompt's hint instead of describing the image: {', '.join(echoed)}"
+                # Copying an accurate hint does not show the image went unseen.
+                label = f"Repeats the prompt's hint text: {', '.join(echoed)}"
         elif code == "unverified_place_name" and details is not None:
             if places := details.get("unverified_place_names"):
                 label = f"Names a place the prompt did not supply: {', '.join(places)}"
@@ -9008,7 +8955,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     chooser_rows = [
         (
             _gallery_summary_model_link(row.model),
-            _markdown_inline_code(_human_status_label(row.usability)),
+            _markdown_inline_code(_usability_label(row.usability, row.observations)),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _format_float_or_dash(row.first_token_latency_s, digits=2),
@@ -9078,7 +9025,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             ]
         )
     parts.extend([_GALLERY_THROUGHPUT_CAVEAT, ""])
-    parts.extend(["## Avoid for This Run", ""])
+    parts.extend(["## Major Mechanical Concerns in This Run", ""])
 
     if data.avoided:
         parts.extend(
@@ -9087,7 +9034,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(_human_status_label(row.usability)),
+                        _markdown_inline_code(_usability_label(row.usability, row.observations)),
                         MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
                     )
                     for row in data.avoided
@@ -9095,7 +9042,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             )
         )
     else:
-        parts.append("No unusable or not-evaluated models in this run.")
+        parts.append("No model had major concerns or went unassessed in this run.")
     parts.append("")
     return parts
 
@@ -9294,7 +9241,6 @@ def _quality_observations(
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
         (bool(analysis.duplicate_keywords), "duplicate_keywords"),
         (bool(analysis.echoed_hint_fields), "prompt_hint_echoed"),
-        (bool(analysis.unverified_place_names), "unverified_place_name"),
     )
     observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
@@ -9376,8 +9322,6 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
     if analysis.echoed_hint_fields:
         details["echoed_hint_fields"] = list(analysis.echoed_hint_fields)
-    if analysis.unverified_place_names:
-        details["unverified_place_names"] = list(analysis.unverified_place_names)
     details.update(_catalog_constraint_observation_details(analysis))
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
@@ -10025,6 +9969,11 @@ class DiagnosticsPartitions:
     # deliberately outside the maintainer lane.
     compliance: tuple[PerformanceResult, ...]
     clean: tuple[PerformanceResult, ...]
+
+    @property
+    def highlighted(self) -> tuple[PerformanceResult, ...]:
+        """The maintainer lane in presentation order: actionable, observations, indeterminate."""
+        return (*self.actionable, *self.observations, *self.indeterminate)
 
 
 def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
@@ -10700,7 +10649,6 @@ def _diagnostics_evidence_blocks(
     # then simply omit the input-image line rather than re-reading the file.
     image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
     partitions = _partition_diagnostics(report_context)
-    highlighted = (*partitions.actionable, *partitions.observations, *partitions.indeterminate)
     triage_rows = tuple(
         (
             ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
@@ -10709,7 +10657,7 @@ def _diagnostics_evidence_blocks(
             assessments[result.model_name].maintainer_status.replace("_", " "),
             _gallery_observation_labels(assessments[result.model_name].observations),
         )
-        for result in highlighted
+        for result in partitions.highlighted
     )
     triage: ReportBlock = (
         ReportTable(
@@ -10868,20 +10816,13 @@ def generate_diagnostics_report(
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
-    model_provenance = _model_provenance_by_model(report_context)
-    partitions = _partition_diagnostics(report_context)
-    highlighted = (
-        *partitions.actionable,
-        *partitions.observations,
-        *partitions.indeterminate,
-    )
     blocks = (
         ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
         *_diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
-            highlighted_results=highlighted,
-            model_provenance=model_provenance,
+            highlighted_results=_partition_diagnostics(report_context).highlighted,
+            model_provenance=_model_provenance_by_model(report_context),
             library_versions=library_versions,
             system_info=system_info,
             image_path=image_path,
@@ -11059,7 +11000,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         (
             _html_model_link(row.model),
             _human_status_label(assessments[row.model].execution),
-            _human_status_label(row.usability),
+            _usability_label(row.usability, row.observations),
             _human_status_label(assessments[row.model].maintainer_status),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
@@ -11145,16 +11086,16 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         )
     parts.append(f"<p>{html.escape(_GALLERY_THROUGHPUT_CAVEAT)}</p>")
 
-    parts.append("<h3>Avoid for This Run</h3>")
+    parts.append("<h3>Major Mechanical Concerns in This Run</h3>")
     if data.avoided:
         parts.append(
             _html_table(
-                caption="Unusable and not-evaluated models",
+                caption="Models with major concerns or not assessed",
                 headers=("Model", "Mechanical checks", "Observations", "Output preview"),
                 rows=[
                     (
                         _html_model_link(row.model),
-                        _human_status_label(row.usability),
+                        _usability_label(row.usability, row.observations),
                         _gallery_observation_labels(row.observations),
                         row.output_preview,
                     )
@@ -11197,36 +11138,36 @@ def _html_gallery_model(
     return "\n".join(parts)
 
 
-def _html_complete_gallery(report_context: HtmlReportContext) -> str:
-    """Render complete evidence in the same stable order as the Markdown gallery."""
+def _gallery_evidence_entries(
+    report_context: HtmlReportContext,
+) -> list[tuple[PerformanceResult, GalleryRow, ResultAssessment, ModelProvenanceRecord | None]]:
+    """Per-model evidence inputs in the stable usable-first order both galleries render."""
     assessments = _assessments_by_model(report_context)
     model_provenance = _model_provenance_by_model(report_context)
-    rows_by_model = {
-        result.model_name: _gallery_row(result, assessments[result.model_name])
+    entries = [
+        (
+            result,
+            _gallery_row(result, assessments[result.model_name]),
+            assessments[result.model_name],
+            model_provenance.get(result.model_name),
+        )
         for result in report_context.result_set.results
-    }
-    ordered_results = sorted(
-        report_context.result_set.results,
-        key=lambda result: (
-            _usability_rank(rows_by_model[result.model_name].usability),
-            result.model_name,
-        ),
+    ]
+    return sorted(
+        entries,
+        key=lambda entry: (_usability_rank(entry[1].usability), entry[0].model_name),
     )
+
+
+def _html_complete_gallery(report_context: HtmlReportContext) -> str:
+    """Render complete evidence in the same stable order as the Markdown gallery."""
     parts = [
         '<section id="complete-model-evidence">',
         "<h2>Complete Per-model Evidence</h2>",
         "<p>Complete generated or crash evidence for every attempted model.</p>",
+        *(_html_gallery_model(*entry) for entry in _gallery_evidence_entries(report_context)),
+        "</section>",
     ]
-    parts.extend(
-        _html_gallery_model(
-            result,
-            rows_by_model[result.model_name],
-            assessments[result.model_name],
-            model_provenance.get(result.model_name),
-        )
-        for result in ordered_results
-    )
-    parts.append("</section>")
     return "\n".join(parts)
 
 
@@ -11290,15 +11231,9 @@ def _html_provenance(
     run_args: argparse.Namespace | None,
 ) -> str:
     """Render the same single-copy reproduction context used by Markdown."""
-    partitions = _partition_diagnostics(report_context)
-    highlighted = (
-        *partitions.actionable,
-        *partitions.observations,
-        *partitions.indeterminate,
-    )
     blocks = _diagnostics_shared_context_blocks(
         prompt=prompt,
-        highlighted_results=highlighted,
+        highlighted_results=_partition_diagnostics(report_context).highlighted,
         model_provenance=_model_provenance_by_model(report_context),
         library_versions=versions,
         system_info=report_context.system_info,
@@ -11446,35 +11381,14 @@ def generate_html_report(
 
 def _generate_model_gallery_section(report_context: ReportRenderContext) -> list[str]:
     """Render complete evidence in stable usable-first order."""
-    assessments = _assessments_by_model(report_context)
-    model_provenance = _model_provenance_by_model(report_context)
-    results = report_context.result_set.results
-    rows_by_model = {
-        result.model_name: _gallery_row(result, assessments[result.model_name])
-        for result in results
-    }
-    ordered_results = sorted(
-        results,
-        key=lambda result: (
-            _usability_rank(rows_by_model[result.model_name].usability),
-            result.model_name,
-        ),
-    )
     md = [
         "## Complete Per-model Evidence",
         "",
         "Complete generated or crash evidence for every attempted model.",
         "",
     ]
-    for result in ordered_results:
-        md.extend(
-            _render_gallery_model(
-                result,
-                rows_by_model[result.model_name],
-                assessments[result.model_name],
-                model_provenance.get(result.model_name),
-            )
-        )
+    for entry in _gallery_evidence_entries(report_context):
+        md.extend(_render_gallery_model(*entry))
         md.extend(["---", ""])
     return md
 
@@ -11509,12 +11423,7 @@ def generate_markdown_gallery_report(
     md.append("")
     md.extend(
         f"- *{label}:* {value}"
-        for label, value in _run_input_summary_rows(
-            _run_image_record(image_path, report_context.image_profile),
-            report_context.mode_policy.eval_mode,
-            report_context.mode_policy.assessment_profile,
-            metadata_exposed_to_prompt=report_context.mode_policy.metadata_exposed_to_prompt,
-        )
+        for label, value in _run_input_rows_for_context(image_path, report_context)
     )
     md.append("")
     md.extend(_wrap_markdown_text(_run_objective_statement(report_context.mode_policy.eval_mode)))
@@ -12162,11 +12071,11 @@ def validate_kv_params(
     *,  # Force all parameters to be keyword-only for clarity
     max_kv_size: int | None,
     kv_bits: float | None,
-    kv_quant_scheme: Literal["uniform", "turboquant"] = DEFAULT_KV_QUANT_SCHEME,
+    kv_quant_scheme: KvQuantScheme = DEFAULT_KV_QUANT_SCHEME,
     kv_key_bits: float | None = None,
     kv_value_bits: float | None = None,
-    kv_key_scheme: Literal["uniform", "turboquant"] | None = None,
-    kv_value_scheme: Literal["uniform", "turboquant"] | None = None,
+    kv_key_scheme: KvQuantScheme | None = None,
+    kv_value_scheme: KvQuantScheme | None = None,
 ) -> None:
     """Validate KV cache parameters are within acceptable ranges."""
     if max_kv_size is not None and max_kv_size <= 0:
@@ -12376,22 +12285,11 @@ def _harness_generation_argument_names() -> frozenset[str]:
 
 def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
     """Validate direct-generation flags shared with the MLX-VLM server request API."""
-    presence_context_size = getattr(
-        args,
-        "presence_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    frequency_context_size = getattr(
-        args,
-        "frequency_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    if presence_context_size is not None and presence_context_size <= 0:
-        msg = f"presence_context_size must be > 0 if specified, got {presence_context_size}"
-        raise ValueError(msg)
-    if frequency_context_size is not None and frequency_context_size <= 0:
-        msg = f"frequency_context_size must be > 0 if specified, got {frequency_context_size}"
-        raise ValueError(msg)
+    for name in ("presence_context_size", "frequency_context_size"):
+        size = getattr(args, name, DEFAULT_PENALTY_CONTEXT_SIZE)
+        if size is not None and size <= 0:
+            msg = f"{name} must be > 0 if specified, got {size}"
+            raise ValueError(msg)
 
 
 def _validate_thinking_params(args: argparse.Namespace) -> None:
@@ -13454,7 +13352,12 @@ def _get_hf_cache_info_cached(*, refresh: bool = False) -> HFCacheInfo:
         raise cached_error
 
     try:
-        cache_info = scan_cache_dir()
+        try:
+            cache_info = scan_cache_dir()
+        except CacheNotFound as missing:
+            # CacheNotFound is a bare Exception; callers handle a missing cache
+            # as FileNotFoundError (a fresh machine run on local paths only).
+            raise FileNotFoundError(str(missing)) from missing
     except (HFValidationError, FileNotFoundError, OSError, ValueError) as err:
         state.attempted = True
         state.info = None
@@ -14831,6 +14734,16 @@ _REPETITION_TAIL_CYCLE_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
+# Known limit, kept on purpose: the check sees only text the detokenizer has
+# released. A BPE detokenizer can hold back a run with no space in it until
+# finalisation (Qwen2-VL's 265 repeats of "<|im_start|>assistant" on
+# 2026-10-11 arrived as empty chunks), so such a loop runs to the token cap.
+# Stopping it by token id was tried in 0.17.49 and reverted: the early stop
+# discarded the held-back text, the very evidence of the loop, and
+# reconstructing it would mean decoding outside mlx-vlm. Running to the cap
+# costs seconds and keeps mlx-vlm's own finalised text.
+
+
 def _detect_streaming_repetition(tail: str) -> bool:
     """Return whether the text tail ends in >=4 exact repeats of one unit."""
     return _REPETITION_TAIL_CYCLE_RE.search(tail) is not None
@@ -15729,22 +15642,85 @@ def _sample_thermal_state() -> int | None:
     return state if 0 <= state < len(_THERMAL_STATE_LABELS) else None
 
 
+_GPU_UTILIZATION_RE: Final[re.Pattern[str]] = re.compile(r'"Device Utilization %"=(\d+)')
+
+
+def _read_gpu_utilization_pct() -> int | None:
+    """One ioreg read of "Device Utilization %"; the highest when several GPUs report."""
+    output = _run_macos_toolchain_command(("ioreg", "-r", "-d", "1", "-c", "IOAccelerator"))
+    if output is None:
+        return None
+    values = [int(value) for value in _GPU_UTILIZATION_RE.findall(output)]
+    return max(values) if values else None
+
+
+# The first read after a long gap returns a stale figure (on 2026-10-11 it
+# showed this process's finished inference at 55-92% while a read a moment
+# later gave 0), so each sample discards one read and takes the next.
+_GPU_REREAD_DELAY_S: Final[float] = 0.05
+
+
+def _sample_gpu_utilization_pct() -> int | None:
+    """Read the GPU's "Device Utilization %" from IOAccelerator (no root needed).
+
+    Discards a first, possibly stale read and returns a second one taken
+    shortly after; None when ioreg is unavailable or reports none.
+    """
+    if _read_gpu_utilization_pct() is None:
+        return None
+    time.sleep(_GPU_REREAD_DELAY_S)
+    return _read_gpu_utilization_pct()
+
+
 class _TelemetryProbe(NamedTuple):
-    """One telemetry sample; the power and thermal fields default to unavailable."""
+    """One telemetry sample; the power, thermal and GPU fields default to unavailable."""
 
     cpu_speed_limit_pct: float | None
     memory_pressure_level: int | None
     power_source: str | None = None
     power_mode: int | None = None
     thermal_state: int | None = None
+    gpu_utilization_pct: int | None = None
 
 
 def _system_telemetry_probe() -> _TelemetryProbe:
-    """Take one probe: thermal CPU limit, memory pressure, power, thermal state."""
+    """Take one snapshot probe: CPU limit, memory pressure, power, thermal state, GPU use."""
     cpu_limit = _sample_thermal_cpu_speed_limit_pct()
     pressure = _sample_memory_pressure_level()
     source, mode = _sample_power_state()
-    return _TelemetryProbe(cpu_limit, pressure, source, mode, _sample_thermal_state())
+    return _TelemetryProbe(
+        cpu_limit,
+        pressure,
+        source,
+        mode,
+        _sample_thermal_state(),
+        _sample_gpu_utilization_pct(),
+    )
+
+
+_GPU_SAMPLE_METHOD: Final[str] = "reread"
+_GPU_UNRELIABLE_NOTE: Final[str] = (
+    "taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this "
+    "run's own inference and are not evidence of other GPU work"
+)
+
+
+def _gpu_reading_reliable(telemetry: Mapping[str, object]) -> bool:
+    """Whether a record's GPU reading discarded the stale first ioreg read."""
+    return telemetry.get("gpu_sample_method") == _GPU_SAMPLE_METHOD
+
+
+def _gpu_telemetry_fields(probes: Sequence[_TelemetryProbe]) -> SystemTelemetryRecord:
+    """GPU-use counts over the probes that carry a reading; empty when none do."""
+    gpu = [p.gpu_utilization_pct for p in probes if p.gpu_utilization_pct is not None]
+    if not gpu:
+        return {}
+    return {
+        "gpu_samples": len(gpu),
+        "gpu_utilization_max_pct": max(gpu),
+        "gpu_busy_samples": sum(value > 0 for value in gpu),
+        "gpu_sample_method": _GPU_SAMPLE_METHOD,
+    }
 
 
 def _system_telemetry_record_from_probes(
@@ -15792,6 +15768,7 @@ def _system_telemetry_record_from_probes(
     if thermal:
         record["thermal_state_max"] = max(thermal)
         record["thermal_elevated_samples"] = sum(state > 0 for state in thermal)
+    record.update(_gpu_telemetry_fields(probes))
     return record
 
 
@@ -15946,6 +15923,12 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
                 telemetry.get("thermal_samples", 0),
             )
         )
+    if (busy := telemetry.get("gpu_busy_samples", 0)) and _gpu_reading_reliable(telemetry):
+        notes.append(
+            f"GPU activity detected outside harness inference (up to "
+            f"{telemetry.get('gpu_utilization_max_pct', 0)}%) "
+            + _telemetry_checks_phrase(telemetry, busy, telemetry.get("gpu_samples", 0))
+        )
     gap = telemetry.get("wall_clock_gap_s")
     if gap is not None:
         notes.append(
@@ -16004,6 +15987,14 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
         )
     else:
         parts.append("thermal-state probe unavailable")
+    if gpu_samples := telemetry.get("gpu_samples", 0):
+        peak = telemetry.get("gpu_utilization_max_pct", 0)
+        parts.append(
+            f"GPU activity outside harness inference: max {peak}% at {gpu_samples} "
+            "instantaneous check(s); activity between checks is not observed"
+            if _gpu_reading_reliable(telemetry)
+            else f"GPU reading max {peak}% at {gpu_samples} check(s), {_GPU_UNRELIABLE_NOTE}"
+        )
     if (gap := telemetry.get("wall_clock_gap_s")) is not None:
         parts.append(f"wall-clock gap {gap:.0f}s (sleep/suspend; timings untrustworthy)")
     parts.append(f"mode {telemetry.get('mode', 'unknown')}")
@@ -16043,6 +16034,13 @@ def _start_system_telemetry(
         return None, []
 
 
+def _settle_own_gpu_work() -> None:
+    """Drain this process's MLX queue so the trailing GPU reading excludes its own work."""
+    synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
+    if synchronize_fn is not None:
+        synchronize_fn()
+
+
 def _finish_system_telemetry(
     sampler: _SystemTelemetrySampler | None,
     probes: list[_TelemetryProbe],
@@ -16058,6 +16056,7 @@ def _finish_system_telemetry(
             sampler.stop()
             return sampler.snapshot()
         if probes:
+            _settle_own_gpu_work()
             probes.append(_system_telemetry_probe())
             return _system_telemetry_record_from_probes(probes, mode="snapshot")
     except Exception:
@@ -18294,16 +18293,18 @@ def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
     per-model callers do not re-read every repo's config.json.
     """
     state = _HF_CACHE_SCAN_STATE
+    # A failed scan is memoised and re-raised to every caller; warn only once.
+    log_failure = logger.debug if state.attempted else logger.warning
     try:
         cache_info = _get_hf_cache_info_cached()
     except HFValidationError:
-        logger.warning("Hugging Face cache directory invalid.")
+        log_failure("Hugging Face cache directory invalid.")
         return ()
     except FileNotFoundError:
-        logger.warning("Hugging Face cache directory not found.")
+        log_failure("Hugging Face cache directory not found.")
         return ()
     except (OSError, ValueError) as e:
-        logger.warning("Unexpected error scanning Hugging Face cache: %s", e)
+        log_failure("Unexpected error scanning Hugging Face cache: %s", e)
         return ()
     if state.eligibility is not None and state.eligibility_source_id == id(cache_info):
         return state.eligibility
@@ -20352,6 +20353,20 @@ class RunComparisonThroughputFlag:
 
 
 @dataclass(frozen=True)
+class RunComparisonPrefillChange:
+    """One model whose prefill rate moved outside the fixed band, as prefill seconds.
+
+    Seconds are prompt tokens divided by prefill tok/s on each side: one timed
+    generation per sweep, so an observation, not a measured speedup.
+    """
+
+    model: str
+    baseline_s: float
+    current_s: float
+    ratio: float  # prefill tok/s now/baseline
+
+
+@dataclass(frozen=True)
 class RunComparisonMemoryChange:
     """One model whose peak memory moved by more than noise."""
 
@@ -20402,6 +20417,11 @@ class TextDivergence(NamedTuple):
     current_chars: int
     # Counts only: equal counts do not show the token ids were the same.
     prompt_token_count_unchanged: bool | None  # None when either side lacks the count
+    # The pair's decoding group (a _DECODING_GROUP_LABELS key).
+    decoding: str = "unknown"
+    # This run's checkpoint quantization from config.json ("4-bit affine",
+    # "not quantized"); None when the record has no model_burden facts.
+    weights: str | None = None
 
 
 class ArchitectureCommits(NamedTuple):
@@ -20415,6 +20435,10 @@ class ArchitectureCommits(NamedTuple):
     architecture: str
     status: str  # "commits", "none", or "unavailable"
     subjects: tuple[str, ...]
+    # Sibling packages and modules under mlx_vlm/models/ that the
+    # architecture's own files import directly (one level), included in the
+    # path-limited log.
+    imports: tuple[str, ...] = ()
 
 
 class ComponentChange(NamedTuple):
@@ -20476,6 +20500,17 @@ class RunComparison:
     # effective decoding settings of both: "greedy", "sampled" (same settings
     # and seed), "changed" (mode or settings differ), "unknown".
     text_changes_by_decoding: tuple[tuple[str, int, int], ...] = ()
+    # (group, text changed, pairs) over greedy pairs only, by this run's
+    # checkpoint quantization: "quantized", "not quantized", "unknown".
+    greedy_text_changes_by_weights: tuple[tuple[str, int, int], ...] = ()
+    # This run's mlx version string and how many earlier retained runs in the
+    # history file recorded the same one (None when either is unknown). The
+    # first sweep on a freshly built mlx has repeatedly timed slower.
+    mlx_version: str | None = None
+    earlier_runs_on_mlx_version: int | None = None
+    # Earlier history records that could not be read or carry no mlx version:
+    # the count above says nothing about them.
+    mlx_version_history_unread: int = 0
     # (baseline, current) check_models versions when they differ: a phase
     # renamed between them changes a signature without changing the fault.
     harness_versions: tuple[str, ...] = ()
@@ -20484,6 +20519,12 @@ class RunComparison:
     prompt_tps_ratio_min: float | None = None
     prompt_tps_ratio_max: float | None = None
     prompt_tps_compared_models: int = 0
+    # The models at the low and high end of each ratio range, so an extreme
+    # can be traced to one model; None in records that predate them.
+    tps_ratio_end_models: tuple[str, str] | None = None
+    prompt_tps_ratio_end_models: tuple[str, str] | None = None
+    # The largest prefill changes outside the fixed band, largest first.
+    prefill_changes: tuple[RunComparisonPrefillChange, ...] = ()
 
     @property
     def comparable(self) -> bool:
@@ -20498,6 +20539,7 @@ class RunComparison:
             or self.models_removed
             or self.changes
             or self.throughput_flags
+            or self.prefill_changes
             or self.memory_changes
             or self.text_changed_models
             or any(
@@ -20990,6 +21032,53 @@ def _history_tps_bands(
     return bands, len(runs)
 
 
+def _earlier_runs_on_version(
+    history_path: Path | None, package: str, version: str | None, *, exclude_last: bool
+) -> tuple[int, int] | None:
+    """Count earlier retained runs whose recorded ``package`` version equals ``version``.
+
+    Reads every run in the history file, whatever its prompt or image: the
+    count is about the installed build, not the workload. Returns the count
+    and how many records could not be read or name no ``package`` version,
+    so a zero is not mistaken for complete coverage. None when the version
+    or the history is unavailable.
+    """
+    if version is None or history_path is None or not history_path.is_file():
+        return None
+    try:
+        rows = [line for line in _read_text_file(history_path).splitlines() if line]
+    except OSError:
+        return None
+    if exclude_last and rows:
+        rows = rows[:-1]
+    count = unread = 0
+    for line in rows:
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            unread += 1
+            continue
+        versions = record.get("library_versions") if isinstance(record, dict) else None
+        recorded = versions.get(package) if isinstance(versions, dict) else None
+        if not isinstance(recorded, str):
+            unread += 1
+        count += recorded == version
+    return count, unread
+
+
+def _mlx_version_history_fields(
+    history_path: Path | None, current_metadata: JsonlMetadataRecord | None, *, exclude_last: bool
+) -> dict[str, Any]:
+    """RunComparison's mlx version, earlier same-version count and unread records."""
+    version = _metadata_library_version(current_metadata, "mlx")
+    counted = _earlier_runs_on_version(history_path, "mlx", version, exclude_last=exclude_last)
+    return {
+        "mlx_version": version,
+        "earlier_runs_on_mlx_version": None if counted is None else counted[0],
+        "mlx_version_history_unread": 0 if counted is None else counted[1],
+    }
+
+
 def _current_model_revisions(
     current: Sequence[JsonlResultRecord],
 ) -> dict[str, str | None]:
@@ -21051,6 +21140,13 @@ def _quantile(ordered: Sequence[float], q: float) -> float:
         return ordered[lower]
     weight = position - lower
     return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+
+def _metadata_library_version(metadata: JsonlMetadataRecord | None, name: str) -> str | None:
+    """One package's recorded version string from a run's metadata, when present."""
+    versions = metadata.get("library_versions") if metadata is not None else None
+    version = versions.get(name) if isinstance(versions, dict) else None
+    return version if isinstance(version, str) and version else None
 
 
 def _comparison_component_rows(metadata: JsonlMetadataRecord) -> tuple[tuple[str, str], ...]:
@@ -21152,6 +21248,45 @@ def _text_changes_by_decoding(
     )
 
 
+_WEIGHT_GROUPS: Final[tuple[str, ...]] = ("quantized", "not quantized", "unknown")
+
+
+def _weights_label(record: JsonlResultRecord) -> str | None:
+    """The checkpoint's config.json quantization ("4-bit affine", "not quantized"), or None."""
+    burden = record.get("model_burden")
+    if not isinstance(burden, dict):
+        return None
+    bits = burden.get("quantization_bits")
+    mode = burden.get("quantization_mode")
+    parts = [f"{bits}-bit"] if isinstance(bits, int) and not isinstance(bits, bool) else []
+    if isinstance(mode, str):
+        parts.append(mode)
+    return " ".join(parts) or "not quantized"
+
+
+def _weight_group(label: str | None) -> str:
+    """Collapse a weights label to its _WEIGHT_GROUPS key."""
+    if label is None:
+        return "unknown"
+    return "not quantized" if label == "not quantized" else "quantized"
+
+
+def _greedy_text_changes_by_weights(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> tuple[tuple[str, int, int], ...]:
+    """Count changed text among greedy pairs, split by this run's checkpoint quantization."""
+    counts: dict[str, list[int]] = {}
+    for _model, now, before in _completed_in_both(pairs):
+        if _decoding_group(now, before) != "greedy":
+            continue
+        tally = counts.setdefault(_weight_group(_weights_label(now)), [0, 0])
+        tally[0] += now.get("generated_text", "") != before.get("generated_text", "")
+        tally[1] += 1
+    return tuple(
+        (group, counts[group][0], counts[group][1]) for group in _WEIGHT_GROUPS if group in counts
+    )
+
+
 def _generated_text_changes(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
 ) -> tuple[int, list[TextDivergence]]:
@@ -21173,13 +21308,24 @@ def _generated_text_changes(
             if all(isinstance(count, int) and not isinstance(count, bool) for count in counts)
             else None
         )
+        # Character-level shared prefix of two texts (not paths, so no os.path).
+        shared_prefix_chars = next(
+            (
+                index
+                for index, (old, new) in enumerate(zip(baseline_text, current_text, strict=False))
+                if old != new
+            ),
+            min(len(baseline_text), len(current_text)),
+        )
         changed.append(
             TextDivergence(
                 model=model,
-                shared_prefix_chars=len(os.path.commonprefix([baseline_text, current_text])),
+                shared_prefix_chars=shared_prefix_chars,
                 baseline_chars=len(baseline_text),
                 current_chars=len(current_text),
                 prompt_token_count_unchanged=unchanged,
+                decoding=_decoding_group(now, before),
+                weights=_weights_label(now),
             )
         )
     return len(completed), changed
@@ -21187,13 +21333,42 @@ def _generated_text_changes(
 
 def _prefill_tps_ratios(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
-) -> list[float]:
-    """Sorted prefill tok/s ratios (now/baseline) over the pairs with clean rates on both sides."""
+) -> list[tuple[float, str]]:
+    """Sorted (prefill tok/s ratio now/baseline, model) over pairs with clean rates on both sides."""
     return sorted(
-        ratio
-        for _model, now, before in pairs
+        (ratio, model)
+        for model, now, before in pairs
         if (ratio := _prefill_tps_ratio(now, before)) is not None
     )
+
+
+_PREFILL_CHANGE_ROWS: Final[int] = 5
+
+
+def _prefill_changes(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> tuple[RunComparisonPrefillChange, ...]:
+    """Up to five models whose prefill rate left the fixed band, largest change first."""
+    low, high = _COMPARISON_TPS_RATIO_FALLBACK_BAND
+    changes: list[RunComparisonPrefillChange] = []
+    for model, now, before in pairs:
+        ratio = _prefill_tps_ratio(now, before)
+        if ratio is None or low <= ratio <= high:
+            continue
+        seconds = [_prefill_seconds(record) for record in (before, now)]
+        if seconds[0] is not None and seconds[1] is not None:
+            changes.append(RunComparisonPrefillChange(model, seconds[0], seconds[1], ratio))
+    changes.sort(key=lambda change: abs(math.log(change.ratio)), reverse=True)
+    return tuple(changes[:_PREFILL_CHANGE_ROWS])
+
+
+def _prefill_seconds(record: JsonlResultRecord) -> float | None:
+    """Prompt tokens divided by prefill tok/s, when both were recorded."""
+    metrics = record.get("metrics") or {}
+    tokens, rate = metrics.get("prompt_tokens"), metrics.get("prompt_tps")
+    if isinstance(tokens, int) and isinstance(rate, int | float) and rate > 0:
+        return tokens / float(rate)
+    return None
 
 
 def _prefill_tps_ratio(now: JsonlResultRecord, before: JsonlResultRecord) -> float | None:
@@ -21222,6 +21397,38 @@ def _record_thermal_throttled(record: JsonlResultRecord) -> bool:
 def _record_timing_untrusted(record: JsonlResultRecord) -> bool:
     """Timings recorded across a sleep or while macOS throttled are not compared."""
     return _record_wall_clock_gap(record) or _record_thermal_throttled(record)
+
+
+def _records_gpu_busy(
+    records: Sequence[JsonlResultRecord], *, reliable: bool
+) -> tuple[int, int] | None:
+    """(models with a non-zero snapshot GPU reading, peak %) among reliable or unreliable ones."""
+    busy = [
+        telemetry.get("gpu_utilization_max_pct", 0)
+        for record in records
+        if isinstance(telemetry := record.get("system_telemetry"), dict)
+        and telemetry.get("gpu_busy_samples", 0)
+        and _gpu_reading_reliable(telemetry) is reliable
+    ]
+    return (len(busy), max(busy)) if busy else None
+
+
+def _gpu_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> list[str]:
+    """Run-level GPU notes: detected activity, and pre-fix readings marked unreliable."""
+    notes: list[str] = []
+    if detected := _records_gpu_busy(records, reliable=True):
+        count, peak = detected
+        notes.append(
+            f"{label} run detected GPU activity outside harness inference at the checks "
+            f"around {count} of {len(records)} models (up to {peak}%)"
+        )
+    if stale := _records_gpu_busy(records, reliable=False):
+        count, peak = stale
+        notes.append(
+            f"{label} run's GPU readings were non-zero around {count} of {len(records)} "
+            f"models (up to {peak}%), but were {_GPU_UNRELIABLE_NOTE}"
+        )
+    return notes
 
 
 def _record_on_battery(record: JsonlResultRecord) -> bool:
@@ -21263,6 +21470,7 @@ def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> 
     on_battery = sum(_record_on_battery(record) for record in records)
     if on_battery:
         notes.append(f"{label} run on battery power for {on_battery} of {len(records)} models")
+    notes.extend(_gpu_environment_notes(label, records))
     gaps = [record["model"] for record in records if _record_wall_clock_gap(record)]
     if gaps:
         notes.append(
@@ -21378,7 +21586,7 @@ def _compare_model_performance(
     before: JsonlResultRecord,
     *,
     bands: Mapping[str, tuple[float, float, int]],
-    ratios: list[float],
+    ratios: list[tuple[float, str]],
     flags: list[RunComparisonThroughputFlag],
     memory: list[RunComparisonMemoryChange],
 ) -> None:
@@ -21394,7 +21602,7 @@ def _compare_model_performance(
     slept = _record_timing_untrusted(now) or _record_timing_untrusted(before)
     now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
     if not slept and now_tps is not None and before_tps is not None:
-        ratios.append(now_tps / before_tps)
+        ratios.append((now_tps / before_tps, model))
         flag = _model_throughput_flag(
             model, now_tps=now_tps, before_tps=before_tps, band=bands.get(model)
         )
@@ -21575,7 +21783,7 @@ def compare_run_results(
     )
 
     changes: list[RunComparisonModelChange] = []
-    ratios: list[float] = []
+    ratios: list[tuple[float, str]] = []
     flags: list[RunComparisonThroughputFlag] = []
     memory: list[RunComparisonMemoryChange] = []
     revision_changes: list[tuple[str, str, str]] = []
@@ -21618,17 +21826,18 @@ def compare_run_results(
         ),
         crash_continuity=_crash_continuity(current, baseline_by),
         text_changes_by_decoding=_text_changes_by_decoding(diff_pairs),
+        greedy_text_changes_by_weights=_greedy_text_changes_by_weights(diff_pairs),
         harness_versions=_harness_versions(baseline.metadata, current_metadata),
         changes=tuple(changes),
         identical_text_models=identical_text,
         text_compared_models=text_compared,
-        tps_ratio_median=_quantile(ratios_sorted, 0.5) if ratios_sorted else None,
-        tps_ratio_min=ratios_sorted[0] if ratios_sorted else None,
-        tps_ratio_max=ratios_sorted[-1] if ratios_sorted else None,
-        tps_compared_models=len(ratios_sorted),
+        **_ratio_range_fields(ratios_sorted, "tps"),
         throughput_flags=tuple(flags),
         memory_changes=tuple(memory),
         history_runs_used=history_runs,
+        **_mlx_version_history_fields(
+            history_path, current_metadata, exclude_last=history_excludes_current
+        ),
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
         baseline_hardware=baseline_hardware,
@@ -21644,11 +21853,24 @@ def compare_run_results(
         throughput_comparable=throughput_comparable,
         text_changed_models=tuple(text_changed),
         text_divergence=tuple(divergence),
-        prompt_tps_ratio_median=_quantile(prefill_sorted, 0.5) if prefill_sorted else None,
-        prompt_tps_ratio_min=prefill_sorted[0] if prefill_sorted else None,
-        prompt_tps_ratio_max=prefill_sorted[-1] if prefill_sorted else None,
-        prompt_tps_compared_models=len(prefill_sorted),
+        **_ratio_range_fields(prefill_sorted, "prompt_tps"),
+        prefill_changes=_prefill_changes(pairs) if throughput_comparable else (),
     )
+
+
+def _ratio_range_fields(ranked: Sequence[tuple[float, str]], prefix: str) -> dict[str, Any]:
+    """RunComparison's median, ends, end models and count for sorted (ratio, model) pairs."""
+    if not ranked:
+        return {
+            f"{prefix}_ratio_{field}": None for field in ("median", "min", "max", "end_models")
+        } | {f"{prefix}_compared_models": 0}
+    return {
+        f"{prefix}_ratio_median": _quantile([ratio for ratio, _ in ranked], 0.5),
+        f"{prefix}_ratio_min": ranked[0][0],
+        f"{prefix}_ratio_max": ranked[-1][0],
+        f"{prefix}_ratio_end_models": (ranked[0][1], ranked[-1][1]),
+        f"{prefix}_compared_models": len(ranked),
+    }
 
 
 def _hardware_identity(system_info: Mapping[str, object] | None) -> str | None:
@@ -21842,43 +22064,37 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
     def _r(value: float | None) -> float | None:
         return round(value, 4) if value is not None else None
 
-    execution_mode: JsonLike = {
-        "baseline": comparison.baseline_execution_mode,
-        "current": comparison.current_execution_mode,
-    }
-    hardware: JsonLike = {
-        "baseline": comparison.baseline_hardware,
-        "current": comparison.current_hardware,
-    }
     return {
         "baseline": comparison.baseline_label,
         "baseline_timestamp": comparison.baseline_timestamp,
-        "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
+        "baseline_components": dict[str, JsonLike](comparison.baseline_components),
         "comparability": comparison.comparability,
-        "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
-        "unverified_facts": cast("JsonLike", list(comparison.unverified_facts)),
+        "incomparable_reasons": list[JsonLike](comparison.incomparable_reasons),
+        "unverified_facts": list[JsonLike](comparison.unverified_facts),
         "throughput_comparable": comparison.throughput_comparable,
-        "environment_notes": cast("JsonLike", list(comparison.environment_notes)),
+        "environment_notes": list[JsonLike](comparison.environment_notes),
         "revision_changes": [
             {"model": model, "baseline": before, "current": after}
             for model, before, after in comparison.revision_changes
         ],
         "compared_models": comparison.compared_models,
-        "models_added": cast("JsonLike", list(comparison.models_added)),
-        "models_removed": cast("JsonLike", list(comparison.models_removed)),
-        "models_removed_status": cast("JsonLike", dict(comparison.models_removed_status)),
-        "crash_continuity": [
-            cast("JsonLike", entry._asdict()) for entry in comparison.crash_continuity
-        ],
+        "models_added": list[JsonLike](comparison.models_added),
+        "models_removed": list[JsonLike](comparison.models_removed),
+        "models_removed_status": dict[str, JsonLike](comparison.models_removed_status),
+        "crash_continuity": [entry._asdict() for entry in comparison.crash_continuity],
         "architecture_commits": [
-            cast("JsonLike", {**entry._asdict(), "subjects": list(entry.subjects)})
+            {**entry._asdict(), "subjects": list(entry.subjects), "imports": list(entry.imports)}
             for entry in comparison.architecture_commits
         ],
         "text_changes_by_decoding": {
             group: {"changed": changed, "compared": compared}
             for group, changed, compared in comparison.text_changes_by_decoding
         },
-        "harness_versions": cast("JsonLike", list(comparison.harness_versions)),
+        "greedy_text_changes_by_weights": {
+            group: {"changed": changed, "compared": compared}
+            for group, changed, compared in comparison.greedy_text_changes_by_weights
+        },
+        "harness_versions": list[JsonLike](comparison.harness_versions),
         "changes": [
             {
                 "model": change.model,
@@ -21896,14 +22112,16 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             "min": _r(comparison.tps_ratio_min),
             "max": _r(comparison.tps_ratio_max),
             "compared_models": comparison.tps_compared_models,
+            **_ratio_end_models_json(comparison.tps_ratio_end_models),
         },
         "prompt_tps_ratio": {
             "median": _r(comparison.prompt_tps_ratio_median),
             "min": _r(comparison.prompt_tps_ratio_min),
             "max": _r(comparison.prompt_tps_ratio_max),
             "compared_models": comparison.prompt_tps_compared_models,
+            **_ratio_end_models_json(comparison.prompt_tps_ratio_end_models),
         },
-        "text_changed_models": cast("JsonLike", list(comparison.text_changed_models)),
+        "text_changed_models": list[JsonLike](comparison.text_changed_models),
         "text_divergence": [
             {
                 "model": entry.model,
@@ -21911,6 +22129,8 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
                 "baseline_chars": entry.baseline_chars,
                 "current_chars": entry.current_chars,
                 "prompt_token_count_unchanged": entry.prompt_token_count_unchanged,
+                "decoding": entry.decoding,
+                "weights": entry.weights,
             }
             for entry in comparison.text_divergence
         ],
@@ -21920,7 +22140,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
                 "baseline": change.baseline_revision,
                 "current": change.current_revision,
                 "commits": change.commit_count,
-                "subjects": cast("JsonLike", list(change.subjects)),
+                "subjects": list[JsonLike](change.subjects),
             }
             for change in comparison.component_changes
         ],
@@ -21936,6 +22156,15 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             }
             for flag in comparison.throughput_flags
         ],
+        "prefill_changes": [
+            {
+                "model": change.model,
+                "baseline_s": _r(change.baseline_s),
+                "current_s": _r(change.current_s),
+                "ratio": _r(change.ratio),
+            }
+            for change in comparison.prefill_changes
+        ],
         "memory_changes": [
             {
                 "model": change.model,
@@ -21946,8 +22175,17 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             for change in comparison.memory_changes
         ],
         "history_runs_used": comparison.history_runs_used,
-        "execution_mode": execution_mode,
-        "hardware": hardware,
+        "mlx_version": comparison.mlx_version,
+        "earlier_runs_on_mlx_version": comparison.earlier_runs_on_mlx_version,
+        "mlx_version_history_unread": comparison.mlx_version_history_unread,
+        "execution_mode": {
+            "baseline": comparison.baseline_execution_mode,
+            "current": comparison.current_execution_mode,
+        },
+        "hardware": {
+            "baseline": comparison.baseline_hardware,
+            "current": comparison.current_hardware,
+        },
     }
 
 
@@ -21976,6 +22214,11 @@ def _comparison_req_int(raw: JsonLike) -> int:
         message = f"comparison field is not an integer: {raw!r}"
         raise TypeError(message)
     return raw
+
+
+def _comparison_opt_int(raw: JsonLike) -> int | None:
+    """Narrow one optional retained comparison integer."""
+    return None if raw is None else _comparison_req_int(raw)
 
 
 def _comparison_req_str(raw: JsonLike) -> str:
@@ -22018,6 +22261,40 @@ def _comparison_req_bool(raw: JsonLike) -> bool:
     return raw
 
 
+def _prefill_changes_from_json(raw: JsonLike) -> tuple[RunComparisonPrefillChange, ...]:
+    """Read the retained prefill-change rows; empty when the record predates them."""
+    return tuple(
+        RunComparisonPrefillChange(
+            model=_comparison_req_str(change["model"]),
+            baseline_s=_comparison_req_float(change["baseline_s"]),
+            current_s=_comparison_req_float(change["current_s"]),
+            ratio=_comparison_req_float(change["ratio"]),
+        )
+        for change in _comparison_rows(raw)
+    )
+
+
+def _prefill_rows(
+    changes: Sequence[RunComparisonPrefillChange],
+) -> tuple[tuple[str, str, str, str], ...]:
+    """Format prefill changes as (model, baseline s, now s, ratio) cells."""
+    return tuple(
+        (change.model, f"{change.baseline_s:.2f}", f"{change.current_s:.2f}", f"{change.ratio:.2f}")
+        for change in changes
+    )
+
+
+def _ratio_end_models_json(models: tuple[str, str] | None) -> dict[str, JsonLike]:
+    """The ``min_model``/``max_model`` keys of a retained ratio block, when known."""
+    return {} if models is None else {"min_model": models[0], "max_model": models[1]}
+
+
+def _ratio_end_models_from_json(block: Mapping[str, JsonLike]) -> tuple[str, str] | None:
+    """Read a ratio block's end models; None when the record predates them."""
+    low, high = block.get("min_model"), block.get("max_model")
+    return (low, high) if isinstance(low, str) and isinstance(high, str) else None
+
+
 def _comparison_opt_str(raw: JsonLike) -> str | None:
     """Narrow one optional retained comparison string."""
     if raw is not None and not isinstance(raw, str):
@@ -22046,6 +22323,18 @@ def _comparison_rows(raw: JsonLike) -> tuple[dict[str, JsonLike], ...]:
     return tuple(cast("dict[str, JsonLike]", item) for item in raw)
 
 
+def _comparison_group_counts(raw: JsonLike) -> tuple[tuple[str, int, int], ...]:
+    """Rehydrate a {group: {changed, compared}} mapping into (group, changed, compared) rows."""
+    return tuple(
+        (
+            group,
+            _comparison_req_int(_comparison_mapping(counts).get("changed", 0)),
+            _comparison_req_int(_comparison_mapping(counts).get("compared", 0)),
+        )
+        for group, counts in _comparison_mapping(raw).items()
+    )
+
+
 def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
     """Rehydrate the retained metadata comparison for summary regeneration.
 
@@ -22061,21 +22350,6 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         message = f"comparison comparability is not a known value: {comparability_value!r}"
         raise ValueError(message)
     comparability = cast("Literal['comparable', 'unknown', 'incomparable']", comparability_value)
-    identity: dict[str, object] = {
-        "baseline_label": _comparison_req_str(value.get("baseline", "unknown baseline")),
-        "baseline_timestamp": _comparison_opt_str(value.get("baseline_timestamp")),
-        "baseline_components": tuple(
-            (_comparison_req_str(name), _comparison_req_str(part))
-            for name, part in components.items()
-        ),
-        "baseline_execution_mode": _comparison_req_str(
-            execution_mode.get("baseline", "in_process")
-        ),
-        "current_execution_mode": _comparison_req_str(execution_mode.get("current", "in_process")),
-        "baseline_hardware": _comparison_opt_str(hardware.get("baseline")),
-        "current_hardware": _comparison_opt_str(hardware.get("current")),
-        "comparability": comparability,
-    }
     ratio = _comparison_mapping(value.get("generation_tps_ratio"))
     prefill = _comparison_mapping(value.get("prompt_tps_ratio"))
     changes = tuple(
@@ -22113,6 +22387,17 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         for change in _comparison_rows(value.get("memory_changes"))
     )
     return RunComparison(
+        baseline_label=_comparison_req_str(value.get("baseline", "unknown baseline")),
+        baseline_timestamp=_comparison_opt_str(value.get("baseline_timestamp")),
+        baseline_components=tuple(
+            (_comparison_req_str(name), _comparison_req_str(part))
+            for name, part in components.items()
+        ),
+        baseline_execution_mode=_comparison_req_str(execution_mode.get("baseline", "in_process")),
+        current_execution_mode=_comparison_req_str(execution_mode.get("current", "in_process")),
+        baseline_hardware=_comparison_opt_str(hardware.get("baseline")),
+        current_hardware=_comparison_opt_str(hardware.get("current")),
+        comparability=comparability,
         compared_models=_comparison_req_int(value.get("compared_models", 0)),
         models_added=_comparison_str_items(value.get("models_added") or []),
         models_removed=_comparison_str_items(value.get("models_removed") or []),
@@ -22123,9 +22408,13 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         tps_ratio_min=_comparison_opt_float(ratio.get("min")),
         tps_ratio_max=_comparison_opt_float(ratio.get("max")),
         tps_compared_models=_comparison_req_int(ratio.get("compared_models", 0)),
+        tps_ratio_end_models=_ratio_end_models_from_json(ratio),
         throughput_flags=throughput_flags,
         memory_changes=memory_changes,
         history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
+        mlx_version=_comparison_opt_str(value.get("mlx_version")),
+        earlier_runs_on_mlx_version=_comparison_opt_int(value.get("earlier_runs_on_mlx_version")),
+        mlx_version_history_unread=_comparison_req_int(value.get("mlx_version_history_unread", 0)),
         unverified_facts=_comparison_str_items(value.get("unverified_facts") or []),
         incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
         models_removed_status=tuple(
@@ -22148,16 +22437,13 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
                 _comparison_req_str(entry["architecture"]),
                 _comparison_req_str(entry["status"]),
                 _comparison_str_items(entry.get("subjects") or []),
+                _comparison_str_items(entry.get("imports") or []),
             )
             for entry in _comparison_rows(value.get("architecture_commits"))
         ),
-        text_changes_by_decoding=tuple(
-            (
-                group,
-                _comparison_req_int(_comparison_mapping(counts).get("changed", 0)),
-                _comparison_req_int(_comparison_mapping(counts).get("compared", 0)),
-            )
-            for group, counts in _comparison_mapping(value.get("text_changes_by_decoding")).items()
+        text_changes_by_decoding=_comparison_group_counts(value.get("text_changes_by_decoding")),
+        greedy_text_changes_by_weights=_comparison_group_counts(
+            value.get("greedy_text_changes_by_weights")
         ),
         revision_changes=tuple(
             (
@@ -22181,6 +22467,8 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
                     if entry.get("prompt_token_count_unchanged") is None
                     else _comparison_req_bool(entry["prompt_token_count_unchanged"])
                 ),
+                _comparison_opt_str(entry.get("decoding")) or "unknown",
+                _comparison_opt_str(entry.get("weights")),
             )
             for entry in _comparison_rows(value.get("text_divergence"))
         ),
@@ -22198,7 +22486,8 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         prompt_tps_ratio_min=_comparison_opt_float(prefill.get("min")),
         prompt_tps_ratio_max=_comparison_opt_float(prefill.get("max")),
         prompt_tps_compared_models=_comparison_req_int(prefill.get("compared_models", 0)),
-        **cast("dict[str, Any]", identity),
+        prompt_tps_ratio_end_models=_ratio_end_models_from_json(prefill),
+        prefill_changes=_prefill_changes_from_json(value.get("prefill_changes")),
     )
 
 
@@ -22254,35 +22543,56 @@ class _ComparisonView:
     memory_rows: tuple[tuple[str, str, str, str], ...]
     continuity_rows: tuple[tuple[str, str], ...] = ()
     continuity_note: str | None = None
+    text_change_rows: tuple[tuple[str, ...], ...] = ()
+    # Facts about this run itself, shown even when the runs are not comparable.
+    run_fact_rows: tuple[tuple[str, str], ...] = ()
+    prefill_rows: tuple[tuple[str, str, str, str], ...] = ()
 
 
-def _text_change_label(model: str, divergence: TextDivergence | None) -> str:
-    """One changed model, with how much text it shares with the baseline when recorded."""
-    if divergence is None:
-        return model
-    prompt = {
-        True: "; same prompt token count",
-        False: "; prompt token count changed",
-        None: "",
-    }[divergence.prompt_token_count_unchanged]
-    return (
-        f"{model} (shared prefix {divergence.shared_prefix_chars:,} characters; length "
-        f"{divergence.baseline_chars:,} \u2192 {divergence.current_chars:,}{prompt})"
-    )
+_DECODING_CELL_LABELS: Final[dict[str, str]] = {
+    "greedy": "greedy",
+    "sampled": "sampled",
+    "changed": "settings changed",
+    "unknown": "not recorded",
+}
+
+
+def _text_change_rows(comparison: RunComparison) -> tuple[tuple[str, ...], ...]:
+    """One table row per changed model: decoding, weights and the counted divergence."""
+    if not comparison.comparable:
+        return ()
+    where = {entry.model: entry for entry in comparison.text_divergence}
+    rows: list[tuple[str, ...]] = []
+    for model in comparison.text_changed_models:
+        entry = where.get(model)
+        if entry is None:
+            rows.append((model, "-", "-", "-", "-", "-"))
+            continue
+        # Facts missing from either record say so, like the decoding cell.
+        prompt = {True: "same", False: "changed", None: "not recorded"}[
+            entry.prompt_token_count_unchanged
+        ]
+        rows.append(
+            (
+                model,
+                _DECODING_CELL_LABELS.get(entry.decoding, entry.decoding),
+                entry.weights or "not recorded",
+                f"{entry.shared_prefix_chars:,}",
+                f"{entry.baseline_chars:,} \u2192 {entry.current_chars:,}",
+                prompt,
+            )
+        )
+    return tuple(rows)
 
 
 def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
-    """Name the models whose generated text changed, and split the count by decoding."""
+    """Count the changed texts and split the count by decoding and, for greedy, by weights."""
     rows = []
     if comparison.text_changed_models:
-        where = {entry.model: entry for entry in comparison.text_divergence}
         rows.append(
             (
                 "Generated text changed",
-                ", ".join(
-                    _text_change_label(model, where.get(model))
-                    for model in comparison.text_changed_models
-                ),
+                f"{len(comparison.text_changed_models)} models (listed below)",
             )
         )
     # Annotated: Pylance infers the Final table's literal keys, then rejects str lookups.
@@ -22297,19 +22607,61 @@ def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str
                 ),
             )
         )
+    if comparison.greedy_text_changes_by_weights:
+        rows.append(
+            (
+                "Greedy text changed, by checkpoint quantization",
+                "; ".join(
+                    f"{group} {changed} of {compared}"
+                    for group, changed, compared in comparison.greedy_text_changes_by_weights
+                ),
+            )
+        )
     return rows
+
+
+def _mlx_version_history_rows(comparison: RunComparison) -> list[tuple[str, str]]:
+    """How many earlier retained runs used this mlx version, when the history says."""
+    count = comparison.earlier_runs_on_mlx_version
+    if count is None or comparison.mlx_version is None:
+        return []
+    # "None recorded", never "first run": the history may be incomplete.
+    value = f"{count or 'none recorded'} on {comparison.mlx_version}"
+    if unread := comparison.mlx_version_history_unread:
+        value += (
+            f"; {_pluralized_count(unread, 'earlier record')} unreadable or without an mlx "
+            "version, so not counted"
+        )
+    return [("Earlier retained runs on this mlx version", value)]
 
 
 def _prefill_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
     """Prefill throughput ratio row, withheld under the same rule as the decode ratio."""
     if not comparison.throughput_comparable or comparison.prompt_tps_ratio_median is None:
         return []
-    prefill_text = (
-        f"{comparison.prompt_tps_ratio_median:.3f} (range "
-        f"{comparison.prompt_tps_ratio_min:.2f}-{comparison.prompt_tps_ratio_max:.2f}, "
-        f"{comparison.prompt_tps_compared_models} models)"
+    prefill_text = _ratio_text(
+        comparison.prompt_tps_ratio_median,
+        (comparison.prompt_tps_ratio_min, comparison.prompt_tps_ratio_max),
+        comparison.prompt_tps_ratio_end_models,
+        comparison.prompt_tps_compared_models,
     )
     return [("Prefill tok/s ratio (now/baseline)", prefill_text)]
+
+
+def _ratio_text(
+    median: float,
+    ends: tuple[float | None, float | None],
+    end_models: tuple[str, str] | None,
+    compared: int,
+) -> str:
+    """Median ratio and its range, naming the model at each end when recorded."""
+    low, high = ends
+    if end_models is None:
+        return f"{median:.3f} (range {low:.2f}-{high:.2f}, {compared} models)"
+    return (
+        f"{median:.3f} over {compared} models; lowest {low:.2f} ({end_models[0]}), "
+        f"highest {high:.2f} ({end_models[1]})"
+    )
 
 
 _REMOVED_MODEL_LABELS: Final[tuple[tuple[str, str], ...]] = (
@@ -22330,9 +22682,11 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         and comparison.tps_ratio_min is not None
         and comparison.tps_ratio_max is not None
     ):
-        ratio_text = (
-            f"{comparison.tps_ratio_median:.3f} (range {comparison.tps_ratio_min:.2f}-"
-            f"{comparison.tps_ratio_max:.2f}, {comparison.tps_compared_models} models)"
+        ratio_text = _ratio_text(
+            comparison.tps_ratio_median,
+            (comparison.tps_ratio_min, comparison.tps_ratio_max),
+            comparison.tps_ratio_end_models,
+            comparison.tps_compared_models,
         )
     else:
         ratio_text = "n/a"
@@ -22460,6 +22814,9 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
             for entry in comparison.crash_continuity
         ),
         continuity_note=_continuity_note(comparison),
+        text_change_rows=_text_change_rows(comparison),
+        run_fact_rows=tuple(_mlx_version_history_rows(comparison)),
+        prefill_rows=_prefill_rows(comparison.prefill_changes),
     )
 
 
@@ -22517,19 +22874,46 @@ _COMPONENT_CHANGE_SUMMARY_SUBJECTS: Final[int] = 15
 
 
 def _architecture_commit_item(entry: ArchitectureCommits) -> str:
-    """One line per affected model: its architecture and what touched that package."""
-    lead = f"`{entry.model}` (`{entry.architecture}`): "
+    """One line per affected model: its architecture, what it imports, and what touched them."""
+    imported = ", ".join(f"`{name}`" for name in entry.imports)
+    lead = f"`{entry.model}` (`{entry.architecture}`" + (
+        f"; imports {imported}): " if imported else "): "
+    )
     if entry.status == "unavailable":
         return lead + "history unavailable (mlx-vlm is not an editable git checkout)"
     if entry.status == "none":
-        return lead + f"no commits touched `mlx_vlm/models/{entry.architecture}/`"
+        scope = " or the entries it imports" if entry.imports else ""
+        return lead + f"no commits touched `mlx_vlm/models/{entry.architecture}/`{scope}"
     return lead + "; ".join(entry.subjects)
+
+
+def _prefill_change_blocks(
+    rows: tuple[tuple[str, str, str, str], ...],
+) -> tuple[ReportBlock, ...]:
+    """The largest-prefill-changes lead and table, or nothing when no model left the band."""
+    if not rows:
+        return ()
+    low, high = _COMPARISON_TPS_RATIO_FALLBACK_BAND
+    return (
+        ReportParagraph(
+            f"Largest prefill changes outside {low:.2f}-{high:.2f}x (prefill seconds are "
+            "prompt tokens divided by prefill tok/s; one timed generation per sweep, so "
+            "observations, not demonstrated speed changes):"
+        ),
+        ReportTable(
+            ("Model", "Baseline prefill s", "Now prefill s", "Prefill tok/s ratio"),
+            rows,
+            compact=True,
+        ),
+    )
 
 
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
     view = _comparison_view(comparison)
-    blocks: list[ReportBlock] = [ReportKeyValues(view.identity_rows + view.summary_rows)]
+    blocks: list[ReportBlock] = [
+        ReportKeyValues(view.identity_rows + view.run_fact_rows + view.summary_rows)
+    ]
     if view.banner is not None:
         blocks.append(ReportParagraph(view.banner))
     if view.revision_note is not None:
@@ -22552,6 +22936,26 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 "No execution, usability, or observation-set changes against the baseline."
             )
         )
+    if view.text_change_rows:
+        blocks.append(
+            ReportDetails(
+                f"Generated text changed for {len(view.text_change_rows)} models",
+                (
+                    ReportTable(
+                        (
+                            "Model",
+                            "Decoding",
+                            "Weights",
+                            "Shared prefix (chars)",
+                            "Length (chars)",
+                            "Prompt token count",
+                        ),
+                        view.text_change_rows,
+                        compact=True,
+                    ),
+                ),
+            )
+        )
     if view.flag_lead is not None:
         blocks.append(ReportParagraph(view.flag_lead))
     if view.flag_rows:
@@ -22562,6 +22966,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 compact=True,
             )
         )
+    blocks.extend(_prefill_change_blocks(view.prefill_rows))
     if view.memory_rows:
         blocks.append(
             ReportTable(
@@ -22593,7 +22998,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
     if comparison.architecture_commits:
         blocks.append(
             ReportDetails(
-                "mlx-vlm commits touching the affected models' architectures",
+                "mlx-vlm commits touching the affected models' architectures and their imports",
                 (
                     ReportBulletList(
                         tuple(
@@ -22610,8 +23015,10 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         )
     blocks.append(
         ReportParagraph(
-            "Mechanical diff only: one image, temperature as configured; single-observation "
-            "flips on one model are usually run-to-run variance, broad shifts are not."
+            "Mechanical diff only: one image and one generation per model in each sweep, "
+            "with no warm-up or repeats. A difference shows that outputs or timings "
+            "differ, not why, whether it affects one model or many; attributing a cause "
+            "needs matched repeats or a native reproduction."
         )
     )
     return ReportSection("Since the baseline sweep", tuple(blocks))
@@ -22620,6 +23027,24 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
 def _plain_log_text(text: str) -> str:
     """Strip the view's Markdown emphasis/backticks for terminal logging."""
     return text.replace("**", "").replace("`", "")
+
+
+def _log_comparison_model_rows(view: _ComparisonView) -> None:
+    """Log the per-model transition, text-change and crash-continuity rows."""
+    for model, execution, usability, observations in view.change_rows:
+        logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
+    for model, decoding, weights, shared, length, prompt in view.text_change_rows:
+        logger.info(
+            "  text changed: %s (%s, %s; shared prefix %s chars; length %s; prompt tokens %s)",
+            model,
+            decoding,
+            weights,
+            shared,
+            length,
+            prompt,
+        )
+    for model, continuity in view.continuity_rows:
+        logger.info("  %s: %s", model, continuity)
 
 
 def _log_run_comparison(comparison: RunComparison | None) -> None:
@@ -22631,7 +23056,7 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
     logger.info("Baseline: %s", comparison.baseline_label)
     if view.banner is not None:
         logger.warning("%s", _plain_log_text(view.banner))
-    for label, value in view.summary_rows:
+    for label, value in (*view.run_fact_rows, *view.summary_rows):
         logger.info("%s: %s", label, value)
     if view.revision_note is not None:
         logger.info("%s", _plain_log_text(view.revision_note))
@@ -22647,10 +23072,7 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         )
     for item in view.membership_items:
         logger.info("%s", _plain_log_text(item))
-    for model, execution, usability, observations in view.change_rows:
-        logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
-    for model, continuity in view.continuity_rows:
-        logger.info("  %s: %s", model, continuity)
+    _log_comparison_model_rows(view)
     if view.continuity_note is not None:
         logger.info("%s", view.continuity_note)
     if view.flag_lead is not None:
@@ -22659,6 +23081,8 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info(
             "  %s: %s -> %s tok/s (x%s) outside band %s", model, baseline_tps, now_tps, ratio, band
         )
+    for model, baseline_s, now_s, ratio in view.prefill_rows:
+        logger.info("  %s: prefill %s -> %s s (tok/s x%s)", model, baseline_s, now_s, ratio)
     for model, baseline_peak, now_peak, delta in view.memory_rows:
         logger.info("  %s: peak %s -> %s GB (%s)", model, baseline_peak, now_peak, delta)
     if comparison.comparable and not comparison.has_changes:
@@ -23862,29 +24286,35 @@ def _run_issue_observation_cluster_key(result: JsonlResultRecord) -> tuple[str, 
 
 def _run_issue_summary_observation_cluster_section(
     results: Sequence[JsonlResultRecord],
+    *,
+    link: Callable[[str], ReportTargetLink],
 ) -> ReportSection | None:
-    """Summarize repeated observation signatures above the per-model review tables."""
-    counts: Counter[tuple[str, ...]] = Counter()
+    """List observation signatures shared by two or more review models, naming them.
+
+    A one-model signature only repeats that model's own review row.
+    """
+    members: dict[tuple[str, ...], list[str]] = defaultdict(list)
     for result in results:
-        key = _run_issue_observation_cluster_key(result)
-        if key:
-            counts[key] += 1
-    # A table of one-model signatures repeats the review table below it.
-    if not any(count > 1 for count in counts.values()):
+        if key := _run_issue_observation_cluster_key(result):
+            members[key].append(result["model"])
+    shared = {signature: models for signature, models in members.items() if len(models) > 1}
+    if not shared:
         return None
     rows = tuple(
         (
-            _human_observation_labels(cast("Sequence[ObservationCode]", signature)),
-            str(count),
+            MARKDOWN_ESCAPER.escape(
+                _human_observation_labels(cast("Sequence[ObservationCode]", signature))
+            ),
+            ", ".join(_render_report_cell_markdown(link(model), escaped=False) for model in models),
         )
         # Integration importance first (best display rank in the signature),
         # then frequency: a rare repetition cluster outranks a common
         # constraint-miss cluster.
-        for signature, count in sorted(
-            counts.items(),
+        for signature, models in sorted(
+            shared.items(),
             key=lambda item: (
                 min(_OBSERVATION_DISPLAY_RANK[cast("ObservationCode", code)] for code in item[0]),
-                -item[1],
+                -len(item[1]),
             ),
         )
     )
@@ -23892,9 +24322,9 @@ def _run_issue_summary_observation_cluster_section(
         "Observation clusters",
         (
             ReportParagraph(
-                "Repeated mechanical observation signatures among results requiring review."
+                "Observation signatures shared by two or more results requiring review."
             ),
-            ReportTable(("Observed result", "Models"), rows, compact=True),
+            ReportTable(("Observed result", "Models"), rows, markdown_escaped=True, compact=True),
         ),
     )
 
@@ -24022,6 +24452,12 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
     return tuple(rows)
 
 
+_NATIVE_REPRO_CELLS: Final[dict[str, str]] = {
+    "actionable_failure": "crash: triage",
+    "observation_needs_reproduction": "candidate",
+}
+
+
 def _run_issue_summary_quality_section(
     results: Sequence[JsonlResultRecord],
     *,
@@ -24032,6 +24468,11 @@ def _run_issue_summary_quality_section(
         results,
         key=lambda result: (
             _usability_rank(result["assessment"]["usability"]),
+            # Within major concerns, answer-format problems before broken generation.
+            _major_concern_kind(
+                result["assessment"]["usability"], result["assessment"]["observations"]
+            )
+            == "generation",
             result["model"].lower(),
         ),
     )
@@ -24048,7 +24489,9 @@ def _run_issue_summary_quality_section(
         rows.append(
             (
                 result["model"],
-                _human_status_label(result["assessment"]["usability"]),
+                _usability_label(
+                    result["assessment"]["usability"], result["assessment"]["observations"]
+                ),
                 total_cell,
                 tps_cell,
                 peak_cell,
@@ -24056,14 +24499,18 @@ def _run_issue_summary_quality_section(
                 *((_run_issue_summary_keyword_cell(result),) if show_keywords else ()),
                 *((_run_issue_summary_hint_text_cell(result),) if show_hint_text else ()),
                 _run_issue_summary_quality_observed(result),
+                _NATIVE_REPRO_CELLS.get(result["assessment"]["maintainer_status"], "-"),
             )
         )
     limit_note = f" (limit {token_limit:,})" if token_limit is not None else ""
     intro = (
         "Every attempted model, ordered by its mechanical checks, with counted facts. "
         '"No concerns detected" is not an accuracy verdict: read the final answers in the '
-        "gallery. Prompt tokens include the image tokens, which drive prefill time; output "
-        f"tokens are the tokens generated{limit_note}."
+        'gallery. "Major concerns: generation" means generation itself failed (no text, '
+        'repeated text, or no final answer); "major concerns: answer format" means an '
+        "answer was generated but missed the requested form. Tokens in count the image's "
+        "tokens too, which drive prefill time; tokens out are those generated"
+        f"{limit_note}."
     )
     if show_keywords:
         intro += " Keywords are counted from the answer's Keywords field" + (
@@ -24088,9 +24535,10 @@ def _run_issue_summary_quality_section(
         *(("Keywords",) if show_keywords else ()),
         *(("Hint text",) if show_hint_text else ()),
         "Observed",
+        "Native repro",
     )
     return ReportSection(
-        "Model quality at a glance",
+        "Mechanical checks at a glance",
         (ReportParagraph(intro), ReportTable(headers, tuple(rows), compact=True)),
     )
 
@@ -24107,8 +24555,10 @@ def _observation_history_note(block: Mapping[str, JsonLike]) -> str:
     return (
         "*History* dates each observation (a crash counts as one) over this model's "
         f"retained runs: {window}. A run that did not attempt the model is skipped, and a "
-        'report-only correction of a run counts once. "Last N runs" counts consecutive '
-        'runs ending with this one; "first" is the earliest run read that showed it.'
+        'report-only correction of a run counts once. "Last N runs" and "N runs since" '
+        'count consecutive runs ending with this one; "first" is the earliest run read '
+        "that showed it. The table shows each model's longest-running observation; every "
+        "observation's dates are under *History by observation*."
     )
 
 
@@ -24118,33 +24568,74 @@ def _history_date(timestamp: str | None, *, open_ended: bool) -> str:
     return f"{date} or earlier" if open_ended else date
 
 
-def _observation_history_cell(model: str, entries: Sequence[ObservationHistory]) -> str:
-    """One model's per-observation history, as "<observation>: <persistence>" clauses."""
-    clauses: list[str] = []
-    for entry in (entry for entry in entries if entry.model == model):
-        gloss = (
-            "crash"
-            if entry.code == _CRASH_HISTORY_CODE
-            else _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", entry.code), entry.code)
+def _history_gloss(entry: ObservationHistory) -> str:
+    """The short observation name a history clause leads with."""
+    if entry.code == _CRASH_HISTORY_CODE:
+        return "crash"
+    return _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", entry.code), entry.code)
+
+
+def _history_persistence(entry: ObservationHistory) -> str:
+    """How long one observation has persisted, e.g. "last 3 runs (since 2026-09-25)"."""
+    first = _history_date(entry.first_observed, open_ended=entry.first_observed_open_ended)
+    if entry.first_observed is None:
+        # With older runs unread, "first" is only first among the runs read.
+        return (
+            "not in earlier runs read" if entry.first_observed_open_ended else "first seen this run"
         )
-        first = _history_date(entry.first_observed, open_ended=entry.first_observed_open_ended)
-        if entry.first_observed is None:
-            # With older runs unread, "first" is only first among the runs read.
-            clauses.append(
-                f"{gloss}: not in earlier runs read"
-                if entry.first_observed_open_ended
-                else f"{gloss}: first seen this run"
-            )
-        elif entry.consecutive_runs == 1:
-            clauses.append(f"{gloss}: back this run; first {first}")
-        else:
-            plus = "+" if entry.consecutive_open_ended else ""
-            since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
-            clause = f"{gloss}: last {entry.consecutive_runs}{plus} runs (since {since})"
-            if entry.first_observed != entry.consecutive_since:
-                clause += f"; first {first}"
-            clauses.append(clause)
-    return "; ".join(clauses) or "-"
+    if entry.consecutive_runs == 1:
+        return f"back this run, first {first}"
+    plus = "+" if entry.consecutive_open_ended else ""
+    since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
+    text = f"last {entry.consecutive_runs}{plus} runs (since {since})"
+    return text + (f", first {first}" if entry.first_observed != entry.consecutive_since else "")
+
+
+def _observation_history_clauses(
+    model: str, entries: Sequence[ObservationHistory]
+) -> tuple[str, ...]:
+    """One model's per-observation history, as "<observation>: <persistence>" clauses."""
+    return tuple(
+        f"{_history_gloss(entry)}: {_history_persistence(entry)}"
+        for entry in entries
+        if entry.model == model
+    )
+
+
+def _observation_history_cell(model: str, entries: Sequence[ObservationHistory]) -> str:
+    """One model's whole history on one line."""
+    return "; ".join(_observation_history_clauses(model, entries)) or "-"
+
+
+def _history_streak(entry: ObservationHistory) -> str:
+    """The short form of a persistence: "16 runs since 2026-09-25", "back this run"."""
+    if entry.first_observed is None:
+        return "not in earlier runs read" if entry.first_observed_open_ended else "new this run"
+    if entry.consecutive_runs == 1:
+        return "back this run"
+    plus = "+" if entry.consecutive_open_ended else ""
+    since = _history_date(entry.consecutive_since, open_ended=entry.consecutive_open_ended)
+    return f"{entry.consecutive_runs}{plus} runs since {since}"
+
+
+def _observation_history_summary(model: str, entries: Sequence[ObservationHistory]) -> str:
+    """A table-sized persistence summary: the longest-running observation and the rest.
+
+    The full per-observation chronology, first dates included, is listed below
+    the review table.
+    """
+    mine = [entry for entry in entries if entry.model == model]
+    if not mine:
+        return "-"
+    longest = max(mine, key=lambda entry: entry.consecutive_runs)
+    streak = _history_streak(longest)
+    if len(mine) > 1 and all(_history_streak(entry) == streak for entry in mine):
+        return f"all {len(mine)}: {streak}"
+    summary = f"{_history_gloss(longest)}: {streak}"
+    if rest := [entry for entry in mine if entry is not longest]:
+        newest = _history_streak(min(rest, key=lambda entry: entry.consecutive_runs))
+        summary += f"; +{len(rest)} more, newest {newest}"
+    return summary
 
 
 def _since_baseline_status(model: str, comparison: RunComparison | None) -> str | None:
@@ -24178,7 +24669,15 @@ def _run_issue_summary_surfaced_sections(
     }
 
     sections: list[ReportSection] = []
-    cluster_section = _run_issue_summary_observation_cluster_section(results)
+    cluster_section = _run_issue_summary_observation_cluster_section(
+        results,
+        link=lambda model: _run_issue_summary_artifact_link(
+            summary_path=summary_path,
+            artifact_path=output_paths.diagnostics,
+            label=model,
+            anchor=_diagnostics_model_anchor(model),
+        ),
+    )
     if cluster_section is not None:
         sections.append(cluster_section)
     for execution, heading in heading_by_execution.items():
@@ -24198,12 +24697,12 @@ def _run_issue_summary_surfaced_sections(
             rows.append(
                 (
                     result["model"],
-                    _human_status_label(assessment["usability"]),
+                    _usability_label(assessment["usability"], assessment["observations"]),
                     *(() if since is None else (since,)),
                     *(
                         ()
                         if history is None
-                        else (_observation_history_cell(result["model"], history[1]),)
+                        else (_observation_history_summary(result["model"], history[1]),)
                     ),
                     _run_issue_summary_observed_result(result),
                     _run_issue_summary_artifact_link(
@@ -24233,10 +24732,38 @@ def _run_issue_summary_surfaced_sections(
                             else ()
                         ),
                         ReportTable(headers, tuple(rows), compact=True),
+                        *(
+                            ()
+                            if history is None
+                            else _observation_chronology_blocks(
+                                [row[0] for row in rows], history[1]
+                            )
+                        ),
                     ),
                 )
             )
     return tuple(sections)
+
+
+def _observation_chronology_blocks(
+    models: Sequence[ReportCell], entries: Sequence[ObservationHistory]
+) -> tuple[ReportBlock, ...]:
+    """Every listed model's per-observation history, one row each, collapsed."""
+    rows = tuple(
+        (model, _history_gloss(entry), _history_persistence(entry))
+        for model in models
+        if isinstance(model, str)
+        for entry in entries
+        if entry.model == model
+    )
+    if not rows:
+        return ()
+    return (
+        ReportDetails(
+            "History by observation",
+            (ReportTable(("Model", "Observation", "Persistence"), rows, compact=True),),
+        ),
+    )
 
 
 def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportSection:
@@ -24278,28 +24805,25 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
         for label in ("macOS Version", "GPU/Chip", "Python Version")
         if system.get(label)
     )
+    return ReportSection("Run context", (ReportKeyValues(tuple(rows)),))
+
+
+def _run_issue_summary_link_caveat() -> str:
+    """Say whether the evidence links are durable, before anyone shares them."""
     blob_ref = _github_blob_ref()
     if re.fullmatch(r"[0-9a-f]{40}", blob_ref):
         # Only reachable via an explicit ref override supplied after the run's
         # artifacts were committed; a producer-HEAD pin is never used because
         # that commit predates the artifacts it would claim to contain.
-        link_caveat = (
-            f"GitHub links are pinned to producer commit `{blob_ref[:12]}`, so the "
-            "linked evidence is durable."
+        return (
+            f"**Evidence links** are pinned to commit `{blob_ref[:12]}`, so the linked "
+            "evidence is durable."
         )
-    else:
-        link_caveat = (
-            "GitHub links target the repository's mutable main branch; they resolve "
-            "to this run's evidence only once these artifacts are committed, and a "
-            "later run's commit supersedes them. Pin links to that artifact commit "
-            "when durable issue evidence is required."
-        )
-    return ReportSection(
-        "Run context",
-        (
-            ReportKeyValues(tuple(rows)),
-            ReportParagraph(link_caveat),
-        ),
+    return (
+        "**Evidence links** target the repository's mutable main branch: they show this "
+        "run only once these artifacts are committed, and a later run's commit replaces "
+        "them. Before sharing upstream, pin them to the commit that published these "
+        "artifacts."
     )
 
 
@@ -24361,7 +24885,7 @@ def _run_issue_summary_artifacts_section(
         )
         for label, path in artifact_rows
     )
-    content: list[ReportBlock] = []
+    content: list[ReportBlock] = [ReportParagraph(_run_issue_summary_link_caveat())]
     if stale_names:
         omitted = ", ".join(f"`{name}`" for name in sorted(stale_names))
         content.append(
@@ -24374,6 +24898,32 @@ def _run_issue_summary_artifacts_section(
     return ReportSection("Full artifacts", tuple(content))
 
 
+def _completion_breakdown(results: Sequence[JsonlResultRecord]) -> tuple[int, int, int]:
+    """Completed results: no observations, prompt-compliance only, and native-repro candidates."""
+    completed = [
+        result["assessment"]
+        for result in results
+        if result["assessment"]["execution"] == "completed"
+    ]
+    clean = sum(not assessment["observations"] for assessment in completed)
+    review = sum(assessment["maintainer_status"] != "none" for assessment in completed)
+    return clean, len(completed) - clean - review, review
+
+
+def _completion_breakdown_sentence(results: Sequence[JsonlResultRecord]) -> str | None:
+    """Why only some completions with observations need native reproduction."""
+    clean, compliance_only, review = _completion_breakdown(results)
+    if not compliance_only + review:
+        return None
+    return (
+        f"**Completed models:** {clean} with no mechanical observations, "
+        f"{compliance_only} with prompt-compliance observations only (labels, form or "
+        f"copied hint text), and {review} with observations mlx-vlm can produce (such as "
+        "repetition, missing final answers or visible control tokens); only those "
+        f"{review} are candidates for native reproduction."
+    )
+
+
 def _run_issue_summary_clean_completions_section(
     results: Sequence[JsonlResultRecord],
     *,
@@ -24382,17 +24932,7 @@ def _run_issue_summary_clean_completions_section(
     include_gallery_markdown: bool,
 ) -> ReportSection:
     """Name the models that completed with nothing for a maintainer to look at."""
-    clean_count = sum(
-        result["assessment"]["execution"] == "completed"
-        and not result["assessment"]["observations"]
-        for result in results
-    )
-    compliance_only_count = sum(
-        result["assessment"]["execution"] == "completed"
-        and result["assessment"]["maintainer_status"] == "none"
-        and bool(result["assessment"]["observations"])
-        for result in results
-    )
+    clean_count, compliance_only_count, _review = _completion_breakdown(results)
     # The quality table above already names them.
     clean_phrase = _pluralized_count(clean_count, "completion") + " without detected concerns"
     clean_sentence = f"{clean_phrase}."
@@ -24506,6 +25046,8 @@ def generate_run_issue_summary_report(
     blocks: list[ReportBlock] = [
         ReportParagraph(_run_issue_summary_maintainer_verdict(actionable, other, comparison)),
     ]
+    if (breakdown := _completion_breakdown_sentence(source.results)) is not None:
+        blocks.append(ReportParagraph(breakdown))
     if preflight_issues := source.metadata.get("preflight_issues"):
         blocks.extend(
             (
@@ -24518,12 +25060,6 @@ def generate_run_issue_summary_report(
         )
     blocks.extend(
         (
-            ReportParagraph(
-                "**What this run measures.** "
-                + _run_objective_statement(eval_mode)
-                + " Every locally cached MLX vision-language model got the same image and "
-                "prompt (reproduced below) through mlx-vlm's generation pipeline."
-            ),
             ReportSection(
                 "Run summary",
                 (
@@ -24554,6 +25090,12 @@ def generate_run_issue_summary_report(
                                 str(_count_observation(source.results, "repetition_abort")),
                             ),
                         )
+                    ),
+                    ReportParagraph(
+                        "**What this run measures.** "
+                        + _run_objective_statement(eval_mode)
+                        + " Every locally cached MLX vision-language model got the same image "
+                        "and prompt (reproduced below) through mlx-vlm's generation pipeline."
                     ),
                     ReportDetails(
                         "Exact prompt sent to every model",
@@ -24650,6 +25192,32 @@ def _check_rendered_comparison(comparison: RunComparison) -> RunComparison:
     return comparison
 
 
+_CURRENT_GPU_NOTE_PREFIXES: Final[tuple[str, ...]] = (
+    "current run detected GPU activity",
+    "current run's GPU readings",
+)
+
+
+def _with_recomputed_gpu_notes(
+    comparison: RunComparison, records: Sequence[JsonlResultRecord]
+) -> RunComparison:
+    """Replace the stored current-run GPU notes with ones recomputed from the records.
+
+    Retained notes are the strings written at run time: a 0.17.44-0.17.46
+    run stored "detected GPU activity" from stale reads, so regeneration
+    recomputes them with today's reliability rule rather than replaying them.
+    """
+    kept = [
+        note
+        for note in comparison.environment_notes
+        if not note.startswith(_CURRENT_GPU_NOTE_PREFIXES)
+    ]
+    # After the current run's other notes, where the live comparison puts it.
+    at = max((i + 1 for i, note in enumerate(kept) if note.startswith("current run")), default=0)
+    kept[at:at] = _gpu_environment_notes("current", records)
+    return replace(comparison, environment_notes=tuple(kept))
+
+
 def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     """Regenerate only the paste-ready issue body from retained run artifacts."""
     output_paths = ReportOutputPaths.from_root(output_dir)
@@ -24672,7 +25240,10 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     comparison: RunComparison | None = None
     if isinstance(comparison_value, dict):
         try:
-            comparison = _check_rendered_comparison(_run_comparison_from_json(comparison_value))
+            comparison = _with_recomputed_gpu_notes(
+                _check_rendered_comparison(_run_comparison_from_json(comparison_value)),
+                source.results,
+            )
         except (KeyError, IndexError, TypeError, ValueError):
             logger.warning(
                 "Retained comparison metadata could not be rehydrated; "
@@ -24704,6 +25275,10 @@ def _output_index_dashboard_lines(
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
     usability_counter = Counter(assessment.usability for _model, assessment in assessments)
+    major_kinds = Counter(
+        _major_concern_kind(assessment.usability, assessment.observations)
+        for _model, assessment in assessments
+    )
     observation_counter: Counter[ObservationCode] = Counter(
         code for _model, assessment in assessments for code in assessment.observations
     )
@@ -24738,6 +25313,12 @@ def _output_index_dashboard_lines(
             "- Mechanical checks: "
             + ", ".join(
                 f"{_human_status_label(label)} {usability_counter.get(label, 0)}"
+                + (
+                    f" (generation {major_kinds['generation']}, "
+                    f"answer format {major_kinds['answer format']})"
+                    if label == "unusable" and usability_counter.get(label)
+                    else ""
+                )
                 for label in _USABILITY_ORDER
             )
         ),
@@ -24752,12 +25333,33 @@ def _output_index_dashboard_lines(
         top_observations = ", ".join(
             f"{_OBSERVATION_DISPLAY_LABELS[code]} ({count})" for code, count in ranked[:5]
         )
-        lines.append(f"- Top observations: {top_observations}")
+        # Say what was left out, so an unlisted observation is not read as absent.
+        more = len(ranked) - 5
+        if more > 0:
+            top_observations += f"; {more} more kind{'s' if more > 1 else ''} in diagnostics"
+        lines.append(f"- Observations, most important first: {top_observations}")
     lines.append("")
     return lines
 
 
-def generate_output_index_report(
+def _run_identity_text(metadata: Mapping[str, object] | None) -> str | None:
+    """When the run started and which check_models source produced it."""
+    if metadata is None:
+        return None
+    parts: list[str] = []
+    if isinstance(started := metadata.get("started_at"), str):
+        parts.append(f"started {started}")
+    producer = _narrow_run_issue_producer(cast("JsonLike", metadata.get("producer")))
+    if producer is not None:
+        revision = producer["git_revision"]
+        source = f"check_models {producer['version']}" + (f" @ {revision[:9]}" if revision else "")
+        if producer.get("dirty"):
+            source += " (uncommitted changes)"
+        parts.append(source)
+    return "; ".join(parts) or None
+
+
+def generate_output_index_report(  # noqa: PLR0913 - every index fact is an explicit keyword  # skylos: ignore[SKY-C303]
     filename: Path,
     *,
     artifacts: Sequence[ReportArtifact],
@@ -24769,6 +25371,7 @@ def generate_output_index_report(
     image: RunImageRecord | None = None,
     assessment_profile: AssessmentProfile | None = None,
     metadata_exposed_to_prompt: bool | None = None,
+    run_metadata: Mapping[str, object] | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -24786,6 +25389,7 @@ def generate_output_index_report(
     md = [
         "# Check Models Output Index",
         "",
+        *((f"Run: {identity}", "") if (identity := _run_identity_text(run_metadata)) else ()),
         f"Assessment: {_assessment_scope(assessment_profile)}",
         "",
     ]
@@ -25755,11 +26359,11 @@ def _editable_revision_range(
 
 
 def _git_log_subjects(
-    checkout: str, before: str, after: str, *, path: str | None = None
+    checkout: str, before: str, after: str, *, paths: Sequence[str] = ()
 ) -> tuple[str, ...] | None:
-    """Commit subjects in before..after (optionally under one path); None when git cannot say.
+    """Commit subjects in before..after (optionally under some paths); None when git cannot say.
 
-    An empty tuple is a real answer: no commit in the range touched the path.
+    An empty tuple is a real answer: no commit in the range touched the paths.
     """
     log = _run_macos_toolchain_command(
         (
@@ -25770,7 +26374,7 @@ def _git_log_subjects(
             "--format=%h %s",
             f"-n{_COMPONENT_CHANGE_SUBJECT_LIMIT}",
             f"{before}..{after}",
-            *(("--", path) if path is not None else ()),
+            *(("--", *paths) if paths else ()),
         ),
         timeout=5,
         empty_output="",
@@ -25808,6 +26412,49 @@ def _component_commit_ranges(
     return tuple(changes)
 
 
+_MODEL_PACKAGE_IMPORT_RE: Final[re.Pattern[str]] = re.compile(
+    r"^\s*from\s+(?:\.\.|mlx_vlm\.models\.)([A-Za-z_]\w*)", re.MULTILINE
+)
+
+
+def _architecture_imports(checkout: str, revision: str, architecture: str) -> tuple[str, ...]:
+    """Entries under mlx_vlm/models/ that the architecture's own files import directly.
+
+    One level only, read at ``revision``: ``from ..qwen3_5.language import``
+    in ``qwen3_5_moe/`` names ``qwen3_5``; a module such as ``base`` maps to
+    ``base.py``. Empty when git cannot say.
+    """
+    source = _run_macos_toolchain_command(
+        (
+            "git",
+            "-C",
+            checkout,
+            "grep",
+            "-h",
+            "-E",
+            r"^[[:space:]]*from (\.\.|mlx_vlm\.models\.)[A-Za-z_]",
+            revision,
+            "--",
+            f":(glob)mlx_vlm/models/{architecture}/*.py",
+        ),
+        timeout=5,
+    )
+    listing = _run_macos_toolchain_command(
+        ("git", "-C", checkout, "ls-tree", "--name-only", revision, "mlx_vlm/models/"),
+        timeout=5,
+    )
+    if source is None or listing is None:
+        return ()
+    entries = {line.rsplit("/", 1)[-1] for line in listing.splitlines()}
+    imports: list[str] = []
+    for name in sorted(set(_MODEL_PACKAGE_IMPORT_RE.findall(source)) - {architecture}):
+        if name in entries:
+            imports.append(name)
+        elif f"{name}.py" in entries:
+            imports.append(f"{name}.py")
+    return tuple(imports)
+
+
 def _architecture_commits(
     comparison: RunComparison,
     current: Sequence[JsonlResultRecord],
@@ -25816,8 +26463,10 @@ def _architecture_commits(
 ) -> tuple[ArchitectureCommits, ...]:
     """For each model whose outcome, text or failure moved, list mlx-vlm commits touching its package.
 
-    Uses the resolved architecture (a checkpoint's model_type can be an alias)
-    and runs only when mlx-vlm itself moved between the runs.
+    The log covers the architecture's own package plus the sibling packages
+    and modules it imports directly. Uses the resolved architecture (a
+    checkpoint's model_type can be an alias) and runs only when mlx-vlm
+    itself moved between the runs.
     """
     affected = {change.model for change in comparison.changes}
     affected |= set(comparison.text_changed_models)
@@ -25831,6 +26480,7 @@ def _architecture_commits(
         return ()
     span = _editable_revision_range(baseline_provenance, current_provenance, "mlx-vlm")
     subjects_by_architecture: dict[str, tuple[str, ...] | None] = {}
+    imports_by_architecture: dict[str, tuple[str, ...]] = {}
     entries: list[ArchitectureCommits] = []
     for record in current:
         architecture_record = record.get("architecture")
@@ -25841,12 +26491,25 @@ def _architecture_commits(
             continue
         if span is not None and architecture not in subjects_by_architecture:
             checkout, before, after = span
+            imports = _architecture_imports(checkout, after, architecture)
+            imports_by_architecture[architecture] = imports
             subjects_by_architecture[architecture] = _git_log_subjects(
-                checkout, before, after, path=f"mlx_vlm/models/{architecture}"
+                checkout,
+                before,
+                after,
+                paths=[f"mlx_vlm/models/{name}" for name in (architecture, *imports)],
             )
         subjects = subjects_by_architecture.get(architecture)
         status = "unavailable" if subjects is None else ("commits" if subjects else "none")
-        entries.append(ArchitectureCommits(record["model"], architecture, status, subjects or ()))
+        entries.append(
+            ArchitectureCommits(
+                record["model"],
+                architecture,
+                status,
+                subjects or (),
+                imports_by_architecture.get(architecture, ()),
+            )
+        )
     return tuple(entries)
 
 
@@ -26146,6 +26809,7 @@ def _generate_reports_and_log_outputs(
             metadata_exposed_to_prompt=(
                 inputs.report_context.mode_policy.metadata_exposed_to_prompt
             ),
+            run_metadata=retained.metadata if retained is not None else None,
         ),
     )
     run_artifact(index_artifact)
@@ -26742,7 +27406,6 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
     )
     parser.add_argument(
         "--compare-with",
-        type=str,
         default=DEFAULT_COMPARE_WITH,
         metavar="auto|none|PATH|GITREF",
         help=(
@@ -26763,7 +27426,6 @@ def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
         "-f",
         "--folder",
         type=Path,
-        default=None,
         help=(
             "Folder to scan. Requires a path when provided. The most recently modified "
             "image file in the folder will be used. If both --folder and --image are "
@@ -26774,13 +27436,11 @@ def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
         "-i",
         "--image",
         type=Path,
-        default=None,
         help=("Path to a specific image file to process directly. Requires a path when provided."),
     )
     input_group.add_argument(
         "--image-source-url",
         type=_parse_public_image_source_url,
-        default=None,
         help=(
             "Public HTTP(S) location of the exact selected image, recorded only as "
             "reproduction metadata; the URL is never used as the inference input."
@@ -26796,8 +27456,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--models",
         action="extend",
         nargs="+",
-        type=str,
-        default=None,
         help=(
             "Specify models by ID/path. Overrides cache scan. "
             "May be provided multiple times; model lists accumulate."
@@ -26808,8 +27466,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--exclude",
         action="extend",
         nargs="+",
-        type=str,
-        default=None,
         help=(
             "Exclude models by ID/path from the model list "
             "(works with both explicit --models and cache scan). "
@@ -26827,14 +27483,10 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     )
     model_group.add_argument(
         "--revision",
-        type=str,
-        default=None,
         help="Model revision (branch, tag, or commit hash) for version pinning.",
     )
     model_group.add_argument(
         "--adapter-path",
-        type=str,
-        default=None,
         help="Path to LoRA adapter weights to apply on top of the base model.",
     )
 
@@ -26842,8 +27494,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "-p",
         "--prompt",
-        type=str,
-        default=None,
         help=(
             "Prompt text to send to the model. Requires text when provided. If omitted, "
             "the resolved --eval-mode lane supplies the prompt. When provided, it "
@@ -26856,7 +27506,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--resize-shape",
         type=int,
         nargs="+",
-        default=None,
         help=(
             "Resize image input before processor handling. "
             "Provide 1 integer for square resize or 2 for height width after a "
@@ -26866,9 +27515,7 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--eos-tokens",
         action="extend",
-        type=str,
         nargs="+",
-        default=None,
         help=(
             "Additional EOS tokens to stop on. Supports escaped values like \\n. "
             "May be provided multiple times; token lists accumulate."
@@ -26877,13 +27524,11 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--skip-special-tokens",
         action="store_true",
-        default=False,
         help="Skip tokenizer special tokens in the detokenized output.",
     )
     prompt_group.add_argument(
         "--processor-kwargs",
         type=_parse_processor_kwargs_arg,
-        default=None,
         help=(
             "Extra processor kwargs as a JSON object. "
             'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
@@ -26892,13 +27537,10 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--enable-thinking",
         action="store_true",
-        default=False,
         help="Enable thinking mode in the upstream chat template and generation flow.",
     )
     prompt_group.add_argument(
         "--thinking-mode",
-        type=str,
-        default=None,
         help=(
             "Value passed to chat templates that support thinking_mode (matches mlx-vlm upstream)."
         ),
@@ -26906,18 +27548,14 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--thinking-budget",
         type=int,
-        default=None,
         help="Maximum number of thinking tokens before forcing the end token.",
     )
     prompt_group.add_argument(
         "--thinking-start-token",
-        type=str,
-        default=None,
         help="Token marking the start of a thinking block, such as <think>.",
     )
     prompt_group.add_argument(
         "--thinking-end-token",
-        type=str,
         default=DEFAULT_THINKING_END_MARKER,
         help="Token marking the end of a thinking block when thinking mode is enabled.",
     )
@@ -26937,8 +27575,7 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
         "--assessment-profile",
-        choices=("general", "metadata"),
-        default=None,
+        choices=_literal_choices(AssessmentProfile),
         help=(
             "Checks applied to the answer, not a prompt change. Defaults to metadata for "
             "built-in metadata prompts and general for custom/triage prompts; explicit "
@@ -26964,7 +27601,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "-x",
         "--max-tokens",
         type=int,
-        default=None,
         help=(
             "Max new tokens to generate. When omitted, the resolved evaluation lane "
             f"supplies the default ({DEFAULT_MAX_TOKENS}; triage {TRIAGE_MAX_TOKENS}). "
@@ -27012,13 +27648,12 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "-r",
         "--repetition-penalty",
         type=float,
-        default=None,
         help="Penalize repeated tokens (>1.0 discourages repetition). None = no penalty.",
     )
     generation_group.add_argument(
         "--repetition-context-size",
         type=int,
-        default=20,
+        default=DEFAULT_PENALTY_CONTEXT_SIZE,
         help="Context window size for repetition penalty.",
     )
 
@@ -27036,7 +27671,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--presence-penalty",
         type=float,
-        default=None,
         help="Additive penalty for tokens that already appeared in generated context.",
     )
     server_group.add_argument(
@@ -27048,7 +27682,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--frequency-penalty",
         type=float,
-        default=None,
         help="Additive penalty scaled by token frequency in generated context.",
     )
     server_group.add_argument(
@@ -27060,7 +27693,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--logit-bias",
         type=_parse_logit_bias_arg,
-        default=None,
         help="OpenAI-style token-id bias JSON object, e.g. '{\"42\": -1.5}'.",
     )
 
@@ -27071,7 +27703,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--system-telemetry",
         action=argparse.BooleanOptionalAction,
-        default=None,
         help=(
             "macOS system-state telemetry per model: thermal state (nominal, fair, "
             "serious, critical; from serious up macOS reduces performance, so that "
@@ -27091,32 +27722,27 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "-L",
         "--lazy-load",
         action="store_true",
-        default=False,
         help="Use lazy loading for models (loads weights on-demand, reduces peak memory).",
     )
     runtime_group.add_argument(
         "--force-download",
         action="store_true",
-        default=False,
         help="Force mlx-vlm/Hugging Face Hub to download model files instead of using cache.",
     )
     runtime_group.add_argument(
         "--quantize-activations",
         action="store_true",
-        default=False,
         help="Enable mlx-vlm activation quantization during model loading when supported.",
     )
     runtime_group.add_argument(
         "--max-kv-size",
         type=int,
-        default=None,
         help="Maximum KV cache size (limits memory for long sequences). None = no limit.",
     )
     runtime_group.add_argument(
         "-b",
         "--kv-bits",
         type=float,
-        default=None,
         help=(
             "Quantize KV cache to N bits. Uniform supports 2, 3, 4, 5, 6, "
             "or 8; fractional values such as 3.5 use TurboQuant automatically."
@@ -27124,7 +27750,7 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     )
     runtime_group.add_argument(
         "--kv-quant-scheme",
-        choices=["uniform", "turboquant"],
+        choices=_literal_choices(KvQuantScheme),
         default=DEFAULT_KV_QUANT_SCHEME,
         help=(
             "KV cache quantization backend. Default: uniform. "
@@ -27134,7 +27760,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--kv-key-bits",
         type=float,
-        default=None,
         help=(
             "Override the KV cache key bit-width per tensor (requires --kv-bits; "
             "TurboQuant defaults to floor(--kv-bits))."
@@ -27143,7 +27768,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--kv-value-bits",
         type=float,
-        default=None,
         help=(
             "Override the KV cache value bit-width per tensor (requires --kv-bits; "
             "TurboQuant defaults to ceil(--kv-bits))."
@@ -27151,14 +27775,12 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     )
     runtime_group.add_argument(
         "--kv-key-scheme",
-        choices=["uniform", "turboquant"],
-        default=None,
+        choices=_literal_choices(KvQuantScheme),
         help="Override the KV quantization backend for keys only (requires --kv-bits).",
     )
     runtime_group.add_argument(
         "--kv-value-scheme",
-        choices=["uniform", "turboquant"],
-        default=None,
+        choices=_literal_choices(KvQuantScheme),
         help="Override the KV quantization backend for values only (requires --kv-bits).",
     )
     runtime_group.add_argument(
@@ -27196,13 +27818,11 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "-c",
         "--quality-config",
         type=Path,
-        default=None,
         help="Path to custom quality configuration YAML file.",
     )
     quality_group.add_argument(
         "--isolate",
         action="store_true",
-        default=False,
         help=(
             "Run each model in a fresh child interpreter. A native crash (segfault, abort, "
             "interpreter-finalization fault) in one model is then recorded as that model's "
@@ -27213,7 +27833,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     quality_group.add_argument(
         "--rerun-triage",
         action="store_true",
-        default=False,
         help=(
             "After the first pass, rerun crashed models and completed models with "
             "recorded mechanical observations using a simple prompt. "
@@ -27237,7 +27856,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "-n",
         "--dry-run",
         action="store_true",
-        default=False,
         help=(
             "Validate arguments and show what would be run without invoking any models. "
             "Lists discovered models, the generated prompt, and image path then exits."
@@ -27264,7 +27882,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     console_group.add_argument(
         "--width",
         type=int,
-        default=None,
         help=(
             "Force a specific CLI output width (columns) for separators and text wrapping. "
             "Overrides terminal detection. Also supported via MLX_VLM_WIDTH env var."

@@ -1,11 +1,11 @@
 # Model Output Gallery
 
-Generated on: 2026-10-04 21:56:04 BST
+Generated on: 2026-10-11 20:05:12 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,641 x 6,427 pixels (62.0 MP), 58.1 MB
+- *Input image:* JPEG, 6,213 x 9,320 pixels (57.9 MP), 52.1 MB
 
 This run records model responses to one shared image and prompt (evaluation
 lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
@@ -18,7 +18,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-c688458ce4ed66ce.jpg)
+![Reference image](assets/source-image-f00ae35004e26a90.jpg)
 
 ## Current-run Chooser
 
@@ -26,88 +26,82 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.11s   | 481 tok/s  | 0.67            | 1.9     | 2,103      | 58      | none                                                                                              |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | 10.27s  | 30.0 tok/s | 3.51            | 23      | 2,372      | 123     | none                                                                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | 8.50s   | 125 tok/s  | 1.31            | 19      | 1,617      | 617     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 8.58s   | 78.7 tok/s | 5.63            | 8.7     | 6,339      | 89      | none                                                                                              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | 8.30s   | 34.3 tok/s | 1.83            | 18      | 2,601      | 130     | none                                                                                              |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.01s   | 57.2 tok/s | 2.09            | 10      | 2,091      | 113     | none                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 5.95s   | 37.3 tok/s | 1.49            | 17      | 2,091      | 80      | none                                                                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 19.45s  | 65.0 tok/s | 1.37            | 20      | 1,312      | 995     | none                                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | 3.34s   | 210 tok/s  | 1.18            | 4.0     | 2,094      | 91      | none                                                                                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.17s   | 106 tok/s  | 0.76            | 7.0     | 369        | 88      | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 6.97s   | 66.0 tok/s | 2.88            | 13      | 2,905      | 140     | none                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 3.87s   | 186 tok/s  | 1.55            | 7.8     | 2,904      | 134     | none                                                                                              |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 5.41s   | 71.4 tok/s | 1.52            | 8.1     | 1,502      | 148     | none                                                                                              |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.34s   | 208 tok/s  | 2.81            | 3.9     | 4,065      | 158     | none                                                                                              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 5.79s   | 103 tok/s  | 1.23            | 24      | 1,267      | 133     | none                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 4.76s   | 58.4 tok/s | 0.83            | 9.3     | 1,115      | 144     | none                                                                                              |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | 26.29s  | 72.8 tok/s | 21.13           | 26      | 12,768     | 138     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 36.09s  | 85.3 tok/s | 31.50           | 23      | 16,525     | 143     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 37.84s  | 69.6 tok/s | 34.32           | 11      | 16,525     | 112     | none                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 35.62s  | 106 tok/s  | 30.81           | 25      | 16,541     | 151     | none                                                                                              |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 61.13s  | 29.3 tok/s | 53.98           | 21      | 16,541     | 121     | none                                                                                              |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 5.00s   | 102 tok/s  | 1.66            | 6.5     | 2,070      | 132     | none                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 8.67s   | 31.2 tok/s | 1.47            | 17      | 572        | 135     | none                                                                                              |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.10s   | 61.1 tok/s | 0.97            | 7.6     | 577        | 108     | none                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.01s   | 122 tok/s  | 1.02            | 16      | 577        | 106     | none                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 9.01s   | 26.2 tok/s | 1.81            | 20      | 577        | 103     | none                                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.27s   | 178 tok/s  | 1.23            | 4.8     | 1,366      | 107     | none                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 7.74s   | 39.8 tok/s | 2.51            | 16      | 3,095      | 119     | none                                                                                              |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 4.62s   | 127 tok/s  | 2.16            | 5.4     | 4,188      | 118     | none                                                                                              |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 7.59s   | 36.6 tok/s | 2.13            | 18      | 1,251      | 114     | none                                                                                              |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 8.62s   | 156 tok/s  | 4.85            | 23      | 3,606      | 132     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 21.05s  | 44.7 tok/s | 11.65           | 78      | 6,339      | 106     | prompt hint repeated                                                                              |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.44s   | 127 tok/s  | 1.13            | 5.6     | 1,407      | 114     | prompt hint repeated                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 36.69s  | 53.1 tok/s | 20.74           | 92      | 3,468      | 111     | prompt hint repeated                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | 6.12s   | 80.2 tok/s | 2.23            | 28      | 573        | 91      | prompt hint repeated                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | 3.70s   | 124 tok/s  | 0.79            | 6.0     | 573        | 83      | prompt hint repeated                                                                              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 2.94s   | 371 tok/s  | 1.16            | 2.2     | 312        | 44      | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | 2.57s   | 422 tok/s  | 0.90            | 2.1     | 2,094      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 38.95s  | 19.3 tok/s | 2.16            | 15      | 290        | 667     | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | 2.96s   | 304 tok/s  | 0.97            | 3.2     | 910        | 104     | incomplete thinking block                                                                         |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | 10.01s  | 31.4 tok/s | 4.11            | 13      | 3,104      | 113     | labelled fields not detected                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 54.80s  | 23.6 tok/s | 8.77            | 25      | 4,390      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | 37.17s  | 125 tok/s  | 33.64           | 9.4     | 16,536     | 225     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.23s   | 553 tok/s  | 0.97            | 1.1     | 1,186      | 22      | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 32.49s  | 57.8 tok/s | 13.10           | 14      | 16,536     | 1,000   | repeated text; cut off at token limit; duplicate keywords                                         |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 4.45s   | 92.6 tok/s | 0.87            | 7.2     | 571        | 129     | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 5.21s   | 144 tok/s  | 3.21            | 4.3     | 5,615      | 86      | labelled fields not detected; duplicate keywords                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 4.13s   | 107 tok/s  | 1.50            | 6.7     | 2,174      | 18      | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 5.04s   | 341 tok/s  | 0.69            | 1.8     | 308        | 1,000   | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | 2.99s   | 162 tok/s  | 0.98            | 4.8     | 1,011      | 48      | labelled fields not detected                                                                      |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.07s   | 481 tok/s  | 0.64            | 1.9     | 2,131      | 83      | none                                                                                                                     |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 69.83s  | 36.3 tok/s | 64.33           | 17      | 16,579     | 123     | none                                                                                                                     |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 8.48s   | 126 tok/s  | 1.31            | 19      | 1,656      | 617     | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected`          | 20.78s  | 45.0 tok/s | 11.49           | 78      | 6,372      | 112     | none                                                                                                                     |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.44s   | 57.4 tok/s | 1.98            | 10      | 2,132      | 98      | none                                                                                                                     |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected`          | 2.26s   | 421 tok/s  | 0.83            | 2.1     | 2,135      | 126     | none                                                                                                                     |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected`          | 15.34s  | 66.6 tok/s | 1.31            | 20      | 1,342      | 750     | none                                                                                                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected`          | 8.74s   | 22.0 tok/s | 2.04            | 15      | 320        | 101     | none                                                                                                                     |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected`          | 3.49s   | 304 tok/s  | 0.87            | 3.2     | 950        | 333     | none                                                                                                                     |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.21s   | 106 tok/s  | 0.71            | 7.1     | 410        | 104     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.31s   | 66.3 tok/s | 2.55            | 13      | 2,959      | 122     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 3.62s   | 188 tok/s  | 1.51            | 7.8     | 2,958      | 113     | none                                                                                                                     |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.30s   | 210 tok/s  | 2.71            | 3.9     | 4,101      | 158     | none                                                                                                                     |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 26.70s  | 73.4 tok/s | 21.89           | 26      | 12,809     | 120     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 43.17s  | 86.9 tok/s | 38.66           | 23      | 16,566     | 144     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 42.92s  | 69.5 tok/s | 39.77           | 11      | 16,566     | 91      | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 41.44s  | 110 tok/s  | 36.94           | 25      | 16,579     | 130     | none                                                                                                                     |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 60.95s  | 30.2 tok/s | 53.65           | 21      | 16,579     | 133     | none                                                                                                                     |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected`          | 18.03s  | 60.0 tok/s | 13.86           | 14      | 16,577     | 127     | none                                                                                                                     |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.54s   | 103 tok/s  | 1.56            | 6.5     | 2,108      | 102     | none                                                                                                                     |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.08s   | 74.4 tok/s | 2.27            | 28      | 611        | 92      | none                                                                                                                     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 8.91s   | 31.4 tok/s | 1.46            | 17      | 610        | 145     | none                                                                                                                     |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.12s   | 62.7 tok/s | 0.93            | 7.6     | 615        | 118     | none                                                                                                                     |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 4.74s   | 124 tok/s  | 0.95            | 16      | 615        | 105     | none                                                                                                                     |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 3.79s   | 125 tok/s  | 0.74            | 6.0     | 611        | 108     | none                                                                                                                     |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 8.19s   | 159 tok/s  | 4.68            | 23      | 3,642      | 101     | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`             | 8.98s   | 78.8 tok/s | 5.55            | 8.7     | 6,372      | 121     | prompt hint repeated                                                                                                     |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.09s   | 213 tok/s  | 1.09            | 4.0     | 2,122      | 84      | prompt hint repeated                                                                                                     |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`             | 5.14s   | 73.0 tok/s | 1.37            | 8.2     | 1,562      | 141     | duplicate keywords                                                                                                       |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.50s   | 128 tok/s  | 1.09            | 5.6     | 1,446      | 128     | duplicate keywords; prompt hint repeated                                                                                 |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`             | 35.43s  | 52.9 tok/s | 20.42           | 92      | 3,506      | 118     | prompt hint repeated                                                                                                     |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.27s   | 181 tok/s  | 1.18            | 4.8     | 1,410      | 105     | prompt hint repeated                                                                                                     |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`             | 7.38s   | 40.1 tok/s | 2.29            | 16      | 3,152      | 115     | prompt hint repeated                                                                                                     |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`             | 4.57s   | 128 tok/s  | 2.11            | 5.4     | 4,229      | 125     | prompt hint repeated                                                                                                     |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `concerns detected`             | 7.23s   | 37.0 tok/s | 1.94            | 18      | 1,299      | 110     | prompt hint repeated                                                                                                     |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 4.17s   | 105 tok/s  | 1.48            | 7.4     | 1,843      | 93      | prompt hint repeated                                                                                                     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 2.87s   | 367 tok/s  | 1.10            | 2.2     | 353        | 44      | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: answer format` | 9.63s   | 31.8 tok/s | 2.87            | 13      | 3,164      | 144     | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 51.01s  | 25.0 tok/s | 7.50            | 25      | 4,418      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns: generation`    | 5.59s   | 59.0 tok/s | 0.80            | 9.3     | 1,151      | 200     | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 50.35s  | 124 tok/s  | 40.56           | 9.4     | 16,577     | 1,000   | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.04s   | 541 tok/s  | 0.87            | 1.1     | 1,225      | 36      | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 5.63s   | 98.1 tok/s | 0.82            | 7.2     | 609        | 261     | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: generation`    | 5.58s   | 150 tok/s  | 3.01            | 4.3     | 5,688      | 200     | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.41s   | 106 tok/s  | 1.48            | 6.7     | 2,211      | 19      | control tokens visible; labelled fields not detected                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.08s   | 372 tok/s  | 0.66            | 1.8     | 349        | 131     | labelled fields not detected                                                                                             |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 3.02s   | 171 tok/s  | 0.92            | 4.8     | 1,038      | 37      | labelled fields not detected; prompt hint repeated                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.11s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.07s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
-## Avoid for This Run
+## Major Mechanical Concerns in This Run
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Mechanical checks | Observations                                                                                      |
-|--------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; duplicate keywords                                                                 |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns`  | incomplete thinking block                                                                         |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | repeated text; cut off at token limit; duplicate keywords                                         |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected; duplicate keywords                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | repeated text; labelled fields not detected; cut off at token limit                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns`  | labelled fields not detected                                                                      |
+| Model                                                                                            | Mechanical checks               | Observations                                                                                                             |
+|--------------------------------------------------------------------------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                       | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                    | `major concerns: answer format` | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)  | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16) | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                          | `major concerns: generation`    | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)    | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                | `major concerns: answer format` | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)   | `major concerns: generation`    | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | `major concerns: answer format` | control tokens visible; labelled fields not detected                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                     | `major concerns: answer format` | labelled fields not detected                                                                                             |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                              | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -118,65 +112,62 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 | Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Harbor at Dusk \| Description: A serene harbor scene at sunset, with moored boats and a backdrop of a dramatic skyline. \| Keywords (10): Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflection                                                                                                                                                  |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | Title: UK Border Security Vessels at Sunset in Ramsgate Harbour \| Description: Two UK Border Security Command patrol vessels, the BSC Defender and BSC Volunteer... \| Keywords (19): UK Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, cliffside buildings, calm water, ...                                                                               |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Ramsgate Harbour Sunset with Patrol Boats \| Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol b... \| Keywords (16): Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, ...[1,912 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsga... \| Keywords (9): Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, Mooring, Maritime, ...                                                                               |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `no concerns detected` | Title: UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent. \| Description: The BSC Defender and BSC Volunteer, two UK Border Security Command patrol vessels... \| Keywords (11): uk border security command, patrol vessels, ramsgate harbour, kent, bsc defender, bsc volunteer, ...                                                                               |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Ramsgate Harbour Sunset with Patrol Boats \| Description: The image captures a serene sunset at Ramsgate Harbour, Kent, with several UK Border Security Comma... \| Keywords (19): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Sunset at Ramsgate Harbour \| Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside... \| Keywords (15): Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, ...                                                                               |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk \| Description: UK Border Security patrol boats, including the Defender and Volunteer,... \| Keywords (12): UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, ...[3,714 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Border security vessels docked in Ramsgate Harbour at sunset \| Description: Patrol boats moored side-by-side against a dramatic sunset, with the town'... \| Keywords (18): Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline, patrol boats, maritime, mooring, boats, ...                                                                               |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Ramsgate Harbour Patrol Boats at Sunset \| Description: Border security patrol vessels moored in Ramsgate Harbour, Kent, with dramatic sunset lighting reflec... \| Keywords (18): Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, ...                                                                               |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **BSC Patrol Vessels at Ramsgate Harbour Sunset** \| Description: A fleet of UK Border Security Command patrol boats, including the *BSC Defender* and *BSC... \| Keywords (16): Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, patrol boats, maritime fleet, ...                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Ramsgate Sunset: Border Patrol Boats at Dusk \| Description: At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *BSC Volun... \| Keywords (14): Border security patrol vessels, Ramsgate Harbour, Kent coast, sunset lighting, moored patrol boats, ...                                                                               |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Ramsgate Harbour Sunset: Border Security Vessels Moored \| Description: At dusk in Ramsgate Harbour, Kent, a row of Border Security Command patrol vessels, in... \| Keywords (24): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset \| Description: On a dramatic sunset, UK Border Security Command patrol vessels, including the BS... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: Border Security Patrol Vessels Moored in Ramsgate at Sunset \| Description: Multiple UK Border Security Command patrol boats, including the BSC Defender an... \| Keywords (18): Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Harbor, Port, Marina, Mooring, ...                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Ramsgate Harbour Sunset with Border Security Vessels \| Description: The sun sets over Ramsgate Harbour, with Border Security Command patrol vessels, includi... \| Keywords (19): Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dusk, England, Coast, Fleet, Maritime, ...                                                                               |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Border Security Command vessels moored in Ramsgate Harbour. \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC... \| Keywords (18): Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, Lifebuoy, Reflection, Buildings, ...                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Border Security Command Vessels at Ramsgate Harbour \| Description: At dusk on October 3, 2026, a fleet of Border Security Command patrol boats, including t... \| Keywords (21): Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, ...                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Border Security Boats at Sunset in Ramsgate Harbour \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, a... \| Keywords (16): Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Border Security Vessels at Ramsgate Sunset \| Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security... \| Keywords (16): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Maritime patrol, Dusk, Sunset, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: UK Border Security Command Vessels in Ramsgate Harbour \| Description: A fleet of Border Security Command patrol vessels, including the BSC Defender, is moored... \| Keywords (16): Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, BSC Volunteer, Sunset, ...                                                                                |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Border Security Command Patrols Kent's Ramsgate Harbour \| Description: At dusk, the UK Border Security Command's patrol vessels, including the BSC Defender a... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: Ramsgate Harbour: UK Border Security Vessels at Sunset \| Description: Captured on 3rd October 2026 at 18:18, UK Border Security Command patrol vessels, inclu... \| Keywords (19): Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Volunteer, harbour, marina, mooring, ...                                                                               |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Fishing vessels and town skyline at sunset in Ramsgate Harbour \| Description: Several fishing vessels are moored side-by-side in Ramsgate Harbour as a dramatic s... \| Keywords (18): Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, Sunset, Dusk, Coast, ...                                                                               |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Border Security Command patrol vessels moored at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC V... \| Keywords (15): Border security vessels, Kent, maritime, patrol boats, sunset, harbour, pier, reflection, England, dusk, boats, ...                                                                               |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: UK Border Security Command vessels in Ramsgate Harbour \| Description: UK Border Security Command patrol vessels, including the BSC Defender, are moored sid... \| Keywords (18): Border security vessels, buildings, coast, dusk, England, fleet, harbour, horizon, Kent, lifebuoy, marina, ...                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Border Security Vessels at Sunset" \| Description: "Two patrol boats from the UK Border Security Command are moored side-by-side in Ramsgate Harbour,... \| Keywords (16): Border security, patrol boats, UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, ...                                                                                |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | Title: Border Security Vessels at Sunset in Ramsgate Harbour \| Description: Border security patrol vessels, including the BSC Defender and BSC Volunteer, are moored... \| Keywords (23): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: BSC Patrol Vessels Moored at Ramsgate Harbour at Dusk \| Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, a... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Border Security Patrol Boats at Sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored i... \| Keywords (18): Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside buildings, Marina, Reflections, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: BSC Patrol Boats at Ramsgate Harbour Sunset \| Description: At 18:18 UTC+01:00 on October 3, 2026, UK Border Security Command patrol vessels, including th... \| Keywords (17): Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritime, Fleet, Coast, Buildings, Cliffside, ...                                                                               |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | Title: Ramsgate Harbour Sunset with Patrol Vessels \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moore... \| Keywords (19): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Border Security Command Patrol Vessels in Ramsgate Harbour \| Description: Border Security Command patrol vessels, including the BSC Defender and BSC Voluntee... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                               |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: UK Border Security vessels moored at Ramsgate Harbour at sunset \| Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC... \| Keywords (20): Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, ...                                                                                |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: UK Border Security Vessels Moored in Ramsgate Harbour at Sunset \| Description: Border Security Command patrol vessels, including the BSC Defender and Volunte... \| Keywords (16): Ramsgate, Kent, harbor, border security, patrol boats, vessels, sunset, dusk, maritime, marina, mooring, ...                                                                               |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | Title: Patrol Vessels Moored in Ramsgate Harbour at Sunset \| Description: UK Border Security Command patrol vessels are moored side-by-side in Ramsgate Harbour, set a... \| Keywords (15): Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Maritime, Mooring, Coast, Defenders, ...                                                                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer patrol vessels stand side-by-side against a breathtaking sunset, with the town's cliffside skyline softly illuminated by the fading light.                                                                                                                                                           |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset \| Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC pat... \| Keywords (55): Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, ...                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | Title: Ramsgate Harbour Sunset with Border Security Vessels \| Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security... \| Keywords (45): Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, ...                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | Title: Ramsgate Harbour Patrol Vessels at Sunset \| Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsg... \| Keywords (15): Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, ...                                                                               |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | Ramsgate Harbour Sunset: Border Security Vessels Moored<br><br>Border security patrol boats, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset. The scene captures the town's cliffside skyline and the reflective wat...                                                                                        |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (2): Need title 5-10 words., ...                                                                                                                                                                                                                                                                                     |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Border Security Command vessels in Ramsgate Harbour at sunset \| Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moo... \| Keywords (22): Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, ...                                                                               |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | Brokewater, BSC, Dusk, England, Marina, Port, Ramsgate, Reflection                                                                                                                                                                                                                                                                                                                    |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: Dusk at Ramsgate: Border Security Vessels \| Description: UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side... \| Keywords (390): UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, ...                                                                               |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | Title: (not detected) \| Description: A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate... \| Keywords (19): fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, ...                                                                               |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Ramsgate Harbour Patrol Boats at Dusk" \| Description: (not detected) \| Keywords (18): Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coast, Dover, Horizon, Lifebuoy, Marina, ...                                                                                                                                                                        |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a harbor with several boats docked in a row.                                                                                                                                                                                                                                                                                      |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, E... \| Description: (not detected) \| Keywords: (not detected)                                                                                                                                                                                                                                    |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | Ramsgate Harbour, Kent, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.                                                                                                                                                       |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: St. Peter Mancroft Church Tower \| Description: A Gothic-style church tower illuminated at twilight, with a Victorian lead flèche and a clear sky in the background. \| Keywords (15): Church tower, Gothic architecture, St. Peter Mancroft, Norwich, Norfolk, England, illuminated, spire, ...                                                                               |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: St Peter Mancroft Tower at Evening \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in... \| Keywords (16): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Spire, Twilight, Evening Light, Stone Masonry, ...                                                                               |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: St Peter Mancroft, Norwich, at Twilight \| Description: A low-angle, evening view of the medieval St Peter Mancroft church in Norwich, Norfolk, England... \| Keywords (35): St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, ...[1,626 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | Title: St Peter Mancroft Tower, Norwich \| Description: The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands illuminated in evening light, with pedes... \| Keywords (19): St Peter Mancroft, Norwich, England, Church Tower, Gothic Architecture, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight \| Description: The Church of St Peter Mancroft's Gothic tower is illuminated in the evening light, with pedestrians walking by in N... \| Keywords (18): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected` | Title: Evening view of St Peter Mancroft Church illuminated in Norwich \| Description: The image captures a serene evening scene featuring the illuminated bell tower o... \| Keywords (23): St Peter Mancroft, Gothic Architecture, Bell Tower, Church Tower, Perpendicular Gothic, Stone Masonry, ...                                                                               |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight \| Description: A low-angle view of St Peter Mancroft's medieval tower and Victorian stone facade illuminated by evening light, with... \| Keywords (19): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...[2,799 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | Title: Evening Illumination of St Peter Mancroft's Tower in Norwich \| Description: The medieval tower of St Peter Mancroft church in Norwich, England, is illumin... \| Keywords (11): Gothic architecture, historic landmark, stone masonry, medieval tower, St Peter Mancroft, Norwich, England, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Medieval Church Tower Illuminated at Twilight \| Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, wit... \| Keywords (18): Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, ...[1,098 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight in Norwich \| Description: A low-angle evening shot captures the illuminated Gothic stone tower of St Peter Mancrof... \| Keywords (15): St Peter Mancroft, Gothic Architecture, Church Tower, Stone Masonry, Spire, Victorian Flèche, Norwich, Norfolk, ...                                                                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **St Peter Mancroft Church Tower at Twilight, Norwich** \| Description: A low-angle evening photograph captures the medieval stone tower and Victorian lead sp... \| Keywords (16): St Peter Mancroft, Norwich, England, Gothic architecture, Perpendicular Gothic, stone tower, lead spire, ...                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: **St Peter Mancroft’s Gothic Tower in Norwich Twilight** \| Description: A towering medieval church spire in Norwich, Norfolk, stands illuminated under twiligh... \| Keywords (17): Church of St Peter Mancroft, Norwich, Norfolk, England, Gothic architecture, Stone masonry, Bell tower, ...                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: Medieval Tower of St Peter Mancroft \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in e... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight \| Description: The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands tall against... \| Keywords (18): Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Stone Masonry, Stone facade, Spire, ...                                                                               |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Church of St Peter Mancroft at twilight \| Description: The Church of St Peter Mancroft in Norwich, Norfolk, England, is captured at dusk, its stone facade illuminated by... \| Keywords (21): Church of St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, ...                                                                               |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight \| Description: The Gothic tower of St Peter Mancroft in Norwich glows in evening light, its stone facade and spire... \| Keywords (10): St Peter Mancroft, Norwich, Gothic Architecture, Tower, Twilight, Stone Masonry, Spire, Pedestrians, Clear Sky, ...                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: St Peter Mancroft Tower at Dusk \| Description: This low-angle view captures the Gothic Church of St Peter Mancroft in Norwich at twilight, its Victorian s... \| Keywords (18): St Peter Mancroft, Norwich, Norfolk, England, Gothic Architecture, Church Tower, Victorian Spire, Twilight, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Tower and Spire of St Peter Mancroft at Dusk in Norwich \| Description: A low-angle view of the medieval tower and Victorian lead spire of the Church of St Pe... \| Keywords (15): Archway, Church Tower, Clear Sky, England, Gothic Architecture, Golden Hour, Historic Landmark, Norwich, ...                                                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected` | Title: Norwich St Peter Mancroft Tower Twilight \| Description: A low-angle view captures the illuminated medieval tower and Victorian lead flèche of St Peter M... \| Keywords (22): Norwich, St Peter Mancroft, Church Tower, Perpendicular Gothic, Victorian lead flèche, medieval architecture, ...                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Medieval Tower Illuminated at Twilight \| Description: The Gothic architecture of St Peter Mancroft's bell tower, with its intricate stone masonry and Victor... \| Keywords (18): Medieval, Gothic, Stone, Victorian, Tower, Bell, Clock, Norwich, England, Historical, Landmark, Twilight, ...                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: The Gothic Tower of St Peter Mancroft in Norwich \| Description: A low-angle evening view of the illuminated medieval stone tower and spire of the St Peter Manc... \| Keywords (15): Norwich, Norfolk, England, St Peter Mancroft, Gothic Architecture, Church Tower, Spire, Stone Masonry, ...                                                                               |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: St Peter Mancroft Tower, Norwich – October Evening \| Description: Captured on 10 October 2026 at 18:09 UTC+01:00, this low-angle view shows the medieval tower and Vi... \| Keywords (18): St Peter Mancroft, Church Tower, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, ...                                                                               |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight \| Description: A low-angle view of the medieval bell tower and Victorian lead flèche of the Church of St Peter Ma... \| Keywords (17): St Peter Mancroft, Norwich, England, Church Tower, Bell Tower, Perpendicular Gothic, Gothic Architecture, ...                                                                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: St Peter Mancroft tower in evening light \| Description: A low-angle view shows the medieval stone tower and Victorian lead flèche of St Peter Mancroft illumi... \| Keywords (16): St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic architecture, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight in Norwich \| Description: A low-angle view captures the Gothic architecture of St Peter Mancroft Church's towe... \| Keywords (15): St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twilight, Perpendicular Gothic, Stone Facade, ...                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Pet... \| Keywords (12): Church Tower, Gothic Architecture, Historic Landmark, Norwich, England, Stone facade, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | Title: St Peter Mancroft Tower \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: St Peter Mancroft Tower, Norwich, England \| Description: A low-angle view of the medieval tower and Victorian lead flèche illuminated in evening light, wit... \| Keywords (13): Church Tower, Gothic Architecture, Historic Landmark, England, Norwich, Pedestrians, Spire, Stone Masonry, ...                                                                               |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight, Norwich \| Description: A low-angle view of the medieval tower and Victorian lead flèche of St Peter Mancroft Churc... \| Keywords (19): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Stone Masonry, Victorian Lead Flèche, Twilight, ...                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: St Peter Mancroft Church, Norwich, England \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminat... \| Keywords (21): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight, Norwich \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illumin... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: "Evening Illumination of Norwich's St Peter Mancroft" \| Description: A low-angle view captures the grandeur of the medieval tower and Victorian lead flèche... \| Keywords (10): Gothic Architecture, Historic Landmark, St Peter Mancroft, Stone Masonry, Spire, Twilight, United Kingdom, ...                                                                               |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | Title: St Peter Mancroft Tower in Evening Light \| Description: The medieval tower and Victorian lead flèche of St Peter Mancroft are illuminated in the evening light, with pe... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | Title: St Peter Mancroft Church Tower Illuminated at Twilight in Norwich, England \| Description: The medieval tower and Victorian lead flèche of the Church of St Peter Mancro... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight \| Description: The medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, Engla... \| Keywords (18): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Perpendicular Gothic, Bell Tower, Stone Masonry, ...                                                                               |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`    | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illu... \| Keywords (10): Church Tower, Gothic Architecture, Norwich, Pedestrians, Twilight, Stone Masonry, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | St Peter Mancroft Tower, Norwich: Gothic Stone Facade at Sunset<br><br>A low-angle view captures the medieval stone tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England. The structure's intricate Gothic architecture is illuminated by the warm glow...                                                                                        |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (1): We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1...                                                                                                                                                                                                  |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns`       | Title: Gothic Church Tower of St Peter Mancroft in Norwich \| Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with... \| Keywords (37): Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, ...                                                                               |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church... \| Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is il... \| Keywords: (not detected)                                                                               |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A low-angle view of the medieval church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                                                              |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | ```json<br>{<br>"caption": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK.",<br>"bounding_boxes": [<br>[<br>125,<br>0,<br>987,<br>1000<br>]<br>],<br>"keywords": [<br>"Archway",...                                                          |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow" \| Description: (not detected) \| Keywords (48): Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, ...                                                                                                                                                 |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a large church tower with a spire and a pointed roof.                                                                                                                                                                                                                                                                             |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: A Gothic Architecture Snapshot of the Church of St Peter Mancroft Illuminated... \| Description: A detailed view of the medieval church of St Peter Mancroft, illuminated by the twilight, with a low-angle view of the church and its bell tower. The image capt... \| Keywords: (not detected)                                                                               |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.4`
-- `mlx`: `0.32.4.dev20261004+65be04707`
-- `transformers`: `5.18.0`
-- `tokenizers`: `0.23.2`
-- `huggingface-hub`: `1.33.0`
+- `mlx-vlm`: `0.7.7`
+- `mlx`: `0.32.4.dev20261010+06eb7483f`
+- `transformers`: `5.19.0`
+- `tokenizers`: `0.23.3`
+- `huggingface-hub`: `2.2.0`
 - *Python Version:* 3.14.7
 - *OS:* Darwin 27.0.0
 - *macOS Version:* 27.0.1
@@ -189,19 +180,23 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Image Metadata
 
-- *Description:* UK Border Security Command patrol vessels, including the BSC
-  Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour,
-  Kent, against a dramatic sunset and the town's cliffside skyline.
-- *Keywords:* Border security vessels, Buildings, Coast, Dover, Dusk, England,
-  Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol
-  boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sea, Ships, Sky,
-  Sunset, Twilight, Vessel, Water reflection, Waterfront, architecture, boat,
-  border security, calm water, chalk cliff, cliffs, coastal, coastal town,
-  coastline, cutter, dawn, docked, english channel, evening, golden hour,
-  marine, moored, nautical, ocean, patrol, radar, scenic, seaside, security,
-  sunrise, townscape, transportation, united kingdom, water
-- *Date:* 2026-10-03 18:18:19 UTC+01:00
-- *Time:* 18:18:19
+- *Description:* A low-angle view of the medieval tower and Victorian lead
+  flèche of the Church of St Peter Mancroft illuminated in evening light, with
+  pedestrians walking along the street below in Norwich, Norfolk, England.
+- *Keywords:* Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic
+  Architecture, Historic Landmark, Historic architecture, Landmark, Norwich,
+  Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry,
+  Stone facade, Trees, Twilight, United Kingdom, Walking, ancient,
+  architectural heritage, architecture, belfry, british architecture, carved
+  stone, cathedral, christianity, church, city, dusk, evening, evening light,
+  exterior, facade, great britain, heritage, historic building, history,
+  illuminated, lantern spire, medieval, medieval architecture, nightfall,
+  norfolk, pinnacles, place of worship, religion, religious building, stone
+  tower, street scene, tourism, tower, travel destination, urban landmark,
+  warm lighting
+- *Date:* 2026-10-10 18:09:17 UTC+01:00
+- *Time:* 18:09:17
+- *GPS:* 52.628000°N, 1.293600°E
 
 ## Prompt
 
@@ -217,15 +212,18 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+> &#45; Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+> &#45; GPS: 52.628000°N, 1.293600°E
 >
 > &#8203;Descriptive hints:
-> &#45; Description hint: UK Border Security Command patrol vessels, including the
-> BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate
-> Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-> &#45; Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk,
-> England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring,
-> Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+> &#45; Description hint: A low-angle view of the medieval tower and Victorian
+> lead flèche of the Church of St Peter Mancroft illuminated in evening light,
+> with pedestrians walking along the street below in Norwich, Norfolk,
+> England.
+> &#45; Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England,
+> Gothic Architecture, Historic Landmark, Historic architecture, Landmark,
+> Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone
+> Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -258,16 +256,16 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.38s
-- *Generation time:* 0.79s
-- *Total time:* 2.11s
-- *Prompt preparation time:* 0.545
-- *First-token latency:* 0.129
-- *Cleanup time:* 0.0663
-- *Prompt tokens:* 2,103
-- *Generation tokens:* 58
-- *Total tokens:* 2,161
-- *Prompt throughput (raw):* 16,241 tok/s
+- *Model load time:* 0.36s
+- *Generation time:* 0.81s
+- *Total time:* 2.07s
+- *Prompt preparation time:* 0.52
+- *First-token latency:* 0.126
+- *Cleanup time:* 0.071
+- *Prompt tokens:* 2,131
+- *Generation tokens:* 83
+- *Total tokens:* 2,214
+- *Prompt throughput (raw):* 16,960 tok/s
 - *Generation throughput (raw):* 481 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
@@ -277,7 +275,7 @@ Complete generated or crash evidence for every attempted model.
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 1464
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -292,25 +290,25 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-Harbor at Dusk
+St. Peter Mancroft Church Tower
 
 Description:
-A serene harbor scene at sunset, with moored boats and a backdrop of a dramatic skyline.
+A Gothic-style church tower illuminated at twilight, with a Victorian lead flèche and a clear sky in the background.
 
 Keywords:
-Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflection
+Church tower, Gothic architecture, St. Peter Mancroft, Norwich, Norfolk, England, illuminated, spire, historical landmark, historic architecture, London, twilight, pedestrian, street, trees
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+<a id="model-technobaptist-ternary-bonsai-2-27b-mlx-2bit"></a>
 
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+### TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit
 
 <details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+<summary>Complete evidence: TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -318,47 +316,45 @@ Harbor, sunset, boats, skyline, Dover, Dusk, England, maritime, coastal, reflect
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.06s
-- *Generation time:* 7.62s
-- *Total time:* 10.27s
-- *Prompt preparation time:* 0.578
-- *First-token latency:* 2.92
-- *Cleanup time:* 0.0909
-- *Prompt tokens:* 2,372
+- *Arch supported by installed mlx-vlm:* yes (model_type
+  prism_hadamard_qwen35)
+- *Model load time:* 1.19s
+- *Generation time:* 67.73s
+- *Total time:* 69.83s
+- *Prompt preparation time:* 0.894
+- *First-token latency:* 63.4
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 16,579
 - *Generation tokens:* 123
-- *Total tokens:* 2,495
-- *Prompt throughput (raw):* 814 tok/s
-- *Generation throughput (raw):* 30.0 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000396
+- *Total tokens:* 16,702
+- *Prompt throughput (raw):* 261 tok/s
+- *Generation throughput (raw):* 36.3 tok/s
+- *Peak memory (GB):* 17
+- *Active memory (GB):* 8.6
+- *Cache memory (GB):* 3.3
+- *Model-load active memory (GB):* 8.6
+- *Post-cleanup active memory (GB):* 0.00113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 1504
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved model revision:* 498775b03b55d038f716fea2568bf6ae6b8e0b5e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--TechnoBaptist--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/498775b03b55d038f716fea2568bf6ae6b8e0b5e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.15, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-UK Border Security Vessels at Sunset in Ramsgate Harbour
+Title: St Peter Mancroft Tower at Evening
 
-Description:
-Two UK Border Security Command patrol vessels, the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, with the town's cliffside buildings and a dramatic sunset reflected in the calm water.
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, illuminated by warm evening light against a clear twilight sky. Pedestrians walk along the street below, with trees and a black iron fence in the foreground.
 
-Keywords:
-UK Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, cliffside buildings, calm water, reflection, moored boats, maritime, coastal town, dusk, horizon, maritime security, harbor, patrol boats, lifebuoys, marina, port
+Keywords: St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Spire, Twilight, Evening Light, Stone Masonry, Pedestrians, Trees, Iron Fence, Historic Landmark, England, United Kingdom, Clear Sky, Perpendicular Gothic
 </pre>
 
 </details>
@@ -379,26 +375,26 @@ UK Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, clif
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.59s
-- *Generation time:* 6.25s
-- *Total time:* 8.50s
-- *Prompt preparation time:* 0.647
-- *First-token latency:* 0.692
-- *Cleanup time:* 0.0961
-- *Prompt tokens:* 1,617
+- *Model load time:* 1.61s
+- *Generation time:* 6.22s
+- *Total time:* 8.48s
+- *Prompt preparation time:* 0.641
+- *First-token latency:* 0.705
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 1,656
 - *Generation tokens:* 617
-- *Total tokens:* 2,234
-- *Prompt throughput (raw):* 2,336 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Total tokens:* 2,273
+- *Prompt throughput (raw):* 2,350 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000609
+- *Post-cleanup active memory (GB):* 0.00135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1488
+- *Rendered prompt characters:* 1603
 - *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
@@ -413,52 +409,44 @@ UK Border Security Command, patrol vessels, Ramsgate Harbour, Kent, sunset, clif
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get to work. I'm looking at this image of a port at sunset, and my task is to create metadata for it, specifically in British English. I need to start with the title. Hmm, a 5-10 word title. I'm thinking "Ramsgate Harbour Sunset with Patrol Boats" – that's good. It's descriptive, and it hits the key elements.
+Alright, let's get this done. I need to create metadata for this image, a classic church tower scene. First things first: the title. Gotta keep it concise and informative. "St Peter Mancroft, Norwich, at Twilight" – perfect.
 
-Now for the description. I'll need to combine the image with the hints provided. The prompt wants the main subject, setting, action, lighting, and details. Okay, the main subject is the Border Security Command patrol boats, moored in Ramsgate Harbour. The setting is the port with the cliffside skyline. The lighting is the golden hour sunset. The distinctive details are the sunset, the cliffside, and the presence of the Border Security Command vessels. I think the following will be good: "A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky."
+Now for the description. I'm going to pull from the hints and the image itself. The church is St Peter Mancroft, a 14th-century Norman-Gothic structure, and it's illuminated. The architectural details are key – the Perpendicular Gothic, the stone, the spire, the tower, the archways. It's evening, twilight, and the city's bustling with pedestrians. The hints mention a Victorian flèche, and that's something I'll definitely include.
 
-Finally, keywords. I need 10 to 18 unique keywords. I'll start with the obvious: Ramsgate, Kent, England, Dover, sunset, dusk, harbor, marina, boats, patrol boats, border security, cliffside, skyline, port, lifeboat, reflection, and coast. That's a good start. Let's refine. I'll add "Dover Strait" for context. I'll also include "UK Border Force" as it's the modern name for the Border Security Command. And "Sea" is a good addition.
+Okay, let's put it together. "A low-angle, evening view of St Peter Mancroft church in Norwich, Norfolk, England. The medieval tower is illuminated, with pedestrians below and a clear, twilight sky." That's it, a solid description.
 
-Okay, I think I've got it.
+Finally, keywords. I need to be comprehensive. The title, description, and hints are my guide. Let's see: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cathedral, cityscape, urban. That should cover everything.
 
-Title: Ramsgate Harbour Sunset with Patrol Boats
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
-
-That should cover everything.
+Okay, let's double-check. Title is good. Description is accurate and evocative. Keywords are relevant. Everything matches the image and hints. I'm satisfied.
 &lt;/think&gt;
 
-Title: Ramsgate Harbour Sunset with Patrol Boats
+Title: St Peter Mancroft, Norwich, at Twilight
 
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
+Description: A low-angle, evening view of the medieval St Peter Mancroft church in Norwich, Norfolk, England. The stone tower and spire are illuminated, with pedestrians walking on the street below under a clear, twilight sky.
 
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
+Keywords: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cityscape, urban
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Alright, let's get to work. I'm looking at this image of a port at sunset, and my task is to create metadata for it, specifically in British English. I need to start with the title. Hmm, a 5-10 word title. I'm thinking "Ramsgate Harbour Sunset with Patrol Boats" – that's good. It's descriptive, and it hits the key elements.
+Alright, let's get this done. I need to create metadata for this image, a classic church tower scene. First things first: the title. Gotta keep it concise and informative. "St Peter Mancroft, Norwich, at Twilight" – perfect.
 
-Now for the description. I'll need to combine the image with the hints provided. The prompt wants the main subject, setting, action, lighting, and details. Okay, the main subject is the Border Security Command patrol boats, moored in Ramsgate Harbour. The setting is the port with the cliffside skyline. The lighting is the golden hour sunset. The distinctive details are the sunset, the cliffside, and the presence of the Border Security Command vessels. I think the following will be good: "A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky."
+Now for the description. I'm going to pull from the hints and the image itself. The church is St Peter Mancroft, a 14th-century Norman-Gothic structure, and it's illuminated. The architectural details are key – the Perpendicular Gothic, the stone, the spire, the tower, the archways. It's evening, twilight, and the city's bustling with pedestrians. The hints mention a Victorian flèche, and that's something I'll definitely include.
 
-Finally, keywords. I need 10 to 18 unique keywords. I'll start with the obvious: Ramsgate, Kent, England, Dover, sunset, dusk, harbor, marina, boats, patrol boats, border security, cliffside, skyline, port, lifeboat, reflection, and coast. That's a good start. Let's refine. I'll add "Dover Strait" for context. I'll also include "UK Border Force" as it's the modern name for the Border Security Command. And "Sea" is a good addition.
+Okay, let's put it together. "A low-angle, evening view of St Peter Mancroft church in Norwich, Norfolk, England. The medieval tower is illuminated, with pedestrians below and a clear, twilight sky." That's it, a solid description.
 
-Okay, I think I've got it.
+Finally, keywords. I need to be comprehensive. The title, description, and hints are my guide. Let's see: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cathedral, cityscape, urban. That should cover everything.
 
-Title: Ramsgate Harbour Sunset with Patrol Boats
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
-
-That should cover everything.
+Okay, let's double-check. Title is good. Description is accurate and evocative. Keywords are relevant. Everything matches the image and hints. I'm satisfied.
 </think>
 
-Title: Ramsgate Harbour Sunset with Patrol Boats
+Title: St Peter Mancroft, Norwich, at Twilight
 
-Description: A dramatic sunset scene at Ramsgate Harbour in Kent, with UK Border Security Command patrol boats moored in the water and the town's cliffside skyline silhouetted against the sky.
+Description: A low-angle, evening view of the medieval St Peter Mancroft church in Norwich, Norfolk, England. The stone tower and spire are illuminated, with pedestrians walking on the street below under a clear, twilight sky.
 
-Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol boats, Border Security Command, Cliffside, Skyline, Port, Coast, Lifeboat, Reflection
+Keywords: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cityscape, urban
 ```
 
 </details>
@@ -467,12 +455,12 @@ Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol b
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-4bit"></a>
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
 
-### mlx-community/GLM-4.6V-Flash-4bit
+### mlx-community/GLM-4.6V-nvfp4
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -480,33 +468,33 @@ Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol b
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.19s
-- *Generation time:* 6.76s
-- *Total time:* 8.58s
-- *Prompt preparation time:* 0.614
-- *First-token latency:* 5.08
-- *Cleanup time:* 0.0841
-- *Prompt tokens:* 6,339
-- *Generation tokens:* 89
-- *Total tokens:* 6,428
-- *Prompt throughput (raw):* 1,249 tok/s
-- *Generation throughput (raw):* 78.7 tok/s
-- *Peak memory (GB):* 8.7
-- *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.00123
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Model load time:* 6.23s
+- *Generation time:* 13.99s
+- *Total time:* 20.78s
+- *Prompt preparation time:* 0.554
+- *First-token latency:* 10.5
+- *Cleanup time:* 0.227
+- *Prompt tokens:* 6,372
+- *Generation tokens:* 112
+- *Total tokens:* 6,484
+- *Prompt throughput (raw):* 606 tok/s
+- *Generation throughput (raw):* 45.0 tok/s
+- *Peak memory (GB):* 78
+- *Active memory (GB):* 62
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 61.9
+- *Post-cleanup active memory (GB):* 0.00228
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1379
+- *Rendered prompt characters:* 1494
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
 - *EOS token:* <\|endoftext\|>
@@ -514,67 +502,9 @@ Keywords: Ramsgate, Kent, England, Dover, Sunset, Dusk, Harbor, Marina, Patrol b
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Patrol Boats at Sunset
-Description: UK Border Security Command patrol vessels, including BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, during a dramatic sunset with the town's cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate Harbour, Kent, Patrol boat, Sunset, Cliffside skyline, Mooring, Maritime, UK Border Security Command
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.87s
-- *Generation time:* 5.62s
-- *Total time:* 8.30s
-- *Prompt preparation time:* 0.801
-- *First-token latency:* 1.07
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 2,601
-- *Generation tokens:* 130
-- *Total tokens:* 2,731
-- *Prompt throughput (raw):* 2,430 tok/s
-- *Generation throughput (raw):* 34.3 tok/s
-- *Peak memory (GB):* 18
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.43
-- *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.0018
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1335
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent.
-
-Description: The BSC Defender and BSC Volunteer, two UK Border Security Command patrol vessels, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The vessels are equipped with lifebuoys and are part of the maritime security fleet that patrols the English coast.
-
-Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bsc defender, bsc volunteer, cliffside skyline, sunset, maritime security fleet, english coast, lifebuoys.
+Title: St Peter Mancroft Tower, Norwich
+Description: The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands illuminated in evening light, with pedestrians walking below and a clear sky overhead.
+Keywords: St Peter Mancroft, Norwich, England, Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Stone Facade, Evening Light, Pedestrians, Clear Sky, United Kingdom, Walking, Archway, Historic Architecture, Spire, Stone Masonry, Trees, Twilight
 </pre>
 
 </details>
@@ -595,26 +525,26 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.23s
-- *Generation time:* 4.07s
-- *Total time:* 6.01s
-- *Prompt preparation time:* 0.711
-- *First-token latency:* 1.4
+- *Model load time:* 1.11s
+- *Generation time:* 3.69s
+- *Total time:* 5.44s
+- *Prompt preparation time:* 0.635
+- *First-token latency:* 1.37
 - *Cleanup time:* 0.101
-- *Prompt tokens:* 2,091
-- *Generation tokens:* 113
-- *Total tokens:* 2,204
-- *Prompt throughput (raw):* 1,495 tok/s
-- *Generation throughput (raw):* 57.2 tok/s
+- *Prompt tokens:* 2,132
+- *Generation tokens:* 98
+- *Total tokens:* 2,230
+- *Prompt throughput (raw):* 1,555 tok/s
+- *Generation throughput (raw):* 57.4 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.00212
+- *Post-cleanup active memory (GB):* 0.00259
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1303
+- *Rendered prompt characters:* 1418
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -629,25 +559,25 @@ Keywords: uk border security command, patrol vessels, ramsgate harbour, kent, bs
 
 <pre class="model-output-readable">
 Title:
-Ramsgate Harbour Sunset with Patrol Boats
+St Peter Mancroft Tower at Twilight
 
 Description:
-The image captures a serene sunset at Ramsgate Harbour, Kent, with several UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, moored side-by-side against the backdrop of the town's cliffside skyline.
+The Church of St Peter Mancroft's Gothic tower is illuminated in the evening light, with pedestrians walking by in Norwich, England.
 
 Keywords:
-Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
+<a id="model-mlx-community-internvl35-1b-4bit"></a>
 
-### mlx-community/InternVL3-8B-bf16
+### mlx-community/InternVL3_5-1B-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
+<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -655,33 +585,32 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.59s
-- *Generation time:* 3.64s
-- *Total time:* 5.95s
-- *Prompt preparation time:* 0.706
-- *First-token latency:* 0.805
-- *Cleanup time:* 0.0975
-- *Prompt tokens:* 2,091
-- *Generation tokens:* 80
-- *Total tokens:* 2,171
-- *Prompt throughput (raw):* 2,596 tok/s
-- *Generation throughput (raw):* 37.3 tok/s
-- *Peak memory (GB):* 17
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 0.17
-- *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00243
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
+- *Model load time:* 0.50s
+- *Generation time:* 1.13s
+- *Total time:* 2.26s
+- *Prompt preparation time:* 0.625
+- *First-token latency:* 0.223
+- *Cleanup time:* 0.0838
+- *Prompt tokens:* 2,135
+- *Generation tokens:* 126
+- *Total tokens:* 2,261
+- *Prompt throughput (raw):* 9,567 tok/s
+- *Generation throughput (raw):* 421 tok/s
+- *Peak memory (GB):* 2.1
+- *Active memory (GB):* 1.1
+- *Cache memory (GB):* 0.29
+- *Model-load active memory (GB):* 1.08
+- *Post-cleanup active memory (GB):* 0.0029
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1303
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
+- *Rendered prompt characters:* 1456
+- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -689,9 +618,11 @@ Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sunset at Ramsgate Harbour
-Description: Border security patrol vessels are moored in Ramsgate Harbour against a dramatic sunset, with the town's cliffside skyline in the background.
-Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patrol boats, Marina, Mooring, Horizon, Lifebuoy, Reflection, Coast, Fleet, Buildings
+Title: Evening view of St Peter Mancroft Church illuminated in Norwich
+
+Description: The image captures a serene evening scene featuring the illuminated bell tower of St Peter Mancroft, with pedestrians walking along a street, surrounded by trees and under a clear sky.
+
+Keywords: St Peter Mancroft, Gothic Architecture, Bell Tower, Church Tower, Perpendicular Gothic, Stone Masonry, Historic Landmark, Norwich, Pedestrians, Clear Sky, Evening Light, Stone Facade, Tree, Walking, UK, Historic architecture, Spire, United Kingdom, Bell, Perpendicular, Time, Location, England
 </pre>
 
 </details>
@@ -712,26 +643,26 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.12s
-- *Generation time:* 16.68s
-- *Total time:* 19.45s
-- *Prompt preparation time:* 0.638
-- *First-token latency:* 0.666
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 1,312
-- *Generation tokens:* 995
-- *Total tokens:* 2,307
-- *Prompt throughput (raw):* 1,970 tok/s
-- *Generation throughput (raw):* 65.0 tok/s
+- *Model load time:* 2.18s
+- *Generation time:* 12.57s
+- *Total time:* 15.34s
+- *Prompt preparation time:* 0.577
+- *First-token latency:* 0.667
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 1,342
+- *Generation tokens:* 750
+- *Total tokens:* 2,092
+- *Prompt throughput (raw):* 2,013 tok/s
+- *Generation throughput (raw):* 66.6 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
-- *Cache memory (GB):* 1.6
+- *Cache memory (GB):* 1.3
 - *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00339
+- *Post-cleanup active memory (GB):* 0.00356
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1485
+- *Rendered prompt characters:* 1600
 - *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -744,30 +675,34 @@ Keywords: Border security vessels, Ramsgate, Kent, Dusk, England, Maritime, Patr
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are: UK Border Security Command patrol vessels (Defender and Volunteer) moored in Ramsgate Harbour, Kent, during dusk, with the town's cliffside buildings and sunset. The image shows several boats docked, a harbor scene at dusk, with buildings in the background. The capture date/time is 2026-10-03 18:18:19 UTC+01:00.
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-10-10 18:09:17 UTC+01:00) and GPS coordinates (52.628000°N, 1.293600°E), which are authoritative. The descriptive hints mention a low-angle view of St Peter Mancroft Church's tower, Victorian lead flèche, illuminated in evening light, pedestrians below in Norwich, Norfolk, England. The keywords include Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
 
-For the title, I need a 5-10 word title that captures the main elements. Maybe something like "UK Border Patrol Vessels Moored at Ramsgate Harbour, Kent, at Dusk". That's concise and includes the key elements.
+First, the title needs to be a concrete 5-10 words. The main subject is the church tower, so something like "St Peter Mancroft Church Tower at Twilight" works.
 
-Next, the description. It needs to be 1-2 sentences, combining context, subject, setting, action, lighting, and details. The vessels are moored, sunset, town skyline. So: "UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings in the background."
+For the description, combine the context: "A low-angle view of St Peter Mancroft's medieval tower and Victorian lead flèche illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England." That includes time, location, main elements, lighting, and action.
 
-For keywords, list 10-18 unique ones. From the hints: Border security vessels, Buildings, Coast, Dover (though it's Ramsgate, maybe 'Harbor' is better), Dusk, England, Fleet, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Wait, Dover is mentioned in hints but the image is Ramsgate. Should I include Dover? The context says Ramsgate, but the keyword hints have Dover. Maybe check the image. The image shows Ramsgate, so maybe correct that. So replace Dover with Ramsgate. Also, check for other elements: "Lifebuoy" is in hints but not visible. Maybe include "Harbor" instead. "Maritime" is there, "Fleet" maybe "Fleet of boats" but not sure. Let's list the visible elements: Border security vessels, Buildings, Coast, Dusk, England, Marina, Patrol boat, Patrol boats, Harbor, Ramsgate, Reflection, Port, Sunset, Town skyline. That's 12 keywords. Need to check if they are all visible. The boats are patrol boats, so "Patrol boat" and "Patrol boats" are there. Buildings are visible in the background. Harbor and Port are the same. So maybe consolidate to avoid duplicates. Maybe "Harbor, Ramsgate, Dusk, UK Border Security vessels, Patrol boats, Maritime, Reflection, Town skyline, England, Coast, Marina". That's 10. Wait, "England" is implied by Kent, but maybe include. Let's check the hints: the keywords include England, so include. So final keywords: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England (wait, no, England is already there. Maybe "England" is redundant. Let me check the hints again. The hints have England, so include. So maybe: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England. Wait, England is already mentioned. Hmm. Maybe "UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England". But that's two England. Maybe just "England" once. Alternatively, check if "UK Border Security" is better. Let's see the context says "UK Border Security Command patrol vessels", so "UK Border Security vessels" is good. So keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection. That's 10 unique. Maybe add "Fleet" if visible. The image has a fleet of boats, so "Fleet" could be added. So: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet. That's 11. That works.◁/think▷Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk
-Description: UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings and coastal backdrop.
-Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet
+For keywords, list 10-18 unique ones. Let's pick the ones from the hints that are visible or confirmed: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18 keywords.
+
+Check if any hints conflict. The original hints mention "Victorian lead flèche" but the image shows the tower, not the flèche. So maybe exclude flèche. Also, the GPS and date/time are authoritative but not visible, so omit them in the metadata. The description and keywords should focus on what's visible. The image shows a low-angle view, so "low-angle" might be a detail to include. Wait, the user said to retain details supported by the image, correct conflicts, and add important visible details. The original hints have "Victorian lead flèche" but the image might not show the flèche clearly. The tower is Victorian, so maybe include that. Let me adjust the keywords to include Victorian if visible. The stone masonry and facade are visible. Also, "Twilight" from the hints. So finalizing the keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18. The title and description should reflect the visible elements.◁/think▷Title: St Peter Mancroft Tower at Twilight
+Description: A low-angle view of St Peter Mancroft's medieval tower and Victorian stone facade illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are: UK Border Security Command patrol vessels (Defender and Volunteer) moored in Ramsgate Harbour, Kent, during dusk, with the town's cliffside buildings and sunset. The image shows several boats docked, a harbor scene at dusk, with buildings in the background. The capture date/time is 2026-10-03 18:18:19 UTC+01:00. 
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-10-10 18:09:17 UTC+01:00) and GPS coordinates (52.628000°N, 1.293600°E), which are authoritative. The descriptive hints mention a low-angle view of St Peter Mancroft Church's tower, Victorian lead flèche, illuminated in evening light, pedestrians below in Norwich, Norfolk, England. The keywords include Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
 
-For the title, I need a 5-10 word title that captures the main elements. Maybe something like "UK Border Patrol Vessels Moored at Ramsgate Harbour, Kent, at Dusk". That's concise and includes the key elements.
+First, the title needs to be a concrete 5-10 words. The main subject is the church tower, so something like "St Peter Mancroft Church Tower at Twilight" works. 
 
-Next, the description. It needs to be 1-2 sentences, combining context, subject, setting, action, lighting, and details. The vessels are moored, sunset, town skyline. So: "UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings in the background."
+For the description, combine the context: "A low-angle view of St Peter Mancroft's medieval tower and Victorian lead flèche illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England." That includes time, location, main elements, lighting, and action.
 
-For keywords, list 10-18 unique ones. From the hints: Border security vessels, Buildings, Coast, Dover (though it's Ramsgate, maybe 'Harbor' is better), Dusk, England, Fleet, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Wait, Dover is mentioned in hints but the image is Ramsgate. Should I include Dover? The context says Ramsgate, but the keyword hints have Dover. Maybe check the image. The image shows Ramsgate, so maybe correct that. So replace Dover with Ramsgate. Also, check for other elements: "Lifebuoy" is in hints but not visible. Maybe include "Harbor" instead. "Maritime" is there, "Fleet" maybe "Fleet of boats" but not sure. Let's list the visible elements: Border security vessels, Buildings, Coast, Dusk, England, Marina, Patrol boat, Patrol boats, Harbor, Ramsgate, Reflection, Port, Sunset, Town skyline. That's 12 keywords. Need to check if they are all visible. The boats are patrol boats, so "Patrol boat" and "Patrol boats" are there. Buildings are visible in the background. Harbor and Port are the same. So maybe consolidate to avoid duplicates. Maybe "Harbor, Ramsgate, Dusk, UK Border Security vessels, Patrol boats, Maritime, Reflection, Town skyline, England, Coast, Marina". That's 10. Wait, "England" is implied by Kent, but maybe include. Let's check the hints: the keywords include England, so include. So final keywords: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England (wait, no, England is already there. Maybe "England" is redundant. Let me check the hints again. The hints have England, so include. So maybe: Border security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England. Wait, England is already mentioned. Hmm. Maybe "UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, England". But that's two England. Maybe just "England" once. Alternatively, check if "UK Border Security" is better. Let's see the context says "UK Border Security Command patrol vessels", so "UK Border Security vessels" is good. So keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection. That's 10 unique. Maybe add "Fleet" if visible. The image has a fleet of boats, so "Fleet" could be added. So: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet. That's 11. That works.◁/think▷Title: UK Border Security Vessels Moored at Ramsgate Harbour, Kent, at Dusk  
-Description: UK Border Security patrol boats, including the Defender and Volunteer, are moored in Ramsgate Harbour, Kent, during a vibrant sunset with the town's cliffside buildings and coastal backdrop.  
-Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbor, Marina, Dusk, Town skyline, Coast, England, Reflection, Fleet
+For keywords, list 10-18 unique ones. Let's pick the ones from the hints that are visible or confirmed: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18 keywords.
+
+Check if any hints conflict. The original hints mention "Victorian lead flèche" but the image shows the tower, not the flèche. So maybe exclude flèche. Also, the GPS and date/time are authoritative but not visible, so omit them in the metadata. The description and keywords should focus on what's visible. The image shows a low-angle view, so "low-angle" might be a detail to include. Wait, the user said to retain details supported by the image, correct conflicts, and add important visible details. The original hints have "Victorian lead flèche" but the image might not show the flèche clearly. The tower is Victorian, so maybe include that. Let me adjust the keywords to include Victorian if visible. The stone masonry and facade are visible. Also, "Twilight" from the hints. So finalizing the keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18. The title and description should reflect the visible elements.◁/think▷Title: St Peter Mancroft Tower at Twilight  
+Description: A low-angle view of St Peter Mancroft's medieval tower and Victorian stone facade illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England.  
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 ```
 
 </details>
@@ -776,12 +711,12 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
 
 ---
 
-<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
-### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -789,44 +724,151 @@ Keywords: UK Border Security vessels, Patrol boat, Patrol boats, Ramsgate, Harbo
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.96s
-- *Generation time:* 1.62s
-- *Total time:* 3.34s
-- *Prompt preparation time:* 0.74
-- *First-token latency:* 0.468
-- *Cleanup time:* 0.088
-- *Prompt tokens:* 2,094
-- *Generation tokens:* 91
-- *Total tokens:* 2,185
-- *Prompt throughput (raw):* 4,474 tok/s
-- *Generation throughput (raw):* 210 tok/s
-- *Peak memory (GB):* 4.0
-- *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 2.82
-- *Post-cleanup active memory (GB):* 0.00366
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.54s
+- *Generation time:* 6.63s
+- *Total time:* 8.74s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 1.52
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 320
+- *Generation tokens:* 101
+- *Total tokens:* 421
+- *Prompt throughput (raw):* 211 tok/s
+- *Generation throughput (raw):* 22.0 tok/s
+- *Peak memory (GB):* 15
+- *Active memory (GB):* 11
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 11.4
+- *Post-cleanup active memory (GB):* 0.00434
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 1517
 - *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Evening Illumination of St Peter Mancroft's Tower in Norwich
+Description: The medieval tower of St Peter Mancroft church in Norwich, England, is illuminated in the evening, with a clear sky and pedestrians walking below. The tower's Gothic architecture and stone masonry are prominently featured.
+Keywords: Gothic architecture, historic landmark, stone masonry, medieval tower, St Peter Mancroft, Norwich, England, evening illumination, clear sky, pedestrians, church tower.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.84s
+- *Generation time:* 1.97s
+- *Total time:* 3.49s
+- *Prompt preparation time:* 0.667
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.0902
+- *Prompt tokens:* 950
+- *Generation tokens:* 333
+- *Total tokens:* 1,283
+- *Prompt throughput (raw):* 4,064 tok/s
+- *Generation throughput (raw):* 304 tok/s
+- *Peak memory (GB):* 3.2
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00485
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1481
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border security vessels docked in Ramsgate Harbour at sunset
-Description: Patrol boats moored side-by-side against a dramatic sunset, with the town's cliffside skyline in the background.
-Keywords: Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline, patrol boats, maritime, mooring, boats, England, Dover, Dusk, Coast, Lifebuoy, Marina, Fleet, Port
+&lt;think&gt;
+Here's a breakdown of the required sections:
+
+Title: I need a 5-10 word title that captures the image. Based on the context, it should mention the church tower and the evening light.
+
+Description: I need a 1-2 sentence factual description combining the main subject, setting, action, lighting, and distinctive details. I'll use the context and descriptive hints.
+
+Keywords: I need 10-18 unique keywords covering relevant context and visible details. I'll list them, ensuring they cover Gothic Architecture, Church Tower, evening light, pedestrians, etc.
+
+Let's construct:
+
+Title: Medieval Church Tower Illuminated at Twilight
+
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway.
+
+Now, check the word count: Title is 5-10 words, description is 1-2 sentences, keywords are 10-18 unique.
+&lt;/think&gt;
+
+Title: Medieval Church Tower Illuminated at Twilight
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+Here's a breakdown of the required sections:
+
+Title: I need a 5-10 word title that captures the image. Based on the context, it should mention the church tower and the evening light.
+
+Description: I need a 1-2 sentence factual description combining the main subject, setting, action, lighting, and distinctive details. I'll use the context and descriptive hints.
+
+Keywords: I need 10-18 unique keywords covering relevant context and visible details. I'll list them, ensuring they cover Gothic Architecture, Church Tower, evening light, pedestrians, etc.
+
+Let's construct:
+
+Title: Medieval Church Tower Illuminated at Twilight
+
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway.
+
+Now, check the word count: Title is 5-10 words, description is 1-2 sentences, keywords are 10-18 unique.
+</think>
+
+Title: Medieval Church Tower Illuminated at Twilight
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway
+```
+
+</details>
 
 </details>
 
@@ -847,25 +889,25 @@ Keywords: Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
 - *Model load time:* 1.00s
-- *Generation time:* 1.59s
-- *Total time:* 3.17s
-- *Prompt preparation time:* 0.568
-- *First-token latency:* 0.213
-- *Cleanup time:* 0.0967
-- *Prompt tokens:* 369
-- *Generation tokens:* 88
-- *Total tokens:* 457
-- *Prompt throughput (raw):* 1,731 tok/s
+- *Generation time:* 1.70s
+- *Total time:* 3.21s
+- *Prompt preparation time:* 0.5
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.0953
+- *Prompt tokens:* 410
+- *Generation tokens:* 104
+- *Total tokens:* 514
+- *Prompt throughput (raw):* 1,755 tok/s
 - *Generation throughput (raw):* 106 tok/s
-- *Peak memory (GB):* 7.0
+- *Peak memory (GB):* 7.1
 - *Active memory (GB):* 6.1
-- *Cache memory (GB):* 0.09
+- *Cache memory (GB):* 0.13
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.005
+- *Post-cleanup active memory (GB):* 0.00516
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1353
+- *Rendered prompt characters:* 1468
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -879,11 +921,11 @@ Keywords: Border security, vessels, Ramsgate Harbour, sunset, cliffside, skyline
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Patrol Boats at Sunset
+Title: St Peter Mancroft Tower at Twilight in Norwich
 
-Description: Border security patrol vessels moored in Ramsgate Harbour, Kent, with dramatic sunset lighting reflecting on water and town skyline visible behind.
+Description: A low-angle evening shot captures the illuminated Gothic stone tower of St Peter Mancroft, with a pointed spire and surrounding trees, under clear twilight skies in Norwich, England.
 
-Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Pier, Port, Ramsgate, Reflection
+Keywords: St Peter Mancroft, Gothic Architecture, Church Tower, Stone Masonry, Spire, Victorian Flèche, Norwich, Norfolk, England, Twilight, Pedestrians, Street, Trees, Historic Landmark, Stone Facade
 </pre>
 
 </details>
@@ -904,26 +946,26 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.35s
-- *Generation time:* 5.01s
-- *Total time:* 6.97s
-- *Prompt preparation time:* 0.607
-- *First-token latency:* 2.3
-- *Cleanup time:* 0.0969
-- *Prompt tokens:* 2,905
-- *Generation tokens:* 140
-- *Total tokens:* 3,045
-- *Prompt throughput (raw):* 1,261 tok/s
-- *Generation throughput (raw):* 66.0 tok/s
+- *Model load time:* 1.36s
+- *Generation time:* 4.40s
+- *Total time:* 6.31s
+- *Prompt preparation time:* 0.544
+- *First-token latency:* 2.03
+- *Cleanup time:* 0.0894
+- *Prompt tokens:* 2,959
+- *Generation tokens:* 122
+- *Total tokens:* 3,081
+- *Prompt throughput (raw):* 1,458 tok/s
+- *Generation throughput (raw):* 66.3 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.56
+- *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00526
+- *Post-cleanup active memory (GB):* 0.00543
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3736
+- *Rendered prompt characters:* 3851
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -937,13 +979,13 @@ Keywords: Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbo
 
 <pre class="model-output-readable">
 Title:
-**BSC Patrol Vessels at Ramsgate Harbour Sunset**
+**St Peter Mancroft Church Tower at Twilight, Norwich**
 
 Description:
-A fleet of UK Border Security Command patrol boats, including the *BSC Defender* and *BSC Volunteer*, is moored in Ramsgate Harbour, Kent, during a dramatic sunset. The scene captures the vessels’ reflections on calm waters, set against the town’s cliffside skyline and the fading golden-orange horizon.
+A low-angle evening photograph captures the medieval stone tower and Victorian lead spire of St Peter Mancroft Church in Norwich, illuminated against a clear twilight sky, with pedestrians walking along the street below and surrounding trees framing the historic Gothic architecture.
 
 Keywords:
-Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, patrol boats, maritime fleet, sunset, cliffside skyline, harbour mooring, calm waters, reflection, UK coast, dusk lighting, maritime security, English coastline
+St Peter Mancroft, Norwich, England, Gothic architecture, Perpendicular Gothic, stone tower, lead spire, historic landmark, twilight, evening light, pedestrians, street scene, trees, stone masonry, church bell tower, United Kingdom
 </pre>
 
 </details>
@@ -964,26 +1006,26 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.99s
-- *Generation time:* 2.27s
-- *Total time:* 3.87s
-- *Prompt preparation time:* 0.601
-- *First-token latency:* 0.976
-- *Cleanup time:* 0.0839
-- *Prompt tokens:* 2,904
-- *Generation tokens:* 134
-- *Total tokens:* 3,038
-- *Prompt throughput (raw):* 2,976 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Model load time:* 0.95s
+- *Generation time:* 2.11s
+- *Total time:* 3.62s
+- *Prompt preparation time:* 0.545
+- *First-token latency:* 0.985
+- *Cleanup time:* 0.0815
+- *Prompt tokens:* 2,958
+- *Generation tokens:* 113
+- *Total tokens:* 3,071
+- *Prompt throughput (raw):* 3,002 tok/s
+- *Generation throughput (raw):* 188 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00552
+- *Post-cleanup active memory (GB):* 0.00569
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3735
+- *Rendered prompt characters:* 3850
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -997,71 +1039,13 @@ Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, pa
 
 <pre class="model-output-readable">
 Title:
-Ramsgate Sunset: Border Patrol Boats at Dusk
+**St Peter Mancroft’s Gothic Tower in Norwich Twilight**
 
 Description:
-At Ramsgate Harbour, Kent, two UK Border Security Command patrol vessels—*BSC Defender* and *BSC Volunteer*—moor side-by-side under a vibrant sunset, reflecting across the calm waters while the town’s cliff-top buildings loom in silhouette against the golden horizon.
+A towering medieval church spire in Norwich, Norfolk, stands illuminated under twilight skies, framed by Victorian lead flèche and surrounded by pedestrian activity along its stone facade.
 
 Keywords:
-Border security patrol vessels, Ramsgate Harbour, Kent coast, sunset lighting, moored patrol boats, maritime scene, lifebuoy details, cliffside town skyline, mooring lines, reflective water, UK Border Command, maritime mooring, coastal England, dusk atmosphere.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
-
-### mlx-community/Molmo2-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.05s
-- *Generation time:* 3.60s
-- *Total time:* 5.41s
-- *Prompt preparation time:* 0.745
-- *First-token latency:* 0.844
-- *Cleanup time:* 0.0932
-- *Prompt tokens:* 1,502
-- *Generation tokens:* 148
-- *Total tokens:* 1,650
-- *Prompt throughput (raw):* 1,779 tok/s
-- *Generation throughput (raw):* 71.4 tok/s
-- *Peak memory (GB):* 8.1
-- *Active memory (GB):* 6.5
-- *Cache memory (GB):* 0.31
-- *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00584
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1336
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset: Border Security Vessels Moored
-
-Description: At dusk in Ramsgate Harbour, Kent, a row of Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side against a dramatic sunset. The scene features the town's cliffside skyline reflected in the water, with lifebuoys visible on the vessels.
-
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Town skyline, Vessels moored, Water reflection
+Church of St Peter Mancroft, Norwich, Norfolk, England, Gothic architecture, Stone masonry, Bell tower, Victorian lead flèche, Historic landmark, Clear sky, Twilight lighting, Pedestrian street, Stone facade, Norwich skyline, Historic architecture, Spire, Medieval tower
 </pre>
 
 </details>
@@ -1082,26 +1066,26 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.96s
-- *Generation time:* 3.57s
-- *Total time:* 5.34s
-- *Prompt preparation time:* 0.805
-- *First-token latency:* 2.04
-- *Cleanup time:* 0.0914
-- *Prompt tokens:* 4,065
+- *Model load time:* 1.07s
+- *Generation time:* 3.46s
+- *Total time:* 5.30s
+- *Prompt preparation time:* 0.76
+- *First-token latency:* 1.99
+- *Cleanup time:* 0.0893
+- *Prompt tokens:* 4,101
 - *Generation tokens:* 158
-- *Total tokens:* 4,223
-- *Prompt throughput (raw):* 1,993 tok/s
-- *Generation throughput (raw):* 208 tok/s
+- *Total tokens:* 4,259
+- *Prompt throughput (raw):* 2,066 tok/s
+- *Generation throughput (raw):* 210 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.65
+- *Cache memory (GB):* 0.66
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00739
+- *Post-cleanup active memory (GB):* 0.00756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1429
+- *Rendered prompt characters:* 1544
 - *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
 - *Requested model revision:* not requested
@@ -1114,129 +1098,11 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Security Patrol Vessels at Ramsgate Harbour Sunset
+Title: Medieval Tower of St Peter Mancroft
 
-Description: On a dramatic sunset, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent. The scene features a town built against a cliffside, with buildings silhouetted against the sky and a body of water reflecting the warm hues of the setting sun. The harbor is dotted with maritime elements, such as lifebuoys and various types of patrol boats, creating a picturesque maritime tableau.
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England. The tower is constructed from stone and features intricate Gothic architecture, including a prominent arched entrance and a tall, pointed spire. The clear sky and the warm glow of the tower's interior create a striking contrast, highlighting the historic landmark.
 
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ornith-15-35b-a3b-optiq-4bit"></a>
-
-### mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.55s
-- *Generation time:* 2.53s
-- *Total time:* 5.79s
-- *Prompt preparation time:* 0.692
-- *First-token latency:* 0.593
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 1,267
-- *Generation tokens:* 133
-- *Total tokens:* 1,400
-- *Prompt throughput (raw):* 2,136 tok/s
-- *Generation throughput (raw):* 103 tok/s
-- *Peak memory (GB):* 24
-- *Active memory (GB):* 23
-- *Cache memory (GB):* 0.15
-- *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.0079
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4620fdbbd1e7a1f14f936d49f1aa012abcda4569
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit/snapshots/4620fdbbd1e7a1f14f936d49f1aa012abcda4569
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Border Security Patrol Vessels Moored in Ramsgate at Sunset
-
-Description:
-Multiple UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour against golden evening light. The town's cliffside skyline of terraced buildings rises behind the fleet as the sun sets, its warm glow reflected across the calm harbour water.
-
-Keywords:
-Border security vessels, Patrol boats, Ramsgate, Kent, England, Coast, Dusk, Harbor, Port, Marina, Mooring, Fleet, Maritime, Buildings, Cliff, Lifebuoy, Reflection, Pier
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.89s
-- *Generation time:* 3.30s
-- *Total time:* 4.76s
-- *Prompt preparation time:* 0.558
-- *First-token latency:* 0.295
-- *Cleanup time:* 0.0866
-- *Prompt tokens:* 1,115
-- *Generation tokens:* 144
-- *Total tokens:* 1,259
-- *Prompt throughput (raw):* 3,774 tok/s
-- *Generation throughput (raw):* 58.4 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 8.3
-- *Cache memory (GB):* 0.52
-- *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00797
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1319
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset with Border Security Vessels
-
-Description: The sun sets over Ramsgate Harbour, with Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, moored side-by-side. The dramatic skyline and calm waters reflect the vibrant colors of the sunset.
-
-Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dusk, England, Coast, Fleet, Maritime, Mooring, Patrol Boat, Coast Guard, Harbor, Horizon, Kent, Lifebuoy, Marina
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
 
 </details>
@@ -1257,26 +1123,26 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.29s
-- *Generation time:* 23.02s
-- *Total time:* 26.29s
-- *Prompt preparation time:* 0.951
-- *First-token latency:* 20.3
+- *Model load time:* 2.26s
+- *Generation time:* 23.53s
+- *Total time:* 26.70s
+- *Prompt preparation time:* 0.896
+- *First-token latency:* 21.1
 - *Cleanup time:* 0.142
-- *Prompt tokens:* 12,768
-- *Generation tokens:* 138
-- *Total tokens:* 12,906
-- *Prompt throughput (raw):* 630 tok/s
-- *Generation throughput (raw):* 72.8 tok/s
+- *Prompt tokens:* 12,809
+- *Generation tokens:* 120
+- *Total tokens:* 12,929
+- *Prompt throughput (raw):* 607 tok/s
+- *Generation throughput (raw):* 73.4 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
 - *Model-load active memory (GB):* 21.8
-- *Post-cleanup active memory (GB):* 0.00859
+- *Post-cleanup active memory (GB):* 0.00824
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
+- *Rendered prompt characters:* 1485
 - *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1290,13 +1156,13 @@ Keywords: Border Security, Ramsgate, Harbour, Sunset, Patrol Vessels, Dover, Dus
 
 <pre class="model-output-readable">
 Title:
-Border Security Command vessels moored in Ramsgate Harbour.
+St Peter Mancroft Church Tower at Twilight
 
 Description:
-UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, England, during a dramatic sunset. The vessels are docked along a pier, with the town's buildings and a chalk cliff visible on the hillside in the background, all under a vibrant orange and purple sky.
+The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands tall against a clear sky, its stone facade illuminated by the warm light of twilight. Pedestrians walk along the street below, with trees framing the historic landmark.
 
 Keywords:
-Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, Lifebuoy, Reflection, Buildings, Coast, Fleet, Mooring, Port, Pier, Patrol boats, Horizon, England
+Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Stone Masonry, Stone facade, Spire, Twilight, Trees, England, Norwich, United Kingdom, Clear Sky, Historic architecture, Archway, Bell Tower, Walking, Landmark
 </pre>
 
 </details>
@@ -1317,26 +1183,26 @@ Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, L
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.87s
-- *Generation time:* 33.18s
-- *Total time:* 36.09s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 30.6
-- *Cleanup time:* 0.125
-- *Prompt tokens:* 16,525
-- *Generation tokens:* 143
-- *Total tokens:* 16,668
-- *Prompt throughput (raw):* 540 tok/s
-- *Generation throughput (raw):* 85.3 tok/s
+- *Model load time:* 1.88s
+- *Generation time:* 40.32s
+- *Total time:* 43.17s
+- *Prompt preparation time:* 0.95
+- *First-token latency:* 37.8
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 16,566
+- *Generation tokens:* 144
+- *Total tokens:* 16,710
+- *Prompt throughput (raw):* 438 tok/s
+- *Generation throughput (raw):* 86.9 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
 - *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.0089
+- *Post-cleanup active memory (GB):* 0.00856
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
+- *Rendered prompt characters:* 1485
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1349,11 +1215,9 @@ Border security vessels, Patrol boat, Maritime, Kent, Ramsgate, Harbour, Dusk, L
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command Vessels at Ramsgate Harbour
-
-Description: At dusk on October 3, 2026, a fleet of Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent. The golden light of the setting sun reflects on the water, illuminating the boats and the cliffside town against a dramatic sky.
-
-Keywords: Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England, Dusk, Sunset, Reflection, Lifebuoy, Maritime, Fleet, Mooring, Harbour, Coast, Buildings, Horizon, Dover, Port, Pier, BSC Defender, BSC Volunteer
+Title: Church of St Peter Mancroft at twilight
+Description: The Church of St Peter Mancroft in Norwich, Norfolk, England, is captured at dusk, its stone facade illuminated by warm evening light. The Gothic tower, featuring a Victorian lead flèche and Perpendicular Gothic style, stands tall against a clear sky, with pedestrians walking below.
+Keywords: Church of St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, Perpendicular Gothic, Church Tower, Bell Tower, Spire, Flèche, Stone Masonry, Stone facade, Historic Landmark, Historic architecture, Twilight, Clear Sky, Trees, Pedestrians, Walking, Archway
 </pre>
 
 </details>
@@ -1375,25 +1239,25 @@ Keywords: Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.86s
-- *Generation time:* 35.94s
-- *Total time:* 37.84s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 33.4
-- *Cleanup time:* 0.105
-- *Prompt tokens:* 16,525
-- *Generation tokens:* 112
-- *Total tokens:* 16,637
-- *Prompt throughput (raw):* 495 tok/s
-- *Generation throughput (raw):* 69.6 tok/s
+- *Generation time:* 41.08s
+- *Total time:* 42.92s
+- *Prompt preparation time:* 0.964
+- *First-token latency:* 38.9
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 16,566
+- *Generation tokens:* 91
+- *Total tokens:* 16,657
+- *Prompt throughput (raw):* 426 tok/s
+- *Generation throughput (raw):* 69.5 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00921
+- *Post-cleanup active memory (GB):* 0.00887
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
+- *Rendered prompt characters:* 1485
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1406,11 +1270,11 @@ Keywords: Border security vessels, Patrol boat, Ramsgate Harbour, Kent, England,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Boats at Sunset in Ramsgate Harbour
+Title: St Peter Mancroft Tower at Twilight
 
-Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, under a dramatic sunset. The scene features calm waters reflecting golden light, with cliffside town buildings in the background.
+Description: The Gothic tower of St Peter Mancroft in Norwich glows in evening light, its stone facade and spire silhouetted against a clear sky as pedestrians walk past beneath leafy trees.
 
-Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, England, Patrol boat, Harbour, Reflection, Lifebuoy, Coast, Maritime, Marina, Pier, Horizon, Buildings
+Keywords: St Peter Mancroft, Norwich, Gothic Architecture, Tower, Twilight, Stone Masonry, Spire, Pedestrians, Clear Sky, Historic Landmark
 </pre>
 
 </details>
@@ -1431,26 +1295,26 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.34s
-- *Generation time:* 32.24s
-- *Total time:* 35.62s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 29.9
-- *Cleanup time:* 0.136
-- *Prompt tokens:* 16,541
-- *Generation tokens:* 151
-- *Total tokens:* 16,692
-- *Prompt throughput (raw):* 553 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Model load time:* 2.35s
+- *Generation time:* 38.12s
+- *Total time:* 41.44s
+- *Prompt preparation time:* 0.952
+- *First-token latency:* 36.1
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 16,579
+- *Generation tokens:* 130
+- *Total tokens:* 16,709
+- *Prompt throughput (raw):* 460 tok/s
+- *Generation throughput (raw):* 110 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.90
+- *Cache memory (GB):* 0.91
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00972
+- *Post-cleanup active memory (GB):* 0.00937
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1504
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1463,11 +1327,11 @@ Keywords: Border security vessels, Ramsgate Harbour, Kent, Dover, Sunset, Englan
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Vessels at Ramsgate Sunset
+Title: St Peter Mancroft Tower at Dusk
 
-Description: Captured on October 3rd, 2026, during the golden hour of dusk, a fleet of UK Border Security Command patrol boats—including the BSC Defender and BSC Volunteer—are moored in formation at Ramsgate Harbour. The vessels are silhouetted against a dramatic orange sky and the iconic white chalk cliffs of Kent, with their hulls and equipment reflecting in the calm water below.
+Description: This low-angle view captures the Gothic Church of St Peter Mancroft in Norwich at twilight, its Victorian stone flèche silhouetted against a clear blue sky. Warm interior light glows from the arched doorway at street level, illuminating pedestrians walking below large green trees.
 
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Maritime patrol, Dusk, Sunset, Reflection, Coast, England, Mooring, Fleet, White cliffs, Lifebuoy, Maritime safety
+Keywords: St Peter Mancroft, Norwich, Norfolk, England, Gothic Architecture, Church Tower, Victorian Spire, Twilight, Evening Light, Stone Facade, Pedestrians, Trees, Archway, Historic Landmark, Perpendicular Gothic, United Kingdom, Clear Sky, Architecture
 </pre>
 
 </details>
@@ -1488,26 +1352,26 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.93s
-- *Generation time:* 58.12s
-- *Total time:* 61.13s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 53.1
-- *Cleanup time:* 0.125
-- *Prompt tokens:* 16,541
-- *Generation tokens:* 121
-- *Total tokens:* 16,662
-- *Prompt throughput (raw):* 312 tok/s
-- *Generation throughput (raw):* 29.3 tok/s
+- *Model load time:* 1.95s
+- *Generation time:* 58.06s
+- *Total time:* 60.95s
+- *Prompt preparation time:* 0.935
+- *First-token latency:* 52.8
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 16,579
+- *Generation tokens:* 133
+- *Total tokens:* 16,712
+- *Prompt throughput (raw):* 314 tok/s
+- *Generation throughput (raw):* 30.2 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0102
+- *Post-cleanup active memory (GB):* 0.00988
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1504
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1521,13 +1385,72 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 
 <pre class="model-output-readable">
 Title:
-UK Border Security Command Vessels in Ramsgate Harbour
+Tower and Spire of St Peter Mancroft at Dusk in Norwich
 
 Description:
-A fleet of Border Security Command patrol vessels, including the BSC Defender, is moored in Ramsgate Harbour, Kent. The scene is illuminated by the golden light of a dramatic sunset reflecting on the water, with a cliffside town skyline in the background.
+A low-angle view of the medieval tower and Victorian lead spire of the Church of St Peter Mancroft in Norwich, illuminated by golden evening light against a clear twilight sky. Lush trees partially obscure the stone facade below, where pedestrians walk along the street in front of a black metal fence.
 
 Keywords:
-Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, BSC Volunteer, Sunset, Reflection, Maritime, Dusk, Mooring, Fleet, Lifebuoy, Coast, England
+Archway, Church Tower, Clear Sky, England, Gothic Architecture, Golden Hour, Historic Landmark, Norwich, Pedestrians, Spire, St Peter Mancroft, Stone Masonry, Trees, Twilight, United Kingdom
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.14s
+- *Generation time:* 15.99s
+- *Total time:* 18.03s
+- *Prompt preparation time:* 0.895
+- *First-token latency:* 13.1
+- *Cleanup time:* 0.0971
+- *Prompt tokens:* 16,577
+- *Generation tokens:* 127
+- *Total tokens:* 16,704
+- *Prompt throughput (raw):* 1,270 tok/s
+- *Generation throughput (raw):* 60.0 tok/s
+- *Peak memory (GB):* 14
+- *Active memory (GB):* 9.5
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 9.46
+- *Post-cleanup active memory (GB):* 0.0107
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1543
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Norwich St Peter Mancroft Tower Twilight
+
+Description:
+A low-angle view captures the illuminated medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, with pedestrians walking below under a clear sky at dusk.
+
+Keywords: Norwich, St Peter Mancroft, Church Tower, Perpendicular Gothic, Victorian lead flèche, medieval architecture, historic landmark, stone masonry, Gothic architecture, historic architecture, twilight, clear sky, pedestrian, United Kingdom, England, Norfolk, stone facade, archway, bell tower, trees, walking, evening light.
 </pre>
 
 </details>
@@ -1548,26 +1471,26 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.03s
-- *Generation time:* 2.96s
-- *Total time:* 5.00s
-- *Prompt preparation time:* 0.993
-- *First-token latency:* 0.756
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 2,070
-- *Generation tokens:* 132
-- *Total tokens:* 2,202
-- *Prompt throughput (raw):* 2,739 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Model load time:* 1.04s
+- *Generation time:* 2.56s
+- *Total time:* 4.54s
+- *Prompt preparation time:* 0.939
+- *First-token latency:* 0.722
+- *Cleanup time:* 0.098
+- *Prompt tokens:* 2,108
+- *Generation tokens:* 102
+- *Total tokens:* 2,210
+- *Prompt throughput (raw):* 2,918 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.34
+- *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.46
-- *Post-cleanup active memory (GB):* 0.0116
+- *Post-cleanup active memory (GB):* 0.0112
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4236
+- *Rendered prompt characters:* 4351
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -1581,11 +1504,65 @@ Border Security Command, Ramsgate, Harbour, Kent, Patrol vessels, BSC Defender, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command Patrols Kent's Ramsgate Harbour
+Title: Medieval Tower Illuminated at Twilight
+Description: The Gothic architecture of St Peter Mancroft's bell tower, with its intricate stone masonry and Victorian lead flèche, is illuminated by the evening light, casting a warm glow on the surrounding trees and pedestrians walking along the street in Norwich, England.
+Keywords: Medieval, Gothic, Stone, Victorian, Tower, Bell, Clock, Norwich, England, Historical, Landmark, Twilight, Pedestrian, Street, Streetlight, Green, Grass, People
+</pre>
 
-Description: At dusk, the UK Border Security Command's patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The boats reflect the vibrant hues of the setting sun, creating a picturesque scene.
+</details>
 
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.17s
+- *Generation time:* 2.28s
+- *Total time:* 6.08s
+- *Prompt preparation time:* 0.604
+- *First-token latency:* 0.31
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 611
+- *Generation tokens:* 92
+- *Total tokens:* 703
+- *Prompt throughput (raw):* 1,970 tok/s
+- *Generation throughput (raw):* 74.4 tok/s
+- *Peak memory (GB):* 28
+- *Active memory (GB):* 27
+- *Cache memory (GB):* 0.01
+- *Model-load active memory (GB):* 27.2
+- *Post-cleanup active memory (GB):* 0.0112
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1439
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: The Gothic Tower of St Peter Mancroft in Norwich
+Description: A low-angle evening view of the illuminated medieval stone tower and spire of the St Peter Mancroft Church at twilight in Norfolk, England.
+Keywords: Norwich, Norfolk, England, St Peter Mancroft, Gothic Architecture, Church Tower, Spire, Stone Masonry, Medieval, Twilight, Landmark, Pedestrians, Historic, Archway, United Kingdom
 </pre>
 
 </details>
@@ -1606,26 +1583,26 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.25s
-- *Generation time:* 5.80s
-- *Total time:* 8.67s
-- *Prompt preparation time:* 0.604
-- *First-token latency:* 0.888
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 572
-- *Generation tokens:* 135
-- *Total tokens:* 707
-- *Prompt throughput (raw):* 644 tok/s
-- *Generation throughput (raw):* 31.2 tok/s
+- *Model load time:* 2.24s
+- *Generation time:* 6.09s
+- *Total time:* 8.91s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 0.928
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 610
+- *Generation tokens:* 145
+- *Total tokens:* 755
+- *Prompt throughput (raw):* 658 tok/s
+- *Generation throughput (raw):* 31.4 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
-- *Cache memory (GB):* 0.43
+- *Cache memory (GB):* 0.45
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0121
+- *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1353
+- *Rendered prompt characters:* 1468
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1639,11 +1616,9 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour: UK Border Security Vessels at Sunset
-
-Description: Captured on 3rd October 2026 at 18:18, UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, illuminated against a vibrant sunset and the town’s cliffside buildings. Reflections shimmer on the calm water, highlighting the vessels’ dark hulls and superstructure.
-
-Keywords: Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Volunteer, harbour, marina, mooring, sunset, dusk, buildings, coast, maritime, reflection, fleet, skyline, pier, calm water
+Title: St Peter Mancroft Tower, Norwich – October Evening
+Description: Captured on 10 October 2026 at 18:09 UTC+01:00, this low-angle view shows the medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, illuminated against a twilight sky with pedestrians on the street below. The stone facade features prominent arched windows and detailed stone masonry.
+Keywords: St Peter Mancroft, Church Tower, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, Perpendicular Gothic, Stone Masonry, Stone facade, Landmark, Historic Landmark, Tower, Archway, Pedestrians, Twilight, Trees, Evening Light
 </pre>
 
 </details>
@@ -1664,26 +1639,26 @@ Keywords: Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Vo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.65s
-- *Generation time:* 2.75s
-- *Total time:* 5.10s
-- *Prompt preparation time:* 0.67
-- *First-token latency:* 0.356
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 577
-- *Generation tokens:* 108
-- *Total tokens:* 685
-- *Prompt throughput (raw):* 1,621 tok/s
-- *Generation throughput (raw):* 61.1 tok/s
+- *Model load time:* 1.68s
+- *Generation time:* 2.82s
+- *Total time:* 5.12s
+- *Prompt preparation time:* 0.604
+- *First-token latency:* 0.359
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 615
+- *Generation tokens:* 118
+- *Total tokens:* 733
+- *Prompt throughput (raw):* 1,711 tok/s
+- *Generation throughput (raw):* 62.7 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.32
+- *Cache memory (GB):* 0.33
 - *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.0132
+- *Post-cleanup active memory (GB):* 0.0128
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
+- *Rendered prompt characters:* 1467
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1697,14 +1672,11 @@ Keywords: Ramsgate, Kent, UK Border Security, patrol boats, BSC Defender, BSC Vo
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Fishing vessels and town skyline at sunset in Ramsgate Harbour
+Title: St Peter Mancroft Church Tower at Twilight
 
-Description:
-Several fishing vessels are moored side-by-side in Ramsgate Harbour as a dramatic sunset reflects off the water and the town's cliffside buildings. The scene captures the maritime character of the Kent coast during the evening glow.
+Description: A low-angle view of the medieval bell tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, illuminated in evening light. Pedestrians walk along the street beside the ornate Perpendicular Gothic stone facade and surrounding trees.
 
-Keywords:
-Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, Sunset, Dusk, Coast, Reflection, Skyline, Buildings, Architecture, Sea, Water
+Keywords: St Peter Mancroft, Norwich, England, Church Tower, Bell Tower, Perpendicular Gothic, Gothic Architecture, Flèche, Spire, Stone Masonry, Historic Landmark, Twilight, Pedestrians, Urban Landscape, Architecture, United Kingdom, Clear Sky
 </pre>
 
 </details>
@@ -1725,26 +1697,26 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.44s
-- *Generation time:* 1.89s
-- *Total time:* 5.01s
-- *Prompt preparation time:* 0.653
-- *First-token latency:* 0.388
-- *Cleanup time:* 0.119
-- *Prompt tokens:* 577
-- *Generation tokens:* 106
-- *Total tokens:* 683
-- *Prompt throughput (raw):* 1,488 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Model load time:* 2.33s
+- *Generation time:* 1.80s
+- *Total time:* 4.74s
+- *Prompt preparation time:* 0.583
+- *First-token latency:* 0.394
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 615
+- *Generation tokens:* 105
+- *Total tokens:* 720
+- *Prompt throughput (raw):* 1,560 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 15.4
-- *Post-cleanup active memory (GB):* 0.0137
+- *Post-cleanup active memory (GB):* 0.0133
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
+- *Rendered prompt characters:* 1467
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1758,23 +1730,23 @@ Ramsgate, Kent, England, Harbor, Port, Maritime, Fishing boats, Fleet, Mooring, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command patrol vessels moored at sunset
+Title: St Peter Mancroft tower in evening light
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline. The evening light reflects off the water as the fleet rests in the port.
+Description: A low-angle view shows the medieval stone tower and Victorian lead flèche of St Peter Mancroft illuminated in the evening light in Norwich, England. Pedestrians walk along the street beside the historic Gothic architecture at twilight.
 
-Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour, pier, reflection, England, dusk, boats, mooring, coastal, fleet, marina
+Keywords: St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic architecture, Perpendicular Gothic, church tower, spire, historic landmark, stone masonry, twilight, clear sky, pedestrians, walking, historic architecture
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+<a id="model-mlx-community-gemma-4-e4b-it-4bit"></a>
 
-### mlx-community/gemma-4-31b-it-4bit
+### mlx-community/gemma-4-e4b-it-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-31b-it-4bit</summary>
+<summary>Complete evidence: mlx-community/gemma-4-e4b-it-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -1783,32 +1755,32 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.59s
-- *Generation time:* 5.75s
-- *Total time:* 9.01s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 1.18
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 577
-- *Generation tokens:* 103
-- *Total tokens:* 680
-- *Prompt throughput (raw):* 487 tok/s
-- *Generation throughput (raw):* 26.2 tok/s
-- *Peak memory (GB):* 20
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 0.78
-- *Model-load active memory (GB):* 18.4
-- *Post-cleanup active memory (GB):* 0.0142
+- *Model load time:* 1.56s
+- *Generation time:* 1.62s
+- *Total time:* 3.79s
+- *Prompt preparation time:* 0.581
+- *First-token latency:* 0.184
+- *Cleanup time:* 0.102
+- *Prompt tokens:* 611
+- *Generation tokens:* 108
+- *Total tokens:* 719
+- *Prompt throughput (raw):* 3,319 tok/s
+- *Generation throughput (raw):* 125 tok/s
+- *Peak memory (GB):* 6.0
+- *Active memory (GB):* 5.2
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 5.16
+- *Post-cleanup active memory (GB):* 0.0139
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 696d436c404745a59f30e4939a658162b0a9e57f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-31b-it-4bit/snapshots/696d436c404745a59f30e4939a658162b0a9e57f
+- *Resolved model revision:* 475b9088d29754a3379866cf5aeb6b41acd313c2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-e4b-it-4bit/snapshots/475b9088d29754a3379866cf5aeb6b41acd313c2
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
 - *EOS token:* &lt;eos&gt;
@@ -1816,240 +1788,9 @@ Keywords: Border security vessels, Kent, maritime, patrol boats, sunset, harbour
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Security Command vessels in Ramsgate Harbour
-Description: UK Border Security Command patrol vessels, including the BSC Defender, are moored side-by-side in Ramsgate Harbour, Kent, under a dramatic sunset. The town's cliffside skyline is visible in the background.
-Keywords: Border security vessels, buildings, coast, dusk, England, fleet, harbour, horizon, Kent, lifebuoy, marina, maritime, mooring, patrol boats, port, Ramsgate, reflection, sunset
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
-
-### mlx-community/granite-4.0-3b-vision-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.58s
-- *Generation time:* 1.84s
-- *Total time:* 3.27s
-- *Prompt preparation time:* 0.833
-- *First-token latency:* 0.428
-- *Cleanup time:* 0.0931
-- *Prompt tokens:* 1,366
-- *Generation tokens:* 107
-- *Total tokens:* 1,473
-- *Prompt throughput (raw):* 3,189 tok/s
-- *Generation throughput (raw):* 178 tok/s
-- *Peak memory (GB):* 4.8
-- *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.23
-- *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0149
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1522
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Border Security Vessels at Sunset"
-Description: "Two patrol boats from the UK Border Security Command are moored side-by-side in Ramsgate Harbour, England, against a dramatic sunset and the town's cliffside skyline."
-Keywords: Border security, patrol boats, UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, sunset, cliffside skyline, maritime, mooring, lifebuoy, reflection, coastal defense, Dover, maritime security.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### mlx-community/pixtral-12b-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.65s
-- *Generation time:* 5.50s
-- *Total time:* 7.74s
-- *Prompt preparation time:* 0.578
-- *First-token latency:* 1.95
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 3,095
-- *Generation tokens:* 119
-- *Total tokens:* 3,214
-- *Prompt throughput (raw):* 1,590 tok/s
-- *Generation throughput (raw):* 39.8 tok/s
-- *Peak memory (GB):* 16
-- *Active memory (GB):* 13
-- *Cache memory (GB):* 0.59
-- *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0164
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Border Security Vessels at Sunset in Ramsgate Harbour
-
-Description:
-Border security patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, with the town's cliffside skyline and dramatic sunset in the background.
-
-Keywords:
-Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Vessel, Vessels
-</pre>
-
-</details>
-
----
-
-<a id="model-nativ-community-mage-vl-optiq-4bit"></a>
-
-### nativ-community/Mage-VL-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/Mage-VL-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 3.10s
-- *Total time:* 4.62s
-- *Prompt preparation time:* 0.737
-- *First-token latency:* 1.47
-- *Cleanup time:* 0.0955
-- *Prompt tokens:* 4,188
-- *Generation tokens:* 118
-- *Total tokens:* 4,306
-- *Prompt throughput (raw):* 2,846 tok/s
-- *Generation throughput (raw):* 127 tok/s
-- *Peak memory (GB):* 5.4
-- *Active memory (GB):* 3.9
-- *Cache memory (GB):* 0.72
-- *Model-load active memory (GB):* 3.93
-- *Post-cleanup active memory (GB):* 0.0167
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
-- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4f0a424370e54984ed783db8f8633a219c72db78
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mage-VL-OptiQ-4bit/snapshots/4f0a424370e54984ed783db8f8633a219c72db78
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: BSC Patrol Vessels Moored at Ramsgate Harbour at Dusk
-Description: UK Border Security Command patrol boats, including the BSC Defender and BSC Volunteer, are docked side-by-side in Ramsgate Harbour, Kent, with the town's cliffside skyline and dramatic sunset in the background.
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-nativ-community-mistral-small-32-24b-instruct-2506-4bit"></a>
-
-### nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.75s
-- *Generation time:* 5.25s
-- *Total time:* 7.59s
-- *Prompt preparation time:* 0.575
-- *First-token latency:* 1.57
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 1,251
-- *Generation tokens:* 114
-- *Total tokens:* 1,365
-- *Prompt throughput (raw):* 795 tok/s
-- *Generation throughput (raw):* 36.6 tok/s
-- *Peak memory (GB):* 18
-- *Active memory (GB):* 15
-- *Cache memory (GB):* 0.28
-- *Model-load active memory (GB):* 15.1
-- *Post-cleanup active memory (GB):* 0.0169
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1298
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mistral-Small-3.2-24B-Instruct-2506-4bit/snapshots/bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.15, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Border Security Patrol Boats at Sunset
-
-Description:
-UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, during a dramatic sunset, with the town's cliffside buildings in the background.
-
-Keywords:
-Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside buildings, Marina, Reflections, Dusk, England, Kent, BSC Defender, BSC Volunteer, Waterfront, Lifebuoys, Mooring, Pier, Horizon, Maritime
+Title: St Peter Mancroft Church Tower at Twilight in Norwich
+Description: A low-angle view captures the Gothic architecture of St Peter Mancroft Church's tower against the evening sky, flanked by dark trees and pedestrians. The interplay of the stone facade and the fading twilight creates a dramatic scene in Norwich.
+Keywords: St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twilight, Perpendicular Gothic, Stone Facade, Spire, Bell Tower, Landmark, Trees, Pedestrians, England, Historic, Architecture
 </pre>
 
 </details>
@@ -2072,25 +1813,25 @@ Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside build
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
 - *Model load time:* 2.25s
-- *Generation time:* 5.70s
-- *Total time:* 8.62s
-- *Prompt preparation time:* 0.649
-- *First-token latency:* 4.24
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 3,606
-- *Generation tokens:* 132
-- *Total tokens:* 3,738
-- *Prompt throughput (raw):* 851 tok/s
-- *Generation throughput (raw):* 156 tok/s
+- *Generation time:* 5.32s
+- *Total time:* 8.19s
+- *Prompt preparation time:* 0.595
+- *First-token latency:* 4.13
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 3,642
+- *Generation tokens:* 101
+- *Total tokens:* 3,743
+- *Prompt throughput (raw):* 883 tok/s
+- *Generation throughput (raw):* 159 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.0172
+- *Post-cleanup active memory (GB):* 0.0163
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1380
+- *Rendered prompt characters:* 1495
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2105,58 +1846,57 @@ Border security vessels, Ramsgate Harbour, Patrol boats, Sunset, Cliffside build
 
 <pre class="model-output-readable">
 
-Title: BSC Patrol Boats at Ramsgate Harbour Sunset
+Title: St Peter Mancroft Church Tower at Dusk
 
-Description: At 18:18 UTC+01:00 on October 3, 2026, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
+Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, illuminated by evening light against a clear sky, with pedestrians walking along the street below.
 
-Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritime, Fleet, Coast, Buildings, Cliffside, Mooring, Lifebuoy, Dusk, England, Horizon, Port, Reflection
+Keywords: Church Tower, Gothic Architecture, Historic Landmark, Norwich, England, Stone facade, Perpendicular Gothic, Spire, Victorian flèche, Twilight, Pedestrians, Trees
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
+<a id="model-mlx-community-glm-46v-flash-4bit"></a>
 
-### mlx-community/GLM-4.6V-nvfp4
+### mlx-community/GLM-4.6V-Flash-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.38s
-- *Generation time:* 14.02s
-- *Total time:* 21.05s
-- *Prompt preparation time:* 0.63
-- *First-token latency:* 10.5
-- *Cleanup time:* 0.211
-- *Prompt tokens:* 6,339
-- *Generation tokens:* 106
-- *Total tokens:* 6,445
-- *Prompt throughput (raw):* 603 tok/s
-- *Generation throughput (raw):* 44.7 tok/s
-- *Peak memory (GB):* 78
-- *Active memory (GB):* 62
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00154
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.32s
+- *Generation time:* 7.09s
+- *Total time:* 8.98s
+- *Prompt preparation time:* 0.554
+- *First-token latency:* 5.06
+- *Cleanup time:* 0.0863
+- *Prompt tokens:* 6,372
+- *Generation tokens:* 121
+- *Total tokens:* 6,493
+- *Prompt throughput (raw):* 1,260 tok/s
+- *Generation throughput (raw):* 78.8 tok/s
+- *Peak memory (GB):* 8.7
+- *Active memory (GB):* 7.1
+- *Cache memory (GB):* 0.47
+- *Model-load active memory (GB):* 7.08
+- *Post-cleanup active memory (GB):* 0.00197
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1379
+- *Rendered prompt characters:* 1494
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
 - *EOS token:* <\|endoftext\|>
@@ -2164,9 +1904,123 @@ Keywords: Border security, Patrol boats, Ramsgate Harbour, Sunset, Kent, Maritim
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset with Patrol Vessels
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Pier, Port, Ramsgate, Reflection
+Title: St Peter Mancroft Tower
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
+
+### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.93s
+- *Generation time:* 1.49s
+- *Total time:* 3.09s
+- *Prompt preparation time:* 0.655
+- *First-token latency:* 0.462
+- *Cleanup time:* 0.0798
+- *Prompt tokens:* 2,122
+- *Generation tokens:* 84
+- *Total tokens:* 2,206
+- *Prompt throughput (raw):* 4,597 tok/s
+- *Generation throughput (raw):* 213 tok/s
+- *Peak memory (GB):* 4.0
+- *Active memory (GB):* 2.8
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 2.82
+- *Post-cleanup active memory (GB):* 0.00382
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1464
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: St Peter Mancroft Tower, Norwich, England
+Description: A low-angle view of the medieval tower and Victorian lead flèche illuminated in evening light, with pedestrians walking along the street below.
+Keywords: Church Tower, Gothic Architecture, Historic Landmark, England, Norwich, Pedestrians, Spire, Stone Masonry, Clear Sky, Twilight, United Kingdom, Architecture, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
+
+### mlx-community/Molmo2-8B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: gothic architecture, stone masonry
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 1.17s
+- *Generation time:* 3.31s
+- *Total time:* 5.14s
+- *Prompt preparation time:* 0.655
+- *First-token latency:* 0.746
+- *Cleanup time:* 0.0987
+- *Prompt tokens:* 1,562
+- *Generation tokens:* 141
+- *Total tokens:* 1,703
+- *Prompt throughput (raw):* 2,092 tok/s
+- *Generation throughput (raw):* 73.0 tok/s
+- *Peak memory (GB):* 8.2
+- *Active memory (GB):* 6.5
+- *Cache memory (GB):* 0.31
+- *Model-load active memory (GB):* 6.45
+- *Post-cleanup active memory (GB):* 0.006
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1451
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: St Peter Mancroft Tower at Twilight, Norwich
+
+Description: A low-angle view of the medieval tower and Victorian lead flèche of St Peter Mancroft Church, illuminated in golden evening light. Pedestrians walk along the street below as the historic landmark stands against a clear sky, with trees and a modern building visible in the foreground.
+
+Keywords: St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Stone Masonry, Victorian Lead Flèche, Twilight, Clear Sky, Pedestrians, Historic Landmark, Stone Facade, Archway, Bell Tower, Gothic Architecture, Stone Masonry, Trees, United Kingdom, Walking, Norwich Cathedral
 </pre>
 
 </details>
@@ -2185,29 +2039,29 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Duplicate keywords: stone facade; Repeats the prompt's hint
+  text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.60s
-- *Generation time:* 2.03s
-- *Total time:* 3.44s
-- *Prompt preparation time:* 0.808
-- *First-token latency:* 0.371
-- *Cleanup time:* 0.0858
-- *Prompt tokens:* 1,407
-- *Generation tokens:* 114
-- *Total tokens:* 1,521
-- *Prompt throughput (raw):* 3,790 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Model load time:* 0.64s
+- *Generation time:* 2.09s
+- *Total time:* 3.50s
+- *Prompt preparation time:* 0.761
+- *First-token latency:* 0.376
+- *Cleanup time:* 0.085
+- *Prompt tokens:* 1,446
+- *Generation tokens:* 128
+- *Total tokens:* 1,574
+- *Prompt throughput (raw):* 3,843 tok/s
+- *Generation throughput (raw):* 128 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.35
+- *Cache memory (GB):* 0.40
 - *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0105
+- *Post-cleanup active memory (GB):* 0.0101
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1330
+- *Rendered prompt characters:* 1445
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2221,9 +2075,9 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Border Security Command Patrol Vessels in Ramsgate Harbour
-Description: Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+ Title: St Peter Mancroft Church, Norwich, England
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
 
 </details>
@@ -2242,29 +2096,28 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 12.99s
-- *Generation time:* 22.83s
-- *Total time:* 36.69s
-- *Prompt preparation time:* 0.845
-- *First-token latency:* 19.2
-- *Cleanup time:* 0.283
-- *Prompt tokens:* 3,468
-- *Generation tokens:* 111
-- *Total tokens:* 3,579
-- *Prompt throughput (raw):* 180 tok/s
-- *Generation throughput (raw):* 53.1 tok/s
+- *Model load time:* 11.94s
+- *Generation time:* 22.66s
+- *Total time:* 35.43s
+- *Prompt preparation time:* 0.816
+- *First-token latency:* 18.9
+- *Cleanup time:* 0.316
+- *Prompt tokens:* 3,506
+- *Generation tokens:* 118
+- *Total tokens:* 3,624
+- *Prompt throughput (raw):* 186 tok/s
+- *Generation throughput (raw):* 52.9 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
-- *Cache memory (GB):* 0.39
+- *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 85
-- *Post-cleanup active memory (GB):* 0.0107
+- *Post-cleanup active memory (GB):* 0.0104
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1376
+- *Rendered prompt characters:* 1491
 - *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2278,127 +2131,302 @@ Keywords: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet
 
 <pre class="model-output-readable">
 Title:
-UK Border Security vessels moored at Ramsgate Harbour at sunset
-
+St Peter Mancroft Tower at Twilight, Norwich
 Description:
-UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 Keywords:
-Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
 
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+### mlx-community/granite-4.0-3b-vision-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.19s
-- *Generation time:* 2.24s
-- *Total time:* 6.12s
-- *Prompt preparation time:* 0.666
-- *First-token latency:* 0.303
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 573
-- *Generation tokens:* 91
-- *Total tokens:* 664
-- *Prompt throughput (raw):* 1,890 tok/s
-- *Generation throughput (raw):* 80.2 tok/s
-- *Peak memory (GB):* 28
-- *Active memory (GB):* 27
-- *Cache memory (GB):* 0.01
-- *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0116
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.69s
+- *Generation time:* 1.77s
+- *Total time:* 3.27s
+- *Prompt preparation time:* 0.79
+- *First-token latency:* 0.438
+- *Cleanup time:* 0.0912
+- *Prompt tokens:* 1,410
+- *Generation tokens:* 105
+- *Total tokens:* 1,515
+- *Prompt throughput (raw):* 3,221 tok/s
+- *Generation throughput (raw):* 181 tok/s
+- *Peak memory (GB):* 4.8
+- *Active memory (GB):* 3.0
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 3.03
+- *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1324
+- *Rendered prompt characters:* 1637
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: UK Border Security Vessels Moored in Ramsgate Harbour at Sunset
-Description: Border Security Command patrol vessels, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour against a dramatic sunset cliffside skyline.
-Keywords: Ramsgate, Kent, harbor, border security, patrol boats, vessels, sunset, dusk, maritime, marina, mooring, reflection, cliffs, skyline, England, fleet
+Title: "Evening Illumination of Norwich's St Peter Mancroft"
+Description: A low-angle view captures the grandeur of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft, bathed in evening light, with pedestrians strolling along the street below.
+Keywords: Gothic Architecture, Historic Landmark, St Peter Mancroft, Stone Masonry, Spire, Twilight, United Kingdom, Pedestrians, Clear Sky, Architectural Detail
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-4-e4b-it-4bit"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### mlx-community/gemma-4-e4b-it-4bit
+### mlx-community/pixtral-12b-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-e4b-it-4bit</summary>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.57s
-- *Generation time:* 1.47s
-- *Total time:* 3.70s
-- *Prompt preparation time:* 0.638
-- *First-token latency:* 0.174
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 573
-- *Generation tokens:* 83
-- *Total tokens:* 656
-- *Prompt throughput (raw):* 3,287 tok/s
-- *Generation throughput (raw):* 124 tok/s
-- *Peak memory (GB):* 6.0
-- *Active memory (GB):* 5.2
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0147
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.69s
+- *Generation time:* 5.16s
+- *Total time:* 7.38s
+- *Prompt preparation time:* 0.512
+- *First-token latency:* 1.8
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 3,152
+- *Generation tokens:* 115
+- *Total tokens:* 3,267
+- *Prompt throughput (raw):* 1,753 tok/s
+- *Generation throughput (raw):* 40.1 tok/s
+- *Peak memory (GB):* 16
+- *Active memory (GB):* 13
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 13.5
+- *Post-cleanup active memory (GB):* 0.0155
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1324
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Rendered prompt characters:* 1413
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 475b9088d29754a3379866cf5aeb6b41acd313c2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-e4b-it-4bit/snapshots/475b9088d29754a3379866cf5aeb6b41acd313c2
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Patrol Vessels Moored in Ramsgate Harbour at Sunset
-Description: UK Border Security Command patrol vessels are moored side-by-side in Ramsgate Harbour, set against a dramatic sunset and the town's skyline.
-Keywords: Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Maritime, Mooring, Coast, Defenders, Buildings, Dusk, Fleet, Patrol Boats, Horizon
+Title:
+St Peter Mancroft Tower in Evening Light
+
+Description:
+The medieval tower and Victorian lead flèche of St Peter Mancroft are illuminated in the evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+
+Keywords:
+Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-nativ-community-mage-vl-optiq-4bit"></a>
+
+### nativ-community/Mage-VL-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: nativ-community/Mage-VL-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
+- *Model load time:* 0.79s
+- *Generation time:* 3.09s
+- *Total time:* 4.57s
+- *Prompt preparation time:* 0.678
+- *First-token latency:* 1.48
+- *Cleanup time:* 0.0921
+- *Prompt tokens:* 4,229
+- *Generation tokens:* 125
+- *Total tokens:* 4,354
+- *Prompt throughput (raw):* 2,861 tok/s
+- *Generation throughput (raw):* 128 tok/s
+- *Peak memory (GB):* 5.4
+- *Active memory (GB):* 3.9
+- *Cache memory (GB):* 0.76
+- *Model-load active memory (GB):* 3.93
+- *Post-cleanup active memory (GB):* 0.0158
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1543
+- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4f0a424370e54984ed783db8f8633a219c72db78
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mage-VL-OptiQ-4bit/snapshots/4f0a424370e54984ed783db8f8633a219c72db78
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: St Peter Mancroft Church Tower Illuminated at Twilight in Norwich, England
+Description: The medieval tower and Victorian lead flèche of the Church of St Peter Mancroft are illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-nativ-community-mistral-small-32-24b-instruct-2506-4bit"></a>
+
+### nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
+
+<details>
+<summary>Complete evidence: nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.78s
+- *Generation time:* 4.92s
+- *Total time:* 7.23s
+- *Prompt preparation time:* 0.516
+- *First-token latency:* 1.44
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 1,299
+- *Generation tokens:* 110
+- *Total tokens:* 1,409
+- *Prompt throughput (raw):* 902 tok/s
+- *Generation throughput (raw):* 37.0 tok/s
+- *Peak memory (GB):* 18
+- *Active memory (GB):* 15
+- *Cache memory (GB):* 0.28
+- *Model-load active memory (GB):* 15.1
+- *Post-cleanup active memory (GB):* 0.0161
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1413
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mistral-Small-3.2-24B-Instruct-2506-4bit/snapshots/bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.15, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+St Peter Mancroft Tower at Twilight
+
+Description:
+The medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, are captured in evening light, with pedestrians walking below.
+
+Keywords:
+St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Perpendicular Gothic, Bell Tower, Stone Masonry, Lead Flèche, Evening Light, Pedestrians, Historic Landmark, Clear Sky, Trees, Archway, United Kingdom, Historic Architecture, Twilight, Stone Facade
+</pre>
+
+</details>
+
+---
+
+<a id="model-sahilchachra-lensvlm-9b-mxfp4"></a>
+
+### sahilchachra/LensVLM-9B-MXFP4
+
+<details>
+<summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.14s
+- *Generation time:* 2.37s
+- *Total time:* 4.17s
+- *Prompt preparation time:* 0.643
+- *First-token latency:* 0.876
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 1,843
+- *Generation tokens:* 93
+- *Total tokens:* 1,936
+- *Prompt throughput (raw):* 2,105 tok/s
+- *Generation throughput (raw):* 105 tok/s
+- *Peak memory (GB):* 7.4
+- *Active memory (GB):* 5.7
+- *Cache memory (GB):* 0.20
+- *Model-load active memory (GB):* 5.69
+- *Post-cleanup active memory (GB):* 0.0168
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1504
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--sahilchachra--LensVLM-9B-MXFP4/snapshots/23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+St Peter Mancroft Church Tower at Dusk
+
+Description:
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+
+Keywords:
+Church Tower, Gothic Architecture, Norwich, Pedestrians, Twilight, Stone Masonry, Perpendicular Gothic, Historic Landmark, England, Spire
 </pre>
 
 </details>
@@ -2418,29 +2446,29 @@ Keywords: Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Mari
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.57s
-- *Generation time:* 1.28s
-- *Total time:* 2.94s
-- *Prompt preparation time:* 1.08
-- *First-token latency:* 0.102
-- *Cleanup time:* 0.0852
-- *Prompt tokens:* 312
+- *Model load time:* 0.61s
+- *Generation time:* 1.22s
+- *Total time:* 2.87s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 0.104
+- *Cleanup time:* 0.0798
+- *Prompt tokens:* 353
 - *Generation tokens:* 44
-- *Total tokens:* 356
-- *Prompt throughput (raw):* 3,054 tok/s
-- *Generation throughput (raw):* 371 tok/s
+- *Total tokens:* 397
+- *Prompt throughput (raw):* 3,379 tok/s
+- *Generation throughput (raw):* 367 tok/s
 - *Peak memory (GB):* 2.2
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
-- *Post-cleanup active memory (GB):* 0.00092
+- *Post-cleanup active memory (GB):* 0.00166
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1393
+- *Rendered prompt characters:* 1508
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2454,202 +2482,8 @@ Keywords: Ramsgate, Border Security, Patrol Vessels, Sunset, Kent, Harbour, Mari
 *Readable output:*
 
 <pre class="model-output-readable">
-A tranquil evening at Ramsgate Harbour, where the BSC Defender and BSC Volunteer patrol vessels stand side-by-side against a breathtaking sunset, with the town's cliffside skyline softly illuminated by the fading light.
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-internvl35-1b-4bit"></a>
-
-### mlx-community/InternVL3_5-1B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: dover, horizon, time,
-  date, timezone
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.49s
-- *Generation time:* 1.38s
-- *Total time:* 2.57s
-- *Prompt preparation time:* 0.705
-- *First-token latency:* 0.219
-- *Cleanup time:* 0.0842
-- *Prompt tokens:* 2,094
-- *Generation tokens:* 200
-- *Total tokens:* 2,294
-- *Prompt throughput (raw):* 9,578 tok/s
-- *Generation throughput (raw):* 422 tok/s
-- *Peak memory (GB):* 2.1
-- *Active memory (GB):* 1.1
-- *Cache memory (GB):* 0.29
-- *Model-load active memory (GB):* 1.08
-- *Post-cleanup active memory (GB):* 0.00274
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1341
-- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Moored Patrol Vessels at Ramsgate Harbour, Kent, During Sunset
-
-Description: The image captures a serene sunset over Ramsgate Harbour, featuring BSC patrol vessels, including the BSC Defender and BSC Volunteer, moored alongside other boats, with a dramatic skyline of buildings and a lifeguard lifebuoy visible.
-
-Keywords: Ramsgate, Kent, Sunset, BSC patrol, harbor, mooring, Dover, Fleet, Maritime, Coast, Dusk, England, Lifebuoy, Marina, Patrol boats, Pier, Port, Dover, Horizon, Building, Dover, Patrol vessels, British, Coastal, Skyline, Vessel, Defense, Horizon, Distant, Sky, Time, Date, Capture, Timezone, Location, Capture date, Time, Timezone, Time, Date, Timezone, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time, Date, Time,
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Duplicate keywords: sea
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.52s
-- *Generation time:* 36.79s
-- *Total time:* 38.95s
-- *Prompt preparation time:* 0.628
-- *First-token latency:* 1.56
-- *Cleanup time:* 0.101
-- *Prompt tokens:* 290
-- *Generation tokens:* 667
-- *Total tokens:* 957
-- *Prompt throughput (raw):* 186 tok/s
-- *Generation throughput (raw):* 19.3 tok/s
-- *Peak memory (GB):* 15
-- *Active memory (GB):* 11
-- *Cache memory (GB):* 0.70
-- *Model-load active memory (GB):* 11.4
-- *Post-cleanup active memory (GB):* 0.00418
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1402
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Ramsgate Harbour Sunset with Border Security Vessels
-
-Description: The image captures a serene sunset scene in Ramsgate Harbour, featuring a fleet of border security vessels, including the BSC Defender and BSC Volunteer, moored alongside each other. The vessels are situated in the foreground, with the town's cliffside skyline and buildings visible in the background.
-
-Keywords: Border security vessels, Ramsgate Harbour, sunset, BSC Defender, BSC Volunteer, moored vessels, cliffside skyline, buildings, harbour, sea, boats, vessels, security, maritime, port, marina, water, reflection, sky, clouds, sun, sea, seafront, sea view, sea and sky, sea and sky view, sea and sky view at sunset, sea and sky view at sunset with boats, sea and sky view at sunset with boats and buildings, sea and sky view at sunset with boats and buildings and cliffside, sea and sky view at sunset with boats and buildings and cliffside and harbour, sea and sky view at sunset with boats and buildings and cliffside and harbour and security, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view and sea and sky, sea and sky view at sunset with boats and buildings and cliffside and harbour and security and maritime and port and marina and water and reflection and sky and clouds and sun and sea and seafront and sea view and sea and sky and sea and sky view.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.87s
-- *Generation time:* 1.32s
-- *Total time:* 2.96s
-- *Prompt preparation time:* 0.757
-- *First-token latency:* 0.245
-- *Cleanup time:* 0.0944
-- *Prompt tokens:* 910
-- *Generation tokens:* 104
-- *Total tokens:* 1,014
-- *Prompt throughput (raw):* 3,707 tok/s
-- *Generation throughput (raw):* 304 tok/s
-- *Peak memory (GB):* 3.2
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00469
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1366
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-Here's the response following the instructions:
-
-Title: Ramsgate Harbour Patrol Vessels at Sunset
-
-Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsgate Harbour during dusk. The scene is illuminated by the sunset, highlighting the harbor and surrounding buildings.
-
-Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, buildings, reflection
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-Here's the response following the instructions:
-
-Title: Ramsgate Harbour Patrol Vessels at Sunset
-
-Description: The image shows Border security vessels, including BSC Defender and Volunteer, moored in Ramsgate Harbour during dusk. The scene is illuminated by the sunset, highlighting the harbor and surrounding buildings.
-
-Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys, maritime, fleet, mooring, patrol, Kent, buildings, reflection
-```
-
-</details>
 
 </details>
 
@@ -2668,28 +2502,28 @@ Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys,
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Names a place the prompt did not supply: Sunset
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.42s
-- *Generation time:* 7.72s
-- *Total time:* 10.01s
-- *Prompt preparation time:* 0.859
-- *First-token latency:* 3.28
-- *Cleanup time:* 0.0936
-- *Prompt tokens:* 3,104
-- *Generation tokens:* 113
-- *Total tokens:* 3,217
-- *Prompt throughput (raw):* 946 tok/s
-- *Generation throughput (raw):* 31.4 tok/s
+- *Model load time:* 1.40s
+- *Generation time:* 7.42s
+- *Total time:* 9.63s
+- *Prompt preparation time:* 0.794
+- *First-token latency:* 2.13
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 3,164
+- *Generation tokens:* 144
+- *Total tokens:* 3,308
+- *Prompt throughput (raw):* 1,488 tok/s
+- *Generation throughput (raw):* 31.8 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.6
-- *Cache memory (GB):* 3.8
+- *Cache memory (GB):* 3.9
 - *Model-load active memory (GB):* 7.23
-- *Post-cleanup active memory (GB):* 0.00646
+- *Post-cleanup active memory (GB):* 0.00662
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1336
+- *Rendered prompt characters:* 1451
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2703,11 +2537,11 @@ Keywords: Border, security, vessels, Ramsgate, harbour, dusk, sunset, lifebuoys,
 *Readable output:*
 
 <pre class="model-output-readable">
-Ramsgate Harbour Sunset: Border Security Vessels Moored
+St Peter Mancroft Tower, Norwich: Gothic Stone Facade at Sunset
 
-Border security patrol boats, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset. The scene captures the town's cliffside skyline and the reflective waters of the harbour.
+A low-angle view captures the medieval stone tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England. The structure's intricate Gothic architecture is illuminated by the warm glow of sunset, creating a striking contrast against the clear blue sky. Pedestrians walk along the street below, adding life to the historic landmark.
 
-Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+Gothic architecture, historic landmark, Norwich, England, medieval tower, Victorian lead flèche, Gothic stone facade, clear sky, sunset, pedestrians, St Peter Mancroft, stone masonry, spire, archway, trees, twilight, United Kingdom
 </pre>
 
 </details>
@@ -2728,28 +2562,29 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible
+  at the token limit; Conversation-role control tokens remain visible; Names a
+  place the prompt did not supply: Dusk
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Model load time:* 2.88s
-- *Generation time:* 51.17s
-- *Total time:* 54.80s
-- *Prompt preparation time:* 0.733
-- *First-token latency:* 8.07
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 4,390
+- *Generation time:* 47.45s
+- *Total time:* 51.01s
+- *Prompt preparation time:* 0.66
+- *First-token latency:* 6.88
+- *Cleanup time:* 0.137
+- *Prompt tokens:* 4,418
 - *Generation tokens:* 1,000
-- *Total tokens:* 5,390
-- *Prompt throughput (raw):* 544 tok/s
-- *Generation throughput (raw):* 23.6 tok/s
+- *Total tokens:* 5,418
+- *Prompt throughput (raw):* 642 tok/s
+- *Generation throughput (raw):* 25.0 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00687
+- *Post-cleanup active memory (GB):* 0.00703
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1536
+- *Rendered prompt characters:* 1651
 - *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2767,11 +2602,12 @@ Border security, Buildings, Coast, Dover, Dusk, England, Fleet, Harbour, Horizon
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -2783,45 +2619,41 @@ Title:
 Description:
 Keywords:
 
-Need title 5-10 words.
+We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not claim visible. Might just describe scene. The instruction says combining relevant context with main visible subject... Context includes capture date/time. Hmm "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." Means we can use them as facts but not say they are visible in image. Could mention "Captured on 2026-10-03 at 18:18:19 UTC+01:00" but that's meta. Might be okay. Might be better to keep description about visual.
+Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
 
-Let's make description: UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a sunset sky reflecting on the water and the town’s cliffside terraces beyond. The fleet shows lifebuoys, wheelhouses and mooring lines along the quay under a golden-orange sky.
+Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
 
-That's one sentence? It's two. Need 1-2 sentences.
-
-Keywords: 10-18 unique comma-separated. Must cover relevant context and visible details. Include Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina? maybe mooring. Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Also Dover appears in image? The hint mentions Dover, and a vessel has DOVER on it. Image shows "DOVER" on a vessel. Also maybe sunset. Also white cliffs. Could include sunset, white cliffs, etc.
-
-Need unique keywords. Provide 10-18.
-
-Let's list: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, England, dusk, sunset, harbour, mooring, fleet, lifebuoy, cliffside buildings, water reflection, maritime, patrol boat, BSC Defender
-
-But need comma-separated.
-
-Let's craft ~15 keywords.
-
-Ensure British English: Harbour not Harbor? Hint says Harbor. Might use Harbour. Use British spelling.
-
-Provide:
+Output exactly three sections with headings.
 
 Title:
 Description:
 Keywords:
 
-Make sure exactly those sections.
+No extra text.
 
-Probably output:
+Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden-orange sunset reflecting on the water and the town’s cliffside terraces in the background. The fleet shows lifebuoys, wheelhouses, radar domes and mooring lines along the quay beneath a dramatic evening sky.
+Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
+Probably keep simple.
+
+Keywords list comma-separated. Ensure unique.
+
+Let's produce:
+
+Title: St Peter Mancroft Tower at Dusk Norwich
+
+Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
+
+Keywords: St Peter Manc
 </pre>
 
 <details>
@@ -2833,11 +2665,12 @@ Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-03 18:18:19 UTC+01:00
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
-- Keyword hints: Border security vessels, Buildings, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -2849,48 +2682,104 @@ Title:
 Description:
 Keywords:
 
-Need title 5-10 words.
+We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
 
-Maybe "Border Security Command Vessels Moored at Ramsgate Harbour Sunset". That's 9 words? Count: Border(1) Security(2) Command(3) Vessels(4) Moored(5) at(6) Ramsgate(7) Harbour(8) Sunset(9). Good.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
 
-We have capture date/time: 2026-10-03 18:18:19 UTC+01:00. Should include? Could mention time? Maybe not claim visible. "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can say captured on ...? Might be okay to include date in description? Probably factual description about image. Might incorporate date? Usually description of scene, not metadata. Safer to not claim visible. Might just describe scene. The instruction says combining relevant context with main visible subject... Context includes capture date/time. Hmm "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." Means we can use them as facts but not say they are visible in image. Could mention "Captured on 2026-10-03 at 18:18:19 UTC+01:00" but that's meta. Might be okay. Might be better to keep description about visual.
+Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
 
-Let's make description: UK Border Security Command patrol vessels, including BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a sunset sky reflecting on the water and the town’s cliffside terraces beyond. The fleet shows lifebuoys, wheelhouses and mooring lines along the quay under a golden-orange sky.
+Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
 
-That's one sentence? It's two. Need 1-2 sentences.
-
-Keywords: 10-18 unique comma-separated. Must cover relevant context and visible details. Include Border security vessels, Buildings, Coast, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina? maybe mooring. Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection. Also Dover appears in image? The hint mentions Dover, and a vessel has DOVER on it. Image shows "DOVER" on a vessel. Also maybe sunset. Also white cliffs. Could include sunset, white cliffs, etc.
-
-Need unique keywords. Provide 10-18.
-
-Let's list: Border Security Command, patrol vessels, Ramsgate Harbour, Kent, England, dusk, sunset, harbour, mooring, fleet, lifebuoy, cliffside buildings, water reflection, maritime, patrol boat, BSC Defender
-
-But need comma-separated.
-
-Let's craft ~15 keywords.
-
-Ensure British English: Harbour not Harbor? Hint says Harbor. Might use Harbour. Use British spelling.
-
-Provide:
+Output exactly three sections with headings.
 
 Title:
 Description:
 Keywords:
 
-Make sure exactly those sections.
+No extra text.
 
-Probably output:
+Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
 
-Title: Border Security Command Vessels Moored at Ramsgate Harbour Sunset
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Description: UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, at dusk with a golden-orange sunset reflecting on the water and the town’s cliffside terraces in the background. The fleet shows lifebuoys, wheelhouses, radar domes and mooring lines along the quay beneath a dramatic evening sky.
+Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
 
-Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
+Probably keep simple.
+
+Keywords list comma-separated. Ensure unique.
+
+Let's produce:
+
+Title: St Peter Mancroft Tower at Dusk Norwich
+
+Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
+
+Keywords: St Peter Manc
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: historic architecture,
+  stone architecture
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.88s
+- *Generation time:* 4.19s
+- *Total time:* 5.59s
+- *Prompt preparation time:* 0.513
+- *First-token latency:* 0.309
+- *Cleanup time:* 0.0928
+- *Prompt tokens:* 1,151
+- *Generation tokens:* 200
+- *Total tokens:* 1,351
+- *Prompt throughput (raw):* 3,722 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 8.3
+- *Cache memory (GB):* 1.1
+- *Model-load active memory (GB):* 8.3
+- *Post-cleanup active memory (GB):* 0.00762
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1434
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Gothic Church Tower of St Peter Mancroft in Norwich
+
+Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with its Victorian lead flèche illuminated in the evening light, as pedestrians walk along the street below.
+
+Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, historic landmark, stone masonry, stone facade, clear sky, twilight, United Kingdom, walking, pedestrians, perpendicular gothic, spire, historic architecture, historic architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone
+</pre>
 
 </details>
 
@@ -2908,29 +2797,30 @@ Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Duplicate keywords: lifeboat station
+- *Observations:* Response repeats the same text; Unrecognised model control
+  tokens remain visible; Required labelled fields not detected: keywords;
+  Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.78s
-- *Generation time:* 35.45s
-- *Total time:* 37.17s
-- *Prompt preparation time:* 0.935
-- *First-token latency:* 32.8
-- *Cleanup time:* 0.096
-- *Prompt tokens:* 16,536
-- *Generation tokens:* 225
-- *Total tokens:* 16,761
-- *Prompt throughput (raw):* 505 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Model load time:* 0.84s
+- *Generation time:* 48.61s
+- *Total time:* 50.35s
+- *Prompt preparation time:* 0.886
+- *First-token latency:* 39.8
+- *Cleanup time:* 0.0955
+- *Prompt tokens:* 16,577
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,577
+- *Prompt throughput (raw):* 417 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 9.4
 - *Active memory (GB):* 4.4
-- *Cache memory (GB):* 1.3
+- *Cache memory (GB):* 0.81
 - *Model-load active memory (GB):* 4.43
-- *Post-cleanup active memory (GB):* 0.00828
+- *Post-cleanup active memory (GB):* 0.00793
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
+- *Rendered prompt characters:* 1543
 - *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2943,12 +2833,555 @@ Keywords: Border Security Command, patrol vessels, Ramsgate Harbour
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Border Security Command vessels in Ramsgate Harbour at sunset
+Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 
-Description: The image shows a marina in Ramsgate, Kent, UK. There are several large boats moored in the harbour, including Border Security Command vessels such as the BSC Defender and BSC Volunteer. The boats are moored alongside each other, with the harbour in the foreground and the town skyline in the background. The sky is illuminated by the setting sun, creating a dramatic and colourful sunset over the buildings and the harbour. The boats are silhouetted against the sunset, with the reflection of the water on the water surface adding to the overall composition. The image captures the contrast between the modern, high-tech vessels and the traditional, historic buildings in the background.
+Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
 
-Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buildings, reflection, Kent, UK, sea, harbour, mooring, lifebuoy, pier, lifeboat, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station, lifeboat station,
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+
+Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
+
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+
+```
+
+</details>
 
 </details>
 
@@ -2967,28 +3400,28 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.31s
-- *Generation time:* 1.02s
-- *Total time:* 2.23s
-- *Prompt preparation time:* 0.895
-- *First-token latency:* 0.119
-- *Cleanup time:* 0.0809
-- *Prompt tokens:* 1,186
-- *Generation tokens:* 22
-- *Total tokens:* 1,208
-- *Prompt throughput (raw):* 9,985 tok/s
-- *Generation throughput (raw):* 553 tok/s
+- *Model load time:* 0.30s
+- *Generation time:* 0.94s
+- *Total time:* 2.04s
+- *Prompt preparation time:* 0.791
+- *First-token latency:* 0.126
+- *Cleanup time:* 0.0826
+- *Prompt tokens:* 1,225
+- *Generation tokens:* 36
+- *Total tokens:* 1,261
+- *Prompt throughput (raw):* 9,713 tok/s
+- *Generation throughput (raw):* 541 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
 - *Model-load active memory (GB):* 0.16
-- *Post-cleanup active memory (GB):* 0.0103
+- *Post-cleanup active memory (GB):* 0.01
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1330
+- *Rendered prompt characters:* 1445
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -3002,69 +3435,7 @@ Keywords: Border Security Command vessels, Ramsgate Harbour, sunset, boats, buil
 *Readable output:*
 
 <pre class="model-output-readable">
- Brokewater, BSC, Dusk, England, Marina, Port, Ramsgate, Reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Duplicate keywords: sunset, buildings, marina, mooring,
-  patrol boats, water, horizon, england, maritime, port, pier, coast, dover,
-  fleet, harbor, lifebuoy, patrol boat, ramsgate, reflection
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.13s
-- *Generation time:* 30.40s
-- *Total time:* 32.49s
-- *Prompt preparation time:* 0.959
-- *First-token latency:* 12.2
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 16,536
-- *Generation tokens:* 1,000
-- *Total tokens:* 17,536
-- *Prompt throughput (raw):* 1,353 tok/s
-- *Generation throughput (raw):* 57.8 tok/s
-- *Peak memory (GB):* 14
-- *Active memory (GB):* 9.5
-- *Cache memory (GB):* 1.3
-- *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.011
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Dusk at Ramsgate: Border Security Vessels
-
-Description:
-UK Border Security Command patrol boats, including the BSC Defender and Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline, with reflections on the water and a mix of warm and cool lighting.
-
-Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harbour, Kent, Dusk, Sunset, Cliffside, Buildings, Marina, Mooring, Patrol boats, Lifebuoys, Reflections, Water, Horizon, England, Maritime, Port, Pier, Horizon, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Reflection, Sunset, Water, Horizon, Buildings, Coast, Dover, England, Fleet, Harbor, Horizon, Lifebuoy, Marina, Maritime,
+ A low-angle view of the medieval church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 </pre>
 
 </details>
@@ -3083,28 +3454,29 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: title
+- *Observations:* Required labelled fields not detected: title, description,
+  keywords; Names a place the prompt did not supply: UK
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.55s
-- *Generation time:* 2.27s
-- *Total time:* 4.45s
-- *Prompt preparation time:* 0.606
-- *First-token latency:* 0.287
-- *Cleanup time:* 0.11
-- *Prompt tokens:* 571
-- *Generation tokens:* 129
-- *Total tokens:* 700
-- *Prompt throughput (raw):* 1,988 tok/s
-- *Generation throughput (raw):* 92.6 tok/s
+- *Model load time:* 1.57s
+- *Generation time:* 3.48s
+- *Total time:* 5.63s
+- *Prompt preparation time:* 0.553
+- *First-token latency:* 0.291
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 609
+- *Generation tokens:* 261
+- *Total tokens:* 870
+- *Prompt throughput (raw):* 2,091 tok/s
+- *Generation throughput (raw):* 98.1 tok/s
 - *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
-- *Post-cleanup active memory (GB):* 0.0126
+- *Post-cleanup active memory (GB):* 0.0123
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1355
+- *Rendered prompt characters:* 1470
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -3118,14 +3490,85 @@ Keywords: UK Border Security Command, BSC Defender, BSC Volunteer, Ramsgate Harb
 *Readable output:*
 
 <pre class="model-output-readable">
-**Description:**
-
-A row of fishing boats, including the "BOS Defender" and "BOS Volunteer," are moored side-by-side in the harbor of Ramsgate, Kent. The boats are lined up along a pier, with a colorful cityscape visible in the background under a vibrant sunset sky. The water reflects the warm hues of the sky, creating a serene and picturesque scene.
-
-**Keywords:**
-
-fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sunset, pier, cityscape, boats, water, reflection, UK, coastal, maritime, fishing, harbor scene, sunset view.
+&#96;&#96;&#96;json
+{
+  "caption": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK.",
+  "bounding_boxes": [
+    [
+      125,
+      0,
+      987,
+      1000
+    ]
+  ],
+  "keywords": [
+    "Archway",
+    "Bell Tower",
+    "Church Tower",
+    "Clear Sky",
+    "England",
+    "Gothic Architecture",
+    "Historic Landmark",
+    "Historic Building",
+    "Norwich",
+    "Pedestrians",
+    "Purple Bench",
+    "Spire",
+    "St Peter Mancroft",
+    "Stone Masonry",
+    "Stone Facade",
+    "Trees",
+    "Twilight",
+    "United Kingdom",
+    "Walking"
+  ],
+  "description": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK."
+}
+&#96;&#96;&#96;
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+````text
+```json
+{
+  "caption": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK.",
+  "bounding_boxes": [
+    [
+      125,
+      0,
+      987,
+      1000
+    ]
+  ],
+  "keywords": [
+    "Archway",
+    "Bell Tower",
+    "Church Tower",
+    "Clear Sky",
+    "England",
+    "Gothic Architecture",
+    "Historic Landmark",
+    "Historic Building",
+    "Norwich",
+    "Pedestrians",
+    "Purple Bench",
+    "Spire",
+    "St Peter Mancroft",
+    "Stone Masonry",
+    "Stone Facade",
+    "Trees",
+    "Twilight",
+    "United Kingdom",
+    "Walking"
+  ],
+  "description": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK."
+}
+```
+````
+
+</details>
 
 </details>
 
@@ -3142,30 +3585,31 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: description;
-  Duplicate keywords: patrol boats
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Required labelled fields not detected:
+  description; Duplicate keywords: norwich, trees
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.55s
-- *Generation time:* 3.81s
-- *Total time:* 5.21s
-- *Prompt preparation time:* 0.844
-- *First-token latency:* 2.42
-- *Cleanup time:* 0.0884
-- *Prompt tokens:* 5,615
-- *Generation tokens:* 86
-- *Total tokens:* 5,701
-- *Prompt throughput (raw):* 2,324 tok/s
-- *Generation throughput (raw):* 144 tok/s
+- *Model load time:* 0.45s
+- *Generation time:* 4.35s
+- *Total time:* 5.58s
+- *Prompt preparation time:* 0.781
+- *First-token latency:* 2.26
+- *Cleanup time:* 0.086
+- *Prompt tokens:* 5,688
+- *Generation tokens:* 200
+- *Total tokens:* 5,888
+- *Prompt throughput (raw):* 2,512 tok/s
+- *Generation throughput (raw):* 150 tok/s
 - *Peak memory (GB):* 4.3
 - *Active memory (GB):* 2.4
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 2.36
-- *Post-cleanup active memory (GB):* 0.0151
+- *Post-cleanup active memory (GB):* 0.0142
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1475
+- *Rendered prompt characters:* 1590
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -3179,8 +3623,8 @@ fishing boats, BOS Defender, BOS Volunteer, Ramsgate, Kent, harbor, mooring, sun
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Ramsgate Harbour Patrol Boats at Dusk"
-Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coast, Dover, Horizon, Lifebuoy, Marina, Maritime, Mooring, Patrol Boats, Patrol Boats, Pier, Port, Ramsgate, Reflection
+Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow"
+Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, Stone facade, Trees, United Kingdom, Walking, Evening Light, Norwich, England, Church Tower, Bell Tower, St Peter Mancroft, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees,
 </pre>
 
 </details>
@@ -3202,26 +3646,26 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.74s
-- *Generation time:* 1.67s
-- *Total time:* 4.13s
-- *Prompt preparation time:* 0.719
-- *First-token latency:* 0.813
-- *Cleanup time:* 0.15
-- *Prompt tokens:* 2,174
-- *Generation tokens:* 18
-- *Total tokens:* 2,192
-- *Prompt throughput (raw):* 2,675 tok/s
-- *Generation throughput (raw):* 107 tok/s
+- *Model load time:* 1.06s
+- *Generation time:* 1.66s
+- *Total time:* 3.41s
+- *Prompt preparation time:* 0.684
+- *First-token latency:* 0.831
+- *Cleanup time:* 0.147
+- *Prompt tokens:* 2,211
+- *Generation tokens:* 19
+- *Total tokens:* 2,230
+- *Prompt throughput (raw):* 2,662 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 5.7
-- *Post-cleanup active memory (GB):* 0.0155
+- *Model-load active memory (GB):* 5.69
+- *Post-cleanup active memory (GB):* 0.0146
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1557
+- *Rendered prompt characters:* 1672
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -3235,14 +3679,14 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a harbor with several boats docked in a row.
+&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a large church tower with a spire and a pointed roof.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The image shows a harbor with several boats docked in a row.
+<|channel|> analysis<|message|> The image shows a large church tower with a spire and a pointed roof.
 ```
 
 </details>
@@ -3262,31 +3706,30 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Required labelled fields not
-  detected: description, keywords; Response appears cut off at the token limit
+- *Maintainer status:* none
+- *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.77s
-- *Generation time:* 3.62s
-- *Total time:* 5.04s
-- *Prompt preparation time:* 0.642
-- *First-token latency:* 0.0846
-- *Cleanup time:* 0.0939
-- *Prompt tokens:* 308
-- *Generation tokens:* 1,000
-- *Total tokens:* 1,308
-- *Prompt throughput (raw):* 3,640 tok/s
-- *Generation throughput (raw):* 341 tok/s
+- *Model load time:* 0.46s
+- *Generation time:* 1.01s
+- *Total time:* 2.08s
+- *Prompt preparation time:* 0.603
+- *First-token latency:* 0.086
+- *Cleanup time:* 0.091
+- *Prompt tokens:* 349
+- *Generation tokens:* 131
+- *Total tokens:* 480
+- *Prompt throughput (raw):* 4,059 tok/s
+- *Generation throughput (raw):* 372 tok/s
 - *Peak memory (GB):* 1.8
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.40
-- *Model-load active memory (GB):* 0.614
-- *Post-cleanup active memory (GB):* 0.0161
+- *Cache memory (GB):* 0.30
+- *Model-load active memory (GB):* 0.613
+- *Post-cleanup active memory (GB):* 0.0152
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1384
+- *Rendered prompt characters:* 1499
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -3300,7 +3743,8 @@ Keywords: Border Security Vessels, Ramsgate Harbour, Kent, England, Sunset, Coas
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dusk, England, Fleet, Harbor, Maritime, Mooring, Patrol Boat, Pier, Port, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor, Horizon, Kent, Lifebuoy, Marina, Maritime, Mooring, Patrol boat, Patrol boats, Pier, Port, Ramsgate, Dusk, Coast, Dover, Dusk, England, Fleet, Harbor
+Title: A Gothic Architecture Snapshot of the Church of St Peter Mancroft Illuminated in Twilight
+Description: A detailed view of the medieval church of St Peter Mancroft, illuminated by the twilight, with a low-angle view of the church and its bell tower. The image captures the historic architecture, the stone facade, and the spire of the church, set against the backdrop of a clear sky. The photograph is taken during the evening hours, with pedestrians walking along the street below. The image is a faithful representation of the historical landmark, providing a comprehensive view of the church's design and the time of day it is illuminated.
 </pre>
 
 </details>
@@ -3320,29 +3764,29 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type moondream1 via
   moondream2)
-- *Model load time:* 0.92s
-- *Generation time:* 1.28s
-- *Total time:* 2.99s
-- *Prompt preparation time:* 0.772
-- *First-token latency:* 0.231
-- *Cleanup time:* 0.0865
-- *Prompt tokens:* 1,011
-- *Generation tokens:* 48
-- *Total tokens:* 1,059
-- *Prompt throughput (raw):* 4,372 tok/s
-- *Generation throughput (raw):* 162 tok/s
+- *Model load time:* 1.17s
+- *Generation time:* 1.14s
+- *Total time:* 3.02s
+- *Prompt preparation time:* 0.698
+- *First-token latency:* 0.239
+- *Cleanup time:* 0.0897
+- *Prompt tokens:* 1,038
+- *Generation tokens:* 37
+- *Total tokens:* 1,075
+- *Prompt throughput (raw):* 4,347 tok/s
+- *Generation throughput (raw):* 171 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.8
 - *Cache memory (GB):* 0.27
 - *Model-load active memory (GB):* 3.75
-- *Post-cleanup active memory (GB):* 0.0173
+- *Post-cleanup active memory (GB):* 0.0169
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1277
+- *Rendered prompt characters:* 1392
 - *Processor:* mlx_vlm.models.moondream2.processing_moondream2.Moondream2Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -3355,7 +3799,7 @@ Title: "UK Border Security Command Patrol Vessels in Ramsgate Harbour, Kent, Dus
 *Readable output:*
 
 <pre class="model-output-readable">
-Ramsgate Harbour, Kent, UK Border Security Command patrol vessels, including the BSC Defender and BSC Volunteer, are moored side-by-side in Ramsgate Harbour, Kent, against a dramatic sunset and the town's cliffside skyline.
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 </pre>
 
 </details>
