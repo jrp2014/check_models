@@ -1117,6 +1117,10 @@ class SystemTelemetryRecord(TypedDict, total=False):
     gpu_samples: int
     gpu_utilization_max_pct: int
     gpu_busy_samples: int
+    # "reread" (0.17.49+): each reading discarded a stale first ioreg read.
+    # Records without it (0.17.44-0.17.46) could count this process's own
+    # finished inference, so their GPU readings are shown as unreliable.
+    gpu_sample_method: str
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -14727,19 +14731,47 @@ _REPETITION_TAIL_CYCLE_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
+# The text check sees only what the detokenizer has released. A BPE
+# detokenizer can hold back a run with no space in it until finalisation:
+# Qwen2-VL emitted 265 repeats of "<|im_start|>assistant" on 2026-10-11 as
+# empty chunks, so the text tail never showed the cycle. The token-id check
+# is stricter than the text one: the last 96 ids must repeat exactly with a
+# period of at most 32 (so at least three full cycles).
+_REPETITION_TOKEN_WINDOW: Final[int] = 96
+_REPETITION_TOKEN_MAX_PERIOD: Final[int] = 32
+
+
 def _detect_streaming_repetition(tail: str) -> bool:
     """Return whether the text tail ends in >=4 exact repeats of one unit."""
     return _REPETITION_TAIL_CYCLE_RE.search(tail) is not None
 
 
-def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int) -> bool:
-    """Check the retained tail for a degenerate cycle every N chunks past the floor."""
+def _detect_token_cycle(token_ids: Sequence[int]) -> bool:
+    """Return whether the last window of token ids is exactly periodic (period <= max)."""
+    window = token_ids[-_REPETITION_TOKEN_WINDOW:]
+    if len(window) < _REPETITION_TOKEN_WINDOW:
+        return False
+    return any(
+        all(window[i] == window[i - period] for i in range(period, len(window)))
+        for period in range(1, _REPETITION_TOKEN_MAX_PERIOD + 1)
+    )
+
+
+def _stream_tail_repeats(
+    pieces: Sequence[str],
+    chunk: object,
+    chunk_count: int,
+    token_ids: Sequence[int] = (),
+) -> bool:
+    """Check the retained tail (text, then token ids) for a cycle every N chunks past the floor."""
     if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
         return False
     generated = getattr(chunk, "generation_tokens", None)
     if not isinstance(generated, int) or generated < _REPETITION_ABORT_MIN_TOKENS:
         return False
-    return _detect_streaming_repetition("".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:])
+    return _detect_streaming_repetition(
+        "".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:]
+    ) or _detect_token_cycle(token_ids)
 
 
 @dataclass
@@ -14976,6 +15008,9 @@ def _generate_with_repetition_guard(
     """
     _register_stream_stop_tokens(model, processor, kwargs.get("eos_tokens"))
     pieces: list[str] = []
+    # Kept here, not only in ``observations``, so the token-cycle check runs
+    # whether or not the caller collects observations.
+    token_ids: list[int] = []
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
     token_seen = False
@@ -15002,6 +15037,10 @@ def _generate_with_repetition_guard(
                 if on_first_token is not None:
                     on_first_token()
             _observe_token(observations, chunk)
+            if isinstance(token := getattr(chunk, "token", None), int) and not isinstance(
+                token, bool
+            ):
+                token_ids.append(token)
             pieces.append(chunk.text)
             if (
                 echo is not None
@@ -15011,7 +15050,7 @@ def _generate_with_repetition_guard(
                 echo.write(chunk.text)
                 echo.flush()
             chunk_count += 1
-            if _stream_tail_repeats(pieces, chunk, chunk_count):
+            if _stream_tail_repeats(pieces, chunk, chunk_count, token_ids):
                 aborted = True
                 break
         if echo is not None and pieces:
@@ -15681,6 +15720,18 @@ def _system_telemetry_probe() -> _TelemetryProbe:
     )
 
 
+_GPU_SAMPLE_METHOD: Final[str] = "reread"
+_GPU_UNRELIABLE_NOTE: Final[str] = (
+    "taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this "
+    "run's own inference and are not evidence of other GPU work"
+)
+
+
+def _gpu_reading_reliable(telemetry: Mapping[str, object]) -> bool:
+    """Whether a record's GPU reading discarded the stale first ioreg read."""
+    return telemetry.get("gpu_sample_method") == _GPU_SAMPLE_METHOD
+
+
 def _gpu_telemetry_fields(probes: Sequence[_TelemetryProbe]) -> SystemTelemetryRecord:
     """GPU-use counts over the probes that carry a reading; empty when none do."""
     gpu = [p.gpu_utilization_pct for p in probes if p.gpu_utilization_pct is not None]
@@ -15690,6 +15741,7 @@ def _gpu_telemetry_fields(probes: Sequence[_TelemetryProbe]) -> SystemTelemetryR
         "gpu_samples": len(gpu),
         "gpu_utilization_max_pct": max(gpu),
         "gpu_busy_samples": sum(value > 0 for value in gpu),
+        "gpu_sample_method": _GPU_SAMPLE_METHOD,
     }
 
 
@@ -15893,7 +15945,7 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
                 telemetry.get("thermal_samples", 0),
             )
         )
-    if busy := telemetry.get("gpu_busy_samples", 0):
+    if (busy := telemetry.get("gpu_busy_samples", 0)) and _gpu_reading_reliable(telemetry):
         notes.append(
             f"GPU activity detected outside harness inference (up to "
             f"{telemetry.get('gpu_utilization_max_pct', 0)}%) "
@@ -15958,10 +16010,12 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
     else:
         parts.append("thermal-state probe unavailable")
     if gpu_samples := telemetry.get("gpu_samples", 0):
+        peak = telemetry.get("gpu_utilization_max_pct", 0)
         parts.append(
-            f"GPU activity outside harness inference: max "
-            f"{telemetry.get('gpu_utilization_max_pct', 0)}% at {gpu_samples} instantaneous "
-            "check(s); activity between checks is not observed"
+            f"GPU activity outside harness inference: max {peak}% at {gpu_samples} "
+            "instantaneous check(s); activity between checks is not observed"
+            if _gpu_reading_reliable(telemetry)
+            else f"GPU reading max {peak}% at {gpu_samples} check(s), {_GPU_UNRELIABLE_NOTE}"
         )
     if (gap := telemetry.get("wall_clock_gap_s")) is not None:
         parts.append(f"wall-clock gap {gap:.0f}s (sleep/suspend; timings untrustworthy)")
@@ -21366,15 +21420,36 @@ def _record_timing_untrusted(record: JsonlResultRecord) -> bool:
     return _record_wall_clock_gap(record) or _record_thermal_throttled(record)
 
 
-def _records_gpu_busy(records: Sequence[JsonlResultRecord]) -> tuple[int, int] | None:
-    """(models with GPU activity at a snapshot check outside inference, peak %), or None."""
+def _records_gpu_busy(
+    records: Sequence[JsonlResultRecord], *, reliable: bool
+) -> tuple[int, int] | None:
+    """(models with a non-zero snapshot GPU reading, peak %) among reliable or unreliable ones."""
     busy = [
         telemetry.get("gpu_utilization_max_pct", 0)
         for record in records
         if isinstance(telemetry := record.get("system_telemetry"), dict)
         and telemetry.get("gpu_busy_samples", 0)
+        and _gpu_reading_reliable(telemetry) is reliable
     ]
     return (len(busy), max(busy)) if busy else None
+
+
+def _gpu_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> list[str]:
+    """Run-level GPU notes: detected activity, and pre-fix readings marked unreliable."""
+    notes: list[str] = []
+    if detected := _records_gpu_busy(records, reliable=True):
+        count, peak = detected
+        notes.append(
+            f"{label} run detected GPU activity outside harness inference at the checks "
+            f"around {count} of {len(records)} models (up to {peak}%)"
+        )
+    if stale := _records_gpu_busy(records, reliable=False):
+        count, peak = stale
+        notes.append(
+            f"{label} run's GPU readings were non-zero around {count} of {len(records)} "
+            f"models (up to {peak}%), but were {_GPU_UNRELIABLE_NOTE}"
+        )
+    return notes
 
 
 def _record_on_battery(record: JsonlResultRecord) -> bool:
@@ -21416,12 +21491,7 @@ def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> 
     on_battery = sum(_record_on_battery(record) for record in records)
     if on_battery:
         notes.append(f"{label} run on battery power for {on_battery} of {len(records)} models")
-    if gpu_busy := _records_gpu_busy(records):
-        count, peak = gpu_busy
-        notes.append(
-            f"{label} run detected GPU activity outside harness inference at the checks "
-            f"around {count} of {len(records)} models (up to {peak}%)"
-        )
+    notes.extend(_gpu_environment_notes(label, records))
     gaps = [record["model"] for record in records if _record_wall_clock_gap(record)]
     if gaps:
         notes.append(

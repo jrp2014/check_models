@@ -1850,6 +1850,7 @@ def test_telemetry_records_other_processes_on_the_gpu() -> None:
     assert record["gpu_samples"] == 2
     assert record["gpu_utilization_max_pct"] == 37
     assert record["gpu_busy_samples"] == 1
+    assert record["gpu_sample_method"] == "reread"
     assert (
         "GPU activity outside harness inference: max 37% at 2 instantaneous check(s); "
         "activity between checks is not observed"
@@ -1888,6 +1889,32 @@ def test_telemetry_records_other_processes_on_the_gpu() -> None:
             "around 1 of 3 models (up to 37%)"
         )
     ]
+
+
+def test_gpu_readings_from_before_the_stale_read_fix_are_marked_unreliable() -> None:
+    """Records without the reread marker keep their numbers but never claim other GPU work."""
+    legacy: check_models.SystemTelemetryRecord = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "gpu_samples": 2,
+        "gpu_utilization_max_pct": 99,
+        "gpu_busy_samples": 1,
+    }
+    assert check_models._telemetry_degradation_note(legacy) is None
+    status = check_models._telemetry_status_line(legacy)
+    assert "GPU reading max 99% at 2 check(s), taken before the 0.17.47 stale-read fix" in status
+    assert "outside harness inference" not in status
+    records = cast(
+        "list[check_models.JsonlResultRecord]",
+        [{"model": "org/a", "system_telemetry": legacy}],
+    )
+    (note,) = check_models._run_environment_notes("current", records)
+    assert note.startswith(
+        "current run's GPU readings were non-zero around 1 of 1 models (up to 99%), but were "
+        "taken before the 0.17.47 stale-read fix"
+    )
+    assert "not evidence of other GPU work" in note
 
 
 def test_wall_clock_gap_is_attached_only_beyond_the_threshold() -> None:

@@ -896,6 +896,21 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The repetition guard also checks token ids. It only saw text the
+  detokenizer had released, and a BPE detokenizer can hold back a run with no
+  space in it until finalisation. Qwen2-VL reached the 1,000-token cap on
+  2026-10-11 with 265 repeats of `<|im_start|>assistant` delivered as empty
+  chunks. The new check is stricter than the text one: the last 96 generated
+  ids must repeat exactly with a period of at most 32, past the same
+  200-token floor. A regression test streams 970 empty-text chunks of that
+  cycle and expects the stop at token 200.
+- GPU readings from before the 0.17.47 stale-read fix are marked unreliable
+  wherever they are shown, with the raw numbers kept. New telemetry records
+  carry `gpu_sample_method: "reread"`, and readers treat records without it
+  (0.17.44-0.17.46) as unreliable: never "GPU activity detected outside
+  harness inference". The retained 2026-10-11 19:53 summary, diagnostics and
+  HTML report now say its non-zero readings are unreliable and not evidence
+  of other GPU work; `results.jsonl` is unchanged.
 - The quality table's intro now says "tokens in count the image's tokens
   too ...; tokens out are those generated". Skylos 4.47.2 flagged the
   previous wording of that sentence as a prompt-injection pattern (SKY-D260)
