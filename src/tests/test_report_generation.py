@@ -1763,6 +1763,36 @@ def test_regeneration_requalifies_stale_gpu_notes_from_the_records(tmp_path: Pat
     ) in prose
 
 
+def test_regenerated_summary_names_the_rendering_check_models(tmp_path: Path) -> None:
+    """A summary rendered by newer code says so; one rendered by the run's code does not.
+
+    Regeneration keeps each model's recorded assessment, so a retired
+    observation can still appear; the provenance row explains why.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/clean"),))
+    renderer: check_models.CheckModelsProvenanceRecord = {
+        "name": "check_models",
+        "version": "0.9.1",
+        "git_revision": "def4567890abcdef",
+        "install_type": "source-tree",
+    }
+
+    with patch.object(check_models, "_collect_check_models_provenance", return_value=renderer):
+        newer = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+        assert newer is not None
+        prose = " ".join(newer.read_text(encoding="utf-8").split())
+        assert (
+            "*Provenance:* run captured by check_models 0.8.9 @ abc123; report rendered by "
+            "0.9.1 @ def456789; original assessments retained"
+        ) in prose
+
+        renderer.update(version="0.8.9", git_revision="abc123")
+        same = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+        assert same is not None
+        assert "Provenance" not in same.read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize(
     ("replacement", "expected"),
     [

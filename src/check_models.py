@@ -24448,6 +24448,34 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
     return tuple(rows)
 
 
+def _run_issue_summary_provenance_rows(
+    producer: CheckModelsProvenanceRecord | None,
+) -> tuple[tuple[str, str], ...]:
+    """Name the check_models that rendered this summary when it is not the run's own.
+
+    A regenerated summary re-renders the retained results: each model's
+    assessment is the one recorded at run time, so it can carry observations
+    since retired or wording since corrected. Silent when the code matches.
+    """
+    if producer is None:
+        return ()
+    renderer = _collect_check_models_provenance()
+    captured_revision, rendered_revision = producer["git_revision"], renderer["git_revision"]
+    if producer["version"] == renderer["version"] and (
+        captured_revision is None
+        or rendered_revision is None
+        or captured_revision == rendered_revision
+    ):
+        return ()
+    captured = producer["version"] + (f" @ {captured_revision[:9]}" if captured_revision else "")
+    rendered = renderer["version"] + (f" @ {rendered_revision[:9]}" if rendered_revision else "")
+    text = (
+        f"run captured by check_models {captured}; report rendered by {rendered}; "
+        "original assessments retained"
+    )
+    return (("Provenance", text),)
+
+
 _NATIVE_REPRO_CELLS: Final[dict[str, str]] = {
     "actionable_failure": "crash: triage",
     "observation_needs_reproduction": "candidate",
@@ -25070,6 +25098,7 @@ def generate_run_issue_summary_report(
                                     "metadata_exposed_to_prompt"
                                 ),
                             ),
+                            *_run_issue_summary_provenance_rows(source.producer),
                             ("Models attempted", str(len(source.results))),
                             ("Sampling settings", _run_issue_summary_sampling_note(source.results)),
                             ("Completed", str(counts["completed"])),

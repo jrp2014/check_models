@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Run summary: a summary rendered by different check_models code than the
+  run says so in a *Provenance* row, such as "run captured by check_models
+  0.17.46 @ 3d1b38a4f; report rendered by 0.17.50 @ ac8822bc0; original
+  assessments retained". Regeneration keeps each model's recorded assessment,
+  so a newer report can still show an observation since retired (the
+  2026-10-11 19:53 sweep's "Dusk" place name) or wording since corrected; the
+  row explains why. It is absent when the version and revision match, which
+  includes every summary written during a run.
 - E2E smoke: `test_full_inference_with_tiny_local_checkpoint` writes a
   random-weight Qwen2-VL checkpoint of about 150 KB (tokenizer, chat template,
   image-processor config, safetensors) to a temp directory and runs it
