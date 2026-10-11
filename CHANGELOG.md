@@ -50,11 +50,13 @@ Notable changes to this project will be documented in this file.
 - Python 3.15 readiness checks, with no change to the CLI's behaviour:
   - CI's static-quality matrix gains a 3.15 lane (`next-python`, pre-releases
     allowed). mlx has no cp315 wheel or sdist yet, so `pip install -e
-    "src/.[dev]"` fails there; on that lane only, the install step then
-    emits a warning and skips the checks instead of failing. Once the stack
-    installs, the lane runs the full gate like the others. A test keeps its
-    version equal to `probe_python_next.sh`'s default and above the fresh-env
-    Python.
+    "src/.[dev]"` fails there. On that lane only, and only when pip reports
+    "No matching distribution found", the install step warns (naming the
+    missing requirements) and skips the checks; a build, resolver or
+    packaging failure still fails it. Once the stack installs, the lane runs
+    the full gate like the others. A test runs the step's real script against
+    a fake pip for each case, and another keeps the lane's version equal to
+    `probe_python_next.sh`'s default and above the fresh-env Python.
   - `make probe-python-next` with `PROBE_TORCH=1` retries torch,
     torchvision and torchaudio from PyTorch's own index (`PROBE_TORCH_INDEX`,
     default `https://download.pytorch.org/whl/cpu`, `--index-url` so no

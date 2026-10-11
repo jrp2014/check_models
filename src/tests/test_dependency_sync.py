@@ -2277,10 +2277,9 @@ def test_python_floor_is_single_sourced() -> None:
 def test_ci_next_python_lane_tracks_the_probe_and_skips_only_its_own_install_failure() -> None:
     """The static-quality lane for the next Python mirrors probe_python_next.sh.
 
-    Its version is the probe's default and newer than the fresh-env Python. An
-    install failure (wheels not published yet) may skip the checks only on
-    that lane; every other lane still fails, and the checks never run on a
-    half-installed stack.
+    Its version is the probe's default and newer than the fresh-env Python,
+    and its checks run only once the install step reports the stack
+    available (which install failures may skip is tested separately).
     """
     probe_script = (PKG_ROOT / "tools" / "probe_python_next.sh").read_text(encoding="utf-8")
     probe_match = re.search(
@@ -2314,19 +2313,107 @@ def test_ci_next_python_lane_tracks_the_probe_and_skips_only_its_own_install_fai
     install = steps["Install dependencies"]
     assert install["id"] == "install"
     assert install["env"]["NEXT_PYTHON"] == "${{ matrix.next-python == true }}"
-    install_script = install["run"]
-    # Other lanes exit 1 before the skip; npm and "available=true" follow it.
-    order = [
-        'if ! pip install -e "src/.[dev]"; then',
-        '[[ "$NEXT_PYTHON" != "true" ]]',
-        "exit 1",
-        "available=false",
-        "npm install --ignore-scripts",
-        "available=true",
-    ]
-    positions = [install_script.index(marker) for marker in order]
-    assert positions == sorted(positions)
     assert steps["Run static quality checks"]["if"] == "steps.install.outputs.available == 'true'"
+
+
+_PIP_NO_MLX_DISTRIBUTION = (
+    "ERROR: Could not find a version that satisfies the requirement mlx>=0.32.3 "
+    "(from check-models) (from versions: none)\n"
+    "ERROR: No matching distribution found for mlx>=0.32.3\n"
+)
+_PIP_BUILD_FAILURE = (
+    "  error: subprocess-exited-with-error\n"
+    "ERROR: Failed to build installable wheels for some pyproject.toml based projects "
+    "(sentencepiece)\n"
+)
+
+
+@pytest.mark.parametrize(
+    ("next_python", "pip_exit", "pip_output", "expected"),
+    [
+        pytest.param(
+            "true", 1, _PIP_NO_MLX_DISTRIBUTION, (0, "false"), id="next-missing-dist-skips"
+        ),
+        pytest.param("true", 1, _PIP_BUILD_FAILURE, (1, None), id="next-build-failure-fails"),
+        pytest.param("false", 1, _PIP_NO_MLX_DISTRIBUTION, (1, None), id="other-lane-never-skips"),
+        pytest.param(
+            "true", 0, "Successfully installed\n", (0, "true"), id="next-installs-and-runs"
+        ),
+        pytest.param(
+            "false", 0, "Successfully installed\n", (0, "true"), id="other-installs-and-runs"
+        ),
+    ],
+)
+def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_lane(
+    tmp_path: Path,
+    next_python: str,
+    pip_exit: int,
+    pip_output: str,
+    expected: tuple[int, str | None],
+) -> None:
+    """Run the workflow's real install script, as Actions does (bash -e), against fake tools.
+
+    Only "no distribution found" on the next-Python lane may skip the checks;
+    a build, resolver or packaging failure fails the lane, as on every other.
+    """
+    returncode, available = expected
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    install = next(
+        step
+        for step in workflow["jobs"]["static-quality"]["steps"]
+        if step.get("name") == "Install dependencies"
+    )
+    script = tmp_path / "install.sh"
+    safe_io.write_text_no_follow(script, install["run"])
+
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    calls = tmp_path / "calls.log"
+    fakes = {
+        "python": 'if [[ "$1" == "-V" ]]; then echo "Python 3.15.0"; fi\n',
+        "pip": (
+            f'if [[ "$*" == *"src/.[dev]"* ]]; then printf "%s" "$FAKE_PIP_OUTPUT"; '
+            f"exit {pip_exit}; fi\n"
+        ),
+        "npm": "",
+    }
+    for name, body in fakes.items():
+        safe_io.write_text_no_follow(
+            fake_bin / name,
+            f'#!/bin/bash\necho "{name} $*" >> "{calls}"\n{body}',
+            mode=0o755,
+        )
+    github_output = tmp_path / "github_output"
+    safe_io.write_text_no_follow(github_output, "")
+
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs the workflow step with fakes
+        ["/bin/bash", "-e", str(script)],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+        cwd=tmp_path,
+        env={
+            "PATH": f"{fake_bin}:/usr/bin:/bin",
+            "NEXT_PYTHON": next_python,
+            "GITHUB_OUTPUT": str(github_output),
+            "RUNNER_TEMP": str(tmp_path),
+            "FAKE_PIP_OUTPUT": pip_output,
+        },
+    )
+    assert result.returncode == returncode, result.stdout + result.stderr
+    outputs = safe_io.read_text_no_follow(github_output)
+    npm_ran = "npm install" in safe_io.read_text_no_follow(calls)
+    if available is None:
+        assert outputs == ""
+        assert not npm_ran
+    else:
+        assert outputs == f"available={available}\n"
+        assert npm_ran is (available == "true")
+    if available == "false":
+        assert "No distribution for Python 3.15.0 yet: mlx>=0.32.3." in result.stdout
 
 
 _SUBPROCESS_TEXT_CALLS = frozenset({"run", "check_output", "Popen", "call", "check_call"})

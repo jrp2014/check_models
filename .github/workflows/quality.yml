@@ -57,9 +57,10 @@ jobs:
         python-version: ["3.13", "3.14"]
         include:
           # The Python after the working env's (probe_python_next.sh's
-          # default). Until its wheels exist (mlx has no cp315 wheel and no
-          # sdist yet), the install step warns and skips the checks instead
-          # of failing; once the stack installs, the lane gates like the rest.
+          # default). While pip finds no distribution for a requirement (mlx
+          # has no cp315 wheel and no sdist yet), the install step warns and
+          # skips the checks; any other install failure fails the lane, and
+          # once the stack installs, the lane gates like the rest.
           - python-version: "3.15"
             next-python: true
 
@@ -88,13 +89,20 @@ jobs:
         id: install
         env:
           NEXT_PYTHON: ${{ matrix.next-python == true }}
+        # Only the next-Python lane may skip, and only when pip found no
+        # distribution at all for some requirement (no wheel and no sdist
+        # yet). Any other install failure (a build, resolver or packaging
+        # error) fails the lane like every other.
         run: |
+          set -o pipefail
           python -m pip install --upgrade pip
-          if ! pip install -e "src/.[dev]"; then
-            if [[ "$NEXT_PYTHON" != "true" ]]; then
+          pip_log="${RUNNER_TEMP:-/tmp}/pip-install.log"
+          if ! pip install -e "src/.[dev]" 2>&1 | tee "$pip_log"; then
+            if [[ "$NEXT_PYTHON" != "true" ]] || ! grep -q "No matching distribution found for" "$pip_log"; then
               exit 1
             fi
-            echo "::warning title=Next Python not installable yet::pip could not install src/.[dev] on $(python -V); its static checks are skipped until the dependency wheels exist."
+            missing="$(grep -o "No matching distribution found for [^[:space:]]*" "$pip_log" | sed 's/^No matching distribution found for //' | sort -u | paste -sd, -)"
+            echo "::warning title=Next Python not installable yet::No distribution for $(python -V) yet: ${missing}. Its static checks are skipped until one is published."
             echo "available=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
