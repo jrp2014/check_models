@@ -1060,6 +1060,15 @@ class JsonlTimingRecord(TypedDict):
     stop_reason: str | None
 
 
+class TextDeliveryRecord(TypedDict):
+    """Streamed-chunk text release counts (see ``TextDelivery``)."""
+
+    chunks: int
+    empty_text_chunks: int
+    longest_empty_text_run: int
+    final_chunk_chars: int
+
+
 class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     """Performance metrics emitted for successful generations."""
 
@@ -1068,6 +1077,7 @@ class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     model_weight_buffer_gb: float
     peak_memory_delta_gb: float
     first_token_peak_memory_gb: float
+    text_delivery: TextDeliveryRecord
     post_cleanup_active_memory_gb: float
     post_cleanup_cache_memory_gb: float
 
@@ -2087,6 +2097,21 @@ class RerunEvidence:
 
 
 @dataclass(frozen=True)
+class TextDelivery:
+    """How the streamed chunks released text: measured counts, no judgment.
+
+    A chunk carries one generated token; its text is empty while the
+    detokenizer holds text back (a BPE detokenizer waits for a token that
+    starts with a space), so a long empty stretch ends in a large final flush.
+    """
+
+    chunks: int
+    empty_text_chunks: int
+    longest_empty_text_run: int
+    final_chunk_chars: int
+
+
+@dataclass(frozen=True)
 class RuntimeDiagnostics:
     """Detailed runtime attribution and termination diagnostics for one run."""
 
@@ -2110,6 +2135,7 @@ class RuntimeDiagnostics:
     # peak), against the final peak which also covers decode.
     first_token_peak_memory_gb: float | None = None
     stop_reason: str | None = None
+    text_delivery: TextDelivery | None = None
     # Allocator residue sampled after the per-model cleanup sequence.
     post_cleanup_active_memory_gb: float | None = None
     post_cleanup_cache_memory_gb: float | None = None
@@ -9977,8 +10003,29 @@ class DiagnosticsPartitions:
 
 
 def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
-    """Partition maintainer evidence using only cached current-run assessments."""
+    """Partition maintainer evidence using only cached current-run assessments.
+
+    One pass places each result in the first bucket its assessment names; the
+    legal outcome axes make the buckets disjoint. Each bucket keeps the shared
+    actionability order.
+    """
     assessments = dict(context.assessments)
+    buckets: dict[str, list[PerformanceResult]] = {
+        name: [] for name in ("actionable", "observations", "indeterminate", "compliance", "clean")
+    }
+    for result in context.result_set.results:
+        assessment = assessments[result.model_name]
+        if assessment.maintainer_status == "actionable_failure":
+            bucket = "actionable"
+        elif assessment.maintainer_status == "observation_needs_reproduction":
+            bucket = "observations"
+        elif assessment.execution == "indeterminate":
+            bucket = "indeterminate"
+        elif assessment.execution != "completed":
+            continue
+        else:
+            bucket = "compliance" if assessment.observations else "clean"
+        buckets[bucket].append(result)
 
     def sort_key(result: PerformanceResult) -> tuple[int, int, str]:
         assessment = assessments[result.model_name]
@@ -9988,61 +10035,9 @@ def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
             assessment.observations,
         )
 
-    actionable = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].maintainer_status == "actionable_failure"
-            ),
-            key=sort_key,
-        )
+    return DiagnosticsPartitions(
+        **{name: tuple(sorted(results, key=sort_key)) for name, results in buckets.items()}
     )
-    observations = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].maintainer_status
-                == "observation_needs_reproduction"
-            ),
-            key=sort_key,
-        )
-    )
-    indeterminate = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].execution == "indeterminate"
-            ),
-            key=sort_key,
-        )
-    )
-    compliance = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].execution == "completed"
-                and assessments[result.model_name].maintainer_status == "none"
-                and assessments[result.model_name].observations
-            ),
-            key=sort_key,
-        )
-    )
-    clean = tuple(
-        sorted(
-            (
-                result
-                for result in context.result_set.results
-                if assessments[result.model_name].execution == "completed"
-                and not assessments[result.model_name].observations
-            ),
-            key=sort_key,
-        )
-    )
-    return DiagnosticsPartitions(actionable, observations, indeterminate, compliance, clean)
 
 
 def _diagnostics_fact(value: object | None) -> str:
@@ -10363,6 +10358,23 @@ def _runtime_termination_facts(
             runtime.time_to_first_token_s,
         ),
         ("Peak memory at first token (GB)", runtime.first_token_peak_memory_gb),
+        ("Text delivery", _notable_text_delivery_fact(runtime.text_delivery)),
+    )
+
+
+# A stretch this long of chunks releasing no text is shown in diagnostics;
+# ordinary words hold back a few tokens at most.
+_TEXT_DELIVERY_NOTABLE_EMPTY_RUN: Final[int] = 32
+
+
+def _notable_text_delivery_fact(delivery: TextDelivery | None) -> str | None:
+    """State the text-delivery counts when a long stretch of chunks released no text."""
+    if delivery is None or delivery.longest_empty_text_run < _TEXT_DELIVERY_NOTABLE_EMPTY_RUN:
+        return None
+    return (
+        f"{delivery.empty_text_chunks:,} of {delivery.chunks:,} streamed chunks released "
+        f"no text (longest consecutive stretch {delivery.longest_empty_text_run:,}); "
+        f"the last released {delivery.final_chunk_chars:,} characters"
     )
 
 
@@ -10638,6 +10650,7 @@ def _run_input_rows_for_context(
 
 def _diagnostics_evidence_blocks(
     report_context: HtmlReportContext,
+    partitions: DiagnosticsPartitions,
     *,
     run_args: argparse.Namespace | None,
     image_path: Path | None = None,
@@ -10648,7 +10661,6 @@ def _diagnostics_evidence_blocks(
     # The canonical HTML context carries no image profile; the capacity rows
     # then simply omit the input-image line rather than re-reading the file.
     image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
-    partitions = _partition_diagnostics(report_context)
     triage_rows = tuple(
         (
             ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
@@ -10816,12 +10828,15 @@ def generate_diagnostics_report(
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
+    partitions = _partition_diagnostics(report_context)
     blocks = (
         ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
-        *_diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path),
+        *_diagnostics_evidence_blocks(
+            report_context, partitions, run_args=run_args, image_path=image_path
+        ),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
-            highlighted_results=_partition_diagnostics(report_context).highlighted,
+            highlighted_results=partitions.highlighted,
             model_provenance=_model_provenance_by_model(report_context),
             library_versions=library_versions,
             system_info=system_info,
@@ -11173,6 +11188,7 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
 
 def _html_maintainer_diagnostics(
     report_context: HtmlReportContext,
+    partitions: DiagnosticsPartitions,
     *,
     run_args: argparse.Namespace | None,
     image_path: Path | None,
@@ -11182,7 +11198,9 @@ def _html_maintainer_diagnostics(
         '<section id="maintainer-diagnostics">',
         "<h2>Maintainer Diagnostics</h2>",
         *render_report_html(
-            _diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path)
+            _diagnostics_evidence_blocks(
+                report_context, partitions, run_args=run_args, image_path=image_path
+            )
         ),
         "</section>",
     ]
@@ -11225,6 +11243,7 @@ def _html_runtime_facts(
 def _html_provenance(
     *,
     report_context: HtmlReportContext,
+    highlighted_results: Sequence[PerformanceResult],
     versions: LibraryVersionDict,
     prompt: str,
     image_path: Path | None,
@@ -11233,7 +11252,7 @@ def _html_provenance(
     """Render the same single-copy reproduction context used by Markdown."""
     blocks = _diagnostics_shared_context_blocks(
         prompt=prompt,
-        highlighted_results=_partition_diagnostics(report_context).highlighted,
+        highlighted_results=highlighted_results,
         model_provenance=_model_provenance_by_model(report_context),
         library_versions=versions,
         system_info=report_context.system_info,
@@ -11282,6 +11301,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
 .embedded-image { border: 1px solid #ccc; max-width: min(100%, 600px); }
 </style>
 """
+    partitions = _partition_diagnostics(report_context)
     return "\n".join(
         (
             "<!DOCTYPE html>",
@@ -11314,11 +11334,13 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
             _html_complete_gallery(report_context),
             _html_maintainer_diagnostics(
                 report_context,
+                partitions,
                 run_args=run_args,
                 image_path=image_path,
             ),
             _html_provenance(
                 report_context=report_context,
+                highlighted_results=partitions.highlighted,
                 versions=versions,
                 prompt=prompt,
                 image_path=image_path,
@@ -14381,6 +14403,7 @@ def _build_runtime_diagnostics(
     first_token_latency_s: float | None = None,
     time_to_first_token_s: float | None = None,
     first_token_peak_memory_gb: float | None = None,
+    text_delivery: TextDelivery | None = None,
     model_load_active_memory_gb: float | None = None,
     model_weight_buffer_gb: float | None = None,
     post_cleanup_active_memory_gb: float | None = None,
@@ -14399,6 +14422,7 @@ def _build_runtime_diagnostics(
         time_to_first_token_s=time_to_first_token_s,
         first_token_peak_memory_gb=first_token_peak_memory_gb,
         stop_reason=stop_reason,
+        text_delivery=text_delivery,
         post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
         post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
@@ -14749,14 +14773,14 @@ def _detect_streaming_repetition(tail: str) -> bool:
     return _REPETITION_TAIL_CYCLE_RE.search(tail) is not None
 
 
-def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int) -> bool:
-    """Check the retained tail for a degenerate cycle every N chunks past the floor."""
+def _stream_tail_repeats(tail: str, chunk: object, chunk_count: int) -> bool:
+    """Check the retained text's tail for a degenerate cycle every N chunks past the floor."""
     if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
         return False
     generated = getattr(chunk, "generation_tokens", None)
     if not isinstance(generated, int) or generated < _REPETITION_ABORT_MIN_TOKENS:
         return False
-    return _detect_streaming_repetition("".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:])
+    return _detect_streaming_repetition(tail)
 
 
 @dataclass
@@ -14771,6 +14795,10 @@ class StreamObservations:
     experiences it (input preparation, prefill and the first decode step).
     ``token_ids`` are the retained (non-draft) generated ids, from which
     special tokens are detected by id rather than by regex on the text.
+    The text-delivery counts say how the detokenizer released that text:
+    retained chunks, those that released none, the longest consecutive
+    stretch of them, and the characters in the last retained chunk (upstream's
+    final flush when the stream ran to its end).
     """
 
     started_at: float | None = None
@@ -14779,6 +14807,34 @@ class StreamObservations:
     first_token_peak_memory_gb: float | None = None
     token_ids: list[int] = dataclass_field(default_factory=list)
     special_tokens: tuple[str, ...] = ()
+    text_chunks: int = 0
+    empty_text_chunks: int = 0
+    longest_empty_text_run: int = 0
+    final_chunk_chars: int = 0
+    _empty_text_run: int = dataclass_field(default=0, repr=False)
+
+    def observe_text(self, text: str) -> None:
+        """Count one retained chunk's released text."""
+        self.text_chunks += 1
+        self.final_chunk_chars = len(text)
+        if text:
+            self._empty_text_run = 0
+            return
+        self.empty_text_chunks += 1
+        self._empty_text_run += 1
+        self.longest_empty_text_run = max(self.longest_empty_text_run, self._empty_text_run)
+
+    @property
+    def text_delivery(self) -> TextDelivery | None:
+        """The text-delivery counts, or None when no retained chunk arrived."""
+        if not self.text_chunks:
+            return None
+        return TextDelivery(
+            chunks=self.text_chunks,
+            empty_text_chunks=self.empty_text_chunks,
+            longest_empty_text_run=self.longest_empty_text_run,
+            final_chunk_chars=self.final_chunk_chars,
+        )
 
     @property
     def time_to_first_token_s(self) -> float | None:
@@ -14993,6 +15049,9 @@ def _generate_with_repetition_guard(
     """
     _register_stream_stop_tokens(model, processor, kwargs.get("eos_tokens"))
     pieces: list[str] = []
+    # The last characters of the joined pieces, kept as they arrive so the
+    # repetition check never re-joins the whole output.
+    tail = ""
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
     token_seen = False
@@ -15019,7 +15078,10 @@ def _generate_with_repetition_guard(
                 if on_first_token is not None:
                     on_first_token()
             _observe_token(observations, chunk)
+            if observations is not None:
+                observations.observe_text(chunk.text)
             pieces.append(chunk.text)
+            tail = (tail + chunk.text)[-_REPETITION_ABORT_TAIL_CHARS:]
             if (
                 echo is not None
                 and chunk.text
@@ -15028,7 +15090,7 @@ def _generate_with_repetition_guard(
                 echo.write(chunk.text)
                 echo.flush()
             chunk_count += 1
-            if _stream_tail_repeats(pieces, chunk, chunk_count):
+            if _stream_tail_repeats(tail, chunk, chunk_count):
                 aborted = True
                 break
         if echo is not None and pieces:
@@ -15459,6 +15521,7 @@ def _build_success_process_result(
             first_token_latency_s=first_token_latency_s,
             time_to_first_token_s=observations.time_to_first_token_s,
             first_token_peak_memory_gb=observations.first_token_peak_memory_gb,
+            text_delivery=observations.text_delivery,
             model_load_active_memory_gb=run.model_load_active_memory_gb,
             model_weight_buffer_gb=run.model_weight_buffer_gb,
             stop_reason=stop_reason,
@@ -19861,6 +19924,13 @@ def _build_jsonl_metrics_record(
     first_token_peak = runtime.first_token_peak_memory_gb if runtime is not None else None
     if first_token_peak is not None:
         metrics["first_token_peak_memory_gb"] = first_token_peak
+    if runtime is not None and (delivery := runtime.text_delivery) is not None:
+        metrics["text_delivery"] = {
+            "chunks": delivery.chunks,
+            "empty_text_chunks": delivery.empty_text_chunks,
+            "longest_empty_text_run": delivery.longest_empty_text_run,
+            "final_chunk_chars": delivery.final_chunk_chars,
+        }
     working_set_pct = _peak_memory_working_set_pct(
         facts.get("peak_memory_gb"),
         recommended_working_set_bytes,
@@ -24452,6 +24522,34 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
     return tuple(rows)
 
 
+def _run_issue_summary_provenance_rows(
+    producer: CheckModelsProvenanceRecord | None,
+) -> tuple[tuple[str, str], ...]:
+    """Name the check_models that rendered this summary when it is not the run's own.
+
+    A regenerated summary re-renders the retained results: each model's
+    assessment is the one recorded at run time, so it can carry observations
+    since retired or wording since corrected. Silent when the code matches.
+    """
+    if producer is None:
+        return ()
+    renderer = _collect_check_models_provenance()
+    captured_revision, rendered_revision = producer["git_revision"], renderer["git_revision"]
+    if producer["version"] == renderer["version"] and (
+        captured_revision is None
+        or rendered_revision is None
+        or captured_revision == rendered_revision
+    ):
+        return ()
+    captured = producer["version"] + (f" @ {captured_revision[:9]}" if captured_revision else "")
+    rendered = renderer["version"] + (f" @ {rendered_revision[:9]}" if rendered_revision else "")
+    text = (
+        f"run captured by check_models {captured}; report rendered by {rendered}; "
+        "original assessments retained"
+    )
+    return (("Provenance", text),)
+
+
 _NATIVE_REPRO_CELLS: Final[dict[str, str]] = {
     "actionable_failure": "crash: triage",
     "observation_needs_reproduction": "candidate",
@@ -25074,6 +25172,7 @@ def generate_run_issue_summary_report(
                                     "metadata_exposed_to_prompt"
                                 ),
                             ),
+                            *_run_issue_summary_provenance_rows(source.producer),
                             ("Models attempted", str(len(source.results))),
                             ("Sampling settings", _run_issue_summary_sampling_note(source.results)),
                             ("Completed", str(counts["completed"])),
@@ -25192,6 +25291,10 @@ def _check_rendered_comparison(comparison: RunComparison) -> RunComparison:
     return comparison
 
 
+# Recognising stored notes by their English wording is a stopgap; stable note
+# codes are planned for the next retained-schema change (see
+# docs/IMPLEMENTATION_GUIDE.md, "Assembly and presentation"). Keep this reader
+# for runs that predate them.
 _CURRENT_GPU_NOTE_PREFIXES: Final[tuple[str, ...]] = (
     "current run detected GPU activity",
     "current run's GPU readings",

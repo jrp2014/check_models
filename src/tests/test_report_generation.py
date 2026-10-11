@@ -1763,6 +1763,36 @@ def test_regeneration_requalifies_stale_gpu_notes_from_the_records(tmp_path: Pat
     ) in prose
 
 
+def test_regenerated_summary_names_the_rendering_check_models(tmp_path: Path) -> None:
+    """A summary rendered by newer code says so; one rendered by the run's code does not.
+
+    Regeneration keeps each model's recorded assessment, so a retired
+    observation can still appear; the provenance row explains why.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/clean"),))
+    renderer: check_models.CheckModelsProvenanceRecord = {
+        "name": "check_models",
+        "version": "0.9.1",
+        "git_revision": "def4567890abcdef",
+        "install_type": "source-tree",
+    }
+
+    with patch.object(check_models, "_collect_check_models_provenance", return_value=renderer):
+        newer = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+        assert newer is not None
+        prose = " ".join(newer.read_text(encoding="utf-8").split())
+        assert (
+            "*Provenance:* run captured by check_models 0.8.9 @ abc123; report rendered by "
+            "0.9.1 @ def456789; original assessments retained"
+        ) in prose
+
+        renderer.update(version="0.8.9", git_revision="abc123")
+        same = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+        assert same is not None
+        assert "Provenance" not in same.read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize(
     ("replacement", "expected"),
     [
@@ -2828,6 +2858,49 @@ def _make_quality_success(
         generation_time=0.6,
         model_load_time=0.4,
         quality_analysis=qa,
+    )
+
+
+def test_diagnostics_partitions_are_disjoint_named_buckets_in_actionability_order() -> None:
+    """Each result lands in exactly one bucket, chosen by its cached assessment."""
+    results = [
+        _make_success("org/clean-b"),
+        _make_quality_success("org/leak", with_quality_issue=True),
+        _make_failure("org/crash"),
+        _make_success("org/clean-a"),
+        _make_failure_with_details(
+            "org/offline", error_msg="502 Bad Gateway", failure_phase="model_load"
+        ),
+        replace(
+            _make_success("org/unlabelled"),
+            generation=_MockGeneration(text="A shopfront.", prompt_tokens=5, generation_tokens=3),
+            assessment_profile="metadata",
+        ),
+    ]
+    context = _build_report_render_context(results=results, prompt="p", system_info={})
+    assessments = dict(context.assessments)
+
+    partitions = check_models._partition_diagnostics(context)
+
+    buckets = {
+        "actionable": partitions.actionable,
+        "observations": partitions.observations,
+        "indeterminate": partitions.indeterminate,
+        "compliance": partitions.compliance,
+        "clean": partitions.clean,
+    }
+    assert {name: [r.model_name for r in rs] for name, rs in buckets.items()} == {
+        "actionable": ["org/crash"],
+        "observations": ["org/leak"],
+        "indeterminate": ["org/offline"],
+        "compliance": ["org/unlabelled"],
+        "clean": ["org/clean-a", "org/clean-b"],
+    }
+    assert assessments["org/unlabelled"].observations
+    assert partitions.highlighted == (
+        *partitions.actionable,
+        *partitions.observations,
+        *partitions.indeterminate,
     )
 
 
@@ -7656,6 +7729,33 @@ def test_diagnostics_facts_show_measured_first_token_and_declared_sampling() -> 
         check_models._chooser_first_token_seconds(RuntimeDiagnostics(first_token_latency_s=0.2))
         == 0.2
     )
+
+
+def test_diagnostics_facts_show_text_delivery_only_after_a_long_empty_stretch() -> None:
+    """Held-back text is stated as counts once a long stretch released nothing."""
+
+    def facts_for(delivery: check_models.TextDelivery) -> dict[str, str]:
+        result = replace(
+            _make_success(),
+            runtime_diagnostics=RuntimeDiagnostics(stop_reason="completed", text_delivery=delivery),
+        )
+        return dict(
+            check_models._diagnostics_result_facts(
+                result, check_models._assess_result(result), run_args=None, model_provenance=None
+            )
+        )
+
+    held_back = check_models.TextDelivery(
+        chunks=1001, empty_text_chunks=970, longest_empty_text_run=970, final_chunk_chars=5830
+    )
+    assert facts_for(held_back)["Text delivery"] == (
+        "970 of 1,001 streamed chunks released no text (longest consecutive stretch 970); "
+        "the last released 5,830 characters"
+    )
+    ordinary = check_models.TextDelivery(
+        chunks=400, empty_text_chunks=60, longest_empty_text_run=4, final_chunk_chars=6
+    )
+    assert "Text delivery" not in facts_for(ordinary)
 
 
 def test_comparison_excludes_slept_models_from_throughput_and_notes_environment() -> None:

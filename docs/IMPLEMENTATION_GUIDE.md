@@ -178,6 +178,13 @@ not rewrite any of these retained outputs.
 - Publish only successful `ReportArtifactOutcome` entries in navigation and
   manifests, never stale files discovered on disk. Preserve atomic final
   reconciliation of `results.jsonl`; there is no separate `run.json`.
+- Planned, deferred until the retained schema next changes: run-level
+  comparison notes are stored as English sentences, and regeneration finds
+  the current run's GPU note by sentence prefix (`_CURRENT_GPU_NOTE_PREFIXES`)
+  before recomputing it. Store stable note codes with factual fields instead
+  and render the wording at report time, so wording can change without
+  migration by string matching. Keep the prefix reader for retained runs that
+  predate the codes; do not convert the other notes in a separate rewrite.
 
 ### Reproduction inputs
 

@@ -6,6 +6,23 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Run summary: a summary rendered by different check_models code than the
+  run says so in a *Provenance* row, such as "run captured by check_models
+  0.17.46 @ 3d1b38a4f; report rendered by 0.17.50 @ ac8822bc0; original
+  assessments retained". Regeneration keeps each model's recorded assessment,
+  so a newer report can still show an observation since retired (the
+  2026-10-11 19:53 sweep's "Dusk" place name) or wording since corrected; the
+  row explains why. It is absent when the version and revision match, which
+  includes every summary written during a run.
+- Streaming boundary: each generation records how its chunks released text:
+  retained chunks, those that released none, the longest consecutive stretch
+  of them, and the characters in the last chunk. A BPE detokenizer holds text
+  back until a token starting with a space arrives, so Qwen2-VL's 265 repeats
+  of `<|im_start|>assistant` on 2026-10-11 came as about 970 empty chunks and
+  one large final flush. Results carry the counts as `metrics.text_delivery`
+  in `results.jsonl`; diagnostics show them only after a stretch of 32 or
+  more empty chunks, as counts with no quality judgment. Generation and its
+  text are unchanged.
 - E2E smoke: `test_full_inference_with_tiny_local_checkpoint` writes a
   random-weight Qwen2-VL checkpoint of about 150 KB (tokenizer, chat template,
   image-processor config, safetensors) to a temp directory and runs it
@@ -67,6 +84,23 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Diagnostics partitioning is one pass: each result goes into the first named
+  bucket its cached assessment selects (actionable, observations,
+  indeterminate, compliance, clean), and each bucket keeps the actionability
+  order. It replaces five filter-and-sort passes. The diagnostics Markdown
+  and the HTML report each partition once and pass the result to both the
+  evidence blocks and the provenance section, which had partitioned again.
+  Output is unchanged; a test checks the buckets on a mixed run.
+- The streaming repetition guard keeps its 600-character tail as chunks
+  arrive instead of joining the whole accumulated output every 25 chunks and
+  discarding all but the end. The full pieces are still kept for the answer
+  and detection is unchanged; tests pin the abort to the first check past the
+  200-token floor and show a unit whose four repeats overflow the tail never
+  trips it. The saving is small, not seconds off a sweep.
+- Docs: the implementation guide records the deferred plan to store
+  run-level comparison notes as stable codes with factual fields at the next
+  retained-schema change, replacing regeneration's match on the GPU note's
+  English prefix while keeping that reader for older runs.
 - Removed the `unverified_place_name` observation (added in 0.17.29). It was
   a heuristic: any capitalised word after "in", "at", "near", "outside" or
   "around", or beside a feature word such as "River", that the prompt lacked.

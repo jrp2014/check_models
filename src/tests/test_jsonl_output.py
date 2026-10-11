@@ -2277,7 +2277,7 @@ def test_retained_run_round_trips_through_the_single_loader(tmp_path: Path) -> N
 
 
 def test_jsonl_carries_measured_first_token_facts_and_declared_sampling(tmp_path: Path) -> None:
-    """Measured TTFT, first-token peak memory and declared sampling reach the row."""
+    """Measured TTFT, first-token peak memory, text delivery and declared sampling reach the row."""
     output_file = tmp_path / "results.jsonl"
     result = PerformanceResult(
         model_name="org/observed",
@@ -2293,6 +2293,9 @@ def test_jsonl_carries_measured_first_token_facts_and_declared_sampling(tmp_path
             time_to_first_token_s=0.35,
             first_token_peak_memory_gb=4.5,
             stop_reason="completed",
+            text_delivery=check_models.TextDelivery(
+                chunks=12, empty_text_chunks=4, longest_empty_text_run=3, final_chunk_chars=9
+            ),
         ),
         prompt_diagnostics=check_models.PromptDiagnostics(
             prepared_input_token_count=274,
@@ -2306,6 +2309,12 @@ def test_jsonl_carries_measured_first_token_facts_and_declared_sampling(tmp_path
     assert row["timing"]["first_token_latency_s"] == 0.2
     assert row["timing"]["time_to_first_token_s"] == 0.35
     assert row["metrics"]["first_token_peak_memory_gb"] == 4.5
+    assert row["metrics"]["text_delivery"] == {
+        "chunks": 12,
+        "empty_text_chunks": 4,
+        "longest_empty_text_run": 3,
+        "final_chunk_chars": 9,
+    }
     diagnostics = row["prompt_diagnostics"]
     assert diagnostics is not None
     assert diagnostics["prepared_input_token_count"] == 274
