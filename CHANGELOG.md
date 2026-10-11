@@ -896,14 +896,19 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- The repetition guard also checks token ids. It only saw text the
-  detokenizer had released, and a BPE detokenizer can hold back a run with no
-  space in it until finalisation. Qwen2-VL reached the 1,000-token cap on
-  2026-10-11 with 265 repeats of `<|im_start|>assistant` delivered as empty
-  chunks. The new check is stricter than the text one: the last 96 generated
-  ids must repeat exactly with a period of at most 32, past the same
-  200-token floor. A regression test streams 970 empty-text chunks of that
-  cycle and expects the stop at token 200.
+- The repetition guard's token-id check (0.17.49) is reverted. It stopped a
+  loop that the BPE detokenizer was holding back, as with Qwen2-VL's 265
+  repeats of `<|im_start|>assistant` on 2026-10-11, but the early stop
+  discarded the held-back text, which was the evidence of the loop.
+  Reconstructing that text would mean decoding outside mlx-vlm. Such a loop
+  now runs to the token cap again and keeps mlx-vlm's own finalised text; a
+  comment at the guard records the limit, and a test streams the case and
+  checks all 265 repeats survive.
+- Regenerating a run summary recomputes the current run's GPU note from the
+  records instead of replaying the stored run-time string. Regenerating the
+  2026-10-11 19:53 sweep had restored its stale "detected GPU activity ...
+  36 of 47 models" claim; it now gives the unreliable-reading note. A
+  regression test regenerates a retained run carrying the stale note.
 - GPU readings from before the 0.17.47 stale-read fix are marked unreliable
   wherever they are shown, with the raw numbers kept. New telemetry records
   carry `gpu_sample_method: "reread"`, and readers treat records without it

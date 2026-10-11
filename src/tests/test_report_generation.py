@@ -1723,6 +1723,46 @@ def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path
     assert "0.980" in content
 
 
+def test_regeneration_requalifies_stale_gpu_notes_from_the_records(tmp_path: Path) -> None:
+    """A retained "detected GPU activity" note from stale reads is recomputed, not replayed.
+
+    The 2026-10-11 19:53 sweep (0.17.46) stored that note for 36 of 47 models;
+    its records lack the reread marker, so regeneration must call the readings
+    unreliable while keeping the raw numbers.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    comparison_payload = _retained_comparison_payload()
+    comparison_payload["environment_notes"] = [
+        "current run on battery power for 1 of 1 models",
+        (
+            "current run detected GPU activity outside harness inference at the checks "
+            "around 1 of 1 models (up to 99%)"
+        ),
+    ]
+    stale = _issue_summary_result("org/clean")
+    stale["system_telemetry"] = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "gpu_samples": 2,
+        "gpu_utilization_max_pct": 99,
+        "gpu_busy_samples": 1,
+    }
+    _write_issue_summary_fixture(output_paths, results=(stale,), comparison=comparison_payload)
+
+    generated = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+
+    if generated is None:
+        pytest.fail("the retained run must regenerate an issue summary")
+    prose = " ".join(generated.read_text(encoding="utf-8").split())
+    assert "detected GPU activity" not in prose
+    assert (
+        "current run on battery power for 1 of 1 models; current run's GPU readings were "
+        "non-zero around 1 of 1 models (up to 99%), but were taken before the 0.17.47 "
+        "stale-read fix"
+    ) in prose
+
+
 @pytest.mark.parametrize(
     ("replacement", "expected"),
     [

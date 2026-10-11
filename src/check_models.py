@@ -14731,14 +14731,14 @@ _REPETITION_TAIL_CYCLE_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-# The text check sees only what the detokenizer has released. A BPE
-# detokenizer can hold back a run with no space in it until finalisation:
-# Qwen2-VL emitted 265 repeats of "<|im_start|>assistant" on 2026-10-11 as
-# empty chunks, so the text tail never showed the cycle. The token-id check
-# is stricter than the text one: the last 96 ids must repeat exactly with a
-# period of at most 32 (so at least three full cycles).
-_REPETITION_TOKEN_WINDOW: Final[int] = 96
-_REPETITION_TOKEN_MAX_PERIOD: Final[int] = 32
+# Known limit, kept on purpose: the check sees only text the detokenizer has
+# released. A BPE detokenizer can hold back a run with no space in it until
+# finalisation (Qwen2-VL's 265 repeats of "<|im_start|>assistant" on
+# 2026-10-11 arrived as empty chunks), so such a loop runs to the token cap.
+# Stopping it by token id was tried in 0.17.49 and reverted: the early stop
+# discarded the held-back text, the very evidence of the loop, and
+# reconstructing it would mean decoding outside mlx-vlm. Running to the cap
+# costs seconds and keeps mlx-vlm's own finalised text.
 
 
 def _detect_streaming_repetition(tail: str) -> bool:
@@ -14746,32 +14746,14 @@ def _detect_streaming_repetition(tail: str) -> bool:
     return _REPETITION_TAIL_CYCLE_RE.search(tail) is not None
 
 
-def _detect_token_cycle(token_ids: Sequence[int]) -> bool:
-    """Return whether the last window of token ids is exactly periodic (period <= max)."""
-    window = token_ids[-_REPETITION_TOKEN_WINDOW:]
-    if len(window) < _REPETITION_TOKEN_WINDOW:
-        return False
-    return any(
-        all(window[i] == window[i - period] for i in range(period, len(window)))
-        for period in range(1, _REPETITION_TOKEN_MAX_PERIOD + 1)
-    )
-
-
-def _stream_tail_repeats(
-    pieces: Sequence[str],
-    chunk: object,
-    chunk_count: int,
-    token_ids: Sequence[int] = (),
-) -> bool:
-    """Check the retained tail (text, then token ids) for a cycle every N chunks past the floor."""
+def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int) -> bool:
+    """Check the retained tail for a degenerate cycle every N chunks past the floor."""
     if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
         return False
     generated = getattr(chunk, "generation_tokens", None)
     if not isinstance(generated, int) or generated < _REPETITION_ABORT_MIN_TOKENS:
         return False
-    return _detect_streaming_repetition(
-        "".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:]
-    ) or _detect_token_cycle(token_ids)
+    return _detect_streaming_repetition("".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:])
 
 
 @dataclass
@@ -15008,9 +14990,6 @@ def _generate_with_repetition_guard(
     """
     _register_stream_stop_tokens(model, processor, kwargs.get("eos_tokens"))
     pieces: list[str] = []
-    # Kept here, not only in ``observations``, so the token-cycle check runs
-    # whether or not the caller collects observations.
-    token_ids: list[int] = []
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
     token_seen = False
@@ -15037,10 +15016,6 @@ def _generate_with_repetition_guard(
                 if on_first_token is not None:
                     on_first_token()
             _observe_token(observations, chunk)
-            if isinstance(token := getattr(chunk, "token", None), int) and not isinstance(
-                token, bool
-            ):
-                token_ids.append(token)
             pieces.append(chunk.text)
             if (
                 echo is not None
@@ -15050,7 +15025,7 @@ def _generate_with_repetition_guard(
                 echo.write(chunk.text)
                 echo.flush()
             chunk_count += 1
-            if _stream_tail_repeats(pieces, chunk, chunk_count, token_ids):
+            if _stream_tail_repeats(pieces, chunk, chunk_count):
                 aborted = True
                 break
         if echo is not None and pieces:
@@ -25213,6 +25188,32 @@ def _check_rendered_comparison(comparison: RunComparison) -> RunComparison:
     return comparison
 
 
+_CURRENT_GPU_NOTE_PREFIXES: Final[tuple[str, ...]] = (
+    "current run detected GPU activity",
+    "current run's GPU readings",
+)
+
+
+def _with_recomputed_gpu_notes(
+    comparison: RunComparison, records: Sequence[JsonlResultRecord]
+) -> RunComparison:
+    """Replace the stored current-run GPU notes with ones recomputed from the records.
+
+    Retained notes are the strings written at run time: a 0.17.44-0.17.46
+    run stored "detected GPU activity" from stale reads, so regeneration
+    recomputes them with today's reliability rule rather than replaying them.
+    """
+    kept = [
+        note
+        for note in comparison.environment_notes
+        if not note.startswith(_CURRENT_GPU_NOTE_PREFIXES)
+    ]
+    # After the current run's other notes, where the live comparison puts it.
+    at = max((i + 1 for i, note in enumerate(kept) if note.startswith("current run")), default=0)
+    kept[at:at] = _gpu_environment_notes("current", records)
+    return replace(comparison, environment_notes=tuple(kept))
+
+
 def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     """Regenerate only the paste-ready issue body from retained run artifacts."""
     output_paths = ReportOutputPaths.from_root(output_dir)
@@ -25235,7 +25236,10 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     comparison: RunComparison | None = None
     if isinstance(comparison_value, dict):
         try:
-            comparison = _check_rendered_comparison(_run_comparison_from_json(comparison_value))
+            comparison = _with_recomputed_gpu_notes(
+                _check_rendered_comparison(_run_comparison_from_json(comparison_value)),
+                source.results,
+            )
         except (KeyError, IndexError, TypeError, ValueError):
             logger.warning(
                 "Retained comparison metadata could not be rehydrated; "

@@ -1751,29 +1751,17 @@ class TestRepetitionGuard:
         cycle = "boathouse, pond, foliage, "
         assert check_models._detect_streaming_repetition("intro " + cycle * 4) is True
 
-    def test_token_cycle_detector_is_strict(self) -> None:
-        """Only an exactly periodic 96-id tail with period <= 32 trips the token check."""
-        cycle = [151644, 77091, 198]
-        assert check_models._detect_token_cycle(list(range(500)) + cycle * 32) is True
-        assert check_models._detect_token_cycle([7] * 96) is True
-        # Too short a window, a broken cycle, or a period beyond the limit stay clean.
-        assert check_models._detect_token_cycle(cycle * 31) is False
-        broken = cycle * 32
-        broken[-40] = 5
-        assert check_models._detect_token_cycle(broken) is False
-        assert check_models._detect_token_cycle(list(range(33)) * 3) is False
-        assert check_models._detect_token_cycle(list(range(1000))) is False
-
-    def test_wrapper_aborts_a_cycle_the_detokenizer_has_not_released(
+    def test_a_loop_the_detokenizer_holds_back_runs_to_the_cap_with_its_text(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A loop buffered by the detokenizer (empty chunk text) is caught by token id.
+        """A held-back loop is not stopped early, so mlx-vlm's finalised text survives.
 
-        Qwen2-VL repeated "<|im_start|>assistant" 265 times to the token cap on
-        2026-10-11: its BPE detokenizer held the no-space run back, so every
-        chunk's text was empty and the text-tail check never saw a cycle.
+        Qwen2-VL repeated "<|im_start|>assistant" 265 times on 2026-10-11 with
+        every chunk's text empty until upstream's final flush. Stopping by token
+        id would discard that flush, the only evidence of the loop.
         """
         cycle = [151644, 77091, 198]
+        flushed = "<|im_start|>assistant\n" * 265
         chunks = [
             types.SimpleNamespace(
                 text="" if i >= 30 else f"word{i} ",
@@ -1786,28 +1774,30 @@ class TestRepetitionGuard:
             )
             for i in range(1000)
         ]
-        pulled = 0
-
-        def fake_stream(**_kwargs: object) -> Iterator[types.SimpleNamespace]:
-            nonlocal pulled
-            for chunk in chunks:
-                pulled += 1
-                yield chunk
-
-        monkeypatch.setattr(check_models, "stream_generate", fake_stream)
-        # The text tail alone shows no cycle, so the old guard ran to the cap.
-        assert not check_models._detect_streaming_repetition(
-            "".join(chunk.text for chunk in chunks)
+        # Upstream finalises its detokenizer and yields the held-back text last.
+        chunks.append(
+            types.SimpleNamespace(
+                text=flushed,
+                token=None,
+                generation_tokens=1000,
+                finish_reason="length",
+                prompt_tokens=5,
+                generation_tps=10.0,
+                peak_memory=1.0,
+            )
         )
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kwargs: iter(chunks))
         result = check_models._generate_with_repetition_guard(
             model=cast("Any", object()),
             processor=_FakeProcessor(),
             prompt="p",
             image="i.jpg",
         )
-        assert result.finish_reason == "repetition_abort"
-        # Stopped at the first check past the 200-token floor.
-        assert pulled == check_models._REPETITION_ABORT_MIN_TOKENS
+        assert result.finish_reason == "length"
+        text = result.text
+        assert text is not None
+        assert text.endswith(flushed)
+        assert text.count("<|im_start|>assistant") == 265
 
     def test_wrapper_aborts_repeating_stream_and_marks_finish_reason(
         self, monkeypatch: pytest.MonkeyPatch
