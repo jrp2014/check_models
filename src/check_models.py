@@ -1109,9 +1109,11 @@ class SystemTelemetryRecord(TypedDict, total=False):
     thermal_elevated_samples: int
     # GPU "Device Utilization %" (IOAccelerator PerformanceStatistics) per
     # snapshot probe. Both probes sit outside this process's GPU work and the
-    # reading falls to 0 within ~50 ms of it ending, so a non-zero value is
-    # another process using the GPU. Continuous samples overlap inference and
-    # never carry it.
+    # reading falls to 0 within ~50 ms of it ending, so a non-zero value is GPU
+    # activity detected outside harness inference. Each probe is one instant:
+    # zero readings do not show an uncontended run, because activity between
+    # probes is never observed. Continuous samples overlap inference and never
+    # carry it.
     gpu_samples: int
     gpu_utilization_max_pct: int
     gpu_busy_samples: int
@@ -15980,7 +15982,7 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
         )
     if busy := telemetry.get("gpu_busy_samples", 0):
         notes.append(
-            f"GPU in use by other processes (up to "
+            f"GPU activity detected outside harness inference (up to "
             f"{telemetry.get('gpu_utilization_max_pct', 0)}%) "
             + _telemetry_checks_phrase(telemetry, busy, telemetry.get("gpu_samples", 0))
         )
@@ -16044,8 +16046,9 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
         parts.append("thermal-state probe unavailable")
     if gpu_samples := telemetry.get("gpu_samples", 0):
         parts.append(
-            f"GPU utilisation by other processes max "
-            f"{telemetry.get('gpu_utilization_max_pct', 0)}% over {gpu_samples} sample(s)"
+            f"GPU activity outside harness inference: max "
+            f"{telemetry.get('gpu_utilization_max_pct', 0)}% at {gpu_samples} instantaneous "
+            "check(s); activity between checks is not observed"
         )
     if (gap := telemetry.get("wall_clock_gap_s")) is not None:
         parts.append(f"wall-clock gap {gap:.0f}s (sleep/suspend; timings untrustworthy)")
@@ -21443,7 +21446,7 @@ def _record_timing_untrusted(record: JsonlResultRecord) -> bool:
 
 
 def _records_gpu_busy(records: Sequence[JsonlResultRecord]) -> tuple[int, int] | None:
-    """(models with another process on the GPU at a snapshot check, peak %), or None."""
+    """(models with GPU activity at a snapshot check outside inference, peak %), or None."""
     busy = [
         telemetry.get("gpu_utilization_max_pct", 0)
         for record in records
@@ -21495,8 +21498,8 @@ def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> 
     if gpu_busy := _records_gpu_busy(records):
         count, peak = gpu_busy
         notes.append(
-            f"{label} run found the GPU in use by other processes before or after {count} of "
-            f"{len(records)} models (up to {peak}%)"
+            f"{label} run detected GPU activity outside harness inference at the checks "
+            f"around {count} of {len(records)} models (up to {peak}%)"
         )
     gaps = [record["model"] for record in records if _record_wall_clock_gap(record)]
     if gaps:

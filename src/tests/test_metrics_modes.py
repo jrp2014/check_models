@@ -7,6 +7,7 @@ import functools
 import io
 import json
 import logging
+import re
 import time
 from contextlib import ExitStack
 from dataclasses import replace
@@ -1833,7 +1834,7 @@ def test_gpu_utilization_sample_parses_ioreg_output(monkeypatch: pytest.MonkeyPa
 
 
 def test_telemetry_records_other_processes_on_the_gpu() -> None:
-    """Snapshot GPU readings aggregate per probe; any non-zero reading is another process."""
+    """Snapshot GPU readings aggregate per probe; zero readings never claim an idle GPU."""
     probe = functools.partial(check_models._TelemetryProbe, 100.0, 1, "ac", 0, 0)
     record = check_models._system_telemetry_record_from_probes(
         [probe(gpu_utilization_pct=0), probe(gpu_utilization_pct=37)], mode="snapshot"
@@ -1841,11 +1842,13 @@ def test_telemetry_records_other_processes_on_the_gpu() -> None:
     assert record["gpu_samples"] == 2
     assert record["gpu_utilization_max_pct"] == 37
     assert record["gpu_busy_samples"] == 1
-    assert "GPU utilisation by other processes max 37% over 2 sample(s)" in (
-        check_models._telemetry_status_line(record)
-    )
+    assert (
+        "GPU activity outside harness inference: max 37% at 2 instantaneous check(s); "
+        "activity between checks is not observed"
+    ) in (check_models._telemetry_status_line(record))
     assert check_models._telemetry_degradation_note(record) == (
-        "GPU in use by other processes (up to 37%) at 1 of 2 checks (before load and after cleanup)"
+        "GPU activity detected outside harness inference (up to 37%) at 1 of 2 checks "
+        "(before load and after cleanup)"
     )
     # A recorded fact: it does not by itself exclude the model from timing comparisons.
     assert not check_models._telemetry_degrades_timings(record)
@@ -1854,6 +1857,12 @@ def test_telemetry_records_other_processes_on_the_gpu() -> None:
     )
     assert idle["gpu_busy_samples"] == 0
     assert check_models._telemetry_degradation_note(idle) is None
+    # Zero at both instants is stated with its limit, never as an uncontended GPU.
+    idle_status = check_models._telemetry_status_line(idle)
+    assert "max 0% at 2 instantaneous check(s); activity between checks is not observed" in (
+        idle_status
+    )
+    assert not re.search(r"idle|uncontended|no other", idle_status)
     # Continuous samples overlap inference and never carry a GPU reading.
     unread = check_models._system_telemetry_record_from_probes([probe()], mode="continuous")
     assert "gpu_samples" not in unread
@@ -1867,8 +1876,8 @@ def test_telemetry_records_other_processes_on_the_gpu() -> None:
     )
     assert check_models._run_environment_notes("current", records) == [
         (
-            "current run found the GPU in use by other processes before or after 1 of 3 "
-            "models (up to 37%)"
+            "current run detected GPU activity outside harness inference at the checks "
+            "around 1 of 3 models (up to 37%)"
         )
     ]
 
