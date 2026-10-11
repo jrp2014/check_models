@@ -132,6 +132,7 @@ def main() -> int:
             ],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
             timeout=OUTDATED_TIMEOUT_SECONDS,
             env=env,

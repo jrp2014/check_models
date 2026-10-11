@@ -96,12 +96,14 @@ class TestToolchainHelpers:
             *,
             capture_output: bool,
             text: bool,
+            encoding: str,
             timeout: int,
             check: bool,
         ) -> subprocess.CompletedProcess[str]:
             assert cmd == ["/usr/bin/example", "--version"]
             assert capture_output is True
             assert text is True
+            assert encoding == "utf-8"
             assert timeout == 2
             assert check is False
             return subprocess.CompletedProcess(cmd, 0, stdout="  value\n", stderr="")
@@ -122,10 +124,11 @@ class TestToolchainHelpers:
             *,
             capture_output: bool,
             text: bool,
+            encoding: str,
             timeout: int,
             check: bool,
         ) -> subprocess.CompletedProcess[str]:
-            _ = (cmd, capture_output, text, timeout, check)
+            _ = (cmd, capture_output, text, encoding, timeout, check)
             msg = "missing"
             raise OSError(msg)
 

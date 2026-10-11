@@ -21,8 +21,11 @@
 #               import. update.sh installs that extra by default because
 #               transformers 5 builds torch-backed processors for about half
 #               the roster (and its mlx install, `-e .[dev]`, needs torch via
-#               mlx's dev extra). Reported on its own line, outside the core
-#               verdict.
+#               mlx's dev extra). PyTorch can publish wheels for a new Python
+#               on its own index before PyPI (3.15 did), so when PyPI fails
+#               the torch packages are retried from PROBE_TORCH_INDEX and the
+#               verdict says which source worked. Reported on its own line,
+#               outside the core verdict.
 #
 # Exit status is the core verdict (checks 1-3): 0 viable, 1 not viable. Every
 # check runs unless an earlier one it depends on failed.
@@ -32,6 +35,7 @@
 #   PROBE_PYTHON=3.16 bash tools/probe_python_next.sh
 #   PROBE_SOURCE_BUILD=1 bash tools/probe_python_next.sh   # build mlx from source first
 #   PROBE_TORCH=1 bash tools/probe_python_next.sh          # also check the torch extra
+#   PROBE_TORCH_INDEX=https://...                          # torch fallback index (default: PyTorch's cpu index)
 #   PROBE_RECREATE=1 bash tools/probe_python_next.sh       # fresh env first
 #   PROBE_MLX_REPO=/path/to/mlx                            # mlx checkout (default: sibling)
 #
@@ -43,6 +47,8 @@ PROBE_PYTHON="${PROBE_PYTHON:-3.15}"
 PROBE_ENV="${PROBE_ENV:-mlx-vlm-${PROBE_PYTHON//./}}"
 PROBE_SOURCE_BUILD="${PROBE_SOURCE_BUILD:-0}"
 PROBE_TORCH="${PROBE_TORCH:-0}"
+# macOS wheels on PyTorch's cpu index include the MPS backend.
+PROBE_TORCH_INDEX="${PROBE_TORCH_INDEX:-https://download.pytorch.org/whl/cpu}"
 PROBE_RECREATE="${PROBE_RECREATE:-0}"
 
 # Both values reach `conda create` and a conda-meta file path; allowlist them
@@ -53,6 +59,10 @@ if [[ ! "$PROBE_PYTHON" =~ ^3\.[0-9]{1,2}$ ]]; then
 fi
 if [[ ! "$PROBE_ENV" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; then
     echo "❌ PROBE_ENV must be a plain conda env name (got '$PROBE_ENV')" >&2
+    exit 1
+fi
+if [[ ! "$PROBE_TORCH_INDEX" =~ ^https://[A-Za-z0-9.-]+(/[A-Za-z0-9._~/-]*)?$ ]]; then
+    echo "❌ PROBE_TORCH_INDEX must be a plain https:// URL (got '$PROBE_TORCH_INDEX')" >&2
     exit 1
 fi
 if [[ "$PROBE_ENV" == "mlx-vlm" ]]; then
@@ -237,19 +247,46 @@ else
         fi
     done <<<"$torch_req_lines"
     torch_status="unavailable"
+    torch_import_cmd="import torch, torchvision; print('   torch', torch.__version__, '- torchvision', torchvision.__version__, '- mps available:', torch.backends.mps.is_available())"
     if [[ ${#torch_reqs[@]} -eq 0 ]]; then
         echo "❌ Could not read the torch extra from $PROJECT_ROOT/pyproject.toml"
     else
-        echo "   installing: ${torch_reqs[*]}"
+        echo "   installing from PyPI: ${torch_reqs[*]}"
+        if "$PY" -m pip install -q ${MLX_PIN_ARGS[@]+"${MLX_PIN_ARGS[@]}"} "${torch_reqs[@]}" \
+            && "$PY" -c "$torch_import_cmd"; then
+            torch_status="available"
+        else
+            # PyTorch's own index, for the torch packages only (--index-url, not
+            # --extra-index-url, so no other package can resolve from it); the
+            # rest of the extra then comes from PyPI against the installed torch.
+            torch_index_reqs=()
+            torch_rest_reqs=()
+            for req in "${torch_reqs[@]}"; do
+                if [[ "$req" =~ ^(torch|torchvision|torchaudio)([^A-Za-z0-9_.-]|$) ]]; then
+                    torch_index_reqs+=("$req")
+                else
+                    torch_rest_reqs+=("$req")
+                fi
+            done
+            echo "   PyPI failed; retrying ${torch_index_reqs[*]} from $PROBE_TORCH_INDEX"
+            if [[ ${#torch_index_reqs[@]} -gt 0 ]] \
+                && "$PY" -m pip install -q --index-url "$PROBE_TORCH_INDEX" "${torch_index_reqs[@]}" \
+                && { [[ ${#torch_rest_reqs[@]} -eq 0 ]] \
+                    || "$PY" -m pip install -q ${MLX_PIN_ARGS[@]+"${MLX_PIN_ARGS[@]}"} "${torch_rest_reqs[@]}"; } \
+                && "$PY" -c "$torch_import_cmd"; then
+                torch_status="index-only"
+            fi
+        fi
     fi
-    if [[ ${#torch_reqs[@]} -gt 0 ]] \
-        && "$PY" -m pip install -q ${MLX_PIN_ARGS[@]+"${MLX_PIN_ARGS[@]}"} "${torch_reqs[@]}" \
-        && "$PY" -c "import torch, torchvision; print('   torch', torch.__version__, '- torchvision', torchvision.__version__)"; then
-        echo "✓ torch extra installs and torch/torchvision import"
-        torch_status="available"
-    else
-        echo "⚠️  torch extra unavailable: about half the roster would fail"
-    fi
+    case "$torch_status" in
+        available) echo "✓ torch extra installs from PyPI and torch/torchvision import" ;;
+        index-only)
+            echo "✓ torch extra installs with the torch packages from $PROBE_TORCH_INDEX (not on PyPI yet)"
+            echo "   tools/update.sh installs them from PyPI, so a switch would need it to"
+            echo "   install them from that index first."
+            ;;
+        *) echo "⚠️  torch extra unavailable: about half the roster would fail" ;;
+    esac
 fi
 echo ""
 
@@ -269,6 +306,7 @@ else
 fi
 case "$torch_status" in
     available) echo "✓ Torch extra: available" ;;
+    index-only) echo "✓ Torch extra: available from $PROBE_TORCH_INDEX only (tools/update.sh would need that index)" ;;
     unavailable) echo "⚠️  Torch extra: unavailable: about half the roster would fail" ;;
     *) echo "   Torch extra: not checked (PROBE_TORCH=1)" ;;
 esac
