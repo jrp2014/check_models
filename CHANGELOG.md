@@ -40,6 +40,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- CLI declarations: the KV quantization schemes are one `KvQuantScheme`
+  alias, and the `--kv-*-scheme` and `--assessment-profile` choices are read
+  from their aliases instead of repeating the values. Options no longer
+  restate argparse's own defaults (`default=None`, `default=False` on
+  `store_true`, `type=str`), `--repetition-context-size` uses
+  `DEFAULT_PENALTY_CONTEXT_SIZE`, and the presence/frequency context-size
+  checks share one loop. Every option parses as before and keeps its flags,
+  default, choices and help (compared before and after, including `--help`).
 - Run summary: "Earlier retained runs on this mlx version" is a fact about
   the run, so it now shows (and is logged) even when a changed image or
   prompt withholds the comparison; the 2026-10-10 sweep on a new photo had

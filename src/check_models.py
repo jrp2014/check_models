@@ -271,7 +271,8 @@ IMPORT_PROBE_SKIP_ENV: Final[str] = "CHECK_MODELS_SKIP_IMPORT_PROBE"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 IMPORT_PROBE_OUTPUT_EXCERPT_CHARS: Final[int] = 220
 IMPORT_PROBE_MIN_TAIL_CHARS: Final[int] = 10
-DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
+type KvQuantScheme = Literal["uniform", "turboquant"]
+DEFAULT_KV_QUANT_SCHEME: Final[KvQuantScheme] = "uniform"
 DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
@@ -3332,13 +3333,13 @@ class ProcessImageParams:
     lazy: bool
     max_kv_size: int | None
     kv_bits: float | None
-    kv_quant_scheme: Literal["uniform", "turboquant"]
+    kv_quant_scheme: KvQuantScheme
     kv_group_size: int
     quantized_kv_start: int
     kv_key_bits: float | None = None
     kv_value_bits: float | None = None
-    kv_key_scheme: Literal["uniform", "turboquant"] | None = None
-    kv_value_scheme: Literal["uniform", "turboquant"] | None = None
+    kv_key_scheme: KvQuantScheme | None = None
+    kv_value_scheme: KvQuantScheme | None = None
     seed: int | None = None
     # Sampling dests the user gave explicitly (CLI or a per-run override);
     # everything else may be filled from the checkpoint's generation_config.json.
@@ -8752,10 +8753,14 @@ def _usability_severity(usability: ModelUsability) -> int:
     return len(assessed) - 1 - assessed.index(usability)
 
 
+def _literal_choices(alias: object) -> tuple[str, ...]:
+    """Return the members of a PEP 695 `type X = Literal[...]` alias in declaration order."""
+    return cast("tuple[str, ...]", get_args(getattr(alias, "__value__", alias)))
+
+
 def _literal_values(alias: object) -> frozenset[str]:
     """Return the string members of a PEP 695 `type X = Literal[...]` alias."""
-    value = getattr(alias, "__value__", alias)
-    return frozenset(cast("tuple[str, ...]", get_args(value)))
+    return frozenset(_literal_choices(alias))
 
 
 _EXECUTION_STATUS_VALUES: Final[frozenset[str]] = _literal_values(ExecutionStatus)
@@ -12193,11 +12198,11 @@ def validate_kv_params(
     *,  # Force all parameters to be keyword-only for clarity
     max_kv_size: int | None,
     kv_bits: float | None,
-    kv_quant_scheme: Literal["uniform", "turboquant"] = DEFAULT_KV_QUANT_SCHEME,
+    kv_quant_scheme: KvQuantScheme = DEFAULT_KV_QUANT_SCHEME,
     kv_key_bits: float | None = None,
     kv_value_bits: float | None = None,
-    kv_key_scheme: Literal["uniform", "turboquant"] | None = None,
-    kv_value_scheme: Literal["uniform", "turboquant"] | None = None,
+    kv_key_scheme: KvQuantScheme | None = None,
+    kv_value_scheme: KvQuantScheme | None = None,
 ) -> None:
     """Validate KV cache parameters are within acceptable ranges."""
     if max_kv_size is not None and max_kv_size <= 0:
@@ -12407,22 +12412,11 @@ def _harness_generation_argument_names() -> frozenset[str]:
 
 def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
     """Validate direct-generation flags shared with the MLX-VLM server request API."""
-    presence_context_size = getattr(
-        args,
-        "presence_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    frequency_context_size = getattr(
-        args,
-        "frequency_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    if presence_context_size is not None and presence_context_size <= 0:
-        msg = f"presence_context_size must be > 0 if specified, got {presence_context_size}"
-        raise ValueError(msg)
-    if frequency_context_size is not None and frequency_context_size <= 0:
-        msg = f"frequency_context_size must be > 0 if specified, got {frequency_context_size}"
-        raise ValueError(msg)
+    for name in ("presence_context_size", "frequency_context_size"):
+        size = getattr(args, name, DEFAULT_PENALTY_CONTEXT_SIZE)
+        if size is not None and size <= 0:
+            msg = f"{name} must be > 0 if specified, got {size}"
+            raise ValueError(msg)
 
 
 def _validate_thinking_params(args: argparse.Namespace) -> None:
@@ -27460,7 +27454,6 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
     )
     parser.add_argument(
         "--compare-with",
-        type=str,
         default=DEFAULT_COMPARE_WITH,
         metavar="auto|none|PATH|GITREF",
         help=(
@@ -27481,7 +27474,6 @@ def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
         "-f",
         "--folder",
         type=Path,
-        default=None,
         help=(
             "Folder to scan. Requires a path when provided. The most recently modified "
             "image file in the folder will be used. If both --folder and --image are "
@@ -27492,13 +27484,11 @@ def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
         "-i",
         "--image",
         type=Path,
-        default=None,
         help=("Path to a specific image file to process directly. Requires a path when provided."),
     )
     input_group.add_argument(
         "--image-source-url",
         type=_parse_public_image_source_url,
-        default=None,
         help=(
             "Public HTTP(S) location of the exact selected image, recorded only as "
             "reproduction metadata; the URL is never used as the inference input."
@@ -27514,8 +27504,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--models",
         action="extend",
         nargs="+",
-        type=str,
-        default=None,
         help=(
             "Specify models by ID/path. Overrides cache scan. "
             "May be provided multiple times; model lists accumulate."
@@ -27526,8 +27514,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--exclude",
         action="extend",
         nargs="+",
-        type=str,
-        default=None,
         help=(
             "Exclude models by ID/path from the model list "
             "(works with both explicit --models and cache scan). "
@@ -27545,14 +27531,10 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     )
     model_group.add_argument(
         "--revision",
-        type=str,
-        default=None,
         help="Model revision (branch, tag, or commit hash) for version pinning.",
     )
     model_group.add_argument(
         "--adapter-path",
-        type=str,
-        default=None,
         help="Path to LoRA adapter weights to apply on top of the base model.",
     )
 
@@ -27560,8 +27542,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "-p",
         "--prompt",
-        type=str,
-        default=None,
         help=(
             "Prompt text to send to the model. Requires text when provided. If omitted, "
             "the resolved --eval-mode lane supplies the prompt. When provided, it "
@@ -27574,7 +27554,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--resize-shape",
         type=int,
         nargs="+",
-        default=None,
         help=(
             "Resize image input before processor handling. "
             "Provide 1 integer for square resize or 2 for height width after a "
@@ -27584,9 +27563,7 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--eos-tokens",
         action="extend",
-        type=str,
         nargs="+",
-        default=None,
         help=(
             "Additional EOS tokens to stop on. Supports escaped values like \\n. "
             "May be provided multiple times; token lists accumulate."
@@ -27595,13 +27572,11 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--skip-special-tokens",
         action="store_true",
-        default=False,
         help="Skip tokenizer special tokens in the detokenized output.",
     )
     prompt_group.add_argument(
         "--processor-kwargs",
         type=_parse_processor_kwargs_arg,
-        default=None,
         help=(
             "Extra processor kwargs as a JSON object. "
             'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
@@ -27610,13 +27585,10 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--enable-thinking",
         action="store_true",
-        default=False,
         help="Enable thinking mode in the upstream chat template and generation flow.",
     )
     prompt_group.add_argument(
         "--thinking-mode",
-        type=str,
-        default=None,
         help=(
             "Value passed to chat templates that support thinking_mode (matches mlx-vlm upstream)."
         ),
@@ -27624,18 +27596,14 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--thinking-budget",
         type=int,
-        default=None,
         help="Maximum number of thinking tokens before forcing the end token.",
     )
     prompt_group.add_argument(
         "--thinking-start-token",
-        type=str,
-        default=None,
         help="Token marking the start of a thinking block, such as <think>.",
     )
     prompt_group.add_argument(
         "--thinking-end-token",
-        type=str,
         default=DEFAULT_THINKING_END_MARKER,
         help="Token marking the end of a thinking block when thinking mode is enabled.",
     )
@@ -27655,8 +27623,7 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
         "--assessment-profile",
-        choices=("general", "metadata"),
-        default=None,
+        choices=_literal_choices(AssessmentProfile),
         help=(
             "Checks applied to the answer, not a prompt change. Defaults to metadata for "
             "built-in metadata prompts and general for custom/triage prompts; explicit "
@@ -27682,7 +27649,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "-x",
         "--max-tokens",
         type=int,
-        default=None,
         help=(
             "Max new tokens to generate. When omitted, the resolved evaluation lane "
             f"supplies the default ({DEFAULT_MAX_TOKENS}; triage {TRIAGE_MAX_TOKENS}). "
@@ -27730,13 +27696,12 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "-r",
         "--repetition-penalty",
         type=float,
-        default=None,
         help="Penalize repeated tokens (>1.0 discourages repetition). None = no penalty.",
     )
     generation_group.add_argument(
         "--repetition-context-size",
         type=int,
-        default=20,
+        default=DEFAULT_PENALTY_CONTEXT_SIZE,
         help="Context window size for repetition penalty.",
     )
 
@@ -27754,7 +27719,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--presence-penalty",
         type=float,
-        default=None,
         help="Additive penalty for tokens that already appeared in generated context.",
     )
     server_group.add_argument(
@@ -27766,7 +27730,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--frequency-penalty",
         type=float,
-        default=None,
         help="Additive penalty scaled by token frequency in generated context.",
     )
     server_group.add_argument(
@@ -27778,7 +27741,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--logit-bias",
         type=_parse_logit_bias_arg,
-        default=None,
         help="OpenAI-style token-id bias JSON object, e.g. '{\"42\": -1.5}'.",
     )
 
@@ -27789,7 +27751,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--system-telemetry",
         action=argparse.BooleanOptionalAction,
-        default=None,
         help=(
             "macOS system-state telemetry per model: thermal state (nominal, fair, "
             "serious, critical; from serious up macOS reduces performance, so that "
@@ -27809,32 +27770,27 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "-L",
         "--lazy-load",
         action="store_true",
-        default=False,
         help="Use lazy loading for models (loads weights on-demand, reduces peak memory).",
     )
     runtime_group.add_argument(
         "--force-download",
         action="store_true",
-        default=False,
         help="Force mlx-vlm/Hugging Face Hub to download model files instead of using cache.",
     )
     runtime_group.add_argument(
         "--quantize-activations",
         action="store_true",
-        default=False,
         help="Enable mlx-vlm activation quantization during model loading when supported.",
     )
     runtime_group.add_argument(
         "--max-kv-size",
         type=int,
-        default=None,
         help="Maximum KV cache size (limits memory for long sequences). None = no limit.",
     )
     runtime_group.add_argument(
         "-b",
         "--kv-bits",
         type=float,
-        default=None,
         help=(
             "Quantize KV cache to N bits. Uniform supports 2, 3, 4, 5, 6, "
             "or 8; fractional values such as 3.5 use TurboQuant automatically."
@@ -27842,7 +27798,7 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     )
     runtime_group.add_argument(
         "--kv-quant-scheme",
-        choices=["uniform", "turboquant"],
+        choices=_literal_choices(KvQuantScheme),
         default=DEFAULT_KV_QUANT_SCHEME,
         help=(
             "KV cache quantization backend. Default: uniform. "
@@ -27852,7 +27808,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--kv-key-bits",
         type=float,
-        default=None,
         help=(
             "Override the KV cache key bit-width per tensor (requires --kv-bits; "
             "TurboQuant defaults to floor(--kv-bits))."
@@ -27861,7 +27816,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--kv-value-bits",
         type=float,
-        default=None,
         help=(
             "Override the KV cache value bit-width per tensor (requires --kv-bits; "
             "TurboQuant defaults to ceil(--kv-bits))."
@@ -27869,14 +27823,12 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     )
     runtime_group.add_argument(
         "--kv-key-scheme",
-        choices=["uniform", "turboquant"],
-        default=None,
+        choices=_literal_choices(KvQuantScheme),
         help="Override the KV quantization backend for keys only (requires --kv-bits).",
     )
     runtime_group.add_argument(
         "--kv-value-scheme",
-        choices=["uniform", "turboquant"],
-        default=None,
+        choices=_literal_choices(KvQuantScheme),
         help="Override the KV quantization backend for values only (requires --kv-bits).",
     )
     runtime_group.add_argument(
@@ -27914,13 +27866,11 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "-c",
         "--quality-config",
         type=Path,
-        default=None,
         help="Path to custom quality configuration YAML file.",
     )
     quality_group.add_argument(
         "--isolate",
         action="store_true",
-        default=False,
         help=(
             "Run each model in a fresh child interpreter. A native crash (segfault, abort, "
             "interpreter-finalization fault) in one model is then recorded as that model's "
@@ -27931,7 +27881,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     quality_group.add_argument(
         "--rerun-triage",
         action="store_true",
-        default=False,
         help=(
             "After the first pass, rerun crashed models and completed models with "
             "recorded mechanical observations using a simple prompt. "
@@ -27955,7 +27904,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "-n",
         "--dry-run",
         action="store_true",
-        default=False,
         help=(
             "Validate arguments and show what would be run without invoking any models. "
             "Lists discovered models, the generated prompt, and image path then exits."
@@ -27982,7 +27930,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     console_group.add_argument(
         "--width",
         type=int,
-        default=None,
         help=(
             "Force a specific CLI output width (columns) for separators and text wrapping. "
             "Overrides terminal detection. Also supported via MLX_VLM_WIDTH env var."
