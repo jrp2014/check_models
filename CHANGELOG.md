@@ -67,6 +67,12 @@ Notable changes to this project will be documented in this file.
   and the HTML report each partition once and pass the result to both the
   evidence blocks and the provenance section, which had partitioned again.
   Output is unchanged; a test checks the buckets on a mixed run.
+- The streaming repetition guard keeps its 600-character tail as chunks
+  arrive instead of joining the whole accumulated output every 25 chunks and
+  discarding all but the end. The full pieces are still kept for the answer
+  and detection is unchanged; tests pin the abort to the first check past the
+  200-token floor and show a unit whose four repeats overflow the tail never
+  trips it. The saving is small, not seconds off a sweep.
 - Removed the `unverified_place_name` observation (added in 0.17.29). It was
   a heuristic: any capitalised word after "in", "at", "near", "outside" or
   "around", or beside a feature word such as "River", that the prompt lacked.

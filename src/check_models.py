@@ -14770,14 +14770,14 @@ def _detect_streaming_repetition(tail: str) -> bool:
     return _REPETITION_TAIL_CYCLE_RE.search(tail) is not None
 
 
-def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int) -> bool:
-    """Check the retained tail for a degenerate cycle every N chunks past the floor."""
+def _stream_tail_repeats(tail: str, chunk: object, chunk_count: int) -> bool:
+    """Check the retained text's tail for a degenerate cycle every N chunks past the floor."""
     if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
         return False
     generated = getattr(chunk, "generation_tokens", None)
     if not isinstance(generated, int) or generated < _REPETITION_ABORT_MIN_TOKENS:
         return False
-    return _detect_streaming_repetition("".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:])
+    return _detect_streaming_repetition(tail)
 
 
 @dataclass
@@ -15046,6 +15046,9 @@ def _generate_with_repetition_guard(
     """
     _register_stream_stop_tokens(model, processor, kwargs.get("eos_tokens"))
     pieces: list[str] = []
+    # The last characters of the joined pieces, kept as they arrive so the
+    # repetition check never re-joins the whole output.
+    tail = ""
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
     token_seen = False
@@ -15075,6 +15078,7 @@ def _generate_with_repetition_guard(
             if observations is not None:
                 observations.observe_text(chunk.text)
             pieces.append(chunk.text)
+            tail = (tail + chunk.text)[-_REPETITION_ABORT_TAIL_CHARS:]
             if (
                 echo is not None
                 and chunk.text
@@ -15083,7 +15087,7 @@ def _generate_with_repetition_guard(
                 echo.write(chunk.text)
                 echo.flush()
             chunk_count += 1
-            if _stream_tail_repeats(pieces, chunk, chunk_count):
+            if _stream_tail_repeats(tail, chunk, chunk_count):
                 aborted = True
                 break
         if echo is not None and pieces:

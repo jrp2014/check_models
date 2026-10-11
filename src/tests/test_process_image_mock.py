@@ -1834,10 +1834,26 @@ class TestRepetitionGuard:
             image="i.jpg",
         )
         assert result.finish_reason == "repetition_abort"
-        assert pulled < 600
+        # The first check past the 200-token floor sees the cycle.
+        assert pulled == 200
         text = result.text
         assert text is not None
         assert text.startswith("keyword, boathouse")
+
+    def test_guard_checks_only_the_bounded_tail(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A unit whose four repeats overflow the 600-character tail never trips the guard."""
+        unit = "".join(f"w{i:02d}-" for i in range(38)) + "end"  # 155 chars, no inner period
+        assert len(unit) * 4 > check_models._REPETITION_ABORT_TAIL_CHARS
+        chunks = self._chunks([unit] * 300)
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kwargs: iter(chunks))
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+        )
+        assert result.finish_reason == "stop"
+        assert result.text == unit * 300
 
     def test_failure_before_any_chunk_is_tagged_before_first_token(
         self, monkeypatch: pytest.MonkeyPatch
