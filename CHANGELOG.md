@@ -48,6 +48,12 @@ Notable changes to this project will be documented in this file.
   `DEFAULT_PENALTY_CONTEXT_SIZE`, and the presence/frequency context-size
   checks share one loop. Every option parses as before and keeps its flags,
   default, choices and help (compared before and after, including `--help`).
+- Comparison serialization: `_run_comparison_to_json` builds its lists and
+  mappings with checked `list[JsonLike](...)`/`dict[str, JsonLike](...)`
+  constructors instead of casts, and `_run_comparison_from_json` passes the
+  baseline identity fields straight to `RunComparison` instead of through an
+  untyped dict, so the type checkers now verify those names and types. The
+  retained JSON is unchanged.
 - Run summary: "Earlier retained runs on this mlx version" is a fact about
   the run, so it now shows (and is logged) even when a changed image or
   prompt withholds the comparison; the 2026-10-10 sweep on a new photo had

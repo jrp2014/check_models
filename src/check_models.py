@@ -22126,43 +22126,26 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
     def _r(value: float | None) -> float | None:
         return round(value, 4) if value is not None else None
 
-    execution_mode: JsonLike = {
-        "baseline": comparison.baseline_execution_mode,
-        "current": comparison.current_execution_mode,
-    }
-    hardware: JsonLike = {
-        "baseline": comparison.baseline_hardware,
-        "current": comparison.current_hardware,
-    }
     return {
         "baseline": comparison.baseline_label,
         "baseline_timestamp": comparison.baseline_timestamp,
-        "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
+        "baseline_components": dict[str, JsonLike](comparison.baseline_components),
         "comparability": comparison.comparability,
-        "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
-        "unverified_facts": cast("JsonLike", list(comparison.unverified_facts)),
+        "incomparable_reasons": list[JsonLike](comparison.incomparable_reasons),
+        "unverified_facts": list[JsonLike](comparison.unverified_facts),
         "throughput_comparable": comparison.throughput_comparable,
-        "environment_notes": cast("JsonLike", list(comparison.environment_notes)),
+        "environment_notes": list[JsonLike](comparison.environment_notes),
         "revision_changes": [
             {"model": model, "baseline": before, "current": after}
             for model, before, after in comparison.revision_changes
         ],
         "compared_models": comparison.compared_models,
-        "models_added": cast("JsonLike", list(comparison.models_added)),
-        "models_removed": cast("JsonLike", list(comparison.models_removed)),
-        "models_removed_status": cast("JsonLike", dict(comparison.models_removed_status)),
-        "crash_continuity": [
-            cast("JsonLike", entry._asdict()) for entry in comparison.crash_continuity
-        ],
+        "models_added": list[JsonLike](comparison.models_added),
+        "models_removed": list[JsonLike](comparison.models_removed),
+        "models_removed_status": dict[str, JsonLike](comparison.models_removed_status),
+        "crash_continuity": [entry._asdict() for entry in comparison.crash_continuity],
         "architecture_commits": [
-            cast(
-                "JsonLike",
-                {
-                    **entry._asdict(),
-                    "subjects": list(entry.subjects),
-                    "imports": list(entry.imports),
-                },
-            )
+            {**entry._asdict(), "subjects": list(entry.subjects), "imports": list(entry.imports)}
             for entry in comparison.architecture_commits
         ],
         "text_changes_by_decoding": {
@@ -22173,7 +22156,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             group: {"changed": changed, "compared": compared}
             for group, changed, compared in comparison.greedy_text_changes_by_weights
         },
-        "harness_versions": cast("JsonLike", list(comparison.harness_versions)),
+        "harness_versions": list[JsonLike](comparison.harness_versions),
         "changes": [
             {
                 "model": change.model,
@@ -22200,7 +22183,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             "compared_models": comparison.prompt_tps_compared_models,
             **_ratio_end_models_json(comparison.prompt_tps_ratio_end_models),
         },
-        "text_changed_models": cast("JsonLike", list(comparison.text_changed_models)),
+        "text_changed_models": list[JsonLike](comparison.text_changed_models),
         "text_divergence": [
             {
                 "model": entry.model,
@@ -22219,7 +22202,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
                 "baseline": change.baseline_revision,
                 "current": change.current_revision,
                 "commits": change.commit_count,
-                "subjects": cast("JsonLike", list(change.subjects)),
+                "subjects": list[JsonLike](change.subjects),
             }
             for change in comparison.component_changes
         ],
@@ -22257,8 +22240,14 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "mlx_version": comparison.mlx_version,
         "earlier_runs_on_mlx_version": comparison.earlier_runs_on_mlx_version,
         "mlx_version_history_unread": comparison.mlx_version_history_unread,
-        "execution_mode": execution_mode,
-        "hardware": hardware,
+        "execution_mode": {
+            "baseline": comparison.baseline_execution_mode,
+            "current": comparison.current_execution_mode,
+        },
+        "hardware": {
+            "baseline": comparison.baseline_hardware,
+            "current": comparison.current_hardware,
+        },
     }
 
 
@@ -22423,21 +22412,6 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         message = f"comparison comparability is not a known value: {comparability_value!r}"
         raise ValueError(message)
     comparability = cast("Literal['comparable', 'unknown', 'incomparable']", comparability_value)
-    identity: dict[str, object] = {
-        "baseline_label": _comparison_req_str(value.get("baseline", "unknown baseline")),
-        "baseline_timestamp": _comparison_opt_str(value.get("baseline_timestamp")),
-        "baseline_components": tuple(
-            (_comparison_req_str(name), _comparison_req_str(part))
-            for name, part in components.items()
-        ),
-        "baseline_execution_mode": _comparison_req_str(
-            execution_mode.get("baseline", "in_process")
-        ),
-        "current_execution_mode": _comparison_req_str(execution_mode.get("current", "in_process")),
-        "baseline_hardware": _comparison_opt_str(hardware.get("baseline")),
-        "current_hardware": _comparison_opt_str(hardware.get("current")),
-        "comparability": comparability,
-    }
     ratio = _comparison_mapping(value.get("generation_tps_ratio"))
     prefill = _comparison_mapping(value.get("prompt_tps_ratio"))
     changes = tuple(
@@ -22475,6 +22449,17 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         for change in _comparison_rows(value.get("memory_changes"))
     )
     return RunComparison(
+        baseline_label=_comparison_req_str(value.get("baseline", "unknown baseline")),
+        baseline_timestamp=_comparison_opt_str(value.get("baseline_timestamp")),
+        baseline_components=tuple(
+            (_comparison_req_str(name), _comparison_req_str(part))
+            for name, part in components.items()
+        ),
+        baseline_execution_mode=_comparison_req_str(execution_mode.get("baseline", "in_process")),
+        current_execution_mode=_comparison_req_str(execution_mode.get("current", "in_process")),
+        baseline_hardware=_comparison_opt_str(hardware.get("baseline")),
+        current_hardware=_comparison_opt_str(hardware.get("current")),
+        comparability=comparability,
         compared_models=_comparison_req_int(value.get("compared_models", 0)),
         models_added=_comparison_str_items(value.get("models_added") or []),
         models_removed=_comparison_str_items(value.get("models_removed") or []),
@@ -22565,7 +22550,6 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         prompt_tps_compared_models=_comparison_req_int(prefill.get("compared_models", 0)),
         prompt_tps_ratio_end_models=_ratio_end_models_from_json(prefill),
         prefill_changes=_prefill_changes_from_json(value.get("prefill_changes")),
-        **cast("dict[str, Any]", identity),
     )
 
 
