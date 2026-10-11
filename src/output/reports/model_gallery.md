@@ -1,11 +1,11 @@
 # Model Output Gallery
 
-Generated on: 2026-10-11 00:35:32 BST
+Generated on: 2026-10-11 20:05:12 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 33.5 MB
+- *Input image:* JPEG, 6,213 x 9,320 pixels (57.9 MP), 52.1 MB
 
 This run records model responses to one shared image and prompt (evaluation
 lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
@@ -18,7 +18,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-142e2341731f9ce5.jpg)
+![Reference image](assets/source-image-f00ae35004e26a90.jpg)
 
 ## Current-run Chooser
 
@@ -26,60 +26,60 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                          |
-|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.12s   | 409 tok/s           | 0.63            | 1.9     | 2,128      | 90      | none                                                                                                                  |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 68.57s  | 32.5 tok/s          | 61.98           | 17      | 16,574     | 125     | none                                                                                                                  |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 12.12s  | 76.4 tok/s          | 8.57            | 8.7     | 6,460      | 99      | none                                                                                                                  |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected`          | 38.60s  | 37.0 tok/s          | 21.46           | 78      | 6,460      | 108     | none                                                                                                                  |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 6.77s   | 53.5 tok/s          | 2.36            | 10      | 2,124      | 123     | none                                                                                                                  |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.25s   | 105 tok/s           | 0.68            | 7.0     | 402        | 91      | none                                                                                                                  |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 7.10s   | 64.4 tok/s          | 2.62            | 13      | 2,935      | 130     | none                                                                                                                  |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 5.20s   | 169 tok/s           | 1.65            | 7.8     | 2,934      | 128     | none                                                                                                                  |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 6.38s   | 65.9 tok/s          | 1.46            | 8.1     | 1,535      | 181     | none                                                                                                                  |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 10.83s  | 29.8 tok/s          | 3.16            | 13      | 3,137      | 129     | none                                                                                                                  |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 6.22s   | 143 tok/s           | 2.81            | 3.9     | 4,095      | 171     | none                                                                                                                  |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 5.98s   | 50.4 tok/s          | 0.93            | 9.3     | 1,149      | 128     | none                                                                                                                  |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 30.73s  | 50.7 tok/s          | 24.96           | 26      | 12,801     | 109     | none                                                                                                                  |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 45.59s  | 75.5 tok/s          | 40.31           | 23      | 16,558     | 161     | none                                                                                                                  |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 45.80s  | 62.3 tok/s          | 41.92           | 11      | 16,558     | 125     | none                                                                                                                  |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 47.62s  | 49.1 tok/s          | 41.07           | 25      | 16,574     | 148     | none                                                                                                                  |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 68.19s  | 27.6 tok/s          | 60.26           | 21      | 16,574     | 124     | none                                                                                                                  |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected`          | 52.59s  | 48.7 tok/s          | 31.00           | 92      | 3,502      | 122     | none                                                                                                                  |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected`          | 19.84s  | 52.8 tok/s          | 14.45           | 14      | 16,569     | 116     | none                                                                                                                  |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 5.15s   | 96.1 tok/s          | 1.61            | 6.5     | 2,100      | 119     | none                                                                                                                  |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.55s   | 77.5 tok/s          | 2.26            | 28      | 605        | 87      | none                                                                                                                  |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 12.50s  | 19.6 tok/s          | 2.15            | 17      | 604        | 140     | none                                                                                                                  |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.52s   | 99.4 tok/s          | 1.05            | 16      | 609        | 106     | none                                                                                                                  |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 3.83s   | 121 tok/s           | 0.80            | 5.9     | 605        | 87      | none                                                                                                                  |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected`          | 7.44s   | 40.2 tok/s          | 2.39            | 16      | 3,125      | 110     | none                                                                                                                  |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 5.39s   | 126 tok/s           | 2.60            | 5.4     | 4,221      | 157     | none                                                                                                                  |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 15.04s  | 13.4 tok/s          | 2.57            | 18      | 1,281      | 133     | none                                                                                                                  |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 10.26s  | 122 tok/s           | 6.13            | 23      | 3,636      | 113     | none                                                                                                                  |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected`          | 5.77s   | 101 tok/s           | 1.50            | 7.5     | 1,886      | 223     | none                                                                                                                  |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`             | 11.43s  | 93.4 tok/s          | 1.34            | 19      | 1,648      | 640     | duplicate keywords                                                                                                    |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 4.23s   | 201 tok/s           | 1.19            | 4.0     | 2,120      | 93      | prompt hint repeated                                                                                                  |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `concerns detected`             | 5.20s   | 58.6 tok/s          | 0.91            | 7.6     | 609        | 108     | duplicate keywords                                                                                                    |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.11s   | 170 tok/s           | 1.16            | 4.7     | 1,390      | 91      | prompt hint repeated                                                                                                  |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `concerns detected`             | 5.61s   | 146 tok/s           | 2.82            | 4.2     | 5,595      | 230     | duplicate keywords                                                                                                    |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 5.00s   | 305 tok/s           | 1.29            | 2.1     | 345        | 42      | labelled fields not detected; prompt hint repeated                                                                    |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.67s   | 225 tok/s           | 0.86            | 2.1     | 2,127      | 200     | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns: generation`    | 22.18s  | 55.7 tok/s          | 1.29            | 20      | 1,334      | 1,000   | labelled fields not detected; cut off at token limit; incomplete thinking block                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns: generation`    | 17.72s  | 15.6 tok/s          | 2.21            | 15      | 311        | 200     | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns: generation`    | 3.64s   | 208 tok/s           | 0.88            | 3.1     | 943        | 124     | incomplete thinking block                                                                                             |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 57.24s  | 22.7 tok/s          | 9.19            | 25      | 4,413      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 50.47s  | 113 tok/s           | 46.70           | 9.4     | 16,569     | 200     | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.92s   | 315 tok/s           | 0.89            | 1.1     | 1,218      | 45      | labelled fields not detected; prompt hint repeated                                                                    |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `major concerns: generation`    | 4.00s   | 125 tok/s           | 1.03            | 5.6     | 1,439      | 200     | repeated text; stopped early: repeating; labelled fields not detected                                                 |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 6.25s   | 65.4 tok/s          | 0.90            | 7.0     | 603        | 186     | labelled fields not detected                                                                                          |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.44s   | insufficient sample | 1.43            | 6.7     | 2,205      | 15      | control tokens visible; labelled fields not detected                                                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.51s   | 200 tok/s           | 0.63            | 1.8     | 341        | 162     | labelled fields not detected                                                                                          |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 7.03s   | 165 tok/s           | 0.93            | 4.8     | 1,034      | 36      | labelled fields not detected; prompt hint repeated                                                                    |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.07s   | 481 tok/s  | 0.64            | 1.9     | 2,131      | 83      | none                                                                                                                     |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 69.83s  | 36.3 tok/s | 64.33           | 17      | 16,579     | 123     | none                                                                                                                     |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 8.48s   | 126 tok/s  | 1.31            | 19      | 1,656      | 617     | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected`          | 20.78s  | 45.0 tok/s | 11.49           | 78      | 6,372      | 112     | none                                                                                                                     |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.44s   | 57.4 tok/s | 1.98            | 10      | 2,132      | 98      | none                                                                                                                     |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected`          | 2.26s   | 421 tok/s  | 0.83            | 2.1     | 2,135      | 126     | none                                                                                                                     |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected`          | 15.34s  | 66.6 tok/s | 1.31            | 20      | 1,342      | 750     | none                                                                                                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected`          | 8.74s   | 22.0 tok/s | 2.04            | 15      | 320        | 101     | none                                                                                                                     |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected`          | 3.49s   | 304 tok/s  | 0.87            | 3.2     | 950        | 333     | none                                                                                                                     |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.21s   | 106 tok/s  | 0.71            | 7.1     | 410        | 104     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.31s   | 66.3 tok/s | 2.55            | 13      | 2,959      | 122     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 3.62s   | 188 tok/s  | 1.51            | 7.8     | 2,958      | 113     | none                                                                                                                     |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.30s   | 210 tok/s  | 2.71            | 3.9     | 4,101      | 158     | none                                                                                                                     |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 26.70s  | 73.4 tok/s | 21.89           | 26      | 12,809     | 120     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 43.17s  | 86.9 tok/s | 38.66           | 23      | 16,566     | 144     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 42.92s  | 69.5 tok/s | 39.77           | 11      | 16,566     | 91      | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 41.44s  | 110 tok/s  | 36.94           | 25      | 16,579     | 130     | none                                                                                                                     |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 60.95s  | 30.2 tok/s | 53.65           | 21      | 16,579     | 133     | none                                                                                                                     |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected`          | 18.03s  | 60.0 tok/s | 13.86           | 14      | 16,577     | 127     | none                                                                                                                     |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.54s   | 103 tok/s  | 1.56            | 6.5     | 2,108      | 102     | none                                                                                                                     |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.08s   | 74.4 tok/s | 2.27            | 28      | 611        | 92      | none                                                                                                                     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 8.91s   | 31.4 tok/s | 1.46            | 17      | 610        | 145     | none                                                                                                                     |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.12s   | 62.7 tok/s | 0.93            | 7.6     | 615        | 118     | none                                                                                                                     |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 4.74s   | 124 tok/s  | 0.95            | 16      | 615        | 105     | none                                                                                                                     |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 3.79s   | 125 tok/s  | 0.74            | 6.0     | 611        | 108     | none                                                                                                                     |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 8.19s   | 159 tok/s  | 4.68            | 23      | 3,642      | 101     | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`             | 8.98s   | 78.8 tok/s | 5.55            | 8.7     | 6,372      | 121     | prompt hint repeated                                                                                                     |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.09s   | 213 tok/s  | 1.09            | 4.0     | 2,122      | 84      | prompt hint repeated                                                                                                     |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`             | 5.14s   | 73.0 tok/s | 1.37            | 8.2     | 1,562      | 141     | duplicate keywords                                                                                                       |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.50s   | 128 tok/s  | 1.09            | 5.6     | 1,446      | 128     | duplicate keywords; prompt hint repeated                                                                                 |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`             | 35.43s  | 52.9 tok/s | 20.42           | 92      | 3,506      | 118     | prompt hint repeated                                                                                                     |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.27s   | 181 tok/s  | 1.18            | 4.8     | 1,410      | 105     | prompt hint repeated                                                                                                     |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`             | 7.38s   | 40.1 tok/s | 2.29            | 16      | 3,152      | 115     | prompt hint repeated                                                                                                     |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`             | 4.57s   | 128 tok/s  | 2.11            | 5.4     | 4,229      | 125     | prompt hint repeated                                                                                                     |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `concerns detected`             | 7.23s   | 37.0 tok/s | 1.94            | 18      | 1,299      | 110     | prompt hint repeated                                                                                                     |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 4.17s   | 105 tok/s  | 1.48            | 7.4     | 1,843      | 93      | prompt hint repeated                                                                                                     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 2.87s   | 367 tok/s  | 1.10            | 2.2     | 353        | 44      | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: answer format` | 9.63s   | 31.8 tok/s | 2.87            | 13      | 3,164      | 144     | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 51.01s  | 25.0 tok/s | 7.50            | 25      | 4,418      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns: generation`    | 5.59s   | 59.0 tok/s | 0.80            | 9.3     | 1,151      | 200     | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 50.35s  | 124 tok/s  | 40.56           | 9.4     | 16,577     | 1,000   | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.04s   | 541 tok/s  | 0.87            | 1.1     | 1,225      | 36      | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 5.63s   | 98.1 tok/s | 0.82            | 7.2     | 609        | 261     | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: generation`    | 5.58s   | 150 tok/s  | 3.01            | 4.3     | 5,688      | 200     | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.41s   | 106 tok/s  | 1.48            | 6.7     | 2,211      | 19      | control tokens visible; labelled fields not detected                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.08s   | 372 tok/s  | 0.66            | 1.8     | 349        | 131     | labelled fields not detected                                                                                             |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 3.02s   | 171 tok/s  | 0.92            | 4.8     | 1,038      | 37      | labelled fields not detected; prompt hint repeated                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.12s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.07s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -89,21 +89,19 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Mechanical checks               | Observations                                                                                                          |
-|--------------------------------------------------------------------------------------------------------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                    |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)        | `major concerns: generation`    | labelled fields not detected; cut off at token limit; incomplete thinking block                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns: generation`    | incomplete thinking block                                                                                             |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                      | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                    |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                 | `major concerns: generation`    | repeated text; stopped early: repeating; labelled fields not detected                                                 |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns: answer format` | labelled fields not detected                                                                                          |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns: answer format` | control tokens visible; labelled fields not detected                                                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns: answer format` | labelled fields not detected                                                                                          |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                          | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                    |
+| Model                                                                                            | Mechanical checks               | Observations                                                                                                             |
+|--------------------------------------------------------------------------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                       | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                    | `major concerns: answer format` | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)  | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16) | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                          | `major concerns: generation`    | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)    | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                | `major concerns: answer format` | labelled fields not detected; unsupplied place name                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)   | `major concerns: generation`    | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | `major concerns: answer format` | control tokens visible; labelled fields not detected                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                     | `major concerns: answer format` | labelled fields not detected                                                                                             |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                              | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -114,53 +112,53 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 | Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Lion Statue at City Hall \| Description: A bronze lion statue stands prominently outside City Hall, overlooking the Market Place in Norwich, England. The sta... \| Keywords (10): Lion statue, City Hall, Norwich, England, Gothic architecture, historical landmark, statue, street scene, ...                                                                               |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: Bronze Lion Statue Before Norwich Guildhall \| Description: A weathered bronze lion sculpture with an open mouth and raised paw stands on a stone plinth... \| Keywords (17): Bronze lion, Norwich Guildhall, Norwich, Norfolk, England, Gothic architecture, Historic landmark, Sculpture, ...                                                                                |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Bronze Lion Statue at Norwich Guildhall \| Description: A bronze lion sculpture stands prominently on a stone pedestal, with the historic 15th-century flint N... \| Keywords (9): Bronze Lion Statue, Norwich Guildhall, Historic Landmark, Gothic Architecture, Norwich, Norfolk, England, ...                                                                               |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | Title: Bronze Lion Sculpture, Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands prominently on a stone pedestal, overlooking a... \| Keywords (17): Bronze, Lion, Sculpture, Alfred Hardiman, Norwich Guildhall, 15th-century, Flint, Norwich, Norfolk, England, ...                                                                                |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Norwich Lion Statue, Gothic Architecture \| Description: A bronze lion statue by Alfred Hardiman is prominently displayed in Norwich, England, with the historic Norwich G... \| Keywords (21): Adobe Stock, Alfred Hardiman, Blue sky, British heritage, Car, East Anglia, England, Europe, ...                                                                               |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Bronze Lion Statue in Norwich Market Place \| Description: A bronze lion sculpture stands prominently on a pedestal in Norwich, with the historic Norwich Gui... \| Keywords (12): Bronze lion, Norwich, Guildhall, Gothic Architecture, Statue, Sculpture, Market Place, Blue sky, England, ...                                                                               |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **Alfred Hardiman’s Lion Sculpture, Norwich Guildhall** \| Description: A bronze lion sculpture by Alfred Hardiman stands prominently on a stone pedestal o... \| Keywords (16): Lion sculpture, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, Gothic architecture, flint building, ...                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: **Norwich Guildhall’s Alfred Hardiman Lion Statue** \| Description: A bronze lion sculpture by Alfred Hardiman stands prominently in Norwich’s Market Plac... \| Keywords (14): bronze lion, Norwich Guildhall, flintwork architecture, Alfred Hardiman, Market Place, East Anglia, England, ...                                                                               |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Bronze Lion Statue Guards Norwich Guildhall, East Anglia \| Description: A bronze lion statue by Alfred Hardiman stands prominently in Norwich, Norfolk, En... \| Keywords (19): Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, East Anglia, Norfolk, England, Gothic Architecture, ...                                                                               |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected` | Title: Bronze Lion Statue in Norwich Market Place \| Description: A weathered bronze lion statue stands on a pedestal in Norwich's Market Place, overlooking the st... \| Keywords (17): Bronze lion, Norwich, Market Place, Guildhall, Norwich Guildhall, Street scene, Pedestrian, Car, Blue sky, ...                                                                               |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: "The Lion Statue at Norwich Guildhall" \| Description: A bronze lion sculpture by Alfred Hardiman stands prominently outside City Hall, overlooking the Ma... \| Keywords (20): Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, ...                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: "Norwich City Hall Lion Statue" \| Description: The bronze lion statue by Alfred Hardiman stands majestically outside City Hall in Norwich, Norfolk, England, wit... \| Keywords (17): Norwich, City Hall, Lion Statue, Alfred Hardiman, Bronze, Sculpture, Historic Landmark, 15th Century, ...                                                                               |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Bronze Lion Sculpture in Norwich \| Description: A bronze lion sculpture stands prominently in the foreground, overlooking a street scene in Norwich, E... \| Keywords (18): Norwich, England, Lion, Sculpture, Bronze, Guildhall, Historic Landmark, British Heritage, Gothic Architecture, ...                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Bronze lion statue in Norwich city centre \| Description: A weathered bronze lion sculpture stands prominently on a stone plinth in Norwich, Norfolk, England, with... \| Keywords (20): bronze lion, sculpture, Norwich Guildhall, Norfolk, England, British heritage, Gothic Architecture, ...                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Bronze Lion Statue at Norwich Guildhall \| Description: A bronze lion statue by Alfred Hardiman stands prominently in front of the historic Norwich Guildhall, its fie... \| Keywords (18): Bronze lion, Alfred Hardiman, Norwich Guildhall, Norwich, Norfolk, England, Gothic architecture, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Bronze Lion Statue at Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands guard outside the historic 15th-century flint N... \| Keywords (18): Bronze Lion, Norwich Guildhall, Alfred Hardiman, Gothic Architecture, Street Scene, Pedestrian, Market Place, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Bronze Lion Statues at Norwich Guildhall \| Description: A pair of weathered bronze lion sculptures by Alfred Hardiman stand on a stone plinth in front o... \| Keywords (17): Bronze Sculpture, Lion Statue, Norwich Guildhall, Gothic Architecture, Alfred Hardiman, East Anglia, England, ...                                                                               |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected` | Title: Bronze Lion Sculpture Outside Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands on a stone plinth outside City Hall, ove... \| Keywords (20): Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, ...                                                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected` | Title: Norwich Guildhall Lion Statue \| Description: A bronze lion sculpture by Alfred Hardiman overlooks the Market Place from the balustrade of a bridge, with the histori... \| Keywords (21): Norwich, Norfolk, England, Guildhall, Lion, Bronze, Statue, Hardiman, Market Place, 15th-century, ...                                                                               |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Bronze Lion Statue Outside Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands outside the historic Norwich Guildhall, overl... \| Keywords (17): Bronze, Lion, Sculpture, Norwich, Guildhall, Market Place, Historical, Architecture, East Anglia, England, ...                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Bronze Lion Sculpture Outside Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands outside the City Hall, overlooking the historic... \| Keywords (15): Norwich, Norfolk, England, British heritage, lion, sculpture, statue, Guildhall, Gothic architecture, ...                                                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: Hardiman Lion Sculpture, Norwich Guildhall, Norfolk \| Description: Captured on 10 October 2026, this photograph shows Alfred Hardiman’s bronze lion sc... \| Keywords (19): Alfred Hardiman, Bronze sculpture, Lion, Statue, Norwich Guildhall, City Hall, Market Place, Historic landmark, ...                                                                               |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Bronze lion sculpture overlooking historic Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands in the foreground, overlooking t... \| Keywords (16): Alfred Hardiman, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, ...                                                                               |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Bronze lion sculpture before historic Norwich Guildhall backdrop. \| Description: A detailed bronze lion sculpture rests on a pedestal, with the impressive,... \| Keywords (15): Norwich Guildhall, bronze sculpture, lion statue, Alfred Hardiman, historic landmark, Gothic architecture, ...                                                                               |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | Title: Bronze Lion Sculpture in Norwich Market Place \| Description: A bronze lion sculpture by Alfred Hardiman stands prominently in Norwich Market Place, with... \| Keywords (20): Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, ...                                                                                |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Bronze Lion Sculpture at Norwich Guildhall, East Anglia \| Description: A bronze lion sculpture by Alfred Hardiman stands proudly on a stone pedestal ou... \| Keywords (17): Bronze Lion, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, East Anglia, England, ...                                                                               |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Bronze Lion Statue at Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands prominently outside City Hall, overlooking the Market P... \| Keywords (18): Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, City Hall, Market Place, Gothic Architecture, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Bronze Lion Statue at Norwich City Hall \| Description: A bronze lion sculpture by Alfred Hardiman stands proudly on its pedestal, overlooking the bustling Ma... \| Keywords (19): bronze lion, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, flint building, Gothic architecture, ...                                                                               |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected` | Title: Norwich Lion Statue and Guildhall \| Description: A bronze lion sculpture stands outside City Hall overlooking the Market Place, with the historic 15th-ce... \| Keywords (20): Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, ...                                                                               |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Bronze Lion Sculpture in Norwich \| Description: A bronze lion sculpture by Alfred Hardiman stands outside Norwich City Hall, overlooking the Market Plac... \| Keywords (52): Norwich, England, UK, city, street, lion, bronze, statue, sculpture, City Hall, Guildhall, Norwich Guildhall, ...[1,630 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: Bronze Lion Statue in Norwich, England \| Description: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place,... \| Keywords (15): London, sculpture, lion, statue, city hall, market place, guildhall, historic, architecture, England, Europe, ...                                                                                |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `concerns detected`    | Title: Bronze Lion Sculpture in Front of Norwich Guildhall \| Description: A bronze lion sculpture by Alfred Hardiman stands in front of the historic 15th-century flint... \| Keywords (17): Norwich, Norfolk, England, Guildhall, Sculpture, Lion Statue, Gothic Architecture, British Heritage, ...                                                                                |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: "Bronze Lion Sculpture by Alfred Hardiman" \| Description: A bronze lion sculpture by Alfred Hardiman stands outside City Hall, overlooking the Market Place in Norwich,... \| Keywords (17): Bronze, Lion, Sculpture, Alfred Hardiman, City Hall, Market Place, Norwich, Norfolk, England, ...                                                                                |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `concerns detected`    | Title: "Alfred Hardiman's Lion Sculpture at City Hall, Norwich" \| Description: A bronze lion sculpture by Alfred Hardiman stands proudly outside City Hall, o... \| Keywords (19): Alfred Hardiman, Lion Sculpture, City Hall, Norwich, Guildhall, Norwich, Norfolk, England, Gothic Architecture, ...                                                                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.                                                                                                                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: "Bronze Lion Sculpture at Norwich Guildhall, Norwich, England" \| Description: The image features a bronze lion sculpture by Alfred Hardiman, positioned o... \| Keywords (47): Alfred Hardiman, Norwich Guildhall, Gothic Architecture, British heritage, Lion, Norwich, Norwich City Hall, ...                                                                               |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | ◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key elements from the context are the capture date/time (2026-10-10 16:41:54 UTC+01:00) and GPS coordinates (52.628900°N,...                                                                                              |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | Title: Bronze Lion Statue in Front of Norwich Guildhall \| Description: A bronze lion statue stands proudly in front of the historic Norwich Guildhall, set against... \| Keywords (44): Bronze lion statue, Norwich Guildhall, historic building, Gothic architecture, sunny day, city of Norwich, ...                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | Title: Bronze Lion Statue at City Hall, Norwich, England \| Description: A grand bronze lion sculpture stands prominently outside City Hall, set against a historic... \| Keywords (21): British-English, bronze lion, City Hall, Norwich, England, historic, Gothic Architecture, Guildhall, Lion, ...                                                                               |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (32): We need title 5-10 words. Concrete., ...                                                                                                                                                                                                                                                                       |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Bronze Lion Statue in Norwich, England \| Description: The bronze lion statue stands on the bridge in Norwich, Norfolk, England. It is a 15th-century flint Nor... \| Keywords (39): Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Landmark, Lion, Statue, Sightseeing, ...                                                                               |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A bronze-colored statue by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.                                                                                                                                                                      |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `major concerns`       | Lion, City Hall, Norwich Guildhall, Sculpture, Sightseeing, Statue, Street Scene, Sculpture, Sightseeing, Statue, Sculpture, Sightseeing, Sculpture, Sightseeing, Sculpture, Sightseeing, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Scu...                                                                                              |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the Market Place, with the historic 15th-century Guildhall visible in the background in Norwich, England. The photo was taken on October 10, 2026, at 4:41:54 PM GMT, at coordinates 52.628900°N, 1.2925...                                                                                              |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a bronze statue of a roaring lion.                                                                                                                                                                                                                                                                                                |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooki... \| Description: A statue of a lion by Alfred Hardiman, located outside City Hall in Norwich, Norfolk, England. The statue is situated in front of the historic flint Norwich Gui... \| Keywords: (not detected)                                                                               |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.                                                                                                                                                                      |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: St. Peter Mancroft Church Tower \| Description: A Gothic-style church tower illuminated at twilight, with a Victorian lead flèche and a clear sky in the background. \| Keywords (15): Church tower, Gothic architecture, St. Peter Mancroft, Norwich, Norfolk, England, illuminated, spire, ...                                                                               |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: St Peter Mancroft Tower at Evening \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in... \| Keywords (16): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Spire, Twilight, Evening Light, Stone Masonry, ...                                                                               |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: St Peter Mancroft, Norwich, at Twilight \| Description: A low-angle, evening view of the medieval St Peter Mancroft church in Norwich, Norfolk, England... \| Keywords (35): St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, ...[1,626 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | Title: St Peter Mancroft Tower, Norwich \| Description: The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands illuminated in evening light, with pedes... \| Keywords (19): St Peter Mancroft, Norwich, England, Church Tower, Gothic Architecture, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight \| Description: The Church of St Peter Mancroft's Gothic tower is illuminated in the evening light, with pedestrians walking by in N... \| Keywords (18): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected` | Title: Evening view of St Peter Mancroft Church illuminated in Norwich \| Description: The image captures a serene evening scene featuring the illuminated bell tower o... \| Keywords (23): St Peter Mancroft, Gothic Architecture, Bell Tower, Church Tower, Perpendicular Gothic, Stone Masonry, ...                                                                               |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight \| Description: A low-angle view of St Peter Mancroft's medieval tower and Victorian stone facade illuminated by evening light, with... \| Keywords (19): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...[2,799 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | Title: Evening Illumination of St Peter Mancroft's Tower in Norwich \| Description: The medieval tower of St Peter Mancroft church in Norwich, England, is illumin... \| Keywords (11): Gothic architecture, historic landmark, stone masonry, medieval tower, St Peter Mancroft, Norwich, England, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Medieval Church Tower Illuminated at Twilight \| Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, wit... \| Keywords (18): Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, ...[1,098 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight in Norwich \| Description: A low-angle evening shot captures the illuminated Gothic stone tower of St Peter Mancrof... \| Keywords (15): St Peter Mancroft, Gothic Architecture, Church Tower, Stone Masonry, Spire, Victorian Flèche, Norwich, Norfolk, ...                                                                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **St Peter Mancroft Church Tower at Twilight, Norwich** \| Description: A low-angle evening photograph captures the medieval stone tower and Victorian lead sp... \| Keywords (16): St Peter Mancroft, Norwich, England, Gothic architecture, Perpendicular Gothic, stone tower, lead spire, ...                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: **St Peter Mancroft’s Gothic Tower in Norwich Twilight** \| Description: A towering medieval church spire in Norwich, Norfolk, stands illuminated under twiligh... \| Keywords (17): Church of St Peter Mancroft, Norwich, Norfolk, England, Gothic architecture, Stone masonry, Bell tower, ...                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: Medieval Tower of St Peter Mancroft \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in e... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight \| Description: The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands tall against... \| Keywords (18): Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Stone Masonry, Stone facade, Spire, ...                                                                               |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Church of St Peter Mancroft at twilight \| Description: The Church of St Peter Mancroft in Norwich, Norfolk, England, is captured at dusk, its stone facade illuminated by... \| Keywords (21): Church of St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, ...                                                                               |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: St Peter Mancroft Tower at Twilight \| Description: The Gothic tower of St Peter Mancroft in Norwich glows in evening light, its stone facade and spire... \| Keywords (10): St Peter Mancroft, Norwich, Gothic Architecture, Tower, Twilight, Stone Masonry, Spire, Pedestrians, Clear Sky, ...                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: St Peter Mancroft Tower at Dusk \| Description: This low-angle view captures the Gothic Church of St Peter Mancroft in Norwich at twilight, its Victorian s... \| Keywords (18): St Peter Mancroft, Norwich, Norfolk, England, Gothic Architecture, Church Tower, Victorian Spire, Twilight, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Tower and Spire of St Peter Mancroft at Dusk in Norwich \| Description: A low-angle view of the medieval tower and Victorian lead spire of the Church of St Pe... \| Keywords (15): Archway, Church Tower, Clear Sky, England, Gothic Architecture, Golden Hour, Historic Landmark, Norwich, ...                                                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected` | Title: Norwich St Peter Mancroft Tower Twilight \| Description: A low-angle view captures the illuminated medieval tower and Victorian lead flèche of St Peter M... \| Keywords (22): Norwich, St Peter Mancroft, Church Tower, Perpendicular Gothic, Victorian lead flèche, medieval architecture, ...                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Medieval Tower Illuminated at Twilight \| Description: The Gothic architecture of St Peter Mancroft's bell tower, with its intricate stone masonry and Victor... \| Keywords (18): Medieval, Gothic, Stone, Victorian, Tower, Bell, Clock, Norwich, England, Historical, Landmark, Twilight, ...                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: The Gothic Tower of St Peter Mancroft in Norwich \| Description: A low-angle evening view of the illuminated medieval stone tower and spire of the St Peter Manc... \| Keywords (15): Norwich, Norfolk, England, St Peter Mancroft, Gothic Architecture, Church Tower, Spire, Stone Masonry, ...                                                                               |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: St Peter Mancroft Tower, Norwich – October Evening \| Description: Captured on 10 October 2026 at 18:09 UTC+01:00, this low-angle view shows the medieval tower and Vi... \| Keywords (18): St Peter Mancroft, Church Tower, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, ...                                                                               |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight \| Description: A low-angle view of the medieval bell tower and Victorian lead flèche of the Church of St Peter Ma... \| Keywords (17): St Peter Mancroft, Norwich, England, Church Tower, Bell Tower, Perpendicular Gothic, Gothic Architecture, ...                                                                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: St Peter Mancroft tower in evening light \| Description: A low-angle view shows the medieval stone tower and Victorian lead flèche of St Peter Mancroft illumi... \| Keywords (16): St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic architecture, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight in Norwich \| Description: A low-angle view captures the Gothic architecture of St Peter Mancroft Church's towe... \| Keywords (15): St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twilight, Perpendicular Gothic, Stone Facade, ...                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Pet... \| Keywords (12): Church Tower, Gothic Architecture, Historic Landmark, Norwich, England, Stone facade, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | Title: St Peter Mancroft Tower \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: St Peter Mancroft Tower, Norwich, England \| Description: A low-angle view of the medieval tower and Victorian lead flèche illuminated in evening light, wit... \| Keywords (13): Church Tower, Gothic Architecture, Historic Landmark, England, Norwich, Pedestrians, Spire, Stone Masonry, ...                                                                               |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight, Norwich \| Description: A low-angle view of the medieval tower and Victorian lead flèche of St Peter Mancroft Churc... \| Keywords (19): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Stone Masonry, Victorian Lead Flèche, Twilight, ...                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: St Peter Mancroft Church, Norwich, England \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminat... \| Keywords (21): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight, Norwich \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illumin... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: "Evening Illumination of Norwich's St Peter Mancroft" \| Description: A low-angle view captures the grandeur of the medieval tower and Victorian lead flèche... \| Keywords (10): Gothic Architecture, Historic Landmark, St Peter Mancroft, Stone Masonry, Spire, Twilight, United Kingdom, ...                                                                               |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | Title: St Peter Mancroft Tower in Evening Light \| Description: The medieval tower and Victorian lead flèche of St Peter Mancroft are illuminated in the evening light, with pe... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | Title: St Peter Mancroft Church Tower Illuminated at Twilight in Norwich, England \| Description: The medieval tower and Victorian lead flèche of the Church of St Peter Mancro... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight \| Description: The medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, Engla... \| Keywords (18): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Perpendicular Gothic, Bell Tower, Stone Masonry, ...                                                                               |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`    | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illu... \| Keywords (10): Church Tower, Gothic Architecture, Norwich, Pedestrians, Twilight, Stone Masonry, Perpendicular Gothic, ...                                                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | St Peter Mancroft Tower, Norwich: Gothic Stone Facade at Sunset<br><br>A low-angle view captures the medieval stone tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England. The structure's intricate Gothic architecture is illuminated by the warm glow...                                                                                        |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (1): We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1...                                                                                                                                                                                                  |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns`       | Title: Gothic Church Tower of St Peter Mancroft in Norwich \| Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with... \| Keywords (37): Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, ...                                                                               |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church... \| Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is il... \| Keywords: (not detected)                                                                               |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A low-angle view of the medieval church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                                                              |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | ```json<br>{<br>"caption": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK.",<br>"bounding_boxes": [<br>[<br>125,<br>0,<br>987,<br>1000<br>]<br>],<br>"keywords": [<br>"Archway",...                                                          |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow" \| Description: (not detected) \| Keywords (48): Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, ...                                                                                                                                                 |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a large church tower with a spire and a pointed roof.                                                                                                                                                                                                                                                                             |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: A Gothic Architecture Snapshot of the Church of St Peter Mancroft Illuminated... \| Description: A detailed view of the medieval church of St Peter Mancroft, illuminated by the twilight, with a low-angle view of the church and its bell tower. The image capt... \| Keywords: (not detected)                                                                               |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns`       | A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
@@ -182,22 +180,23 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Image Metadata
 
-- *Description:* A bronze lion sculpture by Alfred Hardiman stands outside
-  City Hall overlooking the Market Place, with the historic 15th-century flint
-  Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-- *Keywords:* Adobe Stock, Any Vision, Blue sky, British heritage, Car, East
-  Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark,
-  Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture,
-  Sightseeing, Statue, Street Scene, Street lamp, Tree, United Kingdom,
-  architecture, bronze sculpture, city center, city hall, cityscape, civic
-  building, cultural heritage, daytime, flint wall, great britain, historic,
-  historic architecture, historic building, history, knapped flint, landmark,
-  lion statue, majestic, medieval building, metal sculpture, monument, outdoor
-  sculpture, patinated bronze, pedestal, plinth, public art, railing, roaring
-  lion, stone facade, symbol, tourism, tourist attraction, travel, urban
-- *Date:* 2026-10-10 16:41:54 UTC+01:00
-- *Time:* 16:41:54
-- *GPS:* 52.628900°N, 1.292500°E
+- *Description:* A low-angle view of the medieval tower and Victorian lead
+  flèche of the Church of St Peter Mancroft illuminated in evening light, with
+  pedestrians walking along the street below in Norwich, Norfolk, England.
+- *Keywords:* Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic
+  Architecture, Historic Landmark, Historic architecture, Landmark, Norwich,
+  Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry,
+  Stone facade, Trees, Twilight, United Kingdom, Walking, ancient,
+  architectural heritage, architecture, belfry, british architecture, carved
+  stone, cathedral, christianity, church, city, dusk, evening, evening light,
+  exterior, facade, great britain, heritage, historic building, history,
+  illuminated, lantern spire, medieval, medieval architecture, nightfall,
+  norfolk, pinnacles, place of worship, religion, religious building, stone
+  tower, street scene, tourism, tower, travel destination, urban landmark,
+  warm lighting
+- *Date:* 2026-10-10 18:09:17 UTC+01:00
+- *Time:* 18:09:17
+- *GPS:* 52.628000°N, 1.293600°E
 
 ## Prompt
 
@@ -213,18 +212,18 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-10-10 16:41:54 UTC+01:00
-> &#45; GPS: 52.628900°N, 1.292500°E
+> &#45; Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+> &#45; GPS: 52.628000°N, 1.293600°E
 >
 > &#8203;Descriptive hints:
-> &#45; Description hint: A bronze lion sculpture by Alfred Hardiman stands
-> outside City Hall overlooking the Market Place, with the historic
-> 15th-century flint Norwich Guildhall visible in the background in Norwich,
-> Norfolk, England.
-> &#45; Keyword hints: Adobe Stock, Any Vision, Blue sky, British heritage, Car,
-> East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic
-> Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture,
-> Sightseeing, Statue, Street Scene
+> &#45; Description hint: A low-angle view of the medieval tower and Victorian
+> lead flèche of the Church of St Peter Mancroft illuminated in evening light,
+> with pedestrians walking along the street below in Norwich, Norfolk,
+> England.
+> &#45; Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England,
+> Gothic Architecture, Historic Landmark, Historic architecture, Landmark,
+> Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone
+> Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -257,26 +256,26 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.43s
-- *Generation time:* 0.85s
-- *Total time:* 2.12s
+- *Model load time:* 0.36s
+- *Generation time:* 0.81s
+- *Total time:* 2.07s
 - *Prompt preparation time:* 0.52
-- *First-token latency:* 0.124
-- *Cleanup time:* 0.0952
-- *Prompt tokens:* 2,128
-- *Generation tokens:* 90
-- *Total tokens:* 2,218
-- *Prompt throughput (raw):* 17,107 tok/s
-- *Generation throughput (raw):* 409 tok/s
+- *First-token latency:* 0.126
+- *Cleanup time:* 0.071
+- *Prompt tokens:* 2,131
+- *Generation tokens:* 83
+- *Total tokens:* 2,214
+- *Prompt throughput (raw):* 16,960 tok/s
+- *Generation throughput (raw):* 481 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.07
+- *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 0.897
 - *Post-cleanup active memory (GB):* 0.000134
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
+- *Rendered prompt characters:* 1464
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -291,13 +290,13 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-Lion Statue at City Hall
+St. Peter Mancroft Church Tower
 
 Description:
-A bronze lion statue stands prominently outside City Hall, overlooking the Market Place in Norwich, England. The statue, with its detailed armor and open mouth, is set against a backdrop of historic buildings and a clear blue sky.
+A Gothic-style church tower illuminated at twilight, with a Victorian lead flèche and a clear sky in the background.
 
 Keywords:
-Lion statue, City Hall, Norwich, England, Gothic architecture, historical landmark, statue, street scene, pedestrian, blue sky
+Church tower, Gothic architecture, St. Peter Mancroft, Norwich, Norfolk, England, illuminated, spire, historical landmark, historic architecture, London, twilight, pedestrian, street, trees
 </pre>
 
 </details>
@@ -319,17 +318,17 @@ Lion statue, City Hall, Norwich, England, Gothic architecture, historical landma
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   prism_hadamard_qwen35)
-- *Model load time:* 1.62s
-- *Generation time:* 65.83s
-- *Total time:* 68.57s
-- *Prompt preparation time:* 1.11
-- *First-token latency:* 61.1
-- *Cleanup time:* 0.142
-- *Prompt tokens:* 16,574
-- *Generation tokens:* 125
-- *Total tokens:* 16,699
-- *Prompt throughput (raw):* 271 tok/s
-- *Generation throughput (raw):* 32.5 tok/s
+- *Model load time:* 1.19s
+- *Generation time:* 67.73s
+- *Total time:* 69.83s
+- *Prompt preparation time:* 0.894
+- *First-token latency:* 63.4
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 16,579
+- *Generation tokens:* 123
+- *Total tokens:* 16,702
+- *Prompt throughput (raw):* 261 tok/s
+- *Generation throughput (raw):* 36.3 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 3.3
@@ -338,7 +337,7 @@ Lion statue, City Hall, Norwich, England, Gothic architecture, historical landma
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1476
+- *Rendered prompt characters:* 1504
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -351,23 +350,23 @@ Lion statue, City Hall, Norwich, England, Gothic architecture, historical landma
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue Before Norwich Guildhall
+Title: St Peter Mancroft Tower at Evening
 
-Description: A weathered bronze lion sculpture with an open mouth and raised paw stands on a stone plinth in the foreground, set against the blurred backdrop of the historic Norwich Guildhall and a blue sky. The scene is captured in the late afternoon, with a street lamp and parked cars visible in the surrounding urban setting.
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, illuminated by warm evening light against a clear twilight sky. Pedestrians walk along the street below, with trees and a black iron fence in the foreground.
 
-Keywords: Bronze lion, Norwich Guildhall, Norwich, Norfolk, England, Gothic architecture, Historic landmark, Sculpture, Statue, Street scene, Blue sky, Car, Pedestrian, Sightseeing, British heritage, East Anglia, Europe
+Keywords: St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Spire, Twilight, Evening Light, Stone Masonry, Pedestrians, Trees, Iron Fence, Historic Landmark, England, United Kingdom, Clear Sky, Perpendicular Gothic
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-4bit"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
 
-### mlx-community/GLM-4.6V-Flash-4bit
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -375,44 +374,82 @@ Keywords: Bronze lion, Norwich Guildhall, Norwich, Norfolk, England, Gothic arch
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.72s
-- *Generation time:* 9.88s
-- *Total time:* 12.12s
-- *Prompt preparation time:* 0.505
-- *First-token latency:* 8.09
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.61s
+- *Generation time:* 6.22s
+- *Total time:* 8.48s
+- *Prompt preparation time:* 0.641
+- *First-token latency:* 0.705
 - *Cleanup time:* 0.103
-- *Prompt tokens:* 6,460
-- *Generation tokens:* 99
-- *Total tokens:* 6,559
-- *Prompt throughput (raw):* 799 tok/s
-- *Generation throughput (raw):* 76.4 tok/s
-- *Peak memory (GB):* 8.7
-- *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 7.08
-- *Post-cleanup active memory (GB):* 0.00197
+- *Prompt tokens:* 1,656
+- *Generation tokens:* 617
+- *Total tokens:* 2,273
+- *Prompt throughput (raw):* 2,350 tok/s
+- *Generation throughput (raw):* 126 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.15
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.00135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1466
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 1603
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
-- *EOS token:* <\|endoftext\|>
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue at Norwich Guildhall
-Description: A bronze lion sculpture stands prominently on a stone pedestal, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England, captured on 2026-10-10 at 16:41:54 UTC+01:00.
-Keywords: Bronze Lion Statue, Norwich Guildhall, Historic Landmark, Gothic Architecture, Norwich, Norfolk, England, Sculpture, British Heritage
+Alright, let's get this done. I need to create metadata for this image, a classic church tower scene. First things first: the title. Gotta keep it concise and informative. "St Peter Mancroft, Norwich, at Twilight" – perfect.
+
+Now for the description. I'm going to pull from the hints and the image itself. The church is St Peter Mancroft, a 14th-century Norman-Gothic structure, and it's illuminated. The architectural details are key – the Perpendicular Gothic, the stone, the spire, the tower, the archways. It's evening, twilight, and the city's bustling with pedestrians. The hints mention a Victorian flèche, and that's something I'll definitely include.
+
+Okay, let's put it together. "A low-angle, evening view of St Peter Mancroft church in Norwich, Norfolk, England. The medieval tower is illuminated, with pedestrians below and a clear, twilight sky." That's it, a solid description.
+
+Finally, keywords. I need to be comprehensive. The title, description, and hints are my guide. Let's see: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cathedral, cityscape, urban. That should cover everything.
+
+Okay, let's double-check. Title is good. Description is accurate and evocative. Keywords are relevant. Everything matches the image and hints. I'm satisfied.
+&lt;/think&gt;
+
+Title: St Peter Mancroft, Norwich, at Twilight
+
+Description: A low-angle, evening view of the medieval St Peter Mancroft church in Norwich, Norfolk, England. The stone tower and spire are illuminated, with pedestrians walking on the street below under a clear, twilight sky.
+
+Keywords: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cityscape, urban
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get this done. I need to create metadata for this image, a classic church tower scene. First things first: the title. Gotta keep it concise and informative. "St Peter Mancroft, Norwich, at Twilight" – perfect.
+
+Now for the description. I'm going to pull from the hints and the image itself. The church is St Peter Mancroft, a 14th-century Norman-Gothic structure, and it's illuminated. The architectural details are key – the Perpendicular Gothic, the stone, the spire, the tower, the archways. It's evening, twilight, and the city's bustling with pedestrians. The hints mention a Victorian flèche, and that's something I'll definitely include.
+
+Okay, let's put it together. "A low-angle, evening view of St Peter Mancroft church in Norwich, Norfolk, England. The medieval tower is illuminated, with pedestrians below and a clear, twilight sky." That's it, a solid description.
+
+Finally, keywords. I need to be comprehensive. The title, description, and hints are my guide. Let's see: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cathedral, cityscape, urban. That should cover everything.
+
+Okay, let's double-check. Title is good. Description is accurate and evocative. Keywords are relevant. Everything matches the image and hints. I'm satisfied.
+</think>
+
+Title: St Peter Mancroft, Norwich, at Twilight
+
+Description: A low-angle, evening view of the medieval St Peter Mancroft church in Norwich, Norfolk, England. The stone tower and spire are illuminated, with pedestrians walking on the street below under a clear, twilight sky.
+
+Keywords: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedral, tower, spire, stone, Gothic, medieval, Perpendicular Gothic, 14th century, Norman-Gothic, illuminated, twilight, evening, dusk, street, pedestrians, low-angle, England, Norfolk, United Kingdom, historic, landmark, architecture, stone masonry, archway, bell tower, church of England, church building, ancient, historic England, cityscape, urban
+```
+
+</details>
 
 </details>
 
@@ -432,17 +469,17 @@ Keywords: Bronze Lion Statue, Norwich Guildhall, Historic Landmark, Gothic Archi
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 13.60s
-- *Generation time:* 24.39s
-- *Total time:* 38.60s
-- *Prompt preparation time:* 0.597
-- *First-token latency:* 19.8
-- *Cleanup time:* 0.399
-- *Prompt tokens:* 6,460
-- *Generation tokens:* 108
-- *Total tokens:* 6,568
-- *Prompt throughput (raw):* 326 tok/s
-- *Generation throughput (raw):* 37.0 tok/s
+- *Model load time:* 6.23s
+- *Generation time:* 13.99s
+- *Total time:* 20.78s
+- *Prompt preparation time:* 0.554
+- *First-token latency:* 10.5
+- *Cleanup time:* 0.227
+- *Prompt tokens:* 6,372
+- *Generation tokens:* 112
+- *Total tokens:* 6,484
+- *Prompt throughput (raw):* 606 tok/s
+- *Generation throughput (raw):* 45.0 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
 - *Cache memory (GB):* 1.4
@@ -451,7 +488,7 @@ Keywords: Bronze Lion Statue, Norwich Guildhall, Historic Landmark, Gothic Archi
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1466
+- *Rendered prompt characters:* 1494
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -465,9 +502,9 @@ Keywords: Bronze Lion Statue, Norwich Guildhall, Historic Landmark, Gothic Archi
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Sculpture, Norwich Guildhall
-Description: A bronze lion sculpture by Alfred Hardiman stands prominently on a stone pedestal, overlooking a street scene with the historic 15th-century flint Norwich Guildhall in the background, under a clear blue sky.
-Keywords: Bronze, Lion, Sculpture, Alfred Hardiman, Norwich Guildhall, 15th-century, Flint, Norwich, Norfolk, England, Gothic Architecture, Historic Landmark, British Heritage, Street Scene, Pedestrian, Car, Blue Sky
+Title: St Peter Mancroft Tower, Norwich
+Description: The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands illuminated in evening light, with pedestrians walking below and a clear sky overhead.
+Keywords: St Peter Mancroft, Norwich, England, Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Stone Facade, Evening Light, Pedestrians, Clear Sky, United Kingdom, Walking, Archway, Historic Architecture, Spire, Stone Masonry, Trees, Twilight
 </pre>
 
 </details>
@@ -488,17 +525,17 @@ Keywords: Bronze, Lion, Sculpture, Alfred Hardiman, Norwich Guildhall, 15th-cent
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.36s
-- *Generation time:* 4.67s
-- *Total time:* 6.77s
-- *Prompt preparation time:* 0.736
-- *First-token latency:* 1.71
-- *Cleanup time:* 0.201
-- *Prompt tokens:* 2,124
-- *Generation tokens:* 123
-- *Total tokens:* 2,247
-- *Prompt throughput (raw):* 1,241 tok/s
-- *Generation throughput (raw):* 53.5 tok/s
+- *Model load time:* 1.11s
+- *Generation time:* 3.69s
+- *Total time:* 5.44s
+- *Prompt preparation time:* 0.635
+- *First-token latency:* 1.37
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 2,132
+- *Generation tokens:* 98
+- *Total tokens:* 2,230
+- *Prompt throughput (raw):* 1,555 tok/s
+- *Generation throughput (raw):* 57.4 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
@@ -507,7 +544,7 @@ Keywords: Bronze, Lion, Sculpture, Alfred Hardiman, Norwich Guildhall, 15th-cent
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1390
+- *Rendered prompt characters:* 1418
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -522,14 +559,316 @@ Keywords: Bronze, Lion, Sculpture, Alfred Hardiman, Norwich Guildhall, 15th-cent
 
 <pre class="model-output-readable">
 Title:
-Norwich Lion Statue, Gothic Architecture
+St Peter Mancroft Tower at Twilight
 
 Description:
-A bronze lion statue by Alfred Hardiman is prominently displayed in Norwich, England, with the historic Norwich Guildhall in the background. The scene is set on a clear day with blue skies, capturing the essence of British heritage and Gothic architecture.
+The Church of St Peter Mancroft's Gothic tower is illuminated in the evening light, with pedestrians walking by in Norwich, England.
 
 Keywords:
-Adobe Stock, Alfred Hardiman, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Market Place, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-internvl35-1b-4bit"></a>
+
+### mlx-community/InternVL3_5-1B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
+- *Model load time:* 0.50s
+- *Generation time:* 1.13s
+- *Total time:* 2.26s
+- *Prompt preparation time:* 0.625
+- *First-token latency:* 0.223
+- *Cleanup time:* 0.0838
+- *Prompt tokens:* 2,135
+- *Generation tokens:* 126
+- *Total tokens:* 2,261
+- *Prompt throughput (raw):* 9,567 tok/s
+- *Generation throughput (raw):* 421 tok/s
+- *Peak memory (GB):* 2.1
+- *Active memory (GB):* 1.1
+- *Cache memory (GB):* 0.29
+- *Model-load active memory (GB):* 1.08
+- *Post-cleanup active memory (GB):* 0.0029
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1456
+- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Evening view of St Peter Mancroft Church illuminated in Norwich
+
+Description: The image captures a serene evening scene featuring the illuminated bell tower of St Peter Mancroft, with pedestrians walking along a street, surrounded by trees and under a clear sky.
+
+Keywords: St Peter Mancroft, Gothic Architecture, Bell Tower, Church Tower, Perpendicular Gothic, Stone Masonry, Historic Landmark, Norwich, Pedestrians, Clear Sky, Evening Light, Stone Facade, Tree, Walking, UK, Historic architecture, Spire, United Kingdom, Bell, Perpendicular, Time, Location, England
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
+
+### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Model load time:* 2.18s
+- *Generation time:* 12.57s
+- *Total time:* 15.34s
+- *Prompt preparation time:* 0.577
+- *First-token latency:* 0.667
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 1,342
+- *Generation tokens:* 750
+- *Total tokens:* 2,092
+- *Prompt throughput (raw):* 2,013 tok/s
+- *Generation throughput (raw):* 66.6 tok/s
+- *Peak memory (GB):* 20
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 1.3
+- *Model-load active memory (GB):* 17.8
+- *Post-cleanup active memory (GB):* 0.00356
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1600
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.6, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-10-10 18:09:17 UTC+01:00) and GPS coordinates (52.628000°N, 1.293600°E), which are authoritative. The descriptive hints mention a low-angle view of St Peter Mancroft Church's tower, Victorian lead flèche, illuminated in evening light, pedestrians below in Norwich, Norfolk, England. The keywords include Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
+
+First, the title needs to be a concrete 5-10 words. The main subject is the church tower, so something like "St Peter Mancroft Church Tower at Twilight" works.
+
+For the description, combine the context: "A low-angle view of St Peter Mancroft's medieval tower and Victorian lead flèche illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England." That includes time, location, main elements, lighting, and action.
+
+For keywords, list 10-18 unique ones. Let's pick the ones from the hints that are visible or confirmed: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18 keywords.
+
+Check if any hints conflict. The original hints mention "Victorian lead flèche" but the image shows the tower, not the flèche. So maybe exclude flèche. Also, the GPS and date/time are authoritative but not visible, so omit them in the metadata. The description and keywords should focus on what's visible. The image shows a low-angle view, so "low-angle" might be a detail to include. Wait, the user said to retain details supported by the image, correct conflicts, and add important visible details. The original hints have "Victorian lead flèche" but the image might not show the flèche clearly. The tower is Victorian, so maybe include that. Let me adjust the keywords to include Victorian if visible. The stone masonry and facade are visible. Also, "Twilight" from the hints. So finalizing the keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18. The title and description should reflect the visible elements.◁/think▷Title: St Peter Mancroft Tower at Twilight
+Description: A low-angle view of St Peter Mancroft's medieval tower and Victorian stone facade illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-10-10 18:09:17 UTC+01:00) and GPS coordinates (52.628000°N, 1.293600°E), which are authoritative. The descriptive hints mention a low-angle view of St Peter Mancroft Church's tower, Victorian lead flèche, illuminated in evening light, pedestrians below in Norwich, Norfolk, England. The keywords include Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
+
+First, the title needs to be a concrete 5-10 words. The main subject is the church tower, so something like "St Peter Mancroft Church Tower at Twilight" works. 
+
+For the description, combine the context: "A low-angle view of St Peter Mancroft's medieval tower and Victorian lead flèche illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England." That includes time, location, main elements, lighting, and action.
+
+For keywords, list 10-18 unique ones. Let's pick the ones from the hints that are visible or confirmed: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18 keywords.
+
+Check if any hints conflict. The original hints mention "Victorian lead flèche" but the image shows the tower, not the flèche. So maybe exclude flèche. Also, the GPS and date/time are authoritative but not visible, so omit them in the metadata. The description and keywords should focus on what's visible. The image shows a low-angle view, so "low-angle" might be a detail to include. Wait, the user said to retain details supported by the image, correct conflicts, and add important visible details. The original hints have "Victorian lead flèche" but the image might not show the flèche clearly. The tower is Victorian, so maybe include that. Let me adjust the keywords to include Victorian if visible. The stone masonry and facade are visible. Also, "Twilight" from the hints. So finalizing the keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's 18. The title and description should reflect the visible elements.◁/think▷Title: St Peter Mancroft Tower at Twilight  
+Description: A low-angle view of St Peter Mancroft's medieval tower and Victorian stone facade illuminated by evening light, with pedestrians walking along the street in Norwich, Norfolk, England.  
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.54s
+- *Generation time:* 6.63s
+- *Total time:* 8.74s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 1.52
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 320
+- *Generation tokens:* 101
+- *Total tokens:* 421
+- *Prompt throughput (raw):* 211 tok/s
+- *Generation throughput (raw):* 22.0 tok/s
+- *Peak memory (GB):* 15
+- *Active memory (GB):* 11
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 11.4
+- *Post-cleanup active memory (GB):* 0.00434
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1517
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Evening Illumination of St Peter Mancroft's Tower in Norwich
+Description: The medieval tower of St Peter Mancroft church in Norwich, England, is illuminated in the evening, with a clear sky and pedestrians walking below. The tower's Gothic architecture and stone masonry are prominently featured.
+Keywords: Gothic architecture, historic landmark, stone masonry, medieval tower, St Peter Mancroft, Norwich, England, evening illumination, clear sky, pedestrians, church tower.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.84s
+- *Generation time:* 1.97s
+- *Total time:* 3.49s
+- *Prompt preparation time:* 0.667
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.0902
+- *Prompt tokens:* 950
+- *Generation tokens:* 333
+- *Total tokens:* 1,283
+- *Prompt throughput (raw):* 4,064 tok/s
+- *Generation throughput (raw):* 304 tok/s
+- *Peak memory (GB):* 3.2
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00485
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1481
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+Here's a breakdown of the required sections:
+
+Title: I need a 5-10 word title that captures the image. Based on the context, it should mention the church tower and the evening light.
+
+Description: I need a 1-2 sentence factual description combining the main subject, setting, action, lighting, and distinctive details. I'll use the context and descriptive hints.
+
+Keywords: I need 10-18 unique keywords covering relevant context and visible details. I'll list them, ensuring they cover Gothic Architecture, Church Tower, evening light, pedestrians, etc.
+
+Let's construct:
+
+Title: Medieval Church Tower Illuminated at Twilight
+
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway.
+
+Now, check the word count: Title is 5-10 words, description is 1-2 sentences, keywords are 10-18 unique.
+&lt;/think&gt;
+
+Title: Medieval Church Tower Illuminated at Twilight
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+Here's a breakdown of the required sections:
+
+Title: I need a 5-10 word title that captures the image. Based on the context, it should mention the church tower and the evening light.
+
+Description: I need a 1-2 sentence factual description combining the main subject, setting, action, lighting, and distinctive details. I'll use the context and descriptive hints.
+
+Keywords: I need 10-18 unique keywords covering relevant context and visible details. I'll list them, ensuring they cover Gothic Architecture, Church Tower, evening light, pedestrians, etc.
+
+Let's construct:
+
+Title: Medieval Church Tower Illuminated at Twilight
+
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway.
+
+Now, check the word count: Title is 5-10 words, description is 1-2 sentences, keywords are 10-18 unique.
+</think>
+
+Title: Medieval Church Tower Illuminated at Twilight
+Description: The Gothic tower of St Peter Mancroft is visible at twilight, lit warmly by evening light, with pedestrians walking nearby.
+Keywords: Gothic architecture, Church tower, medieval, evening light, illuminated, pedestrians, historical landmark, stone, spire, clear sky, Norwich, England, trees, landmark, walk, tradition, facade, archway
+```
+
+</details>
 
 </details>
 
@@ -549,26 +888,26 @@ Adobe Stock, Alfred Hardiman, Blue sky, British heritage, Car, East Anglia, Engl
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.23s
-- *Generation time:* 1.55s
-- *Total time:* 3.25s
-- *Prompt preparation time:* 0.465
-- *First-token latency:* 0.238
-- *Cleanup time:* 0.11
-- *Prompt tokens:* 402
-- *Generation tokens:* 91
-- *Total tokens:* 493
-- *Prompt throughput (raw):* 1,686 tok/s
-- *Generation throughput (raw):* 105 tok/s
-- *Peak memory (GB):* 7.0
+- *Model load time:* 1.00s
+- *Generation time:* 1.70s
+- *Total time:* 3.21s
+- *Prompt preparation time:* 0.5
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.0953
+- *Prompt tokens:* 410
+- *Generation tokens:* 104
+- *Total tokens:* 514
+- *Prompt throughput (raw):* 1,755 tok/s
+- *Generation throughput (raw):* 106 tok/s
+- *Peak memory (GB):* 7.1
 - *Active memory (GB):* 6.1
-- *Cache memory (GB):* 0.09
+- *Cache memory (GB):* 0.13
 - *Model-load active memory (GB):* 6.15
 - *Post-cleanup active memory (GB):* 0.00516
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1440
+- *Rendered prompt characters:* 1468
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -582,11 +921,11 @@ Adobe Stock, Alfred Hardiman, Blue sky, British heritage, Car, East Anglia, Engl
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue in Norwich Market Place
+Title: St Peter Mancroft Tower at Twilight in Norwich
 
-Description: A bronze lion sculpture stands prominently on a pedestal in Norwich, with the historic Norwich Guildhall visible in the background under a clear blue sky. The scene captures historic architecture and a calm street atmosphere during late afternoon.
+Description: A low-angle evening shot captures the illuminated Gothic stone tower of St Peter Mancroft, with a pointed spire and surrounding trees, under clear twilight skies in Norwich, England.
 
-Keywords: Bronze lion, Norwich, Guildhall, Gothic Architecture, Statue, Sculpture, Market Place, Blue sky, England, Pedestrian, Street Scene, Historic Landmark
+Keywords: St Peter Mancroft, Gothic Architecture, Church Tower, Stone Masonry, Spire, Victorian Flèche, Norwich, Norfolk, England, Twilight, Pedestrians, Street, Trees, Historic Landmark, Stone Facade
 </pre>
 
 </details>
@@ -607,26 +946,26 @@ Keywords: Bronze lion, Norwich, Guildhall, Gothic Architecture, Statue, Sculptur
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.91s
-- *Generation time:* 4.65s
-- *Total time:* 7.10s
-- *Prompt preparation time:* 0.523
-- *First-token latency:* 2.13
-- *Cleanup time:* 0.113
-- *Prompt tokens:* 2,935
-- *Generation tokens:* 130
-- *Total tokens:* 3,065
-- *Prompt throughput (raw):* 1,380 tok/s
-- *Generation throughput (raw):* 64.4 tok/s
+- *Model load time:* 1.36s
+- *Generation time:* 4.40s
+- *Total time:* 6.31s
+- *Prompt preparation time:* 0.544
+- *First-token latency:* 2.03
+- *Cleanup time:* 0.0894
+- *Prompt tokens:* 2,959
+- *Generation tokens:* 122
+- *Total tokens:* 3,081
+- *Prompt throughput (raw):* 1,458 tok/s
+- *Generation throughput (raw):* 66.3 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.56
+- *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
 - *Post-cleanup active memory (GB):* 0.00543
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3823
+- *Rendered prompt characters:* 3851
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -640,13 +979,13 @@ Keywords: Bronze lion, Norwich, Guildhall, Gothic Architecture, Statue, Sculptur
 
 <pre class="model-output-readable">
 Title:
-**Alfred Hardiman’s Lion Sculpture, Norwich Guildhall**
+**St Peter Mancroft Church Tower at Twilight, Norwich**
 
 Description:
-A bronze lion sculpture by Alfred Hardiman stands prominently on a stone pedestal outside Norwich City Hall, with the historic 15th-century Norwich Guildhall in the Gothic architectural background. The scene captures a clear autumn day with warm sunlight, emphasizing the lion’s dynamic pose and the flint-built heritage structure.
+A low-angle evening photograph captures the medieval stone tower and Victorian lead spire of St Peter Mancroft Church in Norwich, illuminated against a clear twilight sky, with pedestrians walking along the street below and surrounding trees framing the historic Gothic architecture.
 
 Keywords:
-Lion sculpture, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, Gothic architecture, flint building, bronze statue, Market Place, Norwich, Norfolk, England, British heritage, historic landmark, street scene, autumn lighting, urban sculpture
+St Peter Mancroft, Norwich, England, Gothic architecture, Perpendicular Gothic, stone tower, lead spire, historic landmark, twilight, evening light, pedestrians, street scene, trees, stone masonry, church bell tower, United Kingdom
 </pre>
 
 </details>
@@ -667,17 +1006,17 @@ Lion sculpture, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, Gothic ar
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.23s
-- *Generation time:* 2.41s
-- *Total time:* 5.20s
-- *Prompt preparation time:* 0.543
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 2,934
-- *Generation tokens:* 128
-- *Total tokens:* 3,062
-- *Prompt throughput (raw):* 2,683 tok/s
-- *Generation throughput (raw):* 169 tok/s
+- *Model load time:* 0.95s
+- *Generation time:* 2.11s
+- *Total time:* 3.62s
+- *Prompt preparation time:* 0.545
+- *First-token latency:* 0.985
+- *Cleanup time:* 0.0815
+- *Prompt tokens:* 2,958
+- *Generation tokens:* 113
+- *Total tokens:* 3,071
+- *Prompt throughput (raw):* 3,002 tok/s
+- *Generation throughput (raw):* 188 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
@@ -686,7 +1025,7 @@ Lion sculpture, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, Gothic ar
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3822
+- *Rendered prompt characters:* 3850
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -700,129 +1039,13 @@ Lion sculpture, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, Gothic ar
 
 <pre class="model-output-readable">
 Title:
-**Norwich Guildhall’s Alfred Hardiman Lion Statue**
+**St Peter Mancroft’s Gothic Tower in Norwich Twilight**
 
 Description:
-A bronze lion sculpture by Alfred Hardiman stands prominently in Norwich’s Market Place, framed by the historic Gothic flintwork of Norwich Guildhall under a clear blue sky. The lion’s dynamic pose, raised front paw, and weathered patina contrast with the intricate medieval architecture in the background.
+A towering medieval church spire in Norwich, Norfolk, stands illuminated under twilight skies, framed by Victorian lead flèche and surrounded by pedestrian activity along its stone facade.
 
 Keywords:
-bronze lion, Norwich Guildhall, flintwork architecture, Alfred Hardiman, Market Place, East Anglia, England, Gothic style, historic landmark, Norwich cityscape, street sculpture, urban heritage, lion statue, Norwich Guildhall façade.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
-
-### mlx-community/Molmo2-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.40s
-- *Generation time:* 4.21s
-- *Total time:* 6.38s
-- *Prompt preparation time:* 0.746
-- *First-token latency:* 0.796
-- *Cleanup time:* 0.108
-- *Prompt tokens:* 1,535
-- *Generation tokens:* 181
-- *Total tokens:* 1,716
-- *Prompt throughput (raw):* 1,928 tok/s
-- *Generation throughput (raw):* 65.9 tok/s
-- *Peak memory (GB):* 8.1
-- *Active memory (GB):* 6.5
-- *Cache memory (GB):* 0.31
-- *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.006
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Bronze Lion Statue Guards Norwich Guildhall, East Anglia
-
-Description: A bronze lion statue by Alfred Hardiman stands prominently in Norwich, Norfolk, England, overlooking the Market Place. The sculpture, with its distinctive mane and open mouth, is set against the backdrop of the historic 15th-century Norwich Guildhall, its flint walls and Gothic architecture clearly visible. The scene is captured on a bright, sunny day with a clear blue sky, and includes a modern car and a streetlight in the foreground, highlighting the blend of historical and contemporary elements in the cityscape.
-
-Keywords: Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, East Anglia, Norfolk, England, Gothic Architecture, Historic Landmark, Lion Sculpture, Street Scene, Blue Sky, Car, Streetlight, Norwich Market Place, Guildhall, Pedestrian, Sightseeing, Statue, British Heritage
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmopoint-8b-4bit"></a>
-
-### mlx-community/MolmoPoint-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MolmoPoint-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.40s
-- *Generation time:* 7.51s
-- *Total time:* 10.83s
-- *Prompt preparation time:* 0.905
-- *First-token latency:* 2.19
-- *Cleanup time:* 0.142
-- *Prompt tokens:* 3,137
-- *Generation tokens:* 129
-- *Total tokens:* 3,266
-- *Prompt throughput (raw):* 1,430 tok/s
-- *Generation throughput (raw):* 29.8 tok/s
-- *Peak memory (GB):* 13
-- *Active memory (GB):* 8.6
-- *Cache memory (GB):* 3.8
-- *Model-load active memory (GB):* 7.23
-- *Post-cleanup active memory (GB):* 0.00662
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 9bab196f867ceedecdb1eab071395bfedcd62538
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MolmoPoint-8B-4bit/snapshots/9bab196f867ceedecdb1eab071395bfedcd62538
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Bronze Lion Statue in Norwich Market Place
-
-Description: A weathered bronze lion statue stands on a pedestal in Norwich's Market Place, overlooking the street. The statue, with its mouth open and one paw raised, is set against a backdrop of historic buildings, including the Norwich Guildhall. The scene captures a typical British street with pedestrians and cars, under a clear blue sky.
-
-Keywords: Bronze lion, Norwich, Market Place, Guildhall, Norwich Guildhall, Street scene, Pedestrian, Car, Blue sky, Gothic architecture, Sculpture, Statue, East Anglia, England, European heritage, Public square, Urban landscape
+Church of St Peter Mancroft, Norwich, Norfolk, England, Gothic architecture, Stone masonry, Bell tower, Victorian lead flèche, Historic landmark, Clear sky, Twilight lighting, Pedestrian street, Stone facade, Norwich skyline, Historic architecture, Spire, Medieval tower
 </pre>
 
 </details>
@@ -843,26 +1066,26 @@ Keywords: Bronze lion, Norwich, Market Place, Guildhall, Norwich Guildhall, Stre
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.45s
-- *Generation time:* 4.00s
-- *Total time:* 6.22s
-- *Prompt preparation time:* 0.756
-- *First-token latency:* 2.08
-- *Cleanup time:* 0.114
-- *Prompt tokens:* 4,095
-- *Generation tokens:* 171
-- *Total tokens:* 4,266
-- *Prompt throughput (raw):* 1,971 tok/s
-- *Generation throughput (raw):* 143 tok/s
+- *Model load time:* 1.07s
+- *Generation time:* 3.46s
+- *Total time:* 5.30s
+- *Prompt preparation time:* 0.76
+- *First-token latency:* 1.99
+- *Cleanup time:* 0.0893
+- *Prompt tokens:* 4,101
+- *Generation tokens:* 158
+- *Total tokens:* 4,259
+- *Prompt throughput (raw):* 2,066 tok/s
+- *Generation throughput (raw):* 210 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.65
+- *Cache memory (GB):* 0.66
 - *Model-load active memory (GB):* 2.18
 - *Post-cleanup active memory (GB):* 0.00756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1516
+- *Rendered prompt characters:* 1544
 - *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
 - *Requested model revision:* not requested
@@ -875,69 +1098,11 @@ Keywords: Bronze lion, Norwich, Market Place, Guildhall, Norwich Guildhall, Stre
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "The Lion Statue at Norwich Guildhall"
+Title: Medieval Tower of St Peter Mancroft
 
-Description: A bronze lion sculpture by Alfred Hardiman stands prominently outside City Hall, overlooking the Market Place in Norwich, Norfolk, England. The historic 1st-century Norwich Guildhall, featuring Gothic architecture, forms the backdrop. The statue, captured at 2006-10-10 16:41:55 UTC, showcases the detailed craftsmanship of the lion in mid-pounce, with its mouth open and front paws raised. The scene is bathed in natural light, highlighting the statue's weathered patina against the clear blue sky.
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England. The tower is constructed from stone and features intricate Gothic architecture, including a prominent arched entrance and a tall, pointed spire. The clear sky and the warm glow of the tower's interior create a striking contrast, highlighting the historic landmark.
 
-Keywords: Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.95s
-- *Generation time:* 3.48s
-- *Total time:* 5.98s
-- *Prompt preparation time:* 0.545
-- *First-token latency:* 0.331
-- *Cleanup time:* 0.11
-- *Prompt tokens:* 1,149
-- *Generation tokens:* 128
-- *Total tokens:* 1,277
-- *Prompt throughput (raw):* 3,471 tok/s
-- *Generation throughput (raw):* 50.4 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 8.3
-- *Cache memory (GB):* 0.52
-- *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00762
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1406
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Norwich City Hall Lion Statue"
-
-Description: The bronze lion statue by Alfred Hardiman stands majestically outside City Hall in Norwich, Norfolk, England, with the historic 15th-century flint Norwich Guildhall in the background.
-
-Keywords: Norwich, City Hall, Lion Statue, Alfred Hardiman, Bronze, Sculpture, Historic Landmark, 15th Century, Guildhall, Gothic Architecture, Pedestrian, Street Scene, Blue Sky, British Heritage, East Anglia, England, Europe
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
 
 </details>
@@ -958,17 +1123,17 @@ Keywords: Norwich, City Hall, Lion Statue, Alfred Hardiman, Bronze, Sculpture, H
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.51s
-- *Generation time:* 27.11s
-- *Total time:* 30.73s
-- *Prompt preparation time:* 1.09
-- *First-token latency:* 24
-- *Cleanup time:* 0.185
-- *Prompt tokens:* 12,801
-- *Generation tokens:* 109
-- *Total tokens:* 12,910
-- *Prompt throughput (raw):* 533 tok/s
-- *Generation throughput (raw):* 50.7 tok/s
+- *Model load time:* 2.26s
+- *Generation time:* 23.53s
+- *Total time:* 26.70s
+- *Prompt preparation time:* 0.896
+- *First-token latency:* 21.1
+- *Cleanup time:* 0.142
+- *Prompt tokens:* 12,809
+- *Generation tokens:* 120
+- *Total tokens:* 12,929
+- *Prompt throughput (raw):* 607 tok/s
+- *Generation throughput (raw):* 73.4 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
@@ -977,7 +1142,7 @@ Keywords: Norwich, City Hall, Lion Statue, Alfred Hardiman, Bronze, Sculpture, H
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1457
+- *Rendered prompt characters:* 1485
 - *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -991,13 +1156,13 @@ Keywords: Norwich, City Hall, Lion Statue, Alfred Hardiman, Bronze, Sculpture, H
 
 <pre class="model-output-readable">
 Title:
-Bronze Lion Sculpture in Norwich
+St Peter Mancroft Church Tower at Twilight
 
 Description:
-A bronze lion sculpture stands prominently in the foreground, overlooking a street scene in Norwich, England. The historic 15th-century flint Norwich Guildhall is visible in the background under a clear blue sky.
+The Perpendicular Gothic tower of St Peter Mancroft in Norwich, England, stands tall against a clear sky, its stone facade illuminated by the warm light of twilight. Pedestrians walk along the street below, with trees framing the historic landmark.
 
 Keywords:
-Norwich, England, Lion, Sculpture, Bronze, Guildhall, Historic Landmark, British Heritage, Gothic Architecture, East Anglia, Norfolk, Street Scene, Car, Pedestrian, Blue Sky, City Hall, Market Place, Alfred Hardiman
+Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Stone Masonry, Stone facade, Spire, Twilight, Trees, England, Norwich, United Kingdom, Clear Sky, Historic architecture, Archway, Bell Tower, Walking, Landmark
 </pre>
 
 </details>
@@ -1018,17 +1183,17 @@ Norwich, England, Lion, Sculpture, Bronze, Guildhall, Historic Landmark, British
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 2.00s
-- *Generation time:* 42.45s
-- *Total time:* 45.59s
-- *Prompt preparation time:* 1.12
-- *First-token latency:* 39.3
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 16,558
-- *Generation tokens:* 161
-- *Total tokens:* 16,719
-- *Prompt throughput (raw):* 421 tok/s
-- *Generation throughput (raw):* 75.5 tok/s
+- *Model load time:* 1.88s
+- *Generation time:* 40.32s
+- *Total time:* 43.17s
+- *Prompt preparation time:* 0.95
+- *First-token latency:* 37.8
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 16,566
+- *Generation tokens:* 144
+- *Total tokens:* 16,710
+- *Prompt throughput (raw):* 438 tok/s
+- *Generation throughput (raw):* 86.9 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
@@ -1037,7 +1202,7 @@ Norwich, England, Lion, Sculpture, Bronze, Guildhall, Historic Landmark, British
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1457
+- *Rendered prompt characters:* 1485
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1050,11 +1215,9 @@ Norwich, England, Lion, Sculpture, Bronze, Guildhall, Historic Landmark, British
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze lion statue in Norwich city centre
-
-Description: A weathered bronze lion sculpture stands prominently on a stone plinth in Norwich, Norfolk, England, with the historic flint Norwich Guildhall visible in the background under a clear blue sky. The lion, with its mouth open and one paw raised, is captured in a dynamic pose during late afternoon sunlight, overlooking a street scene with pedestrians and vehicles.
-
-Keywords: bronze lion, sculpture, Norwich Guildhall, Norfolk, England, British heritage, Gothic Architecture, historic landmark, street scene, blue sky, daylight, urban, pedestrian, car, statue, East Anglia, Europe, Alfred Hardiman, 2026-10-10, 16:41:54 UTC+01:00
+Title: Church of St Peter Mancroft at twilight
+Description: The Church of St Peter Mancroft in Norwich, Norfolk, England, is captured at dusk, its stone facade illuminated by warm evening light. The Gothic tower, featuring a Victorian lead flèche and Perpendicular Gothic style, stands tall against a clear sky, with pedestrians walking below.
+Keywords: Church of St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, Perpendicular Gothic, Church Tower, Bell Tower, Spire, Flèche, Stone Masonry, Stone facade, Historic Landmark, Historic architecture, Twilight, Clear Sky, Trees, Pedestrians, Walking, Archway
 </pre>
 
 </details>
@@ -1075,17 +1238,17 @@ Keywords: bronze lion, sculpture, Norwich Guildhall, Norfolk, England, British h
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.92s
-- *Generation time:* 43.94s
-- *Total time:* 45.80s
-- *Prompt preparation time:* 0.931
-- *First-token latency:* 41.1
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 16,558
-- *Generation tokens:* 125
-- *Total tokens:* 16,683
-- *Prompt throughput (raw):* 403 tok/s
-- *Generation throughput (raw):* 62.3 tok/s
+- *Model load time:* 0.86s
+- *Generation time:* 41.08s
+- *Total time:* 42.92s
+- *Prompt preparation time:* 0.964
+- *First-token latency:* 38.9
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 16,566
+- *Generation tokens:* 91
+- *Total tokens:* 16,657
+- *Prompt throughput (raw):* 426 tok/s
+- *Generation throughput (raw):* 69.5 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
@@ -1094,7 +1257,7 @@ Keywords: bronze lion, sculpture, Norwich Guildhall, Norfolk, England, British h
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1457
+- *Rendered prompt characters:* 1485
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1107,11 +1270,11 @@ Keywords: bronze lion, sculpture, Norwich Guildhall, Norfolk, England, British h
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue at Norwich Guildhall
+Title: St Peter Mancroft Tower at Twilight
 
-Description: A bronze lion statue by Alfred Hardiman stands prominently in front of the historic Norwich Guildhall, its fierce roar captured in mid-motion. The scene is bathed in late afternoon light, with the Gothic architecture of the 15th-century building and a blue sky with scattered clouds forming a majestic backdrop.
+Description: The Gothic tower of St Peter Mancroft in Norwich glows in evening light, its stone facade and spire silhouetted against a clear sky as pedestrians walk past beneath leafy trees.
 
-Keywords: Bronze lion, Alfred Hardiman, Norwich Guildhall, Norwich, Norfolk, England, Gothic architecture, historic landmark, sculpture, statue, blue sky, pedestrian, car, street scene, East Anglia, British heritage, sightseeing, Market Place
+Keywords: St Peter Mancroft, Norwich, Gothic Architecture, Tower, Twilight, Stone Masonry, Spire, Pedestrians, Clear Sky, Historic Landmark
 </pre>
 
 </details>
@@ -1132,26 +1295,26 @@ Keywords: Bronze lion, Alfred Hardiman, Norwich Guildhall, Norwich, Norfolk, Eng
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.55s
-- *Generation time:* 44.09s
-- *Total time:* 47.62s
-- *Prompt preparation time:* 0.957
-- *First-token latency:* 40.2
-- *Cleanup time:* 0.182
-- *Prompt tokens:* 16,574
-- *Generation tokens:* 148
-- *Total tokens:* 16,722
-- *Prompt throughput (raw):* 412 tok/s
-- *Generation throughput (raw):* 49.1 tok/s
+- *Model load time:* 2.35s
+- *Generation time:* 38.12s
+- *Total time:* 41.44s
+- *Prompt preparation time:* 0.952
+- *First-token latency:* 36.1
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 16,579
+- *Generation tokens:* 130
+- *Total tokens:* 16,709
+- *Prompt throughput (raw):* 460 tok/s
+- *Generation throughput (raw):* 110 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.90
+- *Cache memory (GB):* 0.91
 - *Model-load active memory (GB):* 20.4
 - *Post-cleanup active memory (GB):* 0.00937
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1476
+- *Rendered prompt characters:* 1504
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1164,11 +1327,11 @@ Keywords: Bronze lion, Alfred Hardiman, Norwich Guildhall, Norwich, Norfolk, Eng
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue at Norwich Guildhall
+Title: St Peter Mancroft Tower at Dusk
 
-Description: A bronze lion sculpture by Alfred Hardiman stands guard outside the historic 15th-century flint Norwich Guildhall, overlooking the Market Place in Norwich, Norfolk. The statue, captured on October 10, 2026, is set against a backdrop of Gothic architecture under a clear blue sky, with pedestrians and vehicles adding life to the street scene.
+Description: This low-angle view captures the Gothic Church of St Peter Mancroft in Norwich at twilight, its Victorian stone flèche silhouetted against a clear blue sky. Warm interior light glows from the arched doorway at street level, illuminating pedestrians walking below large green trees.
 
-Keywords: Bronze Lion, Norwich Guildhall, Alfred Hardiman, Gothic Architecture, Street Scene, Pedestrian, Market Place, Norfolk, England, European Heritage, Historic Landmark, Sculpture, City Life, Autumn Day, Blue Sky, Urban Setting, Tourist Attraction, Cultural Landmark
+Keywords: St Peter Mancroft, Norwich, Norfolk, England, Gothic Architecture, Church Tower, Victorian Spire, Twilight, Evening Light, Stone Facade, Pedestrians, Trees, Archway, Historic Landmark, Perpendicular Gothic, United Kingdom, Clear Sky, Architecture
 </pre>
 
 </details>
@@ -1189,17 +1352,17 @@ Keywords: Bronze Lion, Norwich Guildhall, Alfred Hardiman, Gothic Architecture, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.22s
-- *Generation time:* 64.76s
-- *Total time:* 68.19s
-- *Prompt preparation time:* 1.19
-- *First-token latency:* 59.2
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 16,574
-- *Generation tokens:* 124
-- *Total tokens:* 16,698
-- *Prompt throughput (raw):* 280 tok/s
-- *Generation throughput (raw):* 27.6 tok/s
+- *Model load time:* 1.95s
+- *Generation time:* 58.06s
+- *Total time:* 60.95s
+- *Prompt preparation time:* 0.935
+- *First-token latency:* 52.8
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 16,579
+- *Generation tokens:* 133
+- *Total tokens:* 16,712
+- *Prompt throughput (raw):* 314 tok/s
+- *Generation throughput (raw):* 30.2 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
@@ -1208,7 +1371,7 @@ Keywords: Bronze Lion, Norwich Guildhall, Alfred Hardiman, Gothic Architecture, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1476
+- *Rendered prompt characters:* 1504
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1221,71 +1384,14 @@ Keywords: Bronze Lion, Norwich Guildhall, Alfred Hardiman, Gothic Architecture, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statues at Norwich Guildhall
-
-Description: A pair of weathered bronze lion sculptures by Alfred Hardiman stand on a stone plinth in front of the 15th-century flint Norwich Guildhall, with their open-mouthed poses and detailed manes set against the Gothic architecture under a blue sky.
-
-Keywords: Bronze Sculpture, Lion Statue, Norwich Guildhall, Gothic Architecture, Alfred Hardiman, East Anglia, England, Historic Landmark, Blue Sky, Stone Plinth, Market Place, Norfolk, Sightseeing, Architectural Heritage, Sculpture, Car, Street Scene
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-step-37-flash-oq3e"></a>
-
-### mlx-community/Step-3.7-Flash-oQ3e
-
-<details>
-<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ3e</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 16.95s
-- *Generation time:* 33.51s
-- *Total time:* 52.59s
-- *Prompt preparation time:* 2.12
-- *First-token latency:* 27.1
-- *Cleanup time:* 0.355
-- *Prompt tokens:* 3,502
-- *Generation tokens:* 122
-- *Total tokens:* 3,624
-- *Prompt throughput (raw):* 129 tok/s
-- *Generation throughput (raw):* 48.7 tok/s
-- *Peak memory (GB):* 92
-- *Active memory (GB):* 85
-- *Cache memory (GB):* 0.41
-- *Model-load active memory (GB):* 85
-- *Post-cleanup active memory (GB):* 0.0104
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1463
-- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ3e/snapshots/41d17ee00e168a2918bb839e4a7b6e445c6f03f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
 Title:
-Bronze Lion Sculpture Outside Norwich Guildhall
+Tower and Spire of St Peter Mancroft at Dusk in Norwich
 
 Description:
-A bronze lion sculpture by Alfred Hardiman stands on a stone plinth outside City Hall, overlooking the Market Place in Norwich, Norfolk, with the historic 15th-century flint Norwich Guildhall visible in the background under a clear blue sky.
+A low-angle view of the medieval tower and Victorian lead spire of the Church of St Peter Mancroft in Norwich, illuminated by golden evening light against a clear twilight sky. Lush trees partially obscure the stone facade below, where pedestrians walk along the street in front of a black metal fence.
 
 Keywords:
-Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+Archway, Church Tower, Clear Sky, England, Gothic Architecture, Golden Hour, Historic Landmark, Norwich, Pedestrians, Spire, St Peter Mancroft, Stone Masonry, Trees, Twilight, United Kingdom
 </pre>
 
 </details>
@@ -1306,17 +1412,17 @@ Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.22s
-- *Generation time:* 16.65s
-- *Total time:* 19.84s
-- *Prompt preparation time:* 1.96
-- *First-token latency:* 13.6
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 16,569
-- *Generation tokens:* 116
-- *Total tokens:* 16,685
-- *Prompt throughput (raw):* 1,220 tok/s
-- *Generation throughput (raw):* 52.8 tok/s
+- *Model load time:* 1.14s
+- *Generation time:* 15.99s
+- *Total time:* 18.03s
+- *Prompt preparation time:* 0.895
+- *First-token latency:* 13.1
+- *Cleanup time:* 0.0971
+- *Prompt tokens:* 16,577
+- *Generation tokens:* 127
+- *Total tokens:* 16,704
+- *Prompt throughput (raw):* 1,270 tok/s
+- *Generation throughput (raw):* 60.0 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 1.4
@@ -1325,7 +1431,7 @@ Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1515
+- *Rendered prompt characters:* 1543
 - *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1339,12 +1445,12 @@ Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, 
 
 <pre class="model-output-readable">
 Title:
-Norwich Guildhall Lion Statue
+Norwich St Peter Mancroft Tower Twilight
 
 Description:
-A bronze lion sculpture by Alfred Hardiman overlooks the Market Place from the balustrade of a bridge, with the historic 15th-century Norwich Guildhall in the background under a clear blue sky.
+A low-angle view captures the illuminated medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, with pedestrians walking below under a clear sky at dusk.
 
-Keywords: Norwich, Norfolk, England, Guildhall, Lion, Bronze, Statue, Hardiman, Market Place, 15th-century, Gothic Architecture, Blue Sky, Historical Landmark, Pedestrian, Street Scene, East Anglia, Europe, Heritage, Sculpture, Tourism, Cityscape.
+Keywords: Norwich, St Peter Mancroft, Church Tower, Perpendicular Gothic, Victorian lead flèche, medieval architecture, historic landmark, stone masonry, Gothic architecture, historic architecture, twilight, clear sky, pedestrian, United Kingdom, England, Norfolk, stone facade, archway, bell tower, trees, walking, evening light.
 </pre>
 
 </details>
@@ -1365,17 +1471,17 @@ Keywords: Norwich, Norfolk, England, Guildhall, Lion, Bronze, Statue, Hardiman, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.30s
-- *Generation time:* 2.85s
-- *Total time:* 5.15s
-- *Prompt preparation time:* 0.984
-- *First-token latency:* 0.757
-- *Cleanup time:* 0.146
-- *Prompt tokens:* 2,100
-- *Generation tokens:* 119
-- *Total tokens:* 2,219
-- *Prompt throughput (raw):* 2,772 tok/s
-- *Generation throughput (raw):* 96.1 tok/s
+- *Model load time:* 1.04s
+- *Generation time:* 2.56s
+- *Total time:* 4.54s
+- *Prompt preparation time:* 0.939
+- *First-token latency:* 0.722
+- *Cleanup time:* 0.098
+- *Prompt tokens:* 2,108
+- *Generation tokens:* 102
+- *Total tokens:* 2,210
+- *Prompt throughput (raw):* 2,918 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.35
@@ -1384,7 +1490,7 @@ Keywords: Norwich, Norfolk, England, Guildhall, Lion, Bronze, Statue, Hardiman, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4323
+- *Rendered prompt characters:* 4351
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -1398,11 +1504,9 @@ Keywords: Norwich, Norfolk, England, Guildhall, Lion, Bronze, Statue, Hardiman, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue Outside Norwich Guildhall
-
-Description: A bronze lion sculpture by Alfred Hardiman stands outside the historic Norwich Guildhall, overlooking the bustling Market Place. The lion, with its powerful stance and raised paw, is a prominent feature against the backdrop of the 15th-century building, while a blue sky and a lone pedestrian add to the scene.
-
-Keywords: Bronze, Lion, Sculpture, Norwich, Guildhall, Market Place, Historical, Architecture, East Anglia, England, Heritage, Sightseeing, Statue, Street, Blue Sky, Pedestrian, Car
+Title: Medieval Tower Illuminated at Twilight
+Description: The Gothic architecture of St Peter Mancroft's bell tower, with its intricate stone masonry and Victorian lead flèche, is illuminated by the evening light, casting a warm glow on the surrounding trees and pedestrians walking along the street in Norwich, England.
+Keywords: Medieval, Gothic, Stone, Victorian, Tower, Bell, Clock, Norwich, England, Historical, Landmark, Twilight, Pedestrian, Street, Streetlight, Green, Grass, People
 </pre>
 
 </details>
@@ -1423,17 +1527,17 @@ Keywords: Bronze, Lion, Sculpture, Norwich, Guildhall, Market Place, Historical,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.59s
-- *Generation time:* 2.27s
-- *Total time:* 6.55s
-- *Prompt preparation time:* 0.649
-- *First-token latency:* 0.323
-- *Cleanup time:* 0.172
-- *Prompt tokens:* 605
-- *Generation tokens:* 87
-- *Total tokens:* 692
-- *Prompt throughput (raw):* 1,872 tok/s
-- *Generation throughput (raw):* 77.5 tok/s
+- *Model load time:* 3.17s
+- *Generation time:* 2.28s
+- *Total time:* 6.08s
+- *Prompt preparation time:* 0.604
+- *First-token latency:* 0.31
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 611
+- *Generation tokens:* 92
+- *Total tokens:* 703
+- *Prompt throughput (raw):* 1,970 tok/s
+- *Generation throughput (raw):* 74.4 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -1442,7 +1546,7 @@ Keywords: Bronze, Lion, Sculpture, Norwich, Guildhall, Market Place, Historical,
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1411
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1456,9 +1560,9 @@ Keywords: Bronze, Lion, Sculpture, Norwich, Guildhall, Market Place, Historical,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Sculpture Outside Norwich Guildhall
-Description: A bronze lion sculpture by Alfred Hardiman stands outside the City Hall, overlooking the historic 15th-century flint Norwich Guildhall under a clear sky.
-Keywords: Norwich, Norfolk, England, British heritage, lion, sculpture, statue, Guildhall, Gothic architecture, historic landmark, East Anglia, street scene, sightseeing, bronze, Europe
+Title: The Gothic Tower of St Peter Mancroft in Norwich
+Description: A low-angle evening view of the illuminated medieval stone tower and spire of the St Peter Mancroft Church at twilight in Norfolk, England.
+Keywords: Norwich, Norfolk, England, St Peter Mancroft, Gothic Architecture, Church Tower, Spire, Stone Masonry, Medieval, Twilight, Landmark, Pedestrians, Historic, Archway, United Kingdom
 </pre>
 
 </details>
@@ -1479,17 +1583,17 @@ Keywords: Norwich, Norfolk, England, British heritage, lion, sculpture, statue, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.58s
-- *Generation time:* 9.30s
-- *Total time:* 12.50s
-- *Prompt preparation time:* 0.598
-- *First-token latency:* 1.56
-- *Cleanup time:* 0.144
-- *Prompt tokens:* 604
-- *Generation tokens:* 140
-- *Total tokens:* 744
-- *Prompt throughput (raw):* 388 tok/s
-- *Generation throughput (raw):* 19.6 tok/s
+- *Model load time:* 2.24s
+- *Generation time:* 6.09s
+- *Total time:* 8.91s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 0.928
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 610
+- *Generation tokens:* 145
+- *Total tokens:* 755
+- *Prompt throughput (raw):* 658 tok/s
+- *Generation throughput (raw):* 31.4 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.45
@@ -1498,7 +1602,7 @@ Keywords: Norwich, Norfolk, England, British heritage, lion, sculpture, statue, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1440
+- *Rendered prompt characters:* 1468
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1512,11 +1616,67 @@ Keywords: Norwich, Norfolk, England, British heritage, lion, sculpture, statue, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Hardiman Lion Sculpture, Norwich Guildhall, Norfolk
+Title: St Peter Mancroft Tower, Norwich – October Evening
+Description: Captured on 10 October 2026 at 18:09 UTC+01:00, this low-angle view shows the medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, illuminated against a twilight sky with pedestrians on the street below. The stone facade features prominent arched windows and detailed stone masonry.
+Keywords: St Peter Mancroft, Church Tower, Norwich, Norfolk, England, United Kingdom, Gothic Architecture, Perpendicular Gothic, Stone Masonry, Stone facade, Landmark, Historic Landmark, Tower, Archway, Pedestrians, Twilight, Trees, Evening Light
+</pre>
 
-Description: Captured on 10 October 2026, this photograph shows Alfred Hardiman’s bronze lion sculpture outside City Hall in Norwich, with the 15th-century flint Norwich Guildhall forming a historic backdrop. The scene is lit by late afternoon sunlight, casting shadows across the Market Place and highlighting the Gothic architecture.
+</details>
 
-Keywords: Alfred Hardiman, Bronze sculpture, Lion, Statue, Norwich Guildhall, City Hall, Market Place, Historic landmark, Gothic architecture, Flint building, Norfolk, Norwich, England, East Anglia, Pedestrian, Street scene, Sculpture, Sunlight, 15th century
+---
+
+<a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
+
+### mlx-community/gemma-4-12B-it-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-4-12B-it-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
+- *Model load time:* 1.68s
+- *Generation time:* 2.82s
+- *Total time:* 5.12s
+- *Prompt preparation time:* 0.604
+- *First-token latency:* 0.359
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 615
+- *Generation tokens:* 118
+- *Total tokens:* 733
+- *Prompt throughput (raw):* 1,711 tok/s
+- *Generation throughput (raw):* 62.7 tok/s
+- *Peak memory (GB):* 7.6
+- *Active memory (GB):* 6.8
+- *Cache memory (GB):* 0.33
+- *Model-load active memory (GB):* 6.76
+- *Post-cleanup active memory (GB):* 0.0128
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1467
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: St Peter Mancroft Church Tower at Twilight
+
+Description: A low-angle view of the medieval bell tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, illuminated in evening light. Pedestrians walk along the street beside the ornate Perpendicular Gothic stone facade and surrounding trees.
+
+Keywords: St Peter Mancroft, Norwich, England, Church Tower, Bell Tower, Perpendicular Gothic, Gothic Architecture, Flèche, Spire, Stone Masonry, Historic Landmark, Twilight, Pedestrians, Urban Landscape, Architecture, United Kingdom, Clear Sky
 </pre>
 
 </details>
@@ -1537,17 +1697,17 @@ Keywords: Alfred Hardiman, Bronze sculpture, Lion, Statue, Norwich Guildhall, Ci
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.74s
-- *Generation time:* 2.12s
-- *Total time:* 5.52s
-- *Prompt preparation time:* 0.623
-- *First-token latency:* 0.428
-- *Cleanup time:* 0.155
-- *Prompt tokens:* 609
-- *Generation tokens:* 106
-- *Total tokens:* 715
-- *Prompt throughput (raw):* 1,422 tok/s
-- *Generation throughput (raw):* 99.4 tok/s
+- *Model load time:* 2.33s
+- *Generation time:* 1.80s
+- *Total time:* 4.74s
+- *Prompt preparation time:* 0.583
+- *First-token latency:* 0.394
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 615
+- *Generation tokens:* 105
+- *Total tokens:* 720
+- *Prompt throughput (raw):* 1,560 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -1556,7 +1716,7 @@ Keywords: Alfred Hardiman, Bronze sculpture, Lion, Statue, Norwich Guildhall, Ci
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1439
+- *Rendered prompt characters:* 1467
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1570,11 +1730,11 @@ Keywords: Alfred Hardiman, Bronze sculpture, Lion, Statue, Norwich Guildhall, Ci
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze lion sculpture overlooking historic Norwich Guildhall
+Title: St Peter Mancroft tower in evening light
 
-Description: A bronze lion sculpture by Alfred Hardiman stands in the foreground, overlooking the historic 15th-century flint Guildhall in Norwich, Norfolk. The scene captures the sculpture against a clear blue sky and historic Gothic architecture during late afternoon light.
+Description: A low-angle view shows the medieval stone tower and Victorian lead flèche of St Peter Mancroft illuminated in the evening light in Norwich, England. Pedestrians walk along the street beside the historic Gothic architecture at twilight.
 
-Keywords: Alfred Hardiman, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Sculpture, Statue, Street Scene, Blue sky, British heritage, Tourism
+Keywords: St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic architecture, Perpendicular Gothic, church tower, spire, historic landmark, stone masonry, twilight, clear sky, pedestrians, walking, historic architecture
 </pre>
 
 </details>
@@ -1595,18 +1755,18 @@ Keywords: Alfred Hardiman, East Anglia, England, Europe, Gothic Architecture, Gu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.71s
-- *Generation time:* 1.53s
-- *Total time:* 3.83s
-- *Prompt preparation time:* 0.552
-- *First-token latency:* 0.208
-- *Cleanup time:* 0.174
-- *Prompt tokens:* 605
-- *Generation tokens:* 87
-- *Total tokens:* 692
-- *Prompt throughput (raw):* 2,914 tok/s
-- *Generation throughput (raw):* 121 tok/s
-- *Peak memory (GB):* 5.9
+- *Model load time:* 1.56s
+- *Generation time:* 1.62s
+- *Total time:* 3.79s
+- *Prompt preparation time:* 0.581
+- *First-token latency:* 0.184
+- *Cleanup time:* 0.102
+- *Prompt tokens:* 611
+- *Generation tokens:* 108
+- *Total tokens:* 719
+- *Prompt throughput (raw):* 3,319 tok/s
+- *Generation throughput (raw):* 125 tok/s
+- *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
@@ -1614,7 +1774,7 @@ Keywords: Alfred Hardiman, East Anglia, England, Europe, Gothic Architecture, Gu
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1411
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1628,186 +1788,9 @@ Keywords: Alfred Hardiman, East Anglia, England, Europe, Gothic Architecture, Gu
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze lion sculpture before historic Norwich Guildhall backdrop.
-Description: A detailed bronze lion sculpture rests on a pedestal, with the impressive, historic Norwich Guildhall complex visible in the background under a partly cloudy sky.
-Keywords: Norwich Guildhall, bronze sculpture, lion statue, Alfred Hardiman, historic landmark, Gothic architecture, Norwich, Norfolk, England, architecture, city hall, heritage, Sightseeing, European, exterior
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### mlx-community/pixtral-12b-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.82s
-- *Generation time:* 5.13s
-- *Total time:* 7.44s
-- *Prompt preparation time:* 0.478
-- *First-token latency:* 1.94
-- *Cleanup time:* 0.116
-- *Prompt tokens:* 3,125
-- *Generation tokens:* 110
-- *Total tokens:* 3,235
-- *Prompt throughput (raw):* 1,615 tok/s
-- *Generation throughput (raw):* 40.2 tok/s
-- *Peak memory (GB):* 16
-- *Active memory (GB):* 13
-- *Cache memory (GB):* 0.59
-- *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0155
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1385
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Bronze Lion Sculpture in Norwich Market Place
-
-Description:
-A bronze lion sculpture by Alfred Hardiman stands prominently in Norwich Market Place, with the historic 15th-century Norwich Guildhall in the background under a clear blue sky.
-
-Keywords:
-Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
-</pre>
-
-</details>
-
----
-
-<a id="model-nativ-community-mage-vl-optiq-4bit"></a>
-
-### nativ-community/Mage-VL-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/Mage-VL-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.80s
-- *Generation time:* 3.85s
-- *Total time:* 5.39s
-- *Prompt preparation time:* 0.73
-- *First-token latency:* 1.94
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 4,221
-- *Generation tokens:* 157
-- *Total tokens:* 4,378
-- *Prompt throughput (raw):* 2,171 tok/s
-- *Generation throughput (raw):* 126 tok/s
-- *Peak memory (GB):* 5.4
-- *Active memory (GB):* 3.9
-- *Cache memory (GB):* 0.76
-- *Model-load active memory (GB):* 3.93
-- *Post-cleanup active memory (GB):* 0.0158
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1515
-- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4f0a424370e54984ed783db8f8633a219c72db78
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mage-VL-OptiQ-4bit/snapshots/4f0a424370e54984ed783db8f8633a219c72db78
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Bronze Lion Sculpture at Norwich Guildhall, East Anglia
-
-Description: A bronze lion sculpture by Alfred Hardiman stands proudly on a stone pedestal outside City Hall, overlooking the historic Market Place in Norwich, Norfolk, England. The 15th-century flint Norwich Guildhall, with its Gothic architecture, is visible in the background, while the blue sky and a few clouds frame the scene. The sculpture, with its detailed features and dynamic pose, captures the essence of British heritage and civic pride.
-
-Keywords: Bronze Lion, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, East Anglia, England, Sculpture, Sightseeing, Street Scene, Pedestrian, Car, Blue sky, British heritage, Guildhall, Norfolk, Norwich
-</pre>
-
-</details>
-
----
-
-<a id="model-nativ-community-mistral-small-32-24b-instruct-2506-4bit"></a>
-
-### nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.99s
-- *Generation time:* 12.53s
-- *Total time:* 15.04s
-- *Prompt preparation time:* 0.505
-- *First-token latency:* 2.09
-- *Cleanup time:* 0.293
-- *Prompt tokens:* 1,281
-- *Generation tokens:* 133
-- *Total tokens:* 1,414
-- *Prompt throughput (raw):* 613 tok/s
-- *Generation throughput (raw):* 13.4 tok/s
-- *Peak memory (GB):* 18
-- *Active memory (GB):* 15
-- *Cache memory (GB):* 0.28
-- *Model-load active memory (GB):* 15.1
-- *Post-cleanup active memory (GB):* 0.0161
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1385
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mistral-Small-3.2-24B-Instruct-2506-4bit/snapshots/bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.15, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Bronze Lion Statue at Norwich Guildhall
-
-Description:
-A bronze lion sculpture by Alfred Hardiman stands prominently outside City Hall, overlooking the Market Place with the historic 15th-century Norwich Guildhall in the background. The scene is bathed in late afternoon sunlight, highlighting the intricate details of the statue and the Gothic architecture.
-
-Keywords:
-Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, City Hall, Market Place, Gothic Architecture, Historic Landmark, Norwich, Norfolk, England, Pedestrian Street, Blue Sky, Street Lamp, Vehicles, 15th Century, Sculpture, British Heritage, Sightseeing
+Title: St Peter Mancroft Church Tower at Twilight in Norwich
+Description: A low-angle view captures the Gothic architecture of St Peter Mancroft Church's tower against the evening sky, flanked by dark trees and pedestrians. The interplay of the stone facade and the fading twilight creates a dramatic scene in Norwich.
+Keywords: St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twilight, Perpendicular Gothic, Stone Facade, Spire, Bell Tower, Landmark, Trees, Pedestrians, England, Historic, Architecture
 </pre>
 
 </details>
@@ -1829,17 +1812,17 @@ Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, City Hall, Market Place,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.63s
-- *Generation time:* 7.06s
-- *Total time:* 10.26s
-- *Prompt preparation time:* 0.547
-- *First-token latency:* 5.63
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 3,636
-- *Generation tokens:* 113
-- *Total tokens:* 3,749
-- *Prompt throughput (raw):* 646 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Model load time:* 2.25s
+- *Generation time:* 5.32s
+- *Total time:* 8.19s
+- *Prompt preparation time:* 0.595
+- *First-token latency:* 4.13
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 3,642
+- *Generation tokens:* 101
+- *Total tokens:* 3,743
+- *Prompt throughput (raw):* 883 tok/s
+- *Generation throughput (raw):* 159 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.15
@@ -1848,7 +1831,7 @@ Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, City Hall, Market Place,
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1467
+- *Rendered prompt characters:* 1495
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -1863,158 +1846,68 @@ Norwich Guildhall, Bronze Lion Statue, Alfred Hardiman, City Hall, Market Place,
 
 <pre class="model-output-readable">
 
-Title: Bronze Lion Statue at Norwich City Hall
-Description: A bronze lion sculpture by Alfred Hardiman stands proudly on its pedestal, overlooking the bustling Market Place with the historic 15th-century flint Norwich Guildhall visible in the background under a clear blue sky.
-Keywords: bronze lion, Alfred Hardiman, Norwich City Hall, Norwich Guildhall, flint building, Gothic architecture, historic landmark, sculpture, statue, blue sky, East Anglia, England, Norfolk, British heritage, street scene, Market Place, pedestrian, car, European landmark
+Title: St Peter Mancroft Church Tower at Dusk
+
+Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, illuminated by evening light against a clear sky, with pedestrians walking along the street below.
+
+Keywords: Church Tower, Gothic Architecture, Historic Landmark, Norwich, England, Stone facade, Perpendicular Gothic, Spire, Victorian flèche, Twilight, Pedestrians, Trees
 </pre>
 
 </details>
 
 ---
 
-<a id="model-sahilchachra-lensvlm-9b-mxfp4"></a>
+<a id="model-mlx-community-glm-46v-flash-4bit"></a>
 
-### sahilchachra/LensVLM-9B-MXFP4
-
-<details>
-<summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.43s
-- *Generation time:* 3.71s
-- *Total time:* 5.77s
-- *Prompt preparation time:* 0.621
-- *First-token latency:* 0.929
-- *Cleanup time:* 0.136
-- *Prompt tokens:* 1,886
-- *Generation tokens:* 223
-- *Total tokens:* 2,109
-- *Prompt throughput (raw):* 2,030 tok/s
-- *Generation throughput (raw):* 101 tok/s
-- *Peak memory (GB):* 7.5
-- *Active memory (GB):* 5.7
-- *Cache memory (GB):* 0.21
-- *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.0168
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1476
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--sahilchachra--LensVLM-9B-MXFP4/snapshots/23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image features a prominent bronze lion sculpture, which the context identifies as being by Alfred Hardiman and located outside City Hall in Norwich. The visible text confirms the setting includes the "historic 15th-century flint Norwich Guildhall" in the background, aligning with the description of the location. The lighting suggests a clear day with a "Blue sky," and the overall scene captures a "Street Scene" in "Norfolk." Based on these details, I can formulate the required metadata.
-
-Title:
-Norwich Lion Statue and Guildhall
-
-Description:
-A bronze lion sculpture stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background. The scene is set in Norwich, Norfolk, England, under a clear sky.
-
-Keywords:
-Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+### mlx-community/GLM-4.6V-Flash-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: norwich, england, uk, pedestrian, stone
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 2.56s
-- *Generation time:* 8.19s
-- *Total time:* 11.43s
-- *Prompt preparation time:* 0.666
-- *First-token latency:* 0.756
-- *Cleanup time:* 0.105
-- *Prompt tokens:* 1,648
-- *Generation tokens:* 640
-- *Total tokens:* 2,288
-- *Prompt throughput (raw):* 2,180 tok/s
-- *Generation throughput (raw):* 93.4 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.15
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.00135
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.32s
+- *Generation time:* 7.09s
+- *Total time:* 8.98s
+- *Prompt preparation time:* 0.554
+- *First-token latency:* 5.06
+- *Cleanup time:* 0.0863
+- *Prompt tokens:* 6,372
+- *Generation tokens:* 121
+- *Total tokens:* 6,493
+- *Prompt throughput (raw):* 1,260 tok/s
+- *Generation throughput (raw):* 78.8 tok/s
+- *Peak memory (GB):* 8.7
+- *Active memory (GB):* 7.1
+- *Cache memory (GB):* 0.47
+- *Model-load active memory (GB):* 7.08
+- *Post-cleanup active memory (GB):* 0.00197
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1575
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Rendered prompt characters:* 1494
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
+- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
+- *EOS token:* <\|endoftext\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get this done. I need to create some metadata for this image of a lion statue in Norwich. First things first, the title. I need something short and sweet. "Bronze Lion Sculpture in Norwich" seems good. It's concise and descriptive.
-
-Now for the description. I've got the context: it's a bronze lion statue in Norwich, and it's by Alfred Hardiman. The setting is City Hall, overlooking the Market Place, with the Guildhall in the background. The lighting is bright, daytime, with a clear blue sky. I'll combine all that. "A bronze lion sculpture by Alfred Hardiman stands outside Norwich City Hall, overlooking the Market Place in the historic city center of Norwich, England, with the 15th-century Guildhall in the background under a bright blue sky." That's a good, detailed sentence that covers everything.
-
-Finally, the keywords. I need to be comprehensive. Let's see... Norwich, England, UK, city, street, lion, bronze, statue, sculpture, City Hall, Guildhall, Norwich Guildhall, Alfred Hardiman, market, market place, pedestrian, car, car park, car parked, car on the street, bollard, blue sky, daylight, sun, sunlit, daylight, historic, historic landmark, architectural, gothic, 15th century, fountain, fountain base, stone, stone wall, stone statue, bronze lion, gargoyle, gargoyles, gothic architecture, England, UK, Europe, East Anglia, sightseeing, tourist, pedestrian, urban, cityscape, panoramic, stone, stone carving, Norwich, Norfolk, UK England, London. I think I've got enough there. It covers the location, the object, the artist, the setting, and all the key details. I'm happy with that.
-&lt;/think&gt;
-
-Title: Bronze Lion Sculpture in Norwich
-
-Description: A bronze lion sculpture by Alfred Hardiman stands outside Norwich City Hall, overlooking the Market Place in the historic city center of Norwich, England, with the 15th-century Guildhall in the background under a bright blue sky.
-
-Keywords: Norwich, England, UK, city, street, lion, bronze, statue, sculpture, City Hall, Guildhall, Norwich Guildhall, Alfred Hardiman, market, market place, pedestrian, car, car park, bollard, blue sky, daylight, sun, sunlit, historic, historic landmark, architectural, gothic, 15th century, fountain, fountain base, stone, stone wall, stone statue, bronze lion, gargoyle, gothic architecture, England, UK, Europe, East Anglia, sightseeing, tourist, pedestrian, urban, cityscape, panoramic, stone, stone carving, Norwich, Norfolk, UK England, London
+Title: St Peter Mancroft Tower
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get this done. I need to create some metadata for this image of a lion statue in Norwich. First things first, the title. I need something short and sweet. "Bronze Lion Sculpture in Norwich" seems good. It's concise and descriptive.
-
-Now for the description. I've got the context: it's a bronze lion statue in Norwich, and it's by Alfred Hardiman. The setting is City Hall, overlooking the Market Place, with the Guildhall in the background. The lighting is bright, daytime, with a clear blue sky. I'll combine all that. "A bronze lion sculpture by Alfred Hardiman stands outside Norwich City Hall, overlooking the Market Place in the historic city center of Norwich, England, with the 15th-century Guildhall in the background under a bright blue sky." That's a good, detailed sentence that covers everything.
-
-Finally, the keywords. I need to be comprehensive. Let's see... Norwich, England, UK, city, street, lion, bronze, statue, sculpture, City Hall, Guildhall, Norwich Guildhall, Alfred Hardiman, market, market place, pedestrian, car, car park, car parked, car on the street, bollard, blue sky, daylight, sun, sunlit, daylight, historic, historic landmark, architectural, gothic, 15th century, fountain, fountain base, stone, stone wall, stone statue, bronze lion, gargoyle, gargoyles, gothic architecture, England, UK, Europe, East Anglia, sightseeing, tourist, pedestrian, urban, cityscape, panoramic, stone, stone carving, Norwich, Norfolk, UK England, London. I think I've got enough there. It covers the location, the object, the artist, the setting, and all the key details. I'm happy with that.
-</think>
-
-Title: Bronze Lion Sculpture in Norwich
-
-Description: A bronze lion sculpture by Alfred Hardiman stands outside Norwich City Hall, overlooking the Market Place in the historic city center of Norwich, England, with the 15th-century Guildhall in the background under a bright blue sky.
-
-Keywords: Norwich, England, UK, city, street, lion, bronze, statue, sculpture, City Hall, Guildhall, Norwich Guildhall, Alfred Hardiman, market, market place, pedestrian, car, car park, bollard, blue sky, daylight, sun, sunlit, historic, historic landmark, architectural, gothic, 15th century, fountain, fountain base, stone, stone wall, stone statue, bronze lion, gargoyle, gothic architecture, England, UK, Europe, East Anglia, sightseeing, tourist, pedestrian, urban, cityscape, panoramic, stone, stone carving, Norwich, Norfolk, UK England, London
-```
-
-</details>
 
 </details>
 
@@ -2034,17 +1927,17 @@ Keywords: Norwich, England, UK, city, street, lion, bronze, statue, sculpture, C
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.84s
-- *Generation time:* 1.66s
-- *Total time:* 4.23s
-- *Prompt preparation time:* 0.704
-- *First-token latency:* 0.495
-- *Cleanup time:* 0.162
-- *Prompt tokens:* 2,120
-- *Generation tokens:* 93
-- *Total tokens:* 2,213
-- *Prompt throughput (raw):* 4,283 tok/s
-- *Generation throughput (raw):* 201 tok/s
+- *Model load time:* 0.93s
+- *Generation time:* 1.49s
+- *Total time:* 3.09s
+- *Prompt preparation time:* 0.655
+- *First-token latency:* 0.462
+- *Cleanup time:* 0.0798
+- *Prompt tokens:* 2,122
+- *Generation tokens:* 84
+- *Total tokens:* 2,206
+- *Prompt throughput (raw):* 4,597 tok/s
+- *Generation throughput (raw):* 213 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
@@ -2053,7 +1946,7 @@ Keywords: Norwich, England, UK, city, street, lion, bronze, statue, sculpture, C
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
+- *Rendered prompt characters:* 1464
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2067,70 +1960,182 @@ Keywords: Norwich, England, UK, city, street, lion, bronze, statue, sculpture, C
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue in Norwich, England
-Description: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background under a blue sky.
-Keywords: London, sculpture, lion, statue, city hall, market place, guildhall, historic, architecture, England, Europe, Norfolk, Norwich, pedestrian, street scene
+Title: St Peter Mancroft Tower, Norwich, England
+Description: A low-angle view of the medieval tower and Victorian lead flèche illuminated in evening light, with pedestrians walking along the street below.
+Keywords: Church Tower, Gothic Architecture, Historic Landmark, England, Norwich, Pedestrians, Spire, Stone Masonry, Clear Sky, Twilight, United Kingdom, Architecture, Walking
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
 
-### mlx-community/gemma-4-12B-it-4bit
+### mlx-community/Molmo2-8B-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-12B-it-4bit</summary>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: sculpture
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.82s
-- *Generation time:* 2.76s
-- *Total time:* 5.20s
-- *Prompt preparation time:* 0.592
-- *First-token latency:* 0.375
-- *Cleanup time:* 0.209
-- *Prompt tokens:* 609
-- *Generation tokens:* 108
-- *Total tokens:* 717
-- *Prompt throughput (raw):* 1,623 tok/s
-- *Generation throughput (raw):* 58.6 tok/s
-- *Peak memory (GB):* 7.6
-- *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.33
-- *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.0128
+- *Observations:* Duplicate keywords: gothic architecture, stone masonry
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 1.17s
+- *Generation time:* 3.31s
+- *Total time:* 5.14s
+- *Prompt preparation time:* 0.655
+- *First-token latency:* 0.746
+- *Cleanup time:* 0.0987
+- *Prompt tokens:* 1,562
+- *Generation tokens:* 141
+- *Total tokens:* 1,703
+- *Prompt throughput (raw):* 2,092 tok/s
+- *Generation throughput (raw):* 73.0 tok/s
+- *Peak memory (GB):* 8.2
+- *Active memory (GB):* 6.5
+- *Cache memory (GB):* 0.31
+- *Model-load active memory (GB):* 6.45
+- *Post-cleanup active memory (GB):* 0.006
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1439
+- *Rendered prompt characters:* 1451
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 73bcf09092aa277861d5a191b989b666f7f32e8f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: St Peter Mancroft Tower at Twilight, Norwich
+
+Description: A low-angle view of the medieval tower and Victorian lead flèche of St Peter Mancroft Church, illuminated in golden evening light. Pedestrians walk along the street below as the historic landmark stands against a clear sky, with trees and a modern building visible in the foreground.
+
+Keywords: St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Stone Masonry, Victorian Lead Flèche, Twilight, Clear Sky, Pedestrians, Historic Landmark, Stone Facade, Archway, Bell Tower, Gothic Architecture, Stone Masonry, Trees, United Kingdom, Walking, Norwich Cathedral
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: stone facade; Repeats the prompt's hint
+  text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.64s
+- *Generation time:* 2.09s
+- *Total time:* 3.50s
+- *Prompt preparation time:* 0.761
+- *First-token latency:* 0.376
+- *Cleanup time:* 0.085
+- *Prompt tokens:* 1,446
+- *Generation tokens:* 128
+- *Total tokens:* 1,574
+- *Prompt throughput (raw):* 3,843 tok/s
+- *Generation throughput (raw):* 128 tok/s
+- *Peak memory (GB):* 5.6
+- *Active memory (GB):* 4.5
+- *Cache memory (GB):* 0.40
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0101
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1445
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: St Peter Mancroft Church, Norwich, England
+Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-step-37-flash-oq3e"></a>
+
+### mlx-community/Step-3.7-Flash-oQ3e
+
+<details>
+<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ3e</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Model load time:* 11.94s
+- *Generation time:* 22.66s
+- *Total time:* 35.43s
+- *Prompt preparation time:* 0.816
+- *First-token latency:* 18.9
+- *Cleanup time:* 0.316
+- *Prompt tokens:* 3,506
+- *Generation tokens:* 118
+- *Total tokens:* 3,624
+- *Prompt throughput (raw):* 186 tok/s
+- *Generation throughput (raw):* 52.9 tok/s
+- *Peak memory (GB):* 92
+- *Active memory (GB):* 85
+- *Cache memory (GB):* 0.41
+- *Model-load active memory (GB):* 85
+- *Post-cleanup active memory (GB):* 0.0104
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1491
+- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ3e/snapshots/41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
 Title:
-Bronze Lion Sculpture in Front of Norwich Guildhall
-
+St Peter Mancroft Tower at Twilight, Norwich
 Description:
-A bronze lion sculpture by Alfred Hardiman stands in front of the historic 15th-century flint Norwich Guildhall in Norfolk, England. The statue is set against a backdrop of Gothic architecture under a clear blue sky.
-
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 Keywords:
-Norwich, Norfolk, England, Guildhall, Sculpture, Lion Statue, Gothic Architecture, British Heritage, East Anglia, Landmark, City Hall, Historical Building, Sculpture, Tourism, Sculpture, Architecture, Street Scene
+Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 </pre>
 
 </details>
@@ -2151,26 +2156,26 @@ Norwich, Norfolk, England, Guildhall, Sculpture, Lion Statue, Gothic Architectur
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.60s
-- *Generation time:* 1.70s
-- *Total time:* 3.11s
-- *Prompt preparation time:* 0.796
-- *First-token latency:* 0.397
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 1,390
-- *Generation tokens:* 91
-- *Total tokens:* 1,481
-- *Prompt throughput (raw):* 3,504 tok/s
-- *Generation throughput (raw):* 170 tok/s
-- *Peak memory (GB):* 4.7
+- *Model load time:* 0.69s
+- *Generation time:* 1.77s
+- *Total time:* 3.27s
+- *Prompt preparation time:* 0.79
+- *First-token latency:* 0.438
+- *Cleanup time:* 0.0912
+- *Prompt tokens:* 1,410
+- *Generation tokens:* 105
+- *Total tokens:* 1,515
+- *Prompt throughput (raw):* 3,221 tok/s
+- *Generation throughput (raw):* 181 tok/s
+- *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.22
+- *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 3.03
 - *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1609
+- *Rendered prompt characters:* 1637
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -2184,65 +2189,244 @@ Norwich, Norfolk, England, Guildhall, Sculpture, Lion Statue, Gothic Architectur
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Bronze Lion Sculpture by Alfred Hardiman"
-Description: A bronze lion sculpture by Alfred Hardiman stands outside City Hall, overlooking the Market Place in Norwich, Norfolk, England.
-Keywords: Bronze, Lion, Sculpture, Alfred Hardiman, City Hall, Market Place, Norwich, Norfolk, England, Gothic Architecture, Historic Landmark, Sightseeing, Pedestrian, Blue sky, Car, East Anglia, Europe
+Title: "Evening Illumination of Norwich's St Peter Mancroft"
+Description: A low-angle view captures the grandeur of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft, bathed in evening light, with pedestrians strolling along the street below.
+Keywords: Gothic Architecture, Historic Landmark, St Peter Mancroft, Stone Masonry, Spire, Twilight, United Kingdom, Pedestrians, Clear Sky, Architectural Detail
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-granite-vision-32-2b-nvfp4"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### mlx-community/granite-vision-3.2-2b-nvfp4
+### mlx-community/pixtral-12b-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/granite-vision-3.2-2b-nvfp4</summary>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: norwich
-- *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.42s
-- *Generation time:* 4.40s
-- *Total time:* 5.61s
-- *Prompt preparation time:* 0.79
-- *First-token latency:* 2.1
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 5,595
-- *Generation tokens:* 230
-- *Total tokens:* 5,825
-- *Prompt throughput (raw):* 2,666 tok/s
-- *Generation throughput (raw):* 146 tok/s
-- *Peak memory (GB):* 4.2
-- *Active memory (GB):* 2.4
-- *Cache memory (GB):* 0.97
-- *Model-load active memory (GB):* 2.36
-- *Post-cleanup active memory (GB):* 0.0142
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.69s
+- *Generation time:* 5.16s
+- *Total time:* 7.38s
+- *Prompt preparation time:* 0.512
+- *First-token latency:* 1.8
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 3,152
+- *Generation tokens:* 115
+- *Total tokens:* 3,267
+- *Prompt throughput (raw):* 1,753 tok/s
+- *Generation throughput (raw):* 40.1 tok/s
+- *Peak memory (GB):* 16
+- *Active memory (GB):* 13
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 13.5
+- *Post-cleanup active memory (GB):* 0.0155
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1562
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Rendered prompt characters:* 1413
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* f0c70965cdae87ebf38e84ff958e841ad943e8e6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-vision-3.2-2b-nvfp4/snapshots/f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Alfred Hardiman's Lion Sculpture at City Hall, Norwich"
-Description: A bronze lion sculpture by Alfred Hardiman stands proudly outside City Hall, overlooking the Market Place. The historic 15th-century flint Norwich Guildhall is visible in the background, showcasing the rich architectural heritage of the area. The setting is a pedestrian street scene in Norwich, Norfolk, England, under a blue sky with a hint of the Gothic architecture of the Guildhall. The lion, a symbol of strength and courage, is a prominent feature in this urban landscape.
-Keywords: Alfred Hardiman, Lion Sculpture, City Hall, Norwich, Guildhall, Norwich, Norfolk, England, Gothic Architecture, Sculpture, Street Scene, Pedestrian, Historic Landmark, Bronze, Blue Sky, European, Art, Architecture, Northern England.
+Title:
+St Peter Mancroft Tower in Evening Light
+
+Description:
+The medieval tower and Victorian lead flèche of St Peter Mancroft are illuminated in the evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+
+Keywords:
+Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-nativ-community-mage-vl-optiq-4bit"></a>
+
+### nativ-community/Mage-VL-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: nativ-community/Mage-VL-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
+- *Model load time:* 0.79s
+- *Generation time:* 3.09s
+- *Total time:* 4.57s
+- *Prompt preparation time:* 0.678
+- *First-token latency:* 1.48
+- *Cleanup time:* 0.0921
+- *Prompt tokens:* 4,229
+- *Generation tokens:* 125
+- *Total tokens:* 4,354
+- *Prompt throughput (raw):* 2,861 tok/s
+- *Generation throughput (raw):* 128 tok/s
+- *Peak memory (GB):* 5.4
+- *Active memory (GB):* 3.9
+- *Cache memory (GB):* 0.76
+- *Model-load active memory (GB):* 3.93
+- *Post-cleanup active memory (GB):* 0.0158
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1543
+- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4f0a424370e54984ed783db8f8633a219c72db78
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mage-VL-OptiQ-4bit/snapshots/4f0a424370e54984ed783db8f8633a219c72db78
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: St Peter Mancroft Church Tower Illuminated at Twilight in Norwich, England
+Description: The medieval tower and Victorian lead flèche of the Church of St Peter Mancroft are illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+</pre>
+
+</details>
+
+---
+
+<a id="model-nativ-community-mistral-small-32-24b-instruct-2506-4bit"></a>
+
+### nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
+
+<details>
+<summary>Complete evidence: nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.78s
+- *Generation time:* 4.92s
+- *Total time:* 7.23s
+- *Prompt preparation time:* 0.516
+- *First-token latency:* 1.44
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 1,299
+- *Generation tokens:* 110
+- *Total tokens:* 1,409
+- *Prompt throughput (raw):* 902 tok/s
+- *Generation throughput (raw):* 37.0 tok/s
+- *Peak memory (GB):* 18
+- *Active memory (GB):* 15
+- *Cache memory (GB):* 0.28
+- *Model-load active memory (GB):* 15.1
+- *Post-cleanup active memory (GB):* 0.0161
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1413
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mistral-Small-3.2-24B-Instruct-2506-4bit/snapshots/bdbeb0d8c89eb01efd49b01139eaa9f5fa3fe19b
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.15, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+St Peter Mancroft Tower at Twilight
+
+Description:
+The medieval tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, are captured in evening light, with pedestrians walking below.
+
+Keywords:
+St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Perpendicular Gothic, Bell Tower, Stone Masonry, Lead Flèche, Evening Light, Pedestrians, Historic Landmark, Clear Sky, Trees, Archway, United Kingdom, Historic Architecture, Twilight, Stone Facade
+</pre>
+
+</details>
+
+---
+
+<a id="model-sahilchachra-lensvlm-9b-mxfp4"></a>
+
+### sahilchachra/LensVLM-9B-MXFP4
+
+<details>
+<summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.14s
+- *Generation time:* 2.37s
+- *Total time:* 4.17s
+- *Prompt preparation time:* 0.643
+- *First-token latency:* 0.876
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 1,843
+- *Generation tokens:* 93
+- *Total tokens:* 1,936
+- *Prompt throughput (raw):* 2,105 tok/s
+- *Generation throughput (raw):* 105 tok/s
+- *Peak memory (GB):* 7.4
+- *Active memory (GB):* 5.7
+- *Cache memory (GB):* 0.20
+- *Model-load active memory (GB):* 5.69
+- *Post-cleanup active memory (GB):* 0.0168
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1504
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--sahilchachra--LensVLM-9B-MXFP4/snapshots/23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+St Peter Mancroft Church Tower at Dusk
+
+Description:
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+
+Keywords:
+Church Tower, Gothic Architecture, Norwich, Pedestrians, Twilight, Stone Masonry, Perpendicular Gothic, Historic Landmark, England, Spire
 </pre>
 
 </details>
@@ -2265,26 +2449,26 @@ Keywords: Alfred Hardiman, Lion Sculpture, City Hall, Norwich, Guildhall, Norwic
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 2.28s
-- *Generation time:* 1.43s
-- *Total time:* 5.00s
-- *Prompt preparation time:* 1.27
-- *First-token latency:* 0.115
-- *Cleanup time:* 0.092
-- *Prompt tokens:* 345
-- *Generation tokens:* 42
-- *Total tokens:* 387
-- *Prompt throughput (raw):* 2,993 tok/s
-- *Generation throughput (raw):* 305 tok/s
-- *Peak memory (GB):* 2.1
+- *Model load time:* 0.61s
+- *Generation time:* 1.22s
+- *Total time:* 2.87s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 0.104
+- *Cleanup time:* 0.0798
+- *Prompt tokens:* 353
+- *Generation tokens:* 44
+- *Total tokens:* 397
+- *Prompt throughput (raw):* 3,379 tok/s
+- *Generation throughput (raw):* 367 tok/s
+- *Peak memory (GB):* 2.2
 - *Active memory (GB):* 1.2
-- *Cache memory (GB):* 0.02
+- *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
 - *Post-cleanup active memory (GB):* 0.00166
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1480
+- *Rendered prompt characters:* 1508
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2298,292 +2482,67 @@ Keywords: Alfred Hardiman, Lion Sculpture, City Hall, Norwich, Guildhall, Norwic
 *Readable output:*
 
 <pre class="model-output-readable">
-A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-internvl35-1b-4bit"></a>
+<a id="model-mlx-community-molmopoint-8b-4bit"></a>
 
-### mlx-community/InternVL3_5-1B-4bit
+### mlx-community/MolmoPoint-8B-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
+<summary>Complete evidence: mlx-community/MolmoPoint-8B-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: norwich guildhall,
-  lion, norwich, southeast europe, southeast
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 1.13s
-- *Generation time:* 1.75s
-- *Total time:* 3.67s
-- *Prompt preparation time:* 0.779
-- *First-token latency:* 0.237
-- *Cleanup time:* 0.124
-- *Prompt tokens:* 2,127
-- *Generation tokens:* 200
-- *Total tokens:* 2,327
-- *Prompt throughput (raw):* 8,963 tok/s
-- *Generation throughput (raw):* 225 tok/s
-- *Peak memory (GB):* 2.1
-- *Active memory (GB):* 1.1
-- *Cache memory (GB):* 0.61
-- *Model-load active memory (GB):* 1.08
-- *Post-cleanup active memory (GB):* 0.0029
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1428
-- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Bronze Lion Sculpture at Norwich Guildhall, Norwich, England"
-
-Description: The image features a bronze lion sculpture by Alfred Hardiman, positioned outside Norwich City Hall, with the historic 15th-century flint Norwich Guildhall visible in the background. The scene captures a sunny day with a blue sky, showcasing a street scene with pedestrians and a car, highlighting British heritage and Gothic architecture.
-
-Keywords: Alfred Hardiman, Norwich Guildhall, Gothic Architecture, British heritage, Lion, Norwich, Norwich City Hall, Southeast Europe, East Anglia, Car, Pedestrian, Statue, Historic Landmark, Blue sky, Southeast, Southeast Europe, Norwich, England, Gothic, British, City Hall, Southeast, Norwich, Norwich, Norwich Guildhall, Lion, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich,
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
-
-### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
+- *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords; Response appears cut off at the token limit; Internal reasoning
-  block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.38s
-- *Generation time:* 19.25s
-- *Total time:* 22.18s
-- *Prompt preparation time:* 0.532
-- *First-token latency:* 0.673
-- *Cleanup time:* 0.162
-- *Prompt tokens:* 1,334
-- *Generation tokens:* 1,000
-- *Total tokens:* 2,334
-- *Prompt throughput (raw):* 1,981 tok/s
-- *Generation throughput (raw):* 55.7 tok/s
-- *Peak memory (GB):* 20
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00356
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1572
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_p": 1.0}
-- *EOS token:* [EOS]
-
-*Readable output:*
-
-<pre class="model-output-readable">
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key elements from the context are the capture date/time (2026-10-10 16:41:54 UTC+01:00) and GPS coordinates (52.628900°N, 1.292500°E). The descriptive hints mention a bronze lion sculpture by Alfred Hardiman outside City Hall in Norwich, with the 15th-century flint Norwich Guildhall in the background. The keywords include Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene.
-
-Now, looking at the image: the main subject is a bronze lion statue in the foreground, positioned on a pedestal. The background features a historic stone building (likely the Guildhall) with Gothic architecture, a blue sky, and some cars, pedestrians, and a street lamp. The lighting suggests it might be late afternoon or early evening.
-
-For the title, something concise that captures the main elements: "Bronze Lion Statue at Norwich Guildhall, Historic Landmark in City Hall, East Anglia." That's 10 words.
-
-The description should combine the context and visible details. Mention the lion sculpture by Alfred Hardiman, the Guildhall, the setting (Norwich, Norfolk), the time of day (implied by lighting), and key elements like the blue sky and Gothic architecture. So, "A bronze lion sculpture by Alfred Hardiman stands prominently on a pedestal overlooking the historic 15th-century flint Norwich Guildhall in Norwich, Norfolk, under a clear blue sky, with Gothic architecture and a bustling street scene in the background."
-
-For keywords, list unique ones from the hints and visible details: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, European Heritage, Pedestrian Area, Street Scene, Blue Sky. Let me check that they’re all present in the image or hints. Yes, most are covered. Also, include the GPS coordinates and date as authoritative facts. Wait, the user said to treat capture date/time and GPS as authoritative facts but not as visible. So include them as metadata but not in the description. So keywords should be visible details. Let me adjust. Maybe add "2026-10-10" but the user said not to include as visible. So focus on the image elements. Maybe "Blue Sky" is already covered. Let me check the hints again. The hints include "Blue sky" and "Street Scene". So the keywords should be unique and visible. Let me list them again:
-
-Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Pedestrian Area, Street Scene, Blue Sky. That's 10 keywords. Wait, the user asked for 10-18. Maybe include "Sculpture" as "Bronze Lion Statue" is already there. Maybe add "Norwich" and "Norfolk" as they are part of the context. Wait, the hints include "Norwich Guildhall" and "Norfolk". So perhaps include "Norwich" and "Norfolk" as separate keywords. Let me check the image: the background has "Norwich" in "Norwich Guildhall". So maybe add "Norwich" as a keyword. Similarly, "Guildhall" is already there. So revised keywords: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Pedestrian Area, Street Scene, Blue Sky, Norwich. That's 11. Maybe add "Historic Building" but that's not in the hints. Wait, the hints mention "Historic Landmark". So keep it as "Historic Landmark". Maybe add "Sculpture" but "Bronze Lion Statue" covers that. Let's stick to the 10-18 keywords. Let me check again. The image has a lion statue, the Guildhall, Gothic architecture, blue sky, street scene, pedestrians, cars, lamp post. So maybe include "Car" as a keyword. But "Street Scene" covers that. Maybe "Cars" is redundant. The hints have "Car" but not visible. Wait, the image shows a car in the background. Since the user said to retain visible details and prefer image evidence over conflicting hints, if the car is visible, include it. So add "Car". Then keywords: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Ped
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key elements from the context are the capture date/time (2026-10-10 16:41:54 UTC+01:00) and GPS coordinates (52.628900°N, 1.292500°E). The descriptive hints mention a bronze lion sculpture by Alfred Hardiman outside City Hall in Norwich, with the 15th-century flint Norwich Guildhall in the background. The keywords include Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene.
-
-Now, looking at the image: the main subject is a bronze lion statue in the foreground, positioned on a pedestal. The background features a historic stone building (likely the Guildhall) with Gothic architecture, a blue sky, and some cars, pedestrians, and a street lamp. The lighting suggests it might be late afternoon or early evening. 
-
-For the title, something concise that captures the main elements: "Bronze Lion Statue at Norwich Guildhall, Historic Landmark in City Hall, East Anglia." That's 10 words. 
-
-The description should combine the context and visible details. Mention the lion sculpture by Alfred Hardiman, the Guildhall, the setting (Norwich, Norfolk), the time of day (implied by lighting), and key elements like the blue sky and Gothic architecture. So, "A bronze lion sculpture by Alfred Hardiman stands prominently on a pedestal overlooking the historic 15th-century flint Norwich Guildhall in Norwich, Norfolk, under a clear blue sky, with Gothic architecture and a bustling street scene in the background."
-
-For keywords, list unique ones from the hints and visible details: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, European Heritage, Pedestrian Area, Street Scene, Blue Sky. Let me check that they’re all present in the image or hints. Yes, most are covered. Also, include the GPS coordinates and date as authoritative facts. Wait, the user said to treat capture date/time and GPS as authoritative facts but not as visible. So include them as metadata but not in the description. So keywords should be visible details. Let me adjust. Maybe add "2026-10-10" but the user said not to include as visible. So focus on the image elements. Maybe "Blue Sky" is already covered. Let me check the hints again. The hints include "Blue sky" and "Street Scene". So the keywords should be unique and visible. Let me list them again:
-
-Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Pedestrian Area, Street Scene, Blue Sky. That's 10 keywords. Wait, the user asked for 10-18. Maybe include "Sculpture" as "Bronze Lion Statue" is already there. Maybe add "Norwich" and "Norfolk" as they are part of the context. Wait, the hints include "Norwich Guildhall" and "Norfolk". So perhaps include "Norwich" and "Norfolk" as separate keywords. Let me check the image: the background has "Norwich" in "Norwich Guildhall". So maybe add "Norwich" as a keyword. Similarly, "Guildhall" is already there. So revised keywords: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Pedestrian Area, Street Scene, Blue Sky, Norwich. That's 11. Maybe add "Historic Building" but that's not in the hints. Wait, the hints mention "Historic Landmark". So keep it as "Historic Landmark". Maybe add "Sculpture" but "Bronze Lion Statue" covers that. Let's stick to the 10-18 keywords. Let me check again. The image has a lion statue, the Guildhall, Gothic architecture, blue sky, street scene, pedestrians, cars, lamp post. So maybe include "Car" as a keyword. But "Street Scene" covers that. Maybe "Cars" is redundant. The hints have "Car" but not visible. Wait, the image shows a car in the background. Since the user said to retain visible details and prefer image evidence over conflicting hints, if the car is visible, include it. So add "Car". Then keywords: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Ped
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: statue of a lion, lion
-  statue
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 2.09s
-- *Generation time:* 15.02s
-- *Total time:* 17.72s
-- *Prompt preparation time:* 0.594
-- *First-token latency:* 1.66
-- *Cleanup time:* 0.193
-- *Prompt tokens:* 311
-- *Generation tokens:* 200
-- *Total tokens:* 511
-- *Prompt throughput (raw):* 188 tok/s
-- *Generation throughput (raw):* 15.6 tok/s
-- *Peak memory (GB):* 15
-- *Active memory (GB):* 11
-- *Cache memory (GB):* 0.73
-- *Model-load active memory (GB):* 11.4
-- *Post-cleanup active memory (GB):* 0.00434
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1489
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Bronze Lion Statue in Front of Norwich Guildhall
-
-Description: A bronze lion statue stands proudly in front of the historic Norwich Guildhall, set against the backdrop of a sunny day in the city of Norwich, Norfolk, England. The statue's intricate details and the building's Gothic architecture are prominent features of the scene.
-
-Keywords: Bronze lion statue, Norwich Guildhall, historic building, Gothic architecture, sunny day, city of Norwich, Norfolk, England, outdoor setting, statue, building, architecture, cityscape, outdoor scene, daytime scene, blue sky, green trees, street scene, people walking, cars parked, street lamps, statue of a lion, lion statue, bronze statue, statue of a lion, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.42s
-- *Generation time:* 1.48s
-- *Total time:* 3.64s
-- *Prompt preparation time:* 0.717
-- *First-token latency:* 0.249
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 943
-- *Generation tokens:* 124
-- *Total tokens:* 1,067
-- *Prompt throughput (raw):* 3,782 tok/s
-- *Generation throughput (raw):* 208 tok/s
-- *Peak memory (GB):* 3.1
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00485
+  keywords; Names a place the prompt did not supply: Sunset
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
+- *Model load time:* 1.40s
+- *Generation time:* 7.42s
+- *Total time:* 9.63s
+- *Prompt preparation time:* 0.794
+- *First-token latency:* 2.13
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 3,164
+- *Generation tokens:* 144
+- *Total tokens:* 3,308
+- *Prompt throughput (raw):* 1,488 tok/s
+- *Generation throughput (raw):* 31.8 tok/s
+- *Peak memory (GB):* 13
+- *Active memory (GB):* 8.6
+- *Cache memory (GB):* 3.9
+- *Model-load active memory (GB):* 7.23
+- *Post-cleanup active memory (GB):* 0.00662
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1453
+- *Rendered prompt characters:* 1451
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved model revision:* 9bab196f867ceedecdb1eab071395bfedcd62538
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MolmoPoint-8B-4bit/snapshots/9bab196f867ceedecdb1eab071395bfedcd62538
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;
-Here's the response following the instructions:
+St Peter Mancroft Tower, Norwich: Gothic Stone Facade at Sunset
 
-Title:
-Bronze Lion Statue at City Hall, Norwich, England
+A low-angle view captures the medieval stone tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England. The structure's intricate Gothic architecture is illuminated by the warm glow of sunset, creating a striking contrast against the clear blue sky. Pedestrians walk along the street below, adding life to the historic landmark.
 
-Description:
-A grand bronze lion sculpture stands prominently outside City Hall, set against a historic backdrop with medieval architecture. The scene is illuminated by bright daylight, highlighting the sculpture's details and the surrounding area.
-
-Keywords: British-English, bronze lion, City Hall, Norwich, England, historic, Gothic Architecture, Guildhall, Lion, Norfolk, Norwich Guildhall, statue, sightseeing, street scene, blue sky, heritage, architecture, market place, pedestrian, sculpture, Europe
+Gothic architecture, historic landmark, Norwich, England, medieval tower, Victorian lead flèche, Gothic stone facade, clear sky, sunset, pedestrians, St Peter Mancroft, stone masonry, spire, archway, trees, twilight, United Kingdom
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-Here's the response following the instructions:
-
-Title:
-Bronze Lion Statue at City Hall, Norwich, England
-
-Description:
-A grand bronze lion sculpture stands prominently outside City Hall, set against a historic backdrop with medieval architecture. The scene is illuminated by bright daylight, highlighting the sculpture's details and the surrounding area.
-
-Keywords: British-English, bronze lion, City Hall, Norwich, England, historic, Gothic Architecture, Guildhall, Lion, Norfolk, Norwich Guildhall, statue, sightseeing, street scene, blue sky, heritage, architecture, market place, pedestrian, sculpture, Europe
-```
-
-</details>
 
 </details>
 
@@ -2603,21 +2562,20 @@ Keywords: British-English, bronze lion, City Hall, Norwich, England, historic, G
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible;
-  Duplicate keywords: correct conflicts, and add important visible details
-  prefer image evidence when a hint conflicts, and omit uncertain details
+  at the token limit; Conversation-role control tokens remain visible; Names a
+  place the prompt did not supply: Dusk
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.26s
-- *Generation time:* 53.31s
-- *Total time:* 57.24s
-- *Prompt preparation time:* 0.641
-- *First-token latency:* 8.58
-- *Cleanup time:* 0.171
-- *Prompt tokens:* 4,413
+- *Model load time:* 2.88s
+- *Generation time:* 47.45s
+- *Total time:* 51.01s
+- *Prompt preparation time:* 0.66
+- *First-token latency:* 6.88
+- *Cleanup time:* 0.137
+- *Prompt tokens:* 4,418
 - *Generation tokens:* 1,000
-- *Total tokens:* 5,413
-- *Prompt throughput (raw):* 515 tok/s
-- *Generation throughput (raw):* 22.7 tok/s
+- *Total tokens:* 5,418
+- *Prompt throughput (raw):* 642 tok/s
+- *Generation throughput (raw):* 25.0 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
@@ -2626,7 +2584,7 @@ Keywords: British-English, bronze lion, City Hall, Norwich, England, historic, G
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1623
+- *Rendered prompt characters:* 1651
 - *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2641,15 +2599,15 @@ Keywords: British-English, bronze lion, City Hall, Norwich, England, historic, G
 <pre class="model-output-readable">
  to=self&lt;|message|&gt;Create British-English catalogue metadata from the image and supplied context.
 
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-10 16:41:54 UTC+01:00
-- GPS: 52.628900°N, 1.292500°E
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-- Keyword hints: Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -2661,33 +2619,41 @@ Title:
 Description:
 Keywords:
 
-We need title 5-10 words. Concrete.
+We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
 
-Bronze lion statue on plinth with Norwich Guildhall behind. The statue is maybe the Norwich lion? Actually the lion sculpture by Alfred Hardiman stands outside City Hall overlooking Market Place? The hint says bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking Market Place, with historic 15th-century flint Norwich Guildhall visible in background in Norwich, Norfolk, England.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
 
-Image shows a bronze lion with green patina, rearing, mouth open, on a stone plinth. Background is stone building with Gothic windows, crenellated roof, arched doorways. There's a street lamp, blue railing, car, pedestrians.
+Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
 
-GPS 52.6289 N 1.2925 E is Norwich. So fine.
+Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
 
-We must not claim capture date/time visible. So don't mention date in description. Can use context but not claim visible.
+Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
 
-We should retain details supported by image. The lion sculpture: bronze, green patina, rearing with one paw raised. Background building is Norwich Guildhall? The building looks like Guildhall. Might be City Hall? The hint says outside City Hall overlooking Market Place, with Guildhall visible. Could be correct. The image shows the building with crenellations and Gothic windows. Could be Norwich Guildhall. Might be consistent.
+Output exactly three sections with headings.
 
-We should not claim author Alfred Hardiman? Hint says sculpture by Alfred Hardiman. Is that correct? Might be uncertain. The hint says description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall... We can retain? The instruction: Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Title:
+Description:
+Keywords:
 
-We cannot verify author from image. Might be uncertain. Probably safer to omit artist name? The hint is authoritative context? It says descriptive hints. Could be wrong. Might be risky. Possibly the lion is the "Norwich Lion" or "City Hall lions". Actually Norwich City Hall has two lions by Alfred Hardiman? Might be correct. Hmm.
+No extra text.
 
-The instruction says retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
 
-Artist name is not visible. So maybe omit. But it's context maybe accepted. The description hint includes it. Might be okay to include? Might be uncertain. Safer to say bronze lion sculpture. Not name artist.
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Also "stands outside City Hall overlooking the Market Place" - image shows building behind. Could be Guildhall. Let's just say in Norwich city centre with historic Guildhall in background.
+Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
 
-Make title 5-10 words. e.g. "Bronze Lion Statue with Norwich Guildhall Background". That's 6 words? Bronze(1) Lion(2) Statue(3) with(4) Norwich(5) Guildhall(6) Background(7). Good.
+Probably keep simple.
 
-Description: 1-2 sentences factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Keywords list comma-separated. Ensure unique.
 
-We can say: A weathered bronze lion statue with a green patina stands on a stone plinth in the foreground, one forepaw raised, mouth open, against a bright blue sky. Behind it the historic flint Norwich Guildhall with Gothic windows and crenellated parapet is visible, with street scene elements including a lamp post, vehicles and pedestrians
+Let's produce:
+
+Title: St Peter Mancroft Tower at Dusk Norwich
+
+Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
+
+Keywords: St Peter Manc
 </pre>
 
 <details>
@@ -2696,15 +2662,15 @@ We can say: A weathered bronze lion statue with a green patina stands on a stone
 ```text
  to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
 
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-10 16:41:54 UTC+01:00
-- GPS: 52.628900°N, 1.292500°E
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-- Keyword hints: Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -2716,36 +2682,104 @@ Title:
 Description:
 Keywords:
 
-We need title 5-10 words. Concrete.
+We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
 
-Bronze lion statue on plinth with Norwich Guildhall behind. The statue is maybe the Norwich lion? Actually the lion sculpture by Alfred Hardiman stands outside City Hall overlooking Market Place? The hint says bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking Market Place, with historic 15th-century flint Norwich Guildhall visible in background in Norwich, Norfolk, England.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
 
-Image shows a bronze lion with green patina, rearing, mouth open, on a stone plinth. Background is stone building with Gothic windows, crenellated roof, arched doorways. There's a street lamp, blue railing, car, pedestrians.
+Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
 
-GPS 52.6289 N 1.2925 E is Norwich. So fine.
+Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
 
-We must not claim capture date/time visible. So don't mention date in description. Can use context but not claim visible.
+Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
 
-We should retain details supported by image. The lion sculpture: bronze, green patina, rearing with one paw raised. Background building is Norwich Guildhall? The building looks like Guildhall. Might be City Hall? The hint says outside City Hall overlooking Market Place, with Guildhall visible. Could be correct. The image shows the building with crenellations and Gothic windows. Could be Norwich Guildhall. Might be consistent.
+Output exactly three sections with headings.
 
-We should not claim author Alfred Hardiman? Hint says sculpture by Alfred Hardiman. Is that correct? Might be uncertain. The hint says description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall... We can retain? The instruction: Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Title:
+Description:
+Keywords:
 
-We cannot verify author from image. Might be uncertain. Probably safer to omit artist name? The hint is authoritative context? It says descriptive hints. Could be wrong. Might be risky. Possibly the lion is the "Norwich Lion" or "City Hall lions". Actually Norwich City Hall has two lions by Alfred Hardiman? Might be correct. Hmm.
+No extra text.
 
-The instruction says retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
 
-Artist name is not visible. So maybe omit. But it's context maybe accepted. The description hint includes it. Might be okay to include? Might be uncertain. Safer to say bronze lion sculpture. Not name artist.
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
 
-Also "stands outside City Hall overlooking the Market Place" - image shows building behind. Could be Guildhall. Let's just say in Norwich city centre with historic Guildhall in background.
+Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
 
-Make title 5-10 words. e.g. "Bronze Lion Statue with Norwich Guildhall Background". That's 6 words? Bronze(1) Lion(2) Statue(3) with(4) Norwich(5) Guildhall(6) Background(7). Good.
+Probably keep simple.
 
-Description: 1-2 sentences factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Keywords list comma-separated. Ensure unique.
 
-We can say: A weathered bronze lion statue with a green patina stands on a stone plinth in the foreground, one forepaw raised, mouth open, against a bright blue sky. Behind it the historic flint Norwich Guildhall with Gothic windows and crenellated parapet is visible, with street scene elements including a lamp post, vehicles and pedestrians
+Let's produce:
+
+Title: St Peter Mancroft Tower at Dusk Norwich
+
+Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
+
+Keywords: St Peter Manc
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: historic architecture,
+  stone architecture
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.88s
+- *Generation time:* 4.19s
+- *Total time:* 5.59s
+- *Prompt preparation time:* 0.513
+- *First-token latency:* 0.309
+- *Cleanup time:* 0.0928
+- *Prompt tokens:* 1,151
+- *Generation tokens:* 200
+- *Total tokens:* 1,351
+- *Prompt throughput (raw):* 3,722 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 8.3
+- *Cache memory (GB):* 1.1
+- *Model-load active memory (GB):* 8.3
+- *Post-cleanup active memory (GB):* 0.00762
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1434
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Gothic Church Tower of St Peter Mancroft in Norwich
+
+Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with its Victorian lead flèche illuminated in the evening light, as pedestrians walk along the street below.
+
+Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, historic landmark, stone masonry, stone facade, clear sky, twilight, United Kingdom, walking, pedestrians, perpendicular gothic, spire, historic architecture, historic architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone
+</pre>
 
 </details>
 
@@ -2763,30 +2797,30 @@ We can say: A weathered bronze lion statue with a green patina stands on a stone
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: medieval town, medieval
-  town square
+- *Observations:* Response repeats the same text; Unrecognised model control
+  tokens remain visible; Required labelled fields not detected: keywords;
+  Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.92s
-- *Generation time:* 48.47s
-- *Total time:* 50.47s
-- *Prompt preparation time:* 1.07
-- *First-token latency:* 45.7
-- *Cleanup time:* 0.167
-- *Prompt tokens:* 16,569
-- *Generation tokens:* 200
-- *Total tokens:* 16,769
-- *Prompt throughput (raw):* 362 tok/s
-- *Generation throughput (raw):* 113 tok/s
+- *Model load time:* 0.84s
+- *Generation time:* 48.61s
+- *Total time:* 50.35s
+- *Prompt preparation time:* 0.886
+- *First-token latency:* 39.8
+- *Cleanup time:* 0.0955
+- *Prompt tokens:* 16,577
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,577
+- *Prompt throughput (raw):* 417 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 9.4
 - *Active memory (GB):* 4.4
-- *Cache memory (GB):* 1.3
+- *Cache memory (GB):* 0.81
 - *Model-load active memory (GB):* 4.43
 - *Post-cleanup active memory (GB):* 0.00793
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1515
+- *Rendered prompt characters:* 1543
 - *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2799,13 +2833,555 @@ We can say: A weathered bronze lion statue with a green patina stands on a stone
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bronze Lion Statue in Norwich, England
+Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 
-Description:
-The bronze lion statue stands on the bridge in Norwich, Norfolk, England. It is a 15th-century flint Norwich Guildhall, with the historic building visible in the background. The statue is a symbol of the city and is a popular tourist attraction.
+Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
 
-Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Landmark, Lion, Statue, Sightseeing, Street Scene, Bridge, City Hall, Flint, Medieval, Medieval Architecture, Medieval City, Medieval Guildhall, Medieval Statue, Medieval Town, Medieval Town Hall, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+&lt;|im_start|&gt;assistant
+
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+
+Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
+
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+
+```
+
+</details>
 
 </details>
 
@@ -2826,17 +3402,17 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Observations:* Required labelled fields not detected: title, description,
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.05s
-- *Generation time:* 1.04s
-- *Total time:* 2.92s
-- *Prompt preparation time:* 0.829
-- *First-token latency:* 0.124
-- *Cleanup time:* 0.081
-- *Prompt tokens:* 1,218
-- *Generation tokens:* 45
-- *Total tokens:* 1,263
-- *Prompt throughput (raw):* 9,794 tok/s
-- *Generation throughput (raw):* 315 tok/s
+- *Model load time:* 0.30s
+- *Generation time:* 0.94s
+- *Total time:* 2.04s
+- *Prompt preparation time:* 0.791
+- *First-token latency:* 0.126
+- *Cleanup time:* 0.0826
+- *Prompt tokens:* 1,225
+- *Generation tokens:* 36
+- *Total tokens:* 1,261
+- *Prompt throughput (raw):* 9,713 tok/s
+- *Generation throughput (raw):* 541 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -2845,7 +3421,7 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1417
+- *Rendered prompt characters:* 1445
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -2859,63 +3435,7 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 *Readable output:*
 
 <pre class="model-output-readable">
- A bronze-colored statue by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Required labelled fields not detected:
-  title, description, keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.64s
-- *Generation time:* 2.63s
-- *Total time:* 4.00s
-- *Prompt preparation time:* 0.727
-- *First-token latency:* 0.374
-- *Cleanup time:* 0.0944
-- *Prompt tokens:* 1,439
-- *Generation tokens:* 200
-- *Total tokens:* 1,639
-- *Prompt throughput (raw):* 3,852 tok/s
-- *Generation throughput (raw):* 125 tok/s
-- *Peak memory (GB):* 5.6
-- *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.72
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0101
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1417
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Lion, City Hall, Norwich Guildhall, Sculpture, Sightseeing, Statue, Street Scene, Sculpture, Sightseeing, Statue, Sculpture, Sightseeing, Sculpture, Sightseeing, Sculpture, Sightseeing, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture,
+ A low-angle view of the medieval church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 </pre>
 
 </details>
@@ -2935,20 +3455,20 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Names a place the prompt did not supply: UK
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.88s
-- *Generation time:* 3.75s
-- *Total time:* 6.25s
-- *Prompt preparation time:* 0.59
-- *First-token latency:* 0.354
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 603
-- *Generation tokens:* 186
-- *Total tokens:* 789
-- *Prompt throughput (raw):* 1,703 tok/s
-- *Generation throughput (raw):* 65.4 tok/s
-- *Peak memory (GB):* 7.0
+- *Model load time:* 1.57s
+- *Generation time:* 3.48s
+- *Total time:* 5.63s
+- *Prompt preparation time:* 0.553
+- *First-token latency:* 0.291
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 609
+- *Generation tokens:* 261
+- *Total tokens:* 870
+- *Prompt throughput (raw):* 2,091 tok/s
+- *Generation throughput (raw):* 98.1 tok/s
+- *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
@@ -2956,7 +3476,7 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1442
+- *Rendered prompt characters:* 1470
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2970,7 +3490,141 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 *Readable output:*
 
 <pre class="model-output-readable">
-A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the Market Place, with the historic 15th-century Guildhall visible in the background in Norwich, England. The photo was taken on October 10, 2026, at 4:41:54 PM GMT, at coordinates 52.628900°N, 1.292500°E. The image is a wide shot, capturing the entire scene with a clear blue sky and some clouds. The lion is positioned in the foreground, facing right, with its mouth open and a detailed mane. The Guildhall is a large, stone building with arched windows and a tower, providing a historical backdrop to the sculpture. The Market Place is visible in the background, with people walking around and cars parked nearby. The overall lighting is natural, suggesting it is daytime.
+&#96;&#96;&#96;json
+{
+  "caption": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK.",
+  "bounding_boxes": [
+    [
+      125,
+      0,
+      987,
+      1000
+    ]
+  ],
+  "keywords": [
+    "Archway",
+    "Bell Tower",
+    "Church Tower",
+    "Clear Sky",
+    "England",
+    "Gothic Architecture",
+    "Historic Landmark",
+    "Historic Building",
+    "Norwich",
+    "Pedestrians",
+    "Purple Bench",
+    "Spire",
+    "St Peter Mancroft",
+    "Stone Masonry",
+    "Stone Facade",
+    "Trees",
+    "Twilight",
+    "United Kingdom",
+    "Walking"
+  ],
+  "description": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK."
+}
+&#96;&#96;&#96;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+````text
+```json
+{
+  "caption": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK.",
+  "bounding_boxes": [
+    [
+      125,
+      0,
+      987,
+      1000
+    ]
+  ],
+  "keywords": [
+    "Archway",
+    "Bell Tower",
+    "Church Tower",
+    "Clear Sky",
+    "England",
+    "Gothic Architecture",
+    "Historic Landmark",
+    "Historic Building",
+    "Norwich",
+    "Pedestrians",
+    "Purple Bench",
+    "Spire",
+    "St Peter Mancroft",
+    "Stone Masonry",
+    "Stone Facade",
+    "Trees",
+    "Twilight",
+    "United Kingdom",
+    "Walking"
+  ],
+  "description": "A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft located in England, with pedestrians walking along the street below in Norwich, UK."
+}
+```
+````
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-granite-vision-32-2b-nvfp4"></a>
+
+### mlx-community/granite-vision-3.2-2b-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/granite-vision-3.2-2b-nvfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Required labelled fields not detected:
+  description; Duplicate keywords: norwich, trees
+- *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
+- *Model load time:* 0.45s
+- *Generation time:* 4.35s
+- *Total time:* 5.58s
+- *Prompt preparation time:* 0.781
+- *First-token latency:* 2.26
+- *Cleanup time:* 0.086
+- *Prompt tokens:* 5,688
+- *Generation tokens:* 200
+- *Total tokens:* 5,888
+- *Prompt throughput (raw):* 2,512 tok/s
+- *Generation throughput (raw):* 150 tok/s
+- *Peak memory (GB):* 4.3
+- *Active memory (GB):* 2.4
+- *Cache memory (GB):* 1.2
+- *Model-load active memory (GB):* 2.36
+- *Post-cleanup active memory (GB):* 0.0142
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1590
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-vision-3.2-2b-nvfp4/snapshots/f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow"
+Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, Stone facade, Trees, United Kingdom, Walking, Evening Light, Norwich, England, Church Tower, Bell Tower, St Peter Mancroft, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees,
 </pre>
 
 </details>
@@ -2992,17 +3646,17 @@ A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.23s
-- *Generation time:* 1.58s
-- *Total time:* 3.44s
-- *Prompt preparation time:* 0.627
-- *First-token latency:* 0.835
-- *Cleanup time:* 0.177
-- *Prompt tokens:* 2,205
-- *Generation tokens:* 15
-- *Total tokens:* 2,220
-- *Prompt throughput (raw):* 2,641 tok/s
-- *Generation throughput (raw):* 105 tok/s
+- *Model load time:* 1.06s
+- *Generation time:* 1.66s
+- *Total time:* 3.41s
+- *Prompt preparation time:* 0.684
+- *First-token latency:* 0.831
+- *Cleanup time:* 0.147
+- *Prompt tokens:* 2,211
+- *Generation tokens:* 19
+- *Total tokens:* 2,230
+- *Prompt throughput (raw):* 2,662 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
@@ -3011,7 +3665,7 @@ A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1644
+- *Rendered prompt characters:* 1672
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -3025,14 +3679,14 @@ A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a bronze statue of a roaring lion.
+&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a large church tower with a spire and a pointed roof.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The image shows a bronze statue of a roaring lion.
+<|channel|> analysis<|message|> The image shows a large church tower with a spire and a pointed roof.
 ```
 
 </details>
@@ -3056,26 +3710,26 @@ A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.47s
-- *Generation time:* 1.44s
-- *Total time:* 2.51s
-- *Prompt preparation time:* 0.588
-- *First-token latency:* 0.0889
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 341
-- *Generation tokens:* 162
-- *Total tokens:* 503
-- *Prompt throughput (raw):* 3,834 tok/s
-- *Generation throughput (raw):* 200 tok/s
+- *Model load time:* 0.46s
+- *Generation time:* 1.01s
+- *Total time:* 2.08s
+- *Prompt preparation time:* 0.603
+- *First-token latency:* 0.086
+- *Cleanup time:* 0.091
+- *Prompt tokens:* 349
+- *Generation tokens:* 131
+- *Total tokens:* 480
+- *Prompt throughput (raw):* 4,059 tok/s
+- *Generation throughput (raw):* 372 tok/s
 - *Peak memory (GB):* 1.8
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.28
+- *Cache memory (GB):* 0.30
 - *Model-load active memory (GB):* 0.613
 - *Post-cleanup active memory (GB):* 0.0152
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1471
+- *Rendered prompt characters:* 1499
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -3089,8 +3743,8 @@ A bronze lion sculpture by Alfred Hirst stands outside City Hall overlooking the
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-Description: A statue of a lion by Alfred Hardiman, located outside City Hall in Norwich, Norfolk, England. The statue is situated in front of the historic flint Norwich Guildhall. The image captures the statue in a sunny day, with the sky as the backdrop. The statue is the main subject, and it is set against the historical architecture of the flint Norwich Guildhall. The lighting is bright, and the statue is in focus, with the surrounding environment in the background. The image is a representation of the historical significance of the statue and the location of the city hall.
+Title: A Gothic Architecture Snapshot of the Church of St Peter Mancroft Illuminated in Twilight
+Description: A detailed view of the medieval church of St Peter Mancroft, illuminated by the twilight, with a low-angle view of the church and its bell tower. The image captures the historic architecture, the stone facade, and the spire of the church, set against the backdrop of a clear sky. The photograph is taken during the evening hours, with pedestrians walking along the street below. The image is a faithful representation of the historical landmark, providing a comprehensive view of the church's design and the time of day it is illuminated.
 </pre>
 
 </details>
@@ -3113,26 +3767,26 @@ Description: A statue of a lion by Alfred Hardiman, located outside City Hall in
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type moondream1 via
   moondream2)
-- *Model load time:* 5.18s
-- *Generation time:* 1.15s
-- *Total time:* 7.03s
-- *Prompt preparation time:* 0.684
-- *First-token latency:* 0.25
-- *Cleanup time:* 0.0994
-- *Prompt tokens:* 1,034
-- *Generation tokens:* 36
-- *Total tokens:* 1,070
-- *Prompt throughput (raw):* 4,131 tok/s
-- *Generation throughput (raw):* 165 tok/s
+- *Model load time:* 1.17s
+- *Generation time:* 1.14s
+- *Total time:* 3.02s
+- *Prompt preparation time:* 0.698
+- *First-token latency:* 0.239
+- *Cleanup time:* 0.0897
+- *Prompt tokens:* 1,038
+- *Generation tokens:* 37
+- *Total tokens:* 1,075
+- *Prompt throughput (raw):* 4,347 tok/s
+- *Generation throughput (raw):* 171 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.8
 - *Cache memory (GB):* 0.27
 - *Model-load active memory (GB):* 3.75
-- *Post-cleanup active memory (GB):* 0.017
+- *Post-cleanup active memory (GB):* 0.0169
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1364
+- *Rendered prompt characters:* 1392
 - *Processor:* mlx_vlm.models.moondream2.processing_moondream2.Moondream2Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -3145,7 +3799,7 @@ Description: A statue of a lion by Alfred Hardiman, located outside City Hall in
 *Readable output:*
 
 <pre class="model-output-readable">
-A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
+A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 </pre>
 
 </details>

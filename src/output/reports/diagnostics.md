@@ -14,7 +14,7 @@ establish fitness for other tasks.
   the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 33.5 MB
+- *Input image:* JPEG, 6,213 x 9,320 pixels (57.9 MP), 52.1 MB
 
 Outcome counts
 
@@ -30,43 +30,40 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 39    |
-| observation needs reproduction | 8     |
+| none                           | 42    |
+| observation needs reproduction | 5     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| major concerns       | 13    |
-| no concerns detected | 29    |
-| concerns detected    | 5     |
+| major concerns       | 11    |
+| no concerns detected | 26    |
+| concerns detected    | 10    |
 
 Observation counts
 
 | Observation                                                  | Count |
 |--------------------------------------------------------------|-------|
-| Response repeats the same text                               | 4     |
-| Generation was stopped early after sustained repeated output | 4     |
-| Unrecognised model control tokens remain visible             | 2     |
-| Required labelled fields not detected                        | 9     |
+| Response repeats the same text                               | 3     |
+| Generation was stopped early after sustained repeated output | 2     |
+| Unrecognised model control tokens remain visible             | 3     |
+| Required labelled fields not detected                        | 10    |
 | Response appears cut off at the token limit                  | 2     |
-| Internal reasoning block appears incomplete                  | 2     |
 | Conversation-role control tokens remain visible              | 1     |
-| Repeated keyword entries                                     | 7     |
-| Output repeats the prompt's own hint text                    | 5     |
+| Repeated keyword entries                                     | 4     |
+| Output repeats the prompt's own hint text                    | 12    |
+| Names a place the prompt did not supply                      | 3     |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                          |
-|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/InternVL3_5-1B-4bit](#diagnostic-mlx-community-internvl35-1b-4bit)                               | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [mlx-community/Qwen2-VL-2B-mlx](#diagnostic-mlx-community-qwen2-vl-2b-mlx)                                      | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                                           |
-| [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)                 | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; labelled fields not detected                                                 |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                                  |
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)              | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit)        | completed | major concerns    | observation needs reproduction | labelled fields not detected; cut off at token limit; incomplete thinking block                                       |
-| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                                 | completed | major concerns    | observation needs reproduction | incomplete thinking block                                                                                             |
+| Model                                                                                               | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                             |
+|-----------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/granite-vision-3.2-2b-nvfp4](#diagnostic-mlx-community-granite-vision-32-2b-nvfp4)   | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
+| [mlx-community/Phi-3.5-vision-instruct-bf16](#diagnostic-mlx-community-phi-35-vision-instruct-bf16) | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [mlx-community/Qwen2-VL-2B-mlx](#diagnostic-mlx-community-qwen2-vl-2b-mlx)                          | completed | major concerns    | observation needs reproduction | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                                                     |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)  | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
 
 ## Crashes requiring action
 
@@ -74,12 +71,12 @@ None.
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-internvl35-1b-4bit"></a>
+<a id="diagnostic-mlx-community-granite-vision-32-2b-nvfp4"></a>
 
 <details>
-<summary>mlx-community/InternVL3_5-1B-4bit — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/granite-vision-3.2-2b-nvfp4 — major concerns — repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords</summary>
 
-### mlx-community/InternVL3_5-1B-4bit
+### mlx-community/granite-vision-3.2-2b-nvfp4
 
 #### Execution and provenance
 
@@ -88,66 +85,66 @@ None.
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "norwich"
-- *Title word count:* 8
-- *Keyword count:* 47
-- *Keywords taken verbatim from the prompt's keyword hints:* 12
-- *Percent of words in four-word runs copied from the description hint:* 36
-- *Text compared with the description hint:* description
-- *Duplicate keywords:* ["norwich guildhall", "lion", "norwich", "southeast
-  europe", "southeast"]
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Processor class:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Observations:* repeated_output, repetition_abort,
+  missing_requested_sections, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
+- *Family README in installed mlx-vlm:* mlx_vlm/models/granite_vision/README.md
+  (read before filing)
+- *Labelled fields not detected:* ["description"]
+- *Repeated fragment:* keyword: "trees"
+- *Title word count:* 12
+- *Keyword count:* 48
+- *Keywords taken verbatim from the prompt's keyword hints:* 14
+- *Duplicate keywords:* ["norwich", "trees"]
+- *Resolved model revision:* f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Processor class:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
+- *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.863
-- *Peak memory at first token (GB):* 2.145
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 3.012
+- *Peak memory at first token (GB):* 4.322
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json text_config": 151645,
-  "generation_config.json": 151645}
-- *Chat template found in (the first is the one the processor uses):* chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.003
+- *EOS ids declared, by file:* {"config.json text_config": 0,
+  "generation_config.json": 0}
+- *Chat template found in (the first is the one the processor uses):* chat_template.json,
+  chat_template.jinja, tokenizer_config.json
+- *Post-cleanup active memory (GB):* 0.014
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2127
-- *Prompt composition:* 2,127 = 335 text/template + 1,792 image tokens (84%;
+- *Prompt tokens:* 5688
+- *Prompt composition:* 5,688 = 449 text/template + 5,239 image tokens (92%;
   exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 1.08
-- *Parameter count:* 1.00B (name-estimate)
-- *Quantization:* 4-bit, group 32, affine
-- *Declared context length:* 40,960 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (1.08 GB vs 1.08 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 1.08 GB; other
-  load-time allocations 0.00 GB
+- *Checkpoint weights (GB):* 2.35
+- *Parameter count:* 2.00B (name-estimate)
+- *Quantization:* 4-bit, group 16, nvfp4
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.01x (2.36 GB vs 2.35 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 2.35 GB; other
+  load-time allocations 0.01 GB
 - *Generation tokens:* 200
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
+- *Configured EOS token ID:* 0
+- *Configured EOS token:* &lt;|end_of_text|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
+  2 sample(s); GPU activity outside harness inference: max 79% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: "Bronze Lion Sculpture at Norwich Guildhall, Norwich, England"
-
-Description: The image features a bronze lion sculpture by Alfred Hardiman, positioned outside Norwich City Hall, with the historic 15th-century flint Norwich Guildhall visible in the background. The scene captures a sunny day with a blue sky, showcasing a street scene with pedestrians and a car, highlighting British heritage and Gothic architecture.
-
-Keywords: Alfred Hardiman, Norwich Guildhall, Gothic Architecture, British heritage, Lion, Norwich, Norwich City Hall, Southeast Europe, East Anglia, Car, Pedestrian, Statue, Historic Landmark, Blue sky, Southeast, Southeast Europe, Norwich, England, Gothic, British, City Hall, Southeast, Norwich, Norwich, Norwich Guildhall, Lion, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich, Norwich,
+Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow"
+Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, Stone facade, Trees, United Kingdom, Walking, Evening Light, Norwich, England, Church Tower, Bell Tower, St Peter Mancroft, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees,
 ```
 
 </details>
 
-<a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="diagnostic-mlx-community-phi-35-vision-instruct-bf16"></a>
 
 <details>
-<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/Phi-3.5-vision-instruct-bf16 — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
 
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+### mlx-community/Phi-3.5-vision-instruct-bf16
 
 #### Execution and provenance
 
@@ -157,55 +154,53 @@ Keywords: Alfred Hardiman, Norwich Guildhall, Gothic Architecture, British herit
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
 - *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "lion statue"
-- *Title word count:* 8
-- *Keyword count:* 44
-- *Keywords taken verbatim from the prompt's keyword hints:* 8
-- *Percent of words in four-word runs copied from the description hint:* 0
+- *Repeated fragment:* keyword: "stone architecture"
+- *Title word count:* 9
+- *Keyword count:* 37
+- *Keywords taken verbatim from the prompt's keyword hints:* 16
+- *Percent of words in four-word runs copied from the description hint:* 50
 - *Text compared with the description hint:* description
-- *Duplicate keywords:* ["statue of a lion", "lion statue"]
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Duplicate keywords:* ["historic architecture", "stone architecture"]
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Processor class:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.209
-- *Peak memory at first token (GB):* 14.982
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.8
+- *Peak memory at first token (GB):* 9.311
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json text_config": [128001, 128008,
-  128009]}
-- *Chat template found in (the first is the one the processor uses):* chat_template.json,
-  tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.004
+- *EOS ids declared, by file:* {"config.json": [2, 32000, 32007]}
+- *Chat template found in (the first is the one the processor uses):* tokenizer_config.json
+- *Post-cleanup active memory (GB):* 0.008
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 311
-- *Prompt composition:* 311 = 310 text/template + 1 image tokens (0%; exact,
-  counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 11.34
-- *Parameter count:* 11.00B (name-estimate)
-- *Quantization:* 8-bit, group 64
-- *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (11.35 GB vs 11.34 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 11.35 GB; other
-  load-time allocations 0.00 GB
+- *Prompt tokens:* 1151
+- *Prompt composition:* 1,151 = 1,151 text/template + 0 image tokens (0%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 8.29
+- *Declared context length:* 131,072 (max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (8.30 GB vs 8.29 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 8.29 GB; other
+  load-time allocations 0.01 GB
 - *Generation tokens:* 200
-- *Configured EOS token ID:* 128009
-- *Configured EOS token:* &lt;|eot_id|&gt;
+- *Configured EOS token ID:* 32000
+- *Configured EOS token:* &lt;|endoftext|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU activity outside harness inference: max 95% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: Bronze Lion Statue in Front of Norwich Guildhall
+Title: Gothic Church Tower of St Peter Mancroft in Norwich
 
-Description: A bronze lion statue stands proudly in front of the historic Norwich Guildhall, set against the backdrop of a sunny day in the city of Norwich, Norfolk, England. The statue's intricate details and the building's Gothic architecture are prominent features of the scene.
+Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with its Victorian lead flèche illuminated in the evening light, as pedestrians walk along the street below.
 
-Keywords: Bronze lion statue, Norwich Guildhall, historic building, Gothic architecture, sunny day, city of Norwich, Norfolk, England, outdoor setting, statue, building, architecture, cityscape, outdoor scene, daytime scene, blue sky, green trees, street scene, people walking, cars parked, street lamps, statue of a lion, lion statue, bronze statue, statue of a lion, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion statue, lion
+Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, historic landmark, stone masonry, stone facade, clear sky, twilight, United Kingdom, walking, pedestrians, perpendicular gothic, spire, historic architecture, historic architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone
 ```
 
 </details>
@@ -213,7 +208,7 @@ Keywords: Bronze lion statue, Norwich Guildhall, historic building, Gothic archi
 <a id="diagnostic-mlx-community-qwen2-vl-2b-mlx"></a>
 
 <details>
-<summary>mlx-community/Qwen2-VL-2B-mlx — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/Qwen2-VL-2B-mlx — major concerns — repeated text; control tokens visible; labelled fields not detected; cut off at token limit</summary>
 
 ### mlx-community/Qwen2-VL-2B-mlx
 
@@ -224,21 +219,23 @@ Keywords: Bronze lion statue, Norwich Guildhall, historic building, Gothic archi
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, repetition_abort, duplicate_keywords
+- *Observations:* repeated_output, missing_requested_sections,
+  token_cap_truncation, unexpected_special_token
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
 - *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "medieval town square"
-- *Title word count:* 6
-- *Keyword count:* 39
-- *Keywords taken verbatim from the prompt's keyword hints:* 9
-- *Percent of words in four-word runs copied from the description hint:* 30
+- *Labelled fields not detected:* ["keywords"]
+- *Repeated fragment:* phrase: "assistant assistant assistant ..."
+- *Unexpected special tokens:* ["&lt;|im_start|&gt;"]
+- *Title word count:* 32
+- *Percent of words in four-word runs copied from the description hint:* 9
 - *Text compared with the description hint:* description
-- *Duplicate keywords:* ["medieval town", "medieval town square"]
+- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail"]
+- *Special tokens emitted (by token id):* ["&lt;|im_start|&gt;"]
 - *Resolved model revision:* d8c7c767e2e2c62cda8a51943276458ea6ad43bc
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 46.7
+- *Stop reason:* max_tokens
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 40.563
 - *Peak memory at first token (GB):* 9.361
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.1; top_p 0.001; top_k 1; repetition_penalty 1.05
@@ -253,8 +250,8 @@ Keywords: Bronze lion statue, Norwich Guildhall, historic building, Gothic archi
   chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.008
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16569
-- *Prompt composition:* 16,569 = 345 text/template + 16,224 image tokens (98%;
+- *Prompt tokens:* 16577
+- *Prompt composition:* 16,577 = 353 text/template + 16,224 image tokens (98%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 4.42
 - *Parameter count:* 2.00B (name-estimate)
@@ -262,83 +259,289 @@ Keywords: Bronze lion statue, Norwich Guildhall, historic building, Gothic archi
 - *Load active memory vs checkpoint:* 1.00x (4.43 GB vs 4.42 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 4.42 GB; other
   load-time allocations 0.01 GB
-- *Generation tokens:* 200
+- *Generation tokens:* 1000
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
+  2 sample(s); GPU activity outside harness inference: max 47% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: Bronze Lion Statue in Norwich, England
+Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
 
-Description:
-The bronze lion statue stands on the bridge in Norwich, Norfolk, England. It is a 15th-century flint Norwich Guildhall, with the historic building visible in the background. The statue is a symbol of the city and is a popular tourist attraction.
+Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
 
-Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Landmark, Lion, Statue, Sightseeing, Street Scene, Bridge, City Hall, Flint, Medieval, Medieval Architecture, Medieval City, Medieval Guildhall, Medieval Statue, Medieval Town, Medieval Town Hall, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town Square, Medieval Town
-```
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
+<|im_start|>assistant
 
-</details>
-
-<a id="diagnostic-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-<details>
-<summary>mlx-community/SmolVLM2-2.2B-Instruct-mlx — major concerns — repeated text; stopped early: repeating; labelled fields not detected</summary>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, repetition_abort,
-  missing_requested_sections
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Family README in installed mlx-vlm:* none
-- *Labelled fields not detected:* ["title", "description", "keywords"]
-- *Repeated fragment:* phrase: "sculpture, sculpture, sculptur..."
-- *Percent of words in four-word runs copied from the description hint:* 0
-- *Text compared with the description hint:* answer
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Processor class:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.031
-- *Peak memory at first token (GB):* 5.563
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json text_config": 2}
-- *Chat template found in (the first is the one the processor uses):* chat_template.json,
-  tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.01
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1439
-- *Prompt composition:* 1,439 = 386 text/template + 1,053 image tokens (73%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 4.49
-- *Parameter count:* 2.20B (name-estimate)
-- *Declared context length:* 8,192 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (4.50 GB vs 4.49 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 4.49 GB; other
-  load-time allocations 0.01 GB
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 49279
-- *Configured EOS token:* &lt;end_of_utterance&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
- Lion, City Hall, Norwich Guildhall, Sculpture, Sightseeing, Statue, Street Scene, Sculpture, Sightseeing, Statue, Sculpture, Sightseeing, Sculpture, Sightseeing, Sculpture, Sightseeing, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture, Sculpture,
 ```
 
 </details>
@@ -368,7 +571,7 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.428
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.478
 - *Peak memory at first token (GB):* 6.729
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -379,8 +582,8 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Chat template found in (the first is the one the processor uses):* chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.015
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2205
-- *Prompt composition:* 2,205 = 413 text/template + 1,792 image tokens (81%;
+- *Prompt tokens:* 2211
+- *Prompt composition:* 2,211 = 419 text/template + 1,792 image tokens (81%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 5.68
 - *Parameter count:* 9.00B (name-estimate)
@@ -388,18 +591,20 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Load active memory vs checkpoint:* 1.00x (5.69 GB vs 5.68 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 5.68 GB; other
   load-time allocations 0.01 GB
-- *Generation tokens:* 15
+- *Generation tokens:* 19
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;|return|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
+  2 sample(s); GPU activity outside harness inference: max 97% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-<|channel|> analysis<|message|> The image shows a bronze statue of a roaring lion.
+<|channel|> analysis<|message|> The image shows a large church tower with a spire and a pointed roof.
 ```
 
 </details>
@@ -407,7 +612,7 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 <a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
 <details>
-<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — major concerns — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords</summary>
+<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — major concerns — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name</summary>
 
 ### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
@@ -419,26 +624,24 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_special_token, role_boundary_token_present, duplicate_keywords
+  unexpected_special_token, role_boundary_token_present, unverified_place_name
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description"]
 - *Unexpected special tokens:* ["&lt;|message|&gt;"]
 - *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
+- *Place names the prompt did not supply:* ["Dusk"]
 - *Title word count:* 0
-- *Keyword count:* 32
-- *Keywords taken verbatim from the prompt's keyword hints:* 3
-- *Duplicate keywords:* ["correct conflicts", "and add important visible
-  details prefer image evidence when a hint conflicts", "and omit uncertain
-  details"]
-- *Token-cap degradation evidence:* ["missing_sections"]
+- *Keyword count:* 1
+- *Keywords taken verbatim from the prompt's keyword hints:* 0
+- *Token-cap degradation evidence:* ["missing_sections", "unfinished_list"]
 - *Special tokens emitted (by token id):* ["&lt;|message|&gt;"]
 - *Resolved model revision:* 98377360cbc84f982e90336f956b08adb46cad88
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.191
-- *Peak memory at first token (GB):* 25.465
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 7.502
+- *Peak memory at first token (GB):* 25.466
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
@@ -451,8 +654,8 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
 - *Chat template found in (the first is the one the processor uses):* chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.007
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4413
-- *Prompt composition:* 4,413 = 357 text/template + 4,056 image tokens (92%;
+- *Prompt tokens:* 4418
+- *Prompt composition:* 4,418 = 362 text/template + 4,056 image tokens (92%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 23.85
 - *Parameter count:* 30.00B (name-estimate)
@@ -468,23 +671,25 @@ Keywords: Bronze Lion Statue, Norwich, Norfolk, England, Guildhall, Historic Lan
   (preprocessor_config.json, processor_config.json)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU activity outside harness inference: max 77% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
  to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
 
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-10 16:41:54 UTC+01:00
-- GPS: 52.628900°N, 1.292500°E
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-- Keyword hints: Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -496,186 +701,41 @@ Title:
 Description:
 Keywords:
 
-We need title 5-10 words. Concrete.
+We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
 
-Bronze lion statue on plinth with Norwich Guildhall behind. The statue is maybe the Norwich lion? Actually the lion sculpture by Alfred Hardiman stands outside City Hall overlooking Market Place? The hint says bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking Market Place, with historic 15th-century flint Norwich Guildhall visible in background in Norwich, Norfolk, England.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
 
-Image shows a bronze lion with green patina, rearing, mouth open, on a stone plinth. Background is stone building with Gothic windows, crenellated roof, arched doorways. There's a street lamp, blue railing, car, pedestrians.
+Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
 
-GPS 52.6289 N 1.2925 E is Norwich. So fine.
+Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
 
-We must not claim capture date/time visible. So don't mention date in description. Can use context but not claim visible.
+Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
 
-We should retain details supported by image. The lion sculpture: bronze, green patina, rearing with one paw raised. Background building is Norwich Guildhall? The building looks like Guildhall. Might be City Hall? The hint says outside City Hall overlooking Market Place, with Guildhall visible. Could be correct. The image shows the building with crenellations and Gothic windows. Could be Norwich Guildhall. Might be consistent.
-
-We should not claim author Alfred Hardiman? Hint says sculpture by Alfred Hardiman. Is that correct? Might be uncertain. The hint says description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall... We can retain? The instruction: Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-We cannot verify author from image. Might be uncertain. Probably safer to omit artist name? The hint is authoritative context? It says descriptive hints. Could be wrong. Might be risky. Possibly the lion is the "Norwich Lion" or "City Hall lions". Actually Norwich City Hall has two lions by Alfred Hardiman? Might be correct. Hmm.
-
-The instruction says retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Artist name is not visible. So maybe omit. But it's context maybe accepted. The description hint includes it. Might be okay to include? Might be uncertain. Safer to say bronze lion sculpture. Not name artist.
-
-Also "stands outside City Hall overlooking the Market Place" - image shows building behind. Could be Guildhall. Let's just say in Norwich city centre with historic Guildhall in background.
-
-Make title 5-10 words. e.g. "Bronze Lion Statue with Norwich Guildhall Background". That's 6 words? Bronze(1) Lion(2) Statue(3) with(4) Norwich(5) Guildhall(6) Background(7). Good.
-
-Description: 1-2 sentences factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
-
-We can say: A weathered bronze lion statue with a green patina stands on a stone plinth in the foreground, one forepaw raised, mouth open, against a bright blue sky. Behind it the historic flint Norwich Guildhall with Gothic windows and crenellated parapet is visible, with street scene elements including a lamp post, vehicles and pedestrians
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
-
-<details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-8bit — major concerns — labelled fields not detected; cut off at token limit; incomplete thinking block</summary>
-
-### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* missing_requested_sections, token_cap_truncation,
-  thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Family README in installed mlx-vlm:* none
-- *Labelled fields not detected:* ["title", "description", "keywords"]
-- *Thinking trace markers:* ["\u25c1think\u25b7"]
-- *Percent of words in four-word runs copied from the description hint:* 4
-- *Text compared with the description hint:* answer
-- *Token-cap degradation evidence:* ["missing_sections",
-  "incomplete_thinking_trace"]
-- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.293
-- *Peak memory at first token (GB):* 20.071
-- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.6
-- *Sampling settings source:* temperature: generation_config; top_p: default;
-  top_k: default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json": [163584, 163586], "config.json
-  text_config": 163585, "generation_config.json": [163585]}
-- *Chat template found in (the first is the one the processor uses):* chat_template.json,
-  chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.004
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1334
-- *Prompt composition:* 1,334 = 320 text/template + 1,014 image tokens (76%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 17.83
-- *Active parameter count:* 3.00B (name-estimate; total not stated in the
-  name)
-- *Quantization:* 8-bit, group 64
-- *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (17.83 GB vs 17.83 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 17.83 GB; other
-  load-time allocations 0.00 GB
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 163594
-- *Configured EOS token:* [EOS]
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key elements from the context are the capture date/time (2026-10-10 16:41:54 UTC+01:00) and GPS coordinates (52.628900°N, 1.292500°E). The descriptive hints mention a bronze lion sculpture by Alfred Hardiman outside City Hall in Norwich, with the 15th-century flint Norwich Guildhall in the background. The keywords include Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene.
-
-Now, looking at the image: the main subject is a bronze lion statue in the foreground, positioned on a pedestal. The background features a historic stone building (likely the Guildhall) with Gothic architecture, a blue sky, and some cars, pedestrians, and a street lamp. The lighting suggests it might be late afternoon or early evening. 
-
-For the title, something concise that captures the main elements: "Bronze Lion Statue at Norwich Guildhall, Historic Landmark in City Hall, East Anglia." That's 10 words. 
-
-The description should combine the context and visible details. Mention the lion sculpture by Alfred Hardiman, the Guildhall, the setting (Norwich, Norfolk), the time of day (implied by lighting), and key elements like the blue sky and Gothic architecture. So, "A bronze lion sculpture by Alfred Hardiman stands prominently on a pedestal overlooking the historic 15th-century flint Norwich Guildhall in Norwich, Norfolk, under a clear blue sky, with Gothic architecture and a bustling street scene in the background."
-
-For keywords, list unique ones from the hints and visible details: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, European Heritage, Pedestrian Area, Street Scene, Blue Sky. Let me check that they’re all present in the image or hints. Yes, most are covered. Also, include the GPS coordinates and date as authoritative facts. Wait, the user said to treat capture date/time and GPS as authoritative facts but not as visible. So include them as metadata but not in the description. So keywords should be visible details. Let me adjust. Maybe add "2026-10-10" but the user said not to include as visible. So focus on the image elements. Maybe "Blue Sky" is already covered. Let me check the hints again. The hints include "Blue sky" and "Street Scene". So the keywords should be unique and visible. Let me list them again:
-
-Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Pedestrian Area, Street Scene, Blue Sky. That's 10 keywords. Wait, the user asked for 10-18. Maybe include "Sculpture" as "Bronze Lion Statue" is already there. Maybe add "Norwich" and "Norfolk" as they are part of the context. Wait, the hints include "Norwich Guildhall" and "Norfolk". So perhaps include "Norwich" and "Norfolk" as separate keywords. Let me check the image: the background has "Norwich" in "Norwich Guildhall". So maybe add "Norwich" as a keyword. Similarly, "Guildhall" is already there. So revised keywords: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Pedestrian Area, Street Scene, Blue Sky, Norwich. That's 11. Maybe add "Historic Building" but that's not in the hints. Wait, the hints mention "Historic Landmark". So keep it as "Historic Landmark". Maybe add "Sculpture" but "Bronze Lion Statue" covers that. Let's stick to the 10-18 keywords. Let me check again. The image has a lion statue, the Guildhall, Gothic architecture, blue sky, street scene, pedestrians, cars, lamp post. So maybe include "Car" as a keyword. But "Street Scene" covers that. Maybe "Cars" is redundant. The hints have "Car" but not visible. Wait, the image shows a car in the background. Since the user said to retain visible details and prefer image evidence over conflicting hints, if the car is visible, include it. So add "Car". Then keywords: Bronze Lion Statue, Alfred Hardiman, Norwich Guildhall, Gothic Architecture, Historic Landmark, City Hall, East Anglia, England, Ped
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-minicpm-v-46-4bit"></a>
-
-<details>
-<summary>mlx-community/MiniCPM-V-4.6-4bit — major concerns — incomplete thinking block</summary>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Family README in installed mlx-vlm:* mlx_vlm/models/minicpmv4_6/README.md
-  (read before filing)
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 8
-- *Keyword count:* 21
-- *Keywords taken verbatim from the prompt's keyword hints:* 14
-- *Percent of words in four-word runs copied from the description hint:* 0
-- *Text compared with the description hint:* description
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.883
-- *Peak memory at first token (GB):* 3.101
-- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
-- *Sampling settings source:* temperature: generation_config; top_p:
-  generation_config; top_k: generation_config; min_p: default;
-  repetition_penalty: default
-- *generation_config.json settings not applied (by mlx-vlm or the harness):* {"repetition_penalty":
-  1.0}
-- *EOS ids declared, by file:* {"config.json": [248044, 248046],
-  "generation_config.json": [248044, 248046]}
-- *Chat template found in (the first is the one the processor uses):* chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.005
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 943
-- *Prompt composition:* 943 = 354 text/template (tokenizer-exact) + 589
-  non-text (62%, image/audio expansion)
-- *Checkpoint weights (GB):* 2.16
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 262,144 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (2.16 GB vs 2.16 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 2.16 GB; other
-  load-time allocations 0.00 GB
-- *Generation tokens:* 124
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<think>
-Here's the response following the instructions:
+Output exactly three sections with headings.
 
 Title:
-Bronze Lion Statue at City Hall, Norwich, England
-
 Description:
-A grand bronze lion sculpture stands prominently outside City Hall, set against a historic backdrop with medieval architecture. The scene is illuminated by bright daylight, highlighting the sculpture's details and the surrounding area.
+Keywords:
 
-Keywords: British-English, bronze lion, City Hall, Norwich, England, historic, Gothic Architecture, Guildhall, Lion, Norfolk, Norwich Guildhall, statue, sightseeing, street scene, blue sky, heritage, architecture, market place, pedestrian, sculpture, Europe
+No extra text.
+
+Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
+
+That's one sentence? It's two sentences. Acceptable 1-2 sentence.
+
+Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
+
+Probably keep simple.
+
+Keywords list comma-separated. Ensure unique.
+
+Let's produce:
+
+Title: St Peter Mancroft Tower at Dusk Norwich
+
+Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
+
+Keywords: St Peter Manc
 ```
 
 </details>
@@ -690,18 +750,24 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                            | Mechanical checks | Observations                                       |
-|--------------------------------------------------|-------------------|----------------------------------------------------|
-| mlx-community/FastVLM-0.5B-bf16                  | major concerns    | labelled fields not detected; prompt hint repeated |
-| mlx-community/gemma-3n-E4B-it-4bit               | major concerns    | labelled fields not detected                       |
-| mlx-community/nanoLLaVA-1.5-4bit                 | major concerns    | labelled fields not detected                       |
-| mlx-community/SmolVLM-256M-Instruct-4bit         | major concerns    | labelled fields not detected; prompt hint repeated |
-| vikhyatk/moondream2                              | major concerns    | labelled fields not detected; prompt hint repeated |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | concerns detected | duplicate keywords                                 |
-| mlx-community/gemma-4-12B-it-4bit                | concerns detected | duplicate keywords                                 |
-| mlx-community/granite-vision-3.2-2b-nvfp4        | concerns detected | duplicate keywords                                 |
-| mlx-community/granite-4.0-3b-vision-4bit         | concerns detected | prompt hint repeated                               |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit            | concerns detected | prompt hint repeated                               |
+| Model                                                    | Mechanical checks | Observations                                        |
+|----------------------------------------------------------|-------------------|-----------------------------------------------------|
+| mlx-community/FastVLM-0.5B-bf16                          | major concerns    | labelled fields not detected; prompt hint repeated  |
+| mlx-community/gemma-3n-E4B-it-4bit                       | major concerns    | labelled fields not detected; unsupplied place name |
+| mlx-community/MolmoPoint-8B-4bit                         | major concerns    | labelled fields not detected; unsupplied place name |
+| mlx-community/nanoLLaVA-1.5-4bit                         | major concerns    | labelled fields not detected                        |
+| mlx-community/SmolVLM-256M-Instruct-4bit                 | major concerns    | labelled fields not detected; prompt hint repeated  |
+| vikhyatk/moondream2                                      | major concerns    | labelled fields not detected; prompt hint repeated  |
+| mlx-community/Molmo2-8B-4bit                             | concerns detected | duplicate keywords                                  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx                 | concerns detected | duplicate keywords; prompt hint repeated            |
+| mlx-community/GLM-4.6V-Flash-4bit                        | concerns detected | prompt hint repeated                                |
+| mlx-community/granite-4.0-3b-vision-4bit                 | concerns detected | prompt hint repeated                                |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                    | concerns detected | prompt hint repeated                                |
+| mlx-community/pixtral-12b-8bit                           | concerns detected | prompt hint repeated                                |
+| mlx-community/Step-3.7-Flash-oQ3e                        | concerns detected | prompt hint repeated                                |
+| nativ-community/Mage-VL-OptiQ-4bit                       | concerns detected | prompt hint repeated                                |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit | concerns detected | prompt hint repeated                                |
+| sahilchachra/LensVLM-9B-MXFP4                            | concerns detected | prompt hint repeated                                |
 
 ## Context for completions without detected concerns
 
@@ -710,35 +776,32 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                          |
 |-------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2128 prompt / 90 generated; 409 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2100 prompt / 119 generated; 96.1 tok/s; 6.5 GB peak |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 605 prompt / 87 generated; 77.5 tok/s; 28 GB peak    |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 604 prompt / 140 generated; 19.6 tok/s; 17 GB peak   |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 609 prompt / 106 generated; 99.4 tok/s; 16 GB peak   |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 605 prompt / 87 generated; 121 tok/s; 5.9 GB peak    |
-| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6460 prompt / 99 generated; 76.4 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6460 prompt / 108 generated; 37.0 tok/s; 78 GB peak  |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2124 prompt / 123 generated; 53.5 tok/s; 10 GB peak  |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 402 prompt / 91 generated; 105 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2935 prompt / 130 generated; 64.4 tok/s; 13 GB peak  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2934 prompt / 128 generated; 169 tok/s; 7.8 GB peak  |
-| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1535 prompt / 181 generated; 65.9 tok/s; 8.1 GB peak |
-| mlx-community/MolmoPoint-8B-4bit                            | rev 9bab196f867c; MolmoPointProcessor; stop completed        | 3137 prompt / 129 generated; 29.8 tok/s; 13 GB peak  |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4095 prompt / 171 generated; 143 tok/s; 3.9 GB peak  |
-| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1149 prompt / 128 generated; 50.4 tok/s; 9.3 GB peak |
-| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3125 prompt / 110 generated; 40.2 tok/s; 16 GB peak  |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12801 prompt / 109 generated; 50.7 tok/s; 26 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16558 prompt / 161 generated; 75.5 tok/s; 23 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16558 prompt / 125 generated; 62.3 tok/s; 11 GB peak |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16574 prompt / 148 generated; 49.1 tok/s; 25 GB peak |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16574 prompt / 124 generated; 27.6 tok/s; 21 GB peak |
-| mlx-community/Step-3.7-Flash-oQ3e                           | rev 41d17ee00e16; Step3VLProcessor; stop completed           | 3502 prompt / 122 generated; 48.7 tok/s; 92 GB peak  |
-| mlx-community/X-Reasoner-7B-8bit                            | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed        | 16569 prompt / 116 generated; 52.8 tok/s; 14 GB peak |
-| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4221 prompt / 157 generated; 126 tok/s; 5.4 GB peak  |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1281 prompt / 133 generated; 13.4 tok/s; 18 GB peak  |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3636 prompt / 113 generated; 122 tok/s; 23 GB peak   |
-| sahilchachra/LensVLM-9B-MXFP4                               | rev 23ae80ae9a7d; Qwen3VLProcessor; stop completed           | 1886 prompt / 223 generated; 101 tok/s; 7.5 GB peak  |
-| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16574 prompt / 125 generated; 32.5 tok/s; 17 GB peak |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2131 prompt / 83 generated; 481 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2108 prompt / 102 generated; 103 tok/s; 6.5 GB peak  |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 611 prompt / 92 generated; 74.4 tok/s; 28 GB peak    |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1656 prompt / 617 generated; 126 tok/s; 19 GB peak   |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 610 prompt / 145 generated; 31.4 tok/s; 17 GB peak   |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 615 prompt / 118 generated; 62.7 tok/s; 7.6 GB peak  |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 615 prompt / 105 generated; 124 tok/s; 16 GB peak    |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 611 prompt / 108 generated; 125 tok/s; 6.0 GB peak   |
+| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6372 prompt / 112 generated; 45.0 tok/s; 78 GB peak  |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2132 prompt / 98 generated; 57.4 tok/s; 10 GB peak   |
+| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2135 prompt / 126 generated; 421 tok/s; 2.1 GB peak  |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1342 prompt / 750 generated; 66.6 tok/s; 20 GB peak  |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 320 prompt / 101 generated; 22.0 tok/s; 15 GB peak   |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 410 prompt / 104 generated; 106 tok/s; 7.1 GB peak   |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 950 prompt / 333 generated; 304 tok/s; 3.2 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2959 prompt / 122 generated; 66.3 tok/s; 13 GB peak  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2958 prompt / 113 generated; 188 tok/s; 7.8 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4101 prompt / 158 generated; 210 tok/s; 3.9 GB peak  |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12809 prompt / 120 generated; 73.4 tok/s; 26 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16566 prompt / 144 generated; 86.9 tok/s; 23 GB peak |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16566 prompt / 91 generated; 69.5 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16579 prompt / 130 generated; 110 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16579 prompt / 133 generated; 30.2 tok/s; 21 GB peak |
+| mlx-community/X-Reasoner-7B-8bit                            | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed        | 16577 prompt / 127 generated; 60.0 tok/s; 14 GB peak |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3642 prompt / 101 generated; 159 tok/s; 23 GB peak   |
+| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16579 prompt / 123 generated; 36.3 tok/s; 17 GB peak |
 
 </details>
 
@@ -747,9 +810,9 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 33,496,486 bytes
-- *Image SHA-256:* 712a5faa6eab3fe302b2a217258979846efc8ae2aa86a8fe7b14b79647a2a44d
+- *Image dimensions:* 6,213 x 9,320 pixels
+- *Image size:* 52,096,760 bytes
+- *Image SHA-256:* 5526381f05071b9832b086adc634888de171e314a3d5d1acc4c80c3afc95a8a4
 
 <details>
 <summary>Exact prompt</summary>
@@ -760,12 +823,12 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-10 16:41:54 UTC+01:00
-- GPS: 52.628900°N, 1.292500°E
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-- Keyword hints: Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -784,10 +847,10 @@ The original local input is not published, so this report does not claim a
 complete reproduction command. Use a shareable equivalent image or add the
 original image before filing.
 
-- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-142e2341731f9ce5.jpg>
-- *Preview dimensions:* 1,024 x 683 pixels
-- *Preview size:* 84,474 bytes
-- *Preview SHA-256:* 142e2341731f9ce58a5268765c820c8a7ee7615c8034dbbee21a7da5a5033260
+- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-f00ae35004e26a90.jpg>
+- *Preview dimensions:* 683 x 1,024 pixels
+- *Preview size:* 99,535 bytes
+- *Preview SHA-256:* f00ae35004e26a90c102e7357a69f13b84009d2416fe3bdb9ba7d7c4b3a6ee3b
 
 Shareable stand-in: the retained gallery preview is a downscaled re-encoding
 of the original, so an observation reproduced on it must be reported as
@@ -798,19 +861,19 @@ native mlx-vlm process.
 
 ```bash
 set -euo pipefail
-curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-142e2341731f9ce5.jpg
-printf '%s\n' '142e2341731f9ce58a5268765c820c8a7ee7615c8034dbbee21a7da5a5033260  repro-image.jpg' | shasum -a 256 --check
+curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-f00ae35004e26a90.jpg
+printf '%s\n' 'f00ae35004e26a90c102e7357a69f13b84009d2416fe3bdb9ba7d7c4b3a6ee3b  repro-image.jpg' | shasum -a 256 --check
 python -m mlx_vlm.generate --verbose --model MODEL_ID --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-10-10 16:41:54 UTC+01:00
-- GPS: 52.628900°N, 1.292500°E
+- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
+- GPS: 52.628000°N, 1.293600°E
 
 Descriptive hints:
-- Description hint: A bronze lion sculpture by Alfred Hardiman stands outside City Hall overlooking the Market Place, with the historic 15th-century flint Norwich Guildhall visible in the background in Norwich, Norfolk, England.
-- Keyword hints: Adobe Stock, Any Vision, Blue sky, British heritage, Car, East Anglia, England, Europe, Gothic Architecture, Guildhall, Historic Landmark, Lion, Norfolk, Norwich, Norwich Guildhall, Pedestrian, Sculpture, Sightseeing, Statue, Street Scene
+- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
 
 Write:
 - a concrete 5-10-word title;
@@ -825,16 +888,13 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 ### Highlighted model revisions
 
-| Model                                            | Resolved revision                        |
-|--------------------------------------------------|------------------------------------------|
-| mlx-community/InternVL3_5-1B-4bit                | f9d179a8be8ac53e96c6ee5cce8493856d4b8f09 |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
-| mlx-community/Qwen2-VL-2B-mlx                    | d8c7c767e2e2c62cda8a51943276458ea6ad43bc |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx         | 844516024a1c4400d34489b89ee067d794e432ed |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit            | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit        | 98377360cbc84f982e90336f956b08adb46cad88 |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit     | e5abbe34cbfabd829fafd0362856e5b468d19f85 |
-| mlx-community/MiniCPM-V-4.6-4bit                 | 86cd463d33a946e4481b77e3c10fc63121b60a19 |
+| Model                                      | Resolved revision                        |
+|--------------------------------------------|------------------------------------------|
+| mlx-community/granite-vision-3.2-2b-nvfp4  | f0c70965cdae87ebf38e84ff958e841ad943e8e6 |
+| mlx-community/Phi-3.5-vision-instruct-bf16 | d8da684308c275a86659e2b36a9189b2f4aec8ea |
+| mlx-community/Qwen2-VL-2B-mlx              | d8c7c767e2e2c62cda8a51943276458ea6ad43bc |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit      | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit  | 98377360cbc84f982e90336f956b08adb46cad88 |
 
 ### Components and system
 
