@@ -10063,6 +10063,11 @@ class DiagnosticsPartitions:
     compliance: tuple[PerformanceResult, ...]
     clean: tuple[PerformanceResult, ...]
 
+    @property
+    def highlighted(self) -> tuple[PerformanceResult, ...]:
+        """The maintainer lane in presentation order: actionable, observations, indeterminate."""
+        return (*self.actionable, *self.observations, *self.indeterminate)
+
 
 def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
     """Partition maintainer evidence using only cached current-run assessments."""
@@ -10737,7 +10742,6 @@ def _diagnostics_evidence_blocks(
     # then simply omit the input-image line rather than re-reading the file.
     image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
     partitions = _partition_diagnostics(report_context)
-    highlighted = (*partitions.actionable, *partitions.observations, *partitions.indeterminate)
     triage_rows = tuple(
         (
             ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
@@ -10746,7 +10750,7 @@ def _diagnostics_evidence_blocks(
             assessments[result.model_name].maintainer_status.replace("_", " "),
             _gallery_observation_labels(assessments[result.model_name].observations),
         )
-        for result in highlighted
+        for result in partitions.highlighted
     )
     triage: ReportBlock = (
         ReportTable(
@@ -10905,20 +10909,13 @@ def generate_diagnostics_report(
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
-    model_provenance = _model_provenance_by_model(report_context)
-    partitions = _partition_diagnostics(report_context)
-    highlighted = (
-        *partitions.actionable,
-        *partitions.observations,
-        *partitions.indeterminate,
-    )
     blocks = (
         ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
         *_diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
-            highlighted_results=highlighted,
-            model_provenance=model_provenance,
+            highlighted_results=_partition_diagnostics(report_context).highlighted,
+            model_provenance=_model_provenance_by_model(report_context),
             library_versions=library_versions,
             system_info=system_info,
             image_path=image_path,
@@ -11234,36 +11231,36 @@ def _html_gallery_model(
     return "\n".join(parts)
 
 
-def _html_complete_gallery(report_context: HtmlReportContext) -> str:
-    """Render complete evidence in the same stable order as the Markdown gallery."""
+def _gallery_evidence_entries(
+    report_context: HtmlReportContext,
+) -> list[tuple[PerformanceResult, GalleryRow, ResultAssessment, ModelProvenanceRecord | None]]:
+    """Per-model evidence inputs in the stable usable-first order both galleries render."""
     assessments = _assessments_by_model(report_context)
     model_provenance = _model_provenance_by_model(report_context)
-    rows_by_model = {
-        result.model_name: _gallery_row(result, assessments[result.model_name])
+    entries = [
+        (
+            result,
+            _gallery_row(result, assessments[result.model_name]),
+            assessments[result.model_name],
+            model_provenance.get(result.model_name),
+        )
         for result in report_context.result_set.results
-    }
-    ordered_results = sorted(
-        report_context.result_set.results,
-        key=lambda result: (
-            _usability_rank(rows_by_model[result.model_name].usability),
-            result.model_name,
-        ),
+    ]
+    return sorted(
+        entries,
+        key=lambda entry: (_usability_rank(entry[1].usability), entry[0].model_name),
     )
+
+
+def _html_complete_gallery(report_context: HtmlReportContext) -> str:
+    """Render complete evidence in the same stable order as the Markdown gallery."""
     parts = [
         '<section id="complete-model-evidence">',
         "<h2>Complete Per-model Evidence</h2>",
         "<p>Complete generated or crash evidence for every attempted model.</p>",
+        *(_html_gallery_model(*entry) for entry in _gallery_evidence_entries(report_context)),
+        "</section>",
     ]
-    parts.extend(
-        _html_gallery_model(
-            result,
-            rows_by_model[result.model_name],
-            assessments[result.model_name],
-            model_provenance.get(result.model_name),
-        )
-        for result in ordered_results
-    )
-    parts.append("</section>")
     return "\n".join(parts)
 
 
@@ -11327,15 +11324,9 @@ def _html_provenance(
     run_args: argparse.Namespace | None,
 ) -> str:
     """Render the same single-copy reproduction context used by Markdown."""
-    partitions = _partition_diagnostics(report_context)
-    highlighted = (
-        *partitions.actionable,
-        *partitions.observations,
-        *partitions.indeterminate,
-    )
     blocks = _diagnostics_shared_context_blocks(
         prompt=prompt,
-        highlighted_results=highlighted,
+        highlighted_results=_partition_diagnostics(report_context).highlighted,
         model_provenance=_model_provenance_by_model(report_context),
         library_versions=versions,
         system_info=report_context.system_info,
@@ -11483,35 +11474,14 @@ def generate_html_report(
 
 def _generate_model_gallery_section(report_context: ReportRenderContext) -> list[str]:
     """Render complete evidence in stable usable-first order."""
-    assessments = _assessments_by_model(report_context)
-    model_provenance = _model_provenance_by_model(report_context)
-    results = report_context.result_set.results
-    rows_by_model = {
-        result.model_name: _gallery_row(result, assessments[result.model_name])
-        for result in results
-    }
-    ordered_results = sorted(
-        results,
-        key=lambda result: (
-            _usability_rank(rows_by_model[result.model_name].usability),
-            result.model_name,
-        ),
-    )
     md = [
         "## Complete Per-model Evidence",
         "",
         "Complete generated or crash evidence for every attempted model.",
         "",
     ]
-    for result in ordered_results:
-        md.extend(
-            _render_gallery_model(
-                result,
-                rows_by_model[result.model_name],
-                assessments[result.model_name],
-                model_provenance.get(result.model_name),
-            )
-        )
+    for entry in _gallery_evidence_entries(report_context):
+        md.extend(_render_gallery_model(*entry))
         md.extend(["---", ""])
     return md
 
@@ -11546,12 +11516,7 @@ def generate_markdown_gallery_report(
     md.append("")
     md.extend(
         f"- *{label}:* {value}"
-        for label, value in _run_input_summary_rows(
-            _run_image_record(image_path, report_context.image_profile),
-            report_context.mode_policy.eval_mode,
-            report_context.mode_policy.assessment_profile,
-            metadata_exposed_to_prompt=report_context.mode_policy.metadata_exposed_to_prompt,
-        )
+        for label, value in _run_input_rows_for_context(image_path, report_context)
     )
     md.append("")
     md.extend(_wrap_markdown_text(_run_objective_statement(report_context.mode_policy.eval_mode)))

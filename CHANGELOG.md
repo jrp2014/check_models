@@ -54,6 +54,13 @@ Notable changes to this project will be documented in this file.
   baseline identity fields straight to `RunComparison` instead of through an
   untyped dict, so the type checkers now verify those names and types. The
   retained JSON is unchanged.
+- Report construction: the HTML and Markdown galleries take their per-model
+  evidence entries, in usable-first order, from one
+  `_gallery_evidence_entries` helper; the Markdown gallery's run-input lines
+  use the same `_run_input_rows_for_context` as HTML; and
+  `DiagnosticsPartitions.highlighted` names the maintainer lane (actionable,
+  observations, indeterminate) that three call sites assembled by hand. HTML,
+  gallery and diagnostics output are byte-identical on a fixed fixture.
 - Run summary: "Earlier retained runs on this mlx version" is a fact about
   the run, so it now shows (and is logged) even when a changed image or
   prompt withholds the comparison; the 2026-10-10 sweep on a new photo had
