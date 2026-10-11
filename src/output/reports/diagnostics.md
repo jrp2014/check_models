@@ -126,8 +126,7 @@ None.
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); GPU activity outside harness inference: max 79% at 2
-  instantaneous check(s); activity between checks is not observed; mode
+  2 sample(s); GPU reading max 79% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
   snapshot
 
 #### Complete output
@@ -189,8 +188,7 @@ Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendi
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
-  over 2 sample(s); GPU activity outside harness inference: max 95% at 2
-  instantaneous check(s); activity between checks is not observed; mode
+  over 2 sample(s); GPU reading max 95% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
   snapshot
 
 #### Complete output
@@ -265,8 +263,7 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); GPU activity outside harness inference: max 47% at 2
-  instantaneous check(s); activity between checks is not observed; mode
+  2 sample(s); GPU reading max 47% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
   snapshot
 
 #### Complete output
@@ -597,8 +594,7 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
-  2 sample(s); GPU activity outside harness inference: max 97% at 2
-  instantaneous check(s); activity between checks is not observed; mode
+  2 sample(s); GPU reading max 97% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
   snapshot
 
 #### Complete output
@@ -672,8 +668,7 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
-  over 2 sample(s); GPU activity outside harness inference: max 77% at 2
-  instantaneous check(s); activity between checks is not observed; mode
+  over 2 sample(s); GPU reading max 77% at 2 check(s), taken before the 0.17.47 stale-read fix, so unreliable: such readings can count this run's own inference and are not evidence of other GPU work; mode
   snapshot
 
 #### Complete output

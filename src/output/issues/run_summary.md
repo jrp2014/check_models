@@ -88,9 +88,10 @@ withheld because the runs differ in: prompt differs; image differs (sha256
 712a5faa6eab… → 5526381f0507…). The roster, revisions and upstream changes
 below are facts about the runs and are still shown.
 
-Run environment: current run on battery power for 47 of 47 models; current run
-detected GPU activity outside harness inference at the checks around 36 of 47
-models (up to 99%).
+Run environment: current run on battery power for 47 of 47 models; current
+run's GPU readings were non-zero around 36 of 47 models (up to 99%), but were
+taken before the 0.17.47 stale-read fix, so unreliable: such readings can
+count this run's own inference and are not evidence of other GPU work.
 
 Mechanical diff only: one image and one generation per model in each sweep,
 with no warm-up or repeats. A difference shows that outputs or timings differ,
