@@ -156,6 +156,31 @@ def test_cached_model_eligibility_reports_skip_reasons(monkeypatch: pytest.Monke
     assert entries["org/no-main-ref"].reasons == ("missing main revision in cache",)
 
 
+def test_missing_cache_directory_yields_no_eligibility_and_warns_once(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A machine with no HF cache yet can still run explicit local-path models."""
+
+    def _missing_cache() -> object:
+        msg = "Cache directory not found: /nowhere"
+        raise CacheNotFound(msg, cache_dir="/nowhere")
+
+    monkeypatch.setattr(check_models, "scan_cache_dir", _missing_cache)
+    monkeypatch.setattr(check_models, "_HF_CACHE_SCAN_STATE", check_models.HFCacheScanState())
+
+    with caplog.at_level(logging.DEBUG, logger=check_models.logger.name):
+        assert check_models.get_cached_model_eligibility() == ()
+        assert check_models.get_cached_model_eligibility() == ()
+
+    warnings = [
+        record
+        for record in caplog.records
+        if record.levelno == logging.WARNING and "cache directory not found" in record.message
+    ]
+    assert len(warnings) == 1
+
+
 @pytest.mark.parametrize(
     ("config_text", "reason"),
     [

@@ -842,15 +842,17 @@ The `src/tools/` directory contains scripts useful for development and verificat
 - **Smoke Testing**: For quick verification, you can use the standard `mlx-vlm` CLI:
 
   ```bash
-  python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image test.jpg
+  python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image test.jpg
   ```
 
-  Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
-
-- **E2E Smoke Tests**: The test suite includes end-to-end tests that run actual model inference:
+- **E2E Smoke Tests**: `tests/test_e2e_smoke.py` runs real inference through
+  the full CLI. One test writes a tiny random-weight Qwen2-VL checkpoint
+  (about 150 KB) to a temp directory and runs it, so the real mlx-vlm load,
+  chat-template and generate path is exercised in CI with no download. The
+  others need `LiquidAI/LFM2.5-VL-450M-MLX-bf16` cached and skip without it.
 
   ```bash
-  # Run E2E tests (requires cached model: mlx-community/nanoLLaVA-1.5-4bit)
+  # Run E2E tests
   pytest tests/test_e2e_smoke.py -v
 
   # Skip slow tests for quick iteration
@@ -859,10 +861,6 @@ The `src/tools/` directory contains scripts useful for development and verificat
   # Run all tests including E2E
   pytest tests/ -v
   ```
-
-  > [!NOTE]
-  > E2E tests require `mlx-community/nanoLLaVA-1.5-4bit` to be cached. Run a quick inference first to download it:
-  > `python -m check_models --models mlx-community/nanoLLaVA-1.5-4bit --max-tokens 10`
 
 - **`validate_env.py`**: Checks your environment for required dependencies and configuration.
 

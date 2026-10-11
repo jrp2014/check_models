@@ -134,7 +134,7 @@ from urllib.request import urlopen
 import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
-from huggingface_hub.errors import HFValidationError
+from huggingface_hub.errors import CacheNotFound, HFValidationError
 from jinja2 import Environment as JinjaEnvironment
 from jinja2 import TemplateSyntaxError as JinjaTemplateSyntaxError
 from jinja2 import meta as jinja_meta
@@ -13485,7 +13485,12 @@ def _get_hf_cache_info_cached(*, refresh: bool = False) -> HFCacheInfo:
         raise cached_error
 
     try:
-        cache_info = scan_cache_dir()
+        try:
+            cache_info = scan_cache_dir()
+        except CacheNotFound as missing:
+            # CacheNotFound is a bare Exception; callers handle a missing cache
+            # as FileNotFoundError (a fresh machine run on local paths only).
+            raise FileNotFoundError(str(missing)) from missing
     except (HFValidationError, FileNotFoundError, OSError, ValueError) as err:
         state.attempted = True
         state.info = None
@@ -18373,16 +18378,18 @@ def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
     per-model callers do not re-read every repo's config.json.
     """
     state = _HF_CACHE_SCAN_STATE
+    # A failed scan is memoised and re-raised to every caller; warn only once.
+    log_failure = logger.debug if state.attempted else logger.warning
     try:
         cache_info = _get_hf_cache_info_cached()
     except HFValidationError:
-        logger.warning("Hugging Face cache directory invalid.")
+        log_failure("Hugging Face cache directory invalid.")
         return ()
     except FileNotFoundError:
-        logger.warning("Hugging Face cache directory not found.")
+        log_failure("Hugging Face cache directory not found.")
         return ()
     except (OSError, ValueError) as e:
-        logger.warning("Unexpected error scanning Hugging Face cache: %s", e)
+        log_failure("Unexpected error scanning Hugging Face cache: %s", e)
         return ()
     if state.eligibility is not None and state.eligibility_source_id == id(cache_info):
         return state.eligibility

@@ -6,6 +6,16 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- E2E smoke: `test_full_inference_with_tiny_local_checkpoint` writes a
+  random-weight Qwen2-VL checkpoint of about 150 KB (tokenizer, chat template,
+  image-processor config, safetensors) to a temp directory and runs it
+  through the full CLI, so CI exercises the real mlx-vlm `load` →
+  `apply_chat_template` → `stream_generate` path without a download. Before,
+  every CI test of that path was mocked and the cached-model e2e tests
+  skipped. The language head is zeroed, so greedy output is a deterministic
+  "a a a a". The technique comes from upstream mlx-vlm's
+  `test_extraction_models`; the rest of upstream's suite tests mlx-vlm
+  internals and was not adopted.
 - System telemetry: each snapshot check (before load and after cleanup) also
   reads the GPU's "Device Utilization %" from `ioreg` (IOAccelerator, no root).
   Both checks sit outside check_models' own GPU work, and the reading drops
@@ -854,6 +864,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- A machine with no Hugging Face cache directory crashed on any explicit
+  `--models` run, local paths included: huggingface_hub's `CacheNotFound` is
+  a bare `Exception`, so it escaped the cache-scan handlers. The scan now
+  reports it as `FileNotFoundError`, and a failed scan warns once rather
+  than at every caller. The tests had hidden this by always creating a cache
+  directory.
 - ty 0.0.86 added `invalid-property-type-override`, which ignores mypy's
   `# type: ignore[override]`, so CI failed on the `_TeeCaptureStream`
   `encoding` and `errors` properties. Each now also carries a
