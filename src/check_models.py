@@ -2172,24 +2172,6 @@ type PromptBurdenKind = Literal[
 ]
 
 
-@dataclass(frozen=True)
-class PromptBurden:
-    """Canonical classification of textual and visual prompt/input burden."""
-
-    kind: PromptBurdenKind
-    total_tokens: int | None = None
-    text_tokens_est: int | None = None
-    nontext_tokens_est: int | None = None
-    visual_tokens_est: int | None = None
-    template_tokens_est: int | None = None
-    nontext_ratio: float | None = None
-    text_tokens_source: str | None = None
-    source: str = "unavailable"
-    reason: str | None = None
-    original_width: int | None = None
-    original_height: int | None = None
-
-
 def _classify_prompt_burden(
     *,
     total: int | None,
@@ -2198,8 +2180,8 @@ def _classify_prompt_burden(
     ratio: float | None,
     placeholders: int | None,
     exact_text_tokens: bool = False,
-) -> tuple[PromptBurdenKind, str | None]:
-    """Classify prompt burden from token components; returns (kind, reason).
+) -> PromptBurdenKind:
+    """Classify prompt burden from token components.
 
     With a heuristic text estimate, a heavy non-text share only counts as
     visual input when a recognised image placeholder confirms it. With an
@@ -2208,17 +2190,17 @@ def _classify_prompt_burden(
     classified the same way as the rest.
     """
     if total is None:
-        return "unknown", "prompt_token_total_unavailable"
+        return "unknown"
     if text_est is None or nontext_est is None:
-        return "unavailable", "component_estimates_unavailable"
+        return "unavailable"
     substantial = total >= QUALITY.long_prompt_tokens_threshold
     if not substantial or ratio is None:
-        return "normal", None
+        return "normal"
     if (placeholders or exact_text_tokens) and ratio >= QUALITY.heavy_nontext_prompt_ratio:
-        return "visual_input", None
+        return "visual_input"
     if text_est >= QUALITY.long_prompt_tokens_threshold:
-        return ("text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"), None
-    return "mixed", None
+        return "text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"
+    return "mixed"
 
 
 def _model_burden_rows(
@@ -2326,11 +2308,8 @@ def _prompt_composition_fact(result: PerformanceResult) -> str | None:
     )
 
 
-def _prompt_burden_for_result(
-    result: PerformanceResult,
-    image_profile: ImageInputProfile | None,
-) -> PromptBurden:
-    """Return the shared prompt/input burden view without re-tokenizing input."""
+def _prompt_burden_for_result(result: PerformanceResult) -> dict[str, JsonLike]:
+    """Return the retained ``prompt_burden`` record without re-tokenizing input."""
     analysis = _quality_analysis_for_result(result)
     total = analysis.prompt_tokens_total if analysis is not None else None
     text_est = analysis.prompt_tokens_text_est if analysis is not None else None
@@ -2338,39 +2317,22 @@ def _prompt_burden_for_result(
     ratio = nontext_est / total if total and nontext_est is not None else None
     diagnostics = result.prompt_diagnostics
     placeholders = diagnostics.image_placeholder_count if diagnostics is not None else 0
-
     text_source = analysis.prompt_tokens_text_source if analysis is not None else None
-    kind, reason = _classify_prompt_burden(
-        total=total,
-        text_est=text_est,
-        nontext_est=nontext_est,
-        ratio=ratio,
-        placeholders=placeholders,
-        exact_text_tokens=text_source in {"tokenizer", "input_ids"},
-    )
-
-    return PromptBurden(
-        kind=kind,
-        total_tokens=total,
-        text_tokens_est=text_est,
-        nontext_tokens_est=nontext_est,
-        nontext_ratio=ratio,
-        text_tokens_source=text_source,
-        source=(
-            (
-                "exact_input_ids"
-                if text_source == "input_ids"
-                else "exact_text_tokens"
-                if text_source == "tokenizer"
-                else "estimated_nontext"
-            )
-            if nontext_est is not None
-            else "unavailable"
+    return {
+        "total_tokens": total,
+        "text_tokens_est": text_est,
+        "nontext_tokens_est": nontext_est,
+        "text_tokens_source": text_source,
+        "nontext_ratio": round(ratio, 2) if ratio is not None else None,
+        "kind": _classify_prompt_burden(
+            total=total,
+            text_est=text_est,
+            nontext_est=nontext_est,
+            ratio=ratio,
+            placeholders=placeholders,
+            exact_text_tokens=text_source in {"tokenizer", "input_ids"},
         ),
-        reason=reason,
-        original_width=image_profile.width if image_profile is not None else None,
-        original_height=image_profile.height if image_profile is not None else None,
-    )
+    }
 
 
 class PhaseTimer:
@@ -20261,17 +20223,7 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
             model_provenance=model_provenance.get(result.model_name),
             recommended_working_set_bytes=report_context.recommended_working_set_bytes,
         )
-        burden = _prompt_burden_for_result(result, report_context.image_profile)
-        record["prompt_burden"] = {
-            "total_tokens": burden.total_tokens,
-            "text_tokens_est": burden.text_tokens_est,
-            "nontext_tokens_est": burden.nontext_tokens_est,
-            "text_tokens_source": burden.text_tokens_source,
-            "nontext_ratio": (
-                round(burden.nontext_ratio, 2) if burden.nontext_ratio is not None else None
-            ),
-            "kind": burden.kind,
-        }
+        record["prompt_burden"] = _prompt_burden_for_result(result)
         records.append(record)
     return RetainedRun(metadata=header, results=tuple(records))
 

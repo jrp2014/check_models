@@ -103,6 +103,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Prompt burden (0.17.72): the intermediate `PromptBurden` dataclass is gone.
+  `_prompt_burden_for_result()` builds the retained `prompt_burden` record
+  directly, with the same six keys and values; the never-read fields
+  (`visual_tokens_est`, `template_tokens_est`, `original_width`,
+  `original_height`, `source`, `reason`), the image-profile argument, and
+  the classifier's unused reason return went with it.
 - Report publication: roll back the 0.17.65/0.17.67 optimizations and their
   draft-summary timing machinery. Summaries once again read the canonical
   JSONL and are refreshed after final timing is recorded. Keep atomic writes,

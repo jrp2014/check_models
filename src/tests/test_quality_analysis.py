@@ -1301,11 +1301,11 @@ class TestExactPromptTokenAccounting:
 
     def test_exact_split_classifies_visual_burden_without_placeholder_regex(self) -> None:
         """With exact text tokens the ratio alone classifies visual burden."""
-        kind, _ = check_models._classify_prompt_burden(
+        kind = check_models._classify_prompt_burden(
             total=16467, text_est=298, nontext_est=16169, ratio=0.98, placeholders=0
         )
         assert kind == "mixed"
-        kind, _ = check_models._classify_prompt_burden(
+        kind = check_models._classify_prompt_burden(
             total=16467,
             text_est=298,
             nontext_est=16169,
