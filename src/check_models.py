@@ -26592,16 +26592,29 @@ def _run_issue_summary_required(inputs: ReportGenerationInputs) -> bool:
     )
 
 
-def _run_issue_summary_failure(
-    summary_path: Path,
-    error_message: str,
-) -> tuple[Path | None, ReportArtifactOutcome]:
-    """Describe one failed or skipped run-issue-summary artifact outcome."""
+def _withdraw_run_issue_summary(
+    output_paths: ReportOutputPaths, reason: str | None
+) -> tuple[None, ReportArtifactOutcome | None]:
+    """Remove an earlier run's summary and record why this run wrote none.
+
+    ``reason`` says why the summary failed: a prerequisite artifact failed,
+    or rendering raised. None means no summary was needed, which is an
+    outcome only when the stale one could not be removed.
+    """
+    cleanup_error = _remove_run_issue_summary(output_paths)
+    if cleanup_error is None:
+        message = reason
+    elif reason is None:
+        message = f"Stale summary cleanup failed: {cleanup_error}"
+    else:
+        message = f"{reason}; stale summary cleanup failed: {cleanup_error}"
+    if message is None:
+        return None, None
     return None, ReportArtifactOutcome(
         key=_RUN_ISSUE_SUMMARY_KEY,
-        path=summary_path,
+        path=_run_issue_summary_path(output_paths),
         succeeded=False,
-        error_message=error_message,
+        error_message=message,
     )
 
 
@@ -26614,27 +26627,16 @@ def _generate_run_issue_summary_output(
     gallery_succeeded: bool,
 ) -> tuple[Path | None, ReportArtifactOutcome | None]:
     """Generate the optional summary only from current-run canonical inputs."""
-    summary_path = _run_issue_summary_path(inputs.output_paths)
     if not jsonl_succeeded:
-        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
-        error_message = "Skipped because current JSONL generation failed."
-        if cleanup_error is not None:
-            error_message += f" Stale summary cleanup failed: {cleanup_error}"
-        return _run_issue_summary_failure(summary_path, error_message)
-    if not _run_issue_summary_required(inputs):
-        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
-        if cleanup_error is None:
-            return None, None
-        return _run_issue_summary_failure(
-            summary_path,
-            f"Stale summary cleanup failed: {cleanup_error}",
+        return _withdraw_run_issue_summary(
+            inputs.output_paths, "Skipped because current JSONL generation failed"
         )
+    if not _run_issue_summary_required(inputs):
+        return _withdraw_run_issue_summary(inputs.output_paths, None)
     if not diagnostics_succeeded:
-        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
-        error_message = "Skipped because current diagnostics generation failed."
-        if cleanup_error is not None:
-            error_message += f" Stale summary cleanup failed: {cleanup_error}"
-        return _run_issue_summary_failure(summary_path, error_message)
+        return _withdraw_run_issue_summary(
+            inputs.output_paths, "Skipped because current diagnostics generation failed"
+        )
     try:
         generated = generate_run_issue_summary_report(
             inputs.output_paths,
@@ -26643,12 +26645,8 @@ def _generate_run_issue_summary_output(
             comparison=inputs.comparison,
         )
     except Exception as error:  # report isolation must contain renderer defects
-        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
         logger.exception("Failed to generate paste-ready run issue summary.")
-        error_message = str(error)
-        if cleanup_error is not None:
-            error_message += f"; stale summary cleanup failed: {cleanup_error}"
-        return _run_issue_summary_failure(summary_path, error_message)
+        return _withdraw_run_issue_summary(inputs.output_paths, str(error))
     outcome = (
         ReportArtifactOutcome(
             key=_RUN_ISSUE_SUMMARY_KEY,

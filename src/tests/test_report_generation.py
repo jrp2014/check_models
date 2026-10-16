@@ -8918,6 +8918,30 @@ def test_both_gallery_formats_share_one_row_per_model(tmp_path: Path) -> None:
     assert replaced.assessment_by_model.keys() == {report_context.assessments[0][0]}
 
 
+def test_withdrawn_run_summary_keeps_not_needed_apart_from_failed(tmp_path: Path) -> None:
+    """Not needed is no outcome; a failed prerequisite or render, or a failed cleanup, is one."""
+    paths = check_models.ReportOutputPaths.from_root(tmp_path)
+    withdraw = check_models._withdraw_run_issue_summary
+    summary = check_models._run_issue_summary_path(paths)
+    check_models._write_text_file(summary, "stale prior-run summary\n")
+    assert withdraw(paths, None) == (None, None)
+    assert not summary.exists()
+    _, failed = withdraw(paths, "Skipped because current JSONL generation failed")
+    assert failed is not None
+    assert not failed.succeeded
+    assert failed.error_message == "Skipped because current JSONL generation failed"
+    denied = PermissionError("summary cleanup denied")
+    with patch.object(check_models, "_remove_run_issue_summary", return_value=denied):
+        _, stale = withdraw(paths, None)
+        _, render = withdraw(paths, "summary fixture failure")
+    assert stale is not None
+    assert stale.error_message == "Stale summary cleanup failed: summary cleanup denied"
+    assert render is not None
+    assert render.error_message == (
+        "summary fixture failure; stale summary cleanup failed: summary cleanup denied"
+    )
+
+
 def _history_bands(
     path: Path,
     *,

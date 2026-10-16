@@ -92,6 +92,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor (0.17.64): the run issue summary's four no-summary branches
+  (JSONL failed, not needed, diagnostics failed, rendering raised) share one
+  helper that removes an earlier run's summary and records why none was
+  written. Not needed is still no outcome unless the stale summary could not
+  be removed. The two prerequisite messages lose their trailing full stop,
+  and every cleanup failure is appended as "; stale summary cleanup failed:
+  ...".
 - Refactor (0.17.63): a run comparison reads and decodes the retained
   history once. The throughput bands and the earlier-runs-on-this-mlx-version
   count share that read but keep their own selection rules: the version count
