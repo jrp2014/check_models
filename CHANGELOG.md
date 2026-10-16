@@ -92,6 +92,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor (0.17.67): the run issue summary is rendered once per run
+  instead of twice. It now runs with the output index, after the other
+  renderers, from the written run carrying the end-to-end duration and
+  finish time the final header records. One helper computes that timing for
+  both, so the summary, the index and the header still agree, and
+  regenerating the summary from `results.jsonl` reproduces it byte for byte.
+  If the final header rewrite fails, the summary is rendered again from the
+  pre-report header that stays on disk, so it still matches the file.
 - `--models` (0.17.66) now rejects a model ID listed more than once,
   before any model runs. Every report keys a run's attempts by model ID, so
   a repeated ID used to run inference twice and then fail publication's

@@ -518,7 +518,7 @@ def test_run_issue_summary_uses_failure_reason_when_observations_are_empty(
 
 
 def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
-    """A re-render that fails mid-write (disk full) must not truncate the shipped summary."""
+    """A fallback re-render that fails mid-write (disk full) must not truncate the summary."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/a"),))
     summary = check_models.generate_run_issue_summary_report(output_paths)
@@ -537,11 +537,12 @@ def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
         Namespace(output_paths=output_paths, comparison=None),
     )
     with patch.object(check_models, "_write_text_file", _explode):
-        check_models._rerender_run_issue_summary(
+        check_models._match_summary_to_pre_report_header(
             inputs,
-            final=check_models.PublishedRun(
+            published=check_models.PublishedRun(
                 output_paths.jsonl, output_paths.jsonl.read_text(encoding="utf-8")
             ),
+            finalized=None,
             summary_written=True,
             issue_reports={},
             include_gallery_markdown=False,
@@ -2588,9 +2589,9 @@ def test_retained_manifest_reflects_report_outcomes_and_final_duration(tmp_path:
 def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Path) -> None:
     """Every surface shows the final header's duration, however long reporting takes.
 
-    The summary is first rendered before the header gains its end-to-end
-    figure, so it is rendered again from the final header; a clock that
-    advances on every read would expose any surface timing itself.
+    The summary is rendered once, before the final header is written, from
+    the timing that header records; a clock that advances on every read
+    would expose any surface timing itself.
     """
     failure = _make_failure_with_details(
         "org/broken",
@@ -2610,14 +2611,21 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
     with (
         patch.object(check_models.time, "time", ticking_clock),
         patch.object(check_models._LinkStyleState, "value", "relative"),
-        # Both summary renders read the run as written, never the file back.
+        # The summary reads the run as written, never the file back.
         patch.object(
             check_models,
             "_load_retained_run",
             side_effect=AssertionError("publication must not reload results.jsonl"),
         ),
+        patch.object(
+            check_models,
+            "generate_run_issue_summary_report",
+            wraps=check_models.generate_run_issue_summary_report,
+        ) as render_summary,
     ):
         result = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert render_summary.call_count == 1
 
     header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
     assert header["total_runtime_seconds"] > 600.0
@@ -2630,6 +2638,55 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
     # run last wrote and never from a file it did not write.
     assert check_models._recorded_run_seconds(result.published) == header["total_runtime_seconds"]
     assert check_models._recorded_run_seconds(None) is None
+    # Regenerating from results.jsonl reproduces the shipped summary exactly.
+    summary_path = check_models._run_issue_summary_path(inputs.output_paths)
+    shipped = summary_path.read_bytes()
+    with patch.object(check_models._LinkStyleState, "value", "relative"):
+        check_models.regenerate_run_issue_summary(inputs.output_paths.index.parent)
+    assert summary_path.read_bytes() == shipped
+
+
+def test_failed_final_header_leaves_the_summary_matching_the_written_header(
+    tmp_path: Path,
+) -> None:
+    """When the final rewrite fails, the summary falls back to the header on disk."""
+    failure = _make_failure_with_details("org/broken", error_msg="Model loading failed: boom")
+    inputs = _report_generation_inputs(tmp_path, result=failure)
+    start = 1_700_000_000.0
+    inputs = replace(inputs, overall_start_time=start, overall_time=600.0)
+    clock = {"now": start + 600.0}
+
+    def ticking_clock() -> float:
+        clock["now"] += 1.0
+        return clock["now"]
+
+    write = check_models._write_retained_run
+    writes: list[Path] = []
+
+    def first_write_only(
+        run: check_models.RetainedRun, filename: Path
+    ) -> check_models.PublishedRun:
+        writes.append(filename)
+        if len(writes) > 1:
+            msg = "disk full"
+            raise OSError(msg)
+        return write(run, filename)
+
+    with (
+        patch.object(check_models.time, "time", ticking_clock),
+        patch.object(check_models._LinkStyleState, "value", "relative"),
+        patch.object(check_models, "_write_retained_run", first_write_only),
+    ):
+        result = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert len(writes) == 2
+    header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
+    assert header["total_runtime_seconds"] == 600.0  # the pre-report header stands
+    summary = check_models._run_issue_summary_path(inputs.output_paths).read_text(encoding="utf-8")
+    duration = check_models.format_overall_runtime(header["total_runtime_seconds"])
+    assert f"*Run duration:* {duration}" in summary
+    assert f"*Run finished:* {header['timestamp']}" in summary
+    assert check_models._recorded_run_seconds(result.published) == 600.0
 
 
 def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: Path) -> None:  # noqa: PLR0915 - exercises the full artifact fan-out twice

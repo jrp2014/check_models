@@ -9822,7 +9822,7 @@ def _write_markdown_artifact(
 ) -> None:
     """Normalize and write Markdown artifact content, keeping the old file on failure.
 
-    The run summary is rendered twice; a failed second render must leave the first.
+    A failed fallback render of the run summary must leave the earlier one intact.
     """
     markdown_content: str = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
     _replace_text_file(filename, markdown_content)
@@ -26686,8 +26686,14 @@ def _generate_run_issue_summary_output(
     published: PublishedRun | None,
     diagnostics_succeeded: bool,
     gallery_succeeded: bool,
+    ended_at: float,
 ) -> tuple[Path | None, ReportArtifactOutcome | None]:
-    """Generate the optional summary only from current-run canonical inputs."""
+    """Generate the optional summary only from current-run canonical inputs.
+
+    Rendered once, from the written run with the end-to-end timing the final
+    header will record (ending at ``ended_at``), so the summary matches what
+    a later regeneration from results.jsonl produces.
+    """
     if published is None:
         return _withdraw_run_issue_summary(
             inputs.output_paths, "Skipped because current JSONL generation failed"
@@ -26704,7 +26710,10 @@ def _generate_run_issue_summary_output(
             issue_reports=issue_reports,
             include_gallery_markdown=gallery_succeeded,
             comparison=inputs.comparison,
-            run=published.run,
+            run=replace(
+                published.run,
+                metadata=_with_final_timing(published.run.metadata, inputs, ended_at),
+            ),
         )
     except Exception as error:  # report isolation must contain renderer defects
         logger.exception("Failed to generate paste-ready run issue summary.")
@@ -27093,6 +27102,23 @@ def _elapsed_run_seconds(inputs: ReportGenerationInputs, until: float | None = N
     return (time.time() if until is None else until) - inputs.overall_start_time
 
 
+def _with_final_timing(
+    metadata: JsonlMetadataRecord, inputs: ReportGenerationInputs, ended_at: float
+) -> JsonlMetadataRecord:
+    """The header with its end-to-end duration and finish time, ending at ``ended_at``.
+
+    One computation for the final header and the summary rendered before it
+    is written, so the two cannot disagree. Unchanged without a run start.
+    """
+    if inputs.overall_start_time is None:
+        return metadata
+    return {
+        **metadata,
+        "total_runtime_seconds": round(ended_at - inputs.overall_start_time, 3),
+        "timestamp": local_time_str(ended_at),
+    }
+
+
 def _finalize_retained_run_record(
     inputs: ReportGenerationInputs,
     retained: RetainedRun | None,
@@ -27120,11 +27146,11 @@ def _finalize_retained_run_record(
         for artifact in artifacts
         if artifact.key in successful_keys
     }
-    metadata: JsonlMetadataRecord = {**retained.metadata, "artifacts": manifest}
-    if inputs.overall_start_time is not None:
-        end = time.time() if ended_at is None else ended_at
-        metadata["total_runtime_seconds"] = round(end - inputs.overall_start_time, 3)
-        metadata["timestamp"] = local_time_str(end)
+    metadata = _with_final_timing(
+        {**retained.metadata, "artifacts": manifest},
+        inputs,
+        time.time() if ended_at is None else ended_at,
+    )
     try:
         return _write_retained_run(
             RetainedRun(metadata=metadata, results=retained.results), inputs.output_paths.jsonl
@@ -27181,23 +27207,24 @@ def _run_jsonl_artifact(
     return published if run_artifact(replace(artifact, job=write)) else None
 
 
-def _rerender_run_issue_summary(
+def _match_summary_to_pre_report_header(
     inputs: ReportGenerationInputs,
     *,
-    final: PublishedRun | None,
+    published: PublishedRun | None,
+    finalized: PublishedRun | None,
     summary_written: bool,
     issue_reports: Mapping[str, Path],
     include_gallery_markdown: bool,
 ) -> None:
-    """Render the summary again from the final JSONL header so its timing matches.
+    """Re-render the summary from the pre-report header after a failed final rewrite.
 
-    The first render ran before the header gained its end-to-end duration and
-    finish time; re-rendering from the final header as written also makes the
-    shipped summary what a later regeneration from results.jsonl produces.
-    Runs only when both the summary and the final header were written; a
-    failure keeps the first render.
+    The summary was rendered with the final timing; when that header could
+    not be written, the file keeps the pre-report one, and the summary must
+    keep matching what a regeneration from results.jsonl produces. Nothing
+    to do when the rewrite succeeded or no summary was written; a failure
+    keeps the earlier render.
     """
-    if final is None or not summary_written:
+    if finalized is not None or published is None or not summary_written:
         return
     try:
         generate_run_issue_summary_report(
@@ -27205,10 +27232,10 @@ def _rerender_run_issue_summary(
             issue_reports=issue_reports,
             include_gallery_markdown=include_gallery_markdown,
             comparison=inputs.comparison,
-            run=final.run,
+            run=published.run,
         )
-    except Exception:  # report isolation: the first render stands
-        logger.exception("Re-rendering the run summary with final timing failed.")
+    except Exception:  # report isolation: the earlier render stands
+        logger.exception("Re-rendering the run summary from the pre-report header failed.")
 
 
 def _generate_reports_and_log_outputs(
@@ -27282,21 +27309,6 @@ def _generate_reports_and_log_outputs(
 
     gallery_succeeded = run_artifact(by_key["markdown_gallery"])
 
-    run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
-        inputs,
-        issue_reports=diagnostics_artifacts.issue_reports,
-        published=published,
-        diagnostics_succeeded=diagnostics_succeeded,
-        gallery_succeeded=gallery_succeeded,
-    )
-    if summary_outcome is not None:
-        outcomes.append(summary_outcome)
-    if run_issue_summary is not None:
-        diagnostics_artifacts = replace(
-            diagnostics_artifacts,
-            run_issue_summary=run_issue_summary,
-        )
-
     for artifact in artifacts:
         if artifact.job is not None and artifact.key not in {
             "output_index",
@@ -27317,11 +27329,26 @@ def _generate_reports_and_log_outputs(
             )
         )
 
-    # The index runs last so its links are driven by this run's outcomes:
-    # a stale file surviving a failed renderer must not be presented. One end
-    # time serves the index and the final JSONL header so both show the same
-    # duration.
+    # The summary and the index run last so the index's links are driven by
+    # this run's outcomes: a stale file surviving a failed renderer must not be
+    # presented. One end time serves the summary, the index and the final JSONL
+    # header so all three show the same duration.
     run_end_time = time.time()
+    run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
+        inputs,
+        issue_reports=diagnostics_artifacts.issue_reports,
+        published=published,
+        diagnostics_succeeded=diagnostics_succeeded,
+        gallery_succeeded=gallery_succeeded,
+        ended_at=run_end_time,
+    )
+    if summary_outcome is not None:
+        outcomes.append(summary_outcome)
+    if run_issue_summary is not None:
+        diagnostics_artifacts = replace(
+            diagnostics_artifacts,
+            run_issue_summary=run_issue_summary,
+        )
     successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
     available = tuple(artifact for artifact in artifacts if artifact.key in successful_keys)
     index_artifact = replace(
@@ -27355,9 +27382,10 @@ def _generate_reports_and_log_outputs(
         jsonl_succeeded=published is not None,
         ended_at=run_end_time,
     )
-    _rerender_run_issue_summary(
+    _match_summary_to_pre_report_header(
         inputs,
-        final=finalized,
+        published=published,
+        finalized=finalized,
         summary_written=run_issue_summary is not None,
         issue_reports=diagnostics_artifacts.issue_reports,
         include_gallery_markdown=gallery_succeeded,
