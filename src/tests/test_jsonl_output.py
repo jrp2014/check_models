@@ -338,7 +338,6 @@ def test_retained_metadata_captures_public_snapshot_contract(
         total_time=1.5,
         quality_analysis=analysis,
         prompt_diagnostics=check_models.PromptDiagnostics(
-            image_patch_count=120,
             generate_kwargs={
                 "max_tokens": 500,
                 "temperature": 0.0,
@@ -481,7 +480,6 @@ def test_retained_metadata_captures_public_snapshot_contract(
         "text_tokens_source": "heuristic",
         "nontext_ratio": 0.85,
         "kind": "normal",
-        "image_patch_count": 120,
     }
     assert header["producer"] == {
         "name": "check_models",
@@ -1386,7 +1384,6 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
             rendered_prompt_preview="<image> Describe this.",
             rendered_prompt_chars=22,
             image_placeholder_count=1,
-            image_patch_count=4,
             eos_token_id=151645,
             special_token_ids=(151645,),
             special_tokens=("<|end|>",),
@@ -1407,7 +1404,7 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     assert prompt_diagnostics["rendered_prompt_hash_sha256"] == "abc123"
     assert prompt_diagnostics["image_placeholder_count"] == 1
     assert "processed_image_width" not in prompt_diagnostics
-    assert prompt_diagnostics["image_patch_count"] == 4
+    assert "image_patch_count" not in prompt_diagnostics
     assert prompt_diagnostics["special_tokens"] == ["<|end|>"]
     assert prompt_diagnostics["generate_kwargs"] == {
         "max_tokens": 500,

@@ -103,6 +103,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Report publication: roll back the 0.17.65/0.17.67 optimizations and their
+  draft-summary timing machinery. Summaries once again read the canonical
+  JSONL and are refreshed after final timing is recorded. Keep atomic writes,
+  failure recovery, and tests for timing consistency and exact regeneration.
+- Prompt diagnostics: remove the unused image patch count field and display
+  row; no runtime path populated it. Older retained records remain readable.
 - Diagnostics (0.17.71): the "Processed image" row and the
   `processed_image_width` / `processed_image_height` fields in
   `prompt_diagnostics` and `prompt_burden` are gone. They only ever held the

@@ -518,7 +518,7 @@ def test_run_issue_summary_uses_failure_reason_when_observations_are_empty(
 
 
 def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
-    """A fallback re-render that fails mid-write (disk full) must not truncate the summary."""
+    """A re-render that fails mid-write (disk full) must not truncate the shipped summary."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/a"),))
     summary = check_models.generate_run_issue_summary_report(output_paths)
@@ -532,12 +532,17 @@ def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
         msg = "disk full"
         raise OSError(msg)
 
-    draft = check_models._draft_run_issue_summary(
-        output_paths, check_models._load_retained_run(output_paths.jsonl)
+    inputs = cast(
+        "check_models.ReportGenerationInputs",
+        Namespace(output_paths=output_paths, comparison=None),
     )
     with patch.object(check_models, "_write_text_file", _explode):
-        check_models._match_summary_to_pre_report_header(
-            draft, finalized=None, summary_written=True
+        check_models._rerender_run_issue_summary(
+            inputs,
+            header_final=True,
+            summary_written=True,
+            issue_reports={},
+            include_gallery_markdown=False,
         )
 
     assert summary.read_bytes() == first
@@ -1730,6 +1735,29 @@ def test_retained_loader_permits_unknown_observation_detail_keys(tmp_path: Path)
     assert summary is not None
 
 
+@pytest.mark.parametrize("patch_count", [None, 4])
+def test_run_summary_accepts_obsolete_image_measurements(
+    tmp_path: Path, patch_count: int | None
+) -> None:
+    """Old diagnostic keys remain readable without reviving unmeasured image facts."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result("org/model")
+    result["prompt_diagnostics"] = {
+        "image_patch_count": patch_count,
+        "processed_image_width": 100,
+        "processed_image_height": 200,
+    }
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = safe_io.read_text_no_follow(summary)
+    assert "org/model" in content
+    assert "Image patch count" not in content
+    assert "Processed image" not in content
+
+
 def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path) -> None:
     """Regeneration must rehydrate the retained comparison, not silently drop it."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
@@ -2407,7 +2435,7 @@ def test_report_artifact_key_error_is_contained(
             side_effect=KeyError("unexpected renderer field"),
         ),
     ):
-        outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     html_outcome = _report_outcome(outcomes, "html")
     assert html_outcome.succeeded is False
@@ -2431,11 +2459,11 @@ def test_report_diagnostics_and_summary_key_errors_are_contained(
         ),
         patch.object(
             check_models,
-            "_draft_run_issue_summary",
+            "generate_run_issue_summary_report",
             side_effect=KeyError("summary defect"),
         ),
     ):
-        outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert _report_outcome(outcomes, "diagnostics").succeeded is False
     assert _report_outcome(outcomes, "jsonl").succeeded is True
@@ -2479,7 +2507,7 @@ def test_comparison_rendering_failure_does_not_block_reports(
             side_effect=KeyError("broken comparison view"),
         ),
     ):
-        outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert _report_outcome(outcomes, "jsonl").succeeded is True
     assert inputs.output_paths.index.is_file()
@@ -2499,11 +2527,11 @@ def test_stale_environment_log_is_not_presented_as_current(tmp_path: Path) -> No
     inputs.output_paths.environment.parent.mkdir(parents=True, exist_ok=True)
     inputs.output_paths.environment.write_text("stale dump from an earlier run", encoding="utf-8")
 
-    outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+    outcomes = check_models._generate_reports_and_log_outputs(inputs)
     assert all(outcome.key != "environment" for outcome in outcomes)
 
     inputs = replace(inputs, environment_logged=True)
-    outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+    outcomes = check_models._generate_reports_and_log_outputs(inputs)
     environment = next(outcome for outcome in outcomes if outcome.key == "environment")
     assert environment.succeeded is True
 
@@ -2521,7 +2549,7 @@ def test_failed_current_artifact_is_omitted_from_navigation(
         patch.object(check_models._LinkStyleState, "value", "relative"),
         patch.object(check_models, "generate_html_report", side_effect=KeyError("html failed")),
     ):
-        outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     index = inputs.output_paths.index.read_text(encoding="utf-8")
     assert "results.html" not in index
@@ -2561,14 +2589,9 @@ def test_retained_manifest_reflects_report_outcomes_and_final_duration(tmp_path:
         patch.object(check_models._LinkStyleState, "value", "relative"),
         patch.object(check_models, "generate_html_report", side_effect=slow_failing_html),
     ):
-        result = check_models._generate_reports_and_log_outputs(inputs)
+        check_models._generate_reports_and_log_outputs(inputs)
 
-    written = inputs.output_paths.jsonl.read_text(encoding="utf-8")
-    header = json.loads(written.splitlines()[0])
-    # Publication hands back the final rewrite itself, so nothing reloads it.
-    assert result.published is not None
-    assert result.published.text == written
-    assert check_models._recorded_run_seconds(result.published) == header["total_runtime_seconds"]
+    header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
     # Outside the tracked src/output tree the manifest carries publication-safe
     # absolute text, so assert on the retained suffixes rather than exact paths.
     assert "results_html" not in header["artifacts"]
@@ -2581,9 +2604,9 @@ def test_retained_manifest_reflects_report_outcomes_and_final_duration(tmp_path:
 def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Path) -> None:
     """Every surface shows the final header's duration, however long reporting takes.
 
-    The summary is rendered once, before the final header is written, from
-    the timing that header records; a clock that advances on every read
-    would expose any surface timing itself.
+    The summary is first rendered before the header gains its end-to-end
+    figure, so it is rendered again from the final header; a clock that
+    advances on every read would expose any surface timing itself.
     """
     failure = _make_failure_with_details(
         "org/broken",
@@ -2603,26 +2626,8 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
     with (
         patch.object(check_models.time, "time", ticking_clock),
         patch.object(check_models._LinkStyleState, "value", "relative"),
-        # The summary reads the run as written, never the file back.
-        patch.object(
-            check_models,
-            "_load_retained_run",
-            side_effect=AssertionError("publication must not reload results.jsonl"),
-        ),
-        patch.object(
-            check_models,
-            "_draft_run_issue_summary",
-            wraps=check_models._draft_run_issue_summary,
-        ) as draft_summary,
-        patch.object(
-            check_models,
-            "_write_run_issue_summary",
-            wraps=check_models._write_run_issue_summary,
-        ) as write_summary,
     ):
-        result = check_models._generate_reports_and_log_outputs(inputs)
-
-    assert (draft_summary.call_count, write_summary.call_count) == (1, 1)
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
     assert header["total_runtime_seconds"] > 600.0
@@ -2631,10 +2636,14 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
     assert f"*Run duration:* {duration}" in summary
     assert f"*Run finished:* {header['timestamp']}" in summary
     assert f"- Run duration: {duration}" in inputs.output_paths.index.read_text(encoding="utf-8")
-    # The closing log line shows the same recorded figure, from the header this
-    # run last wrote and never from a file it did not write.
-    assert check_models._recorded_run_seconds(result.published) == header["total_runtime_seconds"]
-    assert check_models._recorded_run_seconds(None) is None
+    # The closing log line reads the same recorded figure back, and never a
+    # file this run did not write.
+    assert (
+        check_models._recorded_run_seconds(inputs.output_paths, outcomes)
+        == (header["total_runtime_seconds"])
+    )
+    assert check_models._recorded_run_seconds(inputs.output_paths, ()) is None
+
     # Regenerating from results.jsonl reproduces the shipped summary exactly.
     summary_path = check_models._run_issue_summary_path(inputs.output_paths)
     shipped = summary_path.read_bytes()
@@ -2650,20 +2659,19 @@ def test_reported_duration_includes_building_the_run_summary(tmp_path: Path) -> 
     start = 1_700_000_000.0
     inputs = replace(inputs, overall_start_time=start, overall_time=600.0)
     clock = {"now": start + 600.0}
-    draft = check_models._draft_run_issue_summary
+    render = check_models.generate_run_issue_summary_report
 
-    def slow_draft(
+    def slow_render(
         output_paths: check_models.ReportOutputPaths,
-        run: check_models.RetainedRun,
         *,
         issue_reports: Mapping[str, Path] | None = None,
         include_gallery_markdown: bool = True,
         comparison: check_models.RunComparison | None = None,
-    ) -> check_models.RunIssueSummaryDraft:
-        clock["now"] += 120.0  # simulated, not a measurement
-        return draft(
+    ) -> Path | None:
+        if clock["now"] == start + 600.0:
+            clock["now"] += 120.0  # simulated first render, not a measurement
+        return render(
             output_paths,
-            run,
             issue_reports=issue_reports,
             include_gallery_markdown=include_gallery_markdown,
             comparison=comparison,
@@ -2672,7 +2680,7 @@ def test_reported_duration_includes_building_the_run_summary(tmp_path: Path) -> 
     with (
         patch.object(check_models.time, "time", lambda: clock["now"]),
         patch.object(check_models._LinkStyleState, "value", "relative"),
-        patch.object(check_models, "_draft_run_issue_summary", slow_draft),
+        patch.object(check_models, "generate_run_issue_summary_report", slow_render),
     ):
         check_models._generate_reports_and_log_outputs(inputs)
 
@@ -2699,9 +2707,7 @@ def test_failed_final_header_leaves_the_summary_matching_the_written_header(
     write = check_models._write_retained_run
     writes: list[Path] = []
 
-    def first_write_only(
-        run: check_models.RetainedRun, filename: Path
-    ) -> check_models.PublishedRun:
+    def first_write_only(run: check_models.RetainedRun, filename: Path) -> None:
         writes.append(filename)
         if len(writes) > 1:
             msg = "disk full"
@@ -2722,7 +2728,7 @@ def test_failed_final_header_leaves_the_summary_matching_the_written_header(
     duration = check_models.format_overall_runtime(header["total_runtime_seconds"])
     assert f"*Run duration:* {duration}" in summary
     assert f"*Run finished:* {header['timestamp']}" in summary
-    assert check_models._recorded_run_seconds(result.published) == 600.0
+    assert check_models._recorded_run_seconds(inputs.output_paths, result) == 600.0
 
 
 def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: Path) -> None:  # noqa: PLR0915 - exercises the full artifact fan-out twice
@@ -2751,7 +2757,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
     )
 
     with patch.object(check_models._LinkStyleState, "value", "relative"):
-        outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     index_content = output_paths.index.read_text(encoding="utf-8")
     summary_path = output_paths.index.parent / "issues" / "run_summary.md"
@@ -2762,10 +2768,10 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
 
     with patch.object(
         check_models,
-        "_draft_run_issue_summary",
+        "generate_run_issue_summary_report",
         side_effect=ValueError("summary fixture failure"),
     ):
-        failed_summary_outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        failed_summary_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     failed_summary = _report_outcome(failed_summary_outcomes, "run_issue_summary")
     assert not failed_summary.succeeded
@@ -2791,11 +2797,11 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         ),
         patch.object(
             check_models,
-            "_draft_run_issue_summary",
+            "generate_run_issue_summary_report",
             side_effect=AssertionError("summary must not read stale JSONL"),
         ),
     ):
-        stale_jsonl_outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        stale_jsonl_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert not summary_path.exists()
     assert not _report_outcome(stale_jsonl_outcomes, "jsonl").succeeded
@@ -2810,7 +2816,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         ),
         patch.object(check_models, "_remove_run_issue_summary", return_value=cleanup_error),
     ):
-        cleanup_failure_outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        cleanup_failure_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert summary_path.exists()
     assert "run_summary.md" not in output_paths.index.read_text(encoding="utf-8")
@@ -2828,11 +2834,11 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         ),
         patch.object(
             check_models,
-            "_draft_run_issue_summary",
+            "generate_run_issue_summary_report",
             side_effect=AssertionError("summary must not link stale diagnostics"),
         ),
     ):
-        stale_diagnostics_outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        stale_diagnostics_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert not summary_path.exists()
     assert "run_summary.md" not in output_paths.index.read_text(encoding="utf-8")
@@ -2853,7 +2859,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         "generate_markdown_gallery_report",
         side_effect=OSError("current gallery write failed"),
     ):
-        stale_gallery_outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
+        stale_gallery_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     stale_gallery_summary = summary_path.read_text(encoding="utf-8")
     assert "model_gallery.md" not in stale_gallery_summary
