@@ -1215,7 +1215,7 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
         fail_renderer,
     )
 
-    outcomes = check_models._generate_reports_and_log_outputs(inputs)
+    outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
 
     assert events[0] == "jsonl"
     assert failing_renderer in events

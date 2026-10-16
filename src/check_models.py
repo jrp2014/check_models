@@ -89,7 +89,7 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from functools import cached_property, lru_cache, partial
+from functools import cached_property, lru_cache
 from importlib import import_module
 from importlib.metadata import (
     Distribution,
@@ -1612,6 +1612,35 @@ class ReportArtifactOutcome:
     path: Path
     succeeded: bool
     error_message: str | None = None
+
+
+@dataclass(frozen=True)
+class PublishedRun:
+    """The retained-run JSONL text this run wrote to ``path``.
+
+    ``run`` validates that exact text, so a renderer reads what a later
+    ``_load_retained_run(path)`` or regeneration reads, without reading the
+    file back. A validation error is raised on access, inside the caller's
+    own failure boundary.
+    """
+
+    path: Path
+    text: str
+
+    @cached_property
+    def run(self) -> RetainedRun:
+        """The written run, decoded and validated as the loader does."""
+        return _load_retained_run_text(self.text, str(self.path))
+
+
+@dataclass(frozen=True)
+class ReportGenerationResult:
+    """Every artifact outcome, and the retained run as this run last wrote it."""
+
+    outcomes: tuple[ReportArtifactOutcome, ...]
+    # The final rewrite when it succeeded, else the pre-report write; None
+    # when no JSONL was written.
+    published: PublishedRun | None = None
 
 
 class ChatTemplateKwargs(TypedDict, total=False):
@@ -20308,13 +20337,15 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
     return RetainedRun(metadata=header, results=tuple(records))
 
 
-def _write_retained_run(run: RetainedRun, filename: Path) -> None:
+def _write_retained_run(run: RetainedRun, filename: Path) -> PublishedRun:
     """Serialize one retained run as a metadata line plus ordered result lines."""
     lines = [json.dumps(run.metadata)]
     lines.extend(json.dumps(result) for result in run.results)
+    text = "\n".join(lines) + "\n"
     # The final manifest reconciliation relies on a failed rewrite leaving the
     # previous file intact.
-    _replace_text_file(filename, "\n".join(lines) + "\n")
+    _replace_text_file(filename, text)
+    return PublishedRun(filename, text)
 
 
 def save_jsonl_report(
@@ -25419,9 +25450,18 @@ def generate_run_issue_summary_report(
     issue_reports: Mapping[str, Path] | None = None,
     include_gallery_markdown: bool = True,
     comparison: RunComparison | None = None,
+    run: RetainedRun | None = None,
 ) -> Path | None:
-    """Generate a paste-ready whole-run issue from the retained schema-3 artifact."""
-    source = _load_run_issue_summary_source(output_paths)
+    """Generate a paste-ready whole-run issue from the retained schema-3 artifact.
+
+    Renders ``run`` when the caller holds the validated run it just wrote;
+    otherwise loads and validates ``output_paths.jsonl``.
+    """
+    source = (
+        _run_issue_summary_source_from_run(run)
+        if run is not None
+        else _load_run_issue_summary_source(output_paths)
+    )
     summary_path = _run_issue_summary_path(output_paths)
     actionable = tuple(
         result
@@ -26629,12 +26669,12 @@ def _generate_run_issue_summary_output(
     inputs: ReportGenerationInputs,
     *,
     issue_reports: Mapping[str, Path],
-    jsonl_succeeded: bool,
+    published: PublishedRun | None,
     diagnostics_succeeded: bool,
     gallery_succeeded: bool,
 ) -> tuple[Path | None, ReportArtifactOutcome | None]:
     """Generate the optional summary only from current-run canonical inputs."""
-    if not jsonl_succeeded:
+    if published is None:
         return _withdraw_run_issue_summary(
             inputs.output_paths, "Skipped because current JSONL generation failed"
         )
@@ -26650,6 +26690,7 @@ def _generate_run_issue_summary_output(
             issue_reports=issue_reports,
             include_gallery_markdown=gallery_succeeded,
             comparison=inputs.comparison,
+            run=published.run,
         )
     except Exception as error:  # report isolation must contain renderer defects
         logger.exception("Failed to generate paste-ready run issue summary.")
@@ -27046,8 +27087,8 @@ def _finalize_retained_run_record(
     *,
     jsonl_succeeded: bool,
     ended_at: float | None = None,
-) -> bool:
-    """Rewrite the JSONL header once every report outcome is known; True when rewritten.
+) -> PublishedRun | None:
+    """Rewrite the JSONL header once every report outcome is known; the rewrite, or None.
 
     The pre-report write lists every planned destination. A renderer that
     failed (leaving nothing, or a stale file from an earlier run) must not
@@ -27058,7 +27099,7 @@ def _finalize_retained_run_record(
     earlier header rather than costing the run.
     """
     if retained is None or not jsonl_succeeded:
-        return False
+        return None
     successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
     manifest = {
         artifact.public_key: _public_artifact_path(artifact.path)
@@ -27071,30 +27112,28 @@ def _finalize_retained_run_record(
         metadata["total_runtime_seconds"] = round(end - inputs.overall_start_time, 3)
         metadata["timestamp"] = local_time_str(end)
     try:
-        _write_retained_run(
+        return _write_retained_run(
             RetainedRun(metadata=metadata, results=retained.results), inputs.output_paths.jsonl
         )
     except Exception:
         logger.exception(
             "Retained-run manifest reconciliation failed; the pre-report header stands."
         )
-        return False
-    return True
+        return None
 
 
-def _recorded_run_seconds(
-    output_paths: ReportOutputPaths, outcomes: Sequence[ReportArtifactOutcome]
-) -> float | None:
+def _recorded_run_seconds(published: PublishedRun | None) -> float | None:
     """The end-to-end duration this run's retained header records, when it wrote one.
 
-    Read back so the closing log line shows the figure every report shows; a
-    file left by an earlier run is never consulted.
+    Taken from the header as last written so the closing log line shows the
+    figure every report shows; a file left by an earlier run is never
+    consulted.
     """
-    if not any(outcome.key == "jsonl" and outcome.succeeded for outcome in outcomes):
+    if published is None:
         return None
     try:
-        runtime = _load_retained_run(output_paths.jsonl).metadata.get("total_runtime_seconds")
-    except (OSError, ValueError, TypeError, KeyError):
+        runtime = published.run.metadata.get("total_runtime_seconds")
+    except (ValueError, TypeError, KeyError):
         return None
     if isinstance(runtime, int | float) and not isinstance(runtime, bool) and runtime >= 0:
         return float(runtime)
@@ -27107,7 +27146,7 @@ def _run_jsonl_artifact(
     jsonl_path: Path,
     run_artifact: Callable[[ReportArtifact], bool],
     outcomes: list[ReportArtifactOutcome],
-) -> bool:
+) -> PublishedRun | None:
     """Write the retained run through the artifact boundary, or record the miss."""
     if retained is None:
         outcomes.append(
@@ -27118,14 +27157,20 @@ def _run_jsonl_artifact(
                 error_message="retained-run build failed",
             )
         )
-        return False
-    return run_artifact(replace(artifact, job=partial(_write_retained_run, retained, jsonl_path)))
+        return None
+    published: PublishedRun | None = None
+
+    def write() -> None:
+        nonlocal published
+        published = _write_retained_run(retained, jsonl_path)
+
+    return published if run_artifact(replace(artifact, job=write)) else None
 
 
 def _rerender_run_issue_summary(
     inputs: ReportGenerationInputs,
     *,
-    header_final: bool,
+    final: PublishedRun | None,
     summary_written: bool,
     issue_reports: Mapping[str, Path],
     include_gallery_markdown: bool,
@@ -27133,11 +27178,12 @@ def _rerender_run_issue_summary(
     """Render the summary again from the final JSONL header so its timing matches.
 
     The first render ran before the header gained its end-to-end duration and
-    finish time; re-rendering also makes the shipped summary what a later
-    regeneration from results.jsonl produces. Runs only when both the summary
-    and the final header were written; a failure keeps the first render.
+    finish time; re-rendering from the final header as written also makes the
+    shipped summary what a later regeneration from results.jsonl produces.
+    Runs only when both the summary and the final header were written; a
+    failure keeps the first render.
     """
-    if not (header_final and summary_written):
+    if final is None or not summary_written:
         return
     try:
         generate_run_issue_summary_report(
@@ -27145,6 +27191,7 @@ def _rerender_run_issue_summary(
             issue_reports=issue_reports,
             include_gallery_markdown=include_gallery_markdown,
             comparison=inputs.comparison,
+            run=final.run,
         )
     except Exception:  # report isolation: the first render stands
         logger.exception("Re-rendering the run summary with final timing failed.")
@@ -27152,7 +27199,7 @@ def _rerender_run_issue_summary(
 
 def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
-) -> tuple[ReportArtifactOutcome, ...]:
+) -> ReportGenerationResult:
     """Write canonical JSONL first, then isolate every optional renderer."""
     artifacts = _build_report_artifacts(inputs)
     by_key = {artifact.key: artifact for artifact in artifacts}
@@ -27205,7 +27252,7 @@ def _generate_reports_and_log_outputs(
                 results=retained.results,
             )
 
-    jsonl_succeeded = _run_jsonl_artifact(
+    published = _run_jsonl_artifact(
         retained,
         by_key["jsonl"],
         inputs.output_paths.jsonl,
@@ -27224,7 +27271,7 @@ def _generate_reports_and_log_outputs(
     run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
         inputs,
         issue_reports=diagnostics_artifacts.issue_reports,
-        jsonl_succeeded=jsonl_succeeded,
+        published=published,
         diagnostics_succeeded=diagnostics_succeeded,
         gallery_succeeded=gallery_succeeded,
     )
@@ -27291,12 +27338,12 @@ def _generate_reports_and_log_outputs(
         retained,
         artifacts,
         outcomes,
-        jsonl_succeeded=jsonl_succeeded,
+        jsonl_succeeded=published is not None,
         ended_at=run_end_time,
     )
     _rerender_run_issue_summary(
         inputs,
-        header_final=finalized,
+        final=finalized,
         summary_written=run_issue_summary is not None,
         issue_reports=diagnostics_artifacts.issue_reports,
         include_gallery_markdown=gallery_succeeded,
@@ -27306,7 +27353,9 @@ def _generate_reports_and_log_outputs(
         artifacts=artifacts,
         outcomes=outcomes,
     )
-    return tuple(outcomes)
+    return ReportGenerationResult(
+        tuple(outcomes), finalized if finalized is not None else published
+    )
 
 
 # =============================================================================
@@ -27585,12 +27634,12 @@ def finalize_execution(
             trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
             runtime_fingerprint=runtime_fingerprint,
         )
-        report_outcomes = _generate_reports_and_log_outputs(report_inputs)
-        recorded_run_seconds = _recorded_run_seconds(output_paths, report_outcomes)
+        report_result = _generate_reports_and_log_outputs(report_inputs)
+        recorded_run_seconds = _recorded_run_seconds(report_result.published)
         # Print the beautiful report summary dashboard
         _print_reports_dashboard(
             _build_report_artifacts(report_inputs),
-            report_outcomes,
+            report_result.outcomes,
             history_path=history_path,
         )
 

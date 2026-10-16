@@ -92,6 +92,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor (0.17.65): publication no longer reads `results.jsonl` back.
+  Writing the retained run returns the text it wrote, and validating that
+  text gives exactly what reloading the file gave. Both run-summary renders
+  (before and after the header gains its end-to-end timing) and the closing
+  "Overall runtime" line now use it, which removes three reloads per run.
+  Finalisation returns the rewritten record instead of a boolean, and when
+  the rewrite fails the closing line still falls back to the pre-report
+  header. The summary renderer takes an already-validated run, and
+  regeneration still loads and validates the file. Atomic writes, the
+  manifest and the second render that keeps the summary's timing in step
+  with the header are unchanged; dropping that render is left for a
+  separate change.
 - Refactor (0.17.64): the run issue summary's four no-summary branches
   (JSONL failed, not needed, diagnostics failed, rendering raised) share one
   helper that removes an earlier run's summary and records why none was
