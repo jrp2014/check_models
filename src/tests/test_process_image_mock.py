@@ -792,8 +792,6 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["max_patches"] == 3
         prompt_diagnostics = result.prompt_diagnostics
         assert prompt_diagnostics is not None
-        assert prompt_diagnostics.processed_image_width == 384
-        assert prompt_diagnostics.processed_image_height == 512
         assert prompt_diagnostics.image_patch_count is None
 
     def test_run_model_generation_accepts_legacy_tokenizer_processor(

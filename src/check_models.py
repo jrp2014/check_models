@@ -2002,8 +2002,6 @@ class PromptDiagnostics:
     rendered_prompt_chars: int | None = None
     image_placeholder_count: int | None = None
     rendered_prompt_token_count: int | None = None
-    processed_image_width: int | None = None
-    processed_image_height: int | None = None
     image_patch_count: int | None = None
     # Exact composition from a second upstream prepare_inputs() pass: the
     # prepared input length and how many of those ids are the model's image
@@ -2192,8 +2190,6 @@ class ImageInputProfile:
     width: int
     height: int
     megapixels: float
-    processed_width: int | None = None
-    processed_height: int | None = None
 
 
 type PromptBurdenKind = Literal[
@@ -2222,8 +2218,6 @@ class PromptBurden:
     reason: str | None = None
     original_width: int | None = None
     original_height: int | None = None
-    processed_width: int | None = None
-    processed_height: int | None = None
     patch_count: int | None = None
 
 
@@ -2256,20 +2250,6 @@ def _classify_prompt_burden(
     if text_est >= QUALITY.long_prompt_tokens_threshold:
         return ("text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"), None
     return "mixed", None
-
-
-def _merged_processed_dimensions(
-    diagnostics: PromptDiagnostics | None,
-    image_profile: ImageInputProfile | None,
-) -> tuple[int | None, int | None]:
-    """Prefer per-run processed dimensions, falling back to the image profile."""
-    width = (diagnostics.processed_image_width if diagnostics is not None else None) or (
-        image_profile.processed_width if image_profile is not None else None
-    )
-    height = (diagnostics.processed_image_height if diagnostics is not None else None) or (
-        image_profile.processed_height if image_profile is not None else None
-    )
-    return width, height
 
 
 def _model_burden_rows(
@@ -2389,7 +2369,6 @@ def _prompt_burden_for_result(
     ratio = nontext_est / total if total and nontext_est is not None else None
     diagnostics = result.prompt_diagnostics
     placeholders = diagnostics.image_placeholder_count if diagnostics is not None else 0
-    processed_width, processed_height = _merged_processed_dimensions(diagnostics, image_profile)
 
     text_source = analysis.prompt_tokens_text_source if analysis is not None else None
     kind, reason = _classify_prompt_burden(
@@ -2422,8 +2401,6 @@ def _prompt_burden_for_result(
         reason=reason,
         original_width=image_profile.width if image_profile is not None else None,
         original_height=image_profile.height if image_profile is not None else None,
-        processed_width=processed_width,
-        processed_height=processed_height,
         patch_count=diagnostics.image_patch_count if diagnostics is not None else None,
     )
 
@@ -3148,13 +3125,6 @@ def _gallery_prompt_facts(
     if prompt is not None:
         if prompt.image_placeholder_count:
             image_facts.append(("Image placeholders", str(prompt.image_placeholder_count)))
-        if prompt.processed_image_width is not None and prompt.processed_image_height is not None:
-            image_facts.append(
-                (
-                    "Processed image",
-                    f"{prompt.processed_image_width} x {prompt.processed_image_height} px",
-                )
-            )
         if prompt.image_patch_count is not None:
             image_facts.append(("Image patch count", str(prompt.image_patch_count)))
     return (
@@ -13190,8 +13160,6 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
     model_type_raw = _get_config_value(config, "model_type")
     model_type = str(model_type_raw) if model_type_raw is not None else None
     eos_token = getattr(tokenizer, "eos_token", None)
-    processed_height = params.resize_shape[0] if params.resize_shape is not None else None
-    processed_width = params.resize_shape[1] if params.resize_shape is not None else None
     snapshot_path = _resolve_model_snapshot_path(params.model_identifier, params.revision)
     template_variables = _chat_template_variables(processor)
     passed_template_kwargs = _build_chat_template_kwargs(params)
@@ -13210,8 +13178,6 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
         rendered_prompt_token_count=_count_rendered_prompt_tokens(
             tokenizer, formatted_prompt, model_type, processor
         ),
-        processed_image_width=processed_width,
-        processed_image_height=processed_height,
         prepared_input_token_count=prepared_input_token_count,
         image_token_count=image_token_count,
         eos_token_id=_prompt_diag_json_value(getattr(tokenizer, "eos_token_id", None)),
@@ -13290,8 +13256,6 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "rendered_prompt_chars",
         "image_placeholder_count",
         "rendered_prompt_token_count",
-        "processed_image_width",
-        "processed_image_height",
         "image_patch_count",
         "prepared_input_token_count",
         "image_token_count",
@@ -20343,8 +20307,6 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
                 round(burden.nontext_ratio, 2) if burden.nontext_ratio is not None else None
             ),
             "kind": burden.kind,
-            "processed_image_width": burden.processed_width,
-            "processed_image_height": burden.processed_height,
             "image_patch_count": burden.patch_count,
         }
         records.append(record)

@@ -103,6 +103,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Diagnostics (0.17.71): the "Processed image" row and the
+  `processed_image_width` / `processed_image_height` fields in
+  `prompt_diagnostics` and `prompt_burden` are gone. They only ever held the
+  `--resize-shape` bounds, in swapped order, shown as measured dimensions even
+  for models that ignored the option. The setting stays recorded in
+  `generation_settings`; retained runs that carry the old fields still load.
 - Docs (0.17.70): `--resize-shape` is no longer described as a uniform,
   fixed-size resize. mlx-vlm ignores it, with a warning, for models that use
   its own image processor (Phi-3-Vision, Molmo, Gemma 4 and others), and
