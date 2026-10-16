@@ -979,6 +979,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Diagnostics: the prompt composition no longer reports a false exact zero.
+  The 2026-10-16 sweep said Phi-3.5-vision's 1,151-token prompt held "0 image
+  tokens (exact)": Phi-3-vision marks image positions with negative ids, and
+  the count matched only the configured image id. Negative ids now count as
+  image positions (a vocabulary has none), and a count that finds no image
+  positions, now or in an older retained record, is treated as unknown, so
+  the split falls back to the labelled estimate.
 - Run summary comparison: an observation check that check_models has
   since removed no longer shows up as a per-model change. The 2026-10-16
   sweep listed "-unsupplied place name" for gemma-3n and MolmoPoint, whose

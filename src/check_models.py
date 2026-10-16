@@ -12864,9 +12864,16 @@ def _exact_prompt_composition(
         raw_id = inputs.get("image_token_id")
         item = getattr(raw_id, "item", None)
         token_id = item() if callable(item) else raw_id
-    if isinstance(token_id, bool) or not isinstance(token_id, int):
+    known_id = token_id if isinstance(token_id, int) and not isinstance(token_id, bool) else None
+    # A vocabulary has no negative ids, so a negative id in the prepared input
+    # is a placeholder the model fills with image features (Phi-3-vision marks
+    # every image position this way) and counts whatever the configured id.
+    image_positions = sum(1 for ident in flat if ident < 0 or ident == known_id)
+    if image_positions == 0:
+        # Neither the configured id nor a placeholder occurs: the count missed
+        # the image, so the split is unknown rather than "0 image tokens".
         return len(flat), None
-    return len(flat), sum(1 for ident in flat if ident == token_id)
+    return len(flat), image_positions
 
 
 # generation_config.json keys that are bookkeeping, not decoding settings.
@@ -19107,8 +19114,10 @@ def _verified_image_token_count(
     The count comes from a separate ``prepare_inputs`` call; it is trusted
     only when that call produced exactly as many ids as the generation
     reported as its prompt, which rules out a divergent preprocessing path.
+    A zero is never trusted: every run here sends an image, so a count that
+    found no image positions (as records before 0.17.57 could hold) missed it.
     """
-    if diagnostics is None or diagnostics.image_token_count is None:
+    if diagnostics is None or not diagnostics.image_token_count:
         return None
     if prompt_tokens is None or diagnostics.prepared_input_token_count != prompt_tokens:
         return None

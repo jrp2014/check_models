@@ -1604,7 +1604,66 @@ def test_exact_prompt_composition_counts_image_ids_from_a_prepare_inputs_pass(
     )
     assert (total, image) == (5, 3)
     assert check_models._flatten_token_ids([[1, [2, 3]], 4]) == [1, 2, 3, 4]
+
+
+@pytest.mark.parametrize(
+    ("input_ids", "config", "expected"),
+    [
+        # Negative placeholder ids (Phi-3-vision's convention) are image
+        # positions even though none equals the configured image id.
+        ([[1, 2, -1, -1, -1, 3]], {"model_type": "fake", "image_token_index": 32044}, (6, 3)),
+        # With no configured or returned image id, the placeholders still count.
+        ([[1, -1, -1, 2]], {"model_type": "fake"}, (4, 2)),
+        # Configured ids and negative placeholders are counted once each.
+        ([[9, -1, 1]], {"model_type": "fake", "image_token_index": 9}, (3, 2)),
+        # Nothing to count means the count missed the image: unknown, never
+        # an exact "0 image tokens".
+        ([[1, 2, 3]], {"model_type": "fake", "image_token_index": 9}, (3, None)),
+    ],
+)
+def test_exact_prompt_composition_counts_negative_placeholder_ids_and_never_an_exact_zero(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    input_ids: list[list[int]],
+    config: dict[str, object],
+    expected: tuple[int, int | None],
+) -> None:
+    """The 2026-10-16 sweep reported Phi-3.5-vision's prompt as 0 image tokens, "exact"."""
+    monkeypatch.setattr(
+        check_models,
+        "_optional_mlx_vlm_utils_attribute",
+        lambda name: {
+            "prepare_inputs": lambda *_a, **_k: {"input_ids": input_ids},
+            "should_add_special_tokens": lambda *_a: True,
+        }[name],
+    )
+    params = cast(
+        "Any",
+        types.SimpleNamespace(
+            model_identifier="org/m", image_path=tmp_path / "i.jpg", resize_shape=None
+        ),
+    )
+    assert (
+        check_models._exact_prompt_composition(
+            processor=cast("Any", object()),
+            config=config,
+            params=params,
+            formatted_prompt="rendered",
+            processor_passthrough_kwargs={},
+        )
+        == expected
+    )
     assert check_models._flatten_token_ids([True]) is None
+
+
+def test_verified_image_token_count_never_trusts_a_zero() -> None:
+    """A retained zero (written before 0.17.57) is unknown, not an exact count."""
+    zero = check_models.PromptDiagnostics(prepared_input_token_count=1151, image_token_count=0)
+    found = check_models.PromptDiagnostics(prepared_input_token_count=1151, image_token_count=757)
+    assert check_models._verified_image_token_count(zero, 1151) is None
+    assert check_models._verified_image_token_count(found, 1151) == 757
+    # The length check still applies to a non-zero count.
+    assert check_models._verified_image_token_count(found, 1150) is None
 
 
 def test_declared_sampling_fills_only_what_the_cli_left_unset() -> None:
