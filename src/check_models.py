@@ -100,6 +100,7 @@ from importlib.metadata import (
 )
 from importlib.resources import as_file, files
 from importlib.util import find_spec
+from itertools import islice
 from pathlib import Path, PurePosixPath
 from shlex import join as shlex_join
 from statistics import median
@@ -21238,11 +21239,38 @@ def _history_band_tps_sample(facts: object) -> float | None:
     return None
 
 
+def _read_history_records(
+    history_path: Path | None, *, exclude_last: bool
+) -> tuple[object, ...] | None:
+    """Decode each retained history line once, oldest first, for every history reader.
+
+    A line that is not JSON stays in place as ``None`` (as a JSON ``null``
+    line would), so readers can count it as unreadable rather than lose it.
+    ``exclude_last`` drops the record just appended for the current run so it
+    cannot vouch for itself; callers pass it only after a confirmed append.
+    None when there is no history file or it cannot be read.
+    """
+    if history_path is None or not history_path.is_file():
+        return None
+    try:
+        rows = [line for line in _read_text_file(history_path).splitlines() if line]
+    except OSError:
+        return None
+    if exclude_last and rows:
+        rows = rows[:-1]
+    records: list[object] = []
+    for line in rows:
+        try:
+            records.append(json.loads(line))
+        except json.JSONDecodeError:
+            records.append(None)
+    return tuple(records)
+
+
 def _history_tps_bands(
-    history_path: Path,
+    history: Sequence[object] | None,
     *,
     fingerprint: str | None,
-    exclude_last: bool,
     current_revisions: Mapping[str, str | None] | None = None,
     current_settings: Mapping[str, str | None] | None = None,
 ) -> tuple[dict[str, tuple[float, float, int]], int]:
@@ -21256,32 +21284,22 @@ def _history_tps_bands(
     the median. A model's samples must also come from the revision now under
     test when ``current_revisions`` names one, and from the same effective
     per-model generation settings when ``current_settings`` carries their
-    canonical form (see ``_canonical_generation_settings``). ``exclude_last`` drops the
-    record just appended for the current run so it cannot vouch for itself;
-    callers pass it only after a confirmed append.
+    canonical form (see ``_canonical_generation_settings``). ``history`` comes
+    from ``_read_history_records``.
     """
-    if not history_path.is_file():
+    if history is None:
         return {}, 0
-    try:
-        rows = [line for line in _read_text_file(history_path).splitlines() if line]
-    except OSError:
-        return {}, 0
-    if exclude_last and rows:
-        rows = rows[:-1]
-    runs: list[dict[str, JsonLike]] = []
-    for line in rows:
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(record, dict) or record.get("_type") != "run":
-            continue
-        if fingerprint and record.get("comparison_fingerprint") != fingerprint:
-            # Rows without a matching fingerprint cannot be shown to be the
-            # same workload; a band must only be built from runs known to match.
-            continue
-        runs.append(record)
-    runs = runs[-_COMPARISON_HISTORY_WINDOW:]
+    # Newest first, stopping at the window: older records are never examined.
+    # Rows without a matching fingerprint cannot be shown to be the same
+    # workload; a band must only be built from runs known to match.
+    matching = (
+        record
+        for record in reversed(history)
+        if isinstance(record, dict)
+        and record.get("_type") == "run"
+        and (not fingerprint or record.get("comparison_fingerprint") == fingerprint)
+    )
+    runs = list(islice(matching, _COMPARISON_HISTORY_WINDOW))
     samples: dict[str, list[float]] = {}
     for record in runs:
         model_results = record.get("model_results")
@@ -21314,31 +21332,20 @@ def _history_tps_bands(
 
 
 def _earlier_runs_on_version(
-    history_path: Path | None, package: str, version: str | None, *, exclude_last: bool
+    history: Sequence[object] | None, package: str, version: str | None
 ) -> tuple[int, int] | None:
     """Count earlier retained runs whose recorded ``package`` version equals ``version``.
 
-    Reads every run in the history file, whatever its prompt or image: the
+    Reads every record in the history, whatever its prompt or image: the
     count is about the installed build, not the workload. Returns the count
     and how many records could not be read or name no ``package`` version,
     so a zero is not mistaken for complete coverage. None when the version
     or the history is unavailable.
     """
-    if version is None or history_path is None or not history_path.is_file():
+    if version is None or history is None:
         return None
-    try:
-        rows = [line for line in _read_text_file(history_path).splitlines() if line]
-    except OSError:
-        return None
-    if exclude_last and rows:
-        rows = rows[:-1]
     count = unread = 0
-    for line in rows:
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError:
-            unread += 1
-            continue
+    for record in history:
         versions = record.get("library_versions") if isinstance(record, dict) else None
         recorded = versions.get(package) if isinstance(versions, dict) else None
         if not isinstance(recorded, str):
@@ -21348,11 +21355,11 @@ def _earlier_runs_on_version(
 
 
 def _mlx_version_history_fields(
-    history_path: Path | None, current_metadata: JsonlMetadataRecord | None, *, exclude_last: bool
+    history: Sequence[object] | None, current_metadata: JsonlMetadataRecord | None
 ) -> dict[str, Any]:
     """RunComparison's mlx version, earlier same-version count and unread records."""
     version = _metadata_library_version(current_metadata, "mlx")
-    counted = _earlier_runs_on_version(history_path, "mlx", version, exclude_last=exclude_last)
+    counted = _earlier_runs_on_version(history, "mlx", version)
     return {
         "mlx_version": version,
         "earlier_runs_on_mlx_version": None if counted is None else counted[0],
@@ -22059,16 +22066,13 @@ def compare_run_results(
     current_by = {record["model"]: record for record in current}
     baseline_by = {record["model"]: record for record in baseline.results}
     shared = [model for model in current_by if model in baseline_by]
-    bands, history_runs = (
-        _history_tps_bands(
-            history_path,
-            fingerprint=comparison_fingerprint,
-            exclude_last=history_excludes_current,
-            current_revisions=_current_model_revisions(current),
-            current_settings=_current_model_settings(current),
-        )
-        if history_path is not None
-        else ({}, 0)
+    # One read serves both history uses; each keeps its own selection rule.
+    history = _read_history_records(history_path, exclude_last=history_excludes_current)
+    bands, history_runs = _history_tps_bands(
+        history,
+        fingerprint=comparison_fingerprint,
+        current_revisions=_current_model_revisions(current),
+        current_settings=_current_model_settings(current),
     )
 
     changes: list[RunComparisonModelChange] = []
@@ -22124,9 +22128,7 @@ def compare_run_results(
         throughput_flags=tuple(flags),
         memory_changes=tuple(memory),
         history_runs_used=history_runs,
-        **_mlx_version_history_fields(
-            history_path, current_metadata, exclude_last=history_excludes_current
-        ),
+        **_mlx_version_history_fields(history, current_metadata),
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
         baseline_hardware=baseline_hardware,
@@ -26813,13 +26815,29 @@ _MODEL_PACKAGE_IMPORT_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _architecture_imports(checkout: str, revision: str, architecture: str) -> tuple[str, ...]:
+def _model_package_entries(checkout: str, revision: str) -> frozenset[str] | None:
+    """Names directly under mlx_vlm/models/ at ``revision``; None when git cannot say."""
+    listing = _run_macos_toolchain_command(
+        ("git", "-C", checkout, "ls-tree", "--name-only", revision, "mlx_vlm/models/"),
+        timeout=5,
+    )
+    if listing is None:
+        return None
+    return frozenset(line.rsplit("/", 1)[-1] for line in listing.splitlines())
+
+
+def _architecture_imports(
+    checkout: str, revision: str, architecture: str, entries: Collection[str] | None
+) -> tuple[str, ...]:
     """Entries under mlx_vlm/models/ that the architecture's own files import directly.
 
     One level only, read at ``revision``: ``from ..qwen3_5.language import``
     in ``qwen3_5_moe/`` names ``qwen3_5``; a module such as ``base`` maps to
-    ``base.py``. Empty when git cannot say.
+    ``base.py``. ``entries`` is that revision's ``_model_package_entries``,
+    read once for every architecture. Empty when git cannot say.
     """
+    if entries is None:
+        return ()
     source = _run_macos_toolchain_command(
         (
             "git",
@@ -26835,13 +26853,8 @@ def _architecture_imports(checkout: str, revision: str, architecture: str) -> tu
         ),
         timeout=5,
     )
-    listing = _run_macos_toolchain_command(
-        ("git", "-C", checkout, "ls-tree", "--name-only", revision, "mlx_vlm/models/"),
-        timeout=5,
-    )
-    if source is None or listing is None:
+    if source is None:
         return ()
-    entries = {line.rsplit("/", 1)[-1] for line in listing.splitlines()}
     imports: list[str] = []
     for name in sorted(set(_MODEL_PACKAGE_IMPORT_RE.findall(source)) - {architecture}):
         if name in entries:
@@ -26873,6 +26886,8 @@ def _architecture_commits(
     if not affected or not moved:
         return ()
     span = _editable_revision_range(baseline_provenance, current_provenance, "mlx-vlm")
+    # Every architecture is read at the same revision: list its models once.
+    model_entries = _model_package_entries(span[0], span[2]) if span is not None else None
     subjects_by_architecture: dict[str, tuple[str, ...] | None] = {}
     imports_by_architecture: dict[str, tuple[str, ...]] = {}
     entries: list[ArchitectureCommits] = []
@@ -26885,7 +26900,7 @@ def _architecture_commits(
             continue
         if span is not None and architecture not in subjects_by_architecture:
             checkout, before, after = span
-            imports = _architecture_imports(checkout, after, architecture)
+            imports = _architecture_imports(checkout, after, architecture, model_entries)
             imports_by_architecture[architecture] = imports
             subjects_by_architecture[architecture] = _git_log_subjects(
                 checkout,

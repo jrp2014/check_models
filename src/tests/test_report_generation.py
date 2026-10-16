@@ -38,7 +38,7 @@ from check_models import (
 from tools import safe_io
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Mapping, Sequence
 
 type ExpectedUpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 
@@ -6861,6 +6861,32 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
     assert comparison.revision_changes == (("org/m", "revision-m", "newrev123456"),)
 
 
+def test_one_history_read_keeps_each_selection_rule(tmp_path: Path) -> None:
+    """Bands take the newest matching runs; the version count reads every record."""
+
+    def run(fingerprint: str, tps: float) -> str:
+        return json.dumps(
+            {
+                "_type": "run",
+                "comparison_fingerprint": fingerprint,
+                "library_versions": {"mlx": "0.32.4"},
+                "model_results": {"org/m": {"generation_tps": tps}},
+            }
+        )
+
+    old = [run("f", 10.0)] * 2
+    recent = [line for _ in range(10) for line in (run("f", 100.0), run("other", 1.0))]
+    history = tmp_path / "results.history.jsonl"
+    history.write_text("\n".join(["not json", *old, *recent]) + "\n", encoding="utf-8")
+    records = check_models._read_history_records(history, exclude_last=False)
+    assert records is not None
+    bands, runs = check_models._history_tps_bands(records, fingerprint="f")
+    assert runs == 10  # the window, newest first; the two slow old runs fall outside it
+    assert bands["org/m"] == pytest.approx((90.0, 110.0, 10))
+    # Every workload counts toward the version, and the malformed line is reported.
+    assert check_models._earlier_runs_on_version(records, "mlx", "0.32.4") == (22, 1)
+
+
 def test_history_bands_ignore_hashless_rows_and_respect_confirmed_append(tmp_path: Path) -> None:
     """Legacy rows without a comparison fingerprint cannot vouch for the current workload."""
     history = tmp_path / "results.history.jsonl"
@@ -6869,15 +6895,15 @@ def test_history_bands_ignore_hashless_rows_and_respect_confirmed_append(tmp_pat
         for t in (100.0, 101.0, 99.0, 100.5)
     ]
     history.write_text("\n".join(rows) + "\n", encoding="utf-8")
-    bands, runs = check_models._history_tps_bands(history, fingerprint="h", exclude_last=False)
+    bands, runs = _history_bands(history, fingerprint="h", exclude_last=False)
     assert bands == {}
     assert runs == 0
     # Without a current hash, legacy rows are usable.
-    bands, runs = check_models._history_tps_bands(history, fingerprint=None, exclude_last=False)
+    bands, runs = _history_bands(history, fingerprint=None, exclude_last=False)
     assert "org/m" in bands
     assert runs == 4
     # exclude_last only when the caller confirmed the append.
-    _, runs_excl = check_models._history_tps_bands(history, fingerprint=None, exclude_last=True)
+    _, runs_excl = _history_bands(history, fingerprint=None, exclude_last=True)
     assert runs_excl == 3
 
 
@@ -7262,7 +7288,7 @@ def test_history_bands_skip_repetition_aborted_samples(tmp_path: Path) -> None:
     ]
     check_models._write_text_file(history, "\n".join(rows) + "\n")
 
-    bands, runs = check_models._history_tps_bands(history, fingerprint="h" * 8, exclude_last=False)
+    bands, runs = _history_bands(history, fingerprint="h" * 8, exclude_last=False)
     assert runs == 6
     # Only the three steady samples qualify; if that is below the minimum
     # sample count the band is absent — either way the 400 tok/s aborts
@@ -7565,18 +7591,18 @@ def test_history_bands_require_the_current_model_revision(tmp_path: Path) -> Non
         for i in range(5)
     ]
     check_models._write_text_file(history, "\n".join(rows) + "\n")
-    with_old = check_models._history_tps_bands(
+    with_old = _history_bands(
         history, fingerprint="f", exclude_last=False, current_revisions={"org/m": "old"}
     )[0]
     assert "org/m" in with_old
-    with_new = check_models._history_tps_bands(
+    with_new = _history_bands(
         history, fingerprint="f", exclude_last=False, current_revisions={"org/m": "new"}
     )[0]
     assert with_new == {}
     # An unknown current revision cannot exclude anything.
     assert (
         "org/m"
-        in check_models._history_tps_bands(
+        in _history_bands(
             history, fingerprint="f", exclude_last=False, current_revisions={"org/m": None}
         )[0]
     )
@@ -7647,14 +7673,14 @@ def test_history_bands_require_matching_per_model_settings(tmp_path: Path) -> No
     canonical = check_models._canonical_generation_settings
     assert canonical(budget_100) != canonical(budget_800)
     assert canonical({}) is None
-    same = check_models._history_tps_bands(
+    same = _history_bands(
         history,
         fingerprint="f",
         exclude_last=False,
         current_settings={"org/m": canonical(budget_100)},
     )[0]
     assert "org/m" in same
-    changed = check_models._history_tps_bands(
+    changed = _history_bands(
         history,
         fingerprint="f",
         exclude_last=False,
@@ -7673,7 +7699,7 @@ def test_history_bands_require_matching_per_model_settings(tmp_path: Path) -> No
     ] * 5
     check_models._write_text_file(history, "\n".join(bare) + "\n")
     assert (
-        check_models._history_tps_bands(
+        _history_bands(
             history,
             fingerprint="f",
             exclude_last=False,
@@ -7683,7 +7709,7 @@ def test_history_bands_require_matching_per_model_settings(tmp_path: Path) -> No
     )
     assert (
         "org/m"
-        in check_models._history_tps_bands(
+        in _history_bands(
             history, fingerprint="f", exclude_last=False, current_settings={"org/m": None}
         )[0]
     )
@@ -7963,7 +7989,7 @@ def test_sleep_gap_keeps_memory_comparison_and_stays_out_of_history_bands(
     ]
     check_models._write_text_file(history, "\n".join(rows) + "\n")
     assert check_models._history_band_tps_sample(slept_row) is None
-    bands, runs = check_models._history_tps_bands(history, fingerprint="h" * 8, exclude_last=False)
+    bands, runs = _history_bands(history, fingerprint="h" * 8, exclude_last=False)
     assert runs == 6
     band = bands.get("org/m")
     if band is not None:
@@ -8431,7 +8457,14 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
         "check_models.JsonlMetadataRecord",
         {**baseline.metadata, "component_provenance": provenance(after)},
     )
-    entries = check_models._architecture_commits(comparison, current, before_meta, after_meta)
+    with patch.object(
+        check_models,
+        "_run_macos_toolchain_command",
+        wraps=check_models._run_macos_toolchain_command,
+    ) as git:
+        entries = check_models._architecture_commits(comparison, current, before_meta, after_meta)
+    # The models directory is listed once per revision, not once per architecture.
+    assert sum("ls-tree" in call.args[0] for call in git.call_args_list) == 1
     assert {(e.model, e.status) for e in entries} == {
         ("org/a", "commits"),
         ("org/b", "none"),
@@ -8883,6 +8916,23 @@ def test_both_gallery_formats_share_one_row_per_model(tmp_path: Path) -> None:
     # A replaced context derives its own rows rather than reusing stale ones.
     replaced = replace(report_context, assessments=report_context.assessments[:1])
     assert replaced.assessment_by_model.keys() == {report_context.assessments[0][0]}
+
+
+def _history_bands(
+    path: Path,
+    *,
+    fingerprint: str | None,
+    exclude_last: bool = False,
+    current_revisions: Mapping[str, str | None] | None = None,
+    current_settings: Mapping[str, str | None] | None = None,
+) -> tuple[dict[str, tuple[float, float, int]], int]:
+    """Read retained history the way compare_run_results does, then build the bands."""
+    return check_models._history_tps_bands(
+        check_models._read_history_records(path, exclude_last=exclude_last),
+        fingerprint=fingerprint,
+        current_revisions=current_revisions,
+        current_settings=current_settings,
+    )
 
 
 def test_keywords_from_hints_counts_verbatim_reuse_only() -> None:
@@ -9500,7 +9550,12 @@ def test_comparison_counts_earlier_retained_runs_on_the_same_mlx_version(tmp_pat
         {"_type": "run", "library_versions": {"mlx": "0.32.4+new"}},  # the current run
     ]
     check_models._write_text_file(history, "".join(json.dumps(row) + "\n" for row in rows))
-    count = check_models._earlier_runs_on_version
+
+    def count(path: Path, package: str, version: str | None, *, exclude_last: bool) -> object:
+        return check_models._earlier_runs_on_version(
+            check_models._read_history_records(path, exclude_last=exclude_last), package, version
+        )
+
     # The versionless row is counted as unread, not as another version.
     assert count(history, "mlx", "0.32.4+new", exclude_last=True) == (1, 1)
     assert count(history, "mlx", "0.32.4+new", exclude_last=False) == (2, 1)
@@ -9562,10 +9617,9 @@ def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
         history,
         "not json\n" + json.dumps({"_type": "run"}) + "\n" + json.dumps({"_type": "run"}) + "\n",
     )
-    assert check_models._earlier_runs_on_version(history, "mlx", "0.32.4+x", exclude_last=True) == (
-        0,
-        2,
-    )
+    records = check_models._read_history_records(history, exclude_last=True)
+    assert records == (None, {"_type": "run"})  # the malformed line is kept, not dropped
+    assert check_models._earlier_runs_on_version(records, "mlx", "0.32.4+x") == (0, 2)
     baseline = _comparison_baseline([_comparison_record("org/a")])
     compared = check_models.compare_run_results(
         [cast("check_models.JsonlResultRecord", _comparison_record("org/a"))],

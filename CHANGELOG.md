@@ -92,6 +92,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor (0.17.63): a run comparison reads and decodes the retained
+  history once. The throughput bands and the earlier-runs-on-this-mlx-version
+  count share that read but keep their own selection rules: the version count
+  still reads every record, whatever the workload, and still reports
+  unreadable lines; the bands still need a matching fingerprint, revision and
+  settings. The bands now take the newest ten matching runs, newest first,
+  and stop there instead of keeping every matching record and slicing. The
+  mlx-vlm architecture-commit list also reads the `mlx_vlm/models/` listing
+  (`git ls-tree`) once per revision instead of once per affected
+  architecture. Results are unchanged.
 - Refactor (0.17.62): the gallery rows and the per-model assessment,
   provenance and result lookups are derived once per report context and
   shared by the HTML report and the Markdown gallery. Before, each model's
