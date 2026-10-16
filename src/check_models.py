@@ -411,6 +411,20 @@ def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
     _write_bytes_file(path, content.encode("utf-8"), append=append)
 
 
+def _replace_text_file(path: Path, content: str) -> None:
+    """Replace a file's whole content through a staged sibling and a rename.
+
+    A failed write (serialisation, disk full, interrupt) leaves the previous
+    file untouched rather than truncated.
+    """
+    staging = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        _write_text_file(staging, content)
+        staging.replace(path)
+    finally:
+        staging.unlink(missing_ok=True)
+
+
 def _read_text_file(path: Path, *, max_bytes: int = MAX_SAFE_TEXT_FILE_BYTES) -> str:
     """Read UTF-8 text from a regular file with a byte-size cap."""
     _reject_symlink_parent(path)
@@ -9648,9 +9662,12 @@ def _write_markdown_artifact(
     filename: Path,
     markdown_lines: Sequence[str],
 ) -> None:
-    """Normalize and write Markdown artifact content."""
+    """Normalize and write Markdown artifact content, keeping the old file on failure.
+
+    The run summary is rendered twice; a failed second render must leave the first.
+    """
     markdown_content: str = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
-    _write_text_file(filename, markdown_content)
+    _replace_text_file(filename, markdown_content)
 
 
 def _append_markdown_section(
@@ -20188,15 +20205,9 @@ def _write_retained_run(run: RetainedRun, filename: Path) -> None:
     """Serialize one retained run as a metadata line plus ordered result lines."""
     lines = [json.dumps(run.metadata)]
     lines.extend(json.dumps(result) for result in run.results)
-    # Stage next to the target and rename, so a failed rewrite (serialisation,
-    # disk full, interrupt) leaves the previous file untouched rather than
-    # truncated: the final manifest reconciliation relies on that guarantee.
-    staging = filename.with_name(f".{filename.name}.{os.getpid()}.tmp")
-    try:
-        _write_text_file(staging, "\n".join(lines) + "\n")
-        staging.replace(filename)
-    finally:
-        staging.unlink(missing_ok=True)
+    # The final manifest reconciliation relies on a failed rewrite leaving the
+    # previous file intact.
+    _replace_text_file(filename, "\n".join(lines) + "\n")
 
 
 def save_jsonl_report(
@@ -20443,7 +20454,12 @@ class RunComparisonModelChange:
 def _without_retired_observations(
     change: RunComparisonModelChange,
 ) -> RunComparisonModelChange | None:
-    """Drop retired observation codes from one change; None when nothing else moved."""
+    """Drop retired observation codes from one change; None when nothing else moved.
+
+    With no other observation or execution move, a usability move came from
+    the retired check alone (a completed result's usability derives from its
+    observations): an assessment change, not a model change.
+    """
     added = tuple(
         code for code in change.observations_added if code not in _RETIRED_OBSERVATION_CODES
     )
@@ -20452,12 +20468,7 @@ def _without_retired_observations(
     )
     if (added, removed) == (change.observations_added, change.observations_removed):
         return change
-    if (
-        not added
-        and not removed
-        and change.baseline_execution == change.current_execution
-        and change.baseline_usability == change.current_usability
-    ):
+    if not added and not removed and change.baseline_execution == change.current_execution:
         return None
     return replace(change, observations_added=added, observations_removed=removed)
 
@@ -20679,6 +20690,17 @@ class RunComparison:
             for change in self.changes
             for code in {*change.observations_added, *change.observations_removed}
             if code in _RETIRED_OBSERVATION_CODES
+        )
+        return tuple(sorted(counts.items()))
+
+    @property
+    def retired_only_usability_moves(self) -> tuple[tuple[tuple[str, str], int], ...]:
+        """(baseline, current) usability moves that came with a retired check alone, counted."""
+        counts = Counter(
+            (change.baseline_usability, change.current_usability)
+            for change in self.changes
+            if change.baseline_usability != change.current_usability
+            and _without_retired_observations(change) is None
         )
         return tuple(sorted(counts.items()))
 
@@ -22736,6 +22758,23 @@ def _retired_observation_note(comparison: RunComparison) -> str | None:
             for code, count in counts
         )
         + "."
+        + _retired_only_usability_sentence(comparison)
+    )
+
+
+def _retired_only_usability_sentence(comparison: RunComparison) -> str:
+    """Say which usability moves came with a retired check alone, so none reads as a model's."""
+    if not (moves := comparison.retired_only_usability_moves):
+        return ""
+    total = sum(count for _move, count in moves)
+    transitions = ", ".join(
+        _format_usability_transition(before, after) + ("" if len(moves) == 1 else f" for {count}")
+        for (before, after), count in moves
+    )
+    return (
+        f" For {_pluralized_count(total, 'model')} it was the only recorded difference and "
+        f"usability moved with it ({transitions}): an assessment change, not a model change, "
+        f"so {'that model is' if total == 1 else 'those models are'} not listed as changed."
     )
 
 

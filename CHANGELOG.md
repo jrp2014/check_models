@@ -987,6 +987,19 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Run summary: a failed second render no longer empties the summary. The
+  summary is rendered again once the run's final timing is known, and a
+  failure there is meant to keep the first render, but the Markdown writer
+  truncated the file before writing, so a disk-full error left it empty while
+  the error was only logged. Markdown artifacts now write to a staged sibling
+  and rename it into place, as `results.jsonl` already did.
+- Run summary comparison: a model whose usability moved only because a
+  retired check disappeared is no longer listed as changed. With
+  `unverified_place_name` gone, an unchanged answer whose baseline was
+  "concerns detected" for that check alone moved to "no concerns detected"
+  and still read as a model change. Such a model is now left out of the
+  per-model changes, and the retired-check note counts it and its usability
+  move as an assessment change, not a model change.
 - Diagnostics: the prompt composition no longer reports a false exact zero.
   The 2026-10-16 sweep said Phi-3.5-vision's 1,151-token prompt held "0 image
   tokens (exact)": Phi-3-vision marks image positions with negative ids, and

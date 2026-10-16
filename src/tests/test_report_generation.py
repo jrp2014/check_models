@@ -35,6 +35,7 @@ from check_models import (
     generate_html_report,
     generate_markdown_gallery_report,
 )
+from tools import safe_io
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -514,6 +515,38 @@ def test_run_issue_summary_uses_failure_reason_when_observations_are_empty(
     content = summary.read_text(encoding="utf-8")
     assert "Network connection reset during model loading" in content
     assert "| org/network | not evaluated | none |" not in content
+
+
+def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
+    """A re-render that fails mid-write (disk full) must not truncate the shipped summary."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/a"),))
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+    if summary is None:
+        pytest.fail("the fixture must produce a summary")
+    first = summary.read_bytes()
+
+    def _explode(target: Path, content: str, *, append: bool = False) -> None:
+        del content, append
+        safe_io.write_text_no_follow(target, "partial")
+        msg = "disk full"
+        raise OSError(msg)
+
+    inputs = cast(
+        "check_models.ReportGenerationInputs",
+        Namespace(output_paths=output_paths, comparison=None),
+    )
+    with patch.object(check_models, "_write_text_file", _explode):
+        check_models._rerender_run_issue_summary(
+            inputs,
+            header_final=True,
+            summary_written=True,
+            issue_reports={},
+            include_gallery_markdown=False,
+        )
+
+    assert summary.read_bytes() == first
+    assert [p.name for p in summary.parent.iterdir() if p.suffix == ".tmp"] == []
 
 
 def test_run_issue_summary_sorts_review_rows_by_observation_severity(tmp_path: Path) -> None:
@@ -9067,12 +9100,21 @@ def test_changed_text_rows_show_output_token_counts_and_survive_rehydration() ->
 
 
 def test_comparison_leaves_retired_observation_checks_out_of_the_delta() -> None:
-    """A check removed since the baseline is named once, not shown vanishing from models."""
+    """A check removed since the baseline is named once, not shown vanishing from models.
+
+    Each baseline record carries the usability the retired check gave it, so
+    the unchanged answer moves from caveats to usable on policy alone.
+    """
+    caveats = "usable_with_caveats"
     baseline = _comparison_baseline(
         [
-            _comparison_record("org/only-retired", observations=["unverified_place_name"]),
             _comparison_record(
-                "org/mixed", observations=["unverified_place_name", "duplicate_keywords"]
+                "org/only-retired", usability=caveats, observations=["unverified_place_name"]
+            ),
+            _comparison_record(
+                "org/mixed",
+                usability=caveats,
+                observations=["unverified_place_name", "duplicate_keywords"],
             ),
         ]
     )
@@ -9085,8 +9127,11 @@ def test_comparison_leaves_retired_observation_checks_out_of_the_delta() -> None
     )
     # The machine record keeps the recorded sets; readers see only real moves.
     assert {change.model for change in comparison.changes} == {"org/only-retired", "org/mixed"}
+    assert all(change.baseline_usability == caveats for change in comparison.changes)
+    assert all(change.current_usability == "usable" for change in comparison.changes)
     (reported,) = comparison.reported_changes
     assert (reported.model, reported.observations_removed) == ("org/mixed", ("duplicate_keywords",))
+    assert comparison.retired_only_usability_moves == (((caveats, "usable"), 1),)
     assert comparison.affected_models == frozenset({"org/mixed"})
     assert check_models._since_baseline_status("org/only-retired", comparison) == "unchanged"
     assert check_models._since_baseline_status("org/mixed", comparison) == "changed"
@@ -9095,7 +9140,10 @@ def test_comparison_leaves_retired_observation_checks_out_of_the_delta() -> None
     assert [(row[0], row[3]) for row in view.change_rows] == [("org/mixed", "-duplicate keywords")]
     assert view.retired_note == (
         "Left out of the observation delta: unsupplied place name, a check removed in "
-        "check_models 0.17.48, recorded for 2 models in only one of the two runs."
+        "check_models 0.17.48, recorded for 2 models in only one of the two runs. "
+        "For 1 model it was the only recorded difference and usability moved with it "
+        "(concerns detected \u2192 no concerns detected): an assessment change, not a "
+        "model change, so that model is not listed as changed."
     )
     with_commits = replace(
         comparison,
@@ -9125,7 +9173,11 @@ def test_comparison_leaves_retired_observation_checks_out_of_the_delta() -> None
     only_retired = check_models.compare_run_results(
         current[:1],
         _comparison_baseline(
-            [_comparison_record("org/only-retired", observations=["unverified_place_name"])]
+            [
+                _comparison_record(
+                    "org/only-retired", usability=caveats, observations=["unverified_place_name"]
+                )
+            ]
         ),
         **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     )
