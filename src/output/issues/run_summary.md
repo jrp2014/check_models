@@ -13,8 +13,8 @@ reproduction.
 ## Run summary
 
 - *Run started:* 2026-10-16 13:52:16 BST
-- *Run finished:* 2026-10-16 14:02:57 BST
-- *Run duration:* 10m 41s
+- *Run finished:* 2026-10-16 14:03:00 BST
+- *Run duration:* 10m 44s
 - *Time by phase:* generation 498s, model load 83s, prompt prep 33s, cleanup
   5s, outside the model loop 26s
 - *Evaluation lane:* assisted
@@ -23,6 +23,8 @@ reproduction.
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Input image:* JPEG, 6,213 x 9,320 pixels (57.9 MP), 52.1 MB
+- *Provenance:* run captured by check_models 0.17.55 @ c960bfb1e; report
+  rendered by 0.17.56 @ 570bc55ce; original assessments retained
 - *Models attempted:* 47
 - *Sampling settings:* checkpoint generation_config.json values for 20 of 47
   completed models where the command line left them unset; harness defaults
@@ -107,17 +109,18 @@ evidence of other GPU work.
 
 | Model | Execution | Usability | Observation delta |
 | --- | --- | --- | --- |
-| mlx-community/gemma-3n-E4B-it-4bit | completed | major concerns | -unsupplied place name |
-| mlx-community/MolmoPoint-8B-4bit | completed | major concerns | -unsupplied place name |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | completed | major concerns | -role tokens visible; -control tokens visible; -unsupplied place name |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | completed | major concerns | -role tokens visible; -control tokens visible |
+
+Left out of the observation delta: unsupplied place name, a check removed in
+check_models 0.17.48, recorded for 3 models in only one of the two runs.
 
 <details>
 <summary>Generated text changed for 2 models</summary>
 
-| Model | Decoding | Weights | Shared prefix (chars) | Length (chars) | Prompt token count |
-| --- | --- | --- | --- | --- | --- |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | sampled | 4-bit affine | 209 | 465 → 553 | same |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | sampled | 4-bit affine | 0 | 4,677 → 66 | same |
+| Model | Decoding | Weights | Shared prefix (chars) | Length (chars) | Output tokens | Prompt token count |
+| --- | --- | --- | --- | --- | --- | --- |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | sampled | 4-bit affine | 209 | 465 → 553 | 101 → 121 | same |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | sampled | 4-bit affine | 0 | 4,677 → 66 | 1,000 → 1,000 | same |
 
 </details>
 
@@ -129,7 +132,7 @@ demonstrated speed changes):
 | --- | --- | --- | --- |
 | nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | 4.13 | 2.06 | 2.00 |
 | mlx-community/FastVLM-0.5B-bf16 | 0.10 | 0.16 | 0.65 |
-| mlx-community/Qwen2-VL-2B-mlx | 39.75 | 31.54 | 1.26 |
+| mlx-community/Qwen2-VL-2B-mlx | 39.75 | 31.55 | 1.26 |
 | mlx-community/GLM-4.6V-nvfp4 | 10.51 | 13.05 | 0.81 |
 | mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | 37.79 | 30.68 | 1.23 |
 
@@ -185,12 +188,6 @@ demonstrated speed changes):
   (`nemotron_h_nano_omni`; imports `base.py`, `interpolate.py`, `nemotron_h`):
   63fc9795 Add Nemotron 3.5 Super VL with MTP and Bolt support (#2528);
   035d6abb Preserve NVFP4 global scales (#2437)
-- `mlx-community/gemma-3n-E4B-it-4bit` (`gemma3n`; imports `base.py`,
-  `cache.py`, `kernels.py`, `rope_utils.py`): 0602e658 Fix cancellation during
-  multi-row prefill (#2273)
-- `mlx-community/MolmoPoint-8B-4bit` (`molmo_point`; imports `base.py`,
-  `cache.py`, `interpolate.py`, `rope_utils.py`): 0602e658 Fix cancellation
-  during multi-row prefill (#2273)
 - `mlx-community/Muse-Glimmer-30B-OptiQ-4bit` (`muse_glimmer`; imports
   `activations.py`, `base.py`, `cache.py`, `rope_utils.py`): 0602e658 Fix
   cancellation during multi-row prefill (#2273); fdb26251 Fix Muse Glimmer
