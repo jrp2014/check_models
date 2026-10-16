@@ -6,9 +6,11 @@ skill files:
 
 - Superpowers is disabled here. The canonical agent guidance defines the local
   development and validation workflow without a second general process layer.
-- The repository's generated `.agents/skills/hf-cli` remains the HF CLI reference.
-  Canonical agent guidance selects it instead of loading duplicate personal or
-  plugin CLI references. The Hugging Face plugin remains enabled.
+- The repository's maintained `.agents/skills/hf-cli/SKILL.md` selects the
+  installed CLI's help, with a generated command catalogue under `references/`
+  for on-demand lookup. Canonical agent guidance selects this skill instead of
+  loading duplicate personal or plugin CLI references. The Hugging Face plugin
+  remains enabled.
 - Repository-specific MLX and typing skills, OpenAI's built-in skills, and the
   personal GitHub skills are unchanged.
 

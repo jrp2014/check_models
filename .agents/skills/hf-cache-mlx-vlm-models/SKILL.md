@@ -109,8 +109,9 @@ use `native-mlx-vlm-repro`.
 Sweeps have shown three distinct outcomes; keep them apart when judging a
 candidate or explaining a result.
 
-**Misconfigured checkpoint** (fails, or misbehaves, whatever the model's
-quality). Signals seen so far, each with its check:
+**Load or input-preparation failure** (not a model-quality verdict).
+These signals guide investigation; they do not by themselves distinguish
+checkpoint configuration, loader compatibility, and environmental limits:
 
 | Signal | What happened | Check |
 | --- | --- | --- |
@@ -122,10 +123,12 @@ quality). Signals seen so far, each with its check:
 | Weights larger than unified memory | cannot be held | `tools.hub_precheck` memory verdict |
 | Missing or empty weight shards | incomplete download | discovery layout skip |
 
-The remedy is usually another checkpoint, not a code fix. The family README
-in the installed mlx-vlm (`mlx_vlm/models/<family>/README.md`, named in issue
-drafts) can list a corrected repo; the `nativ-community` checkpoints linked
-from them loaded and ran where the `mlx-community` copies did not.
+Reproduce the original checkpoint and settings before attributing the failure.
+The installed model family's README can suggest a supported checkpoint for a
+separate control, but a working alternative does not establish whether the
+original needs a configuration correction, loader support, or an upstream fix.
+Keep the checkpoint, revision, environment, and settings explicit in comparisons;
+do not infer the remedy from its publisher or silently replace sweep coverage.
 
 **Runnable but unusable output** is a finding in its own right, not a reason
 to drop a model: missing requested fields, repetition loops, unfinished

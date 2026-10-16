@@ -61,7 +61,7 @@ run_markdownlint_step() {
             "!**/node_modules/**" \
             "!**/.worktrees/**" \
             "!**/.claude/**" \
-            "!.agents/skills/hf-cli/**"
+            "!.agents/skills/hf-cli/references/commands.md"
     )
 }
 

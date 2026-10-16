@@ -99,6 +99,12 @@ Notable changes to this project will be documented in this file.
   be removed. The two prerequisite messages lose their trailing full stop,
   and every cleanup failure is appended as "; stale summary cleanup failed:
   ...".
+- HF skills: replace the broad generated CLI entrypoint with maintained,
+  command-specific guidance using the existing conda CLI and explicit mutation
+  boundaries. Refresh the on-demand command catalogue from Hub 2.2.0, omit
+  generic installer advice and the incorrect output-format prose, and lint the
+  maintained entrypoint. Remove the empty generated-skill manifest. Cache
+  diagnosis no longer treats a working alternative checkpoint as proof of blame.
 - Refactor (0.17.63): a run comparison reads and decodes the retained
   history once. The throughput bands and the earlier-runs-on-this-mlx-version
   count share that read but keep their own selection rules: the version count
