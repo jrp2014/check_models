@@ -89,6 +89,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: cleared the seven warnings Pyrefly 1.4.0 adds (it fails the gate
+  on warnings): exception tuples no longer list a subclass of a type they
+  already catch (`URLError` and `FileNotFoundError` under `OSError`,
+  `HFValidationError` under `ValueError`), a redundant `bool()` is gone, and
+  an unreachable `raise SystemExit` after a `NoReturn` call is removed.
+  Behaviour is unchanged.
+- CI: the Static Quality job checks out full history (`fetch-depth: 0`), as
+  skylos-advisory already did. On pull requests, Skylos 4.50's `cicd gate`
+  resolves `origin/main` as its policy base, which a shallow checkout lacks:
+  Dependabot PRs #31 and #32 failed with "Could not resolve PR policy base:
+  origin/main". Local runs, on Skylos 4.47.2, never saw it. A test keeps both
+  Skylos-gated jobs on full history.
 - Diagnostics partitioning is one pass: each result goes into the first named
   bucket its cached assessment selects (actionable, observations,
   indeterminate, compliance, clean), and each bucket keeps the actionability

@@ -68,6 +68,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # Full history, as in skylos-advisory: on pull requests Skylos 4.50's
+          # `cicd gate` resolves origin/main as its policy base, which a shallow
+          # checkout lacks ("Could not resolve PR policy base: origin/main").
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}

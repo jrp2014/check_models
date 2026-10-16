@@ -127,7 +127,6 @@ from typing import (
     get_type_hints,
     runtime_checkable,
 )
-from urllib.error import URLError
 from urllib.parse import quote, unquote, urlparse
 from urllib.request import urlopen
 
@@ -6202,7 +6201,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception("Error reading image: %s", image_str)
-    except (OSError, ValueError, URLError) as e:
+    except (OSError, ValueError) as e:  # URLError is an OSError
         logger.debug("Failed to extract EXIF from %s: %s", image_str, e)
     return None
 
@@ -12320,8 +12319,8 @@ def _validate_thinking_params(args: argparse.Namespace) -> None:
     thinking_budget = getattr(args, "thinking_budget", None)
     thinking_start_token = getattr(args, "thinking_start_token", None)
     thinking_end_token = getattr(args, "thinking_end_token", DEFAULT_THINKING_END_MARKER)
-    thinking_requested = bool(
-        enable_thinking or thinking_budget is not None or thinking_start_token is not None,
+    thinking_requested = (
+        enable_thinking or thinking_budget is not None or thinking_start_token is not None
     )
 
     if thinking_budget is not None and thinking_budget <= 0:
@@ -13454,7 +13453,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
                 "Model %s not found in HF cache (may need to download)",
                 model_identifier,
             )
-    except (OSError, ValueError, HFValidationError) as cache_err:
+    except (OSError, ValueError) as cache_err:  # HFValidationError is a ValueError
         logger.debug("Could not check HF cache integrity: %s", cache_err)
 
 
@@ -14146,7 +14145,7 @@ def _resolve_model_snapshot(
     for refresh in (False, True):
         try:
             cache_info = _get_hf_cache_info_cached(refresh=refresh)
-        except (OSError, ValueError, FileNotFoundError, HFValidationError):
+        except (OSError, ValueError):  # covers FileNotFoundError and HFValidationError
             return None
         for repo in cache_info.repos:
             if repo.repo_id == model_identifier:
@@ -17238,7 +17237,7 @@ def _dump_environment_to_log(output_path: Path) -> bool:
         log_file_path(str(env_log_path))
         logger.debug("Environment details saved for reproducibility")
 
-    except (OSError, FileNotFoundError, subprocess.SubprocessError) as e:
+    except (OSError, subprocess.SubprocessError) as e:
         logger.warning("Failed to dump environment info: %s", e)
         return False
     return True
@@ -17398,7 +17397,6 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         exit_with_cli_error(
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
-        raise SystemExit  # pragma: no cover
     return _validate_selected_image(most_recent_path.resolve())
 
 

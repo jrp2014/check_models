@@ -1948,6 +1948,24 @@ def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
         assert "MACOSX_DEPLOYMENT_TARGET" not in install_command
 
 
+def test_ci_jobs_running_the_skylos_gate_check_out_full_history() -> None:
+    """Skylos's PR gate resolves origin/main, which a shallow checkout lacks.
+
+    Dependabot PRs #31 and #32 failed Static Quality with "Could not resolve
+    PR policy base: origin/main" while skylos-advisory (full history) passed.
+    """
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    for job_name in ("skylos-advisory", "static-quality"):
+        checkout = next(
+            step
+            for step in workflow["jobs"][job_name]["steps"]
+            if str(step.get("uses", "")).startswith("actions/checkout@")
+        )
+        assert checkout["with"]["fetch-depth"] == 0, job_name
+
+
 def test_mlx_runtime_imports_avoid_static_native_module_resolution() -> None:
     """Static checkers should not need importable stubs for the native MLX module."""
     source_path = PKG_ROOT / "check_models.py"
