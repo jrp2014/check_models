@@ -84,7 +84,7 @@ dev = [
     "ty>=0.0.86", # first release with invalid-property-type-override, suppressed in check_models.py
     "pyrefly",
     "vulture>=2.16",
-    "skylos>=4.47.1", # 4.47 verifies editable installs (mlx, mlx-vlm) from platform or portable wheels
+    "skylos>=4.50.1", # 4.47 verifies editable installs (mlx, mlx-vlm); 4.50.1 stops flagging prose under "token" keys (SKY-S101)
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.5.0", # Parallel test execution

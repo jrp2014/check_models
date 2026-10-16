@@ -89,6 +89,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: the Skylos floor is now 4.50.1, which no longer reports a prose
+  value under a key containing "token" as a high-entropy secret (SKY-S101;
+  4.47.2 still does). The `skylos: ignore[SKY-S101]` on the
+  `upstream_prefill_first_token` label is gone. ty 0.0.89 and mypy still
+  need the `TextIOBase` property-override ignores.
 - Tooling: cleared the seven warnings Pyrefly 1.4.0 adds (it fails the gate
   on warnings): exception tuples no longer list a subclass of a type they
   already catch (`URLError` and `FileNotFoundError` under `OSError`,
