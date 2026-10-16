@@ -557,6 +557,38 @@ thinking, KV-cache, and token-budget options.
 Diagnostics and repro artifacts preserve the effective generation kwargs that
 the `mlx_vlm.generate.stream_generate` call receives.
 
+##### Capping or raising image resolution
+
+There is no dedicated resolution flag. Pass the processor's pixel-area limits
+through `--processor-kwargs` instead:
+
+```bash
+python -m check_models --image photo.jpg --models mlx-community/Qwen2-VL-2B-mlx \
+  --processor-kwargs '{"max_pixels": 1048576}'
+```
+
+`min_pixels` and `max_pixels` are pixel areas (1048576 is 1024 × 1024). mlx-vlm
+forwards them to processors that accept arbitrary keyword arguments
+(Qwen-style processors, since
+[Blaizzy/mlx-vlm#2529](https://github.com/Blaizzy/mlx-vlm/pull/2529)); the
+image keeps its aspect ratio and is rounded to the processor's patch size.
+SmolVLM-256M's processor ignored them without a warning, and other processors
+may do the same, so one setting can change some models and not others. On a
+58 MP photo, with `max_pixels` set to 1048576 (one run each, 60-token limit),
+Qwen2-VL-2B went from 16,577 prompt tokens and 9.35 GB peak memory to 1,629
+tokens and 5.58 GB, while SmolVLM-256M stayed at 1,225 tokens. Compare each
+model's prompt tokens with a default run to see whether the limit took effect.
+
+The setting is recorded in each model's generation kwargs and in the run's
+`generation_settings`, so `--compare-with` reports such a run as not directly
+comparable with a default-resolution baseline (for example "generation
+settings differ: processor_kwargs unset → {"max_pixels": 1048576}") and
+withholds the per-model diff; `--resize-shape` is treated the same way. Use
+these settings for experiments, not for baseline sweeps, which keep each
+model's own preprocessing defaults.
+`--resize-shape` is the uniform alternative: it resizes the image for every
+model before its processor sees it, but to a fixed height and width.
+
 #### KV Cache Quantization (Memory Optimization)
 
 Vision-language models maintain a **key-value (KV) cache** during text generation to avoid recomputing attention for previous tokens. For long sequences or large models, this cache can consume significant memory. MLX-VLM supports KV cache quantization to reduce memory usage with minimal impact on output quality.

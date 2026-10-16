@@ -22337,6 +22337,11 @@ def _comparison_fingerprint_from_metadata(metadata: JsonlMetadataRecord) -> str:
     )
 
 
+# Run-level settings recorded only when the user passes them, and that change
+# the image input itself (--processor-kwargs, --resize-shape).
+_INPUT_SHAPING_SETTING_KEYS: Final[frozenset[str]] = frozenset({"processor_kwargs", "resize_shape"})
+
+
 def _comparison_compatibility(
     baseline: ComparisonBaseline,
     *,
@@ -22380,23 +22385,43 @@ def _comparison_compatibility(
     ):
         unverified.append("hardware identity")
     if current_generation_settings and baseline.generation_settings:
-        now_settings = dict(current_generation_settings)
-        before_settings = dict(baseline.generation_settings)
-        # Run-level settings are the ones every model shared, so the key set
-        # follows the roster (a targeted rerun shares more keys than a full
-        # sweep): a key recorded on only one side is unknown, not a change.
-        diffs = sorted(
-            f"{key} {before_settings[key]} → {now_settings[key]}"
-            for key in set(now_settings) & set(before_settings)
-            if now_settings[key] != before_settings[key]
+        setting_reason, setting_unknown = _generation_settings_compatibility(
+            dict(baseline.generation_settings), dict(current_generation_settings)
         )
-        if diffs:
-            reasons.append("generation settings differ: " + ", ".join(diffs))
-        if one_sided := sorted(set(now_settings) ^ set(before_settings)):
-            unverified.append("generation settings " + ", ".join(one_sided))
+        reasons.extend(setting_reason)
+        unverified.extend(setting_unknown)
     else:
         unverified.append("generation settings")
     return tuple(reasons), tuple(unverified)
+
+
+def _generation_settings_compatibility(
+    before_settings: Mapping[str, str], now_settings: Mapping[str, str]
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Return (mismatch reasons, unverified facts) for two runs' run-level settings.
+
+    Run-level settings are the ones every model shared, so the key set
+    follows the roster (a targeted rerun shares more keys than a full sweep):
+    a key recorded on only one side is unknown, not a change. The exception
+    is a user-supplied preprocessing setting, recorded only when passed, so
+    one recorded on one side is a changed input (the image the model saw).
+    """
+    one_sided = sorted(set(now_settings) ^ set(before_settings))
+    diffs = sorted(
+        f"{key} {before_settings[key]} → {now_settings[key]}"
+        for key in set(now_settings) & set(before_settings)
+        if now_settings[key] != before_settings[key]
+    )
+    diffs.extend(
+        f"{key} {before_settings.get(key, 'unset')} → {now_settings.get(key, 'unset')}"
+        for key in one_sided
+        if key in _INPUT_SHAPING_SETTING_KEYS
+    )
+    unknown = [key for key in one_sided if key not in _INPUT_SHAPING_SETTING_KEYS]
+    return (
+        (("generation settings differ: " + ", ".join(diffs)),) if diffs else (),
+        (("generation settings " + ", ".join(unknown)),) if unknown else (),
+    )
 
 
 def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonLike] | None:

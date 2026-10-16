@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Docs: the README explains how to cap or raise image resolution without a
+  dedicated flag, by passing `min_pixels`/`max_pixels` through
+  `--processor-kwargs`. It records what was measured: Qwen2-VL-2B's prompt
+  fell from 16,577 to 1,629 tokens and its peak memory from 9.35 to 5.58 GB
+  on a 58 MP photo, while SmolVLM-256M, whose processor ignores the keys,
+  was unchanged. It points to `--resize-shape` as the uniform alternative.
+- Comparison: a run that used `--processor-kwargs` or `--resize-shape`, set
+  on one side only, is now incomparable with the other, with the reason
+  named ("generation settings differ: processor_kwargs unset → …"). It used
+  to be rated "unknown", because a key recorded on one side was treated as a
+  roster artefact. That rule still holds for every other setting.
 - Run summary: a summary rendered by different check_models code than the
   run says so in a *Provenance* row, such as "run captured by check_models
   0.17.46 @ 3d1b38a4f; report rendered by 0.17.50 @ ac8822bc0; original

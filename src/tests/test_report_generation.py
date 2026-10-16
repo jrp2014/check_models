@@ -6864,6 +6864,39 @@ def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_
     assert check_models._comparison_model_list(("org/a", "org/b")) == "`org/a`, `org/b`"
 
 
+def test_one_sided_preprocessing_setting_makes_runs_incomparable() -> None:
+    """A --processor-kwargs or --resize-shape run against a default one changed the input."""
+    baseline = replace(
+        _comparison_baseline([_comparison_record("org/m")]),
+        generation_settings=(("max_tokens", "1000"),),
+    )
+    current = [cast("check_models.JsonlResultRecord", _comparison_record("org/m"))]
+    kwargs = cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
+    kwargs["current_generation_settings"] = (
+        ("max_tokens", "1000"),
+        ("processor_kwargs", '{"max_pixels": 1048576}'),
+        ("temperature", "0.1"),
+    )
+    comparison = check_models.compare_run_results(current, baseline, **kwargs)
+    assert comparison.comparability == "incomparable"
+    assert comparison.incomparable_reasons == (
+        'generation settings differ: processor_kwargs unset → {"max_pixels": 1048576}',
+    )
+    # Any other one-sided key is still a roster artefact: unknown, not a change.
+    assert comparison.unverified_facts == ("generation settings temperature",)
+
+    # The reverse direction (the baseline resized, this run did not) is the same.
+    resized = replace(
+        baseline, generation_settings=(("max_tokens", "1000"), ("resize_shape", "(512, 512)"))
+    )
+    kwargs["current_generation_settings"] = (("max_tokens", "1000"),)
+    comparison = check_models.compare_run_results(current, resized, **kwargs)
+    assert comparison.incomparable_reasons == (
+        "generation settings differ: resize_shape (512, 512) → unset",
+    )
+    assert comparison.unverified_facts == ()
+
+
 def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
     """A prompt/image/settings change is reported as such, never as a model regression."""
     baseline = _comparison_baseline([_comparison_record("org/m", usability="usable")])
