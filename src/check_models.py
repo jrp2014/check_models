@@ -11309,15 +11309,22 @@ def _gallery_evidence_entries(
     report_context: HtmlReportContext,
 ) -> list[tuple[PerformanceResult, GalleryRow, ResultAssessment, ModelProvenanceRecord | None]]:
     """Per-model evidence inputs in the stable usable-first order both galleries render."""
-    return [
+    # Each row stays paired with the result it was built from.
+    entries = [
         (
-            report_context.result_by_model[row.model],
+            result,
             row,
-            report_context.assessment_by_model[row.model],
-            report_context.provenance_by_model.get(row.model),
+            report_context.assessment_by_model[result.model_name],
+            report_context.provenance_by_model.get(result.model_name),
         )
-        for row in report_context.gallery_chooser.ordered
+        for result, row in zip(
+            report_context.result_set.results, report_context.gallery_rows, strict=True
+        )
     ]
+    return sorted(
+        entries,
+        key=lambda entry: (_usability_rank(entry[1].usability), entry[0].model_name),
+    )
 
 
 def _html_complete_gallery(report_context: HtmlReportContext) -> str:

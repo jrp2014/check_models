@@ -118,8 +118,7 @@ Notable changes to this project will be documented in this file.
   each renderer. The values are computed on first use and held by the context
   itself, not a module-level cache, so a context built with `replace()`
   derives its own. Escaping, Markdown formatting and each format's layout are
-  unchanged; the evidence sections follow the chooser order, which used the
-  same usable-first, then model-name key.
+  unchanged, and each evidence entry keeps the row built from its own result.
 - Refactor (0.17.61): each answer's labelled fields are parsed once per
   analysis. The keyword-repetition check, the Title/Description/Keywords
   checks, the keyword counts and the hint-keyword count read one parse
