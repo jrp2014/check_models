@@ -1000,6 +1000,17 @@ Notable changes to this project will be documented in this file.
   and still read as a model change. Such a model is now left out of the
   per-model changes, and the retired-check note counts it and its usability
   move as an assessment change, not a model change.
+- Assessment: an answer that hands back the prompt's own instructions is
+  reported again, as `prompt_instruction_echo`. On the 2026-10-16 blind sweep
+  nanoLLaVA answered "Title: A Concrete 5-10-word Title" with the
+  description requirement as its Description, and was rated usable: the
+  observation code survived 0.17.0, but its detector had been removed with
+  the old heuristics. It is now counted like the repeated prompt hint: a
+  title or description (or an unlabelled answer) with 80% or more of its
+  words in four-word runs copied from the prompt minus its camera-fact and
+  hint lines. Replayed over both 2026-10-16 sweeps, it flags only nanoLLaVA
+  and SmolVLM-256M, both blind. Results record the fields as
+  `instruction_echo_fields`.
 - Diagnostics: the prompt composition no longer reports a false exact zero.
   The 2026-10-16 sweep said Phi-3.5-vision's 1,151-token prompt held "0 image
   tokens (exact)": Phi-3-vision marks image positions with negative ids, and

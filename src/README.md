@@ -344,9 +344,14 @@ Assessment is independent of the evaluation lane and prompt wording:
   `--assessment-profile general` to disable field checks for a built-in prompt.
   Differential triage reruns always use general checks.
 
-Length ranges are no longer inferred from prose, and sentence counting, hint-overlap
-and instruction-echo heuristics have been removed. Short answers, copied hints,
-prefaces and lack of final punctuation are not automatically faults. Inspect the
+Length ranges are no longer inferred from prose, and sentence counting has been
+removed. Copying is counted rather than inferred: a title or description (or a
+whole answer with no labelled field) with 80% or more of its words in four-word
+runs copied from the prompt's description hint is reported as a repeated prompt
+hint, and one copied from the prompt's instruction text as an echo of the
+instructions. The prompt's camera facts and hints never count as instructions.
+Short answers, prefaces and lack of final punctuation are not automatically
+faults. Inspect the
 image, exact prompt and visible final answer to judge suitability. Complete raw
 output, including thinking, remains available. Older retained runs keep their
 original verdicts and are labelled as having no recorded assessment profile.

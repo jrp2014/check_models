@@ -1860,6 +1860,62 @@ def test_description_that_hands_back_the_prompt_hint_is_flagged() -> None:
     assert check_models._hint_coverage(_SWAN_HINT, _SWAN_HINT) == 1.0
 
 
+_BLIND_PROMPT = (
+    "Create British-English catalogue metadata using only clearly visible facts and the "
+    "supplied camera context. Treat the capture date/time and GPS, recorded by the camera, as "
+    "authoritative facts, but do not claim they are visible.\n\n"
+    "Context: Authoritative context:\n- Capture date/time: 2026-10-10 18:09:17 UTC+01:00\n"
+    "- GPS: 52.628000\u00b0N, 1.293600\u00b0E\n\nWrite:\n- a concrete 5-10-word title;\n"
+    "- a 1-2-sentence factual description combining relevant context with the main visible "
+    "subject, setting, action, lighting, and distinctive details;\n"
+    "- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\n"
+    "Return exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:"
+)
+
+
+def test_answer_that_hands_back_the_prompt_instructions_is_flagged() -> None:
+    """NanoLLaVA answered the 2026-10-16 blind prompt with its own instructions; it read as usable."""
+
+    def blind(text: str, profile: check_models.AssessmentProfile = "metadata") -> list[str]:
+        return check_models.analyze_generation_text(
+            text,
+            generated_tokens=60,
+            prompt=_BLIND_PROMPT,
+            requested_max_tokens=1000,
+            assessment_profile=profile,
+        ).instruction_echo_fields
+
+    nanollava = (
+        "Title: A Concrete 5-10-word Title\nDescription: A 1-2-sentence factual description "
+        "combining relevant context with the main visible subject, setting, action, lighting, "
+        "and distinctive details.\nKeywords: 5-10-word, 1-2-sentence, Context, Authoritative"
+    )
+    assert blind(nanollava) == ["description"]
+    analysis = check_models.analyze_generation_text(
+        nanollava, generated_tokens=60, prompt=_BLIND_PROMPT, assessment_profile="metadata"
+    )
+    observations = check_models._quality_observations(text=nanollava, analysis=analysis)
+    assert "prompt_instruction_echo" in observations
+    assert check_models._completed_assessment(observations).usability == "unusable"
+    # An unlabelled answer is compared whole, as SmolVLM-256M's was.
+    assert blind(
+        "a 5-10-word title;\na 1-2-sentence factual description combining relevant context "
+        "with the main visible subject and distinctive details."
+    ) == ["answer"]
+    # A real description sharing a phrase with the instructions is not an echo,
+    # and reusing the supplied camera facts never is.
+    assert (
+        blind(
+            "Title: Gothic church tower at dusk\nDescription: Captured on 2026-10-10 18:09:17 "
+            "UTC+01:00 at 52.628000\u00b0N, 1.293600\u00b0E, a stone tower's main visible "
+            "subject is its spire, lit warmly above iron railings and two pedestrians.\n"
+            "Keywords: tower, spire"
+        )
+        == []
+    )
+    assert blind("Title: Tower\nDescription: A tower.\nKeywords: tower") == []
+
+
 def test_description_hint_share_is_counted_below_the_echo_threshold() -> None:
     """The copied share is a count for every metadata answer, flagged or not."""
     echoed = _assisted(f"Title: Swan on River\nDescription: {_SWAN_HINT}\nKeywords: swan, river")

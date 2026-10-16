@@ -1379,6 +1379,7 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     duplicated_answer_separator: str
     emitted_special_tokens: list[str]
     echoed_hint_fields: list[str]
+    instruction_echo_fields: list[str]
     unverified_place_names: list[str]
 
 
@@ -4592,6 +4593,46 @@ def _echoed_hint_fields(
     return _dedupe_preserve_order(echoed)
 
 
+# Prompt lines that supply facts or hints an answer may legitimately reuse:
+# camera date/time and GPS, and the descriptive hints. The rest of the prompt
+# is instruction text.
+_PROMPT_SUPPLIED_LINE_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^[ \t]*[-*][ \t]*(?:title hint|description hint|keyword hints|capture date/time|gps)"
+    r"[ \t]*:.*$"
+)
+
+
+def _instruction_echo_fields(
+    prompt: str | None,
+    *,
+    sections: Mapping[str, str],
+    text: str,
+    assessment_profile: AssessmentProfile,
+) -> list[str]:
+    """Name the answer fields that reproduce the prompt's own instruction text.
+
+    Counted like the hint echo: a field echoes when at least the hint-echo
+    share of its words lie in four-word runs copied from the prompt minus its
+    fact and hint lines. A metadata answer is compared by title and
+    description (keywords are single terms); one with no labelled field, or a
+    general-profile answer, is compared whole as "answer".
+    """
+    if not prompt:
+        return []
+    instructions = _PROMPT_SUPPLIED_LINE_RE.sub("", prompt)
+    candidates = (
+        [(field, sections.get(field, "")) for field in ("title", "description")]
+        if assessment_profile == "metadata" and sections
+        else [("answer", text)]
+    )
+    return [
+        field
+        for field, candidate in candidates
+        if (coverage := _hint_coverage(candidate, instructions)) is not None
+        and coverage >= QUALITY.hint_echo_min_coverage
+    ]
+
+
 # =============================================================================
 # SECTION: METRICS, SCORING & FIELD FORMATTING
 # =============================================================================
@@ -4685,6 +4726,8 @@ class GenerationQualityAnalysis:
     emitted_special_tokens: list[str] = dataclass_field(default_factory=list)
     # Output fields that reproduce the prompt's own "<Field> hint:" text.
     echoed_hint_fields: list[str] = dataclass_field(default_factory=list)
+    # Output fields that reproduce the prompt's instruction text.
+    instruction_echo_fields: list[str] = dataclass_field(default_factory=list)
     # Percent of the description (or of the whole answer, when no field is
     # labelled) inside four-word runs copied from the description hint.
     description_hint_percent: int | None = None
@@ -4940,6 +4983,9 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         ),
         emitted_special_tokens=id_detected,
         echoed_hint_fields=_echoed_hint_fields(
+            prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
+        ),
+        instruction_echo_fields=_instruction_echo_fields(
             prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
         ),
     )
@@ -8834,6 +8880,9 @@ def _human_observation_labels(
             if echoed := details.get("echoed_hint_fields"):
                 # Copying an accurate hint does not show the image went unseen.
                 label = f"Repeats the prompt's hint text: {', '.join(echoed)}"
+        elif code == "prompt_instruction_echo" and details is not None:
+            if echo_fields := details.get("instruction_echo_fields"):
+                label = f"Repeats the prompt's instructions: {', '.join(echo_fields)}"
         elif code == "unverified_place_name" and details is not None:
             if places := details.get("unverified_place_names"):
                 label = f"Names a place the prompt did not supply: {', '.join(places)}"
@@ -9290,6 +9339,7 @@ def _quality_observations(
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
         (bool(analysis.duplicate_keywords), "duplicate_keywords"),
         (bool(analysis.echoed_hint_fields), "prompt_hint_echoed"),
+        (bool(analysis.instruction_echo_fields), "prompt_instruction_echo"),
     )
     observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
@@ -9371,6 +9421,8 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
     if analysis.echoed_hint_fields:
         details["echoed_hint_fields"] = list(analysis.echoed_hint_fields)
+    if analysis.instruction_echo_fields:
+        details["instruction_echo_fields"] = list(analysis.instruction_echo_fields)
     details.update(_catalog_constraint_observation_details(analysis))
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
@@ -10133,6 +10185,7 @@ _OBSERVATION_DETAIL_LABELS: Final[dict[str, str]] = {
     "duplicated_answer_separator": "Text between the two answer copies",
     "emitted_special_tokens": "Special tokens emitted (by token id)",
     "echoed_hint_fields": "Fields repeating the prompt's hint",
+    "instruction_echo_fields": "Fields repeating the prompt's instructions",
     "unverified_place_names": "Place names the prompt did not supply",
 }
 
