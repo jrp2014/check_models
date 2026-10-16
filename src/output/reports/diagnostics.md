@@ -3,18 +3,17 @@
 <!-- markdownlint-disable MD004 MD037 -->
 
 This run records model responses to one shared image and prompt (evaluation
-lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
+lane: blind). Mechanical checks are not factual-accuracy judgments; inspect
 the image, prompt and final answers before choosing a model. Results do not
 establish fitness for other tasks.
 
 ## Run Summary
 
-- *Evaluation lane:* assisted
-- *Prompt hints:* the image's description and keyword hints were included in
-  the prompt, so field content may be copied from them rather than seen
+- *Evaluation lane:* blind
+- *Prompt hints:* no description or keyword hints
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Input image:* JPEG, 6,213 x 9,320 pixels (57.9 MP), 52.1 MB
+- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
 
 Outcome counts
 
@@ -30,37 +29,38 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 47    |
-| observation needs reproduction | 4     |
+| none                           | 45    |
+| observation needs reproduction | 6     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| major concerns       | 11    |
-| no concerns detected | 29    |
-| concerns detected    | 11    |
+| major concerns       | 10    |
+| no concerns detected | 41    |
 
 Observation counts
 
 | Observation                                                  | Count |
 |--------------------------------------------------------------|-------|
-| Response repeats the same text                               | 3     |
-| Generation was stopped early after sustained repeated output | 2     |
+| Response repeats the same text                               | 4     |
+| Generation was stopped early after sustained repeated output | 1     |
+| Final answer emitted twice                                   | 1     |
 | Unrecognised model control tokens remain visible             | 2     |
-| Required labelled fields not detected                        | 10    |
-| Response appears cut off at the token limit                  | 2     |
-| Repeated keyword entries                                     | 4     |
-| Output repeats the prompt's own hint text                    | 13    |
+| Required labelled fields not detected                        | 6     |
+| Response appears cut off at the token limit                  | 3     |
+| Repeated keyword entries                                     | 3     |
 
 ## Triage
 
-| Model                                                                                               | Execution | Mechanical checks | Maintainer status              | Observations                                                                                |
-|-----------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------|
-| [mlx-community/granite-vision-3.2-2b-nvfp4](#diagnostic-mlx-community-granite-vision-32-2b-nvfp4)   | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords   |
-| [mlx-community/Phi-3.5-vision-instruct-bf16](#diagnostic-mlx-community-phi-35-vision-instruct-bf16) | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords                                 |
-| [mlx-community/Qwen2-VL-2B-mlx](#diagnostic-mlx-community-qwen2-vl-2b-mlx)                          | completed | major concerns    | observation needs reproduction | repeated text; control tokens visible; labelled fields not detected; cut off at token limit |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                                        |
+| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                        |
+|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------|
+| [mlx-community/InternVL3_5-1B-4bit](#diagnostic-mlx-community-internvl35-1b-4bit)                               | completed | major concerns    | observation needs reproduction | repeated text; cut off at token limit; duplicate keywords           |
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation needs reproduction | repeated text; cut off at token limit; duplicate keywords           |
+| [mlx-community/Qwen2-VL-2B-mlx](#diagnostic-mlx-community-qwen2-vl-2b-mlx)                                      | completed | major concerns    | observation needs reproduction | repeated text; labelled fields not detected; cut off at token limit |
+| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | major concerns    | observation needs reproduction | repeated text; stopped early: repeating; duplicate keywords         |
+| [mlx-community/Step-3.7-Flash-oQ3e](#diagnostic-mlx-community-step-37-flash-oq3e)                               | completed | major concerns    | observation needs reproduction | answer emitted twice; control tokens visible                        |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation needs reproduction | control tokens visible; labelled fields not detected                |
 
 ## Crashes requiring action
 
@@ -68,12 +68,12 @@ None.
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-granite-vision-32-2b-nvfp4"></a>
+<a id="diagnostic-mlx-community-internvl35-1b-4bit"></a>
 
 <details>
-<summary>mlx-community/granite-vision-3.2-2b-nvfp4 — major concerns — repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords</summary>
+<summary>mlx-community/InternVL3_5-1B-4bit — major concerns — repeated text; cut off at token limit; duplicate keywords</summary>
 
-### mlx-community/granite-vision-3.2-2b-nvfp4
+### mlx-community/InternVL3_5-1B-4bit
 
 #### Execution and provenance
 
@@ -82,65 +82,69 @@ None.
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, repetition_abort,
-  missing_requested_sections, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Family README in installed mlx-vlm:* mlx_vlm/models/granite_vision/README.md
-  (read before filing)
-- *Labelled fields not detected:* ["description"]
-- *Repeated fragment:* keyword: "trees"
-- *Title word count:* 12
-- *Keyword count:* 48
-- *Keywords taken verbatim from the prompt's keyword hints:* 14
-- *Duplicate keywords:* ["norwich", "trees"]
-- *Resolved model revision:* f0c70965cdae87ebf38e84ff958e841ad943e8e6
-- *Processor class:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
-- *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 3.022
-- *Peak memory at first token (GB):* 4.324
+- *Observations:* repeated_output, token_cap_truncation, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
+- *Family README in installed mlx-vlm:* none
+- *Repeated fragment:* keyword: "british english examples of me"
+- *Title word count:* 7
+- *Keyword count:* 144
+- *Duplicate keywords:* ["british english", "british english examples of
+  metadata", "british english examples of details", "british english examples
+  of context", "british english examples of information", "british english
+  examples of data", "british english examples of content", "british english
+  examples of examples"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
+- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Processor class:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* max_tokens
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.372
+- *Peak memory at first token (GB):* 2.307
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json text_config": 0,
-  "generation_config.json": 0}
-- *Chat template found in (the first is the one the processor uses):* chat_template.json,
-  chat_template.jinja, tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.016
+- *EOS ids declared, by file:* {"config.json text_config": 151645,
+  "generation_config.json": 151645}
+- *Chat template found in (the first is the one the processor uses):* chat_template.jinja
+- *Post-cleanup active memory (GB):* 0.003
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 5688
-- *Prompt composition:* 5,688 = 449 text/template + 5,239 image tokens (92%;
+- *Prompt tokens:* 3438
+- *Prompt composition:* 3,438 = 110 text/template + 3,328 image tokens (97%;
   exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 2.35
-- *Parameter count:* 2.00B (name-estimate)
-- *Quantization:* 4-bit, group 16, nvfp4
-- *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.01x (2.36 GB vs 2.35 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 2.35 GB; other
-  load-time allocations 0.02 GB
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 0
-- *Configured EOS token:* &lt;|end_of_text|&gt;
+- *Checkpoint weights (GB):* 1.08
+- *Parameter count:* 1.00B (name-estimate)
+- *Quantization:* 4-bit, group 32, affine
+- *Declared context length:* 40,960 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (1.08 GB vs 1.08 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 1.08 GB; other
+  load-time allocations 0.00 GB
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); GPU activity outside harness inference: max 0% at 2 instantaneous
-  check(s); activity between checks is not observed; mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU activity outside harness inference: max 0% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: "Twilight at St Peter Mancroft: A Gothic Symphony of Light and Shadow"
-Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendicular Gothic, Stone Masonry, Stone facade, Trees, United Kingdom, Walking, Evening Light, Norwich, England, Church Tower, Bell Tower, St Peter Mancroft, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees, Trees,
+Title: Two cats sleeping on a pink couch
+
+Description: Two striped cats are sleeping on a pink couch, with one cat lying on its side and the other on its back, next to a remote control.
+
+Keywords: cats, sleeping, pink couch, remote control, striped, British English, British, British-English, British-English catalogue, British-English metadata, British-English details, British-English context, British-English information, British-English data, British-English content, British-English examples, British-English examples of metadata, British-English examples of keywords, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata
 ```
 
 </details>
 
-<a id="diagnostic-mlx-community-phi-35-vision-instruct-bf16"></a>
+<a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 <details>
-<summary>mlx-community/Phi-3.5-vision-instruct-bf16 — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — major concerns — repeated text; cut off at token limit; duplicate keywords</summary>
 
-### mlx-community/Phi-3.5-vision-instruct-bf16
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 #### Execution and provenance
 
@@ -149,53 +153,61 @@ Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendi
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Observations:* repeated_output, token_cap_truncation, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
 - *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "stone architecture"
-- *Title word count:* 9
-- *Keyword count:* 37
-- *Keywords taken verbatim from the prompt's keyword hints:* 16
-- *Percent of words in four-word runs copied from the description hint:* 50
-- *Text compared with the description hint:* description
-- *Duplicate keywords:* ["historic architecture", "stone architecture"]
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Processor class:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Repeated fragment:* keyword: "feline household domesticated "
+- *Title word count:* 6
+- *Keyword count:* 141
+- *Duplicate keywords:* ["feline household domesticated animals", "feline
+  household domesticated companions", "feline household domesticated friends",
+  "feline household domesticated comfort", "feline household domesticated
+  relaxation", "feline household domesticated comfort and relaxation"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.796
-- *Peak memory at first token (GB):* 9.313
+- *Stop reason:* max_tokens
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.513
+- *Peak memory at first token (GB):* 14.953
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *EOS ids declared, by file:* {"config.json": [2, 32000, 32007]}
-- *Chat template found in (the first is the one the processor uses):* tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.009
+- *EOS ids declared, by file:* {"config.json text_config": [128001, 128008,
+  128009]}
+- *Chat template found in (the first is the one the processor uses):* chat_template.json,
+  tokenizer_config.json
+- *Post-cleanup active memory (GB):* 0.005
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1151
-- *Prompt composition:* 1,151 = 394 text/template + 757 image tokens (66%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 8.29
-- *Declared context length:* 131,072 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (8.30 GB vs 8.29 GB on disk)
-- *Loaded weights in memory (mx.get_array_buffer_size):* 8.29 GB; other
-  load-time allocations 0.01 GB
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 32000
-- *Configured EOS token:* &lt;|endoftext|&gt;
+- *Prompt tokens:* 107
+- *Prompt composition:* 107 = 106 text/template + 1 image tokens (1%; exact,
+  counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 11.34
+- *Parameter count:* 11.00B (name-estimate)
+- *Quantization:* 8-bit, group 64
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (11.35 GB vs 11.34 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 11.35 GB; other
+  load-time allocations 0.00 GB
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 128009
+- *Configured EOS token:* &lt;|eot_id|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); GPU activity outside harness inference: max 0% at 2 instantaneous
-  check(s); activity between checks is not observed; mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU activity outside harness inference: max 0% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: Gothic Church Tower of St Peter Mancroft in Norwich
+Here is the metadata for the image:
 
-Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with its Victorian lead flèche illuminated in the evening light, as pedestrians walk along the street below.
+**Title:** Two Cats on a Pink Blanket
 
-Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, historic landmark, stone masonry, stone facade, clear sky, twilight, United Kingdom, walking, pedestrians, perpendicular gothic, spire, historic architecture, historic architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone architecture, stone
+**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed. The blanket is a deep pink color and appears to be made of a soft, plush material.
+
+**Keywords:** Tabby cats, pink blanket, remote controls, sleeping, feline, domestic, household, comfort, relaxation, domesticated, household pets, feline companions, household items, comfort and relaxation, domesticated animals, household companions, feline friends, household comfort, feline relaxation, household felines, feline household, household feline, feline household items, feline household comfort, feline household relaxation, feline household companions, feline household friends, feline household comfort and relaxation, feline household domesticated, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation, feline household domesticated animals, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort, feline household domesticated relaxation, feline household domesticated companions, feline household domesticated friends, feline household domesticated comfort and relaxation,
 ```
 
 </details>
@@ -203,7 +215,7 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
 <a id="diagnostic-mlx-community-qwen2-vl-2b-mlx"></a>
 
 <details>
-<summary>mlx-community/Qwen2-VL-2B-mlx — major concerns — repeated text; control tokens visible; labelled fields not detected; cut off at token limit</summary>
+<summary>mlx-community/Qwen2-VL-2B-mlx — major concerns — repeated text; labelled fields not detected; cut off at token limit</summary>
 
 ### mlx-community/Qwen2-VL-2B-mlx
 
@@ -215,25 +227,19 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation, unexpected_special_token
+  token_cap_truncation
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["keywords"]
-- *Repeated fragment:* phrase: "assistant assistant assistant ..."
-- *Unexpected special tokens:* ["&lt;|im_start|&gt;"]
-- *Title word count:* 32
-- *Percent of words in four-word runs copied from the description hint:* 9
-- *Text compared with the description hint:* description
+- *Repeated fragment:* phrase: "the cats are not..."
+- *Title word count:* 7
 - *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail"]
-- *Special tokens emitted (by token id):* ["&lt;|im_start|&gt;"]
 - *Resolved model revision:* d8c7c767e2e2c62cda8a51943276458ea6ad43bc
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 39.805
-- *Peak memory at first token (GB):* 9.362
-- *Text delivery:* 853 of 1,001 streamed chunks released no text (longest
-  consecutive stretch 796); the last released 5,841 characters
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.17
+- *Peak memory at first token (GB):* 5.433
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.1; top_p 0.001; top_k 1; repetition_penalty 1.05
 - *Sampling settings source:* temperature: generation_config; top_p:
@@ -247,8 +253,8 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
   chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.009
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16577
-- *Prompt composition:* 16,577 = 353 text/template + 16,224 image tokens (98%;
+- *Prompt tokens:* 511
+- *Prompt composition:* 511 = 120 text/template + 391 image tokens (77%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 4.42
 - *Parameter count:* 2.00B (name-estimate)
@@ -261,283 +267,165 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); GPU activity outside harness inference: max 0% at 2 instantaneous
-  check(s); activity between checks is not observed; mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
+  2 sample(s); GPU activity outside harness inference: max 0% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
+Title: Two cats sleeping on a pink couch
 
-Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is illuminated in evening light, with pedestrians walking along the street below. The church has a gothic architectural style with intricate details and a spire. The sky is clear, and there are trees in the foreground. The image is taken during twilight, with the sky transitioning from day to night. The church is a historic landmark and a popular tourist destination. The keywords include Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking.
+Description: Two cats, one with a green collar, are sleeping on a pink couch. One cat is lying on its side, while the other cat is lying on its back. Both cats are striped and have their eyes closed. There are two remote controls on the couch next to the cats. The cats are lying on a pink blanket that covers the couch. The cats are not interacting with each other. The cats are not looking at the camera. The cats are not wearing any other accessories. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry. The cats are not wearing any other makeup. The cats are not wearing any other clothes. The cats are not wearing any other shoes. The cats are not wearing any other jewelry.
+```
 
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
+</details>
 
+<a id="diagnostic-mlx-community-x-reasoner-7b-8bit"></a>
+
+<details>
+<summary>mlx-community/X-Reasoner-7B-8bit — major concerns — repeated text; stopped early: repeating; duplicate keywords</summary>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* repeated_output, repetition_abort, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Family README in installed mlx-vlm:* none
+- *Repeated fragment:* keyword: "feline behavior"
+- *Title word count:* 7
+- *Keyword count:* 54
+- *Duplicate keywords:* ["feline behavior", "feline companions", "feline
+  comfort", "feline companionship", "feline lifestyle", "feline rest", "feline
+  home"]
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* repetition_abort
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.346
+- *Peak memory at first token (GB):* 10.221
+- *Sampling settings source:* temperature: default; top_p: default; top_k:
+  default; min_p: default; repetition_penalty: default
+- *EOS ids declared, by file:* {"config.json": 151645,
+  "generation_config.json": 151645}
+- *Chat template found in (the first is the one the processor uses):* chat_template.json,
+  chat_template.jinja
+- *Post-cleanup active memory (GB):* 0.012
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 511
+- *Prompt composition:* 511 = 120 text/template + 391 image tokens (77%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 9.45
+- *Parameter count:* 7.00B (name-estimate)
+- *Quantization:* 8-bit, group 64
+- *Declared context length:* 128,000 (max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (9.46 GB vs 9.45 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 9.45 GB; other
+  load-time allocations 0.01 GB
+- *Generation tokens:* 275
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU activity outside harness inference: max 0% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
+
+#### Complete output
+
+```text
+Title: Cats Sleeping on Pink Couch with Remotes
+
+Description: Two tabby cats are curled up on a pink couch, one slightly larger than the other, both appearing relaxed. A remote control rests between them, adding a casual, lived-in feel to the scene. The lighting is soft and natural, highlighting the cats' striped fur and the vibrant pink fabric.
+
+Keywords: cats, sleeping, pink couch, tabby, remote control, relaxed, striped fur, natural light, cozy, domestic, feline, comfort, home setting, feline behavior, rest, domestic animals, feline companions, feline friends, feline relaxation, feline comfort, feline companionship, feline lifestyle, feline rest, feline behavior, feline home, feline comfort, feline companions, feline lifestyle, feline rest, feline behavior, feline home, feline comfort, feline companionship, feline lifestyle, feline rest, feline behavior, feline home, feline comfort, feline companionship, feline lifestyle, feline rest, feline behavior, feline home, feline comfort, feline companionship, feline lifestyle, feline rest, feline behavior, feline home, feline comfort, feline companionship, feline lifestyle, feline rest, feline behavior,
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-step-37-flash-oq3e"></a>
+
+<details>
+<summary>mlx-community/Step-3.7-Flash-oQ3e — major concerns — answer emitted twice; control tokens visible</summary>
+
+### mlx-community/Step-3.7-Flash-oQ3e
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* final_answer_duplicated, unexpected_special_token
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Family README in installed mlx-vlm:* none
+- *Unexpected special tokens:* ["&lt;/think&gt;"]
+- *Title word count:* 7
+- *Keyword count:* 19
+- *Text between the two answer copies:* &lt;/think&gt;
+- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Processor class:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 13.103
+- *Peak memory at first token (GB):* 86.896
+- *Sampling settings source:* temperature: default; top_p: default; top_k:
+  default; min_p: default; repetition_penalty: default
+- *EOS ids declared, by file:* {"config.json": 128007, "config.json
+  text_config": [1, 2, 128007]}
+- *Chat template found in (the first is the one the processor uses):* chat_template.jinja
+- *Post-cleanup active memory (GB):* 0.012
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 286
+- *Prompt composition:* 286 = 117 text/template + 169 image tokens (59%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 84.95
+- *Quantization:* 3-bit, group 128, affine
+- *Declared context length:* 262,144 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (84.96 GB vs 84.95 GB on disk)
+- *Loaded weights in memory (mx.get_array_buffer_size):* 84.95 GB; other
+  load-time allocations 0.01 GB
+- *Generation tokens:* 236
+- *Configured EOS token ID:* 128007
+- *Configured EOS token:* &lt;|im_end|&gt;
+- *Snapshot notes (neutral):* processor config missing from snapshot
+  (preprocessor_config.json, processor_config.json)
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max fair over
+  2 sample(s); GPU activity outside harness inference: max 0% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
+
+#### Complete output
+
+```text
+Title:
+Two cats sleeping on a pink blanket
+
+Description:
+Two tabby cats are lying on a bright pink blanket on a red sofa. Both cats appear to be asleep, with one cat on the left having a green collar and the other cat on the right being larger. Two remote controls are placed near the cats on the blanket.
+
+Keywords:
+cats, sleeping, pink blanket, red sofa, tabby cats, remote controls, green collar, large cat, small cat, relaxed, pets, home interior, soft fabric, lying down, close-up, daytime, comfortable, cozy
+</think>
+Title:
+Two cats sleeping on a pink blanket
+
+Description:
+Two tabby cats are lying on a bright pink blanket on a red sofa. Both cats appear to be asleep, with one cat on the left having a green collar and the other cat on the right being larger. Two remote controls are placed near the cats on the blanket.
+
+Keywords:
+cats, sleeping, pink blanket, red sofa, tabby cats, remote controls, green collar, large cat, small cat, relaxed, pets, home interior, soft fabric, lying down, close-up, daytime, comfortable, cozy
 ```
 
 </details>
@@ -561,14 +449,12 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description", "keywords"]
 - *Unexpected special tokens:* ["&lt;|channel|&gt;", "&lt;|message|&gt;"]
-- *Percent of words in four-word runs copied from the description hint:* 0
-- *Text compared with the description hint:* answer
 - *Resolved model revision:* 9c056d48b1e611dc586139a5deb927ae363cfe6f
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.465
-- *Peak memory at first token (GB):* 6.73
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.366
+- *Peak memory at first token (GB):* 7.013
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *generation_config.json settings not applied (by mlx-vlm or the harness):* {"max_new_tokens":
@@ -578,8 +464,8 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *Chat template found in (the first is the one the processor uses):* chat_template.jinja
 - *Post-cleanup active memory (GB):* 0.016
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2211
-- *Prompt composition:* 2,211 = 419 text/template + 1,792 image tokens (81%;
+- *Prompt tokens:* 3512
+- *Prompt composition:* 3,512 = 184 text/template + 3,328 image tokens (95%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 5.68
 - *Parameter count:* 9.00B (name-estimate)
@@ -587,19 +473,20 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *Load active memory vs checkpoint:* 1.00x (5.70 GB vs 5.68 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 5.68 GB; other
   load-time allocations 0.02 GB
-- *Generation tokens:* 19
+- *Generation tokens:* 14
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;|return|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); GPU activity outside harness inference: max 0% at 2 instantaneous
-  check(s); activity between checks is not observed; mode snapshot
+  sample(s); power: battery for 2 of 2 sample(s); thermal state max nominal
+  over 2 sample(s); GPU activity outside harness inference: max 0% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
 ```text
-<|channel|> analysis<|message|> The image shows a large church tower with a spire and a pointed roof.
+<|channel|> analysis<|message|> The two cats are sleeping on a pink couch.
 ```
 
 </details>
@@ -614,63 +501,61 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                                    | Mechanical checks | Observations                                         |
-|----------------------------------------------------------|-------------------|------------------------------------------------------|
-| mlx-community/FastVLM-0.5B-bf16                          | major concerns    | labelled fields not detected; prompt hint repeated   |
-| mlx-community/gemma-3n-E4B-it-4bit                       | major concerns    | labelled fields not detected                         |
-| mlx-community/MolmoPoint-8B-4bit                         | major concerns    | labelled fields not detected                         |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit                | major concerns    | labelled fields not detected; cut off at token limit |
-| mlx-community/nanoLLaVA-1.5-4bit                         | major concerns    | labelled fields not detected                         |
-| mlx-community/SmolVLM-256M-Instruct-4bit                 | major concerns    | labelled fields not detected; prompt hint repeated   |
-| vikhyatk/moondream2                                      | major concerns    | labelled fields not detected; prompt hint repeated   |
-| mlx-community/Molmo2-8B-4bit                             | concerns detected | duplicate keywords                                   |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx                 | concerns detected | duplicate keywords; prompt hint repeated             |
-| mlx-community/AREX-2-4bit                                | concerns detected | prompt hint repeated                                 |
-| mlx-community/GLM-4.6V-Flash-4bit                        | concerns detected | prompt hint repeated                                 |
-| mlx-community/granite-4.0-3b-vision-4bit                 | concerns detected | prompt hint repeated                                 |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                    | concerns detected | prompt hint repeated                                 |
-| mlx-community/pixtral-12b-8bit                           | concerns detected | prompt hint repeated                                 |
-| mlx-community/Step-3.7-Flash-oQ3e                        | concerns detected | prompt hint repeated                                 |
-| nativ-community/Mage-VL-OptiQ-4bit                       | concerns detected | prompt hint repeated                                 |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit | concerns detected | prompt hint repeated                                 |
-| sahilchachra/LensVLM-9B-MXFP4                            | concerns detected | prompt hint repeated                                 |
+| Model                                    | Mechanical checks | Observations                 |
+|------------------------------------------|-------------------|------------------------------|
+| mlx-community/FastVLM-0.5B-bf16          | major concerns    | labelled fields not detected |
+| mlx-community/nanoLLaVA-1.5-4bit         | major concerns    | labelled fields not detected |
+| mlx-community/SmolVLM-256M-Instruct-4bit | major concerns    | labelled fields not detected |
+| vikhyatk/moondream2                      | major concerns    | labelled fields not detected |
 
 ## Context for completions without detected concerns
 
 <details>
 <summary>Completions without detected concerns</summary>
 
-| Model                                                       | Runtime identity                                             | Performance                                          |
-|-------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2131 prompt / 83 generated; 493 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2108 prompt / 102 generated; 102 tok/s; 6.5 GB peak  |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 611 prompt / 92 generated; 75.8 tok/s; 28 GB peak    |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1656 prompt / 617 generated; 124 tok/s; 19 GB peak   |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 610 prompt / 145 generated; 31.5 tok/s; 17 GB peak   |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 615 prompt / 118 generated; 62.6 tok/s; 7.6 GB peak  |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 615 prompt / 105 generated; 123 tok/s; 16 GB peak    |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 611 prompt / 108 generated; 125 tok/s; 6.0 GB peak   |
-| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6372 prompt / 112 generated; 44.7 tok/s; 78 GB peak  |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2132 prompt / 98 generated; 57.6 tok/s; 10 GB peak   |
-| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2135 prompt / 126 generated; 423 tok/s; 2.1 GB peak  |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1342 prompt / 750 generated; 66.6 tok/s; 20 GB peak  |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 320 prompt / 101 generated; 22.0 tok/s; 15 GB peak   |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 410 prompt / 104 generated; 104 tok/s; 7.1 GB peak   |
-| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 950 prompt / 333 generated; 305 tok/s; 3.2 GB peak   |
-| mlx-community/MiniCPM-V-4.7-1B-4bit                         | rev 13caa569f70e; MiniCPMV4_7Processor; stop completed       | 952 prompt / 77 generated; 311 tok/s; 3.7 GB peak    |
-| mlx-community/MiniCPM-V-4.7-35B-A3B-4bit                    | rev 0e3b706c1599; MiniCPMV4_7Processor; stop completed       | 952 prompt / 120 generated; 88.9 tok/s; 25 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2959 prompt / 122 generated; 66.1 tok/s; 13 GB peak  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2958 prompt / 113 generated; 187 tok/s; 7.8 GB peak  |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4101 prompt / 158 generated; 209 tok/s; 3.9 GB peak  |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12809 prompt / 120 generated; 72.0 tok/s; 26 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16566 prompt / 144 generated; 85.9 tok/s; 23 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16566 prompt / 91 generated; 69.0 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16579 prompt / 130 generated; 108 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16579 prompt / 133 generated; 29.8 tok/s; 21 GB peak |
-| mlx-community/X-Reasoner-7B-8bit                            | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed        | 16577 prompt / 127 generated; 59.7 tok/s; 14 GB peak |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3642 prompt / 121 generated; 156 tok/s; 23 GB peak   |
-| nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit       | rev 4bc0a247d78e; NemotronHNanoOmniProcessor; stop completed | 3641 prompt / 153 generated; 69.6 tok/s; 52 GB peak  |
-| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16579 prompt / 123 generated; 36.2 tok/s; 17 GB peak |
+| Model                                                       | Runtime identity                                             | Performance                                         |
+|-------------------------------------------------------------|--------------------------------------------------------------|-----------------------------------------------------|
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 350 prompt / 47 generated; 521 tok/s; 1.2 GB peak   |
+| mlx-community/AREX-2-4bit                                   | rev 02551ee54839; Qwen3VLProcessor; stop completed           | 421 prompt / 80 generated; 33.3 tok/s; 17 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2909 prompt / 82 generated; 100 tok/s; 6.5 GB peak  |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 386 prompt / 67 generated; 54.0 tok/s; 28 GB peak   |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 545 prompt / 478 generated; 109 tok/s; 18 GB peak   |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 379 prompt / 89 generated; 31.5 tok/s; 17 GB peak   |
+| mlx-community/gemma-3n-E4B-it-4bit                          | rev 505468a22e57; Gemma3nProcessor; stop completed           | 378 prompt / 63 generated; 72.3 tok/s; 7.2 GB peak  |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 390 prompt / 77 generated; 62.6 tok/s; 7.5 GB peak  |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 390 prompt / 81 generated; 115 tok/s; 16 GB peak    |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 386 prompt / 62 generated; 125 tok/s; 5.9 GB peak   |
+| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 499 prompt / 49 generated; 86.5 tok/s; 8.0 GB peak  |
+| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 499 prompt / 85 generated; 49.9 tok/s; 63 GB peak   |
+| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 734 prompt / 66 generated; 179 tok/s; 4.7 GB peak   |
+| mlx-community/granite-vision-3.2-2b-nvfp4                   | rev f0c70965cdae; GraniteVisionProcessor; stop completed     | 3095 prompt / 119 generated; 174 tok/s; 3.9 GB peak |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 3435 prompt / 90 generated; 56.1 tok/s; 10 GB peak  |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 489 prompt / 435 generated; 67.8 tok/s; 20 GB peak  |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                       | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed            | 344 prompt / 74 generated; 214 tok/s; 3.6 GB peak   |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 177 prompt / 103 generated; 103 tok/s; 7.0 GB peak  |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 330 prompt / 478 generated; 255 tok/s; 3.1 GB peak  |
+| mlx-community/MiniCPM-V-4.7-1B-4bit                         | rev 13caa569f70e; MiniCPMV4_7Processor; stop completed       | 332 prompt / 64 generated; 261 tok/s; 3.6 GB peak   |
+| mlx-community/MiniCPM-V-4.7-35B-A3B-4bit                    | rev 0e3b706c1599; MiniCPMV4_7Processor; stop completed       | 332 prompt / 86 generated; 78.9 tok/s; 24 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 1070 prompt / 72 generated; 68.7 tok/s; 9.8 GB peak |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 1069 prompt / 100 generated; 198 tok/s; 4.5 GB peak |
+| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 873 prompt / 95 generated; 71.3 tok/s; 8.5 GB peak  |
+| mlx-community/MolmoPoint-8B-4bit                            | rev 9bab196f867c; MolmoPointProcessor; stop completed        | 860 prompt / 70 generated; 32.0 tok/s; 12 GB peak   |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit                   | rev 865ee8de6579; MuseGlimmerProcessor; stop completed       | 545 prompt / 937 generated; 23.1 tok/s; 25 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 418 prompt / 78 generated; 164 tok/s; 3.5 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 883 prompt / 94 generated; 59.4 tok/s; 9.1 GB peak  |
+| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 1335 prompt / 89 generated; 41.1 tok/s; 15 GB peak  |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 409 prompt / 87 generated; 84.5 tok/s; 23 GB peak   |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 409 prompt / 83 generated; 88.4 tok/s; 19 GB peak   |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 409 prompt / 60 generated; 102 tok/s; 6.8 GB peak   |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 421 prompt / 102 generated; 79.3 tok/s; 21 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 421 prompt / 113 generated; 30.5 tok/s; 17 GB peak  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx                    | rev 844516024a1c; SmolVLMProcessor; stop completed           | 1204 prompt / 31 generated; 131 tok/s; 5.6 GB peak  |
+| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 420 prompt / 89 generated; 149 tok/s; 4.9 GB peak   |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 538 prompt / 87 generated; 37.3 tok/s; 17 GB peak   |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 421 prompt / 65 generated; 141 tok/s; 21 GB peak    |
+| nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit       | rev 4bc0a247d78e; NemotronHNanoOmniProcessor; stop completed | 420 prompt / 105 generated; 61.4 tok/s; 46 GB peak  |
+| sahilchachra/LensVLM-9B-MXFP4                               | rev 23ae80ae9a7d; Qwen3VLProcessor; stop completed           | 421 prompt / 111 generated; 105 tok/s; 6.8 GB peak  |
+| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 421 prompt / 94 generated; 40.9 tok/s; 11 GB peak   |
 
 </details>
 
@@ -679,30 +564,20 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 6,213 x 9,320 pixels
-- *Image size:* 52,096,760 bytes
-- *Image SHA-256:* 5526381f05071b9832b086adc634888de171e314a3d5d1acc4c80c3afc95a8a4
+- *Image dimensions:* 640 x 480 pixels
+- *Image size:* 173,131 bytes
+- *Image SHA-256:* dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e
 
 <details>
 <summary>Exact prompt</summary>
 
 ```text
-Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
-- GPS: 52.628000°N, 1.293600°E
-
-Descriptive hints:
-- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
-- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
 
 Write:
 - a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
 
 Return exactly these three sections and nothing else:
 Title:
@@ -716,10 +591,10 @@ The original local input is not published, so this report does not claim a
 complete reproduction command. Use a shareable equivalent image or add the
 original image before filing.
 
-- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-f00ae35004e26a90.jpg>
-- *Preview dimensions:* 683 x 1,024 pixels
-- *Preview size:* 99,535 bytes
-- *Preview SHA-256:* f00ae35004e26a90c102e7357a69f13b84009d2416fe3bdb9ba7d7c4b3a6ee3b
+- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-c4aeb8d18432656f.jpg>
+- *Preview dimensions:* 640 x 480 pixels
+- *Preview size:* 63,187 bytes
+- *Preview SHA-256:* c4aeb8d18432656f38f690facffbfa90ad3966dc2113a675025d1231a7c5747b
 
 Shareable stand-in: the retained gallery preview is a downscaled re-encoding
 of the original, so an observation reproduced on it must be reported as
@@ -730,24 +605,14 @@ native mlx-vlm process.
 
 ```bash
 set -euo pipefail
-curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-f00ae35004e26a90.jpg
-printf '%s\n' 'f00ae35004e26a90c102e7357a69f13b84009d2416fe3bdb9ba7d7c4b3a6ee3b  repro-image.jpg' | shasum -a 256 --check
-python -m mlx_vlm.generate --verbose --model MODEL_ID --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
-- GPS: 52.628000°N, 1.293600°E
-
-Descriptive hints:
-- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
-- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
+curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-c4aeb8d18432656f.jpg
+printf '%s\n' 'c4aeb8d18432656f38f690facffbfa90ad3966dc2113a675025d1231a7c5747b  repro-image.jpg' | shasum -a 256 --check
+python -m mlx_vlm.generate --verbose --model MODEL_ID --image repro-image.jpg --prompt 'Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
 
 Write:
 - a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
 
 Return exactly these three sections and nothing else:
 Title:
@@ -757,19 +622,21 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 ### Highlighted model revisions
 
-| Model                                      | Resolved revision                        |
-|--------------------------------------------|------------------------------------------|
-| mlx-community/granite-vision-3.2-2b-nvfp4  | f0c70965cdae87ebf38e84ff958e841ad943e8e6 |
-| mlx-community/Phi-3.5-vision-instruct-bf16 | d8da684308c275a86659e2b36a9189b2f4aec8ea |
-| mlx-community/Qwen2-VL-2B-mlx              | d8c7c767e2e2c62cda8a51943276458ea6ad43bc |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit      | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| Model                                            | Resolved revision                        |
+|--------------------------------------------------|------------------------------------------|
+| mlx-community/InternVL3_5-1B-4bit                | f9d179a8be8ac53e96c6ee5cce8493856d4b8f09 |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
+| mlx-community/Qwen2-VL-2B-mlx                    | d8c7c767e2e2c62cda8a51943276458ea6ad43bc |
+| mlx-community/X-Reasoner-7B-8bit                 | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
+| mlx-community/Step-3.7-Flash-oQ3e                | 41d17ee00e168a2918bb839e4a7b6e445c6f03f1 |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit            | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
 
 ### Components and system
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.8                                                                                                                                           |
-| mlx-vlm source revision    | 259802ec00b26cd73d1a138cd0ed2bb72d85e205                                                                                                        |
+| mlx-vlm source revision    | b38cfa7b84b7824400290e6a2bb7d9fd3fe3690f                                                                                                        |
 | mlx                        | 0.32.5.dev20261016+b6642e604                                                                                                                    |
 | mlx source revision        | b6642e604                                                                                                                                       |
 | mlx-audio                  | 0.5.9                                                                                                                                           |
