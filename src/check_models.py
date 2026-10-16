@@ -12539,6 +12539,20 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     )
     _validate_server_shared_request_params(args)
     _validate_thinking_params(args)
+    _validate_unique_model_ids(getattr(args, "models", None))
+
+
+def _validate_unique_model_ids(models: Sequence[str] | None) -> None:
+    """Reject a ``--models`` list that names one model more than once.
+
+    Every report keys a run's attempts by model ID, so a repeated ID would
+    fail publication only after inference; repeated attempts are not a
+    supported feature.
+    """
+    repeated = sorted(model for model, count in Counter(models or ()).items() if count > 1)
+    if repeated:
+        msg = f"--models lists the same model more than once: {', '.join(repeated)}"
+        raise ValueError(msg)
 
 
 def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
@@ -27990,7 +28004,7 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         nargs="+",
         help=(
             "Specify models by ID/path. Overrides cache scan. "
-            "May be provided multiple times; model lists accumulate."
+            "May be provided multiple times; model lists accumulate. Each ID may appear once."
         ),
     )
     model_group.add_argument(

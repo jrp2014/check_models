@@ -342,6 +342,18 @@ class TestCliArgumentNormalization:
         assert args.frequency_context_size == 64
         assert args.logit_bias == {42: -1.5, 123: 2.0}
 
+    def test_repeated_model_ids_are_rejected_before_inference(self) -> None:
+        """Reports key attempts by model ID, so a repeated --models entry fails up front."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(
+            ["--folder", "test-folder", "--models", "org/a", "org/b", "--models", "org/a"]
+        )
+
+        with pytest.raises(ValueError, match="more than once: org/a"):
+            validate_cli_arguments(args)
+
+        validate_cli_arguments(self._build_args(models=["org/a", "org/b"]))
+
     def test_invalid_resize_shape_raises_error(self) -> None:
         """Resize shape should reject anything other than one or two positive ints."""
         args = self._build_args(resize_shape=[224, 224, 224])

@@ -92,6 +92,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `--models` (0.17.66) now rejects a model ID listed more than once,
+  before any model runs. Every report keys a run's attempts by model ID, so
+  a repeated ID used to run inference twice and then fail publication's
+  identity check; repeated attempts are not a supported feature. A
+  regression test now covers the gallery evidence pairing from 3cf3bf5:
+  each result keeps the row built from it, including when a directly built
+  context holds two attempts of one model.
 - Refactor (0.17.65): publication no longer reads `results.jsonl` back.
   Writing the retained run returns the text it wrote, and validating that
   text gives exactly what reloading the file gave. Both run-summary renders

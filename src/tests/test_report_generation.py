@@ -8928,6 +8928,20 @@ def test_both_gallery_formats_share_one_row_per_model(tmp_path: Path) -> None:
     assert replaced.assessment_by_model.keys() == {report_context.assessments[0][0]}
 
 
+def test_gallery_evidence_keeps_each_row_with_its_own_result() -> None:
+    """Evidence pairs each result with the row built from it, never one found by name.
+
+    The CLI rejects repeated --models IDs, but a context built directly can
+    still hold two attempts of one model; each keeps its own measured facts.
+    """
+    first = replace(_make_success("org/m"), total_time=1.0)
+    second = replace(_make_success("org/m"), total_time=3.0)
+    context = check_models._build_html_report_context(results=[first, second], prompt="p")
+    entries = check_models._gallery_evidence_entries(context)
+    assert [entry[0].total_time for entry in entries] == [1.0, 3.0]
+    assert all(entry[1].total_time_s == entry[0].total_time for entry in entries)
+
+
 def test_withdrawn_run_summary_keeps_not_needed_apart_from_failed(tmp_path: Path) -> None:
     """Not needed is no outcome; a failed prerequisite or render, or a failed cleanup, is one."""
     paths = check_models.ReportOutputPaths.from_root(tmp_path)
