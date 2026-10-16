@@ -1989,7 +1989,6 @@ class TestRerunEvidence:
             quality_analysis=check_models.GenerationQualityAnalysis(
                 is_repetitive=True,
                 repeated_token=repeated_phrase,
-                word_count=100,
             ),
         )
         clean = PerformanceResult(
@@ -2002,7 +2001,6 @@ class TestRerunEvidence:
             quality_analysis=check_models.GenerationQualityAnalysis(
                 is_repetitive=False,
                 repeated_token=None,
-                word_count=8,
             ),
         )
 

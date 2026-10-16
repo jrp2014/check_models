@@ -4651,7 +4651,6 @@ class GenerationQualityAnalysis:
     thinking_trace_incomplete: bool = False
     thinking_only_output: bool = False
     thinking_trace_markers: list[str] = dataclass_field(default_factory=list)
-    word_count: int = 0
     prompt_checks_ran: bool = False
     likely_capped: bool = False
     token_cap_reasons: list[str] = dataclass_field(default_factory=list)
@@ -4914,7 +4913,6 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         thinking_trace_incomplete=reasoning.thinking_trace_incomplete,
         thinking_only_output=reasoning.thinking_only_output,
         thinking_trace_markers=list(reasoning.thinking_trace_markers),
-        word_count=len(re.findall(r"\b\w+\b", analysis_text)),
         prompt_checks_ran=bool(prompt),
         likely_capped=likely_capped,
         token_cap_reasons=cutoff_reasons,

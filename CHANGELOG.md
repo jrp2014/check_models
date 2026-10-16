@@ -103,6 +103,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Quality analysis (0.17.73): `GenerationQualityAnalysis.word_count` is gone.
+  It was computed on every analysis and never read; the standalone
+  `tools/analyze_output_quality.py` counts its own displayed words. Worker
+  payloads that still carry the key load unchanged.
 - Prompt burden (0.17.72): the intermediate `PromptBurden` dataclass is gone.
   `_prompt_burden_for_result()` builds the retained `prompt_burden` record
   directly, with the same six keys and values; the never-read fields

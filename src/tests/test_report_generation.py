@@ -3068,7 +3068,6 @@ def _make_quality_success(
     qa = GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
-        word_count=20,
         prompt_checks_ran=True,
         unexpected_special_tokens=["<|unexpected|>"] if with_quality_issue else [],
     )
@@ -3599,7 +3598,6 @@ def _make_harness_success(
     qa = GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
-        word_count=0,
         prompt_checks_ran=True,
         unexpected_special_tokens=(
             [harness_detail.split(":", maxsplit=1)[-1]]

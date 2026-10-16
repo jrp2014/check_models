@@ -702,7 +702,6 @@ class TestProcessImageWithModelMock:
         analysis = check_models.GenerationQualityAnalysis(
             is_repetitive=True,
             repeated_token=repeated_phrase,
-            word_count=25,
         )
         result: check_models.PerformanceResult
         try:
