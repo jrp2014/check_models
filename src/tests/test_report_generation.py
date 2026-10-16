@@ -532,20 +532,12 @@ def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
         msg = "disk full"
         raise OSError(msg)
 
-    inputs = cast(
-        "check_models.ReportGenerationInputs",
-        Namespace(output_paths=output_paths, comparison=None),
+    draft = check_models._draft_run_issue_summary(
+        output_paths, check_models._load_retained_run(output_paths.jsonl)
     )
     with patch.object(check_models, "_write_text_file", _explode):
         check_models._match_summary_to_pre_report_header(
-            inputs,
-            published=check_models.PublishedRun(
-                output_paths.jsonl, output_paths.jsonl.read_text(encoding="utf-8")
-            ),
-            finalized=None,
-            summary_written=True,
-            issue_reports={},
-            include_gallery_markdown=False,
+            draft, finalized=None, summary_written=True
         )
 
     assert summary.read_bytes() == first
@@ -2439,7 +2431,7 @@ def test_report_diagnostics_and_summary_key_errors_are_contained(
         ),
         patch.object(
             check_models,
-            "generate_run_issue_summary_report",
+            "_draft_run_issue_summary",
             side_effect=KeyError("summary defect"),
         ),
     ):
@@ -2619,13 +2611,18 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
         ),
         patch.object(
             check_models,
-            "generate_run_issue_summary_report",
-            wraps=check_models.generate_run_issue_summary_report,
-        ) as render_summary,
+            "_draft_run_issue_summary",
+            wraps=check_models._draft_run_issue_summary,
+        ) as draft_summary,
+        patch.object(
+            check_models,
+            "_write_run_issue_summary",
+            wraps=check_models._write_run_issue_summary,
+        ) as write_summary,
     ):
         result = check_models._generate_reports_and_log_outputs(inputs)
 
-    assert render_summary.call_count == 1
+    assert (draft_summary.call_count, write_summary.call_count) == (1, 1)
 
     header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
     assert header["total_runtime_seconds"] > 600.0
@@ -2644,6 +2641,45 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
     with patch.object(check_models._LinkStyleState, "value", "relative"):
         check_models.regenerate_run_issue_summary(inputs.output_paths.index.parent)
     assert summary_path.read_bytes() == shipped
+
+
+def test_reported_duration_includes_building_the_run_summary(tmp_path: Path) -> None:
+    """Time spent building the summary counts toward the end-to-end duration."""
+    failure = _make_failure_with_details("org/broken", error_msg="Model loading failed: boom")
+    inputs = _report_generation_inputs(tmp_path, result=failure)
+    start = 1_700_000_000.0
+    inputs = replace(inputs, overall_start_time=start, overall_time=600.0)
+    clock = {"now": start + 600.0}
+    draft = check_models._draft_run_issue_summary
+
+    def slow_draft(
+        output_paths: check_models.ReportOutputPaths,
+        run: check_models.RetainedRun,
+        *,
+        issue_reports: Mapping[str, Path] | None = None,
+        include_gallery_markdown: bool = True,
+        comparison: check_models.RunComparison | None = None,
+    ) -> check_models.RunIssueSummaryDraft:
+        clock["now"] += 120.0  # simulated, not a measurement
+        return draft(
+            output_paths,
+            run,
+            issue_reports=issue_reports,
+            include_gallery_markdown=include_gallery_markdown,
+            comparison=comparison,
+        )
+
+    with (
+        patch.object(check_models.time, "time", lambda: clock["now"]),
+        patch.object(check_models._LinkStyleState, "value", "relative"),
+        patch.object(check_models, "_draft_run_issue_summary", slow_draft),
+    ):
+        check_models._generate_reports_and_log_outputs(inputs)
+
+    header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
+    assert header["total_runtime_seconds"] == 720.0
+    summary = check_models._run_issue_summary_path(inputs.output_paths).read_text(encoding="utf-8")
+    assert f"*Run duration:* {check_models.format_overall_runtime(720.0)}" in summary
 
 
 def test_failed_final_header_leaves_the_summary_matching_the_written_header(
@@ -2726,7 +2762,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
 
     with patch.object(
         check_models,
-        "generate_run_issue_summary_report",
+        "_draft_run_issue_summary",
         side_effect=ValueError("summary fixture failure"),
     ):
         failed_summary_outcomes = check_models._generate_reports_and_log_outputs(inputs).outcomes
@@ -2755,7 +2791,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         ),
         patch.object(
             check_models,
-            "generate_run_issue_summary_report",
+            "_draft_run_issue_summary",
             side_effect=AssertionError("summary must not read stale JSONL"),
         ),
     ):
@@ -2792,7 +2828,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         ),
         patch.object(
             check_models,
-            "generate_run_issue_summary_report",
+            "_draft_run_issue_summary",
             side_effect=AssertionError("summary must not link stale diagnostics"),
         ),
     ):

@@ -103,6 +103,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Run duration (0.17.68): the end-to-end duration again includes building
+  the run summary. 0.17.67 took the finish time before the summary ran, so
+  a summary that took two minutes went uncounted (600 s recorded against
+  720 s elapsed). The summary's findings, tables and comparison are now
+  built before the finish time; only its timing rows, artifact links,
+  Markdown rendering and file write come after it.
 - Refactor (0.17.67): the run issue summary is rendered once per run
   instead of twice. It now runs with the output index, after the other
   renderers, from the written run carrying the end-to-end duration and

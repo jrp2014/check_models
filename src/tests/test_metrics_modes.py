@@ -127,9 +127,7 @@ def _run_finalize_with_report_patches(
             patch("check_models.append_history_record", return_value=_finalize_history_stub())
         )
         stack.enter_context(patch("check_models.generate_diagnostics_report", return_value=False))
-        stack.enter_context(
-            patch("check_models.generate_run_issue_summary_report", return_value=None)
-        )
+        stack.enter_context(patch("check_models._write_run_issue_summary", return_value=None))
         finalize_execution(
             args=args,
             results=results,
@@ -1972,9 +1970,7 @@ def test_run_start_system_facts_are_reused_not_re_read(
             patch("check_models.append_history_record", return_value=_finalize_history_stub())
         )
         stack.enter_context(patch("check_models.generate_diagnostics_report", return_value=False))
-        stack.enter_context(
-            patch("check_models.generate_run_issue_summary_report", return_value=None)
-        )
+        stack.enter_context(patch("check_models._write_run_issue_summary", return_value=None))
         context_builder = stack.enter_context(
             patch(
                 "check_models._build_report_render_context",
