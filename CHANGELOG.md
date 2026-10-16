@@ -979,6 +979,26 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Run summary comparison: an observation check that check_models has
+  since removed no longer shows up as a per-model change. The 2026-10-16
+  sweep listed "-unsupplied place name" for gemma-3n and MolmoPoint, whose
+  text was identical, because the baseline predated the check's removal in
+  0.17.48. Readers' views now leave retired checks out of the delta, drop
+  models with nothing else moved, and name each retired check once with its
+  removal release and how many models carried it. `results.jsonl` keeps the
+  recorded observation sets, so retained comparisons read the same way.
+- Run summary comparison: the changed-text table gains a column of
+  generated token counts, baseline then now. Muse-Glimmer's text went from 4,677 to 66
+  characters, which read like a scaffolding fix; both runs used all 1,000
+  tokens on reasoning, and only this one reached its answer channel. New
+  comparisons record the counts; older ones say "not recorded".
+- One run duration everywhere. The run summary was rendered before the
+  `results.jsonl` header gained its end-to-end duration, so the 2026-10-16
+  sweep's summary said 10m 41s while the index and log said 10m 44s, and its
+  finish time disagreed with `results.jsonl`. The index and the final header
+  now share one end time, the summary is rendered again from the final
+  header (also matching what a regeneration produces), and the closing log
+  line reads the recorded duration back.
 - The repetition guard's token-id check (0.17.49) is reverted. It stopped a
   loop that the BPE detokenizer was holding back, as with Qwen2-VL's 265
   repeats of `<|im_start|>assistant` on 2026-10-11, but the early stop

@@ -4941,6 +4941,11 @@ def local_now_str(fmt: str = LOCAL_TIMESTAMP_FORMAT) -> str:
     return datetime.now().astimezone().strftime(fmt)
 
 
+def local_time_str(epoch_seconds: float, fmt: str = LOCAL_TIMESTAMP_FORMAT) -> str:
+    """Format a ``time.time()`` value in local time, like :func:`local_now_str`."""
+    return datetime.fromtimestamp(epoch_seconds).astimezone().strftime(fmt)
+
+
 def _parse_local_timestamp(value: object, *, embedded: bool = False) -> datetime | None:
     """Parse one project timestamp, optionally from surrounding log text."""
     if not isinstance(value, str):
@@ -8610,6 +8615,11 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         "no keyword overlap",
     ),
 )
+# Observation codes check_models no longer emits, with the release that removed
+# each. A comparison against a baseline that carries one would show it
+# vanishing from models whose output did not change, so readers' views leave
+# these codes out of the per-model delta and name them instead.
+_RETIRED_OBSERVATION_CODES: Final[dict[str, str]] = {"unverified_place_name": "0.17.48"}
 _OBSERVATION_DISPLAY_BY_CODE: Final[dict[ObservationCode, ObservationDisplaySpec]] = {
     spec.code: spec for spec in _OBSERVATION_DISPLAY_SPECS
 }
@@ -20406,6 +20416,28 @@ class RunComparisonModelChange:
     observations_removed: tuple[str, ...]
 
 
+def _without_retired_observations(
+    change: RunComparisonModelChange,
+) -> RunComparisonModelChange | None:
+    """Drop retired observation codes from one change; None when nothing else moved."""
+    added = tuple(
+        code for code in change.observations_added if code not in _RETIRED_OBSERVATION_CODES
+    )
+    removed = tuple(
+        code for code in change.observations_removed if code not in _RETIRED_OBSERVATION_CODES
+    )
+    if (added, removed) == (change.observations_added, change.observations_removed):
+        return change
+    if (
+        not added
+        and not removed
+        and change.baseline_execution == change.current_execution
+        and change.baseline_usability == change.current_usability
+    ):
+        return None
+    return replace(change, observations_added=added, observations_removed=removed)
+
+
 @dataclass(frozen=True)
 class RunComparisonThroughputFlag:
     """One model whose generation throughput left its usual band."""
@@ -20490,6 +20522,10 @@ class TextDivergence(NamedTuple):
     # This run's checkpoint quantization from config.json ("4-bit affine",
     # "not quantized"); None when the record has no model_burden facts.
     weights: str | None = None
+    # Generated token counts; None when a record lacks one. Equal counts at the
+    # token limit show both runs were cut off, whatever the text lengths.
+    baseline_output_tokens: int | None = None
+    current_output_tokens: int | None = None
 
 
 class ArchitectureCommits(NamedTuple):
@@ -20600,12 +20636,44 @@ class RunComparison:
         return self.comparability != "incomparable"
 
     @property
+    def reported_changes(self) -> tuple[RunComparisonModelChange, ...]:
+        """Per-model changes as readers see them, without retired observation checks.
+
+        ``changes`` keeps the recorded observation sets for the machine record.
+        """
+        return tuple(
+            reported
+            for change in self.changes
+            if (reported := _without_retired_observations(change)) is not None
+        )
+
+    @property
+    def retired_observation_counts(self) -> tuple[tuple[str, int], ...]:
+        """How many changed models carried each retired observation code, by code."""
+        counts = Counter(
+            code
+            for change in self.changes
+            for code in {*change.observations_added, *change.observations_removed}
+            if code in _RETIRED_OBSERVATION_CODES
+        )
+        return tuple(sorted(counts.items()))
+
+    @property
+    def affected_models(self) -> frozenset[str]:
+        """Models whose outcome, text or failure moved, as readers see them."""
+        return frozenset(
+            {change.model for change in self.reported_changes}
+            | set(self.text_changed_models)
+            | {entry.model for entry in self.crash_continuity}
+        )
+
+    @property
     def has_changes(self) -> bool:
         """Return whether anything beyond noise moved."""
         return bool(
             self.models_added
             or self.models_removed
-            or self.changes
+            or self.reported_changes
             or self.throughput_flags
             or self.prefill_changes
             or self.memory_changes
@@ -21394,9 +21462,17 @@ def _generated_text_changes(
                 prompt_token_count_unchanged=unchanged,
                 decoding=_decoding_group(now, before),
                 weights=_weights_label(now),
+                baseline_output_tokens=_generation_token_count(before),
+                current_output_tokens=_generation_token_count(now),
             )
         )
     return len(completed), changed
+
+
+def _generation_token_count(record: JsonlResultRecord) -> int | None:
+    """The record's generated token count, or None when absent or not an integer."""
+    count = (record.get("metrics") or {}).get("generation_tokens")
+    return count if isinstance(count, int) and not isinstance(count, bool) else None
 
 
 def _prefill_tps_ratios(
@@ -22199,6 +22275,8 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
                 "prompt_token_count_unchanged": entry.prompt_token_count_unchanged,
                 "decoding": entry.decoding,
                 "weights": entry.weights,
+                "baseline_output_tokens": entry.baseline_output_tokens,
+                "current_output_tokens": entry.current_output_tokens,
             }
             for entry in comparison.text_divergence
         ],
@@ -22537,6 +22615,8 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
                 ),
                 _comparison_opt_str(entry.get("decoding")) or "unknown",
                 _comparison_opt_str(entry.get("weights")),
+                _comparison_opt_int(entry.get("baseline_output_tokens")),
+                _comparison_opt_int(entry.get("current_output_tokens")),
             )
             for entry in _comparison_rows(value.get("text_divergence"))
         ),
@@ -22615,6 +22695,24 @@ class _ComparisonView:
     # Facts about this run itself, shown even when the runs are not comparable.
     run_fact_rows: tuple[tuple[str, str], ...] = ()
     prefill_rows: tuple[tuple[str, str, str, str], ...] = ()
+    # Retired observation checks the per-model delta leaves out.
+    retired_note: str | None = None
+
+
+def _retired_observation_note(comparison: RunComparison) -> str | None:
+    """Name each retired check the delta leaves out, the release that removed it, and its reach."""
+    if not comparison.comparable or not (counts := comparison.retired_observation_counts):
+        return None
+    return (
+        "Left out of the observation delta: "
+        + "; ".join(
+            f"{_OBSERVATION_SELECTOR_GLOSSES.get(cast('ObservationCode', code), code)}, "
+            f"a check removed in check_models {_RETIRED_OBSERVATION_CODES[code]}, "
+            f"recorded for {_pluralized_count(count, 'model')} in only one of the two runs"
+            for code, count in counts
+        )
+        + "."
+    )
 
 
 _DECODING_CELL_LABELS: Final[dict[str, str]] = {
@@ -22634,7 +22732,7 @@ def _text_change_rows(comparison: RunComparison) -> tuple[tuple[str, ...], ...]:
     for model in comparison.text_changed_models:
         entry = where.get(model)
         if entry is None:
-            rows.append((model, "-", "-", "-", "-", "-"))
+            rows.append((model, "-", "-", "-", "-", "-", "-"))
             continue
         # Facts missing from either record say so, like the decoding cell.
         prompt = {True: "same", False: "changed", None: "not recorded"}[
@@ -22647,6 +22745,12 @@ def _text_change_rows(comparison: RunComparison) -> tuple[tuple[str, ...], ...]:
                 entry.weights or "not recorded",
                 f"{entry.shared_prefix_chars:,}",
                 f"{entry.baseline_chars:,} \u2192 {entry.current_chars:,}",
+                (
+                    f"{entry.baseline_output_tokens:,} \u2192 {entry.current_output_tokens:,}"
+                    if entry.baseline_output_tokens is not None
+                    and entry.current_output_tokens is not None
+                    else "not recorded"
+                ),
                 prompt,
             )
         )
@@ -22838,7 +22942,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
             _format_usability_transition(change.baseline_usability, change.current_usability),
             _format_observation_delta(change),
         )
-        for change in comparison.changes
+        for change in comparison.reported_changes
     )
     flag_rows = tuple(
         (
@@ -22885,6 +22989,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         text_change_rows=_text_change_rows(comparison),
         run_fact_rows=tuple(_mlx_version_history_rows(comparison)),
         prefill_rows=_prefill_rows(comparison.prefill_changes),
+        retired_note=_retired_observation_note(comparison),
     )
 
 
@@ -22976,6 +23081,33 @@ def _prefill_change_blocks(
     )
 
 
+def _architecture_commit_blocks(comparison: RunComparison) -> tuple[ReportBlock, ...]:
+    """The mlx-vlm commits touching each affected model's architecture, when any.
+
+    A retained comparison can list models whose only change was a since-retired
+    observation; only models a reader still sees as affected are shown.
+    """
+    entries = tuple(
+        entry
+        for entry in comparison.architecture_commits
+        if entry.model in comparison.affected_models
+    )
+    if not entries:
+        return ()
+    return (
+        ReportDetails(
+            "mlx-vlm commits touching the affected models' architectures and their imports",
+            (
+                ReportBulletList(tuple(_architecture_commit_item(entry) for entry in entries)),
+                ReportParagraph(
+                    "Context, not attribution: shared generation, sampling and processor "
+                    "code can change a model without touching its own package."
+                ),
+            ),
+        ),
+    )
+
+
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
     view = _comparison_view(comparison)
@@ -23004,6 +23136,8 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 "No execution, usability, or observation-set changes against the baseline."
             )
         )
+    if view.retired_note is not None:
+        blocks.append(ReportParagraph(view.retired_note))
     if view.text_change_rows:
         blocks.append(
             ReportDetails(
@@ -23016,6 +23150,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                             "Weights",
                             "Shared prefix (chars)",
                             "Length (chars)",
+                            "Output tokens",
                             "Prompt token count",
                         ),
                         view.text_change_rows,
@@ -23063,24 +23198,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 ),
             )
         )
-    if comparison.architecture_commits:
-        blocks.append(
-            ReportDetails(
-                "mlx-vlm commits touching the affected models' architectures and their imports",
-                (
-                    ReportBulletList(
-                        tuple(
-                            _architecture_commit_item(entry)
-                            for entry in comparison.architecture_commits
-                        )
-                    ),
-                    ReportParagraph(
-                        "Context, not attribution: shared generation, sampling and processor "
-                        "code can change a model without touching its own package."
-                    ),
-                ),
-            )
-        )
+    blocks.extend(_architecture_commit_blocks(comparison))
     blocks.append(
         ReportParagraph(
             "Mechanical diff only: one image and one generation per model in each sweep, "
@@ -23101,14 +23219,16 @@ def _log_comparison_model_rows(view: _ComparisonView) -> None:
     """Log the per-model transition, text-change and crash-continuity rows."""
     for model, execution, usability, observations in view.change_rows:
         logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
-    for model, decoding, weights, shared, length, prompt in view.text_change_rows:
+    for model, decoding, weights, shared, length, output, prompt in view.text_change_rows:
         logger.info(
-            "  text changed: %s (%s, %s; shared prefix %s chars; length %s; prompt tokens %s)",
+            "  text changed: %s (%s, %s; shared prefix %s chars; length %s; "
+            "output tokens %s; prompt tokens %s)",
             model,
             decoding,
             weights,
             shared,
             length,
+            output,
             prompt,
         )
     for model, continuity in view.continuity_rows:
@@ -23141,6 +23261,8 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
     for item in view.membership_items:
         logger.info("%s", _plain_log_text(item))
     _log_comparison_model_rows(view)
+    if view.retired_note is not None:
+        logger.info("%s", view.retired_note)
     if view.continuity_note is not None:
         logger.info("%s", view.continuity_note)
     if view.flag_lead is not None:
@@ -24751,7 +24873,7 @@ def _since_baseline_status(model: str, comparison: RunComparison | None) -> str 
         return None
     if model in comparison.models_added:
         return "new"
-    if any(change.model == model for change in comparison.changes):
+    if any(change.model == model for change in comparison.reported_changes):
         return "changed"
     return "unchanged"
 
@@ -26580,9 +26702,7 @@ def _architecture_commits(
     checkpoint's model_type can be an alias) and runs only when mlx-vlm
     itself moved between the runs.
     """
-    affected = {change.model for change in comparison.changes}
-    affected |= set(comparison.text_changed_models)
-    affected |= {entry.model for entry in comparison.crash_continuity}
+    affected = comparison.affected_models
     current_provenance = current_metadata.get("component_provenance")
     baseline_provenance = baseline_metadata.get("component_provenance")
     moved = _component_source_revision(baseline_provenance, "mlx-vlm") != (
@@ -26729,11 +26849,11 @@ def _build_retained_run_guarded(
         return None
 
 
-def _elapsed_run_seconds(inputs: ReportGenerationInputs) -> float:
-    """End-to-end wall-clock seconds so far, or the pre-report figure if unknown."""
+def _elapsed_run_seconds(inputs: ReportGenerationInputs, until: float | None = None) -> float:
+    """End-to-end wall-clock seconds to ``until`` (default now), or the pre-report figure."""
     if inputs.overall_start_time is None:
         return inputs.overall_time
-    return time.time() - inputs.overall_start_time
+    return (time.time() if until is None else until) - inputs.overall_start_time
 
 
 def _finalize_retained_run_record(
@@ -26743,18 +26863,20 @@ def _finalize_retained_run_record(
     outcomes: Sequence[ReportArtifactOutcome],
     *,
     jsonl_succeeded: bool,
-) -> None:
-    """Rewrite the JSONL header once every report outcome is known.
+    ended_at: float | None = None,
+) -> bool:
+    """Rewrite the JSONL header once every report outcome is known; True when rewritten.
 
     The pre-report write lists every planned destination. A renderer that
     failed (leaving nothing, or a stale file from an earlier run) must not
     stay advertised in the sole machine contract, so the manifest is reduced
     to the artifacts this run produced — matching index.md — and the
-    duration and timestamp become end-to-end. A failed rewrite keeps the
+    duration and timestamp become end-to-end, ending at ``ended_at`` (default
+    now) so the index can show the same figure. A failed rewrite keeps the
     earlier header rather than costing the run.
     """
     if retained is None or not jsonl_succeeded:
-        return
+        return False
     successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
     manifest = {
         artifact.public_key: _public_artifact_path(artifact.path)
@@ -26763,8 +26885,9 @@ def _finalize_retained_run_record(
     }
     metadata: JsonlMetadataRecord = {**retained.metadata, "artifacts": manifest}
     if inputs.overall_start_time is not None:
-        metadata["total_runtime_seconds"] = round(time.time() - inputs.overall_start_time, 3)
-        metadata["timestamp"] = local_now_str()
+        end = time.time() if ended_at is None else ended_at
+        metadata["total_runtime_seconds"] = round(end - inputs.overall_start_time, 3)
+        metadata["timestamp"] = local_time_str(end)
     try:
         _write_retained_run(
             RetainedRun(metadata=metadata, results=retained.results), inputs.output_paths.jsonl
@@ -26773,6 +26896,27 @@ def _finalize_retained_run_record(
         logger.exception(
             "Retained-run manifest reconciliation failed; the pre-report header stands."
         )
+        return False
+    return True
+
+
+def _recorded_run_seconds(
+    output_paths: ReportOutputPaths, outcomes: Sequence[ReportArtifactOutcome]
+) -> float | None:
+    """The end-to-end duration this run's retained header records, when it wrote one.
+
+    Read back so the closing log line shows the figure every report shows; a
+    file left by an earlier run is never consulted.
+    """
+    if not any(outcome.key == "jsonl" and outcome.succeeded for outcome in outcomes):
+        return None
+    try:
+        runtime = _load_retained_run(output_paths.jsonl).metadata.get("total_runtime_seconds")
+    except (OSError, ValueError, TypeError, KeyError):
+        return None
+    if isinstance(runtime, int | float) and not isinstance(runtime, bool) and runtime >= 0:
+        return float(runtime)
+    return None
 
 
 def _run_jsonl_artifact(
@@ -26794,6 +26938,34 @@ def _run_jsonl_artifact(
         )
         return False
     return run_artifact(replace(artifact, job=partial(_write_retained_run, retained, jsonl_path)))
+
+
+def _rerender_run_issue_summary(
+    inputs: ReportGenerationInputs,
+    *,
+    header_final: bool,
+    summary_written: bool,
+    issue_reports: Mapping[str, Path],
+    include_gallery_markdown: bool,
+) -> None:
+    """Render the summary again from the final JSONL header so its timing matches.
+
+    The first render ran before the header gained its end-to-end duration and
+    finish time; re-rendering also makes the shipped summary what a later
+    regeneration from results.jsonl produces. Runs only when both the summary
+    and the final header were written; a failure keeps the first render.
+    """
+    if not (header_final and summary_written):
+        return
+    try:
+        generate_run_issue_summary_report(
+            inputs.output_paths,
+            issue_reports=issue_reports,
+            include_gallery_markdown=include_gallery_markdown,
+            comparison=inputs.comparison,
+        )
+    except Exception:  # report isolation: the first render stands
+        logger.exception("Re-rendering the run summary with final timing failed.")
 
 
 def _generate_reports_and_log_outputs(
@@ -26903,7 +27075,10 @@ def _generate_reports_and_log_outputs(
         )
 
     # The index runs last so its links are driven by this run's outcomes:
-    # a stale file surviving a failed renderer must not be presented.
+    # a stale file surviving a failed renderer must not be presented. One end
+    # time serves the index and the final JSONL header so both show the same
+    # duration.
+    run_end_time = time.time()
     successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
     available = tuple(artifact for artifact in artifacts if artifact.key in successful_keys)
     index_artifact = replace(
@@ -26915,7 +27090,7 @@ def _generate_reports_and_log_outputs(
             issue_reports=diagnostics_artifacts.issue_reports,
             assessments=inputs.report_context.assessments,
             eval_mode=inputs.report_context.mode_policy.eval_mode,
-            run_duration_seconds=_elapsed_run_seconds(inputs),
+            run_duration_seconds=_elapsed_run_seconds(inputs, until=run_end_time),
             image=_run_image_record(inputs.image_path, inputs.report_context.image_profile),
             assessment_profile=inputs.report_context.mode_policy.assessment_profile,
             metadata_exposed_to_prompt=(
@@ -26929,12 +27104,20 @@ def _generate_reports_and_log_outputs(
     # The definitive machine record is written last: only artifacts this run
     # actually produced stay in its manifest, and its duration and timestamp
     # cover report generation too.
-    _finalize_retained_run_record(
+    finalized = _finalize_retained_run_record(
         inputs,
         retained,
         artifacts,
         outcomes,
         jsonl_succeeded=jsonl_succeeded,
+        ended_at=run_end_time,
+    )
+    _rerender_run_issue_summary(
+        inputs,
+        header_final=finalized,
+        summary_written=run_issue_summary is not None,
+        issue_reports=diagnostics_artifacts.issue_reports,
+        include_gallery_markdown=gallery_succeeded,
     )
 
     _log_report_generation_outcomes(
@@ -27096,6 +27279,7 @@ def finalize_execution(
     # The run-start snapshot, not a fresh read: several facts are labelled
     # "(run start)" and the comparison relies on them.
     system_info = run_facts.system_info
+    recorded_run_seconds: float | None = None
     if results:
         metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
 
@@ -27220,6 +27404,7 @@ def finalize_execution(
             runtime_fingerprint=runtime_fingerprint,
         )
         report_outcomes = _generate_reports_and_log_outputs(report_inputs)
+        recorded_run_seconds = _recorded_run_seconds(output_paths, report_outcomes)
         # Print the beautiful report summary dashboard
         _print_reports_dashboard(
             _build_report_artifacts(report_inputs),
@@ -27235,7 +27420,11 @@ def finalize_execution(
     log_blank()
     logger.info(
         "⏱  Overall runtime: %s",
-        format_overall_runtime(time.time() - overall_start_time),
+        format_overall_runtime(
+            recorded_run_seconds
+            if recorded_run_seconds is not None
+            else time.time() - overall_start_time
+        ),
         extra={"style_hint": LogStyles.METRIC_LABEL},
     )
     if getattr(args, "verbose", False):
