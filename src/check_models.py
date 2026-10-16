@@ -3347,22 +3347,6 @@ class ProcessImageParams:
 # =============================================================================
 
 
-class PerfCounterTimer:
-    """Default timing strategy using time.perf_counter()."""
-
-    def __init__(self) -> None:
-        self._start_time: float | None = None
-
-    def start(self) -> None:
-        self._start_time = time.perf_counter()
-
-    def stop(self) -> float:
-        if self._start_time is None:
-            msg = "Timer was not started"
-            raise RuntimeError(msg)
-        return time.perf_counter() - self._start_time
-
-
 # Custom timeout context manager
 # Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
 # Uses SIGALRM which is Unix-only - Windows doesn't support this signal mechanism
@@ -15187,8 +15171,7 @@ def _execute_prepared_generation(
         )
 
     # Time the generation process manually since MLX VLM doesn't include timing.
-    timer = PerfCounterTimer()
-    timer.start()
+    generation_started = time.perf_counter()
     if phase_timer is not None:
         phase_timer.start("decode")
     # Failure phase (not the timer phase): a crash before any chunk arrives is
@@ -15204,7 +15187,7 @@ def _execute_prepared_generation(
         # decode phase and the local generation duration both include all
         # pending GPU work and agree with each other.
         mx.synchronize()
-        duration = timer.stop()
+        duration = time.perf_counter() - generation_started
         observations.special_tokens = _emitted_special_tokens(
             observations.token_ids,
             prepared.generation_processor,

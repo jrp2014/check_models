@@ -103,6 +103,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Generation timing (0.17.75): the single-use `PerfCounterTimer` class is
+  gone; `_execute_prepared_generation` takes two `time.perf_counter()`
+  readings at the same points, so the generation duration still starts
+  before the decode phase and stops after `mx.synchronize()`. `PhaseTimer`
+  is unchanged.
 - Report escaping (0.17.74): the stateless `HTMLSelectiveEscaper`,
   `MarkdownPipeEscaper` and `DiagnosticsEscaper` classes and their global
   instances are now the functions `escape_html_selectively`,
