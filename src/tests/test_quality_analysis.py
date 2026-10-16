@@ -1958,6 +1958,44 @@ def test_description_hint_percent_rounds_down_to_match_the_echo_threshold(
         assert (analysis.echoed_hint_fields == ["description"]) is echoed
 
 
+def test_answer_fields_are_parsed_and_hints_measured_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """One parse and one hint measurement feed every check, so the checks cannot disagree."""
+    sections_calls: list[str] = []
+    hint_calls: list[str] = []
+    extract, coverage = check_models._extract_catalog_sections, check_models._hint_coverage
+
+    def counting_extract(text: str) -> dict[str, str]:
+        sections_calls.append(text)
+        return extract(text)
+
+    def counting_coverage(candidate: str, hint: str) -> float | None:
+        hint_calls.append(hint)
+        return coverage(candidate, hint)
+
+    monkeypatch.setattr(check_models, "_extract_catalog_sections", counting_extract)
+    monkeypatch.setattr(check_models, "_hint_coverage", counting_coverage)
+    # A second description hint is checked for an echo; only the first is counted.
+    prompt = _ASSISTED_PROMPT.replace(
+        "\n\nReturn exactly", "\n- Description hint: A narrowboat on a canal.\n\nReturn exactly"
+    )
+    keywords = ", ".join(["swan"] * 12)
+    analysis = check_models.analyze_generation_text(
+        f"Title: Swan on River\nDescription: {_SWAN_HINT}\nKeywords: {keywords}",
+        generated_tokens=90,
+        prompt=prompt,
+        assessment_profile="metadata",
+    )
+    assert len(sections_calls) == 1
+    assert hint_calls.count(_SWAN_HINT) == 1
+    assert analysis.is_repetitive
+    assert analysis.repeated_token == 'keyword: "swan"'
+    assert analysis.duplicate_keywords == ["swan"]
+    assert analysis.description_hint_percent == 100
+    assert analysis.echoed_hint_fields == ["description"]
+
+
 def test_unlabelled_answer_that_is_the_hint_is_flagged_as_an_echo() -> None:
     """A prompt-only model that hands the hint back without labels is measured whole."""
     unlabelled = _assisted(f"River Deben, Woodbridge. {_SWAN_HINT}")

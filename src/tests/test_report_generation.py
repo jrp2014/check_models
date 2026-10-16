@@ -8856,10 +8856,13 @@ def test_throughput_flags_are_named_and_an_mlx_rebuild_is_called_out() -> None:
 def test_keywords_from_hints_counts_verbatim_reuse_only() -> None:
     """A count of hint keywords reused, not a judgement of whether reuse was right."""
     prompt = "Context:\n- Keyword hints: Boat, Calm Water, Marina, Yacht\n"
-    count = check_models._keywords_from_hints
-    assert count({"keywords": "boat, calm water, Harbour, Boat"}, prompt) == 2
-    assert count({"keywords": "boat"}, "Describe the image.") is None
-    assert count({}, prompt) is None  # no Keywords field in the answer
+
+    def count(answer: str, prompt: str) -> int | None:
+        return check_models._keywords_from_hints(check_models._parse_catalog_answer(answer), prompt)
+
+    assert count("Keywords: boat, calm water, Harbour, Boat", prompt) == 2
+    assert count("Keywords: boat", "Describe the image.") is None
+    assert count("Title: Boat", prompt) is None  # no Keywords field in the answer
 
 
 def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(

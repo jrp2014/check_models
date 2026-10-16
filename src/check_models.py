@@ -3990,7 +3990,12 @@ def format_overall_runtime(total_seconds: float) -> str:
     return f"{minutes}m {seconds:02d}s"
 
 
-def _detect_repetitive_output(text: str, threshold: float | None = None) -> tuple[bool, str | None]:
+def _detect_repetitive_output(
+    text: str,
+    threshold: float | None = None,
+    *,
+    catalog: CatalogAnswer | None = None,
+) -> tuple[bool, str | None]:
     """Detect if generated text is highly repetitive (tokens or phrases).
 
     Checks for:
@@ -4001,6 +4006,8 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
         text: Generated text to check
         threshold: Fraction of text that must be repetitive to flag
             (default from QUALITY.repetition_ratio)
+        catalog: The text's catalogue fields when the caller already parsed
+            them; parsed here otherwise.
 
     Returns:
         Tuple of (is_repetitive, repeated_pattern)
@@ -4018,7 +4025,9 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
         if count / len(tokens) >= threshold:
             return True, most_common_token
 
-    repeated_item = _repeated_catalog_keyword(text)
+    if catalog is None:
+        catalog = _parse_catalog_answer(text)
+    repeated_item = _repeated_catalog_keyword(catalog.matching_keywords)
     if repeated_item is not None:
         return True, f'keyword: "{repeated_item[:30]}"'
 
@@ -4259,13 +4268,8 @@ def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     return keywords
 
 
-def _repeated_catalog_keyword(text: str) -> str | None:
+def _repeated_catalog_keyword(keywords: Sequence[str]) -> str | None:
     """Return a repeated keyword when a catalog list is dominated by duplicates."""
-    raw_keywords = _extract_catalog_sections(text).get("keywords", "")
-    keywords = [
-        _normalize_phrase_for_matching(item) for item in _split_catalog_keywords(raw_keywords)
-    ]
-    keywords = [item for item in keywords if item]
     if len(keywords) < QUALITY.min_catalog_keywords_for_repeat:
         return None
     counts = Counter(keywords)
@@ -4308,12 +4312,32 @@ def _extract_catalog_sections(text: str) -> dict[str, str]:
     return sections
 
 
-def _missing_catalog_sections(text: str) -> list[str]:
+def _missing_catalog_sections(sections: Mapping[str, str]) -> list[str]:
     """Return requested catalog sections that are absent or structurally empty."""
-    sections: dict[str, str] = _extract_catalog_sections(text)
     return [
         section for section in ("title", "description", "keywords") if not sections.get(section)
     ]
+
+
+@dataclass(frozen=True)
+class CatalogAnswer:
+    """One answer's catalogue fields, parsed once and shared by every check."""
+
+    sections: Mapping[str, str] = dataclass_field(default_factory=dict)
+    # Keyword terms as written, then their matching form with empties dropped.
+    keywords: tuple[str, ...] = ()
+    matching_keywords: tuple[str, ...] = ()
+
+
+def _parse_catalog_answer(text: str) -> CatalogAnswer:
+    """Extract the labelled fields and split the keyword list once."""
+    sections = _extract_catalog_sections(text)
+    keywords = tuple(_split_catalog_keywords(sections.get("keywords", "")))
+    return CatalogAnswer(
+        sections=sections,
+        keywords=keywords,
+        matching_keywords=tuple(filter(None, map(_normalize_phrase_for_matching, keywords))),
+    )
 
 
 @dataclass(frozen=True)
@@ -4462,7 +4486,7 @@ _PROMPT_KEYWORD_HINTS_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _keywords_from_hints(sections: Mapping[str, str], prompt: str | None) -> int | None:
+def _keywords_from_hints(catalog: CatalogAnswer, prompt: str | None) -> int | None:
     """Count the answer's distinct keywords that appear verbatim in the prompt's keyword hints.
 
     None when the answer has no Keywords field or the prompt carried no
@@ -4471,11 +4495,10 @@ def _keywords_from_hints(sections: Mapping[str, str], prompt: str | None) -> int
     the hints says nothing about what the model saw.
     """
     match = _PROMPT_KEYWORD_HINTS_RE.search(prompt or "")
-    if match is None or "keywords" not in sections:
+    if match is None or "keywords" not in catalog.sections:
         return None
     hints = set(filter(None, map(_normalize_phrase_for_matching, match.group(1).split(","))))
-    keywords = _split_catalog_keywords(sections["keywords"])
-    return len(set(filter(None, map(_normalize_phrase_for_matching, keywords))) & hints)
+    return len(set(catalog.matching_keywords) & hints)
 
 
 def _match_words(text: str) -> list[str]:
@@ -4519,78 +4542,79 @@ def _hint_comparison_text(
     return text, "answer"
 
 
-def _description_hint_share(
+@dataclass(frozen=True)
+class HintComparison:
+    """One ``<Field> hint:`` prompt line compared with the answer text it covers."""
+
+    field: str
+    hint: str
+    candidate: str
+    scope: Literal["field", "answer"]
+    # Four-word-run coverage; computed for description hints only, since a
+    # title echoes only as an exact word match. None when too short to judge.
+    coverage: float | None
+
+
+def _compare_prompt_hints(
     prompt: str | None,
     *,
     sections: Mapping[str, str],
     text: str,
+    assessment_profile: AssessmentProfile,
+) -> tuple[HintComparison, ...]:
+    """Compare every hint line with its answer text once, in prompt order."""
+    comparisons: list[HintComparison] = []
+    for match in _PROMPT_HINT_RE.finditer(prompt or ""):
+        field, hint = match.group(1).lower(), match.group(2).strip()
+        candidate, scope = _hint_comparison_text(
+            field, sections=sections, text=text, assessment_profile=assessment_profile
+        )
+        coverage = None if field == "title" else _hint_coverage(candidate, hint)
+        comparisons.append(HintComparison(field, hint, candidate, scope, coverage))
+    return tuple(comparisons)
+
+
+def _description_hint_share(
+    comparisons: Sequence[HintComparison],
+    *,
     assessment_profile: AssessmentProfile,
 ) -> tuple[int | None, Literal["description", "answer"] | None]:
     """Percent of the compared words lying in four-word runs copied from the description hint.
 
     A count behind the binary echo observation, reported for every metadata
-    answer so heavy copying below the echo threshold stays visible. Both
-    parts are None for the general profile, when the prompt has no
-    description hint, or when either side is too short to judge.
+    answer so heavy copying below the echo threshold stays visible. Only the
+    prompt's first description hint is counted. Both parts are None for the
+    general profile, when the prompt has no description hint, or when either
+    side is too short to judge.
     """
     if assessment_profile != "metadata":
         return None, None
-    hint = next(
-        (
-            match.group(2).strip()
-            for match in _PROMPT_HINT_RE.finditer(prompt or "")
-            if match.group(1).lower() == "description"
-        ),
-        None,
-    )
-    if hint is None:
-        return None, None
-    candidate, scope = _hint_comparison_text(
-        "description", sections=sections, text=text, assessment_profile=assessment_profile
-    )
-    coverage = _hint_coverage(candidate, hint)
-    if coverage is None:
+    first = next((item for item in comparisons if item.field == "description"), None)
+    if first is None or first.coverage is None:
         return None, None
     # Under the metadata profile the scope is "answer" only for an unlabelled answer.
     # Rounded down, so a reported 80% always means the echo threshold was met;
     # rounding to 6 places first keeps float noise (0.29 * 100 = 28.999...)
     # from costing a whole percent.
-    percent = math.floor(round(coverage * 100, 6))
-    return percent, "description" if scope == "field" else "answer"
+    percent = math.floor(round(first.coverage * 100, 6))
+    return percent, "description" if first.scope == "field" else "answer"
 
 
-def _echoed_hint_fields(
-    prompt: str | None,
-    *,
-    sections: Mapping[str, str],
-    text: str,
-    assessment_profile: AssessmentProfile,
-) -> list[str]:
+def _echoed_hint_fields(comparisons: Sequence[HintComparison]) -> list[str]:
     """Name the output fields that reproduce the prompt's own ``<Field> hint:`` text.
 
     The assisted lane supplies a draft description as a hint; an answer that
     hands it back passes every structural check without showing that the
-    model looked at the image. Keywords are not compared: reusing supplied
-    keywords is legitimate.
+    model looked at the image. Every hint line is checked. Keywords are not
+    compared: reusing supplied keywords is legitimate.
     """
-    if not prompt:
-        return []
 
-    def _echoes(field: str, hint: str) -> bool:
-        candidate, _scope = _hint_comparison_text(
-            field, sections=sections, text=text, assessment_profile=assessment_profile
-        )
-        if field == "title":
-            return bool(candidate) and _match_words(candidate) == _match_words(hint)
-        coverage = _hint_coverage(candidate, hint)
-        return coverage is not None and coverage >= QUALITY.hint_echo_min_coverage
+    def _echoes(item: HintComparison) -> bool:
+        if item.field == "title":
+            return bool(item.candidate) and _match_words(item.candidate) == _match_words(item.hint)
+        return item.coverage is not None and item.coverage >= QUALITY.hint_echo_min_coverage
 
-    echoed = [
-        match.group(1).lower()
-        for match in _PROMPT_HINT_RE.finditer(prompt)
-        if _echoes(match.group(1).lower(), match.group(2).strip())
-    ]
-    return _dedupe_preserve_order(echoed)
+    return _dedupe_preserve_order([item.field for item in comparisons if _echoes(item)])
 
 
 # Prompt lines that supply facts or hints an answer may legitimately reuse:
@@ -4868,16 +4892,19 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
             )
         ),
     )
-    is_repetitive, repeated_token = _detect_repetitive_output(analysis_text)
+    # Parse the labelled fields once. Repetition reads a keyword list under
+    # any profile; the field checks below assess it only under "metadata".
+    parsed_catalog = _parse_catalog_answer(analysis_text)
+    is_repetitive, repeated_token = _detect_repetitive_output(analysis_text, catalog=parsed_catalog)
     reasoning = _detect_reasoning_output(
         text, delimiter_pairs=thinking_trace_delimiters, seeded_text=seeded_thinking_text
     )
-    sections = _extract_catalog_sections(analysis_text) if assessment_profile == "metadata" else {}
+    catalog = parsed_catalog if assessment_profile == "metadata" else CatalogAnswer()
+    sections = catalog.sections
     missing_sections = (
-        _missing_catalog_sections(analysis_text) if assessment_profile == "metadata" else []
+        _missing_catalog_sections(sections) if assessment_profile == "metadata" else []
     )
-    keywords = _split_catalog_keywords(sections.get("keywords", ""))
-    keyword_counts = Counter(filter(None, map(_normalize_phrase_for_matching, keywords)))
+    keyword_counts = Counter(catalog.matching_keywords)
     (
         prompt_tokens_text_est,
         prompt_tokens_nontext_est,
@@ -4944,8 +4971,11 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         for wrapper in _dedupe_preserve_order(configured_generation_wrappers)
         if wrapper and wrapper in text
     ]
-    hint_percent, hint_scope = _description_hint_share(
+    hint_comparisons = _compare_prompt_hints(
         prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
+    )
+    hint_percent, hint_scope = _description_hint_share(
+        hint_comparisons, assessment_profile=assessment_profile
     )
 
     return GenerationQualityAnalysis(
@@ -4974,17 +5004,15 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         title_word_count=len(re.findall(r"\b\w+(?:[-\u2019']\w+)*\b", sections["title"]))
         if "title" in sections
         else None,
-        keyword_count=len(keywords) if "keywords" in sections else None,
-        keywords_from_hints=_keywords_from_hints(sections, prompt),
+        keyword_count=len(catalog.keywords) if "keywords" in sections else None,
+        keywords_from_hints=_keywords_from_hints(catalog, prompt),
         duplicate_keywords=[word for word, count in keyword_counts.items() if count > 1],
         unexpected_special_tokens=unexpected_special_tokens,
         duplicated_answer_separator=_detect_duplicated_answer(
             analysis_text, is_repetitive=is_repetitive
         ),
         emitted_special_tokens=id_detected,
-        echoed_hint_fields=_echoed_hint_fields(
-            prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
-        ),
+        echoed_hint_fields=_echoed_hint_fields(hint_comparisons),
         instruction_echo_fields=_instruction_echo_fields(
             prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
         ),

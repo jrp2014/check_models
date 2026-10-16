@@ -92,6 +92,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor (0.17.61): each answer's labelled fields are parsed once per
+  analysis. The keyword-repetition check, the Title/Description/Keywords
+  checks, the keyword counts and the hint-keyword count read one parse
+  instead of extracting the sections up to three times and splitting the
+  keywords again for each. Each `<Field> hint:` line is likewise compared
+  with the answer once, so the description-hint percentage and the echo flag
+  share one measurement. The percentage still counts the first description
+  hint, the echo still checks every hint line, and repetition still reads a
+  keyword list under the general profile. Results are unchanged.
 - The blind lane now gives the model the camera's capture date/time and
   GPS, stated as authoritative facts it must not claim are visible, just as
   the assisted lane does. The camera records them; only the descriptive
