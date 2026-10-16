@@ -36,7 +36,7 @@ a separate upstream write-up.
 
 ## Required information
 
-Collect or infer:
+Collect and verify; mark unavailable facts as unknown rather than inferring them:
 
 - mlx-vlm version **or** git commit; install method (PyPI, editable, branch).
 - Python version, macOS version, chip (for example M-series), Metal vs CUDA.
@@ -52,20 +52,25 @@ Collect or infer:
 
 ## Repro minimization
 
-1. Reduce to the smallest native command or request that still fails.
+1. Establish the original native failure with the recorded checkpoint revision,
+   prompt, media and effective decoding settings, then reduce it one factor at
+   a time to the smallest command or request that still fails. A greedy run is
+   a separate control, not a replacement for a sampling-related reproduction.
 2. Remove private paths, tokens, and unrelated environment variables.
 3. Prefer public models and small/synthetic media when possible.
 4. One image before multi-input; one model per process.
 5. State clearly if it only fails with a private checkpoint.
 6. Read the model family's `mlx_vlm/models/<family>/README.md` before filing
    (the draft's "Family README in installed mlx-vlm" fact names it). If it
-   recommends a different checkpoint, try that one first; when that one also
-   fails, file it and say so in the issue.
+   recommends a different checkpoint, an authorized test of that checkpoint
+   can supply comparison evidence after reproducing the original failure.
+   Record which checkpoint each outcome belongs to; do not imply permission
+   for additional downloads or inference merely because an issue is requested.
 7. Lead with **root exception + first frames inside mlx-vlm / transformers /
    model code**; keep long harness stacks under an optional details block.
 8. Commands use `python -m …` under conda + pip, not `uv run`: the environment is conda-managed, and uv would install outside it.
 
-## Checkpoint problems are not mlx-vlm issues
+## Establish whether the defect is in the checkpoint or runtime
 
 mlx-vlm maintainers receive many reports that turn out to be checkpoint
 problems. Every generated draft opens with "Before filing: rule out the
@@ -75,11 +80,15 @@ README, a load-phase failure). Work through them first:
 
 - No loader for the model type: a support request, not a bug. Look for an
   existing request; do not file a crash report.
-- A corrected or alternative checkpoint runs cleanly: the fault is in the
-  original checkpoint. Report it on that model's Hugging Face repo
-  (discussions), not to mlx-vlm, or not at all.
-- File with mlx-vlm only when the failure reproduces natively with a
-  checkpoint that should work, and say in the issue which checks you ran.
+- An alternative checkpoint running cleanly establishes a difference, not
+  fault ownership. A valid configuration can expose an upstream compatibility
+  bug that another checkpoint avoids. Compare the relevant config, processor,
+  weights and failing code path before attributing the defect.
+- Route a demonstrated checkpoint defect to its Hugging Face repository and a
+  demonstrated runtime defect to mlx-vlm. If ownership remains uncertain,
+  describe the evidence and uncertainty rather than declaring a checkpoint
+  faulty or suppressing a potentially valid upstream report. Publishing to
+  either destination still needs the user's authorization.
 
 ## Maintainer quality bar
 

@@ -10,7 +10,7 @@ description: >
 Adapted from the transformers skill of the same name
 ([`.ai/skills/add-or-fix-type-checking`](https://github.com/huggingface/transformers/tree/main/.ai/skills/add-or-fix-type-checking)),
 which targets ty alone; this version covers this repository's three checkers
-(mypy, ty, pyrefly), its conventions and its stub management, under conda + pip.
+(mypy, ty, pyrefly) and its upstream-shipped typing policy, under conda + pip.
 
 ## Input
 
@@ -29,10 +29,11 @@ cd src && python -m tools.validate_env && cd ..  # quick sanity check
 ### 1. Identify scope from the failing run
 
 Keep the Transformers-derived workflow and examples below; this adaptation adds
-the repository's environment, three-checker, and stub-management requirements.
+the repository's environment, three-checker, and dependency-typing requirements.
 For a review or diagnosis request, inspect and run read-only checks only.
-Formatting, fixes, installation, and stub regeneration belong to an authorized
-implementation task. Preserve unrelated local edits throughout.
+Formatting and fixes belong to an authorized implementation task; dependency
+installation or upgrades need separate authorization. Preserve unrelated local
+edits throughout.
 
 - If you already have `make quality` or CI output, extract the failing
   file/module paths.
@@ -80,7 +81,7 @@ You can also run mypy on a specific file:
 - Protocol/TypedDict self-type issues
 - Dynamic attributes on objects or modules
 - Third-party stub gaps (missing kwargs, missing attributes)
-  - Stubs live in `typings/`; regenerate with `make stubs`
+  - Check the installed package's annotations and the current checker configuration.
 
 ### 4. Apply fixes using this priority order (simplest first)
 
@@ -234,26 +235,19 @@ These rules are **mandatory** for this codebase (see `docs/IMPLEMENTATION_GUIDE.
 - No suppressions (`# noqa`, `# type: ignore`) without a documented reason.
 - Optional dependencies use `try/except ImportError` → `None` fallback pattern.
 
-### 7. Stubs management
+### 7. Third-party typing
 
-Third-party stubs live in `typings/` at the repo root (git-ignored). All
-three checkers reference them:
+Use upstream-shipped types, as required by `docs/IMPLEMENTATION_GUIDE.md`.
+This repository no longer generates local stubs. Inspect `src/pyproject.toml`
+and the installed dependency's types rather than adding a local stub search
+path or reviving the removed generation workflow.
 
-- mypy: `mypy_path = "../typings"` in `[tool.mypy]`
-- ty: `extra-paths = ["../typings"]` in `[tool.ty.environment]`
-- pyrefly: `search-path = ["../typings"]` in `[tool.pyrefly]`
-
-Mypy consumes the generated stubs at call sites but ignores errors inside the
-stub files themselves. Do not "fix" generated third-party stubs just to satisfy
-project strictness unless the contract audit in `tools.generate_stubs` requires
-it.
-
-If stub gaps cause errors:
-
-```bash
-make stubs          # Regenerate all stubs
-make stubs-clear    # Remove generated stubs
-```
+For an apparent dependency typing defect, establish the installed version and
+actual API contract first. Distinguish an incorrect call from incomplete
+annotations, then use the narrowing, protocol, cast or narrowly justified
+suppression options above. Keep checking this project's call sites even when
+third-party implementation errors are excluded. Dependency installation or
+upgrades require separate authorization; they are not an automatic typing fix.
 
 ### 8. Verify and close the loop
 

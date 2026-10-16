@@ -122,6 +122,12 @@ Notable changes to this project will be documented in this file.
   share one measurement. The percentage still counts the first description
   hint, the echo still checks every hint line, and repetition still reads a
   keyword list under the general profile. Results are unchanged.
+- Correct four repository skill workflows: use upstream-shipped types instead
+  of removed stub-generation commands; isolate benchmark artifacts and require
+  exact-build restoration; handle native stream cleanup and empty results;
+  preserve original reproduction settings and avoid attributing a runtime
+  failure solely from an alternative checkpoint's success. Add focused skill
+  contract and fake-stream example checks, without model inference.
 - The blind lane now gives the model the camera's capture date/time and
   GPS, stated as authoritative facts it must not claim are visible, just as
   the assisted lane does. The camera records them; only the descriptive

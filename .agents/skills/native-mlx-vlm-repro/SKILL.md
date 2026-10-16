@@ -42,8 +42,9 @@ python -m mlx_vlm.generate --help   # confirm installed CLI flags before finaliz
    editable checkout or the installed package) before anything else. It may
    name a corrected or recommended checkpoint (for example the
    `nativ-community/` repos listed for Mage-VL, Mistral 3 and Nemotron 3 Nano
-   Omni); when the harness ran a different repo, try the README's checkpoint
-   before treating the failure as an mlx-vlm defect.
+   Omni). Reproduce the original checkpoint and resolved revision first;
+   testing a recommendation is a subsequent controlled comparison, within
+   the user's download and inference authorization, not a substitute.
 3. Prefer an existing local/cached model when reproducing.
 4. If `check_models` already produced artifacts, start from those instead of
    inventing a new command:
@@ -56,6 +57,11 @@ python -m mlx_vlm.generate --help   # confirm installed CLI flags before finaliz
    command as final; mlx-vlm flags drift across releases.
 
 ## Command patterns
+
+These are smoke-test shapes, not replacements for a retained run's settings.
+For a reported failure, first copy its effective prompt, decoding settings,
+token limit, checkpoint revision and media. Change one factor at a time only
+after that baseline is established.
 
 Text-only smoke:
 
@@ -91,11 +97,10 @@ python -m mlx_vlm.generate \
   --trust-remote-code
 ```
 
-Canonical Python shape (one model per process). This is the path the
-harness itself takes: `check_models` never calls `generate()`; it loops over
-`stream_generate` inside `_generate_with_repetition_guard`, skipping draft
-chunks and keeping the last chunk's metrics, so a repro that uses the same
-loop isolates upstream behaviour from harness behaviour:
+For a streaming-specific investigation, this Python probe skips draft text,
+keeps final-chunk metrics and applies optional output cleanup, as the harness
+does. It does not reproduce the harness's repetition abort or instrumentation.
+Use one model per process and fill the uppercase inputs from retained evidence:
 
 ```python
 from mlx_vlm.generate import stream_generate
@@ -121,20 +126,31 @@ for chunk in stream_generate(
     if getattr(chunk, "is_draft", False):
         continue  # speculative/diffusion drafts are display only
     pieces.append(chunk.text)
-print("".join(pieces))
-print(last.generation_tps, last.peak_memory, last.finish_reason)
+text = "".join(pieces)
+if last is not None:
+    clean_output = getattr(processor, "clean_output", None)
+    if callable(clean_output) and isinstance(cleaned := clean_output(text), str):
+        text = cleaned
+print(text)
+if last is not None:
+    print(last.generation_tps, last.peak_memory, last.finish_reason)
+else:
+    print("No chunks returned; no final-chunk metrics.")
 ```
 
-Use upstream `generate()` in a repro only when the suspected defect is in
-`generate()` itself (its accumulator, verbose printing, or `clean_output`
-hook) — then say so, because the harness does not exercise that code.
+Prefer the generated native CLI command or upstream `generate()` for an
+end-to-end reproduction; use the probe above when the streaming boundary is
+what needs isolation. The harness calls `stream_generate` directly but mirrors
+wrapper behaviour including `processor.clean_output`. Distinguish raw streamed
+text from the final cleaned answer when reporting an output discrepancy.
 
 ## Reproducibility rules
 
 - Include exact command, model ID/path, resolved revision, media type/size,
   Python version, package versions or git commits, and full error/traceback.
-- Use greedy / low temperature (`--temperature 0.0`) when debugging quality or
-  regressions.
+- Preserve the failing run's effective decoding settings first. Greedy decoding
+  (`--temperature 0.0`) can be a separate control experiment; it can hide a
+  sampling-specific regression and must not silently replace the reproduction.
 - Bound output with `--max-tokens`.
 - Preserve shell quoting exactly (JSON prompts, thinking delimiters, newlines).
 - Prefer portable paths in filed issues; strip private home directories when

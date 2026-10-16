@@ -61,17 +61,41 @@ issue instead).
 
 ## A/B across MLX versions (conda + pip)
 
+Inference and dependency/build changes need explicit authorization for their
+scope. Before switching builds, record the baseline's installed versions,
+editable origins, commit SHAs and dirty state, and agree how that exact build
+will be restored. Do not switch a dirty checkout or assume a package version
+alone identifies a locally built binary.
+
+For an authorized comparison, run from the repository root. Set `MODEL` and
+`IMAGE` to the same cached checkpoint and exact input for both runs; preserve
+the same prompt, generation settings and execution mode too. These commands
+show one pair, not the warmup and repeated measurements required above:
+
 ```bash
 conda activate mlx-vlm
+: "${MODEL:?Set MODEL to the cached checkpoint}" "${IMAGE:?Set IMAGE to the exact input path}"
+benchmark_dir="$(mktemp -d /private/tmp/check-models-ab.XXXXXX)" || exit
 
 # Baseline numbers on the current install
-cd src && python -m check_models --models <model> --image <img> > /tmp/a.log
-
-# Switch the candidate build (editable local repo or pinned wheel), then rerun
-pip install -e ../../mlx   # or: pip install mlx==<version> mlx-metal==<version>
-python -m check_models --models <model> --image <img> > /tmp/b.log
+(cd src && python -m check_models --models "$MODEL" --image "$IMAGE" \
+  --output-dir "$benchmark_dir/baseline" --compare-with none) \
+  > "$benchmark_dir/baseline.log" 2>&1 || exit
 ```
 
+Only after the baseline succeeds, switch using the agreed candidate-build
+procedure and verify its identity. Then, in the same shell with the same
+`benchmark_dir`, run the candidate:
+
+```bash
+(cd src && python -m check_models --models "$MODEL" --image "$IMAGE" \
+  --output-dir "$benchmark_dir/candidate" \
+  --compare-with "$benchmark_dir/baseline/results.jsonl") \
+  > "$benchmark_dir/candidate.log" 2>&1
+```
+
+- Give every warmup and measured repeat its own output directory; never reuse
+  the baseline directory. Redirecting stdout alone does not relocate reports.
 - `check_models` already reports generation TPS, prefill/first-token latency,
   and peak memory per model — prefer those captured metrics over ad-hoc
   timers for whole-model comparisons; `results.history.jsonl` retains prior
@@ -84,8 +108,11 @@ python -m check_models --models <model> --image <img> > /tmp/b.log
   tok/s and peak-memory comparisons unless chip, execution mode (`--isolate`
   or not), prompt, image digest, and generation settings all match; a
   hand-rolled A/B must respect the same like-for-like rule.
-- Restore the environment afterwards (`bash src/tools/update.sh` or
-  `pip install -e .[dev,extras,torch]` from `src/`).
+- Restore the exact baseline build through the agreed procedure and verify its
+  versions, editable origins and revisions afterwards. A general updater or
+  project reinstall is not restoration: it may change unrelated dependencies
+  or leave the candidate MLX build installed. If exact restoration cannot be
+  established, stop before switching builds and ask for direction.
 
 ## Presentation rules (for upstream PRs/issues)
 

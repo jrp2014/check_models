@@ -10,6 +10,7 @@ import ast
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -3090,6 +3091,102 @@ def test_agent_skills_are_well_formed_and_listed() -> None:
     claude_skills = REPO_ROOT / ".claude" / "skills"
     assert claude_skills.is_symlink(), ".claude/skills must be a symlink, not a copy"
     assert claude_skills.resolve() == AGENT_SKILLS_DIR.resolve()
+
+
+def test_typing_skill_commands_use_current_make_targets() -> None:
+    """Do not direct typing repairs into removed stub-generation infrastructure."""
+    text = safe_io.read_text_no_follow(AGENT_SKILLS_DIR / "add-or-fix-type-checking/SKILL.md")
+    makefiles = "\n".join(
+        safe_io.read_text_no_follow(path)
+        for path in (REPO_ROOT / "Makefile", PKG_ROOT / "Makefile")
+    )
+    targets = set(re.findall(r"^([\w-]+):", makefiles, re.MULTILINE))
+    commands = [
+        target
+        for fence in re.findall(r"```bash\n(.*?)```", text, re.DOTALL)
+        for target in re.findall(r"^make(?: -C src)? ([\w-]+)", fence, re.MULTILINE)
+    ]
+    assert commands
+    assert set(commands) <= targets
+    assert "../typings" not in text
+    assert "tools.generate_stubs" not in text
+
+
+def test_benchmark_skill_isolates_retained_outputs() -> None:
+    """Both sides retain separate artifacts, and B explicitly compares with A."""
+    text = safe_io.read_text_no_follow(AGENT_SKILLS_DIR / "benchmarking-mlx-vlm/SKILL.md")
+    commands = []
+    for fence in re.findall(r"```bash\n(.*?)```", text, re.DOTALL):
+        for line in fence.replace("\\\n", " ").splitlines():
+            if "python -m check_models " in line:
+                lexer = shlex.shlex(line, posix=True, punctuation_chars=True)
+                lexer.whitespace_split = True
+                commands.append(list(lexer))
+    assert len(commands) == 2
+    outputs = [command[command.index("--output-dir") + 1] for command in commands]
+    assert outputs[0] != outputs[1]
+    assert all(output.startswith("$benchmark_dir/") for output in outputs)
+    assert commands[0][commands[0].index("--compare-with") + 1] == "none"
+    comparison = commands[1][commands[1].index("--compare-with") + 1]
+    assert comparison == f"{outputs[0]}/results.jsonl"
+
+
+@pytest.mark.parametrize(
+    ("case", "expected"),
+    [
+        ("cleanup", "answer\n12.0 0.5 stop\n"),
+        ("missing", "<raw>answer</raw>\n12.0 0.5 stop\n"),
+        ("nonstring", "<raw>answer</raw>\n12.0 0.5 stop\n"),
+        ("empty", "\nNo chunks returned; no final-chunk metrics.\n"),
+    ],
+)
+def test_native_repro_skill_stream_example(tmp_path: Path, case: str, expected: str) -> None:
+    """Execute the documented probe with fake upstream modules, never MLX or weights."""
+    text = safe_io.read_text_no_follow(AGENT_SKILLS_DIR / "native-mlx-vlm-repro/SKILL.md")
+    example = next(
+        fence
+        for fence in re.findall(r"```python\n(.*?)```", text, re.DOTALL)
+        if "from mlx_vlm.generate import stream_generate" in fence
+    )
+    setup = dedent(
+        """\
+        import sys
+        from types import ModuleType, SimpleNamespace
+
+        case = sys.argv[1]
+        processor = SimpleNamespace()
+        if case == "cleanup":
+            processor.clean_output = lambda text: text.replace("<raw>", "").replace("</raw>", "")
+        elif case == "nonstring":
+            processor.clean_output = lambda text: None
+        elif case == "empty":
+            def unexpected_cleanup(text):
+                raise AssertionError("An empty stream must not invoke output cleanup")
+            processor.clean_output = unexpected_cleanup
+        chunks = [] if case == "empty" else [
+            SimpleNamespace(text="ignored draft", is_draft=True),
+            SimpleNamespace(text="<raw>answer", is_draft=False),
+            SimpleNamespace(text="</raw>", generation_tps=12.0, peak_memory=0.5, finish_reason="stop"),
+        ]
+        for name in ("mlx_vlm", "mlx_vlm.generate", "mlx_vlm.prompt_utils", "mlx_vlm.utils"):
+            sys.modules[name] = ModuleType(name)
+        sys.modules["mlx_vlm.generate"].stream_generate = lambda **kwargs: iter(chunks)
+        sys.modules["mlx_vlm.prompt_utils"].apply_chat_template = lambda *a, **kw: "formatted"
+        sys.modules["mlx_vlm.utils"].load = lambda *a, **kw: (SimpleNamespace(config={}), processor)
+        MODEL, PROMPT, IMAGE = "fake-model", "prompt", "fake-image"
+        LOAD_KWARGS, TEMPLATE_KWARGS, GENERATE_KWARGS, EOS_TOKENS = {}, {}, {}, []
+        """
+    )
+    completed = subprocess.run(  # noqa: S603 - repo-owned example, fake upstream, no model loading
+        [sys.executable, "-P", "-c", setup + "\n" + example, case],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=10,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stdout == expected
 
 
 def test_batched_noqa_audit_slices_ruff_output_per_finding(tmp_path: Path) -> None:
