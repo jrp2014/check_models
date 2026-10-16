@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-10-11 20:05:12 BST
+Generated on: 2026-10-16 14:03:00 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -26,60 +26,60 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.07s   | 481 tok/s  | 0.64            | 1.9     | 2,131      | 83      | none                                                                                                                     |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 69.83s  | 36.3 tok/s | 64.33           | 17      | 16,579     | 123     | none                                                                                                                     |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 8.48s   | 126 tok/s  | 1.31            | 19      | 1,656      | 617     | none                                                                                                                     |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected`          | 20.78s  | 45.0 tok/s | 11.49           | 78      | 6,372      | 112     | none                                                                                                                     |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.44s   | 57.4 tok/s | 1.98            | 10      | 2,132      | 98      | none                                                                                                                     |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected`          | 2.26s   | 421 tok/s  | 0.83            | 2.1     | 2,135      | 126     | none                                                                                                                     |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected`          | 15.34s  | 66.6 tok/s | 1.31            | 20      | 1,342      | 750     | none                                                                                                                     |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected`          | 8.74s   | 22.0 tok/s | 2.04            | 15      | 320        | 101     | none                                                                                                                     |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected`          | 3.49s   | 304 tok/s  | 0.87            | 3.2     | 950        | 333     | none                                                                                                                     |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.21s   | 106 tok/s  | 0.71            | 7.1     | 410        | 104     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.31s   | 66.3 tok/s | 2.55            | 13      | 2,959      | 122     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 3.62s   | 188 tok/s  | 1.51            | 7.8     | 2,958      | 113     | none                                                                                                                     |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.30s   | 210 tok/s  | 2.71            | 3.9     | 4,101      | 158     | none                                                                                                                     |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 26.70s  | 73.4 tok/s | 21.89           | 26      | 12,809     | 120     | none                                                                                                                     |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 43.17s  | 86.9 tok/s | 38.66           | 23      | 16,566     | 144     | none                                                                                                                     |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 42.92s  | 69.5 tok/s | 39.77           | 11      | 16,566     | 91      | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 41.44s  | 110 tok/s  | 36.94           | 25      | 16,579     | 130     | none                                                                                                                     |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 60.95s  | 30.2 tok/s | 53.65           | 21      | 16,579     | 133     | none                                                                                                                     |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected`          | 18.03s  | 60.0 tok/s | 13.86           | 14      | 16,577     | 127     | none                                                                                                                     |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.54s   | 103 tok/s  | 1.56            | 6.5     | 2,108      | 102     | none                                                                                                                     |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.08s   | 74.4 tok/s | 2.27            | 28      | 611        | 92      | none                                                                                                                     |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 8.91s   | 31.4 tok/s | 1.46            | 17      | 610        | 145     | none                                                                                                                     |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.12s   | 62.7 tok/s | 0.93            | 7.6     | 615        | 118     | none                                                                                                                     |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 4.74s   | 124 tok/s  | 0.95            | 16      | 615        | 105     | none                                                                                                                     |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 3.79s   | 125 tok/s  | 0.74            | 6.0     | 611        | 108     | none                                                                                                                     |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 8.19s   | 159 tok/s  | 4.68            | 23      | 3,642      | 101     | none                                                                                                                     |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`             | 8.98s   | 78.8 tok/s | 5.55            | 8.7     | 6,372      | 121     | prompt hint repeated                                                                                                     |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.09s   | 213 tok/s  | 1.09            | 4.0     | 2,122      | 84      | prompt hint repeated                                                                                                     |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`             | 5.14s   | 73.0 tok/s | 1.37            | 8.2     | 1,562      | 141     | duplicate keywords                                                                                                       |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.50s   | 128 tok/s  | 1.09            | 5.6     | 1,446      | 128     | duplicate keywords; prompt hint repeated                                                                                 |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`             | 35.43s  | 52.9 tok/s | 20.42           | 92      | 3,506      | 118     | prompt hint repeated                                                                                                     |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.27s   | 181 tok/s  | 1.18            | 4.8     | 1,410      | 105     | prompt hint repeated                                                                                                     |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`             | 7.38s   | 40.1 tok/s | 2.29            | 16      | 3,152      | 115     | prompt hint repeated                                                                                                     |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`             | 4.57s   | 128 tok/s  | 2.11            | 5.4     | 4,229      | 125     | prompt hint repeated                                                                                                     |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `concerns detected`             | 7.23s   | 37.0 tok/s | 1.94            | 18      | 1,299      | 110     | prompt hint repeated                                                                                                     |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 4.17s   | 105 tok/s  | 1.48            | 7.4     | 1,843      | 93      | prompt hint repeated                                                                                                     |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 2.87s   | 367 tok/s  | 1.10            | 2.2     | 353        | 44      | labelled fields not detected; prompt hint repeated                                                                       |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: answer format` | 9.63s   | 31.8 tok/s | 2.87            | 13      | 3,164      | 144     | labelled fields not detected; unsupplied place name                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 51.01s  | 25.0 tok/s | 7.50            | 25      | 4,418      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns: generation`    | 5.59s   | 59.0 tok/s | 0.80            | 9.3     | 1,151      | 200     | repeated text; stopped early: repeating; duplicate keywords                                                              |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 50.35s  | 124 tok/s  | 40.56           | 9.4     | 16,577     | 1,000   | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.04s   | 541 tok/s  | 0.87            | 1.1     | 1,225      | 36      | labelled fields not detected; prompt hint repeated                                                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 5.63s   | 98.1 tok/s | 0.82            | 7.2     | 609        | 261     | labelled fields not detected; unsupplied place name                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: generation`    | 5.58s   | 150 tok/s  | 3.01            | 4.3     | 5,688      | 200     | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.41s   | 106 tok/s  | 1.48            | 6.7     | 2,211      | 19      | control tokens visible; labelled fields not detected                                                                     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.08s   | 372 tok/s  | 0.66            | 1.8     | 349        | 131     | labelled fields not detected                                                                                             |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 3.02s   | 171 tok/s  | 0.92            | 4.8     | 1,038      | 37      | labelled fields not detected; prompt hint repeated                                                                       |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.00s   | 484 tok/s  | 0.60            | 1.9     | 2,131      | 83      | none                                                                                        |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 58.41s  | 35.8 tok/s | 52.94           | 17      | 16,579     | 123     | none                                                                                        |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 8.80s   | 121 tok/s  | 1.34            | 19      | 1,656      | 617     | none                                                                                        |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected`          | 25.69s  | 44.2 tok/s | 14.50           | 78      | 6,372      | 112     | none                                                                                        |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.63s   | 56.5 tok/s | 2.10            | 10      | 2,132      | 98      | none                                                                                        |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `no concerns detected`          | 2.33s   | 419 tok/s  | 0.85            | 2.1     | 2,135      | 126     | none                                                                                        |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected`          | 15.60s  | 65.3 tok/s | 1.40            | 20      | 1,342      | 750     | none                                                                                        |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected`          | 8.81s   | 21.8 tok/s | 2.09            | 15      | 320        | 101     | none                                                                                        |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected`          | 3.56s   | 301 tok/s  | 0.88            | 3.2     | 950        | 333     | none                                                                                        |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.27s   | 103 tok/s  | 0.73            | 7.1     | 410        | 104     | none                                                                                        |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.39s   | 64.9 tok/s | 2.58            | 13      | 2,959      | 122     | none                                                                                        |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 3.68s   | 185 tok/s  | 1.52            | 7.8     | 2,958      | 113     | none                                                                                        |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.20s   | 207 tok/s  | 2.66            | 3.9     | 4,101      | 158     | none                                                                                        |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 24.93s  | 71.7 tok/s | 20.00           | 26      | 12,809     | 120     | none                                                                                        |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 36.14s  | 85.7 tok/s | 31.55           | 23      | 16,566     | 144     | none                                                                                        |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 35.68s  | 68.4 tok/s | 32.47           | 11      | 16,566     | 91      | none                                                                                        |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 35.02s  | 106 tok/s  | 30.37           | 25      | 16,579     | 130     | none                                                                                        |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 54.76s  | 29.4 tok/s | 47.27           | 21      | 16,579     | 133     | none                                                                                        |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `no concerns detected`          | 17.10s  | 59.3 tok/s | 12.83           | 14      | 16,577     | 127     | none                                                                                        |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.63s   | 101 tok/s  | 1.57            | 6.5     | 2,108      | 102     | none                                                                                        |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.30s   | 69.9 tok/s | 2.39            | 28      | 611        | 92      | none                                                                                        |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected`          | 9.07s   | 31.0 tok/s | 1.47            | 17      | 610        | 145     | none                                                                                        |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.23s   | 61.6 tok/s | 0.92            | 7.6     | 615        | 118     | none                                                                                        |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 4.84s   | 122 tok/s  | 0.95            | 16      | 615        | 105     | none                                                                                        |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 3.88s   | 123 tok/s  | 0.75            | 6.0     | 611        | 108     | none                                                                                        |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 6.51s   | 149 tok/s  | 2.72            | 23      | 3,642      | 121     | none                                                                                        |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`             | 9.08s   | 77.9 tok/s | 5.74            | 8.7     | 6,372      | 121     | prompt hint repeated                                                                        |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.14s   | 209 tok/s  | 1.10            | 4.0     | 2,122      | 84      | prompt hint repeated                                                                        |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`             | 5.08s   | 72.0 tok/s | 1.39            | 8.2     | 1,562      | 141     | duplicate keywords                                                                          |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.49s   | 125 tok/s  | 1.09            | 5.6     | 1,446      | 128     | duplicate keywords; prompt hint repeated                                                    |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`             | 38.89s  | 52.2 tok/s | 22.17           | 92      | 3,506      | 118     | prompt hint repeated                                                                        |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.19s   | 178 tok/s  | 1.20            | 4.8     | 1,410      | 105     | prompt hint repeated                                                                        |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`             | 7.55s   | 39.6 tok/s | 2.46            | 16      | 3,152      | 115     | prompt hint repeated                                                                        |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`             | 4.63s   | 126 tok/s  | 2.12            | 5.4     | 4,229      | 125     | prompt hint repeated                                                                        |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `concerns detected`             | 7.34s   | 36.5 tok/s | 1.96            | 18      | 1,299      | 110     | prompt hint repeated                                                                        |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 4.24s   | 102 tok/s  | 1.50            | 7.4     | 1,843      | 93      | prompt hint repeated                                                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 3.00s   | 361 tok/s  | 1.16            | 2.0     | 353        | 44      | labelled fields not detected; prompt hint repeated                                          |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns: answer format` | 9.85s   | 31.0 tok/s | 2.93            | 13      | 3,164      | 144     | labelled fields not detected                                                                |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 52.01s  | 24.9 tok/s | 7.67            | 25      | 4,418      | 1,000   | labelled fields not detected; cut off at token limit                                        |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns: generation`    | 5.75s   | 57.2 tok/s | 0.80            | 9.3     | 1,151      | 200     | repeated text; stopped early: repeating; duplicate keywords                                 |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns: generation`    | 42.25s  | 124 tok/s  | 32.38           | 9.4     | 16,577     | 1,000   | repeated text; control tokens visible; labelled fields not detected; cut off at token limit |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns: answer format` | 2.12s   | 512 tok/s  | 0.88            | 1.1     | 1,225      | 36      | labelled fields not detected; prompt hint repeated                                          |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns: answer format` | 5.82s   | 94.3 tok/s | 0.84            | 7.2     | 609        | 261     | labelled fields not detected                                                                |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns: generation`    | 5.75s   | 148 tok/s  | 3.18            | 4.3     | 5,688      | 200     | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords   |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.46s   | 106 tok/s  | 1.48            | 6.7     | 2,211      | 19      | control tokens visible; labelled fields not detected                                        |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.14s   | 319 tok/s  | 0.66            | 1.8     | 349        | 131     | labelled fields not detected                                                                |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                                                                 | `major concerns: answer format` | 3.01s   | 165 tok/s  | 0.92            | 4.8     | 1,038      | 37      | labelled fields not detected; prompt hint repeated                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.07s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.00s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -89,19 +89,19 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                            | Mechanical checks               | Observations                                                                                                             |
-|--------------------------------------------------------------------------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                       | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                    | `major concerns: answer format` | labelled fields not detected; unsupplied place name                                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)  | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16) | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                                              |
-| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                          | `major concerns: generation`    | repeated text; control tokens visible; labelled fields not detected; cut off at token limit                              |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)    | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                | `major concerns: answer format` | labelled fields not detected; unsupplied place name                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)   | `major concerns: generation`    | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords                                |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | `major concerns: answer format` | control tokens visible; labelled fields not detected                                                                     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                     | `major concerns: answer format` | labelled fields not detected                                                                                             |
-| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                              | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                                       |
+| Model                                                                                            | Mechanical checks               | Observations                                                                                |
+|--------------------------------------------------------------------------------------------------|---------------------------------|---------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                       | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                          |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                    | `major concerns: answer format` | labelled fields not detected                                                                |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)  | `major concerns: answer format` | labelled fields not detected; cut off at token limit                                        |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16) | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                 |
+| [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                          | `major concerns: generation`    | repeated text; control tokens visible; labelled fields not detected; cut off at token limit |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)    | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                          |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                | `major concerns: answer format` | labelled fields not detected                                                                |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)   | `major concerns: generation`    | repeated text; stopped early: repeating; labelled fields not detected; duplicate keywords   |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)          | `major concerns: answer format` | control tokens visible; labelled fields not detected                                        |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                     | `major concerns: answer format` | labelled fields not detected                                                                |
+| [`vikhyatk/moondream2`](#model-vikhyatk-moondream2)                                              | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -137,7 +137,7 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight \| Description: A low-angle view of the medieval bell tower and Victorian lead flèche of the Church of St Peter Ma... \| Keywords (17): St Peter Mancroft, Norwich, England, Church Tower, Bell Tower, Perpendicular Gothic, Gothic Architecture, ...                                                                               |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: St Peter Mancroft tower in evening light \| Description: A low-angle view shows the medieval stone tower and Victorian lead flèche of St Peter Mancroft illumi... \| Keywords (16): St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic architecture, Perpendicular Gothic, ...                                                                               |
 | [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: St Peter Mancroft Church Tower at Twilight in Norwich \| Description: A low-angle view captures the Gothic architecture of St Peter Mancroft Church's towe... \| Keywords (15): St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twilight, Perpendicular Gothic, Stone Facade, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Pet... \| Keywords (12): Church Tower, Gothic Architecture, Historic Landmark, Norwich, England, Stone facade, Perpendicular Gothic, ...                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Peter Ma... \| Keywords (17): Church Tower, Gothic Architecture, Perpendicular Gothic, Norwich, Norfolk, England, Historic Landmark, ...                                                                               |
 | [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | Title: St Peter Mancroft Tower \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light... \| Keywords (20): Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, ...                                                                               |
 | [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: St Peter Mancroft Tower, Norwich, England \| Description: A low-angle view of the medieval tower and Victorian lead flèche illuminated in evening light, wit... \| Keywords (13): Church Tower, Gothic Architecture, Historic Landmark, England, Norwich, Pedestrians, Spire, Stone Masonry, ...                                                                               |
 | [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `concerns detected`    | Title: St Peter Mancroft Tower at Twilight, Norwich \| Description: A low-angle view of the medieval tower and Victorian lead flèche of St Peter Mancroft Churc... \| Keywords (19): St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Stone Masonry, Victorian Lead Flèche, Twilight, ...                                                                               |
@@ -150,7 +150,7 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`    | Title: St Peter Mancroft Church Tower at Dusk \| Description: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illu... \| Keywords (10): Church Tower, Gothic Architecture, Norwich, Pedestrians, Twilight, Stone Masonry, Perpendicular Gothic, ...                                                                               |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                       |
 | [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `major concerns`       | St Peter Mancroft Tower, Norwich: Gothic Stone Facade at Sunset<br><br>A low-angle view captures the medieval stone tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England. The structure's intricate Gothic architecture is illuminated by the warm glow...                                                                                        |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (1): We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1...                                                                                                                                                                                                  |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: St Peter Mancroft Church Tower Norwich Evening \| Description: (not detected) \| Keywords: (not detected)                                                                                                                                                                                                                                                                      |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `major concerns`       | Title: Gothic Church Tower of St Peter Mancroft in Norwich \| Description: The Gothic Church Tower of St Peter Mancroft in Norwich, Norfolk, England, stands tall with... \| Keywords (37): Gothic architecture, Victorian lead flèche, Church Tower, St Peter Mancroft, Norwich, Norfolk, England, ...                                                                               |
 | [`mlx-community/Qwen2-VL-2B-mlx`](#model-mlx-community-qwen2-vl-2b-mlx)                                                             | `major concerns`       | Title: Low-angle view of the medieval tower and Victorian lead flèche of the Church... \| Description: The image shows a low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, England. The tower is il... \| Keywords: (not detected)                                                                               |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A low-angle view of the medieval church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.                                                                                                                                                                                                              |
@@ -163,9 +163,9 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.7`
-- `mlx`: `0.32.4.dev20261010+06eb7483f`
-- `transformers`: `5.19.0`
+- `mlx-vlm`: `0.7.8`
+- `mlx`: `0.32.5.dev20261016+b6642e604`
+- `transformers`: `5.20.0`
 - `tokenizers`: `0.23.3`
 - `huggingface-hub`: `2.2.0`
 - *Python Version:* 3.14.7
@@ -256,17 +256,17 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.36s
-- *Generation time:* 0.81s
-- *Total time:* 2.07s
-- *Prompt preparation time:* 0.52
-- *First-token latency:* 0.126
-- *Cleanup time:* 0.071
+- *Model load time:* 0.39s
+- *Generation time:* 0.77s
+- *Total time:* 2.00s
+- *Prompt preparation time:* 0.489
+- *First-token latency:* 0.117
+- *Cleanup time:* 0.0722
 - *Prompt tokens:* 2,131
 - *Generation tokens:* 83
 - *Total tokens:* 2,214
-- *Prompt throughput (raw):* 16,960 tok/s
-- *Generation throughput (raw):* 481 tok/s
+- *Prompt throughput (raw):* 18,196 tok/s
+- *Generation throughput (raw):* 484 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.08
@@ -318,17 +318,17 @@ Church tower, Gothic architecture, St. Peter Mancroft, Norwich, Norfolk, England
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   prism_hadamard_qwen35)
-- *Model load time:* 1.19s
-- *Generation time:* 67.73s
-- *Total time:* 69.83s
-- *Prompt preparation time:* 0.894
-- *First-token latency:* 63.4
-- *Cleanup time:* 0.113
+- *Model load time:* 1.17s
+- *Generation time:* 56.38s
+- *Total time:* 58.41s
+- *Prompt preparation time:* 0.836
+- *First-token latency:* 52.1
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 16,579
 - *Generation tokens:* 123
 - *Total tokens:* 16,702
-- *Prompt throughput (raw):* 261 tok/s
-- *Generation throughput (raw):* 36.3 tok/s
+- *Prompt throughput (raw):* 318 tok/s
+- *Generation throughput (raw):* 35.8 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 3.3
@@ -375,17 +375,17 @@ Keywords: St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Spire, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.61s
-- *Generation time:* 6.22s
-- *Total time:* 8.48s
-- *Prompt preparation time:* 0.641
-- *First-token latency:* 0.705
-- *Cleanup time:* 0.103
+- *Model load time:* 1.69s
+- *Generation time:* 6.44s
+- *Total time:* 8.80s
+- *Prompt preparation time:* 0.662
+- *First-token latency:* 0.731
+- *Cleanup time:* 0.1
 - *Prompt tokens:* 1,656
 - *Generation tokens:* 617
 - *Total tokens:* 2,273
-- *Prompt throughput (raw):* 2,350 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Prompt throughput (raw):* 2,266 tok/s
+- *Generation throughput (raw):* 121 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.15
@@ -469,17 +469,17 @@ Keywords: St Peter Mancroft, Norwich, church tower, St Peter's, Norwich Cathedra
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.23s
-- *Generation time:* 13.99s
-- *Total time:* 20.78s
-- *Prompt preparation time:* 0.554
-- *First-token latency:* 10.5
-- *Cleanup time:* 0.227
+- *Model load time:* 8.07s
+- *Generation time:* 17.04s
+- *Total time:* 25.69s
+- *Prompt preparation time:* 0.567
+- *First-token latency:* 13
+- *Cleanup time:* 0.267
 - *Prompt tokens:* 6,372
 - *Generation tokens:* 112
 - *Total tokens:* 6,484
-- *Prompt throughput (raw):* 606 tok/s
-- *Generation throughput (raw):* 45.0 tok/s
+- *Prompt throughput (raw):* 488 tok/s
+- *Generation throughput (raw):* 44.2 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
 - *Cache memory (GB):* 1.4
@@ -525,17 +525,17 @@ Keywords: St Peter Mancroft, Norwich, England, Church Tower, Gothic Architecture
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.11s
-- *Generation time:* 3.69s
-- *Total time:* 5.44s
-- *Prompt preparation time:* 0.635
-- *First-token latency:* 1.37
-- *Cleanup time:* 0.101
+- *Model load time:* 1.14s
+- *Generation time:* 3.84s
+- *Total time:* 5.63s
+- *Prompt preparation time:* 0.644
+- *First-token latency:* 1.47
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 2,132
 - *Generation tokens:* 98
 - *Total tokens:* 2,230
-- *Prompt throughput (raw):* 1,555 tok/s
-- *Generation throughput (raw):* 57.4 tok/s
+- *Prompt throughput (raw):* 1,447 tok/s
+- *Generation throughput (raw):* 56.5 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
@@ -586,17 +586,17 @@ Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Hist
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.50s
-- *Generation time:* 1.13s
-- *Total time:* 2.26s
-- *Prompt preparation time:* 0.625
-- *First-token latency:* 0.223
-- *Cleanup time:* 0.0838
+- *Model load time:* 0.54s
+- *Generation time:* 1.15s
+- *Total time:* 2.33s
+- *Prompt preparation time:* 0.632
+- *First-token latency:* 0.236
+- *Cleanup time:* 0.0869
 - *Prompt tokens:* 2,135
 - *Generation tokens:* 126
 - *Total tokens:* 2,261
-- *Prompt throughput (raw):* 9,567 tok/s
-- *Generation throughput (raw):* 421 tok/s
+- *Prompt throughput (raw):* 9,065 tok/s
+- *Generation throughput (raw):* 419 tok/s
 - *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.1
 - *Cache memory (GB):* 0.29
@@ -643,17 +643,17 @@ Keywords: St Peter Mancroft, Gothic Architecture, Bell Tower, Church Tower, Perp
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.18s
-- *Generation time:* 12.57s
-- *Total time:* 15.34s
+- *Model load time:* 2.12s
+- *Generation time:* 12.90s
+- *Total time:* 15.60s
 - *Prompt preparation time:* 0.577
-- *First-token latency:* 0.667
-- *Cleanup time:* 0.106
+- *First-token latency:* 0.758
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 1,342
 - *Generation tokens:* 750
 - *Total tokens:* 2,092
-- *Prompt throughput (raw):* 2,013 tok/s
-- *Generation throughput (raw):* 66.6 tok/s
+- *Prompt throughput (raw):* 1,771 tok/s
+- *Generation throughput (raw):* 65.3 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 1.3
@@ -725,17 +725,17 @@ Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architec
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.54s
-- *Generation time:* 6.63s
-- *Total time:* 8.74s
-- *Prompt preparation time:* 0.562
-- *First-token latency:* 1.52
-- *Cleanup time:* 0.1
+- *Model load time:* 1.52s
+- *Generation time:* 6.73s
+- *Total time:* 8.81s
+- *Prompt preparation time:* 0.546
+- *First-token latency:* 1.57
+- *Cleanup time:* 0.0985
 - *Prompt tokens:* 320
 - *Generation tokens:* 101
 - *Total tokens:* 421
-- *Prompt throughput (raw):* 211 tok/s
-- *Generation throughput (raw):* 22.0 tok/s
+- *Prompt throughput (raw):* 204 tok/s
+- *Generation throughput (raw):* 21.8 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.59
@@ -781,17 +781,17 @@ Keywords: Gothic architecture, historic landmark, stone masonry, medieval tower,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.84s
-- *Generation time:* 1.97s
-- *Total time:* 3.49s
-- *Prompt preparation time:* 0.667
-- *First-token latency:* 0.234
-- *Cleanup time:* 0.0902
+- *Model load time:* 0.90s
+- *Generation time:* 1.99s
+- *Total time:* 3.56s
+- *Prompt preparation time:* 0.665
+- *First-token latency:* 0.238
+- *Cleanup time:* 0.0942
 - *Prompt tokens:* 950
 - *Generation tokens:* 333
 - *Total tokens:* 1,283
-- *Prompt throughput (raw):* 4,064 tok/s
-- *Generation throughput (raw):* 304 tok/s
+- *Prompt throughput (raw):* 3,986 tok/s
+- *Generation throughput (raw):* 301 tok/s
 - *Peak memory (GB):* 3.2
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.06
@@ -888,17 +888,17 @@ Keywords: Gothic architecture, Church tower, medieval, evening light, illuminate
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.00s
-- *Generation time:* 1.70s
-- *Total time:* 3.21s
-- *Prompt preparation time:* 0.5
-- *First-token latency:* 0.234
-- *Cleanup time:* 0.0953
+- *Model load time:* 1.01s
+- *Generation time:* 1.74s
+- *Total time:* 3.27s
+- *Prompt preparation time:* 0.503
+- *First-token latency:* 0.245
+- *Cleanup time:* 0.0966
 - *Prompt tokens:* 410
 - *Generation tokens:* 104
 - *Total tokens:* 514
-- *Prompt throughput (raw):* 1,755 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Prompt throughput (raw):* 1,675 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 7.1
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.13
@@ -946,17 +946,17 @@ Keywords: St Peter Mancroft, Gothic Architecture, Church Tower, Stone Masonry, S
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.36s
-- *Generation time:* 4.40s
-- *Total time:* 6.31s
-- *Prompt preparation time:* 0.544
-- *First-token latency:* 2.03
-- *Cleanup time:* 0.0894
+- *Model load time:* 1.37s
+- *Generation time:* 4.46s
+- *Total time:* 6.39s
+- *Prompt preparation time:* 0.546
+- *First-token latency:* 2.05
+- *Cleanup time:* 0.0965
 - *Prompt tokens:* 2,959
 - *Generation tokens:* 122
 - *Total tokens:* 3,081
-- *Prompt throughput (raw):* 1,458 tok/s
-- *Generation throughput (raw):* 66.3 tok/s
+- *Prompt throughput (raw):* 1,441 tok/s
+- *Generation throughput (raw):* 64.9 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.60
@@ -1006,17 +1006,17 @@ St Peter Mancroft, Norwich, England, Gothic architecture, Perpendicular Gothic, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.95s
-- *Generation time:* 2.11s
-- *Total time:* 3.62s
-- *Prompt preparation time:* 0.545
-- *First-token latency:* 0.985
-- *Cleanup time:* 0.0815
+- *Model load time:* 0.99s
+- *Generation time:* 2.13s
+- *Total time:* 3.68s
+- *Prompt preparation time:* 0.544
+- *First-token latency:* 0.995
+- *Cleanup time:* 0.086
 - *Prompt tokens:* 2,958
 - *Generation tokens:* 113
 - *Total tokens:* 3,071
-- *Prompt throughput (raw):* 3,002 tok/s
-- *Generation throughput (raw):* 188 tok/s
+- *Prompt throughput (raw):* 2,973 tok/s
+- *Generation throughput (raw):* 185 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
@@ -1066,17 +1066,17 @@ Church of St Peter Mancroft, Norwich, Norfolk, England, Gothic architecture, Sto
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.07s
-- *Generation time:* 3.46s
-- *Total time:* 5.30s
-- *Prompt preparation time:* 0.76
-- *First-token latency:* 1.99
-- *Cleanup time:* 0.0893
+- *Model load time:* 0.99s
+- *Generation time:* 3.42s
+- *Total time:* 5.20s
+- *Prompt preparation time:* 0.773
+- *First-token latency:* 1.93
+- *Cleanup time:* 0.0904
 - *Prompt tokens:* 4,101
 - *Generation tokens:* 158
 - *Total tokens:* 4,259
-- *Prompt throughput (raw):* 2,066 tok/s
-- *Generation throughput (raw):* 210 tok/s
+- *Prompt throughput (raw):* 2,128 tok/s
+- *Generation throughput (raw):* 207 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.66
@@ -1123,17 +1123,17 @@ Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architec
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.26s
-- *Generation time:* 23.53s
-- *Total time:* 26.70s
-- *Prompt preparation time:* 0.896
-- *First-token latency:* 21.1
-- *Cleanup time:* 0.142
+- *Model load time:* 2.34s
+- *Generation time:* 21.67s
+- *Total time:* 24.93s
+- *Prompt preparation time:* 0.906
+- *First-token latency:* 19.2
+- *Cleanup time:* 0.135
 - *Prompt tokens:* 12,809
 - *Generation tokens:* 120
 - *Total tokens:* 12,929
-- *Prompt throughput (raw):* 607 tok/s
-- *Generation throughput (raw):* 73.4 tok/s
+- *Prompt throughput (raw):* 668 tok/s
+- *Generation throughput (raw):* 71.7 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
@@ -1183,17 +1183,17 @@ Church Tower, Gothic Architecture, Perpendicular Gothic, Historic Landmark, Ston
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.88s
-- *Generation time:* 40.32s
-- *Total time:* 43.17s
-- *Prompt preparation time:* 0.95
-- *First-token latency:* 37.8
-- *Cleanup time:* 0.127
+- *Model load time:* 1.90s
+- *Generation time:* 33.23s
+- *Total time:* 36.14s
+- *Prompt preparation time:* 0.986
+- *First-token latency:* 30.7
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 16,566
 - *Generation tokens:* 144
 - *Total tokens:* 16,710
-- *Prompt throughput (raw):* 438 tok/s
-- *Generation throughput (raw):* 86.9 tok/s
+- *Prompt throughput (raw):* 540 tok/s
+- *Generation throughput (raw):* 85.7 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
@@ -1238,17 +1238,17 @@ Keywords: Church of St Peter Mancroft, Norwich, Norfolk, England, United Kingdom
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.86s
-- *Generation time:* 41.08s
-- *Total time:* 42.92s
-- *Prompt preparation time:* 0.964
-- *First-token latency:* 38.9
+- *Model load time:* 0.90s
+- *Generation time:* 33.80s
+- *Total time:* 35.68s
+- *Prompt preparation time:* 0.965
+- *First-token latency:* 31.6
 - *Cleanup time:* 0.104
 - *Prompt tokens:* 16,566
 - *Generation tokens:* 91
 - *Total tokens:* 16,657
-- *Prompt throughput (raw):* 426 tok/s
-- *Generation throughput (raw):* 69.5 tok/s
+- *Prompt throughput (raw):* 524 tok/s
+- *Generation throughput (raw):* 68.4 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
@@ -1295,17 +1295,17 @@ Keywords: St Peter Mancroft, Norwich, Gothic Architecture, Tower, Twilight, Ston
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.35s
-- *Generation time:* 38.12s
-- *Total time:* 41.44s
-- *Prompt preparation time:* 0.952
-- *First-token latency:* 36.1
-- *Cleanup time:* 0.129
+- *Model load time:* 2.42s
+- *Generation time:* 31.61s
+- *Total time:* 35.02s
+- *Prompt preparation time:* 0.974
+- *First-token latency:* 29.5
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 16,579
 - *Generation tokens:* 130
 - *Total tokens:* 16,709
-- *Prompt throughput (raw):* 460 tok/s
-- *Generation throughput (raw):* 110 tok/s
+- *Prompt throughput (raw):* 562 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.91
@@ -1352,17 +1352,17 @@ Keywords: St Peter Mancroft, Norwich, Norfolk, England, Gothic Architecture, Chu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.95s
-- *Generation time:* 58.06s
-- *Total time:* 60.95s
-- *Prompt preparation time:* 0.935
-- *First-token latency:* 52.8
-- *Cleanup time:* 0.128
+- *Model load time:* 1.98s
+- *Generation time:* 51.80s
+- *Total time:* 54.76s
+- *Prompt preparation time:* 0.965
+- *First-token latency:* 46.4
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 16,579
 - *Generation tokens:* 133
 - *Total tokens:* 16,712
-- *Prompt throughput (raw):* 314 tok/s
-- *Generation throughput (raw):* 30.2 tok/s
+- *Prompt throughput (raw):* 357 tok/s
+- *Generation throughput (raw):* 29.4 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
@@ -1412,17 +1412,17 @@ Archway, Church Tower, Clear Sky, England, Gothic Architecture, Golden Hour, His
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.14s
-- *Generation time:* 15.99s
-- *Total time:* 18.03s
-- *Prompt preparation time:* 0.895
-- *First-token latency:* 13.1
-- *Cleanup time:* 0.0971
+- *Model load time:* 1.19s
+- *Generation time:* 14.98s
+- *Total time:* 17.10s
+- *Prompt preparation time:* 0.922
+- *First-token latency:* 12
+- *Cleanup time:* 0.0981
 - *Prompt tokens:* 16,577
 - *Generation tokens:* 127
 - *Total tokens:* 16,704
-- *Prompt throughput (raw):* 1,270 tok/s
-- *Generation throughput (raw):* 60.0 tok/s
+- *Prompt throughput (raw):* 1,381 tok/s
+- *Generation throughput (raw):* 59.3 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 1.4
@@ -1471,17 +1471,17 @@ Keywords: Norwich, St Peter Mancroft, Church Tower, Perpendicular Gothic, Victor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.04s
-- *Generation time:* 2.56s
-- *Total time:* 4.54s
-- *Prompt preparation time:* 0.939
-- *First-token latency:* 0.722
-- *Cleanup time:* 0.098
+- *Model load time:* 1.08s
+- *Generation time:* 2.58s
+- *Total time:* 4.63s
+- *Prompt preparation time:* 0.962
+- *First-token latency:* 0.719
+- *Cleanup time:* 0.0986
 - *Prompt tokens:* 2,108
 - *Generation tokens:* 102
 - *Total tokens:* 2,210
-- *Prompt throughput (raw):* 2,918 tok/s
-- *Generation throughput (raw):* 103 tok/s
+- *Prompt throughput (raw):* 2,931 tok/s
+- *Generation throughput (raw):* 101 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.35
@@ -1527,17 +1527,17 @@ Keywords: Medieval, Gothic, Stone, Victorian, Tower, Bell, Clock, Norwich, Engla
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.17s
-- *Generation time:* 2.28s
-- *Total time:* 6.08s
-- *Prompt preparation time:* 0.604
-- *First-token latency:* 0.31
-- *Cleanup time:* 0.128
+- *Model load time:* 3.27s
+- *Generation time:* 2.40s
+- *Total time:* 6.30s
+- *Prompt preparation time:* 0.616
+- *First-token latency:* 0.312
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 611
 - *Generation tokens:* 92
 - *Total tokens:* 703
-- *Prompt throughput (raw):* 1,970 tok/s
-- *Generation throughput (raw):* 74.4 tok/s
+- *Prompt throughput (raw):* 1,957 tok/s
+- *Generation throughput (raw):* 69.9 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -1583,17 +1583,17 @@ Keywords: Norwich, Norfolk, England, St Peter Mancroft, Gothic Architecture, Chu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.24s
-- *Generation time:* 6.09s
-- *Total time:* 8.91s
-- *Prompt preparation time:* 0.562
-- *First-token latency:* 0.928
-- *Cleanup time:* 0.125
+- *Model load time:* 2.32s
+- *Generation time:* 6.16s
+- *Total time:* 9.07s
+- *Prompt preparation time:* 0.572
+- *First-token latency:* 0.93
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 610
 - *Generation tokens:* 145
 - *Total tokens:* 755
-- *Prompt throughput (raw):* 658 tok/s
-- *Generation throughput (raw):* 31.4 tok/s
+- *Prompt throughput (raw):* 656 tok/s
+- *Generation throughput (raw):* 31.0 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.45
@@ -1639,17 +1639,17 @@ Keywords: St Peter Mancroft, Church Tower, Norwich, Norfolk, England, United Kin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.68s
-- *Generation time:* 2.82s
-- *Total time:* 5.12s
-- *Prompt preparation time:* 0.604
+- *Model load time:* 1.74s
+- *Generation time:* 2.84s
+- *Total time:* 5.23s
+- *Prompt preparation time:* 0.622
 - *First-token latency:* 0.359
-- *Cleanup time:* 0.103
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 615
 - *Generation tokens:* 118
 - *Total tokens:* 733
 - *Prompt throughput (raw):* 1,711 tok/s
-- *Generation throughput (raw):* 62.7 tok/s
+- *Generation throughput (raw):* 61.6 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.33
@@ -1697,17 +1697,17 @@ Keywords: St Peter Mancroft, Norwich, England, Church Tower, Bell Tower, Perpend
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.33s
-- *Generation time:* 1.80s
-- *Total time:* 4.74s
-- *Prompt preparation time:* 0.583
-- *First-token latency:* 0.394
-- *Cleanup time:* 0.113
+- *Model load time:* 2.41s
+- *Generation time:* 1.82s
+- *Total time:* 4.84s
+- *Prompt preparation time:* 0.589
+- *First-token latency:* 0.39
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 615
 - *Generation tokens:* 105
 - *Total tokens:* 720
-- *Prompt throughput (raw):* 1,560 tok/s
-- *Generation throughput (raw):* 124 tok/s
+- *Prompt throughput (raw):* 1,579 tok/s
+- *Generation throughput (raw):* 122 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -1755,17 +1755,17 @@ Keywords: St Peter Mancroft, Norwich, Norfolk, England, United Kingdom, Gothic a
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.56s
-- *Generation time:* 1.62s
-- *Total time:* 3.79s
-- *Prompt preparation time:* 0.581
-- *First-token latency:* 0.184
-- *Cleanup time:* 0.102
+- *Model load time:* 1.64s
+- *Generation time:* 1.63s
+- *Total time:* 3.88s
+- *Prompt preparation time:* 0.585
+- *First-token latency:* 0.178
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 611
 - *Generation tokens:* 108
 - *Total tokens:* 719
-- *Prompt throughput (raw):* 3,319 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Prompt throughput (raw):* 3,435 tok/s
+- *Generation throughput (raw):* 123 tok/s
 - *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
@@ -1812,22 +1812,22 @@ Keywords: St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twiligh
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.25s
-- *Generation time:* 5.32s
-- *Total time:* 8.19s
-- *Prompt preparation time:* 0.595
-- *First-token latency:* 4.13
-- *Cleanup time:* 0.123
+- *Model load time:* 2.32s
+- *Generation time:* 3.53s
+- *Total time:* 6.51s
+- *Prompt preparation time:* 0.637
+- *First-token latency:* 2.06
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 3,642
-- *Generation tokens:* 101
-- *Total tokens:* 3,743
-- *Prompt throughput (raw):* 883 tok/s
-- *Generation throughput (raw):* 159 tok/s
+- *Generation tokens:* 121
+- *Total tokens:* 3,763
+- *Prompt throughput (raw):* 1,766 tok/s
+- *Generation throughput (raw):* 149 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.0163
+- *Post-cleanup active memory (GB):* 0.0169
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1848,9 +1848,9 @@ Keywords: St Peter Mancroft, Church Tower, Gothic Architecture, Norwich, Twiligh
 
 Title: St Peter Mancroft Church Tower at Dusk
 
-Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, illuminated by evening light against a clear sky, with pedestrians walking along the street below.
+Description: A low-angle view captures the medieval stone tower and Victorian lead flèche of the Church of St Peter Mancroft in Norwich, Norfolk, illuminated by warm evening light against a clear blue sky, with pedestrians walking along the street below.
 
-Keywords: Church Tower, Gothic Architecture, Historic Landmark, Norwich, England, Stone facade, Perpendicular Gothic, Spire, Victorian flèche, Twilight, Pedestrians, Trees
+Keywords: Church Tower, Gothic Architecture, Perpendicular Gothic, Norwich, Norfolk, England, Historic Landmark, Stone facade, Evening light, Clear Sky, Pedestrians, Trees, Victorian flèche, Medieval tower, United Kingdom, St Peter Mancroft, Archway
 </pre>
 
 </details>
@@ -1871,17 +1871,17 @@ Keywords: Church Tower, Gothic Architecture, Historic Landmark, Norwich, England
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.32s
-- *Generation time:* 7.09s
-- *Total time:* 8.98s
-- *Prompt preparation time:* 0.554
-- *First-token latency:* 5.06
-- *Cleanup time:* 0.0863
+- *Model load time:* 1.20s
+- *Generation time:* 7.30s
+- *Total time:* 9.08s
+- *Prompt preparation time:* 0.567
+- *First-token latency:* 5.23
+- *Cleanup time:* 0.0929
 - *Prompt tokens:* 6,372
 - *Generation tokens:* 121
 - *Total tokens:* 6,493
-- *Prompt throughput (raw):* 1,260 tok/s
-- *Generation throughput (raw):* 78.8 tok/s
+- *Prompt throughput (raw):* 1,218 tok/s
+- *Generation throughput (raw):* 77.9 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
@@ -1927,17 +1927,17 @@ Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architec
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.93s
-- *Generation time:* 1.49s
-- *Total time:* 3.09s
-- *Prompt preparation time:* 0.655
-- *First-token latency:* 0.462
-- *Cleanup time:* 0.0798
+- *Model load time:* 0.96s
+- *Generation time:* 1.51s
+- *Total time:* 3.14s
+- *Prompt preparation time:* 0.657
+- *First-token latency:* 0.468
+- *Cleanup time:* 0.0831
 - *Prompt tokens:* 2,122
 - *Generation tokens:* 84
 - *Total tokens:* 2,206
-- *Prompt throughput (raw):* 4,597 tok/s
-- *Generation throughput (raw):* 213 tok/s
+- *Prompt throughput (raw):* 4,534 tok/s
+- *Generation throughput (raw):* 209 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
@@ -1983,17 +1983,17 @@ Keywords: Church Tower, Gothic Architecture, Historic Landmark, England, Norwich
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: gothic architecture, stone masonry
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.17s
-- *Generation time:* 3.31s
-- *Total time:* 5.14s
-- *Prompt preparation time:* 0.655
-- *First-token latency:* 0.746
-- *Cleanup time:* 0.0987
+- *Model load time:* 1.06s
+- *Generation time:* 3.35s
+- *Total time:* 5.08s
+- *Prompt preparation time:* 0.66
+- *First-token latency:* 0.763
+- *Cleanup time:* 0.0899
 - *Prompt tokens:* 1,562
 - *Generation tokens:* 141
 - *Total tokens:* 1,703
-- *Prompt throughput (raw):* 2,092 tok/s
-- *Generation throughput (raw):* 73.0 tok/s
+- *Prompt throughput (raw):* 2,047 tok/s
+- *Generation throughput (raw):* 72.0 tok/s
 - *Peak memory (GB):* 8.2
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.31
@@ -2042,17 +2042,17 @@ Keywords: St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Stone M
 - *Observations:* Duplicate keywords: stone facade; Repeats the prompt's hint
   text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.64s
-- *Generation time:* 2.09s
-- *Total time:* 3.50s
-- *Prompt preparation time:* 0.761
-- *First-token latency:* 0.376
-- *Cleanup time:* 0.085
+- *Model load time:* 0.61s
+- *Generation time:* 2.12s
+- *Total time:* 3.49s
+- *Prompt preparation time:* 0.758
+- *First-token latency:* 0.374
+- *Cleanup time:* 0.0894
 - *Prompt tokens:* 1,446
 - *Generation tokens:* 128
 - *Total tokens:* 1,574
-- *Prompt throughput (raw):* 3,843 tok/s
-- *Generation throughput (raw):* 128 tok/s
+- *Prompt throughput (raw):* 3,862 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.40
@@ -2098,17 +2098,17 @@ Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architec
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 11.94s
-- *Generation time:* 22.66s
-- *Total time:* 35.43s
-- *Prompt preparation time:* 0.816
-- *First-token latency:* 18.9
-- *Cleanup time:* 0.316
+- *Model load time:* 13.61s
+- *Generation time:* 24.44s
+- *Total time:* 38.89s
+- *Prompt preparation time:* 0.828
+- *First-token latency:* 20.6
+- *Cleanup time:* 0.299
 - *Prompt tokens:* 3,506
 - *Generation tokens:* 118
 - *Total tokens:* 3,624
-- *Prompt throughput (raw):* 186 tok/s
-- *Generation throughput (raw):* 52.9 tok/s
+- *Prompt throughput (raw):* 171 tok/s
+- *Generation throughput (raw):* 52.2 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.41
@@ -2156,17 +2156,17 @@ Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Hist
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.69s
-- *Generation time:* 1.77s
-- *Total time:* 3.27s
-- *Prompt preparation time:* 0.79
-- *First-token latency:* 0.438
-- *Cleanup time:* 0.0912
+- *Model load time:* 0.59s
+- *Generation time:* 1.79s
+- *Total time:* 3.19s
+- *Prompt preparation time:* 0.792
+- *First-token latency:* 0.439
+- *Cleanup time:* 0.0924
 - *Prompt tokens:* 1,410
 - *Generation tokens:* 105
 - *Total tokens:* 1,515
-- *Prompt throughput (raw):* 3,221 tok/s
-- *Generation throughput (raw):* 181 tok/s
+- *Prompt throughput (raw):* 3,214 tok/s
+- *Generation throughput (raw):* 178 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.23
@@ -2212,17 +2212,17 @@ Keywords: Gothic Architecture, Historic Landmark, St Peter Mancroft, Stone Mason
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.69s
-- *Generation time:* 5.16s
-- *Total time:* 7.38s
-- *Prompt preparation time:* 0.512
-- *First-token latency:* 1.8
-- *Cleanup time:* 0.1
+- *Model load time:* 1.65s
+- *Generation time:* 5.37s
+- *Total time:* 7.55s
+- *Prompt preparation time:* 0.52
+- *First-token latency:* 1.96
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 3,152
 - *Generation tokens:* 115
 - *Total tokens:* 3,267
-- *Prompt throughput (raw):* 1,753 tok/s
-- *Generation throughput (raw):* 40.1 tok/s
+- *Prompt throughput (raw):* 1,608 tok/s
+- *Generation throughput (raw):* 39.6 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
@@ -2272,17 +2272,17 @@ Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Hist
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.79s
-- *Generation time:* 3.09s
-- *Total time:* 4.57s
-- *Prompt preparation time:* 0.678
+- *Model load time:* 0.81s
+- *Generation time:* 3.12s
+- *Total time:* 4.63s
+- *Prompt preparation time:* 0.688
 - *First-token latency:* 1.48
-- *Cleanup time:* 0.0921
+- *Cleanup time:* 0.0961
 - *Prompt tokens:* 4,229
 - *Generation tokens:* 125
 - *Total tokens:* 4,354
-- *Prompt throughput (raw):* 2,861 tok/s
-- *Generation throughput (raw):* 128 tok/s
+- *Prompt throughput (raw):* 2,853 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.76
@@ -2327,17 +2327,17 @@ Keywords: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architec
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.78s
-- *Generation time:* 4.92s
-- *Total time:* 7.23s
-- *Prompt preparation time:* 0.516
-- *First-token latency:* 1.44
-- *Cleanup time:* 0.104
+- *Model load time:* 1.82s
+- *Generation time:* 4.98s
+- *Total time:* 7.34s
+- *Prompt preparation time:* 0.518
+- *First-token latency:* 1.47
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 1,299
 - *Generation tokens:* 110
 - *Total tokens:* 1,409
-- *Prompt throughput (raw):* 902 tok/s
-- *Generation throughput (raw):* 37.0 tok/s
+- *Prompt throughput (raw):* 887 tok/s
+- *Generation throughput (raw):* 36.5 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
@@ -2387,22 +2387,22 @@ St Peter Mancroft, Norwich, Church Tower, Gothic Architecture, Perpendicular Got
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.14s
-- *Generation time:* 2.37s
-- *Total time:* 4.17s
-- *Prompt preparation time:* 0.643
-- *First-token latency:* 0.876
-- *Cleanup time:* 0.101
+- *Model load time:* 1.16s
+- *Generation time:* 2.42s
+- *Total time:* 4.24s
+- *Prompt preparation time:* 0.648
+- *First-token latency:* 0.887
+- *Cleanup time:* 0.109
 - *Prompt tokens:* 1,843
 - *Generation tokens:* 93
 - *Total tokens:* 1,936
-- *Prompt throughput (raw):* 2,105 tok/s
-- *Generation throughput (raw):* 105 tok/s
+- *Prompt throughput (raw):* 2,077 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 7.4
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.20
 - *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.0168
+- *Post-cleanup active memory (GB):* 0.0174
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2449,18 +2449,18 @@ Church Tower, Gothic Architecture, Norwich, Pedestrians, Twilight, Stone Masonry
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.61s
-- *Generation time:* 1.22s
-- *Total time:* 2.87s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 0.104
-- *Cleanup time:* 0.0798
+- *Model load time:* 0.65s
+- *Generation time:* 1.29s
+- *Total time:* 3.00s
+- *Prompt preparation time:* 1.06
+- *First-token latency:* 0.16
+- *Cleanup time:* 0.0819
 - *Prompt tokens:* 353
 - *Generation tokens:* 44
 - *Total tokens:* 397
-- *Prompt throughput (raw):* 3,379 tok/s
-- *Generation throughput (raw):* 367 tok/s
-- *Peak memory (GB):* 2.2
+- *Prompt throughput (raw):* 2,201 tok/s
+- *Generation throughput (raw):* 361 tok/s
+- *Peak memory (GB):* 2.0
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
@@ -2502,19 +2502,19 @@ A low-angle view of the medieval tower and Victorian lead flèche of the Church 
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords; Names a place the prompt did not supply: Sunset
+  keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.40s
-- *Generation time:* 7.42s
-- *Total time:* 9.63s
-- *Prompt preparation time:* 0.794
-- *First-token latency:* 2.13
-- *Cleanup time:* 0.101
+- *Model load time:* 1.46s
+- *Generation time:* 7.59s
+- *Total time:* 9.85s
+- *Prompt preparation time:* 0.793
+- *First-token latency:* 2.15
+- *Cleanup time:* 0.0931
 - *Prompt tokens:* 3,164
 - *Generation tokens:* 144
 - *Total tokens:* 3,308
-- *Prompt throughput (raw):* 1,488 tok/s
-- *Generation throughput (raw):* 31.8 tok/s
+- *Prompt throughput (raw):* 1,475 tok/s
+- *Generation throughput (raw):* 31.0 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 3.9
@@ -2559,23 +2559,21 @@ Gothic architecture, historic landmark, Norwich, England, medieval tower, Victor
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Required
-  labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible; Names a
-  place the prompt did not supply: Dusk
+- *Maintainer status:* none
+- *Observations:* Required labelled fields not detected: description,
+  keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.88s
-- *Generation time:* 47.45s
-- *Total time:* 51.01s
-- *Prompt preparation time:* 0.66
-- *First-token latency:* 6.88
-- *Cleanup time:* 0.137
+- *Model load time:* 3.52s
+- *Generation time:* 47.80s
+- *Total time:* 52.01s
+- *Prompt preparation time:* 0.669
+- *First-token latency:* 7.05
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 4,418
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,418
-- *Prompt throughput (raw):* 642 tok/s
-- *Generation throughput (raw):* 25.0 tok/s
+- *Prompt throughput (raw):* 627 tok/s
+- *Generation throughput (raw):* 24.9 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
@@ -2597,129 +2595,9 @@ Gothic architecture, historic landmark, Norwich, England, medieval tower, Victor
 *Readable output:*
 
 <pre class="model-output-readable">
- to=self&lt;|message|&gt;Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
-- GPS: 52.628000°N, 1.293600°E
-
-Descriptive hints:
-- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
-- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
+Title: St Peter Mancroft Church Tower Norwich Evening
 Description:
-Keywords:
-
-We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
-
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
-
-Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
-
-Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
-
-Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
-
-Output exactly three sections with headings.
-
-Title:
-Description:
-Keywords:
-
-No extra text.
-
-Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
-
-That's one sentence? It's two sentences. Acceptable 1-2 sentence.
-
-Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
-
-Probably keep simple.
-
-Keywords list comma-separated. Ensure unique.
-
-Let's produce:
-
-Title: St Peter Mancroft Tower at Dusk Norwich
-
-Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
-
-Keywords: St Peter Manc
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-10-10 18:09:17 UTC+01:00
-- GPS: 52.628000°N, 1.293600°E
-
-Descriptive hints:
-- Description hint: A low-angle view of the medieval tower and Victorian lead flèche of the Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along the street below in Norwich, Norfolk, England.
-- Keyword hints: Archway, Bell Tower, Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:
-
-We need 5-10 word title. Concrete. Probably "St Peter Mancroft Tower at Dusk Norwich". That's 7 words? St(1) Peter(2) Mancroft(3) Tower(4) at(5) Dusk(6) Norwich(7). Good.
-
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? Not claim visible. Could include? Maybe not necessary. It says combining relevant context with main visible subject, setting, action, lighting, distinctive details. Authoritative context includes capture date/time and GPS. Might want to incorporate? Probably can mention location. Should not claim date/time visible. Could say captured on ...? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can mention date? Maybe not claim visible, but can state as fact. Probably include location Norwich, Norfolk, England. Mention low-angle view of medieval tower and Victorian lead flèche of Church of St Peter Mancroft illuminated in evening light, with pedestrians walking along street below, tree in foreground, clear sky, etc.
-
-Make sure accurate: The building is St Peter Mancroft, Norwich. Tower is Perpendicular Gothic. There's a flèche/spire. The archway lit. Pedestrians on right, woman on left. Tree in foreground.
-
-Keywords: 10-18 unique comma-separated. Use hints but retain details supported by image. Should include Archway, Bell Tower? Is it bell tower? It's tower. Church Tower, Clear Sky, England, Gothic Architecture, Historic Landmark, Historic architecture, Landmark, Norwich, Pedestrians, Perpendicular Gothic, Spire, St Peter Mancroft, Stone Masonry, Stone facade, Trees, Twilight, United Kingdom, Walking. That's many. Need 10-18 unique. Let's pick 15 maybe.
-
-Make sure British-English spelling: "illuminated" etc. "favour"? Not needed.
-
-Output exactly three sections with headings.
-
-Title:
-Description:
-Keywords:
-
-No extra text.
-
-Let's craft description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated against a clear evening sky. The stone façade and arched entrance glow warmly below a large tree, with pedestrians on the pavement and modern buildings to the right.
-
-That's one sentence? It's two sentences. Acceptable 1-2 sentence.
-
-Maybe include GPS? Could incorporate location coordinates? Probably not needed. Might mention captured 2026-10-10. The instruction says treat capture date/time and GPS as authoritative facts, but do not claim they are visible. So could mention date in description? Could be okay. Might be safer to not mention date unless relevant. But context says combine relevant context. Maybe mention location coordinates? Hmm.
-
-Probably keep simple.
-
-Keywords list comma-separated. Ensure unique.
-
-Let's produce:
-
-Title: St Peter Mancroft Tower at Dusk Norwich
-
-Description: Low-angle view of the Perpendicular Gothic tower and Victorian lead flèche of St Peter Mancroft Church in Norwich, Norfolk, England, illuminated in evening light against a clear sky. The stone façade and lit arched entrance are partially framed by a tree, with pedestrians on the street and modern buildings to the right.
-
-Keywords: St Peter Manc
-```
-
-</details>
 
 </details>
 
@@ -2741,17 +2619,17 @@ Keywords: St Peter Manc
   after sustained repeated output; Duplicate keywords: historic architecture,
   stone architecture
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.88s
-- *Generation time:* 4.19s
-- *Total time:* 5.59s
-- *Prompt preparation time:* 0.513
-- *First-token latency:* 0.309
-- *Cleanup time:* 0.0928
+- *Model load time:* 0.93s
+- *Generation time:* 4.30s
+- *Total time:* 5.75s
+- *Prompt preparation time:* 0.512
+- *First-token latency:* 0.311
+- *Cleanup time:* 0.0938
 - *Prompt tokens:* 1,151
 - *Generation tokens:* 200
 - *Total tokens:* 1,351
-- *Prompt throughput (raw):* 3,722 tok/s
-- *Generation throughput (raw):* 59.0 tok/s
+- *Prompt throughput (raw):* 3,702 tok/s
+- *Generation throughput (raw):* 57.2 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 1.1
@@ -2801,16 +2679,16 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
   tokens remain visible; Required labelled fields not detected: keywords;
   Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.84s
-- *Generation time:* 48.61s
-- *Total time:* 50.35s
-- *Prompt preparation time:* 0.886
-- *First-token latency:* 39.8
-- *Cleanup time:* 0.0955
+- *Model load time:* 0.85s
+- *Generation time:* 40.45s
+- *Total time:* 42.25s
+- *Prompt preparation time:* 0.938
+- *First-token latency:* 31.5
+- *Cleanup time:* 0.0928
 - *Prompt tokens:* 16,577
 - *Generation tokens:* 1,000
 - *Total tokens:* 17,577
-- *Prompt throughput (raw):* 417 tok/s
+- *Prompt throughput (raw):* 526 tok/s
 - *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 9.4
 - *Active memory (GB):* 4.4
@@ -3402,17 +3280,17 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *Observations:* Required labelled fields not detected: title, description,
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.30s
-- *Generation time:* 0.94s
-- *Total time:* 2.04s
-- *Prompt preparation time:* 0.791
-- *First-token latency:* 0.126
-- *Cleanup time:* 0.0826
+- *Model load time:* 0.37s
+- *Generation time:* 0.95s
+- *Total time:* 2.12s
+- *Prompt preparation time:* 0.785
+- *First-token latency:* 0.127
+- *Cleanup time:* 0.0846
 - *Prompt tokens:* 1,225
 - *Generation tokens:* 36
 - *Total tokens:* 1,261
-- *Prompt throughput (raw):* 9,713 tok/s
-- *Generation throughput (raw):* 541 tok/s
+- *Prompt throughput (raw):* 9,663 tok/s
+- *Generation throughput (raw):* 512 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -3455,19 +3333,19 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords; Names a place the prompt did not supply: UK
+  keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.57s
-- *Generation time:* 3.48s
-- *Total time:* 5.63s
-- *Prompt preparation time:* 0.553
-- *First-token latency:* 0.291
+- *Model load time:* 1.62s
+- *Generation time:* 3.61s
+- *Total time:* 5.82s
+- *Prompt preparation time:* 0.565
+- *First-token latency:* 0.303
 - *Cleanup time:* 0.106
 - *Prompt tokens:* 609
 - *Generation tokens:* 261
 - *Total tokens:* 870
-- *Prompt throughput (raw):* 2,091 tok/s
-- *Generation throughput (raw):* 98.1 tok/s
+- *Prompt throughput (raw):* 2,007 tok/s
+- *Generation throughput (raw):* 94.3 tok/s
 - *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
@@ -3590,17 +3468,17 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
   after sustained repeated output; Required labelled fields not detected:
   description; Duplicate keywords: norwich, trees
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
-- *Model load time:* 0.45s
-- *Generation time:* 4.35s
-- *Total time:* 5.58s
-- *Prompt preparation time:* 0.781
-- *First-token latency:* 2.26
-- *Cleanup time:* 0.086
+- *Model load time:* 0.41s
+- *Generation time:* 4.53s
+- *Total time:* 5.75s
+- *Prompt preparation time:* 0.792
+- *First-token latency:* 2.43
+- *Cleanup time:* 0.0889
 - *Prompt tokens:* 5,688
 - *Generation tokens:* 200
 - *Total tokens:* 5,888
-- *Prompt throughput (raw):* 2,512 tok/s
-- *Generation throughput (raw):* 150 tok/s
+- *Prompt throughput (raw):* 2,336 tok/s
+- *Generation throughput (raw):* 148 tok/s
 - *Peak memory (GB):* 4.3
 - *Active memory (GB):* 2.4
 - *Cache memory (GB):* 1.2
@@ -3646,16 +3524,16 @@ Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendi
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.06s
+- *Model load time:* 1.12s
 - *Generation time:* 1.66s
-- *Total time:* 3.41s
-- *Prompt preparation time:* 0.684
+- *Total time:* 3.46s
+- *Prompt preparation time:* 0.672
 - *First-token latency:* 0.831
-- *Cleanup time:* 0.147
+- *Cleanup time:* 0.152
 - *Prompt tokens:* 2,211
 - *Generation tokens:* 19
 - *Total tokens:* 2,230
-- *Prompt throughput (raw):* 2,662 tok/s
+- *Prompt throughput (raw):* 2,659 tok/s
 - *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
@@ -3711,19 +3589,19 @@ Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendi
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
 - *Model load time:* 0.46s
-- *Generation time:* 1.01s
-- *Total time:* 2.08s
-- *Prompt preparation time:* 0.603
-- *First-token latency:* 0.086
-- *Cleanup time:* 0.091
+- *Generation time:* 1.07s
+- *Total time:* 2.14s
+- *Prompt preparation time:* 0.601
+- *First-token latency:* 0.0853
+- *Cleanup time:* 0.0968
 - *Prompt tokens:* 349
 - *Generation tokens:* 131
 - *Total tokens:* 480
-- *Prompt throughput (raw):* 4,059 tok/s
-- *Generation throughput (raw):* 372 tok/s
+- *Prompt throughput (raw):* 4,093 tok/s
+- *Generation throughput (raw):* 319 tok/s
 - *Peak memory (GB):* 1.8
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.30
+- *Cache memory (GB):* 0.29
 - *Model-load active memory (GB):* 0.613
 - *Post-cleanup active memory (GB):* 0.0152
 - *Post-cleanup cache memory (GB):* 0.0
@@ -3767,22 +3645,22 @@ Description: A detailed view of the medieval church of St Peter Mancroft, illumi
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type moondream1 via
   moondream2)
-- *Model load time:* 1.17s
-- *Generation time:* 1.14s
-- *Total time:* 3.02s
-- *Prompt preparation time:* 0.698
-- *First-token latency:* 0.239
-- *Cleanup time:* 0.0897
+- *Model load time:* 1.15s
+- *Generation time:* 1.15s
+- *Total time:* 3.01s
+- *Prompt preparation time:* 0.699
+- *First-token latency:* 0.233
+- *Cleanup time:* 0.0878
 - *Prompt tokens:* 1,038
 - *Generation tokens:* 37
 - *Total tokens:* 1,075
-- *Prompt throughput (raw):* 4,347 tok/s
-- *Generation throughput (raw):* 171 tok/s
+- *Prompt throughput (raw):* 4,447 tok/s
+- *Generation throughput (raw):* 165 tok/s
 - *Peak memory (GB):* 4.8
 - *Active memory (GB):* 3.8
 - *Cache memory (GB):* 0.27
 - *Model-load active memory (GB):* 3.75
-- *Post-cleanup active memory (GB):* 0.0169
+- *Post-cleanup active memory (GB):* 0.0175
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
