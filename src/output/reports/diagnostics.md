@@ -20,9 +20,9 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 47    |
-| Conclusive outcomes | 47    |
-| Completed           | 47    |
+| Attempted           | 51    |
+| Conclusive outcomes | 51    |
+| Completed           | 51    |
 | Crashed             | 0     |
 | Indeterminate       | 0     |
 
@@ -30,7 +30,7 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 43    |
+| none                           | 47    |
 | observation needs reproduction | 4     |
 
 Mechanical-check counts
@@ -38,8 +38,8 @@ Mechanical-check counts
 | Mechanical checks    | Count |
 |----------------------|-------|
 | major concerns       | 11    |
-| no concerns detected | 26    |
-| concerns detected    | 10    |
+| no concerns detected | 29    |
+| concerns detected    | 11    |
 
 Observation counts
 
@@ -51,7 +51,7 @@ Observation counts
 | Required labelled fields not detected                        | 10    |
 | Response appears cut off at the token limit                  | 2     |
 | Repeated keyword entries                                     | 4     |
-| Output repeats the prompt's own hint text                    | 12    |
+| Output repeats the prompt's own hint text                    | 13    |
 
 ## Triage
 
@@ -97,15 +97,15 @@ None.
 - *Processor class:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
 - *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 3.182
-- *Peak memory at first token (GB):* 4.322
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 3.022
+- *Peak memory at first token (GB):* 4.324
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *EOS ids declared, by file:* {"config.json text_config": 0,
   "generation_config.json": 0}
 - *Chat template found in (the first is the one the processor uses):* chat_template.json,
   chat_template.jinja, tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.014
+- *Post-cleanup active memory (GB):* 0.016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 5688
 - *Prompt composition:* 5,688 = 449 text/template + 5,239 image tokens (92%;
@@ -116,7 +116,7 @@ None.
 - *Declared context length:* 131,072 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.01x (2.36 GB vs 2.35 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 2.35 GB; other
-  load-time allocations 0.01 GB
+  load-time allocations 0.02 GB
 - *Generation tokens:* 200
 - *Configured EOS token ID:* 0
 - *Configured EOS token:* &lt;|end_of_text|&gt;
@@ -163,16 +163,16 @@ Keywords: Gothic Architecture, Historic Landmark, Norwich, Pedestrians, Perpendi
 - *Processor class:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.804
-- *Peak memory at first token (GB):* 9.311
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.796
+- *Peak memory at first token (GB):* 9.313
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *EOS ids declared, by file:* {"config.json": [2, 32000, 32007]}
 - *Chat template found in (the first is the one the processor uses):* tokenizer_config.json
-- *Post-cleanup active memory (GB):* 0.008
+- *Post-cleanup active memory (GB):* 0.009
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1151
-- *Prompt composition:* 1,151 = 1,151 text/template + 0 image tokens (0%;
+- *Prompt composition:* 1,151 = 394 text/template + 757 image tokens (66%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 8.29
 - *Declared context length:* 131,072 (max_position_embeddings)
@@ -230,8 +230,8 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 32.376
-- *Peak memory at first token (GB):* 9.361
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 39.805
+- *Peak memory at first token (GB):* 9.362
 - *Text delivery:* 853 of 1,001 streamed chunks released no text (longest
   consecutive stretch 796); the last released 5,841 characters
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
@@ -245,7 +245,7 @@ Keywords: Gothic architecture, Victorian lead flèche, Church Tower, St Peter Ma
   "generation_config.json": [151645, 151643]}
 - *Chat template found in (the first is the one the processor uses):* chat_template.json,
   chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.008
+- *Post-cleanup active memory (GB):* 0.009
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16577
 - *Prompt composition:* 16,577 = 353 text/template + 16,224 image tokens (98%;
@@ -567,8 +567,8 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.477
-- *Peak memory at first token (GB):* 6.729
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.465
+- *Peak memory at first token (GB):* 6.73
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *generation_config.json settings not applied (by mlx-vlm or the harness):* {"max_new_tokens":
@@ -576,7 +576,7 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *EOS ids declared, by file:* {"config.json": [2, 2],
   "generation_config.json": [2, 2]}
 - *Chat template found in (the first is the one the processor uses):* chat_template.jinja
-- *Post-cleanup active memory (GB):* 0.015
+- *Post-cleanup active memory (GB):* 0.016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2211
 - *Prompt composition:* 2,211 = 419 text/template + 1,792 image tokens (81%;
@@ -584,9 +584,9 @@ Description: The image shows a low-angle view of the medieval tower and Victoria
 - *Checkpoint weights (GB):* 5.68
 - *Parameter count:* 9.00B (name-estimate)
 - *Quantization:* 4-bit, group 64, affine
-- *Load active memory vs checkpoint:* 1.00x (5.69 GB vs 5.68 GB on disk)
+- *Load active memory vs checkpoint:* 1.00x (5.70 GB vs 5.68 GB on disk)
 - *Loaded weights in memory (mx.get_array_buffer_size):* 5.68 GB; other
-  load-time allocations 0.01 GB
+  load-time allocations 0.02 GB
 - *Generation tokens:* 19
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;|return|&gt;
@@ -625,6 +625,7 @@ is in the model gallery.
 | vikhyatk/moondream2                                      | major concerns    | labelled fields not detected; prompt hint repeated   |
 | mlx-community/Molmo2-8B-4bit                             | concerns detected | duplicate keywords                                   |
 | mlx-community/SmolVLM2-2.2B-Instruct-mlx                 | concerns detected | duplicate keywords; prompt hint repeated             |
+| mlx-community/AREX-2-4bit                                | concerns detected | prompt hint repeated                                 |
 | mlx-community/GLM-4.6V-Flash-4bit                        | concerns detected | prompt hint repeated                                 |
 | mlx-community/granite-4.0-3b-vision-4bit                 | concerns detected | prompt hint repeated                                 |
 | mlx-community/LFM2.5-VL-3B-OptiQ-4bit                    | concerns detected | prompt hint repeated                                 |
@@ -641,32 +642,35 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                          |
 |-------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2131 prompt / 83 generated; 484 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2108 prompt / 102 generated; 101 tok/s; 6.5 GB peak  |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 611 prompt / 92 generated; 69.9 tok/s; 28 GB peak    |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1656 prompt / 617 generated; 121 tok/s; 19 GB peak   |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 610 prompt / 145 generated; 31.0 tok/s; 17 GB peak   |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 615 prompt / 118 generated; 61.6 tok/s; 7.6 GB peak  |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 615 prompt / 105 generated; 122 tok/s; 16 GB peak    |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 611 prompt / 108 generated; 123 tok/s; 6.0 GB peak   |
-| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6372 prompt / 112 generated; 44.2 tok/s; 78 GB peak  |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2132 prompt / 98 generated; 56.5 tok/s; 10 GB peak   |
-| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2135 prompt / 126 generated; 419 tok/s; 2.1 GB peak  |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1342 prompt / 750 generated; 65.3 tok/s; 20 GB peak  |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 320 prompt / 101 generated; 21.8 tok/s; 15 GB peak   |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 410 prompt / 104 generated; 103 tok/s; 7.1 GB peak   |
-| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 950 prompt / 333 generated; 301 tok/s; 3.2 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2959 prompt / 122 generated; 64.9 tok/s; 13 GB peak  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2958 prompt / 113 generated; 185 tok/s; 7.8 GB peak  |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4101 prompt / 158 generated; 207 tok/s; 3.9 GB peak  |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12809 prompt / 120 generated; 71.7 tok/s; 26 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16566 prompt / 144 generated; 85.7 tok/s; 23 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16566 prompt / 91 generated; 68.4 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16579 prompt / 130 generated; 106 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16579 prompt / 133 generated; 29.4 tok/s; 21 GB peak |
-| mlx-community/X-Reasoner-7B-8bit                            | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed        | 16577 prompt / 127 generated; 59.3 tok/s; 14 GB peak |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3642 prompt / 121 generated; 149 tok/s; 23 GB peak   |
-| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16579 prompt / 123 generated; 35.8 tok/s; 17 GB peak |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2131 prompt / 83 generated; 493 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2108 prompt / 102 generated; 102 tok/s; 6.5 GB peak  |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 611 prompt / 92 generated; 75.8 tok/s; 28 GB peak    |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1656 prompt / 617 generated; 124 tok/s; 19 GB peak   |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 610 prompt / 145 generated; 31.5 tok/s; 17 GB peak   |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 615 prompt / 118 generated; 62.6 tok/s; 7.6 GB peak  |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 615 prompt / 105 generated; 123 tok/s; 16 GB peak    |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 611 prompt / 108 generated; 125 tok/s; 6.0 GB peak   |
+| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6372 prompt / 112 generated; 44.7 tok/s; 78 GB peak  |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2132 prompt / 98 generated; 57.6 tok/s; 10 GB peak   |
+| mlx-community/InternVL3_5-1B-4bit                           | rev f9d179a8be8a; InternVLProcessor; stop completed          | 2135 prompt / 126 generated; 423 tok/s; 2.1 GB peak  |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1342 prompt / 750 generated; 66.6 tok/s; 20 GB peak  |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 320 prompt / 101 generated; 22.0 tok/s; 15 GB peak   |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 410 prompt / 104 generated; 104 tok/s; 7.1 GB peak   |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 950 prompt / 333 generated; 305 tok/s; 3.2 GB peak   |
+| mlx-community/MiniCPM-V-4.7-1B-4bit                         | rev 13caa569f70e; MiniCPMV4_7Processor; stop completed       | 952 prompt / 77 generated; 311 tok/s; 3.7 GB peak    |
+| mlx-community/MiniCPM-V-4.7-35B-A3B-4bit                    | rev 0e3b706c1599; MiniCPMV4_7Processor; stop completed       | 952 prompt / 120 generated; 88.9 tok/s; 25 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2959 prompt / 122 generated; 66.1 tok/s; 13 GB peak  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2958 prompt / 113 generated; 187 tok/s; 7.8 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4101 prompt / 158 generated; 209 tok/s; 3.9 GB peak  |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit              | rev 93b3cbddd65e; Qwen3OmniMoeProcessor; stop completed      | 12809 prompt / 120 generated; 72.0 tok/s; 26 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16566 prompt / 144 generated; 85.9 tok/s; 23 GB peak |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16566 prompt / 91 generated; 69.0 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16579 prompt / 130 generated; 108 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16579 prompt / 133 generated; 29.8 tok/s; 21 GB peak |
+| mlx-community/X-Reasoner-7B-8bit                            | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed        | 16577 prompt / 127 generated; 59.7 tok/s; 14 GB peak |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3642 prompt / 121 generated; 156 tok/s; 23 GB peak   |
+| nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit       | rev 4bc0a247d78e; NemotronHNanoOmniProcessor; stop completed | 3641 prompt / 153 generated; 69.6 tok/s; 52 GB peak  |
+| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16579 prompt / 123 generated; 36.2 tok/s; 17 GB peak |
 
 </details>
 
@@ -765,11 +769,11 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.8                                                                                                                                           |
-| mlx-vlm source revision    | 6d2f226dde69a32f897ce4722682fb220b261ec6                                                                                                        |
+| mlx-vlm source revision    | 259802ec00b26cd73d1a138cd0ed2bb72d85e205                                                                                                        |
 | mlx                        | 0.32.5.dev20261016+b6642e604                                                                                                                    |
 | mlx source revision        | b6642e604                                                                                                                                       |
 | mlx-audio                  | 0.5.9                                                                                                                                           |
-| transformers               | 5.20.0                                                                                                                                          |
+| transformers               | 5.20.1                                                                                                                                          |
 | tokenizers                 | 0.23.3                                                                                                                                          |
 | huggingface-hub            | 2.2.0                                                                                                                                           |
 | Python Version             | 3.14.7                                                                                                                                          |

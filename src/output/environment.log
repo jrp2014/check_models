@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-10-16 13:52:16 BST
+FULL ENVIRONMENT DUMP - 2026-10-16 16:53:48 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -22,7 +22,7 @@ certifi==2026.7.22
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
-check_models==0.17.55
+check_models==0.17.57
 click==8.5.0
 cmake==4.4.4
 coverage==7.16.2
@@ -31,12 +31,12 @@ cyclonedx-python-lib==11.12.0
 datasets==5.1.0
 defusedxml==0.7.1
 dill==0.4.1
-distlib==0.4.3
+distlib==0.4.4
 docopt==0.6.2
 editor==2.0.1
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.143.2
+fastapi==0.143.3
 filelock==4.2.0
 frozenlist==1.8.0
 fsspec==2026.7.0
@@ -154,7 +154,7 @@ torch==2.14.1
 torchaudio==2.11.0
 torchvision==0.29.1
 tqdm==4.70.1
-transformers==5.20.0
+transformers==5.20.1
 tree-sitter==0.26.0
 tree-sitter-cpp==0.23.4
 tree-sitter-dart-orchard==0.5.0
@@ -189,5 +189,5 @@ yarl==1.25.1
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-10-16 13:52:16 BST
+Environment dump completed at 2026-10-16 16:53:48 BST
 ================================================================================
