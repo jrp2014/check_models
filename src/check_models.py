@@ -2700,7 +2700,7 @@ def _render_report_table_markdown(block: ReportTable) -> list[str]:
     escaped_headers = (
         list(block.headers)
         if block.markdown_escaped
-        else [MARKDOWN_ESCAPER.escape(header) for header in block.headers]
+        else [escape_markdown_cell(header) for header in block.headers]
     )
     escaped_rows = [
         tuple(_render_report_cell_markdown(cell, escaped=block.markdown_escaped) for cell in row)
@@ -2749,7 +2749,7 @@ def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
         label = label.replace("[", r"\[").replace("]", r"\]")
         target = html.escape(cell.target, quote=True).replace("(", "%28").replace(")", "%29")
         return f"[{label}]({target})"
-    return cell if escaped else MARKDOWN_ESCAPER.escape(cell)
+    return cell if escaped else escape_markdown_cell(cell)
 
 
 def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
@@ -3198,7 +3198,7 @@ def _render_gallery_model(
 ) -> list[str]:
     """Render complete captured evidence for one model without reclassification."""
     escaped_facts = tuple(
-        (MARKDOWN_ESCAPER.escape(label), MARKDOWN_ESCAPER.escape(value))
+        (escape_markdown_cell(label), escape_markdown_cell(value))
         for label, value in _gallery_model_facts(result, row, assessment, model_provenance)
         if value is not None
     )
@@ -3749,48 +3749,33 @@ def format_field_label(field_name: str) -> str:
 
 
 # =============================================================================
-# TEXT ESCAPING & MECHANICAL OUTPUT DETECTORS - escaping strategy plus
+# TEXT ESCAPING & MECHANICAL OUTPUT DETECTORS - escaping helpers plus
 # repetition/reasoning/echo/cutoff detectors and catalog contract checks
 # =============================================================================
 
 
-class HTMLSelectiveEscaper:
-    """Selective HTML escaping preserving GitHub-safe tags.
+# Bare formatting tags GitHub Markdown renders and that are safe to keep in
+# reports. Attributes are always escaped, so event handlers, style injection
+# and URL-bearing attributes cannot reach HTML output. ``s`` is deliberately
+# absent so ``<s>`` tokens in model output never render as strikethrough.
+_HTML_SAFE_TAGS: Final[frozenset[str]] = frozenset({"br", "b", "strong", "i", "em", "code"})
+_HTML_TAG_RE: Final[re.Pattern[str]] = re.compile(
+    r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+(?:\"[^\"]*\"|'[^']*'|[^<>\"'])*?)?>"
+)
 
-    Escapes potentially unsafe HTML while preserving common formatting
-    tags that GitHub Markdown recognizes (br, b, strong, i, em, code).
-    Only bare tags are preserved; attributes are escaped so event handlers,
-    style injection, and URL-bearing attributes cannot flow into HTML reports.
-    Does NOT preserve 's' tag to avoid interpreting <s> tokens from
-    model output as strikethrough.
-    """
 
-    allowed_tags: frozenset[str] = frozenset({"br", "b", "strong", "i", "em", "code"})
-    tag_pattern: re.Pattern[str] = re.compile(
-        r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+(?:\"[^\"]*\"|'[^']*'|[^<>\"'])*?)?>"
-    )
+def _escape_html_tag_match(match: re.Match[str]) -> str:
+    """Keep one bare safe tag; escape every other HTML-like token."""
+    token = match.group(0)
+    name = token[1:-1].strip().removeprefix("/").strip().removesuffix("/").strip()
+    if name and name.lower() in _HTML_SAFE_TAGS:
+        return token
+    return html.escape(token, quote=True)
 
-    def escape(self, text: str) -> str:
-        """Escape tags except allowed safe tags."""
 
-        def _is_plain_allowed_tag(inner: str) -> bool:
-            normalized = inner.strip()
-            if not normalized:
-                return False
-            normalized = normalized.removeprefix("/").strip()
-            normalized = normalized.removesuffix("/").strip()
-            return bool(normalized) and normalized.lower() in self.allowed_tags
-
-        def _escape_html_like(m: re.Match[str]) -> str:
-            token = m.group(0)
-            inner = token[1:-1].strip()
-            if not inner:
-                return html.escape(token, quote=True)
-            if _is_plain_allowed_tag(inner):
-                return token  # Keep recognized safe tag
-            return html.escape(token, quote=True)
-
-        return self.tag_pattern.sub(_escape_html_like, text)
+def escape_html_selectively(text: str) -> str:
+    """Escape HTML-like tags in ``text`` except bare GitHub-safe formatting tags."""
+    return _HTML_TAG_RE.sub(_escape_html_tag_match, text)
 
 
 def _escape_markdown_table_text(
@@ -3806,54 +3791,29 @@ def _escape_markdown_table_text(
         result = re.sub(r"\s+", " ", result).strip()
     result = _wrap_bare_urls(result)
     result = result.replace("|", "\\|")
-    result = HTML_ESCAPER.escape(result)
+    result = escape_html_selectively(result)
     result = _escape_markdown_underscore_runs(result)
     return HTML_UNESCAPED_AMPERSAND_RE.sub("&amp;", result)
 
 
-class MarkdownPipeEscaper:
-    """Markdown escaping for table pipe characters and formatting.
+def escape_markdown_cell(text: str) -> str:
+    """Escape text for a Markdown table cell, collapsing its whitespace.
 
-    Handles pipe character escaping and converts newlines to <br> tags
-    to prevent breaking Markdown table formatting. Preserves model-generated
-    markdown like **bold**, *italic*, `code` while preventing table breakage.
+    Newlines become ``<br>`` (runs of two or more collapse to one blank line),
+    other whitespace runs become single spaces, bare URLs are wrapped, pipes
+    are escaped and HTML-like tags are neutralised, while model-written
+    Markdown such as ``**bold**`` and `` `code` `` is preserved.
     """
-
-    def escape(self, text: str) -> str:
-        """Escape text for safe inclusion in Markdown tables.
-
-        Converts newlines to <br> tags, wraps bare URLs, escapes pipes,
-        and neutralizes HTML-like tags while preserving markdown formatting.
-        """
-        return _escape_markdown_table_text(
-            text,
-            collapse_breaks_at=2,
-            normalize_whitespace=True,
-        )
+    return _escape_markdown_table_text(text, collapse_breaks_at=2, normalize_whitespace=True)
 
 
-class DiagnosticsEscaper:
-    """Markdown escaping optimized for error/diagnostic messages.
+def escape_diagnostics_cell(text: str) -> str:
+    """Escape error or diagnostic text for a Markdown table cell.
 
-    Preserves diagnostic spacing while still preventing table breakage.
+    Unlike :func:`escape_markdown_cell` it keeps the message's own spacing and
+    collapses only runs of three or more line breaks.
     """
-
-    def escape(self, text: str) -> str:
-        """Escape diagnostics text for Markdown tables.
-
-        More lenient than standard escaping to preserve error message formatting.
-        """
-        return _escape_markdown_table_text(
-            text,
-            collapse_breaks_at=3,
-            normalize_whitespace=False,
-        )
-
-
-# Instantiate default escapers for runtime use
-HTML_ESCAPER = HTMLSelectiveEscaper()
-MARKDOWN_ESCAPER = MarkdownPipeEscaper()
-DIAGNOSTICS_ESCAPER = DiagnosticsEscaper()
+    return _escape_markdown_table_text(text, collapse_breaks_at=3, normalize_whitespace=False)
 
 
 def _format_memory_value_gb(num: float) -> str:
@@ -8332,7 +8292,7 @@ GALLERY_STAMP_SYSTEM_KEYS: Final[tuple[str, ...]] = (
 
 def _markdown_inline_code(value: str) -> str:
     """Return a safe inline-code span for generated Markdown table cells."""
-    escaped = MARKDOWN_ESCAPER.escape(value).replace("`", "&#96;")
+    escaped = escape_markdown_cell(value).replace("`", "&#96;")
     return f"`{escaped}`"
 
 
@@ -8369,7 +8329,7 @@ def _build_gallery_stamps_section(
 
 def _gallery_summary_model_link(model_name: str) -> str:
     """Return a safe self-link for a model row in the gallery summary table."""
-    escaped_name = MARKDOWN_ESCAPER.escape(model_name)
+    escaped_name = escape_markdown_cell(model_name)
     return f"[`{escaped_name}`](#{_gallery_model_anchor(model_name)})"
 
 
@@ -8881,9 +8841,9 @@ def _gallery_reasoning_note(row: GalleryRow) -> str:
 
 def _gallery_preview_cell_markdown(row: GalleryRow) -> str:
     """Render the final-answer preview plus the omitted-reasoning note."""
-    cell = MARKDOWN_ESCAPER.escape(row.output_preview)
+    cell = escape_markdown_cell(row.output_preview)
     if note := _gallery_reasoning_note(row):
-        cell += MARKDOWN_ESCAPER.escape(f" [{note}; complete output in the evidence block]")
+        cell += escape_markdown_cell(f" [{note}; complete output in the evidence block]")
     return cell
 
 
@@ -9013,7 +8973,7 @@ def _render_gallery_chooser(data: GalleryChooserData) -> list[str]:
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("prompt_tokens", row.prompt_tokens),
             _gallery_metric("generation_tokens", row.generation_tokens),
-            MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
+            escape_markdown_cell(_gallery_observation_labels(row.observations)),
         )
         for row in ordered
     ]
@@ -9086,7 +9046,7 @@ def _render_gallery_chooser(data: GalleryChooserData) -> list[str]:
                     (
                         _gallery_summary_model_link(row.model),
                         _markdown_inline_code(_usability_label(row.usability, row.observations)),
-                        MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
+                        escape_markdown_cell(_gallery_observation_labels(row.observations)),
                     )
                     for row in data.avoided
                 ],
@@ -9603,7 +9563,7 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
 
 def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
-    escaped: str = _escape_markdown_underscore_runs(HTML_ESCAPER.escape(_wrap_bare_urls(text)))
+    escaped: str = _escape_markdown_underscore_runs(escape_html_selectively(_wrap_bare_urls(text)))
     escaped = escaped.replace("*", "&#42;")
     escaped = HTML_UNESCAPED_AMPERSAND_RE.sub("&amp;", escaped)
     return _neutralize_markdown_blockquote_prefix(escaped)
@@ -9900,7 +9860,7 @@ def _diagnostics_environment_section(
 ) -> list[str]:
     """Build environment details section for diagnostics report footer context."""
     table_rows = [
-        (component, DIAGNOSTICS_ESCAPER.escape(value))
+        (component, escape_diagnostics_cell(value))
         for component, value in _collect_report_component_rows(
             versions=versions,
             system_info=system_info,
@@ -9924,7 +9884,7 @@ def _diagnostics_environment_section(
         table_rows.append(
             (
                 f"{component} provenance",
-                DIAGNOSTICS_ESCAPER.escape("; ".join(details)),
+                escape_diagnostics_cell("; ".join(details)),
             )
         )
     parts = _guard_markdownlint_block(
@@ -9969,7 +9929,7 @@ def _build_environment_failure_diagnostics(
                 "Run aborted before any model execution because core runtime "
                 "dependencies were unavailable."
             ),
-            f"**Error:** {DIAGNOSTICS_ESCAPER.escape(_home_relative_report_text(error_message))}",
+            f"**Error:** {escape_diagnostics_cell(_home_relative_report_text(error_message))}",
         ],
     )
     parts.extend(
@@ -20439,7 +20399,7 @@ def _output_index_link(index_filename: Path, artifact_path: Path, label: str) ->
         report_filename=index_filename,
         artifact_filename=artifact_path,
     )
-    return f"[{MARKDOWN_ESCAPER.escape(label)}]({target})"
+    return f"[{escape_markdown_cell(label)}]({target})"
 
 
 # Derived from the canonical Literals / observation registry (F1).
@@ -24606,7 +24566,7 @@ def _run_issue_summary_observation_cluster_section(
         return None
     rows = tuple(
         (
-            MARKDOWN_ESCAPER.escape(
+            escape_markdown_cell(
                 _human_observation_labels(cast("Sequence[ObservationCode]", signature))
             ),
             ", ".join(_render_report_cell_markdown(link(model), escaped=False) for model in models),
@@ -26269,7 +26229,7 @@ def _generate_github_issue_reports(
     )
     for result in crashes:
         issue_path = issue_paths[result.model_name]
-        parts = [f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
+        parts = [f"# Crash: {escape_markdown_cell(result.model_name)}", ""]
         provenance = model_provenance.get(result.model_name)
         model_type, _resolved, arch_supported = _arch_precheck_for_model(result.model_name)
         issue_blocks: tuple[ReportBlock, ...] = (

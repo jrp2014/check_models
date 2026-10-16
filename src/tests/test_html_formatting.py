@@ -5,34 +5,34 @@ import check_models
 
 def test_escape_html_tags_selective_basic() -> None:
     """Should escape < and > in text."""
-    result = check_models.HTML_ESCAPER.escape("Use <model> here")
+    result = check_models.escape_html_selectively("Use <model> here")
     assert result == "Use &lt;model&gt; here"
 
 
 def test_escape_html_tags_selective_multiple() -> None:
     """Should escape non-allowed tags but keep allowed tags like <b>."""
     text = "<a> and <b> tags"
-    result = check_models.HTML_ESCAPER.escape(text)
+    result = check_models.escape_html_selectively(text)
     # <a> is not allowed, so it's escaped; <b> is allowed, so it's kept
     assert result == "&lt;a&gt; and <b> tags"
 
 
 def test_escape_html_tags_selective_rejects_attributes_on_allowed_tags() -> None:
     """Allowed formatting tags should not preserve unsafe attributes."""
-    result = check_models.HTML_ESCAPER.escape('<b onclick="alert(1)">bold</b><br data-x="1">')
+    result = check_models.escape_html_selectively('<b onclick="alert(1)">bold</b><br data-x="1">')
     assert result == "&lt;b onclick=&quot;alert(1)&quot;&gt;bold</b>&lt;br data-x=&quot;1&quot;&gt;"
 
 
 def test_escape_html_tags_selective_preserves_entities() -> None:
     """Should preserve existing HTML entities."""
-    result = check_models.HTML_ESCAPER.escape("5 &lt; 10")
+    result = check_models.escape_html_selectively("5 &lt; 10")
     assert result == "5 &lt; 10"
 
 
 def test_escape_html_tags_selective_mixed() -> None:
     """Should handle mixed content with entities."""
     # Function only escapes tag-like patterns, not bare angle brackets
-    result = check_models.HTML_ESCAPER.escape("5 < 10 &amp; 10 > 5")
+    result = check_models.escape_html_selectively("5 < 10 &amp; 10 > 5")
     # Bare angle brackets and entities are preserved as-is
     assert result == "5 < 10 &amp; 10 > 5"
 
@@ -40,7 +40,7 @@ def test_escape_html_tags_selective_mixed() -> None:
 def test_escape_html_tags_selective_ampersands() -> None:
     """Should handle standalone ampersands."""
     # Function only escapes tags, not ampersands
-    result = check_models.HTML_ESCAPER.escape("Tom & Jerry")
+    result = check_models.escape_html_selectively("Tom & Jerry")
     # Ampersand is preserved as-is (not escaped by this function)
     assert result == "Tom & Jerry"
 
@@ -48,18 +48,18 @@ def test_escape_html_tags_selective_ampersands() -> None:
 def test_escape_html_tags_selective_no_tags() -> None:
     """Should leave text without tags unchanged."""
     text = "Plain text without any special characters"
-    result = check_models.HTML_ESCAPER.escape(text)
+    result = check_models.escape_html_selectively(text)
     assert result == text
 
 
 def test_escape_html_tags_selective_empty() -> None:
     """Should handle empty string."""
-    assert check_models.HTML_ESCAPER.escape("") == ""
+    assert check_models.escape_html_selectively("") == ""
 
 
 def test_escape_html_tags_selective_entity_chain() -> None:
     """Should preserve complex entity chains."""
-    result = check_models.HTML_ESCAPER.escape("&lt;&gt; &amp; &quot;")
+    result = check_models.escape_html_selectively("&lt;&gt; &amp; &quot;")
     assert "&lt;" in result
     assert "&gt;" in result
     assert "&amp;" in result
@@ -69,14 +69,14 @@ def test_escape_html_tags_selective_entity_chain() -> None:
 def test_html_escaper_escapes_a_tag_whose_quoted_attribute_holds_angle_brackets() -> None:
     """A quoted "<" is legal inside a CommonMark raw-HTML tag, so it must not hide the tag."""
     for tag in ('<img alt="<" src=x onerror=alert(1)>', '<img alt="<b>" onerror=x>'):
-        result = check_models.HTML_ESCAPER.escape(tag)
+        result = check_models.escape_html_selectively(tag)
         assert result.startswith("&lt;img")
         assert "<b>" not in result
 
 
 def test_table_escaping_does_not_double_escape_quotes() -> None:
     """html.escape(quote=True) yields &quot;, which must survive the ampersand pass."""
-    result = check_models.MARKDOWN_ESCAPER.escape('<a href="x">')
+    result = check_models.escape_markdown_cell('<a href="x">')
     assert result == "&lt;a href=&quot;x&quot;&gt;"
 
 

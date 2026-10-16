@@ -9,44 +9,44 @@ import check_models
 
 def test_escape_markdown_in_text_pipes() -> None:
     """Should escape pipe characters."""
-    result = check_models.MARKDOWN_ESCAPER.escape("a|b|c")
+    result = check_models.escape_markdown_cell("a|b|c")
     assert result == "a\\|b\\|c"
 
 
 def test_escape_markdown_in_text_single_pipe() -> None:
     """Should escape single pipe."""
-    result = check_models.MARKDOWN_ESCAPER.escape("before|after")
+    result = check_models.escape_markdown_cell("before|after")
     assert result == "before\\|after"
 
 
 def test_escape_markdown_in_text_no_pipes() -> None:
     """Should leave text without pipes unchanged."""
     text = "normal text without pipes"
-    result = check_models.MARKDOWN_ESCAPER.escape(text)
+    result = check_models.escape_markdown_cell(text)
     assert result == text
 
 
 def test_escape_markdown_in_text_empty() -> None:
     """Should handle empty string."""
-    result = check_models.MARKDOWN_ESCAPER.escape("")
+    result = check_models.escape_markdown_cell("")
     assert result == ""
 
 
 def test_escape_markdown_in_text_only_pipes() -> None:
     """Should escape text with only pipes."""
-    result = check_models.MARKDOWN_ESCAPER.escape("|||")
+    result = check_models.escape_markdown_cell("|||")
     assert result == "\\|\\|\\|"
 
 
 def test_escape_markdown_in_text_mixed_content() -> None:
     """Should escape pipes in mixed content."""
-    result = check_models.MARKDOWN_ESCAPER.escape("model|size|speed")
+    result = check_models.escape_markdown_cell("model|size|speed")
     assert result == "model\\|size\\|speed"
 
 
 def test_escape_markdown_in_text_whitespace() -> None:
     """Should preserve whitespace around escaped pipes."""
-    result = check_models.MARKDOWN_ESCAPER.escape("a | b | c")
+    result = check_models.escape_markdown_cell("a | b | c")
     assert result == "a \\| b \\| c"
 
 
@@ -54,8 +54,8 @@ def test_table_escapers_preserve_their_whitespace_policies() -> None:
     """Regular tables normalize whitespace while diagnostics retain it."""
     text = "alpha  \n\n beta|gamma"
 
-    assert check_models.MARKDOWN_ESCAPER.escape(text) == "alpha <br><br>beta\\|gamma"
-    assert check_models.DIAGNOSTICS_ESCAPER.escape(text) == "alpha  <br><br> beta\\|gamma"
+    assert check_models.escape_markdown_cell(text) == "alpha <br><br>beta\\|gamma"
+    assert check_models.escape_diagnostics_cell(text) == "alpha  <br><br> beta\\|gamma"
 
 
 def test_complete_diagnostics_evidence_uses_a_non_truncating_safe_fence() -> None:

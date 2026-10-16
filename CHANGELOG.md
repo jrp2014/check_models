@@ -103,6 +103,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Report escaping (0.17.74): the stateless `HTMLSelectiveEscaper`,
+  `MarkdownPipeEscaper` and `DiagnosticsEscaper` classes and their global
+  instances are now the functions `escape_html_selectively`,
+  `escape_markdown_cell` and `escape_diagnostics_cell`. Escaping is
+  unchanged, including the two whitespace policies; a differential check of
+  90,000 random inputs against the old classes gave identical output.
 - Quality analysis (0.17.73): `GenerationQualityAnalysis.word_count` is gone.
   It was computed on every analysis and never read; the standalone
   `tools/analyze_output_quality.py` counts its own displayed words. Worker
