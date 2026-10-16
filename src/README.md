@@ -818,12 +818,14 @@ the fast test lane. `PROBE_PYTHON=3.16` targets a later version. Two opt-in chec
   before PyPI (3.15's macOS wheels are not on PyPI), so when the PyPI install
   fails the probe retries torch, torchvision and torchaudio from
   `PROBE_TORCH_INDEX` (default `https://download.pytorch.org/whl/cpu`, whose
-  macOS wheels include MPS) and the rest of the extra from PyPI. The verdict
-  says which source worked; "from the index only" means `tools/update.sh`
-  would need the same index before a switch. A failure from both is reported
-  as "torch extra unavailable: about half the roster would fail" and stays
-  outside the core verdict. The exit status covers only the build, install
-  and test checks.
+  macOS wheels include MPS) with `--no-deps`, then installs their
+  dependencies and the rest of the extra from PyPI. Pip's `--index-url` also
+  serves dependencies, so without `--no-deps` they could come from that
+  index too. The verdict says which source worked; "from the index only"
+  means `tools/update.sh` would need the same index before a switch. A
+  failure from both is reported as "torch extra unavailable: about half the
+  roster would fail" and stays outside the core verdict. The exit status
+  covers only the build, install and test checks.
 
 ### Advanced Configuration
 

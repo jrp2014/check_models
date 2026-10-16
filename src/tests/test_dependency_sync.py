@@ -1643,8 +1643,9 @@ def test_probe_python_next_torch_check_installs_the_pyproject_extra(tmp_path: Pa
 def test_probe_python_next_torch_check_falls_back_to_the_pytorch_index(tmp_path: Path) -> None:
     """Torch wheels on PyTorch's own index only (as for 3.15) are found and named as such.
 
-    Only the torch packages come from that index, via --index-url so nothing
-    else can resolve from it; the rest of the extra then installs from PyPI.
+    Only the torch packages come from that index, with --no-deps because
+    --index-url also governs dependency resolution; the rest of the extra and
+    the torch packages' own dependencies then resolve from PyPI.
     """
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
     torch_extra = pyproject["project"]["optional-dependencies"]["torch"]
@@ -1662,10 +1663,11 @@ def test_probe_python_next_torch_check_falls_back_to_the_pytorch_index(tmp_path:
 
     index_install = _probe_call_index(calls, "--index-url")
     assert calls[index_install].endswith(
-        "-m pip install -q --index-url https://download.pytorch.org/whl/cpu "
+        "-m pip install -q --no-deps --index-url https://download.pytorch.org/whl/cpu "
         + " ".join(torch_family)
     )
-    assert calls[index_install + 1].endswith("-m pip install -q " + " ".join(rest))
+    assert calls[index_install + 1].endswith("-m pip install -q " + " ".join(rest + torch_family))
+    assert "--index-url" not in calls[index_install + 1]
     assert "Torch extra: available from https://download.pytorch.org/whl/cpu only" in result.stdout
     assert "Core: viable from PyPI" in result.stdout
 
@@ -2339,6 +2341,23 @@ _PIP_NO_MLX_DISTRIBUTION = (
     "(from check-models) (from versions: none)\n"
     "ERROR: No matching distribution found for mlx>=0.32.3\n"
 )
+# Pip ends with the same "No matching distribution found" when it could not
+# read the index at all; neither of these says the wheel is missing.
+_PIP_CERTIFICATE_FAILURE = (
+    "WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) "
+    "after connection broken by 'SSLError(SSLCertVerificationError(1, '[SSL: "
+    "CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer "
+    "certificate (_ssl.c:1010)'))': /simple/mlx/\n"
+    "Could not fetch URL https://pypi.org/simple/mlx/: There was a problem confirming the "
+    "ssl certificate: HTTPSConnectionPool(host='pypi.org', port=443): Max retries exceeded "
+    "with url: /simple/mlx/ - skipping\n" + _PIP_NO_MLX_DISTRIBUTION
+)
+_PIP_CONNECTION_FAILURE = (
+    "WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) "
+    "after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection."
+    "HTTPSConnection object at 0x104>: Failed to establish a new connection: [Errno 8] "
+    "nodename nor servname provided, or not known')': /simple/mlx/\n" + _PIP_NO_MLX_DISTRIBUTION
+)
 _PIP_BUILD_FAILURE = (
     "  error: subprocess-exited-with-error\n"
     "ERROR: Failed to build installable wheels for some pyproject.toml based projects "
@@ -2353,6 +2372,12 @@ _PIP_BUILD_FAILURE = (
             "true", 1, _PIP_NO_MLX_DISTRIBUTION, (0, "false"), id="next-missing-dist-skips"
         ),
         pytest.param("true", 1, _PIP_BUILD_FAILURE, (1, None), id="next-build-failure-fails"),
+        pytest.param(
+            "true", 1, _PIP_CERTIFICATE_FAILURE, (1, None), id="next-certificate-failure-fails"
+        ),
+        pytest.param(
+            "true", 1, _PIP_CONNECTION_FAILURE, (1, None), id="next-connection-failure-fails"
+        ),
         pytest.param("false", 1, _PIP_NO_MLX_DISTRIBUTION, (1, None), id="other-lane-never-skips"),
         pytest.param(
             "true", 0, "Successfully installed\n", (0, "true"), id="next-installs-and-runs"
@@ -2371,8 +2396,9 @@ def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_la
 ) -> None:
     """Run the workflow's real install script, as Actions does (bash -e), against fake tools.
 
-    Only "no distribution found" on the next-Python lane may skip the checks;
-    a build, resolver or packaging failure fails the lane, as on every other.
+    Only "no distribution found" on the next-Python lane may skip the checks,
+    and not when pip could not read the index; a build, resolver, packaging
+    or index failure fails the lane, as on every other.
     """
     returncode, available = expected
     workflow = yaml.safe_load(

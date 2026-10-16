@@ -56,16 +56,19 @@ Notable changes to this project will be documented in this file.
     "src/.[dev]"` fails there. On that lane only, and only when pip reports
     "No matching distribution found", the install step warns (naming the
     missing requirements) and skips the checks; a build, resolver or
-    packaging failure still fails it. Once the stack installs, the lane runs
-    the full gate like the others. A test runs the step's real script against
-    a fake pip for each case, and another keeps the lane's version equal to
+    packaging failure still fails it, and so does a connection, certificate,
+    proxy or HTTP error reading the index, after which pip prints the same
+    message. Once the stack installs, the lane runs the full gate like the
+    others. A test runs the step's real script against a fake pip for each
+    case, and another keeps the lane's version equal to
     `probe_python_next.sh`'s default and above the fresh-env Python.
   - `make probe-python-next` with `PROBE_TORCH=1` retries torch,
     torchvision and torchaudio from PyTorch's own index (`PROBE_TORCH_INDEX`,
-    default `https://download.pytorch.org/whl/cpu`, `--index-url` so no
-    other package resolves from it) when PyPI has no wheel. PyTorch's 3.15
-    macOS wheels are not on PyPI. The verdict names the source that worked
-    and prints MPS availability.
+    default `https://download.pytorch.org/whl/cpu`) when PyPI has no wheel.
+    They install from it with `--no-deps`, because `--index-url` also serves
+    dependencies; their dependencies and the rest of the extra then resolve
+    from PyPI. PyTorch's 3.15 macOS wheels are not on PyPI. The verdict names
+    the source that worked and prints MPS availability.
   - `test_shipped_text_io_names_its_encoding` fails on text I/O in
     `check_models.py` or `tools/*.py` that leaves its encoding to the
     locale: `subprocess` calls with `text=True`, text-mode `open`,

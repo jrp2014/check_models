@@ -256,9 +256,10 @@ else
             && "$PY" -c "$torch_import_cmd"; then
             torch_status="available"
         else
-            # PyTorch's own index, for the torch packages only (--index-url, not
-            # --extra-index-url, so no other package can resolve from it); the
-            # rest of the extra then comes from PyPI against the installed torch.
+            # PyTorch's own index, for the torch packages only. --index-url also
+            # governs dependency resolution, so they install with --no-deps; the
+            # second install then resolves their dependencies and the rest of
+            # the extra from PyPI against the already-installed torch packages.
             torch_index_reqs=()
             torch_rest_reqs=()
             for req in "${torch_reqs[@]}"; do
@@ -270,9 +271,9 @@ else
             done
             echo "   PyPI failed; retrying ${torch_index_reqs[*]} from $PROBE_TORCH_INDEX"
             if [[ ${#torch_index_reqs[@]} -gt 0 ]] \
-                && "$PY" -m pip install -q --index-url "$PROBE_TORCH_INDEX" "${torch_index_reqs[@]}" \
-                && { [[ ${#torch_rest_reqs[@]} -eq 0 ]] \
-                    || "$PY" -m pip install -q ${MLX_PIN_ARGS[@]+"${MLX_PIN_ARGS[@]}"} "${torch_rest_reqs[@]}"; } \
+                && "$PY" -m pip install -q --no-deps --index-url "$PROBE_TORCH_INDEX" "${torch_index_reqs[@]}" \
+                && "$PY" -m pip install -q ${MLX_PIN_ARGS[@]+"${MLX_PIN_ARGS[@]}"} \
+                    ${torch_rest_reqs[@]+"${torch_rest_reqs[@]}"} "${torch_index_reqs[@]}" \
                 && "$PY" -c "$torch_import_cmd"; then
                 torch_status="index-only"
             fi

@@ -96,13 +96,17 @@ jobs:
         # Only the next-Python lane may skip, and only when pip found no
         # distribution at all for some requirement (no wheel and no sdist
         # yet). Any other install failure (a build, resolver or packaging
-        # error) fails the lane like every other.
+        # error) fails the lane like every other. Pip also ends with "No
+        # matching distribution found" when it could not read the index
+        # (connection, certificate, proxy or HTTP errors), so any sign of
+        # those fails the lane first.
         run: |
           set -o pipefail
           python -m pip install --upgrade pip
           pip_log="${RUNNER_TEMP:-/tmp}/pip-install.log"
           if ! pip install -e "src/.[dev]" 2>&1 | tee "$pip_log"; then
-            if [[ "$NEXT_PYTHON" != "true" ]] || ! grep -q "No matching distribution found for" "$pip_log"; then
+            index_errors='Retrying \(Retry\(|Could not fetch URL|Max retries exceeded|HTTP error [0-9]{3}|SSLError|certificate verify failed|ssl certificate|ProxyError|NewConnectionError|ConnectTimeoutError|ReadTimeoutError|Connection(Error|ResetError| refused| aborted)|Temporary failure in name resolution|Name or service not known|nodename nor servname|Network is unreachable|not a trusted or secure host'
+            if [[ "$NEXT_PYTHON" != "true" ]] || grep -Eiq "$index_errors" "$pip_log" || ! grep -q "No matching distribution found for" "$pip_log"; then
               exit 1
             fi
             missing="$(grep -o "No matching distribution found for [^[:space:]]*" "$pip_log" | sed 's/^No matching distribution found for //' | sort -u | paste -sd, -)"
