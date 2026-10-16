@@ -586,8 +586,14 @@ settings differ: processor_kwargs unset → {"max_pixels": 1048576}") and
 withholds the per-model diff; `--resize-shape` is treated the same way. Use
 these settings for experiments, not for baseline sweeps, which keep each
 model's own preprocessing defaults.
-`--resize-shape` is the uniform alternative: it resizes the image for every
-model before its processor sees it, but to a fixed height and width.
+`--resize-shape` is not a uniform alternative. mlx-vlm applies it before the
+processor, and only for models whose image processor comes from Transformers
+(such as Qwen2-VL and SmolVLM). Models with mlx-vlm's own image processor
+(such as Phi-3-Vision, Molmo, InternVL-Chat, Kimi-VL, Gemma 4 and Llama 4)
+ignore it with a warning. Where it applies, it scales the image to fit inside
+the given bounds and keeps its aspect ratio, enlarging smaller images too;
+it never stretches the image to the exact size. The processor then applies its
+own sizing, so the model may still see a different resolution.
 
 #### KV Cache Quantization (Memory Optimization)
 
@@ -1300,7 +1306,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
 | `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, the `--eval-mode` lane supplies the prompt. When provided, it overrides the lane prompt only: the lane still governs the default token cap and report labeling, and `assisted` still requires descriptive metadata. |
-| `--resize-shape` | int(s) | (none) | Resize image input before processor handling. Provide 1 integer for square resize or 2 for height width after one flag occurrence. |
+| `--resize-shape` | int(s) | (none) | Scale the image to fit within these bounds, keeping its aspect ratio, before the processor sees it. Provide 1 integer for a square bound, or 2 after one flag occurrence; mlx-vlm reads the first as the width bound. Ignored, with a warning, for models that use mlx-vlm's own image processor. |
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
 | `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |

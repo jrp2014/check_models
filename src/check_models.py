@@ -28176,9 +28176,11 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         type=int,
         nargs="+",
         help=(
-            "Resize image input before processor handling. "
-            "Provide 1 integer for square resize or 2 for height width after a "
-            "single flag occurrence."
+            "Scale the image to fit within these bounds, keeping its aspect ratio, "
+            "before the processor sees it. Provide 1 integer for a square bound or 2 "
+            "after a single flag occurrence (mlx-vlm reads the first as the width "
+            "bound). Ignored, with a warning, for models that use mlx-vlm's own "
+            "image processor."
         ),
     )
     prompt_group.add_argument(

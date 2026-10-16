@@ -103,6 +103,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Docs (0.17.70): `--resize-shape` is no longer described as a uniform,
+  fixed-size resize. mlx-vlm ignores it, with a warning, for models that use
+  its own image processor (Phi-3-Vision, Molmo, Gemma 4 and others), and
+  otherwise scales the image to fit the bounds while keeping its aspect
+  ratio. The README and `--help` now say so, including that mlx-vlm reads
+  the first of two values as the width bound.
 - Run duration (0.17.69): the end-to-end duration again includes building
   the run summary. 0.17.67 took the finish time before the summary ran, so
   a summary that took two minutes went uncounted (600 s recorded against
