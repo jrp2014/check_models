@@ -89,7 +89,7 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from functools import lru_cache, partial
+from functools import cached_property, lru_cache, partial
 from importlib import import_module
 from importlib.metadata import (
     Distribution,
@@ -8469,7 +8469,8 @@ def _field_aware_preview(answer: str, *, max_chars: int) -> str | None:
     hides the keywords, usually the weakest field. Returns ``None`` when no
     labelled field was detected, so the caller falls back to the head.
     """
-    sections = _extract_catalog_sections(answer)
+    catalog = _parse_catalog_answer(answer)
+    sections = catalog.sections
     if not sections:
         return None
     collapse = _collapse_preview_line_whitespace
@@ -8480,7 +8481,7 @@ def _field_aware_preview(answer: str, *, max_chars: int) -> str | None:
         return f"{label}: {_truncate_text_preview(collapse(body).replace(chr(10), ' '), max_chars=budget)}"
 
     title_part = _field("Title", sections.get("title", ""), _PREVIEW_TITLE_CHARS)
-    keywords = _split_catalog_keywords(sections.get("keywords", ""))
+    keywords = catalog.keywords
     if keywords:
         shown: list[str] = []
         for keyword in keywords:
@@ -9074,9 +9075,8 @@ def _gallery_chooser_explanation() -> str:
     )
 
 
-def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
+def _render_gallery_chooser(data: GalleryChooserData) -> list[str]:
     """Render the skim-first chooser, resource highlights, and avoid list."""
-    data = _gallery_chooser_data(rows)
     ordered = data.ordered
     chooser_rows = [
         (
@@ -9173,14 +9173,14 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     return parts
 
 
-def _render_gallery_output_glance(rows: Sequence[GalleryRow]) -> list[str]:
+def _render_gallery_output_glance(data: GalleryChooserData) -> list[str]:
     """Render every model's actual output preview as one skimmable table.
 
     The chooser carries mechanical judgements; this table answers the other
     first question — what did each model actually say — without expanding the
     per-model evidence blocks.
     """
-    ordered = _gallery_chooser_data(rows).ordered
+    ordered = data.ordered
     if not ordered:
         return []
     return [
@@ -9492,8 +9492,56 @@ def _default_report_mode_policy() -> ReportModePolicy:
     return _build_report_mode_policy(eval_mode=DEFAULT_EVAL_MODE, metadata=None)
 
 
+class _ReportContextLookups:
+    """Per-model lookups and gallery rows, derived once per report context.
+
+    A context is built for one report operation and both formats render from
+    it, so each derived value is computed on first use and shared by both
+    without a module-level cache. ``replace()`` builds a new context, which
+    derives its own.
+    """
+
+    if TYPE_CHECKING:
+        # Supplied by the frozen dataclass fields of each context; read-only
+        # here so those fields may override them.
+        @property
+        def result_set(self) -> ResultSet: ...
+        @property
+        def assessments(self) -> tuple[tuple[str, ResultAssessment], ...]: ...
+        @property
+        def model_provenance(self) -> tuple[tuple[str, ModelProvenanceRecord], ...]: ...
+
+    @cached_property
+    def result_by_model(self) -> Mapping[str, PerformanceResult]:
+        """Index the context's results by model identifier."""
+        return {result.model_name: result for result in self.result_set.results}
+
+    @cached_property
+    def assessment_by_model(self) -> Mapping[str, ResultAssessment]:
+        """Index the cached minimal current-run assessment by model identifier."""
+        return dict(self.assessments)
+
+    @cached_property
+    def provenance_by_model(self) -> Mapping[str, ModelProvenanceRecord]:
+        """Index the cached requested and resolved model identities."""
+        return dict(self.model_provenance)
+
+    @cached_property
+    def gallery_rows(self) -> tuple[GalleryRow, ...]:
+        """One chooser row per result, in result order."""
+        return tuple(
+            _gallery_row(result, self.assessment_by_model[result.model_name])
+            for result in self.result_set.results
+        )
+
+    @cached_property
+    def gallery_chooser(self) -> GalleryChooserData:
+        """The chooser ordering and highlights both gallery formats render."""
+        return _gallery_chooser_data(self.gallery_rows)
+
+
 @dataclass(frozen=True)
-class ReportRenderContext:
+class ReportRenderContext(_ReportContextLookups):
     """Shared cached context for retained current-run report generation."""
 
     result_set: ResultSet
@@ -9507,7 +9555,7 @@ class ReportRenderContext:
 
 
 @dataclass(frozen=True)
-class CanonicalHtmlReportContext:
+class CanonicalHtmlReportContext(_ReportContextLookups):
     """Minimal cached facts required by the standalone HTML report."""
 
     result_set: ResultSet
@@ -10115,7 +10163,7 @@ def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
     legal outcome axes make the buckets disjoint. Each bucket keeps the shared
     actionability order.
     """
-    assessments = dict(context.assessments)
+    assessments = context.assessment_by_model
     buckets: dict[str, list[PerformanceResult]] = {
         name: [] for name in ("actionable", "observations", "indeterminate", "compliance", "clean")
     }
@@ -10763,8 +10811,8 @@ def _diagnostics_evidence_blocks(
     image_path: Path | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Build the shared skim-first diagnostics hierarchy from cached assessments."""
-    assessments = _assessments_by_model(report_context)
-    provenance = _model_provenance_by_model(report_context)
+    assessments = report_context.assessment_by_model
+    provenance = report_context.provenance_by_model
     # The canonical HTML context carries no image profile; the capacity rows
     # then simply omit the input-image line rather than re-reading the file.
     image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
@@ -10944,7 +10992,7 @@ def generate_diagnostics_report(
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
             highlighted_results=partitions.highlighted,
-            model_provenance=_model_provenance_by_model(report_context),
+            model_provenance=report_context.provenance_by_model,
             library_versions=library_versions,
             system_info=system_info,
             image_path=image_path,
@@ -11110,13 +11158,9 @@ def _html_embedded_image(image_path: Path | None) -> str:
 
 def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     """Render the same facts-only chooser and resource highlights as Markdown."""
-    assessments = _assessments_by_model(report_context)
-    rows = [
-        _gallery_row(result, assessments[result.model_name])
-        for result in report_context.result_set.results
-    ]
-    result_by_model = {result.model_name: result for result in report_context.result_set.results}
-    data = _gallery_chooser_data(rows)
+    assessments = report_context.assessment_by_model
+    result_by_model = report_context.result_by_model
+    data = report_context.gallery_chooser
     ordered = data.ordered
     chooser_rows = [
         (
@@ -11264,21 +11308,15 @@ def _gallery_evidence_entries(
     report_context: HtmlReportContext,
 ) -> list[tuple[PerformanceResult, GalleryRow, ResultAssessment, ModelProvenanceRecord | None]]:
     """Per-model evidence inputs in the stable usable-first order both galleries render."""
-    assessments = _assessments_by_model(report_context)
-    model_provenance = _model_provenance_by_model(report_context)
-    entries = [
+    return [
         (
-            result,
-            _gallery_row(result, assessments[result.model_name]),
-            assessments[result.model_name],
-            model_provenance.get(result.model_name),
+            report_context.result_by_model[row.model],
+            row,
+            report_context.assessment_by_model[row.model],
+            report_context.provenance_by_model.get(row.model),
         )
-        for result in report_context.result_set.results
+        for row in report_context.gallery_chooser.ordered
     ]
-    return sorted(
-        entries,
-        key=lambda entry: (_usability_rank(entry[1].usability), entry[0].model_name),
-    )
 
 
 def _html_complete_gallery(report_context: HtmlReportContext) -> str:
@@ -11360,7 +11398,7 @@ def _html_provenance(
     blocks = _diagnostics_shared_context_blocks(
         prompt=prompt,
         highlighted_results=highlighted_results,
-        model_provenance=_model_provenance_by_model(report_context),
+        model_provenance=report_context.provenance_by_model,
         library_versions=versions,
         system_info=report_context.system_info,
         image_path=image_path,
@@ -11539,12 +11577,6 @@ def generate_markdown_gallery_report(
     if report_context is None:
         raise MissingGalleryAssessmentError
 
-    assessments = _assessments_by_model(report_context)
-    gallery_rows = [
-        _gallery_row(result, assessments[result.model_name])
-        for result in report_context.result_set.results
-    ]
-
     md: list[str] = []
     md.append("# Model Output Gallery")
     md.append("")
@@ -11584,8 +11616,8 @@ def generate_markdown_gallery_report(
                     "",
                 )
             )
-    md.extend(_render_gallery_chooser(gallery_rows))
-    md.extend(_render_gallery_output_glance(gallery_rows))
+    md.extend(_render_gallery_chooser(report_context.gallery_chooser))
+    md.extend(_render_gallery_output_glance(report_context.gallery_chooser))
     md.extend(
         _build_gallery_stamps_section(
             versions=versions,
@@ -11598,20 +11630,6 @@ def generate_markdown_gallery_report(
     md.extend(_generate_model_gallery_section(report_context))
 
     _write_markdown_artifact(filename, md)
-
-
-def _assessments_by_model(
-    report_context: HtmlReportContext,
-) -> dict[str, ResultAssessment]:
-    """Index the cached minimal current-run assessment by model identifier."""
-    return dict(report_context.assessments)
-
-
-def _model_provenance_by_model(
-    report_context: HtmlReportContext,
-) -> dict[str, ModelProvenanceRecord]:
-    """Index the cached requested and resolved model identities."""
-    return dict(report_context.model_provenance)
 
 
 # A bare http(s) URL that is not already inside angle brackets or a Markdown
@@ -20226,8 +20244,8 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
     if mode_policy is None:
         resolved_policy = report_context.mode_policy
     cached_results = {result.model_name: result for result in report_context.result_set.results}
-    assessments = _assessments_by_model(report_context)
-    model_provenance = _model_provenance_by_model(report_context)
+    assessments = report_context.assessment_by_model
+    model_provenance = report_context.provenance_by_model
     header = _build_jsonl_metadata_record(
         prompt=prompt,
         system_info=system_info,
@@ -26281,8 +26299,8 @@ def _generate_github_issue_reports(
     if stale_index.exists():
         stale_index.unlink()
 
-    assessments = dict(report_context.assessments)
-    model_provenance = _model_provenance_by_model(report_context)
+    assessments = report_context.assessment_by_model
+    model_provenance = report_context.provenance_by_model
     actionable = _partition_diagnostics(report_context).actionable
     crashes = tuple(
         result for result in actionable if assessments[result.model_name].execution == "crashed"
@@ -27459,7 +27477,7 @@ def finalize_execution(
         )
         results = list(report_context.result_set.results)
         _validate_report_render_context(report_context)
-        assessments = dict(report_context.assessments)
+        assessments = report_context.assessment_by_model
         # A heading closes the last model's run block, so its closing notes
         # are not read as the first result's; the order is the report's, not
         # the run's.

@@ -92,6 +92,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor (0.17.62): the gallery rows and the per-model assessment,
+  provenance and result lookups are derived once per report context and
+  shared by the HTML report and the Markdown gallery. Before, each model's
+  row (final-answer extraction, field parsing, preview) was rebuilt four
+  times when both formats were written, once for each chooser and once for
+  each complete-evidence section, and the lookup dictionaries were rebuilt by
+  each renderer. The values are computed on first use and held by the context
+  itself, not a module-level cache, so a context built with `replace()`
+  derives its own. Escaping, Markdown formatting and each format's layout are
+  unchanged; the evidence sections follow the chooser order, which used the
+  same usable-first, then model-name key.
 - Refactor (0.17.61): each answer's labelled fields are parsed once per
   analysis. The keyword-repetition check, the Title/Description/Keywords
   checks, the keyword counts and the hint-keyword count read one parse

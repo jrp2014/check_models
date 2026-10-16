@@ -8853,6 +8853,38 @@ def test_throughput_flags_are_named_and_an_mlx_rebuild_is_called_out() -> None:
     assert check_models._comparison_view(_bare_comparison()).flag_lead is None
 
 
+def test_both_gallery_formats_share_one_row_per_model(tmp_path: Path) -> None:
+    """Gallery rows are built once per report context and rendered by both formats."""
+    prompt = "Describe this image briefly."
+    results = [
+        _make_success("org/good"),
+        _make_failure_with_details("org/broken", error_msg="Model loading failed: boom"),
+    ]
+    report_context = _build_report_render_context(results=results, prompt=prompt)
+    with patch.object(check_models, "_gallery_row", wraps=check_models._gallery_row) as gallery_row:
+        generate_html_report(
+            results=results,
+            filename=tmp_path / "results.html",
+            versions=_stub_versions(),
+            prompt=prompt,
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+        )
+        generate_markdown_gallery_report(
+            results=results,
+            filename=tmp_path / "model_gallery.md",
+            prompt=prompt,
+            report_context=report_context,
+        )
+    assert sorted(call.args[0].model_name for call in gallery_row.call_args_list) == [
+        "org/broken",
+        "org/good",
+    ]
+    # A replaced context derives its own rows rather than reusing stale ones.
+    replaced = replace(report_context, assessments=report_context.assessments[:1])
+    assert replaced.assessment_by_model.keys() == {report_context.assessments[0][0]}
+
+
 def test_keywords_from_hints_counts_verbatim_reuse_only() -> None:
     """A count of hint keywords reused, not a judgement of whether reuse was right."""
     prompt = "Context:\n- Keyword hints: Boat, Calm Water, Marina, Yacht\n"
