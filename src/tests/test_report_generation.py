@@ -1016,7 +1016,7 @@ def test_every_summary_surface_leads_with_lane_and_input_image(tmp_path: Path) -
     )
     assert check_models._run_input_summary_rows(None, "blind", metadata_exposed_to_prompt=False)[
         1
-    ] == ("Prompt hints", "none; the prompt carried nothing about the image")
+    ] == ("Prompt hints", "no description or keyword hints")
     exposed = check_models._run_input_summary_rows(
         None, "assisted", metadata_exposed_to_prompt=True
     )

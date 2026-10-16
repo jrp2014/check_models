@@ -381,6 +381,36 @@ def test_build_prompt_blind_lane_is_concise_and_ends_with_output_schema() -> Non
     )
 
 
+def test_build_prompt_blind_lane_states_camera_facts_only() -> None:
+    """Camera date, time and GPS are facts in the blind lane; descriptive hints stay out."""
+    meta: dict[str, str | None] = {
+        "description": "Sunset over cliffs",
+        "title": "Coastal Sunset",
+        "keywords": "sunset, cliffs, ocean",
+        "date": "2025-10-01",
+        "time": "18:30",
+        "gps": "51.0N, 0.9W",
+    }
+    prompt = _build_cataloguing_prompt(meta, include_metadata_hints=False)
+
+    assert "Context: Authoritative context:" in prompt
+    assert "- Capture date/time: 2025-10-01 18:30" in prompt
+    assert "- GPS: 51.0N, 0.9W" in prompt
+    assert "recorded by the camera" in prompt
+    for hint in ("Sunset over cliffs", "Coastal Sunset", "cliffs, ocean", "hints"):
+        assert hint not in prompt
+    assert "covering relevant context and visible details" in prompt
+    assert prompt.endswith(
+        "Return exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:"
+    )
+    # Without camera facts the blind prompt is unchanged: no context at all.
+    no_camera = _build_cataloguing_prompt(
+        {key: value for key, value in meta.items() if key not in {"date", "time", "gps"}},
+        include_metadata_hints=False,
+    )
+    assert no_camera == _build_cataloguing_prompt({}, include_metadata_hints=False)
+
+
 def test_build_prompt_includes_metadata_fields() -> None:
     """Assisted prompts should distinguish authoritative facts from descriptive hints."""
     meta: dict[str, str | None] = {

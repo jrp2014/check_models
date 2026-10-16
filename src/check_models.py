@@ -17546,7 +17546,10 @@ def _build_cataloguing_prompt(
     *,
     include_metadata_hints: bool = True,
 ) -> str:
-    provenance = _build_metadata_provenance(metadata if include_metadata_hints else None)
+    # Capture date/time and GPS are recorded by the camera, not written by a
+    # person or a model, so every lane that has them states them as facts; only
+    # the descriptive title, description and keywords are lane-dependent hints.
+    provenance = _build_metadata_provenance(metadata)
     parts: list[str]
     if include_metadata_hints:
         parts = [
@@ -17557,6 +17560,16 @@ def _build_cataloguing_prompt(
                 "they are visible. Descriptive hints may be incomplete or wrong: retain details "
                 "supported by the image, correct conflicts, and add important visible details. "
                 "Prefer image evidence when a hint conflicts, and omit uncertain details."
+            ),
+        ]
+    elif provenance.has_authoritative_context:
+        parts = [
+            (
+                "Create British-English catalogue metadata using only clearly visible facts "
+                "and the supplied camera context. Treat the capture date/time and GPS, "
+                "recorded by the camera, as authoritative facts, but do not claim they are "
+                "visible. Omit uncertain details and any identity, location, event, brand, "
+                "species, period, or intent that neither the image nor this context supports."
             ),
         ]
     else:
@@ -17581,7 +17594,7 @@ def _build_cataloguing_prompt(
         if provenance.gps:
             parts.append(f"- GPS: {provenance.gps}")
 
-    if provenance.has_draft:
+    if include_metadata_hints and provenance.has_draft:
         hint_heading = (
             "Descriptive hints:"
             if provenance.has_authoritative_context
@@ -17605,16 +17618,17 @@ def _build_cataloguing_prompt(
             if keyword_hint:
                 parts.append(f"- Keyword hints: {keyword_hint}")
 
+    supplies_context = include_metadata_hints or provenance.has_authoritative_context
     description_requirement = (
         "- a 1-2-sentence factual description combining relevant context with the main visible "
         "subject, setting, action, lighting, and distinctive details;"
-        if include_metadata_hints
+        if supplies_context
         else "- a 1-2-sentence factual description of the main subject, setting, action, "
         "lighting, and distinctive details;"
     )
     keyword_requirement = (
         "- 10-18 unique, comma-separated keywords covering relevant context and visible details."
-        if include_metadata_hints
+        if supplies_context
         else "- 10-18 unique, comma-separated keywords."
     )
     parts.extend(
@@ -17658,13 +17672,14 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     else:
         include_metadata_hints = eval_mode == "assisted"
         prompt_source = (
-            "built-in (metadata hints)" if include_metadata_hints else "built-in (no hints)"
+            "built-in (metadata hints)"
+            if include_metadata_hints
+            else "built-in (no descriptive hints)"
         )
         logger.info("Generating default prompt for the '%s' evaluation lane.", eval_mode)
-        prompt = _build_cataloguing_prompt(
-            metadata if include_metadata_hints else {},
-            include_metadata_hints=include_metadata_hints,
-        )
+        # The builder decides what each lane may see: camera date/time and GPS
+        # in both, descriptive hints only when assisted.
+        prompt = _build_cataloguing_prompt(metadata, include_metadata_hints=include_metadata_hints)
         logger.debug("Using generated %s-lane prompt.", eval_mode)
         if not getattr(args, "dry_run", False):  # dry-run prints the whole prompt below
             logger.info(
@@ -20337,7 +20352,7 @@ _PROMPT_HINTS_EXPOSED: Final[str] = (
     "the image's description and keyword hints were included in the prompt, so "
     "field content may be copied from them rather than seen"
 )
-_PROMPT_HINTS_WITHHELD: Final[str] = "none; the prompt carried nothing about the image"
+_PROMPT_HINTS_WITHHELD: Final[str] = "no description or keyword hints"
 
 
 def _run_input_summary_rows(
@@ -27900,9 +27915,10 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         help=(
             "Evaluation lane: 'auto' (default) selects 'assisted' when descriptive metadata "
             "is available and 'blind' otherwise; 'triage' = brief compatibility caption, "
-            f"{TRIAGE_MAX_TOKENS} tokens; 'blind' = structured cataloguing without metadata "
-            f"hints, {DEFAULT_MAX_TOKENS} tokens; 'assisted' = structured cataloguing with "
-            f"metadata hints, {DEFAULT_MAX_TOKENS} tokens. A custom --prompt overrides the "
+            f"{TRIAGE_MAX_TOKENS} tokens; 'blind' = structured cataloguing without "
+            "descriptive hints (the camera's capture date/time and GPS are kept as facts), "
+            f"{DEFAULT_MAX_TOKENS} tokens; 'assisted' = structured cataloguing with "
+            f"descriptive hints too, {DEFAULT_MAX_TOKENS} tokens. A custom --prompt overrides the "
             "lane prompt only; the lane still governs the default token cap and report "
             "labeling."
         ),

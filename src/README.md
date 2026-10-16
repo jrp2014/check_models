@@ -1160,7 +1160,7 @@ is secondary data and does not alter current-run assessment or report guidance.
 | Lane | Prompt input | Default token cap | Intended use |
 | ---- | ------------ | ----------------- | ------------ |
 | `triage` | Image only; brief caption request | 200 | Compares plain image-caption output while providing a fast MLX-VLM compatibility and mechanical output check. |
-| `blind` | Image only; structured title, description, and keywords request | 1000 | Exercises unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model and current-run assessment. |
+| `blind` | Image plus the camera's capture date/time and GPS; structured title, description, and keywords request | 1000 | Exercises visual cataloguing without descriptive hints. The camera records date, time and GPS, so they are stated as facts; an existing title, description and keywords are withheld from the model and current-run assessment. |
 | `assisted` | Image plus descriptive title, description, or keyword hints | 1000 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
 
 `--eval-mode auto` selects `assisted` when descriptive title, description, or
@@ -1168,9 +1168,11 @@ keywords are available and `blind` otherwise. The retired `stress` and
 `quality` aliases are rejected with an actionable error naming the current
 lanes.
 
-Blind and assisted lanes expose different prompt context. Blind runs exercise
-unaided cataloguing; assisted runs ask a model to verify and improve fallible draft
-metadata while retaining authoritative location and capture context when present.
+Blind and assisted lanes expose different prompt context. Both state the
+camera's capture date/time and GPS as authoritative facts when present, since
+the camera records them. Blind runs then exercise cataloguing without
+descriptive hints; assisted runs also ask a model to verify and improve
+fallible draft metadata.
 Existing title, description, and keywords are editable hints, not ground truth.
 Literal omission of an optional hint term is evidence, not by itself a fault.
 
@@ -1188,7 +1190,7 @@ the model is asked. `--max-tokens` overrides the lane's default budget.
 
 | Options | Prompt sent | Default assessment | Default token cap |
 | ------- | ----------- | ------------------ | ----------------- |
-| `--eval-mode blind` | Built-in metadata request, no hints | metadata | 1000 |
+| `--eval-mode blind` | Built-in metadata request, camera date/time and GPS, no descriptive hints | metadata | 1000 |
 | `--eval-mode assisted` | Built-in metadata request with hints | metadata | 1000 |
 | `--eval-mode triage` | Brief caption request | general | 200 |
 | `--prompt "…"` | Exactly your custom prompt | general | 1000 |
@@ -1271,7 +1273,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `--auto-thinking-budget` | flag | `True` | When no explicit thinking flags and no `--thinking-mode` are given, cap thinking for models whose chat template leaves a thinking block open (final start marker unmatched — closed blocks and literal mentions are ignored): budget = max-tokens − 200 (skipped when that leaves under 128). Other models are unaffected and the chat template itself is never altered. The effective per-model budget is recorded in prompt diagnostics and native repro commands. Disable with `--no-auto-thinking-budget`. |
 | `--system-telemetry` | flag | snapshot | macOS thermal/memory-pressure telemetry via read-only `pmset -g` / `sysctl -n` probes (sudo-free, no system settings changed). Default: one snapshot probe pair per model taken outside timed inference. Pass `--system-telemetry` for opt-in continuous background sampling (subprocesses overlap timed inference), or `--no-system-telemetry` to disable entirely. Per-probe sample counts are recorded so an unavailable probe is reported as unavailable, never as clean. Each probe also reads the power source and power mode (`pmset -g batt` / `pmset -g`), recorded as facts and noted in the run comparison without withholding it. Independently of telemetry, a model whose wall clock outran the process clock by more than 5 s (the Mac slept or was suspended mid-model; `perf_counter` stops during sleep) gets a `wall_clock_gap_s` fact, a warning, and is excluded from throughput comparison. |
-| `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. The retired `stress`/`quality` inputs are rejected. |
+| `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without descriptive hints, keeping the camera's capture date/time and GPS; `assisted` also supplies descriptive metadata for visual verification. The retired `stress`/`quality` inputs are rejected. |
 | `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (1000; `triage` 200); an explicit value always wins over the lane default. |
 | `-t`, `--temperature` | float | checkpoint's `generation_config.json` value, else 0.0 | Sampling temperature. Unset, each model uses the temperature its checkpoint declares (a declared `do_sample: false` keeps greedy); given, the value applies to every model. |
 | `--top-p` | float | checkpoint value, else 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. Unset, taken from the checkpoint's `generation_config.json` when declared. |

@@ -423,7 +423,7 @@ class TestPreparePrompt:
             ),
             (
                 ["--eval-mode", "blind"],
-                "Lane: blind | Prompt: built-in (no hints) | Assessment: metadata | Max tokens: 1000",
+                "Lane: blind | Prompt: built-in (no descriptive hints) | Assessment: metadata | Max tokens: 1000",
             ),
             (
                 ["--eval-mode", "triage"],
@@ -526,8 +526,10 @@ class TestPreparePrompt:
         assert "metadata hints" not in result.casefold()
         assert "Context:" not in result
 
-    def test_blind_prompt_withholds_available_metadata(self, mod: types.ModuleType) -> None:
-        """Blind lane should not expose descriptive or capture metadata to the model."""
+    def test_blind_prompt_keeps_camera_facts_and_withholds_descriptive_hints(
+        self, mod: types.ModuleType
+    ) -> None:
+        """Blind lane states camera-recorded facts but never the descriptive hints."""
         args = self._make_args(eval_mode="blind")
         result = mod.prepare_prompt(
             args,
@@ -541,9 +543,11 @@ class TestPreparePrompt:
         )
 
         assert "Private reference" not in result
-        assert "2026-07-10" not in result
-        assert "51.5,-0.1" not in result
-        assert "Context:" not in result
+        assert "private, reference" not in result
+        assert "Descriptive hints" not in result
+        assert "- Capture date/time: 2026-07-10" in result
+        assert "- GPS: 51.5,-0.1" in result
+        assert "do not claim they are visible" in result
 
     def test_resolve_eval_mode_rejects_unsupported_values(self, mod: types.ModuleType) -> None:
         """Resolved report lanes should remain a closed, precisely typed set."""

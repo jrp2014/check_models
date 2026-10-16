@@ -92,6 +92,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The blind lane now gives the model the camera's capture date/time and
+  GPS, stated as authoritative facts it must not claim are visible, just as
+  the assisted lane does. The camera records them; only the descriptive
+  title, description and keywords are hints, and the blind lane still
+  withholds those. Without camera data the blind prompt is unchanged. Reports
+  label the blind lane's prompt as having "no description or keyword hints"
+  instead of "the prompt carried nothing about the image", and blind runs
+  before and after this change are not comparable because the prompt differs.
 - Tooling: the Skylos floor is now 4.50.1, which no longer reports a prose
   value under a key containing "token" as a high-entropy secret (SKY-S101;
   4.47.2 still does). The `skylos: ignore[SKY-S101]` on the
