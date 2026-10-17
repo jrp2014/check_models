@@ -103,6 +103,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Generation setup (0.17.79): one `_build_generate_kwargs(params)` builds
+  every keyword sent to mlx-vlm, always-sent settings first and optional ones
+  after; `_build_generate_extra_kwargs` is gone. The prompt preparation reads
+  `generation_config.json` once and passes it to the sampling defaults, the
+  unapplied-settings record and the EOS-by-file record, which each read it
+  before. `_DECLARED_SAMPLING_KEYS` and `_DECODING_KEYS` are built from
+  `_CHECKPOINT_SAMPLING_DESTS` instead of repeating it. Behaviour is
+  unchanged apart from the key order of a result's recorded `generate_kwargs`.
 - Generation timing (0.17.75): the single-use `PerfCounterTimer` class is
   gone; `_execute_prepared_generation` takes two `time.perf_counter()`
   readings at the same points, so the generation duration still starts

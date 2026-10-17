@@ -1320,10 +1320,7 @@ def test_sent_generate_keywords_mirror_the_kwargs_builders(test_image: Path) -> 
         kv_value_scheme="turboquant",
     )
 
-    sent = check_models._build_generate_kwargs(
-        params,
-        check_models._build_generate_extra_kwargs(params),
-    )
+    sent = check_models._build_generate_kwargs(params)
 
     assert set(sent) == set(check_models._SENT_GENERATE_KEYWORDS)
 
@@ -1332,10 +1329,7 @@ def test_disabled_top_k_is_sent_explicitly(test_image: Path) -> None:
     """top_k 0 must reach mlx-vlm, which otherwise fills it from generation_config.json."""
     params = replace(_build_params(test_image), top_k=0)
 
-    sent = check_models._build_generate_kwargs(
-        params,
-        check_models._build_generate_extra_kwargs(params),
-    )
+    sent = check_models._build_generate_kwargs(params)
 
     assert sent["top_k"] == 0
 

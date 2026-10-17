@@ -1555,13 +1555,13 @@ def test_declared_sampling_defaults_read_generation_config(tmp_path: Path) -> No
         snapshot / "generation_config.json",
         '{"do_sample": true, "temperature": 0.7, "top_p": 0.8, "top_k": 20, "eos_token_id": [1, 2]}',
     )
-    assert check_models._declared_sampling_defaults(snapshot) == {
+    generation_config = check_models._read_snapshot_json(snapshot, "generation_config.json")
+    assert check_models._declared_sampling_defaults(generation_config) == {
         "do_sample": True,
         "temperature": 0.7,
         "top_p": 0.8,
         "top_k": 20,
     }
-    assert check_models._declared_sampling_defaults(tmp_path / "missing") == {}
     assert check_models._declared_sampling_defaults(None) == {}
 
 
@@ -2054,12 +2054,13 @@ def test_checkpoint_file_facts_record_what_each_file_declares(tmp_path: Path) ->
     }
     for name, payload in files.items():
         check_models._write_text_file(snapshot / name, json.dumps(payload))
+    generation_config = check_models._read_snapshot_json(snapshot, "generation_config.json")
     unapplied = check_models._unapplied_generation_settings(
-        snapshot, {"temperature": "generation_config", "repetition_penalty": "default"}
+        generation_config, {"temperature": "generation_config", "repetition_penalty": "default"}
     )
     # Applied keys and bookkeeping are left out; what nothing applied is kept with its value.
     assert unapplied == {"max_new_tokens": 16384, "repetition_penalty": 1.05}
-    assert check_models._declared_eos_token_ids(snapshot) == {
+    assert check_models._declared_eos_token_ids(snapshot, generation_config) == {
         "config.json text_config": [1, 2],
         "generation_config.json": 2,
     }

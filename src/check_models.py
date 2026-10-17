@@ -5506,12 +5506,12 @@ def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
 
 # The drift detector checks only the surface check_models actually calls.
 # _GENERATE_CALL_ARGS are the call-site positional/required arguments;
-# _SENT_GENERATE_KEYWORDS mirrors _build_generate_kwargs /
-# _build_generate_extra_kwargs exactly (locked by a builder-parity test), so
+# _SENT_GENERATE_KEYWORDS mirrors _build_generate_kwargs exactly (locked by
+# a builder-parity test), so
 # upstream parameters this harness never passes cannot raise false drift.
 _GENERATE_CALL_ARGS: Final[tuple[str, ...]] = ("model", "processor", "prompt", "image")
 _SENT_GENERATE_KEYWORDS: Final[tuple[str, ...]] = (
-    # Always sent by _build_generate_kwargs
+    # Always sent
     "verbose",
     "temperature",
     "top_p",
@@ -5530,7 +5530,7 @@ _SENT_GENERATE_KEYWORDS: Final[tuple[str, ...]] = (
     "kv_group_size",
     "quantized_kv_start",
     "max_tokens",
-    # Conditionally sent by _build_generate_extra_kwargs
+    # Sent only when set
     "kv_key_bits",
     "kv_value_bits",
     "kv_key_scheme",
@@ -12394,42 +12394,6 @@ def _validate_unique_model_ids(models: Sequence[str] | None) -> None:
         raise ValueError(msg)
 
 
-def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
-    """Collect optional generate kwargs for benchmark runs."""
-    extra_kwargs: GenerateKwargs = {}
-    if params.min_p > 0.0:
-        extra_kwargs["min_p"] = params.min_p
-    if params.prefill_step_size is not None:
-        extra_kwargs["prefill_step_size"] = params.prefill_step_size
-    if params.resize_shape is not None:
-        extra_kwargs["resize_shape"] = params.resize_shape
-    if params.eos_tokens is not None:
-        extra_kwargs["eos_tokens"] = list(params.eos_tokens)
-    # Per-tensor KV fields are merged through a cast because PyPI mlx-vlm
-    # releases before per-tensor KV quantization lack these GenerateKwargs
-    # keys, and CI type-checks against release stubs.
-    per_tensor_kv_kwargs: dict[str, float | str] = {}
-    if params.kv_key_bits is not None:
-        per_tensor_kv_kwargs["kv_key_bits"] = params.kv_key_bits
-    if params.kv_value_bits is not None:
-        per_tensor_kv_kwargs["kv_value_bits"] = params.kv_value_bits
-    if params.kv_key_scheme is not None:
-        per_tensor_kv_kwargs["kv_key_scheme"] = params.kv_key_scheme
-    if params.kv_value_scheme is not None:
-        per_tensor_kv_kwargs["kv_value_scheme"] = params.kv_value_scheme
-    extra_kwargs.update(cast("GenerateKwargs", per_tensor_kv_kwargs))
-    if params.skip_special_tokens:
-        extra_kwargs["skip_special_tokens"] = True
-    if params.enable_thinking:
-        extra_kwargs["enable_thinking"] = True
-        extra_kwargs["thinking_end_token"] = params.thinking_end_token
-        if params.thinking_budget is not None:
-            extra_kwargs["thinking_budget"] = params.thinking_budget
-        if params.thinking_start_token is not None:
-            extra_kwargs["thinking_start_token"] = params.thinking_start_token
-    return extra_kwargs
-
-
 def _prompt_opens_thinking_block(
     formatted_prompt: str,
     pair: ThinkingDelimiterPair,
@@ -12505,33 +12469,62 @@ def _apply_auto_thinking_budget(
     return True
 
 
-def _build_generate_kwargs(
-    params: ProcessImageParams,
-    extra_kwargs: GenerateKwargs,
-) -> GenerateKwargs:
+def _build_generate_kwargs(params: ProcessImageParams) -> GenerateKwargs:
     """Build the complete typed keyword contract for one upstream generate call."""
-    generate_kwargs = extra_kwargs.copy()
-    generate_kwargs["verbose"] = params.verbose
-    generate_kwargs["temperature"] = params.temperature
-    generate_kwargs["top_p"] = params.top_p
-    # Sent even at 0 (disabled): mlx-vlm 73d366e fills an omitted top_k from
-    # the checkpoint's generation_config.json, which would bypass
-    # _apply_declared_sampling and the recorded sampling sources.
-    generate_kwargs["top_k"] = params.top_k
-    generate_kwargs["repetition_penalty"] = params.repetition_penalty
-    generate_kwargs["repetition_context_size"] = params.repetition_context_size
-    generate_kwargs["seed"] = params.seed
-    generate_kwargs["presence_penalty"] = params.presence_penalty
-    generate_kwargs["presence_context_size"] = params.presence_context_size
-    generate_kwargs["frequency_penalty"] = params.frequency_penalty
-    generate_kwargs["frequency_context_size"] = params.frequency_context_size
-    generate_kwargs["logit_bias"] = params.logit_bias
-    generate_kwargs["max_kv_size"] = params.max_kv_size
-    generate_kwargs["kv_bits"] = params.kv_bits
-    generate_kwargs["kv_quant_scheme"] = params.kv_quant_scheme
-    generate_kwargs["kv_group_size"] = params.kv_group_size
-    generate_kwargs["quantized_kv_start"] = params.quantized_kv_start
-    generate_kwargs["max_tokens"] = params.max_tokens
+    generate_kwargs: GenerateKwargs = {
+        "verbose": params.verbose,
+        "temperature": params.temperature,
+        "top_p": params.top_p,
+        # Sent even at 0 (disabled): mlx-vlm 73d366e fills an omitted top_k from
+        # the checkpoint's generation_config.json, which would bypass
+        # _apply_declared_sampling and the recorded sampling sources.
+        "top_k": params.top_k,
+        "repetition_penalty": params.repetition_penalty,
+        "repetition_context_size": params.repetition_context_size,
+        "seed": params.seed,
+        "presence_penalty": params.presence_penalty,
+        "presence_context_size": params.presence_context_size,
+        "frequency_penalty": params.frequency_penalty,
+        "frequency_context_size": params.frequency_context_size,
+        "logit_bias": params.logit_bias,
+        "max_kv_size": params.max_kv_size,
+        "kv_bits": params.kv_bits,
+        "kv_quant_scheme": params.kv_quant_scheme,
+        "kv_group_size": params.kv_group_size,
+        "quantized_kv_start": params.quantized_kv_start,
+        "max_tokens": params.max_tokens,
+    }
+    # Optional settings, sent only when set.
+    if params.min_p > 0.0:
+        generate_kwargs["min_p"] = params.min_p
+    if params.prefill_step_size is not None:
+        generate_kwargs["prefill_step_size"] = params.prefill_step_size
+    if params.resize_shape is not None:
+        generate_kwargs["resize_shape"] = params.resize_shape
+    if params.eos_tokens is not None:
+        generate_kwargs["eos_tokens"] = list(params.eos_tokens)
+    # Per-tensor KV fields are merged through a cast because PyPI mlx-vlm
+    # releases before per-tensor KV quantization lack these GenerateKwargs
+    # keys, and CI type-checks against release stubs.
+    per_tensor_kv_kwargs: dict[str, float | str] = {}
+    if params.kv_key_bits is not None:
+        per_tensor_kv_kwargs["kv_key_bits"] = params.kv_key_bits
+    if params.kv_value_bits is not None:
+        per_tensor_kv_kwargs["kv_value_bits"] = params.kv_value_bits
+    if params.kv_key_scheme is not None:
+        per_tensor_kv_kwargs["kv_key_scheme"] = params.kv_key_scheme
+    if params.kv_value_scheme is not None:
+        per_tensor_kv_kwargs["kv_value_scheme"] = params.kv_value_scheme
+    generate_kwargs.update(cast("GenerateKwargs", per_tensor_kv_kwargs))
+    if params.skip_special_tokens:
+        generate_kwargs["skip_special_tokens"] = True
+    if params.enable_thinking:
+        generate_kwargs["enable_thinking"] = True
+        generate_kwargs["thinking_end_token"] = params.thinking_end_token
+        if params.thinking_budget is not None:
+            generate_kwargs["thinking_budget"] = params.thinking_budget
+        if params.thinking_start_token is not None:
+            generate_kwargs["thinking_start_token"] = params.thinking_start_token
     return generate_kwargs
 
 
@@ -12715,31 +12708,23 @@ def _optional_mlx_vlm_utils_attribute(name: str) -> object | None:
     return getattr(utils_module, name, None)
 
 
-_DECLARED_SAMPLING_KEYS: Final[tuple[str, ...]] = (
-    "do_sample",
-    "temperature",
-    "top_p",
-    "top_k",
-    "min_p",
-    "repetition_penalty",
-)
+_DECLARED_SAMPLING_KEYS: Final[tuple[str, ...]] = ("do_sample", *_CHECKPOINT_SAMPLING_DESTS)
 
 
-def _declared_sampling_defaults(snapshot_path: Path | None) -> dict[str, JsonLike]:
+def _declared_sampling_defaults(
+    generation_config: Mapping[str, JsonLike] | None,
+) -> dict[str, JsonLike]:
     """Return the sampling defaults a checkpoint's generation_config.json declares.
 
     This is the structured form of a model card's "recommended settings":
     authors ship them in the snapshot, so no prose parsing is needed. Facts
     only; the harness keeps its own fixed settings.
     """
-    if snapshot_path is None:
-        return {}
-    payload = _read_snapshot_json(snapshot_path, "generation_config.json")
-    if not isinstance(payload, dict):
+    if generation_config is None:
         return {}
     declared: dict[str, JsonLike] = {}
     for key in _DECLARED_SAMPLING_KEYS:
-        value = payload.get(key)
+        value = generation_config.get(key)
         if isinstance(value, bool | int | float):
             declared[key] = value
     return declared
@@ -12902,24 +12887,23 @@ _CHAT_TEMPLATE_FILES: Final[tuple[str, ...]] = (
 
 
 def _unapplied_generation_settings(
-    snapshot_path: Path | None, sampling_sources: Mapping[str, str]
+    generation_config: Mapping[str, JsonLike] | None, sampling_sources: Mapping[str, str]
 ) -> dict[str, JsonLike]:
     """generation_config.json settings that nothing in this run applied, with their values."""
-    if snapshot_path is None:
-        return {}
-    payload = _read_snapshot_json(snapshot_path, "generation_config.json")
-    if not isinstance(payload, dict):
+    if generation_config is None:
         return {}
     applied = {key for key, source in sampling_sources.items() if source == "generation_config"}
     applied |= {"do_sample", "eos_token_id"} & set(upstream_generation_config_keys)
     return {
         key: _prompt_diag_json_value(value)
-        for key, value in sorted(payload.items())
+        for key, value in sorted(generation_config.items())
         if key not in applied and key not in _GENERATION_CONFIG_BOOKKEEPING and value is not None
     }
 
 
-def _declared_eos_token_ids(snapshot_path: Path | None) -> dict[str, JsonLike]:
+def _declared_eos_token_ids(
+    snapshot_path: Path | None, generation_config: Mapping[str, JsonLike] | None
+) -> dict[str, JsonLike]:
     """EOS ids from each checkpoint file that declares them (files can disagree)."""
     if snapshot_path is None:
         return {}
@@ -12933,9 +12917,10 @@ def _declared_eos_token_ids(snapshot_path: Path | None) -> dict[str, JsonLike]:
             declared["config.json text_config"] = _prompt_diag_json_value(
                 text_config["eos_token_id"]
             )
-    generation = _read_snapshot_json(snapshot_path, "generation_config.json")
-    if isinstance(generation, dict) and generation.get("eos_token_id") is not None:
-        declared["generation_config.json"] = _prompt_diag_json_value(generation["eos_token_id"])
+    if generation_config is not None and generation_config.get("eos_token_id") is not None:
+        declared["generation_config.json"] = _prompt_diag_json_value(
+            generation_config["eos_token_id"]
+        )
     return declared
 
 
@@ -13023,15 +13008,16 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
     snapshot_notes: tuple[str, ...] = (),
     prepared_input_token_count: int | None = None,
     image_token_count: int | None = None,
-    declared_sampling: Mapping[str, JsonLike] | None = None,
-    sampling_sources: Mapping[str, str] | None = None,
+    snapshot_path: Path | None,
+    generation_config: Mapping[str, JsonLike] | None,
+    declared_sampling: Mapping[str, JsonLike],
+    sampling_sources: Mapping[str, str],
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
     tokenizer = _extract_processor_tokenizer(processor)
     model_type_raw = _get_config_value(config, "model_type")
     model_type = str(model_type_raw) if model_type_raw is not None else None
     eos_token = getattr(tokenizer, "eos_token", None)
-    snapshot_path = _resolve_model_snapshot_path(params.model_identifier, params.revision)
     template_variables = _chat_template_variables(processor)
     passed_template_kwargs = _build_chat_template_kwargs(params)
     return PromptDiagnostics(
@@ -13057,16 +13043,12 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         thinking_budget_source=thinking_budget_source,
         template_thinking_markers=_template_declares_thinking(snapshot_path),
-        declared_sampling=(
-            dict[str, JsonLike](declared_sampling)
-            if declared_sampling is not None
-            else _declared_sampling_defaults(snapshot_path)
-        ),
-        sampling_sources=dict(sampling_sources or {}),
+        declared_sampling=dict(declared_sampling),
+        sampling_sources=dict(sampling_sources),
         unapplied_generation_settings=_unapplied_generation_settings(
-            snapshot_path, sampling_sources or {}
+            generation_config, sampling_sources
         ),
-        declared_eos_token_ids=_declared_eos_token_ids(snapshot_path),
+        declared_eos_token_ids=_declared_eos_token_ids(snapshot_path, generation_config),
         chat_template_sources=_chat_template_sources(snapshot_path),
         chat_template_variables=template_variables,
         unread_chat_template_kwargs=tuple(
@@ -14702,12 +14684,16 @@ def _prepare_generation(
         "\n".join(str(m) for m in formatted) if isinstance(formatted, list) else formatted
     )
 
-    extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
-    generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
-    declared_sampling = _declared_sampling_defaults(
-        _resolve_model_snapshot_path(params.model_identifier, params.revision)
+    generate_kwargs = _build_generate_kwargs(params)
+    # One read of generation_config.json serves sampling and the diagnostics.
+    snapshot_path = _resolve_model_snapshot_path(params.model_identifier, params.revision)
+    generation_config = (
+        _read_snapshot_json(snapshot_path, "generation_config.json")
+        if snapshot_path is not None
+        else None
     )
+    declared_sampling = _declared_sampling_defaults(generation_config)
     sampling_sources = _apply_declared_sampling(
         generate_kwargs, declared_sampling, params.explicit_sampling
     )
@@ -14749,6 +14735,8 @@ def _prepare_generation(
         snapshot_notes=prepared_prompt.snapshot_notes,
         prepared_input_token_count=prepared_input_token_count,
         image_token_count=image_token_count,
+        snapshot_path=snapshot_path,
+        generation_config=generation_config,
         declared_sampling=declared_sampling,
         sampling_sources=sampling_sources,
     )
@@ -21342,14 +21330,7 @@ def _record_repetition_aborted(record: JsonlResultRecord) -> bool:
     return "repetition_abort" in record["assessment"]["observations"]
 
 
-_DECODING_KEYS: Final[tuple[str, ...]] = (
-    "temperature",
-    "top_p",
-    "top_k",
-    "min_p",
-    "repetition_penalty",
-    "seed",
-)
+_DECODING_KEYS: Final[tuple[str, ...]] = (*_CHECKPOINT_SAMPLING_DESTS, "seed")
 _DECODING_GROUP_LABELS: Final[tuple[tuple[str, str], ...]] = (
     ("greedy", "greedy"),
     ("sampled", "sampled, same settings and seed"),
