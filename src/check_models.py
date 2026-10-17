@@ -445,7 +445,7 @@ def _read_text_file(path: Path, *, max_bytes: int = MAX_SAFE_TEXT_FILE_BYTES) ->
     remaining = max_bytes + 1
     try:
         while remaining > 0:
-            chunk = os.read(  # skylos: ignore[SKY-P401] bounded by max_bytes.
+            chunk = os.read(
                 fd,
                 min(remaining, SAFE_TEXT_FILE_READ_CHUNK_BYTES),
             )

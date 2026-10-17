@@ -72,11 +72,13 @@ Then take the first option that holds:
    search is not proof of dead code. Cross-check with `make vulture`.
 3. **Inline suppression** on the reported line, naming the rule and the
    reason: `# skylos: ignore[SKY-D215] path is canonicalized and opened with
-   O_NOFOLLOW.` The suppression audit (`tools/check_suppressions.py`) does
-   not re-check Skylos comments, so a stale one stays silently; if it works
-   around a Skylos bug, name the Skylos version and record when to remove it
-   (as the SKY-S101 and SKY-D223 comments in `check_models.py` did until
-   Skylos fixed them).
+   O_NOFOLLOW.` The suppression audit (`tools/check_suppressions.py`) runs
+   one Skylos scan limited to the rules these comments name and fails any
+   comment that suppressed nothing, so a stale one surfaces after an upgrade
+   (two `SKY-P401` comments on bounded `os.read` calls went that way). If it
+   works around a Skylos bug, name the Skylos version and record when to
+   remove it (as the SKY-S101 and SKY-D223 comments in `check_models.py` did
+   until Skylos fixed them).
 4. **Project-wide `ignore`** only for a rule the project rejects as policy,
    with a one-line reason, in both config files. Never raise a `[gate]`
    threshold instead: `max_quality = 0` is deliberate.

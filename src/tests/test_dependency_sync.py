@@ -2224,6 +2224,162 @@ def test_run_for_finding_uses_active_python_for_ruff(
     assert recorded_args[:4] == [sys.executable, "-m", "ruff", "check"]
 
 
+def test_find_suppressions_detects_ty_and_skylos_directives(tmp_path: Path) -> None:
+    """Both ty and Skylos ignores are findings, even beside a noqa on the same line."""
+    file_path = tmp_path / "sample.py"
+    file_path.write_text(
+        "def f(a, b):  # noqa: PLR0913 - shared why  # skylos: ignore[SKY-C303]\n"
+        "    return a  # ty: ignore[invalid-return-type]  # stub is wrong\n"
+        "x = 1  # skylos: ignore\n"
+        "y = 2  # ty: ignore\n",
+        encoding="utf-8",
+    )
+
+    findings = check_suppressions.find_suppressions(file_path)
+
+    assert [(finding.line_num, finding.kind, finding.codes) for finding in findings] == [
+        (1, "noqa", ("PLR0913",)),
+        (1, "skylos-ignore", ("SKY-C303",)),
+        (2, "ty-ignore", ("invalid-return-type",)),
+        (3, "bare-skylos-ignore", ()),
+        (4, "bare-ty-ignore", ()),
+    ]
+    # A Skylos ignore beside a justified noqa shares that justification; the
+    # ty ignore carries its own.
+    assert check_suppressions._suppression_rationale(findings[1]) == "shared why"
+    assert check_suppressions._suppression_rationale(findings[2]) == "stub is wrong"
+    for bare in findings[3:]:
+        needed, reason = check_suppressions.check_if_needed(
+            bare, repo_root=tmp_path, src_root=tmp_path
+        )
+        assert needed is False
+        assert "not allowed" in reason
+
+
+def test_skylos_audit_keeps_only_ignores_that_suppressed_a_finding(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """One scan, limited to the named rules; an ignore Skylos did not use is stale."""
+    file_path = tmp_path / "sample.py"
+    file_path.write_text(
+        "fd = os.open(path)  # skylos: ignore[SKY-D215] canonicalized above\n"
+        "chunk = os.read(fd, 10)  # skylos: ignore[SKY-P401] bounded read\n",
+        encoding="utf-8",
+    )
+    findings = check_suppressions.find_suppressions(file_path)
+    recorded: dict[str, object] = {}
+
+    def fake_run(args: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        recorded["args"] = args
+        recorded["cwd"] = kwargs["cwd"]
+        recorded["report"] = report = Path(args[args.index("-o") + 1])
+        safe_io.write_text_no_follow(
+            report,
+            json.dumps(
+                {
+                    "suppressed": [
+                        {"rule_id": "SKY-D215", "file": str(file_path), "line": 1},
+                        {"file": str(file_path), "line": 2},
+                    ]
+                }
+            ),
+        )
+        return subprocess.CompletedProcess(args=args, returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(check_suppressions, "_python_tool", lambda name: f"/bin/{name}")
+    monkeypatch.setattr(check_suppressions.subprocess, "run", fake_run)
+
+    outputs = check_suppressions._skylos_audit_outputs(findings, src_root=tmp_path)
+
+    args = recorded["args"]
+    assert isinstance(args, list)
+    assert args[args.index("--select") + 1] == "SKY-D215,SKY-P401"
+    assert recorded["cwd"] == tmp_path
+    report_path = recorded["report"]
+    assert isinstance(report_path, Path)
+    assert not report_path.exists()
+    verdicts = [
+        check_suppressions.check_if_needed(
+            finding,
+            repo_root=tmp_path,
+            src_root=tmp_path,
+            audit_output=check_suppressions._batched_output_for(finding, {}, outputs),
+        )
+        for finding in findings
+    ]
+    assert verdicts == [
+        (True, "Suppression needed: SKY-D215 violations found"),
+        (False, "No violation found for: SKY-P401"),
+    ]
+
+
+def test_skylos_and_ty_audits_skip_when_the_tool_is_missing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    file_path = tmp_path / "sample.py"
+    file_path.write_text(
+        "x = f()  # skylos: ignore[SKY-D215] trusted literal\n"
+        "y = g()  # ty: ignore[call-non-callable]  # stub is wrong\n",
+        encoding="utf-8",
+    )
+    findings = check_suppressions.find_suppressions(file_path)
+    monkeypatch.setattr(check_suppressions, "_python_tool", lambda _name: None)
+
+    skylos_outputs = check_suppressions._skylos_audit_outputs(findings, src_root=tmp_path)
+
+    assert skylos_outputs is None
+    verdicts = [
+        check_suppressions.check_if_needed(
+            finding,
+            repo_root=tmp_path,
+            src_root=tmp_path,
+            audit_output=check_suppressions._batched_output_for(finding, {}, skylos_outputs),
+        )
+        for finding in findings
+    ]
+    assert verdicts == [
+        (True, "Skipped skylos audit because skylos is unavailable"),
+        (True, "Skipped ty audit because ty is unavailable"),
+    ]
+
+
+def test_run_for_finding_reruns_ty_without_only_the_ty_ignore(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The ty variant keeps the line's type: ignore, so mypy's suppression is not counted."""
+    file_path = tmp_path / "sample.py"
+    line = "    def encoding(self) -> str:  # type: ignore[override]  # ty: ignore[bad]  # why"
+    file_path.write_text(f"class A:\n{line}\n        return ''\n", encoding="utf-8")
+    finding = check_suppressions.find_suppressions(file_path)[-1]
+    assert finding.kind == "ty-ignore"
+    seen: dict[str, object] = {}
+
+    def fake_run(args: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        seen["args"] = args
+        seen["cwd"] = kwargs["cwd"]
+        seen["line"] = safe_io.read_text_no_follow(Path(args[-1])).splitlines()[1]
+        return subprocess.CompletedProcess(
+            args=args, returncode=1, stdout="x.py:2:9: error[bad] message", stderr=""
+        )
+
+    monkeypatch.setattr(check_suppressions, "_python_tool", lambda name: f"/bin/{name}")
+    monkeypatch.setattr(check_suppressions.subprocess, "run", fake_run)
+
+    needed, reason = check_suppressions.check_if_needed(
+        finding, repo_root=tmp_path, src_root=tmp_path
+    )
+
+    assert (needed, reason) == (True, "Suppression needed: bad violations found")
+    args = seen["args"]
+    assert isinstance(args, list)
+    assert args[:4] == ["/bin/ty", "check", "--python", sys.executable]
+    assert seen["cwd"] == tmp_path
+    assert seen["line"] == "    def encoding(self) -> str:  # type: ignore[override]  # why"
+
+
 def test_claude_instructions_are_a_link_to_agents_instructions() -> None:
     """One instruction file: CLAUDE.md is a symlink to AGENTS.md, never a mirrored copy."""
     claude = REPO_ROOT / "CLAUDE.md"

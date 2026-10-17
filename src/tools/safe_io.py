@@ -62,7 +62,7 @@ def read_text_no_follow(
     remaining = max_bytes + 1
     try:
         while remaining > 0:
-            chunk = os.read(  # skylos: ignore[SKY-P401] bounded by max_bytes.
+            chunk = os.read(
                 fd,
                 min(remaining, SAFE_TEXT_FILE_READ_CHUNK_BYTES),
             )

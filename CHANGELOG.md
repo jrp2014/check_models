@@ -103,6 +103,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Suppression audit (0.17.87): `tools/check_suppressions.py` now rechecks
+  `# ty: ignore[...]` and `# skylos: ignore[...]` comments as well. ty reruns
+  on a copy without the ty ignore (keeping any `type: ignore` on the line), as
+  mypy and Ruff already did for theirs. Skylos runs once, limited to the rules
+  the comments name (about 45 s), and a comment fails when Skylos's own list
+  of suppressed findings does not include it. Bare ty or Skylos ignores fail,
+  and a ty or Skylos ignore with no reason of its own may share the reason
+  given by a `noqa` on the same line. A missing ty or Skylos skips its checks,
+  as a missing ShellCheck already does. The first run found two stale
+  `SKY-P401` ignores on bounded `os.read` calls in `check_models.py` and
+  `tools/safe_io.py`. Skylos 4.50.1 treats a read with a size as bounded, so
+  both are removed.
 - CI (0.17.86): the Python 3.15 lane of the static-quality job is on hold
   until 2026-11-01, at john's request. Before that date (UTC) its install
   step prints a "Next Python lane on hold" warning and skips the checks,

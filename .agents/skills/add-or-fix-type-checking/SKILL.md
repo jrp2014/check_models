@@ -207,8 +207,9 @@ Always add the specific error code: `# type: ignore[call-arg]`, not bare
   correctness cannot depend on them; use `if ...: raise` instead.
 - **`# type: ignore` as a first resort.** Try the approaches above first: a
   suppression also hides the next real error on that line.
-- **Bare `# type: ignore`.** Name the error code, so the suppression audit in
-  the quality gate can check the suppression is still needed.
+- **Bare `# type: ignore` or `# ty: ignore`.** Name the error code or ty
+  rule, so the suppression audit in the quality gate can rerun mypy or ty
+  without it and check the suppression is still needed.
 - Do not use `cast()` when `@overload` or generics can eliminate it at the
   source.
 - Do not add helper methods or abstractions just to satisfy the type checker

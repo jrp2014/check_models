@@ -1,8 +1,11 @@
 """Audit inline suppressions so stale or overly broad ones fail quality checks.
 
-Scope: per-line ``# noqa``, ``# type: ignore``, and ``# shellcheck disable``
-comments, each re-checked without the suppression to prove it still earns
-its keep. Configuration-wide suppressions (Ruff ``ignore`` /
+Scope: per-line ``# noqa``, ``# type: ignore``, ``# ty: ignore``,
+``# skylos: ignore`` and ``# shellcheck disable`` comments, each re-checked to
+prove it still earns its keep. Ruff, mypy, ty and ShellCheck rerun on a copy
+without the suppression; one Skylos scan, limited to the rules the comments
+name, reports which findings each ``skylos: ignore`` actually suppressed.
+Configuration-wide suppressions (Ruff ``ignore`` /
 ``per-file-ignores``, Skylos ``ignore``, mypy overrides, markdownlint
 rules) are deliberate policy in ``src/pyproject.toml``, ``.skylos/config.yaml``,
 and ``.markdownlint.jsonc``; review those by hand when they change.
@@ -35,9 +38,17 @@ SuppressionKind = Literal[
     "noqa",
     "type-ignore",
     "shellcheck",
+    "ty-ignore",
+    "skylos-ignore",
     "bare-noqa",
     "bare-type-ignore",
+    "bare-ty-ignore",
+    "bare-skylos-ignore",
 ]
+# Kinds whose checker prints each diagnostic's code in brackets.
+BRACKETED_CODE_KINDS: Final[frozenset[SuppressionKind]] = frozenset(
+    {"type-ignore", "ty-ignore", "skylos-ignore"}
+)
 
 PYTHON_SUFFIXES: Final[frozenset[str]] = frozenset({".py"})
 SHELL_SUFFIXES: Final[frozenset[str]] = frozenset({".sh"})
@@ -77,6 +88,25 @@ TYPE_IGNORE_SPECIFIC_RE: Final[re.Pattern[str]] = re.compile(
 )
 TYPE_IGNORE_BARE_RE: Final[re.Pattern[str]] = re.compile(r"#\s*type:\s*ignore(?!\[)\b")
 SHELLCHECK_RE: Final[re.Pattern[str]] = re.compile(r"#\s*shellcheck\s+disable=([A-Z0-9,\s]+)")
+TY_IGNORE_SPECIFIC_RE: Final[re.Pattern[str]] = re.compile(r"#\s*ty:\s*ignore\[([^\]]+)\]")
+TY_IGNORE_BARE_RE: Final[re.Pattern[str]] = re.compile(r"#\s*ty:\s*ignore(?!\[)\b")
+SKYLOS_IGNORE_SPECIFIC_RE: Final[re.Pattern[str]] = re.compile(
+    r"#\s*skylos:\s*ignore\[([^\]]+)\]",
+)
+SKYLOS_IGNORE_BARE_RE: Final[re.Pattern[str]] = re.compile(r"#\s*skylos:\s*ignore(?!\[)\b")
+# A line may carry several of these; each is its own finding.
+_PYTHON_DIRECTIVES: Final[
+    tuple[tuple[re.Pattern[str], re.Pattern[str], SuppressionKind, SuppressionKind], ...]
+] = (
+    (TY_IGNORE_SPECIFIC_RE, TY_IGNORE_BARE_RE, "ty-ignore", "bare-ty-ignore"),
+    (SKYLOS_IGNORE_SPECIFIC_RE, SKYLOS_IGNORE_BARE_RE, "skylos-ignore", "bare-skylos-ignore"),
+)
+# Checkers a run may lack; their suppressions are skipped rather than failed.
+_OPTIONAL_AUDIT_TOOLS: Final[dict[SuppressionKind, str]] = {
+    "shellcheck": "shellcheck",
+    "ty-ignore": "ty",
+    "skylos-ignore": "skylos",
+}
 
 
 def _split_codes(raw_codes: str) -> tuple[str, ...]:
@@ -193,6 +223,29 @@ def _find_python_suppressions(file_path: Path) -> list[SuppressionFinding]:
                 ),
             )
 
+        for specific_re, bare_re, kind, bare_kind in _PYTHON_DIRECTIVES:
+            specific_match = specific_re.search(comment_text)
+            if specific_match:
+                suppressions.append(
+                    SuppressionFinding(
+                        file_path=file_path,
+                        line_num=line_num,
+                        kind=kind,
+                        codes=_split_codes(specific_match.group(1)),
+                        line_text=line_text,
+                    ),
+                )
+            elif bare_re.search(comment_text):
+                suppressions.append(
+                    SuppressionFinding(
+                        file_path=file_path,
+                        line_num=line_num,
+                        kind=bare_kind,
+                        codes=(),
+                        line_text=line_text,
+                    ),
+                )
+
     return suppressions
 
 
@@ -210,6 +263,8 @@ def _remove_suppression_from_line(line: str, kind: SuppressionKind) -> str:
         return re.sub(r"\s*#\s*noqa:[^#\n]*", "", line)
     if kind == "type-ignore":
         return re.sub(r"\s*#\s*type:\s*ignore\[[^\]]+\]", "", line)
+    if kind == "ty-ignore":
+        return re.sub(r"\s*#\s*ty:\s*ignore\[[^\]]+\]", "", line)
     if kind == "shellcheck":
         return ""
     return line
@@ -237,54 +292,63 @@ def _write_temp_variant(file_path: Path, line_num: int, kind: SuppressionKind) -
         return Path(handle.name)
 
 
+def _python_tool(name: str) -> str | None:
+    """Return a tool installed beside the running interpreter, else one on PATH."""
+    beside_interpreter = Path(sys.executable).parent / name
+    if beside_interpreter.is_file():
+        return str(beside_interpreter)
+    return shutil.which(name)
+
+
 def _run_for_finding(
     finding: SuppressionFinding,
     *,
     repo_root: Path,
     src_root: Path,
 ) -> subprocess.CompletedProcess[str] | None:
-    """Run the relevant linter on a temporary file without the suppression."""
+    """Run the relevant linter on a temporary file without the suppression.
+
+    Returns ``None`` when no runner exists for the kind or its tool is missing.
+    """
     temp_path: Path = _write_temp_variant(finding.file_path, finding.line_num, finding.kind)
+    command: list[str] | None = None
+    cwd = src_root
+    if finding.kind == "noqa":
+        command = [sys.executable, "-m", "ruff", "check", str(temp_path)]
+    elif finding.kind == "type-ignore":
+        command = [
+            sys.executable,
+            "-m",
+            "mypy",
+            "--show-error-codes",
+            "--hide-error-context",
+            "--no-error-summary",
+            str(temp_path),
+        ]
+    elif finding.kind == "ty-ignore" and (ty_path := _python_tool("ty")) is not None:
+        command = [
+            ty_path,
+            "check",
+            "--python",
+            sys.executable,
+            "--output-format",
+            "concise",
+            str(temp_path),
+        ]
+    elif finding.kind == "shellcheck" and (shellcheck_path := shutil.which("shellcheck")):
+        command = [shellcheck_path, "-x", str(temp_path)]
+        cwd = repo_root
     try:
-        if finding.kind == "noqa":
-            return subprocess.run(  # noqa: S603 - fixed interpreter over a repo-local temp file
-                [sys.executable, "-m", "ruff", "check", str(temp_path)],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                check=False,
-                cwd=src_root,
-            )
-        if finding.kind == "type-ignore":
-            return subprocess.run(  # noqa: S603 - fixed interpreter over a repo-local temp file
-                [
-                    sys.executable,
-                    "-m",
-                    "mypy",
-                    "--show-error-codes",
-                    "--hide-error-context",
-                    "--no-error-summary",
-                    str(temp_path),
-                ],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                check=False,
-                cwd=src_root,
-            )
-        if finding.kind == "shellcheck":
-            shellcheck_path = shutil.which("shellcheck")
-            if shellcheck_path is None:
-                return None
-            return subprocess.run(  # noqa: S603 - resolved absolute binary over a repo-local temp file
-                [shellcheck_path, "-x", str(temp_path)],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                check=False,
-                cwd=repo_root,
-            )
-        return None
+        if command is None:
+            return None
+        return subprocess.run(  # noqa: S603 - fixed interpreter or resolved tool over a repo-local temp file
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+            cwd=cwd,
+        )
     finally:
         temp_path.unlink(missing_ok=True)
 
@@ -350,17 +414,92 @@ def _batch_noqa_audit_outputs(
     return {key: "\n".join(lines_by_variant[path.resolve()]) for key, path in variants.items()}
 
 
-def _batched_output_for(
-    finding: SuppressionFinding, outputs: dict[tuple[Path, int], str]
-) -> str | None:
-    """Return the batched ruff output for a noqa finding; other kinds run their own checker.
+def _skylos_audit_outputs(
+    findings: Sequence[SuppressionFinding],
+    *,
+    src_root: Path,
+) -> dict[tuple[Path, int], str] | None:
+    """Return, per ``skylos: ignore`` line, the rules Skylos says it suppressed there.
 
-    The batch is keyed by file and line, and a line may carry both a noqa and
-    a type: ignore, so the kind guard keeps mypy findings off ruff's output.
+    One scan of ``src_root`` limited to the rules the comments name (about 45 s
+    on this tree, against minutes for the full gate). Skylos's JSON lists every
+    finding an inline ignore suppressed, so a comment absent from that list no
+    longer suppresses anything. Each value holds bracketed rule IDs, matching
+    the ``[CODE]`` check in ``check_if_needed``. Returns ``None`` when Skylos
+    is not installed; raises ``RuntimeError`` when the scan leaves no report.
     """
-    if finding.kind != "noqa":
+    skylos_findings = [
+        finding for finding in findings if finding.kind == "skylos-ignore" and finding.codes
+    ]
+    if not skylos_findings:
+        return {}
+    skylos_path = _python_tool("skylos")
+    if skylos_path is None:
         return None
-    return outputs.get((finding.file_path, finding.line_num))
+    rule_ids = sorted({code for finding in skylos_findings for code in finding.codes})
+    # Skylos refuses to write through a symlinked parent, and macOS's temp
+    # directory sits under one (/var -> /private/var), hence the resolve().
+    with tempfile.TemporaryDirectory(prefix="suppression-audit.") as report_dir:
+        report_path = Path(report_dir).resolve() / "skylos.json"
+        completed = subprocess.run(  # noqa: S603 - resolved skylos binary scanning the package root
+            [
+                skylos_path,
+                ".",
+                "--select",
+                ",".join(rule_ids),
+                "--json",
+                "-o",
+                str(report_path),
+                "--no-upload",
+            ],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+            cwd=src_root,
+        )
+        try:
+            report = json.loads(read_text_no_follow(report_path))
+        except (OSError, json.JSONDecodeError) as error:
+            detail = (completed.stderr or completed.stdout).strip()[-500:]
+            msg = f"Skylos suppression scan left no readable report ({error}): {detail}"
+            raise RuntimeError(msg) from error
+
+    suppressed: dict[tuple[Path, int], list[str]] = {}
+    entries = report.get("suppressed", []) if isinstance(report, dict) else []
+    for entry in entries if isinstance(entries, list) else []:
+        if not isinstance(entry, dict) or not entry.get("rule_id") or not entry.get("file"):
+            continue
+        file_path = Path(str(entry["file"]))
+        if not file_path.is_absolute():
+            file_path = src_root / file_path
+        key = (file_path.resolve(), int(entry.get("line", 0)))
+        suppressed.setdefault(key, []).append(f"[{entry['rule_id']}]")
+    return {
+        (finding.file_path, finding.line_num): " ".join(
+            suppressed.get((finding.file_path.resolve(), finding.line_num), [])
+        )
+        for finding in skylos_findings
+    }
+
+
+def _batched_output_for(
+    finding: SuppressionFinding,
+    outputs: dict[tuple[Path, int], str],
+    skylos_outputs: dict[tuple[Path, int], str] | None = None,
+) -> str | None:
+    """Return the batched output for a noqa or skylos finding; other kinds run their own checker.
+
+    Both batches are keyed by file and line, and a line may carry a noqa, a
+    type: ignore and a skylos: ignore at once, so the kind guard keeps each
+    checker's output with its own suppressions.
+    """
+    if finding.kind == "noqa":
+        return outputs.get((finding.file_path, finding.line_num))
+    if finding.kind == "skylos-ignore" and skylos_outputs is not None:
+        return skylos_outputs.get((finding.file_path, finding.line_num))
+    return None
 
 
 def _suppression_rationale(finding: SuppressionFinding) -> str:
@@ -371,11 +510,23 @@ def _suppression_rationale(finding: SuppressionFinding) -> str:
         match = TYPE_IGNORE_SPECIFIC_RE.search(finding.line_text)
     elif finding.kind == "shellcheck":
         match = SHELLCHECK_RE.search(finding.line_text)
+    elif finding.kind == "ty-ignore":
+        match = TY_IGNORE_SPECIFIC_RE.search(finding.line_text)
+    elif finding.kind == "skylos-ignore":
+        match = SKYLOS_IGNORE_SPECIFIC_RE.search(finding.line_text)
     else:
         return ""
     if match is None:
         return ""
-    return finding.line_text[match.end() :].strip().lstrip("#- ").strip()
+    rationale = finding.line_text[match.end() :].strip().lstrip("#- ").strip()
+    if rationale or finding.kind not in {"ty-ignore", "skylos-ignore"}:
+        return rationale
+    # A ty or Skylos ignore beside a justified noqa on the same line shares
+    # that justification (one long signature, two checkers).
+    noqa_match = NOQA_SPECIFIC_RE.search(finding.line_text)
+    if noqa_match is None:
+        return ""
+    return finding.line_text[noqa_match.end() :].split("#", 1)[0].strip().lstrip("- ").strip()
 
 
 def check_if_needed(
@@ -396,6 +547,10 @@ def check_if_needed(
         invalid_reason = "Bare # noqa is not allowed; use explicit codes"
     elif finding.kind == "bare-type-ignore":
         invalid_reason = "Bare # type: ignore is not allowed; use explicit error codes"
+    elif finding.kind == "bare-ty-ignore":
+        invalid_reason = "Bare # ty: ignore is not allowed; use explicit rule names"
+    elif finding.kind == "bare-skylos-ignore":
+        invalid_reason = "Bare # skylos: ignore is not allowed; use explicit rule IDs"
     elif not finding.codes:
         invalid_reason = "Suppression has no explicit codes"
     elif not _suppression_rationale(finding):
@@ -410,16 +565,23 @@ def check_if_needed(
     if audit_output is not None:
         output: str = audit_output
     else:
-        result = _run_for_finding(finding, repo_root=repo_root, src_root=src_root)
-        if result is None and finding.kind == "shellcheck":
-            return True, "Skipped shellcheck audit because shellcheck is unavailable"
+        # Skylos findings only come from the batched scan, which yields
+        # nothing for them when skylos is not installed.
+        result = (
+            None
+            if finding.kind == "skylos-ignore"
+            else _run_for_finding(finding, repo_root=repo_root, src_root=src_root)
+        )
         if result is None:
+            tool = _OPTIONAL_AUDIT_TOOLS.get(finding.kind)
+            if tool is not None:
+                return True, f"Skipped {tool} audit because {tool} is unavailable"
             return False, "No audit runner available for suppression"
         output = f"{result.stdout}\n{result.stderr}"
     missing_codes = tuple(
         code
         for code in finding.codes
-        if (f"[{code}]" if finding.kind == "type-ignore" else code) not in output
+        if (f"[{code}]" if finding.kind in BRACKETED_CODE_KINDS else code) not in output
     )
     if missing_codes:
         return False, f"No violation found for: {', '.join(missing_codes)}"
@@ -431,7 +593,10 @@ def main() -> int:
     src_root: Path = Path(__file__).resolve().parents[1]
     repo_root: Path = src_root.parent
 
-    print(f"Auditing inline suppressions (noqa / type: ignore / shellcheck) in: {repo_root}\n")
+    print(
+        "Auditing inline suppressions (noqa / type: ignore / ty: ignore / skylos: ignore / "
+        f"shellcheck) in: {repo_root}\n"
+    )
     print("=" * 80)
 
     findings: list[SuppressionFinding] = iter_repo_suppressions(repo_root)
@@ -444,6 +609,11 @@ def main() -> int:
     necessary: list[tuple[SuppressionFinding, str]] = []
     unnecessary: list[tuple[SuppressionFinding, str]] = []
     batched_outputs = _batch_noqa_audit_outputs(findings, src_root=src_root)
+    try:
+        skylos_outputs = _skylos_audit_outputs(findings, src_root=src_root)
+    except RuntimeError as error:
+        print(f"✗ FAIL: {error}")
+        return 1
 
     for finding in findings:
         relative_path: Path = finding.file_path.relative_to(repo_root)
@@ -455,7 +625,7 @@ def main() -> int:
             finding,
             repo_root=repo_root,
             src_root=src_root,
-            audit_output=_batched_output_for(finding, batched_outputs),
+            audit_output=_batched_output_for(finding, batched_outputs, skylos_outputs),
         )
         if needed:
             print(f"  ✓ NEEDED: {reason}")
