@@ -60,7 +60,8 @@ jobs:
           # default). While pip finds no distribution for a requirement (mlx
           # has no cp315 wheel and no sdist yet), the install step warns and
           # skips the checks; any other install failure fails the lane, and
-          # once the stack installs, the lane gates like the rest.
+          # once the stack installs, the lane gates like the rest. It is also
+          # skipped before NEXT_PYTHON_HOLD_UNTIL (install step).
           - python-version: "3.15"
             next-python: true
 
@@ -93,6 +94,10 @@ jobs:
         id: install
         env:
           NEXT_PYTHON: ${{ matrix.next-python == true }}
+          # The next-Python lane is held (checks skipped with a warning)
+          # before this UTC date; it runs again from that day with no edit.
+          # Clear the value to lift the hold early.
+          NEXT_PYTHON_HOLD_UNTIL: "2026-11-01"
         # Only the next-Python lane may skip, and only when pip found no
         # distribution at all for some requirement (no wheel and no sdist
         # yet). Any other install failure (a build, resolver or packaging
@@ -102,6 +107,11 @@ jobs:
         # those fails the lane first.
         run: |
           set -o pipefail
+          if [[ "$NEXT_PYTHON" == "true" && "$(date -u +%F)" < "${NEXT_PYTHON_HOLD_UNTIL:-}" ]]; then
+            echo "::warning title=Next Python lane on hold::$(python -V) checks are held until ${NEXT_PYTHON_HOLD_UNTIL}."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           python -m pip install --upgrade pip
           pip_log="${RUNNER_TEMP:-/tmp}/pip-install.log"
           if ! pip install -e "src/.[dev]" 2>&1 | tee "$pip_log"; then

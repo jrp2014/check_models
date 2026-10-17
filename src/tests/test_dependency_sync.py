@@ -7,6 +7,7 @@ This enforces local parity in addition to CI. The test focuses only on runtime d
 from __future__ import annotations
 
 import ast
+import datetime as dt
 import json
 import os
 import re
@@ -2353,42 +2354,13 @@ _PIP_BUILD_FAILURE = (
 )
 
 
-@pytest.mark.parametrize(
-    ("next_python", "pip_exit", "pip_output", "expected"),
-    [
-        pytest.param(
-            "true", 1, _PIP_NO_MLX_DISTRIBUTION, (0, "false"), id="next-missing-dist-skips"
-        ),
-        pytest.param("true", 1, _PIP_BUILD_FAILURE, (1, None), id="next-build-failure-fails"),
-        pytest.param(
-            "true", 1, _PIP_CERTIFICATE_FAILURE, (1, None), id="next-certificate-failure-fails"
-        ),
-        pytest.param(
-            "true", 1, _PIP_CONNECTION_FAILURE, (1, None), id="next-connection-failure-fails"
-        ),
-        pytest.param("false", 1, _PIP_NO_MLX_DISTRIBUTION, (1, None), id="other-lane-never-skips"),
-        pytest.param(
-            "true", 0, "Successfully installed\n", (0, "true"), id="next-installs-and-runs"
-        ),
-        pytest.param(
-            "false", 0, "Successfully installed\n", (0, "true"), id="other-installs-and-runs"
-        ),
-    ],
-)
-def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_lane(
-    tmp_path: Path,
-    next_python: str,
-    pip_exit: int,
-    pip_output: str,
-    expected: tuple[int, str | None],
-) -> None:
+def _run_ci_install_step(
+    tmp_path: Path, next_python: str, pip_exit: int, pip_output: str, hold_until: str = ""
+) -> tuple[subprocess.CompletedProcess[str], str, str]:
     """Run the workflow's real install script, as Actions does (bash -e), against fake tools.
 
-    Only "no distribution found" on the next-Python lane may skip the checks,
-    and not when pip could not read the index; a build, resolver, packaging
-    or index failure fails the lane, as on every other.
+    Returns the completed process, what it wrote to GITHUB_OUTPUT and the fake-tool call log.
     """
-    returncode, available = expected
     workflow = yaml.safe_load(
         (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
     )
@@ -2430,14 +2402,57 @@ def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_la
         env={
             "PATH": f"{fake_bin}:/usr/bin:/bin",
             "NEXT_PYTHON": next_python,
+            "NEXT_PYTHON_HOLD_UNTIL": hold_until,
             "GITHUB_OUTPUT": str(github_output),
             "RUNNER_TEMP": str(tmp_path),
             "FAKE_PIP_OUTPUT": pip_output,
         },
     )
+    return (
+        result,
+        safe_io.read_text_no_follow(github_output),
+        safe_io.read_text_no_follow(calls),
+    )
+
+
+@pytest.mark.parametrize(
+    ("next_python", "pip_exit", "pip_output", "expected"),
+    [
+        pytest.param(
+            "true", 1, _PIP_NO_MLX_DISTRIBUTION, (0, "false"), id="next-missing-dist-skips"
+        ),
+        pytest.param("true", 1, _PIP_BUILD_FAILURE, (1, None), id="next-build-failure-fails"),
+        pytest.param(
+            "true", 1, _PIP_CERTIFICATE_FAILURE, (1, None), id="next-certificate-failure-fails"
+        ),
+        pytest.param(
+            "true", 1, _PIP_CONNECTION_FAILURE, (1, None), id="next-connection-failure-fails"
+        ),
+        pytest.param("false", 1, _PIP_NO_MLX_DISTRIBUTION, (1, None), id="other-lane-never-skips"),
+        pytest.param(
+            "true", 0, "Successfully installed\n", (0, "true"), id="next-installs-and-runs"
+        ),
+        pytest.param(
+            "false", 0, "Successfully installed\n", (0, "true"), id="other-installs-and-runs"
+        ),
+    ],
+)
+def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_lane(
+    tmp_path: Path,
+    next_python: str,
+    pip_exit: int,
+    pip_output: str,
+    expected: tuple[int, str | None],
+) -> None:
+    """Only a missing distribution on the next-Python lane may skip the checks.
+
+    Not when pip could not read the index: a build, resolver, packaging or
+    index failure fails the lane, as on every other.
+    """
+    returncode, available = expected
+    result, outputs, calls = _run_ci_install_step(tmp_path, next_python, pip_exit, pip_output)
     assert result.returncode == returncode, result.stdout + result.stderr
-    outputs = safe_io.read_text_no_follow(github_output)
-    npm_ran = "npm install" in safe_io.read_text_no_follow(calls)
+    npm_ran = "npm install" in calls
     if available is None:
         assert outputs == ""
         assert not npm_ran
@@ -2446,6 +2461,46 @@ def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_la
         assert npm_ran is (available == "true")
     if available == "false":
         assert "No distribution for Python 3.15.0 yet: mlx>=0.32.3." in result.stdout
+
+
+@pytest.mark.parametrize(
+    ("next_python", "hold_until", "held"),
+    [
+        pytest.param("true", "9999-12-31", True, id="next-lane-held"),
+        pytest.param("true", "2000-01-01", False, id="next-lane-hold-over"),
+        pytest.param("false", "9999-12-31", False, id="other-lane-never-held"),
+    ],
+)
+def test_ci_install_step_holds_the_next_python_lane_until_its_date(
+    tmp_path: Path, next_python: str, hold_until: str, *, held: bool
+) -> None:
+    """Before NEXT_PYTHON_HOLD_UNTIL the next-Python lane skips without installing.
+
+    From that date it installs and runs again with no edit; other lanes
+    ignore the hold.
+    """
+    result, outputs, calls = _run_ci_install_step(
+        tmp_path, next_python, 0, "Successfully installed\n", hold_until
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert outputs == f"available={'false' if held else 'true'}\n"
+    assert ("pip install" in calls) is not held
+    if held:
+        assert "checks are held until 9999-12-31." in result.stdout
+
+
+def test_ci_next_python_hold_is_a_date() -> None:
+    """The workflow's hold value is empty or an ISO date, so the string comparison holds."""
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    install = next(
+        step
+        for step in workflow["jobs"]["static-quality"]["steps"]
+        if step.get("name") == "Install dependencies"
+    )
+    hold = install["env"]["NEXT_PYTHON_HOLD_UNTIL"]
+    assert hold == "" or dt.date.fromisoformat(hold).isoformat() == hold
 
 
 _SUBPROCESS_TEXT_CALLS = frozenset({"run", "check_output", "Popen", "call", "check_call"})

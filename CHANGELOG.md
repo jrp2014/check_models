@@ -103,6 +103,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- CI (0.17.86): the Python 3.15 lane of the static-quality job is on hold
+  until 2026-11-01, at john's request. Before that date (UTC) its install
+  step prints a "Next Python lane on hold" warning and skips the checks,
+  as it already does while a requirement has no 3.15 distribution; from
+  2026-11-01 it installs and gates again with no edit. The date is
+  `NEXT_PYTHON_HOLD_UNTIL` on that step; clearing it lifts the hold early.
+  The lane runs alongside 3.13 and 3.14, so the hold frees a macOS runner
+  rather than shortening the workflow.
 - Tooling (0.17.83): the last traces of locally generated `typings/` stubs,
   retired earlier, are gone. ty runs without `--no-respect-ignore-files`
   (an explicit target inside a gitignored worktree is still checked; tested
