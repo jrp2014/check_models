@@ -526,7 +526,7 @@ def test_prompt_seeded_thinking_open_is_closed_by_generated_marker() -> None:
         prompt="Describe this image.",
         system_info={},
     )
-    enriched = context.result_set.results[0]
+    enriched = context.results[0]
     assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
         "completed", "usable", "none", ()
     )
@@ -559,7 +559,7 @@ def test_prompt_seeded_thinking_uses_full_prompt_when_preview_is_truncated() -> 
         prompt="Describe this image.",
         system_info={},
     )
-    enriched = context.result_set.results[0]
+    enriched = context.results[0]
 
     assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
         "completed", "usable", "none", ()
@@ -689,7 +689,7 @@ def test_configured_empty_thinking_wrapper_is_neutral_evidence() -> None:
         prompt="Describe this image.",
         system_info={},
     )
-    enriched = context.result_set.results[0]
+    enriched = context.results[0]
 
     assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
         "completed", "usable", "none", ()
@@ -747,7 +747,7 @@ def test_declared_generation_wrappers_are_neutral_without_model_name_policy() ->
         system_info={},
     )
 
-    enriched = context.result_set.results[0]
+    enriched = context.results[0]
     assert enriched.quality_analysis is not None
     assert enriched.quality_analysis.unexpected_special_tokens == []
     assert enriched.quality_analysis.configured_generation_wrappers == [

@@ -1134,6 +1134,16 @@ Notable changes to this project will be documented in this file.
   Everything shipped since 0.15.0 (0.16.0–0.17.0) is now recorded under the
   `[0.17.0]` heading below.
 
+### Removed
+
+- `ResultSet` (0.17.81) is no longer part of `check_models`'s public names.
+  Production read only its sorted `.results`; `.successful`, `.failed` and
+  the unused `_fields` slot served tests alone. `ReportRenderContext` and
+  `CanonicalHtmlReportContext` now hold the time-sorted results directly as
+  a `results` tuple, so `context.result_set.results` becomes
+  `context.results`. A script that imports `ResultSet` from `check_models`
+  must now sort its own results. Report order is unchanged.
+
 ### Fixed
 
 - Run comparison (0.17.78): a sampled record without `top_k` makes the pair

@@ -84,7 +84,7 @@ The file is organized in this order — search for these exact landmark headers 
 | --------- | ------------- | ---------------------------- |
 | Imports, config & optional dependency guards | `MISSING_DEPENDENCIES`, `QualityThresholds`, `load_quality_config()` | `SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS` |
 | Type aliases, protocols & JSONL records | `SupportsGenerationResult`, `SupportsExifIfd`, `JsonlResultRecord` | `SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS` |
-| App constants & core result types | `PerformanceResult`, `ResultSet`, `ProcessImageParams`, report block primitives | `SECTION: APP CONSTANTS & CORE RESULT TYPES` |
+| App constants & core result types | `PerformanceResult`, `ProcessImageParams`, report block primitives | `SECTION: APP CONSTANTS & CORE RESULT TYPES` |
 | Timing, logging & Rich console plumbing | `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler` | `SECTION: TIMING, LOGGING & RICH CONSOLE PLUMBING` |
 | Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
 | Metrics and field formatting | `analyze_generation_text`, mechanical observation helpers, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |

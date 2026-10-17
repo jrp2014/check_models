@@ -185,7 +185,6 @@ __all__ = [
     "GenerationQualityAnalysis",
     "PerformanceResult",
     "ProcessImageParams",
-    "ResultSet",
     "analyze_generation_text",
     "append_history_record",
     "exit_with_cli_error",
@@ -1578,7 +1577,7 @@ class ReportGenerationInputs:
     @property
     def results(self) -> list[PerformanceResult]:
         """Assessed results in report order, as cached by the render context."""
-        return list(self.report_context.result_set.results)
+        return list(self.report_context.results)
 
     @property
     def system_info(self) -> dict[str, str]:
@@ -3204,62 +3203,6 @@ def _render_gallery_model(
     )
     out.extend(["", "</details>", ""])
     return out
-
-
-class ResultSet:
-    """Cache-friendly wrapper around a collection of PerformanceResult.
-
-    Provides:
-        - Single-pass sorting by generation time (fastest first)
-        - Lazy discovery/caching of available metric fields (generation + timing)
-        - Simple iteration / length protocol support
-
-    Rationale: Multiple rendering paths previously repeated the same sort
-    and field extraction logic. Centralizing reduces duplication and
-    guarantees consistent ordering across console, HTML, and Markdown
-    outputs.
-    """
-
-    __slots__ = ("_failed", "_fields", "_results", "_successful")  # Sorted for lint consistency
-
-    def __init__(self, results: list[PerformanceResult]) -> None:
-        """Initialize and sort results.
-
-        A shallow copy of ``results`` is taken to guard against external
-        mutation after construction.
-        """
-        self._results = _sort_results_by_time(list(results))
-        self._successful: list[PerformanceResult] | None = None
-        self._failed: list[PerformanceResult] | None = None
-
-    # Public API -----------------------------------------------------
-    @property
-    def results(self) -> list[PerformanceResult]:  # Sorted
-        """Return results sorted by generation time (fastest first)."""
-        return self._results
-
-    @property
-    def successful(self) -> list[PerformanceResult]:
-        """Return cached list of successful results."""
-        if self._successful is None:
-            self._successful = [r for r in self._results if r.success]
-        return self._successful
-
-    @property
-    def failed(self) -> list[PerformanceResult]:
-        """Return cached list of failed results."""
-        if self._failed is None:
-            self._failed = [r for r in self._results if not r.success]
-        return self._failed
-
-    # Dunder conveniences --------------------------------------------
-    def __len__(self) -> int:  # pragma: no cover - trivial
-        """Return number of results."""
-        return len(self._results)
-
-    def __iter__(self) -> Iterator[PerformanceResult]:  # pragma: no cover - trivial
-        """Iterate over sorted results."""
-        return iter(self._results)
 
 
 @dataclass(frozen=True)
@@ -6944,10 +6887,10 @@ def _build_report_render_context(
         )
         for result in results
     ]
-    result_set: ResultSet = ResultSet(resolved_results)
+    sorted_results = tuple(_sort_results_by_time(resolved_results))
     image_profile = _load_image_input_profile(image_path)
     return ReportRenderContext(
-        result_set=result_set,
+        results=sorted_results,
         # Missing facts stay unavailable; reporting never measures the system now.
         system_info=system_info if system_info is not None else {},
         recommended_working_set_bytes=recommended_working_set_bytes,
@@ -6961,9 +6904,7 @@ def _build_report_render_context(
             if resolved_results
             else "general",
         ),
-        assessments=tuple(
-            (result.model_name, _assess_result(result)) for result in result_set.results
-        ),
+        assessments=tuple((result.model_name, _assess_result(result)) for result in sorted_results),
         model_provenance=tuple(
             (model_name, record.copy()) for model_name, record in (model_provenance or {}).items()
         ),
@@ -6972,7 +6913,7 @@ def _build_report_render_context(
 
 def _validate_report_render_context(context: ReportRenderContext) -> None:
     """Reject inconsistent cached identities or outcome axes before publication."""
-    result_names = tuple(result.model_name for result in context.result_set.results)
+    result_names = tuple(result.model_name for result in context.results)
     assessment_names = tuple(model_name for model_name, _assessment in context.assessments)
     provenance_names = tuple(model_name for model_name, _record in context.model_provenance)
     named_groups = {
@@ -9357,7 +9298,7 @@ class _ReportContextLookups:
         # Supplied by the frozen dataclass fields of each context; read-only
         # here so those fields may override them.
         @property
-        def result_set(self) -> ResultSet: ...
+        def results(self) -> tuple[PerformanceResult, ...]: ...
         @property
         def assessments(self) -> tuple[tuple[str, ResultAssessment], ...]: ...
         @property
@@ -9366,7 +9307,7 @@ class _ReportContextLookups:
     @cached_property
     def result_by_model(self) -> Mapping[str, PerformanceResult]:
         """Index the context's results by model identifier."""
-        return {result.model_name: result for result in self.result_set.results}
+        return {result.model_name: result for result in self.results}
 
     @cached_property
     def assessment_by_model(self) -> Mapping[str, ResultAssessment]:
@@ -9383,7 +9324,7 @@ class _ReportContextLookups:
         """One chooser row per result, in result order."""
         return tuple(
             _gallery_row(result, self.assessment_by_model[result.model_name])
-            for result in self.result_set.results
+            for result in self.results
         )
 
     @cached_property
@@ -9396,7 +9337,7 @@ class _ReportContextLookups:
 class ReportRenderContext(_ReportContextLookups):
     """Shared cached context for retained current-run report generation."""
 
-    result_set: ResultSet
+    results: tuple[PerformanceResult, ...]
     system_info: dict[str, str]
     recommended_working_set_bytes: int | None = None
     image_profile: ImageInputProfile | None = None
@@ -9410,7 +9351,7 @@ class ReportRenderContext(_ReportContextLookups):
 class CanonicalHtmlReportContext(_ReportContextLookups):
     """Minimal cached facts required by the standalone HTML report."""
 
-    result_set: ResultSet
+    results: tuple[PerformanceResult, ...]
     system_info: dict[str, str]
     assessments: tuple[tuple[str, ResultAssessment], ...]
     model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
@@ -9434,7 +9375,7 @@ def _build_html_report_context(
         for result in results
     ]
     return CanonicalHtmlReportContext(
-        result_set=ResultSet(analyzed_results),
+        results=tuple(_sort_results_by_time(analyzed_results)),
         system_info=system_info if system_info is not None else {},
         assessments=tuple(
             (result.model_name, _assess_result(result)) for result in analyzed_results
@@ -10012,7 +9953,7 @@ def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
     buckets: dict[str, list[PerformanceResult]] = {
         name: [] for name in ("actionable", "observations", "indeterminate", "compliance", "clean")
     }
-    for result in context.result_set.results:
+    for result in context.results:
         assessment = assessments[result.model_name]
         if assessment.maintainer_status == "actionable_failure":
             bucket = "actionable"
@@ -10634,7 +10575,7 @@ def _run_input_rows_for_context(
     report_context: HtmlReportContext,
 ) -> tuple[tuple[str, str], ...]:
     """Lane and input-image rows from whichever report context a renderer holds."""
-    results = report_context.result_set.results
+    results = report_context.results
     mode_policy = getattr(report_context, "mode_policy", None)
     return _run_input_summary_rows(
         _run_image_record(image_path, getattr(report_context, "image_profile", None)),
@@ -11161,9 +11102,7 @@ def _gallery_evidence_entries(
             report_context.assessment_by_model[result.model_name],
             report_context.provenance_by_model.get(result.model_name),
         )
-        for result, row in zip(
-            report_context.result_set.results, report_context.gallery_rows, strict=True
-        )
+        for result, row in zip(report_context.results, report_context.gallery_rows, strict=True)
     ]
     return sorted(
         entries,
@@ -11326,7 +11265,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
             + "</p>",
             _html_run_inputs(image_path, report_context),
             _html_embedded_image(image_path),
-            _html_runtime_facts(report_context.result_set.results, total_runtime_seconds),
+            _html_runtime_facts(report_context.results, total_runtime_seconds),
             _html_gallery_chooser(report_context),
             _html_complete_gallery(report_context),
             _html_maintainer_diagnostics(
@@ -20057,7 +19996,7 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
         )
     if mode_policy is None:
         resolved_policy = report_context.mode_policy
-    cached_results = {result.model_name: result for result in report_context.result_set.results}
+    cached_results = {result.model_name: result for result in report_context.results}
     assessments = report_context.assessment_by_model
     model_provenance = report_context.provenance_by_model
     header = _build_jsonl_metadata_record(
@@ -26234,7 +26173,7 @@ def _write_diagnostics_artifacts(
 ) -> DiagnosticsArtifacts:
     """Write current-run diagnostics and direct per-crash issue drafts."""
     generate_diagnostics_report(
-        report_context.result_set.results,
+        report_context.results,
         diagnostics_path,
         prompt=prompt,
         library_versions=library_versions,
@@ -27311,7 +27250,7 @@ def finalize_execution(
             preflight_issues=run_facts.preflight_issues,
             model_provenance=model_provenance,
         )
-        results = list(report_context.result_set.results)
+        results = list(report_context.results)
         _validate_report_render_context(report_context)
         assessments = report_context.assessment_by_model
         # A heading closes the last model's run block, so its closing notes
