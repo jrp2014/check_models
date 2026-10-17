@@ -1174,13 +1174,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Tests (0.17.84): `test_shared_flag_defaults_match_mlx_vlm_generate` lists
-  `--temperature`, `--top-p` and `--top-k` as deliberate divergences. From
-  mlx-vlm 73d366e upstream defaults them to None and fills them from the
-  checkpoint; the harness keeps concrete defaults and applies the checkpoint
-  itself, so it can record each value and its source. CI did not catch the
-  drift because it installs the PyPI mlx-vlm release (0.7.8), which predates
-  73d366e; the failure showed only against a git checkout of mlx-vlm.
+- Tests (0.17.85): `test_shared_flag_defaults_match_mlx_vlm_generate` passes
+  against mlx-vlm 73d366e and later. Upstream now defaults `--temperature`,
+  `--top-p` and `--top-k` to None, meaning the checkpoint's value or else a
+  library fallback, which is the rule the harness applies itself. The test
+  compares our defaults with the fallback upstream's
+  `resolve_sampling_defaults` gives a checkpoint that declares nothing, so a
+  real change in upstream's fallback still fails it. This replaces 0.17.84,
+  which listed the three flags as deliberate divergences. CI missed the
+  drift because it installs the PyPI mlx-vlm release (0.7.8), which
+  predates 73d366e.
 - Run comparison (0.17.78): a sampled record without `top_k` makes the pair
   "settings not recorded" rather than "same settings". Before 0.17.76 the
   harness left out a `top_k` of 0, and from mlx-vlm 73d366e an omitted one is

@@ -666,12 +666,6 @@ class TestUpstreamCliParity:
         "--prompt": "harness builds a metadata-cataloguing prompt when unset",
         "--revision": "None distinguishes requested vs resolved revisions in reports",
         "--seed": "0 keeps sampled runs reproducible now that checkpoint temperatures apply",
-        # mlx-vlm 73d366e defaults these to None and fills them from the
-        # checkpoint; the harness applies the checkpoint itself (explicit_cli
-        # marks a given flag) so it can record each value and its source.
-        "--temperature": "harness resolves checkpoint sampling itself; upstream None",
-        "--top-k": "harness resolves checkpoint sampling itself; upstream None",
-        "--top-p": "harness resolves checkpoint sampling itself; upstream None",
         "--thinking-start-token": "None defers to the upstream default at call time",
         "--trust-remote-code": "harness defaults on, with a security warning and opt-out",
     }
@@ -699,6 +693,16 @@ class TestUpstreamCliParity:
 
         with patch.object(argparse.ArgumentParser, "parse_args", _grab):
             dispatch.parse_arguments()
+        # From mlx-vlm 73d366e the sampling flags default to None: "the
+        # checkpoint's value, else a library fallback", the rule the harness
+        # applies itself. Compare with the fallback that upstream resolves
+        # for a checkpoint declaring nothing.
+        resolve = getattr(dispatch, "resolve_sampling_defaults", None)
+        if resolve is not None:
+            sampling_flags = ("--temperature", "--top-p", "--top-k")
+            for option, fallback in zip(sampling_flags, resolve(None), strict=True):
+                if upstream.get(option) is None:
+                    upstream[option] = fallback
         parser = check_models._build_cli_parser()
         ours: dict[str, object] = {}
         for action in parser._actions:
