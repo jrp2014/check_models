@@ -490,7 +490,6 @@ class FormattingThresholds:
     max_prompt_preview_lines: int = 10  # Max lines to show in prompt preview
 
     # Layout constants
-    min_separator_chars: int = 50
     markdown_hard_break_spaces: int = 2
     markdown_wrap_width: int = 78
     generation_wrap_width: int = 100
@@ -1501,7 +1500,6 @@ class DiagnosticsArtifacts:
     outcome_counts: RunOutcomeCounts | None = None
     diagnostics_written: bool = False
     issue_reports: Mapping[str, Path] = dataclass_field(default_factory=dict)
-    run_issue_summary: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -2552,22 +2550,14 @@ class ReportBulletList:
 
 
 @dataclass(frozen=True)
-class ReportLink:
-    """Internal report link rendered safely in Markdown and HTML."""
-
-    label: str
-    anchor: str
-
-
-@dataclass(frozen=True)
 class ReportTargetLink:
-    """Explicit artifact link rendered safely in Markdown and HTML."""
+    """Report link (artifact path or ``#anchor``) rendered safely in Markdown and HTML."""
 
     label: str
     target: str
 
 
-type ReportCell = str | ReportLink | ReportTargetLink
+type ReportCell = str | ReportTargetLink
 
 
 @dataclass(frozen=True)
@@ -2739,11 +2729,6 @@ def _render_padded_pipe_table(
 
 def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
     """Render one table cell as safe Markdown."""
-    if isinstance(cell, ReportLink):
-        label = html.escape(cell.label, quote=False).replace("\\", "\\\\")
-        label = label.replace("[", r"\[").replace("]", r"\]")
-        anchor = html.escape(cell.anchor, quote=True).replace("(", "%28").replace(")", "%29")
-        return f"[{label}](#{anchor})"
     if isinstance(cell, ReportTargetLink):
         label = html.escape(cell.label, quote=False).replace("\\", "\\\\")
         label = label.replace("[", r"\[").replace("]", r"\]")
@@ -2872,8 +2857,6 @@ def _render_report_table_html(block: ReportTable) -> list[str]:
 
 def _render_report_cell_html(cell: ReportCell) -> str:
     """Render one table cell as escaped HTML."""
-    if isinstance(cell, ReportLink):
-        return f'<a href="#{html.escape(cell.anchor, quote=True)}">{html.escape(cell.label)}</a>'
     if isinstance(cell, ReportTargetLink):
         return f'<a href="{html.escape(cell.target, quote=True)}">{html.escape(cell.label)}</a>'
     return html.escape(cell)
@@ -9927,14 +9910,7 @@ def _build_environment_failure_diagnostics(
 
 def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
     """Return unique items while preserving first-seen order."""
-    unique_items: list[str] = []
-    seen: set[str] = set()
-    for item in items:
-        if item in seen:
-            continue
-        seen.add(item)
-        unique_items.append(item)
-    return unique_items
+    return list(dict.fromkeys(items))
 
 
 @dataclass(frozen=True)
@@ -10687,7 +10663,7 @@ def _diagnostics_evidence_blocks(
     image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
     triage_rows = tuple(
         (
-            ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
+            ReportTargetLink(result.model_name, "#" + _diagnostics_model_anchor(result.model_name)),
             assessments[result.model_name].execution,
             _human_status_label(assessments[result.model_name].usability),
             assessments[result.model_name].maintainer_status.replace("_", " "),
@@ -12154,44 +12130,10 @@ def validate_kv_params(
             raise ValueError(msg)
 
 
+# Every keyword the generation call already sends, plus the media and prompt
+# inputs it is built around.
 _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
-    {
-        "audio",
-        "eos_tokens",
-        "frequency_context_size",
-        "frequency_penalty",
-        "image",
-        "kv_bits",
-        "kv_group_size",
-        "kv_key_bits",
-        "kv_key_scheme",
-        "kv_quant_scheme",
-        "kv_value_bits",
-        "kv_value_scheme",
-        "logit_bias",
-        "max_kv_size",
-        "max_tokens",
-        "min_p",
-        "prefill_step_size",
-        "presence_context_size",
-        "presence_penalty",
-        "processor",
-        "prompt",
-        "quantized_kv_start",
-        "repetition_context_size",
-        "repetition_penalty",
-        "resize_shape",
-        "seed",
-        "skip_special_tokens",
-        "enable_thinking",
-        "thinking_budget",
-        "thinking_end_token",
-        "thinking_start_token",
-        "temperature",
-        "top_k",
-        "top_p",
-        "verbose",
-    },
+    {*_SENT_GENERATE_KEYWORDS, "audio", "image", "processor", "prompt"},
 )
 
 
@@ -22309,20 +22251,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             **_ratio_end_models_json(comparison.prompt_tps_ratio_end_models),
         },
         "text_changed_models": list[JsonLike](comparison.text_changed_models),
-        "text_divergence": [
-            {
-                "model": entry.model,
-                "shared_prefix_chars": entry.shared_prefix_chars,
-                "baseline_chars": entry.baseline_chars,
-                "current_chars": entry.current_chars,
-                "prompt_token_count_unchanged": entry.prompt_token_count_unchanged,
-                "decoding": entry.decoding,
-                "weights": entry.weights,
-                "baseline_output_tokens": entry.baseline_output_tokens,
-                "current_output_tokens": entry.current_output_tokens,
-            }
-            for entry in comparison.text_divergence
-        ],
+        "text_divergence": [entry._asdict() for entry in comparison.text_divergence],
         "component_changes": [
             {
                 "component": change.name,
@@ -27122,11 +27051,6 @@ def _generate_reports_and_log_outputs(
     )
     if summary_outcome is not None:
         outcomes.append(summary_outcome)
-    if run_issue_summary is not None:
-        diagnostics_artifacts = replace(
-            diagnostics_artifacts,
-            run_issue_summary=run_issue_summary,
-        )
 
     for artifact in artifacts:
         if artifact.job is not None and artifact.key not in {

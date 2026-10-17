@@ -103,6 +103,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Cleanup (0.17.80), from john's review of 0.17.77, with no output change:
+  `DiagnosticsArtifacts.run_issue_summary` (set, never read) and
+  `FormattingThresholds.min_separator_chars` (unused) are gone. `ReportLink`
+  is folded into `ReportTargetLink`, whose target now carries the leading `#`
+  for an in-page anchor; Markdown and HTML escaping are unchanged.
+  `_RESERVED_PROCESSOR_KWARG_KEYS` is built from `_SENT_GENERATE_KEYWORDS`
+  plus `audio`, `image`, `processor` and `prompt` instead of repeating the
+  31 keywords. `_dedupe_preserve_order` is `list(dict.fromkeys(items))`, and
+  the comparison record's `text_divergence` entries use `_asdict()`, whose
+  keys and values match the previous hand-written mapping.
 - Generation setup (0.17.79): one `_build_generate_kwargs(params)` builds
   every keyword sent to mlx-vlm, always-sent settings first and optional ones
   after; `_build_generate_extra_kwargs` is gone. The prompt preparation reads

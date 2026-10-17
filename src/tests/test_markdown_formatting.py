@@ -78,7 +78,7 @@ def test_shared_report_blocks_render_links_and_safe_model_output() -> None:
     blocks: tuple[check_models.ReportBlock, ...] = (
         check_models.ReportTable(
             headers=("Model",),
-            rows=((check_models.ReportLink("org/model", "diagnostic-org-model"),),),
+            rows=((check_models.ReportTargetLink("org/model", "#diagnostic-org-model"),),),
         ),
         check_models.ReportModelOutput(captured),
     )
