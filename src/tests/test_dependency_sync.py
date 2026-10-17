@@ -2295,6 +2295,7 @@ def test_skylos_audit_keeps_only_ignores_that_suppressed_a_finding(
     args = recorded["args"]
     assert isinstance(args, list)
     assert args[args.index("--select") + 1] == "SKY-D215,SKY-P401"
+    assert args[args.index("--format") + 1] == "json-ci"
     assert recorded["cwd"] == tmp_path
     report_path = recorded["report"]
     assert isinstance(report_path, Path)

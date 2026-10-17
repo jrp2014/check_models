@@ -447,7 +447,11 @@ def _skylos_audit_outputs(
                 ".",
                 "--select",
                 ",".join(rule_ids),
-                "--json",
+                # json-ci keeps the "suppressed" list but omits the dead-code
+                # definitions and evidence that make plain --json exceed the
+                # 16 MiB safe-read cap on this tree.
+                "--format",
+                "json-ci",
                 "-o",
                 str(report_path),
                 "--no-upload",

@@ -103,6 +103,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Suppression audit (0.17.88): the Skylos recheck asks for `--format json-ci`
+  instead of `--json`. Plain JSON carries Skylos's dead-code definitions and
+  evidence, which made the report 16.9 MB in CI, over the 16 MiB safe-read
+  cap, so the 0.17.87 gate failed on both Python lanes. The `json-ci` report
+  holds the same `suppressed` list in about 1.9 MB.
 - Suppression audit (0.17.87): `tools/check_suppressions.py` now rechecks
   `# ty: ignore[...]` and `# skylos: ignore[...]` comments as well. ty reruns
   on a copy without the ty ignore (keeping any `type: ignore` on the line), as
