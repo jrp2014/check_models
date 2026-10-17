@@ -1174,6 +1174,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Tests (0.17.84): `test_shared_flag_defaults_match_mlx_vlm_generate` lists
+  `--temperature`, `--top-p` and `--top-k` as deliberate divergences. From
+  mlx-vlm 73d366e upstream defaults them to None and fills them from the
+  checkpoint; the harness keeps concrete defaults and applies the checkpoint
+  itself, so it can record each value and its source. CI did not catch the
+  drift because it installs the PyPI mlx-vlm release (0.7.8), which predates
+  73d366e; the failure showed only against a git checkout of mlx-vlm.
 - Run comparison (0.17.78): a sampled record without `top_k` makes the pair
   "settings not recorded" rather than "same settings". Before 0.17.76 the
   harness left out a `top_k` of 0, and from mlx-vlm 73d366e an omitted one is

@@ -666,6 +666,12 @@ class TestUpstreamCliParity:
         "--prompt": "harness builds a metadata-cataloguing prompt when unset",
         "--revision": "None distinguishes requested vs resolved revisions in reports",
         "--seed": "0 keeps sampled runs reproducible now that checkpoint temperatures apply",
+        # mlx-vlm 73d366e defaults these to None and fills them from the
+        # checkpoint; the harness applies the checkpoint itself (explicit_cli
+        # marks a given flag) so it can record each value and its source.
+        "--temperature": "harness resolves checkpoint sampling itself; upstream None",
+        "--top-k": "harness resolves checkpoint sampling itself; upstream None",
+        "--top-p": "harness resolves checkpoint sampling itself; upstream None",
         "--thinking-start-token": "None defers to the upstream default at call time",
         "--trust-remote-code": "harness defaults on, with a security warning and opt-out",
     }
