@@ -103,6 +103,24 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Typing and lint suppressions (0.17.81), from john's review of 0.17.79,
+  with no output change. mypy now uses `follow_imports = "silent"` instead of
+  `"skip"`, which had turned every name imported from a Python package into
+  `Any`: `jinja2.Environment` and `huggingface_hub.scan_cache_dir` now carry
+  their real signatures, and the monolith still passes. The per-package
+  overrides that skipped or ignored defusedxml, huggingface_hub, numpy, PIL,
+  psutil, PyYAML, tokenizers and transformers are gone, since each ships
+  inline types or a `types-*` dev stub; only mlx and mlx-vlm, often editable
+  checkouts, may still be unresolved. The comments about locally generated
+  stubs, retired earlier, are removed. Thirteen inline suppressions go with
+  less code: `_add_output_path_arguments` takes the parser and creates its
+  own "Output Reports" group, so the `_ArgumentAdder` protocol and its
+  `ANN401` are gone (help and parsing are byte-identical); `test_e2e_smoke.py`
+  drops its copy of the Hugging Face cache setup that `conftest.py` already
+  performs before collection, and with it six `E402`s; `os` in
+  `tools/hub_precheck.py`, `hub_precheck` in `test_quality_analysis.py` and
+  `huggingface_hub` in `test_dependency_sync.py` are top-level imports, and
+  `conftest.py` reads `check_models.logger` directly.
 - Cleanup (0.17.80), from john's review of 0.17.77, with no output change:
   `DiagnosticsArtifacts.run_issue_summary` (set, never read) and
   `FormattingThresholds.min_separator_chars` (unused) are gone. `ReportLink`

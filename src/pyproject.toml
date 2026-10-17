@@ -292,14 +292,13 @@ reportAttributeAccessIssue = "warning"
 [tool.mypy]
 # Pragmatic type checking with MLX library support
 python_version = "3.13"
-# Skip following imports into external libraries to avoid their stub errors
-# This focuses type checking on our code while still using type info from libraries
-follow_imports = "skip"
+# Follow imports for their type information but report errors only in the
+# files passed to mypy; "skip" would turn every imported name into Any.
+follow_imports = "silent"
 # Do not globally suppress missing imports; use targeted overrides below.
 ignore_missing_imports = false
 # Exclude archived tools (paths are seen relative to src/, so no "src/" prefix)
 exclude = ["^tools/\\.archived/"]
-# Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
 
 # Core strictness - catch common errors in our own code
 warn_unused_ignores = true
@@ -309,43 +308,17 @@ warn_redundant_casts = true
 check_untyped_defs = true
 disallow_incomplete_defs = true
 
-# Allow missing stubs for third-party runtime dependencies used by check_models.py.
+# mlx and mlx-vlm are often editable installs of local checkouts (update.sh);
+# if mypy cannot resolve one, its imports stay Any instead of failing the gate.
+# Every other dependency ships inline types or a types-* stub package.
 [[tool.mypy.overrides]]
-module = [
-    "defusedxml.*",
-    "huggingface_hub.*",
-    "mlx.*",
-    "numpy",
-    "PIL.*",
-    "psutil",
-    "yaml",
-]
+module = ["mlx", "mlx.*", "mlx_vlm", "mlx_vlm.*"]
 ignore_missing_imports = true
-follow_imports = "skip"
-
-# Auto-generated stubs for MLX packages: use "normal" to type-check call sites
-# against stub signatures.  Missing stubs remain non-fatal, and generated-stub
-# internals are not treated as this project's strictness debt.
-[[tool.mypy.overrides]]
-module = ["mlx_vlm", "mlx_vlm.*"]
-ignore_missing_imports = true
-ignore_errors = true
-follow_imports = "normal"
-
-# Auto-generated stubs for transformers/tokenizers.  Use "silent" to read type
-# info at call sites without reporting errors within the (noisy) generated stubs.
-[[tool.mypy.overrides]]
-module = ["tokenizers", "tokenizers.*", "transformers", "transformers.*"]
-ignore_missing_imports = true
-ignore_errors = true
-follow_imports = "silent"
 
 [tool.ty]
 # ty (Astral's type checker) configuration
 
 [tool.ty.environment]
-# Prefer repo-local generated stubs for packages like mlx-vlm that do not ship
-# complete import-resolvable typing metadata in site-packages.
 # Do not hardcode `python` here: this project uses an external conda env whose
 # absolute path is machine-specific, so repo automation passes `--python`
 # explicitly from the resolved target environment.

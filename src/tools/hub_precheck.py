@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
@@ -206,8 +207,7 @@ Fetcher = Callable[[str], HubCandidate]
 
 def _default_arch_check() -> ArchCheck:
     """Use the harness's own resolution so hub and cache verdicts agree."""
-    import os  # noqa: PLC0415 - deferred so --help never imports the monolith
-
+    # Deferred so --help never imports the monolith.
     os.environ.setdefault("CHECK_MODELS_SKIP_IMPORT_PROBE", "1")
     from check_models import arch_precheck_for_model_type  # noqa: PLC0415 - see above
 
@@ -216,8 +216,7 @@ def _default_arch_check() -> ArchCheck:
 
 def _default_memory_check() -> tuple[int | None, int | None]:
     """(unified memory bytes, Metal recommended working set bytes) from the harness."""
-    import os  # noqa: PLC0415 - deferred so --help never imports the monolith
-
+    # Deferred so --help never imports the monolith.
     os.environ.setdefault("CHECK_MODELS_SKIP_IMPORT_PROBE", "1")
     from check_models import (  # noqa: PLC0415 - see above
         _get_recommended_working_set_bytes,

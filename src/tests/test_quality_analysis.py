@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 import pytest
 
 import check_models
+from tools import hub_precheck
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -2163,7 +2164,6 @@ def test_chat_template_source_order_matches_the_real_processor_loader(
     must use the same precedence.
     """
     processing_utils = pytest.importorskip("transformers.processing_utils")
-    from tools import hub_precheck  # noqa: PLC0415 - tools package is test-local
 
     for name in present:
         check_models._write_text_file(tmp_path / name, _TEMPLATE_FILE_CONTENTS[name])

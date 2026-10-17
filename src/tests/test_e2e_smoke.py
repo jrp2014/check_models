@@ -16,40 +16,21 @@ Skip these in CI by default (they require MLX hardware and model downloads).
 from __future__ import annotations
 
 import json
-import os
 import sys
-import tempfile
-from pathlib import Path
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 from unittest.mock import patch
 
-# =============================================================================
-# EARLY ENVIRONMENT SETUP (MUST happen before huggingface_hub imports)
-# =============================================================================
+# conftest.py sets up the HF cache environment before this module is collected.
+import pytest
+from huggingface_hub import scan_cache_dir
+from huggingface_hub.errors import CacheNotFound
+from PIL import Image
 
-# Set up HF cache directory early, before any huggingface_hub functions cache the path.
-# Strategy (following HuggingFace documentation):
-# 1. If HF_HUB_CACHE is set → use it (user explicitly configured)
-# 2. Else if default cache exists (~/.cache/huggingface/hub) → use it
-# 3. Else create temp cache (CI environment without cache)
-_DEFAULT_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
+import check_models
+from tools import safe_io
 
-if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
-    # CI environment - create temp cache to prevent CacheNotFound
-    _temp_hf_cache = Path(tempfile.gettempdir()) / "pytest_hf_cache"
-    _temp_hf_cache.mkdir(parents=True, exist_ok=True)
-    (_temp_hf_cache / "hub").mkdir(parents=True, exist_ok=True)
-    os.environ["HF_HUB_CACHE"] = str(_temp_hf_cache / "hub")
-    os.environ["HF_HOME"] = str(_temp_hf_cache)
-
-# Now import huggingface_hub after environment is configured
-import pytest  # noqa: E402 - after HF cache env setup
-from huggingface_hub import scan_cache_dir  # noqa: E402 - after HF cache env setup
-from huggingface_hub.errors import CacheNotFound  # noqa: E402 - after HF cache env setup
-from PIL import Image  # noqa: E402 - after HF cache env setup
-
-import check_models  # noqa: E402 - after HF cache env setup
-from tools import safe_io  # noqa: E402 - after HF cache env setup
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # Fixture model - small, fast, reliable MLX conversion
 # Smallest usable model in the standing suite; nanoLLaVA-1.5 was retired

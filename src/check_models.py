@@ -27626,23 +27626,16 @@ class _ConditionalDefaultsHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
         return super()._get_help_string(action) or help_text
 
 
-class _ArgumentAdder(Protocol):
-    """Minimal argparse container protocol for parser and argument groups."""
-
-    def add_argument(self, *_name_or_flags: str, **kwargs: Any) -> argparse.Action:  # noqa: ANN401 - argparse keyword protocol
-        """Register an argparse option."""
-        ...
-
-
-def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
+def _add_output_path_arguments(parser: argparse.ArgumentParser) -> None:
     """Register the output-root and comparison arguments on the CLI parser."""
-    parser.add_argument(
+    output_group = parser.add_argument_group("Output Reports")
+    output_group.add_argument(
         "--output-dir",
         type=Path,
         default=_SCRIPT_DIR / "output",
         help="Root directory for the canonical report, machine-data, issue, and log layout.",
     )
-    parser.add_argument(
+    output_group.add_argument(
         "--compare-with",
         default=DEFAULT_COMPARE_WITH,
         metavar="auto|none|PATH|GITREF",
@@ -28145,8 +28138,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     )
 
     _add_input_arguments(parser)
-    output_group = parser.add_argument_group("Output Reports")
-    _add_output_path_arguments(output_group)
+    _add_output_path_arguments(parser)
     _add_model_prompt_generation_arguments(parser)
     _add_runtime_workflow_console_arguments(parser)
     return parser

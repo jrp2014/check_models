@@ -95,8 +95,7 @@ def reset_logger_handlers() -> Generator[None]:
     on closed file" errors. This fixture ensures handlers use a fresh stream and
     propagate is enabled for caplog to work correctly.
     """
-    # Import lazily to avoid circular imports at module load time
-    from check_models import logger  # noqa: PLC0415 - avoid circular import at load
+    logger = check_models.logger
 
     # Save original state
     original_propagate = logger.propagate

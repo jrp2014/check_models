@@ -20,6 +20,8 @@ import zipfile
 from pathlib import Path
 from textwrap import dedent
 
+import huggingface_hub
+import huggingface_hub.utils
 import pytest
 import yaml
 from packaging.requirements import Requirement
@@ -322,28 +324,21 @@ def test_pyrefly_quality_check_passes_explicit_targets() -> None:
     assert '"${targets[@]}" 2>&1 | tee "$output_path"' in common_quality
 
 
-def test_mypy_uses_generated_typings_without_gating_stub_internals() -> None:
-    """Generated third-party stubs should inform call sites, not fail strict checks."""
-    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
-    overrides = pyproject["tool"]["mypy"]["overrides"]
+def test_mypy_follows_imports_for_their_types() -> None:
+    """Imported packages must keep their types; "skip" silently turned them into Any.
 
-    generated_overrides = [
-        override
-        for override in overrides
-        if set(override.get("module", []))
-        & {
-            "mlx_vlm",
-            "mlx_vlm.*",
-            "tokenizers",
-            "tokenizers.*",
-            "transformers",
-            "transformers.*",
-        }
-    ]
+    Only the editable-checkout packages may be missing, and no override may
+    reinstate skipping or hide errors in the files mypy is asked to check.
+    """
+    mypy_config = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))["tool"]["mypy"]
 
-    assert generated_overrides
-    for override in generated_overrides:
-        assert override["ignore_errors"] is True
+    assert mypy_config["follow_imports"] == "silent"
+    assert mypy_config["ignore_missing_imports"] is False
+    for override in mypy_config.get("overrides", []):
+        assert override.get("follow_imports", "silent") == "silent"
+        assert "ignore_errors" not in override
+        if override.get("ignore_missing_imports"):
+            assert set(override["module"]) <= {"mlx", "mlx.*", "mlx_vlm", "mlx_vlm.*"}
 
 
 def test_root_makefile_exposes_documented_maintenance_targets() -> None:
@@ -3339,8 +3334,6 @@ def _fetch_with_siblings(
     pipeline_tag: str | None = None,
 ) -> hub_precheck.HubCandidate:
     """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set)."""
-    import huggingface_hub  # noqa: PLC0415 - patched for this call only
-    import huggingface_hub.utils  # noqa: PLC0415 - as above
 
     class _Sibling:
         def __init__(self, name: str, size: int | None) -> None:
