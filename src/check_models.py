@@ -5515,6 +5515,7 @@ _SENT_GENERATE_KEYWORDS: Final[tuple[str, ...]] = (
     "verbose",
     "temperature",
     "top_p",
+    "top_k",
     "repetition_penalty",
     "repetition_context_size",
     "seed",
@@ -5535,7 +5536,6 @@ _SENT_GENERATE_KEYWORDS: Final[tuple[str, ...]] = (
     "kv_key_scheme",
     "kv_value_scheme",
     "min_p",
-    "top_k",
     "prefill_step_size",
     "resize_shape",
     "eos_tokens",
@@ -12399,8 +12399,6 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
     extra_kwargs: GenerateKwargs = {}
     if params.min_p > 0.0:
         extra_kwargs["min_p"] = params.min_p
-    if params.top_k > 0:
-        extra_kwargs["top_k"] = params.top_k
     if params.prefill_step_size is not None:
         extra_kwargs["prefill_step_size"] = params.prefill_step_size
     if params.resize_shape is not None:
@@ -12516,6 +12514,10 @@ def _build_generate_kwargs(
     generate_kwargs["verbose"] = params.verbose
     generate_kwargs["temperature"] = params.temperature
     generate_kwargs["top_p"] = params.top_p
+    # Sent even at 0 (disabled): mlx-vlm 73d366e fills an omitted top_k from
+    # the checkpoint's generation_config.json, which would bypass
+    # _apply_declared_sampling and the recorded sampling sources.
+    generate_kwargs["top_k"] = params.top_k
     generate_kwargs["repetition_penalty"] = params.repetition_penalty
     generate_kwargs["repetition_context_size"] = params.repetition_context_size
     generate_kwargs["seed"] = params.seed
@@ -21362,7 +21364,9 @@ def _decoding_settings(record: JsonlResultRecord) -> tuple[JsonLike, ...] | None
     settings = diagnostics.get("generate_kwargs") if isinstance(diagnostics, dict) else None
     if not isinstance(settings, dict) or not isinstance(settings.get("temperature"), int | float):
         return None
-    return tuple(settings.get(key) for key in _DECODING_KEYS)
+    # Before 0.17.76 the harness left top_k out when it was 0 (disabled), so an
+    # older record without it ran with 0.
+    return tuple(settings.get(key, 0 if key == "top_k" else None) for key in _DECODING_KEYS)
 
 
 def _decoding_group(now: JsonlResultRecord, before: JsonlResultRecord) -> str:

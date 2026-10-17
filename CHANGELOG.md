@@ -1118,6 +1118,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Sampling (0.17.76): `top_k` is now always passed to mlx-vlm, including 0
+  (disabled). mlx-vlm 73d366e ("Honor checkpoint sampling defaults") fills an
+  omitted `top_k` from the checkpoint's `generation_config.json`, so the
+  harness's old habit of leaving out a 0 let a sampled run use the
+  checkpoint's `top_k` while the record said 0: for example `--top-k 0` given
+  on the command line, or `--temperature 0.7` on a `do_sample: false`
+  checkpoint. Greedy runs were unaffected. Run comparison reads an older
+  record without `top_k` as 0, so it does not mark sampled pairs across this
+  change as "settings changed". Pillow 13.0.0 needed no change: none of its
+  removed APIs are used and the test suite passes on it.
 - Run summary: a failed second render no longer empties the summary. The
   summary is rendered again once the run's final timing is known, and a
   failure there is meant to keep the first render, but the Markdown writer

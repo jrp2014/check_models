@@ -8461,7 +8461,8 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         ),
         weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
-        decoded("org/sampled", "B", temperature=0.7, top_p=0.8),
+        # Records from 0.17.76 carry top_k 0; older ones omitted it.
+        decoded("org/sampled", "B", temperature=0.7, top_p=0.8, top_k=0),
         decoded("org/reseeded", "C", temperature=0.7, top_p=0.8, seed=1),
         _comparison_record("org/unrecorded", text="d"),
     ]
