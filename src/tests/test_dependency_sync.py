@@ -297,13 +297,6 @@ def test_pillow_floor_uses_security_fixed_release() -> None:
     )
 
 
-def test_ty_quality_check_resolves_gitignored_generated_stubs() -> None:
-    """Ty must not exclude the configured typings path merely because Git ignores it."""
-    common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
-
-    assert 'check --no-respect-ignore-files --python "$python_path"' in common_quality
-
-
 def test_pyrefly_quality_check_passes_explicit_targets() -> None:
     """Pyrefly must run in single-file mode, not project discovery.
 
@@ -670,7 +663,6 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
             "node_modules",
             "output",
             "tests",
-            "typings",
         ),
     )
 
@@ -2627,8 +2619,7 @@ def test_make_format_covers_every_gate_formatted_directory() -> None:
         for path in PKG_ROOT.iterdir()
         if path.is_dir()
         and not path.name.startswith(".")
-        and path.name
-        not in {"node_modules", "output", "build", "dist", "check_models.egg-info", "typings"}
+        and path.name not in {"node_modules", "output", "build", "dist", "check_models.egg-info"}
         and any(path.glob("*.py"))
     }
     assert expected_dirs | {"check_models.py"} <= fmt_paths | expected_dirs & fmt_paths | {

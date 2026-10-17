@@ -1343,8 +1343,7 @@ update_local_mlx_repos() {
 			# Compat-mode editable installs expose the checkout as a plain sys.path
 			# entry (a real .pth) instead of an __editable__ finder hook, which
 			# static type checkers cannot traverse. With mlx-vlm shipping py.typed,
-			# this is what lets mypy/pyrefly/ty read its inline annotations without
-			# locally generated stubs.
+			# this is what lets mypy/pyrefly/ty read its inline annotations.
 			INSTALL_CMD=(pip_install -e . --config-settings editable_mode=compat)
 		fi
 

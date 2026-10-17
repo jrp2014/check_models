@@ -50,7 +50,6 @@ EXCLUDED_PATH_PARTS: Final[frozenset[str]] = frozenset(
         ".pytest_cache",
         "node_modules",
         "check_models.egg-info",
-        "typings",
     },
 )
 EXCLUDED_PATH_PREFIXES: Final[tuple[Path, ...]] = (

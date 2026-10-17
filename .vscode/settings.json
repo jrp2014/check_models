@@ -34,7 +34,6 @@
     "src/tests"
   ],
   "mypy.configFile": "src/pyproject.toml",
-  "python.analysis.stubPath": "typings",
   "python.analysis.exclude": [
     ".git",
     ".conda",
@@ -67,7 +66,6 @@
   },
   "search.exclude": {
     "**/node_modules": true,
-    "typings": true,
     "docs/notes/archive": true,
     "**/.pytest_cache": true
   },
@@ -76,8 +74,7 @@
     "**/.mypy_cache/**": true,
     "**/.ruff_cache/**": true,
     "**/.pytest_cache/**": true,
-    "**/node_modules/**": true,
-    "typings/**": true
+    "**/node_modules/**": true
   },
   // Force JSON/JSONC to use the built-in JSON formatter (prevents Copilot being used)
   "[json]": {
@@ -116,7 +113,6 @@
   "cursorpyright.analysis.extraPaths": [
     "${workspaceFolder}/src"
   ],
-  "cursorpyright.analysis.stubPath": "typings",
   "cursorpyright.analysis.typeCheckingMode": "basic",
   "cursorpyright.analysis.useLibraryCodeForTypes": true,
   "window.autoDetectColorScheme": true,

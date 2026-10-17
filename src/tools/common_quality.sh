@@ -276,24 +276,16 @@ quality_require_command() {
         python_path="$(quality_resolve_python_path)" || return 1
         ty_path="$(quality_find_python_tool ty)" || return 1
         quality_print_ty_diagnostics "$python_path" "$ty_path" "$@"
-        "$ty_path" check --no-respect-ignore-files --python "$python_path" "$@"
+        "$ty_path" check --python "$python_path" "$@"
     }
 
     quality_write_pyrefly_config() {
         local config_path="$1"
         local python_path="$2"
         local pyproject_path=""
-        local main_checkout_root=""
 
         pyproject_path="$(quality_src_root)/pyproject.toml"
-        # Linked worktrees (for example .claude/worktrees/*) share the primary
-        # checkout's gitignored assets such as typings/; resolve that root so
-        # relative search-path entries can fall back to it.
-        main_checkout_root="$(git -C "$(quality_src_root)" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || main_checkout_root=""
-        if [ -n "$main_checkout_root" ]; then
-            main_checkout_root="$(dirname "$main_checkout_root")"
-        fi
-        "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" "$main_checkout_root" <<'PY'
+        "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" <<'PY'
 from __future__ import annotations
 
 import json
@@ -305,7 +297,6 @@ from typing import Any
 config_path = Path(sys.argv[1])
 python_path = Path(sys.argv[2]).resolve()
 pyproject_path = Path(sys.argv[3])
-main_checkout_root = Path(sys.argv[4]) if len(sys.argv) > 4 and sys.argv[4] else None
 
 tool_config = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))["tool"]["pyrefly"]
 tool_config = dict(tool_config)
@@ -351,24 +342,12 @@ tool_config["project-excludes"] = project_excludes
 # is instead of letting it infer an import root from the config's directory.
 tool_config.setdefault("project-includes", [f"{src_root}/**/*.py"])
 
-# Absolutize search-path entries; a relative entry missing from this checkout
-# (worktrees do not carry gitignored typings/) resolves against the primary
-# checkout instead so both use the same stub source. The package root itself
-# always leads so `check_models`, `check_models_data` and `tools` resolve.
-checkout_root = src_root.parent
+# Absolutize search-path entries. The package root itself always leads so
+# `check_models`, `check_models_data` and `tools` resolve.
 search_path_entries: list[str] = [str(src_root)]
 for entry in tool_config.get("search-path", []):
     entry_path = Path(entry)
     resolved = entry_path if entry_path.is_absolute() else (src_root / entry_path).resolve()
-    if not resolved.exists() and main_checkout_root is not None:
-        try:
-            relative_to_checkout = resolved.relative_to(checkout_root)
-        except ValueError:
-            relative_to_checkout = None
-        if relative_to_checkout is not None:
-            fallback = main_checkout_root / relative_to_checkout
-            if fallback.exists():
-                resolved = fallback
     if str(resolved) not in search_path_entries:
         search_path_entries.append(str(resolved))
 tool_config["search-path"] = search_path_entries

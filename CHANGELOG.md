@@ -103,6 +103,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling (0.17.83): the last traces of locally generated `typings/` stubs,
+  retired earlier, are gone. ty runs without `--no-respect-ignore-files`
+  (an explicit target inside a gitignored worktree is still checked; tested
+  with a planted error under `.claude/worktrees/`). The generated Pyrefly
+  config no longer falls back to the primary checkout for search-path
+  entries missing from a worktree. `typings/` is no longer gitignored, set
+  as the VS Code and Cursor stub path, excluded from search and file
+  watching, or skipped by the suppression auditor and two tests. A
+  `typings/` folder left in an existing checkout now shows as untracked and
+  can be deleted.
 - Typing and lint suppressions (0.17.82), from john's review of 0.17.79,
   with no output change. mypy now uses `follow_imports = "silent"` instead of
   `"skip"`, which had turned every name imported from a Python package into
