@@ -103,7 +103,7 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Typing and lint suppressions (0.17.81), from john's review of 0.17.79,
+- Typing and lint suppressions (0.17.82), from john's review of 0.17.79,
   with no output change. mypy now uses `follow_imports = "silent"` instead of
   `"skip"`, which had turned every name imported from a Python package into
   `Any`: `jinja2.Environment` and `huggingface_hub.scan_cache_dir` now carry
