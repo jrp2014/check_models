@@ -21364,9 +21364,13 @@ def _decoding_settings(record: JsonlResultRecord) -> tuple[JsonLike, ...] | None
     settings = diagnostics.get("generate_kwargs") if isinstance(diagnostics, dict) else None
     if not isinstance(settings, dict) or not isinstance(settings.get("temperature"), int | float):
         return None
-    # Before 0.17.76 the harness left top_k out when it was 0 (disabled), so an
-    # older record without it ran with 0.
-    return tuple(settings.get(key, 0 if key == "top_k" else None) for key in _DECODING_KEYS)
+    values = [settings.get(key) for key in _DECODING_KEYS]
+    declared = diagnostics.get("declared_sampling") if isinstance(diagnostics, dict) else None
+    top_k = _DECODING_KEYS.index("top_k")
+    if values[top_k] is None and isinstance(declared, dict) and "top_k" not in declared:
+        # The checkpoint declares no top_k, so even mlx-vlm 73d366e used 0.
+        values[top_k] = 0
+    return tuple(values)
 
 
 def _decoding_group(now: JsonlResultRecord, before: JsonlResultRecord) -> str:
@@ -21374,10 +21378,24 @@ def _decoding_group(now: JsonlResultRecord, before: JsonlResultRecord) -> str:
     settings = (_decoding_settings(before), _decoding_settings(now))
     if None in settings:
         return "unknown"
-    greedy = [cast("tuple[float, ...]", side)[0] == 0 for side in settings]
+    old, new = cast("tuple[tuple[JsonLike, ...], tuple[JsonLike, ...]]", settings)
+    greedy = [side[0] == 0 for side in (old, new)]
     if all(greedy):
         return "greedy"
-    return "sampled" if not any(greedy) and settings[0] == settings[1] else "changed"
+    top_k = _DECODING_KEYS.index("top_k")
+    others_differ = any(
+        old_value != new_value
+        for index, (old_value, new_value) in enumerate(zip(old, new, strict=True))
+        if index != top_k
+    )
+    if any(greedy) or others_differ:
+        return "changed"
+    # Before 0.17.76 the harness left out a top_k of 0, and from mlx-vlm 73d366e
+    # an omitted top_k is filled from generation_config.json, so a sampled
+    # record without one does not establish what ran.
+    if old[top_k] is None or new[top_k] is None:
+        return "unknown"
+    return "sampled" if old[top_k] == new[top_k] else "changed"
 
 
 def _completed_in_both(

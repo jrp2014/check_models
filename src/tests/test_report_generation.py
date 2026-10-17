@@ -8475,8 +8475,8 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         weighted(decoded("org/q4", "q", temperature=0.0), quantization_bits=4),
         weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
-        decoded("org/sampled", "b", temperature=0.7, top_p=0.8),
-        decoded("org/reseeded", "c", temperature=0.7, top_p=0.8),
+        decoded("org/sampled", "b", temperature=0.7, top_p=0.8, top_k=0),
+        decoded("org/reseeded", "c", temperature=0.7, top_p=0.8, top_k=0),
         _comparison_record("org/unrecorded", text="d"),
     ]
     now = [
@@ -8485,9 +8485,8 @@ def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None
         ),
         weighted(decoded("org/bf16", "u", temperature=0.0)),
         decoded("org/greedy", "a", temperature=0.0),
-        # Records from 0.17.76 carry top_k 0; older ones omitted it.
         decoded("org/sampled", "B", temperature=0.7, top_p=0.8, top_k=0),
-        decoded("org/reseeded", "C", temperature=0.7, top_p=0.8, seed=1),
+        decoded("org/reseeded", "C", temperature=0.7, top_p=0.8, top_k=0, seed=1),
         _comparison_record("org/unrecorded", text="d"),
     ]
     baseline = _comparison_baseline(before)
@@ -8743,6 +8742,30 @@ def test_baseline_revisions_must_be_commit_ids_before_reaching_git() -> None:
     }
     hostile = {"mlx": {"built_revision": "--output=/tmp/x"}}
     assert check_models._editable_revision_range(hostile, current, "mlx") is None
+
+
+def test_sampled_record_without_top_k_is_unknown_unless_the_checkpoint_declares_none() -> None:
+    """Before 0.17.76 a top_k of 0 was omitted, and mlx-vlm 73d366e fills an omitted one."""
+
+    def record(
+        *, declared: dict[str, object] | None = None, **settings: object
+    ) -> check_models.JsonlResultRecord:
+        diagnostics: dict[str, object] = {"generate_kwargs": {"seed": 0, **settings}}
+        if declared is not None:
+            diagnostics["declared_sampling"] = declared
+        return cast("check_models.JsonlResultRecord", {"prompt_diagnostics": diagnostics})
+
+    now = record(temperature=0.7, top_p=1.0, top_k=0)
+    group = check_models._decoding_group
+    # The checkpoint declared top_k 50, so the old omitted value may have been 50.
+    assert group(now, record(temperature=0.7, top_p=1.0, declared={"top_k": 50})) == "unknown"
+    assert group(now, record(temperature=0.7, top_p=1.0)) == "unknown"
+    # Nothing declared top_k, so mlx-vlm ran 0 either way.
+    assert group(now, record(temperature=0.7, top_p=1.0, declared={})) == "sampled"
+    # A setting that is recorded on both sides and differs still decides.
+    assert group(now, record(temperature=0.9, top_p=1.0)) == "changed"
+    assert group(now, record(temperature=0.0)) == "changed"
+    assert group(record(temperature=0.0), record(temperature=0.0)) == "greedy"
 
 
 def test_decoding_split_counts_the_same_pairs_as_the_text_count() -> None:

@@ -1118,6 +1118,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Run comparison (0.17.78): a sampled record without `top_k` makes the pair
+  "settings not recorded" rather than "same settings". Before 0.17.76 the
+  harness left out a `top_k` of 0, and from mlx-vlm 73d366e an omitted one is
+  filled from the checkpoint, so such a record does not show what ran. The
+  exception is a record whose `declared_sampling` has no `top_k`: nothing
+  could fill it, so it ran with 0. A setting recorded on both sides that
+  differs still marks the pair "changed", and greedy pairs are unaffected.
+  This replaces 0.17.76's reading of a missing `top_k` as 0.
 - Native repro commands (0.17.77): a sampled run's command now states
   `--top-p` and `--top-k` even at their defaults (1.0 and 0). From mlx-vlm
   73d366e the CLI fills omitted ones from `generation_config.json`, so the
@@ -1132,9 +1140,7 @@ Notable changes to this project will be documented in this file.
   harness's old habit of leaving out a 0 let a sampled run use the
   checkpoint's `top_k` while the record said 0: for example `--top-k 0` given
   on the command line, or `--temperature 0.7` on a `do_sample: false`
-  checkpoint. Greedy runs were unaffected. Run comparison reads an older
-  record without `top_k` as 0, so it does not mark sampled pairs across this
-  change as "settings changed". Pillow 13.0.0 needed no change: none of its
+  checkpoint. Greedy runs were unaffected. Pillow 13.0.0 needed no change: none of its
   removed APIs are used and the test suite passes on it.
 - Run summary: a failed second render no longer empties the summary. The
   summary is rendered again once the run's final timing is known, and a
