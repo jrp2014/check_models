@@ -23959,7 +23959,7 @@ def _effective_repro_args(
     repro built from global CLI arguments alone would not reproduce the
     recorded output. The per-model kwargs captured in prompt diagnostics win.
     """
-    # Checkpoint sampling values too: native mlx-vlm does not read
+    # Checkpoint sampling values too: mlx-vlm before 73d366e does not read
     # generation_config.json, so the command must state what the run used.
     overrides = _repro_thinking_overrides(
         run_args,
@@ -25912,9 +25912,12 @@ def _build_native_mlx_vlm_cli_tokens(
         _append_native_cli_sequence(tokens, flag, getattr(run_args, attribute, None))
     for flag, attribute in _NATIVE_CLI_OPTIONAL_ARGS:
         _append_native_cli_optional_pair(tokens, flag, getattr(run_args, attribute, None))
+    # A sampled run states top_p and top_k even at their defaults: since
+    # mlx-vlm 73d366e the CLI fills omitted ones from generation_config.json.
+    sampled = float(getattr(run_args, "temperature", DEFAULT_TEMPERATURE)) > 0
     for flag, attribute, default in _NATIVE_CLI_NONDEFAULT_ARGS:
         value = getattr(run_args, attribute, default)
-        if value != default:
+        if value != default or (sampled and attribute in {"top_p", "top_k"}):
             tokens.extend([flag, str(value)])
     for flag, attribute in _NATIVE_CLI_BOOLEAN_FLAGS:
         if bool(getattr(run_args, attribute, False)):

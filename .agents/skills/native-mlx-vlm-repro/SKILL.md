@@ -166,12 +166,13 @@ text from the final cleaned answer when reporting an output discrepancy.
 - Prefer the harness’s effective generation kwargs from diagnostics/JSONL over
   guessed flags. Only include native-CLI-supported settings in CLI repros;
   put harness-only settings in the Python block or prose.
-- State sampling explicitly. The native CLI does not read the checkpoint's
-  `generation_config.json`
-  ([Blaizzy/mlx-vlm#2228](https://github.com/Blaizzy/mlx-vlm/issues/2228)),
-  so a command without `--temperature`, `--top-p` and `--top-k` runs the CLI's
-  defaults, not what the harness ran. Copy them from the model's effective
-  `generate_kwargs` (the harness's own repro commands already do).
+- State sampling explicitly. Before mlx-vlm 73d366e the native CLI ignores
+  the checkpoint's `generation_config.json`
+  ([Blaizzy/mlx-vlm#2228](https://github.com/Blaizzy/mlx-vlm/issues/2228));
+  from 73d366e it fills omitted `--temperature`, `--top-p` and `--top-k` from
+  it. Either way an omitted flag may not be what the harness ran, so copy all
+  three from the model's effective `generate_kwargs` (the harness's own repro
+  commands already do).
 
 ## Thinking-output checks
 

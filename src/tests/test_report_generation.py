@@ -828,6 +828,30 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
         assert getattr(parsed, flag) is True, flag
 
 
+def test_native_repro_states_default_top_p_and_top_k_only_when_sampled() -> None:
+    """mlx-vlm 73d366e fills omitted --top-p/--top-k from generation_config.json."""
+
+    def sampling_flags(temperature: float) -> dict[str, str]:
+        run_args = argparse.Namespace(
+            **{**vars(_native_repro_args_with_every_setting()), "top_p": 1.0, "top_k": 0},
+        )
+        run_args.temperature = temperature
+        tokens = check_models._build_native_mlx_vlm_cli_tokens(
+            model_name="org/model",
+            prompt="Describe this image.",
+            image_ref="image.jpg",
+            run_args=run_args,
+        )
+        return {
+            flag: tokens[index + 1]
+            for index, flag in enumerate(tokens)
+            if flag in {"--top-p", "--top-k"}
+        }
+
+    assert sampling_flags(0.7) == {"--top-p": "1.0", "--top-k": "0"}
+    assert sampling_flags(0.0) == {}
+
+
 def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
     """The native command must retain every harness setting exposed by its CLI."""
     run_args = _native_repro_args_with_every_setting()

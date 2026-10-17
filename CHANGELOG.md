@@ -1118,6 +1118,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Native repro commands (0.17.77): a sampled run's command now states
+  `--top-p` and `--top-k` even at their defaults (1.0 and 0). From mlx-vlm
+  73d366e the CLI fills omitted ones from `generation_config.json`, so the
+  command could sample differently from the run. Greedy commands are
+  unchanged. The harness still applies checkpoint sampling itself rather
+  than leaving it to mlx-vlm, since it records each setting's source,
+  supports mlx-vlm releases before 73d366e, and ignores out-of-range values.
+  The `native-mlx-vlm-repro` skill now describes both CLI behaviours.
 - Sampling (0.17.76): `top_k` is now always passed to mlx-vlm, including 0
   (disabled). mlx-vlm 73d366e ("Honor checkpoint sampling defaults") fills an
   omitted `top_k` from the checkpoint's `generation_config.json`, so the
