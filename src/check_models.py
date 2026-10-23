@@ -12960,8 +12960,8 @@ _STREAM_CAPTURE_STDERR_MARKER: Final[str] = "=== STDERR ===\n"
 def _captured_upstream_output_for_record(result: PerformanceResult) -> str | None:
     """Return the captured console output worth retaining in a JSONL row.
 
-    For a completed model the tee'd STDOUT is, by construction, the verbose
-    passthrough of the answer that the row already retains as
+    For a completed model the tee'd STDOUT is, by construction, the live
+    echo of the answer that the row already retains as
     ``generated_text``; only the STDERR half (upstream warnings, progress)
     adds anything. The STDOUT half is kept whenever it differs from the
     retained answer (a Harmony-style transcript that ``clean_output`` later
@@ -14924,10 +14924,10 @@ def _generate_with_repetition_guard(
     over a few hundred tokens is not comparable with a full-length run.
 
     Upstream ``stream_generate`` does not echo text the way
-    ``generate(verbose=True)`` did, so under ``verbose`` the guard streams
-    each retained (non-draft, not-already-printed) chunk to stdout as it
-    arrives — inside the tee capture, so the live console and the retained
-    upstream capture both keep the text. Like upstream ``generate()``, the
+    ``generate(verbose=True)`` did, so the guard streams each retained
+    (non-draft, not-already-printed) chunk to stdout as it arrives, with or
+    without ``verbose`` — inside the tee capture, so the live console and the
+    retained upstream capture both keep the text. Like upstream ``generate()``, the
     joined text passes through the processor's optional ``clean_output``
     hook before being returned.
 
@@ -14949,7 +14949,6 @@ def _generate_with_repetition_guard(
     aborted = False
     token_seen = False
     chunk_count = 0
-    echo = sys.stdout if kwargs.get("verbose") else None
     stream: Iterator[GenerationResult] | None = None
     pending: BaseException | None = None
     try:
@@ -14975,20 +14974,16 @@ def _generate_with_repetition_guard(
                 observations.observe_text(chunk.text)
             pieces.append(chunk.text)
             tail = (tail + chunk.text)[-_REPETITION_ABORT_TAIL_CHARS:]
-            if (
-                echo is not None
-                and chunk.text
-                and not getattr(chunk, "text_already_printed", False)
-            ):
-                echo.write(chunk.text)
-                echo.flush()
+            if chunk.text and not getattr(chunk, "text_already_printed", False):
+                sys.stdout.write(chunk.text)
+                sys.stdout.flush()
             chunk_count += 1
             if _stream_tail_repeats(tail, chunk, chunk_count):
                 aborted = True
                 break
-        if echo is not None and pieces:
-            echo.write("\n")
-            echo.flush()
+        if pieces:
+            sys.stdout.write("\n")
+            sys.stdout.flush()
         return _assemble_stream_result(last, pieces, processor, aborted=aborted)
     except BaseException as stream_err:
         # The streaming boundary is the only phase evidence available here:
@@ -16896,74 +16891,38 @@ def _log_quality_warnings(
         log_warning_note(message)
 
 
-def _preview_generation(
-    gen: StoredGenerationResult | None,
+def _log_success_details(
+    res: PerformanceResult,
     *,
     analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
 ) -> None:
-    if not gen:
+    """Emit the notes under a completed model's summary line.
+
+    The answer itself was streamed live by the repetition guard, so only its
+    absence needs a marker here. The timing, token and memory figures are
+    left to the comparison table that follows the per-model lines, and to
+    results.jsonl.
+    """
+    if not res.generation:
         return
-    text_val = _generation_text_value(gen)
-    gen_tokens = _generation_int_metric(gen, "generation_tokens")
-    prompt_tokens = _generation_int_metric(gen, "prompt_tokens")
+
+    gen_text = _generation_text_value(res.generation)
+    gen_tokens = _generation_int_metric(res.generation, "generation_tokens")
+
     if analysis is None:
         analysis = analyze_generation_text(
-            text_val,
+            gen_text,
             gen_tokens,
-            prompt_tokens=prompt_tokens,
+            prompt_tokens=_generation_int_metric(res.generation, "prompt_tokens"),
             prompt=prompt,
         )
-
-    if not text_val:
-        log_metric_label("Generated Text:", emoji="📝")
-        logger.info(
-            "<empty>",
-            extra={"style_hint": LogStyles.GENERATED_TEXT},
-        )
-        return
 
     _log_quality_warnings(analysis, gen_tokens)
     if analysis.likely_capped and not analysis.token_cap_reasons:
         # Same gate as the token_cap_truncation observation: a cap hit without
         # degradation evidence is neutral information, not a warning.
         logger.info("Output used the full requested token budget (%s tokens)", gen_tokens)
-
-    # Show full output in trace (truncated in summary table)
-    log_metric_label("Generated Text:", emoji="📝")
-    log_generated_text(text_val, wrap=True)
-
-
-def _log_verbose_success_details(
-    res: PerformanceResult,
-    *,
-    analysis: GenerationQualityAnalysis | None = None,
-    prompt: str | None = None,
-) -> None:
-    """Emit the warnings under a model's summary line after the guard's live echo.
-
-    The timing, token and memory figures are left to the comparison table
-    that follows the per-model lines, and to results.jsonl.
-    """
-    if not res.generation:
-        return
-
-    # Generated text was already streamed live by the repetition guard's
-    # verbose echo inside the passthrough window; only its absence needs a
-    # marker here.
-    gen_text = getattr(res.generation, "text", None) or ""
-    gen_tokens = _generation_int_metric(res.generation, "generation_tokens")
-
-    if analysis is None:
-        prompt_tokens = getattr(res.generation, "prompt_tokens", None)
-        analysis = analyze_generation_text(
-            gen_text,
-            gen_tokens,
-            prompt_tokens=prompt_tokens,
-            prompt=prompt,
-        )
-
-    _log_quality_warnings(analysis, gen_tokens)
 
     if not gen_text:
         log_metric_label("Generated Text:", emoji="📝")
@@ -17005,12 +16964,11 @@ def print_model_result(
     result: PerformanceResult,
     *,
     assessment: ResultAssessment | None = None,
-    verbose: bool = False,
     run_index: int | None = None,
     total_runs: int | None = None,
     prompt: str | None = None,
 ) -> None:
-    """Print a concise summary + optional verbose block for a model result."""
+    """Print a model's summary line, then its warnings or failure details."""
     resolved_assessment = assessment or _assess_result(result)
     # Position in the sorted results, not the run order (hence no "RUN").
     run_prefix = "" if run_index is None else f"[{run_index}/{total_runs}] "
@@ -17027,24 +16985,11 @@ def print_model_result(
                 else LogStyles.DETAIL
             )
             logger.info(line, extra={"style_hint": style})
-    if result.success and not verbose:  # quick exit with preview only
-        _preview_generation(
-            result.generation,
-            analysis=result.quality_analysis,
-            prompt=prompt,
-        )
-        return
-    # For failures, show detailed error info; for success, show generation details
     if not result.success:
         log_blank()  # Single blank before error details
         _log_failure_details(result)
         return
-    if result.generation and verbose:
-        _log_verbose_success_details(
-            result,
-            analysis=result.quality_analysis,
-            prompt=prompt,
-        )
+    _log_success_details(result, analysis=result.quality_analysis, prompt=prompt)
 
 
 def print_cli_separator() -> None:
@@ -27264,19 +27209,17 @@ def finalize_execution(
         # are not read as the first result's; the order is the report's, not
         # the run's.
         print_cli_section("Per-model results (failures first, then fastest to slowest)")
-        verbose = bool(getattr(args, "verbose", False))
         previous_has_block = False
         for index, result in enumerate(results, start=1):
-            # Under --verbose a completed model is its summary line and any
-            # warnings, so only a failure's details or a preview needs a rule.
-            has_block = not (verbose and result.success)
+            # A completed model is its summary line and any warnings (its
+            # answer was streamed live), so only a failure's details need a rule.
+            has_block = not result.success
             if index > 1 and (has_block or previous_has_block):
                 print_cli_separator()
             previous_has_block = has_block
             print_model_result(
                 result,
                 assessment=assessments[result.model_name],
-                verbose=verbose,
                 run_index=index,
                 total_runs=len(results),
                 prompt=prompt,

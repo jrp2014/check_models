@@ -103,6 +103,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Console (0.17.90): each model's answer streams to the terminal as it is
+  generated, with or without `--verbose`. Without it, answers used to appear
+  only at the end of the sweep. "Per-model results" is now the same in both
+  modes: a summary line per model, any warnings, a note when a clean answer
+  used the whole token budget, and full details for failures. It no longer
+  prints each answer a second time. `--verbose` still adds DEBUG logging and
+  mlx-vlm's own progress output. A non-verbose file log now holds each
+  answer in the model's captured-output block, as a verbose one already did;
+  `results.jsonl` is unchanged, since it drops captured stdout that matches
+  the retained answer.
 - Tooling (0.17.89): the Skylos floor is 5.0.0. Its danger gate found two
   new things. Report links now render as plain text unless their target has
   no scheme or uses `https` (SKY-D228); every target check_models builds is a

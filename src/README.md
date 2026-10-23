@@ -76,8 +76,8 @@ envs use 3.14. CI tests both.
   - Memory: peak, active/cache snapshots, and post-cleanup active/cache residue (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
 - **Multiple Output Formats**:
-  - **CLI**: Colorized; `--verbose` streams each model's output live and ends
-    with one summary line per model before the comparison tables
+  - **CLI**: Colorized; streams each model's output live and ends with one
+    summary line per model (plus any warnings) before the comparison tables
   - **HTML**: Standalone report with inline CSS, failed row highlighting
   - **Markdown**: Tiny run index, evidence gallery, and conditional diagnostics
   - **JSONL**: The sole schema-3 machine contract — run-level metadata header
@@ -1559,7 +1559,7 @@ This provides:
 
 - Detailed model loading information
 - EXIF metadata extraction details
-- Live per-model output and phase progress
+- mlx-vlm's own progress output (such as its Prefill bar)
 - Error stack traces
 - Library version information
 

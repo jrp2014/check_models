@@ -2152,13 +2152,17 @@ class TestRepetitionGuard:
         copied = names - check_models._PARAMS_NOT_COPIED_FROM_ARGS
         assert [name for name in sorted(copied) if not hasattr(args, name)] == []
 
-    def test_wrapper_echoes_stream_live_under_verbose(
-        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    @pytest.mark.parametrize("verbose", [True, False])
+    def test_wrapper_echoes_stream_live(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+        verbose: bool,
     ) -> None:
-        """Verbose sweeps must still show output as it streams.
+        """Sweeps show each model's answer as it streams, with or without verbose.
 
         Upstream stream_generate does not echo the way generate(verbose=True)
-        did, so the guard supplies the live echo.
+        did, so the guard supplies the live echo; draft chunks stay hidden.
         """
         chunks = self._chunks(["Title: ", "draft-noise ", "Boathouse"])
         chunks[1].is_draft = True
@@ -2169,31 +2173,13 @@ class TestRepetitionGuard:
             processor=_FakeProcessor(),
             prompt="p",
             image="i.jpg",
-            verbose=True,
+            verbose=verbose,
         )
 
         assert result.text == "Title: Boathouse"
         streamed = capsys.readouterr().out
         assert streamed == "Title: Boathouse\n"
         assert "draft-noise" not in streamed
-
-    def test_wrapper_streams_silently_without_verbose(
-        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-    ) -> None:
-        """The guard must not echo raw chunks without verbose.
-
-        Non-verbose runs keep the formatted finalization preview as the only
-        text surface.
-        """
-        monkeypatch.setattr(
-            check_models, "stream_generate", lambda **_kw: iter(self._chunks(["quiet "]))
-        )
-
-        check_models._generate_with_repetition_guard(
-            model=cast("Any", object()), processor=_FakeProcessor(), prompt="p", image="i.jpg"
-        )
-
-        assert capsys.readouterr().out == ""
 
     def test_wrapper_applies_processor_clean_output_hook(
         self, monkeypatch: pytest.MonkeyPatch

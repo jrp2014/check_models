@@ -267,7 +267,7 @@ def test_verbose_success_is_summary_line_without_metrics_block(
         ),
     )
 
-    print_model_result(res, verbose=True)
+    print_model_result(res)
 
     messages = [record.message for record in caplog.records]
     assert messages[0].startswith("dummy/model: completed")
@@ -276,10 +276,10 @@ def test_verbose_success_is_summary_line_without_metrics_block(
     assert all(message.strip() for message in messages)
 
 
-def test_metrics_mode_verbose_does_not_repeat_generated_text(
+def test_print_model_result_does_not_repeat_streamed_text(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Verbose mode should keep streamed output out of the post-run summary block."""
+    """The answer streams live, so the post-run block keeps it out in either mode."""
     caplog.set_level(logging.INFO)
     res = PerformanceResult(
         model_name="dummy/model",
@@ -290,22 +290,18 @@ def test_metrics_mode_verbose_does_not_repeat_generated_text(
         total_time=1.5,
     )
 
-    print_model_result(res, verbose=True)
+    print_model_result(res)
 
     messages = [record.message for record in caplog.records]
     assert not any("Generated Text:" in message for message in messages)
     assert not any("Distinct streamed output" in message for message in messages)
 
 
-def test_print_model_result_non_verbose_labels_generated_text_preview(
+def test_print_model_result_keeps_warnings_under_the_summary_line(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Non-verbose preview mode should still label the emitted model output block."""
+    """Mechanical warnings still follow a completed model's summary line."""
     caplog.set_level(logging.INFO)
-    preview_text = (
-        "- Keywords hint: St Pancras, clock tower, Victorian Gothic\n"
-        "architecture, public square, urban space"
-    )
     analysis = GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
@@ -313,7 +309,7 @@ def test_print_model_result_non_verbose_labels_generated_text_preview(
     )
     result = PerformanceResult(
         model_name="dummy/model",
-        generation=_StubGeneration(text=preview_text, generation_tokens=32),
+        generation=_StubGeneration(text="- Keywords hint: St Pancras", generation_tokens=32),
         success=True,
         generation_time=1.0,
         model_load_time=0.5,
@@ -321,15 +317,11 @@ def test_print_model_result_non_verbose_labels_generated_text_preview(
         quality_analysis=analysis,
     )
 
-    print_model_result(result, verbose=False)
+    print_model_result(result)
 
     messages = [record.message for record in caplog.records]
+    assert messages[0].startswith("dummy/model: ")
     assert any("Labelled fields not detected:" in message for message in messages)
-    label_index = next(i for i, message in enumerate(messages) if "Generated Text:" in message)
-    output_index = next(
-        i for i, message in enumerate(messages) if "- Keywords hint: St Pancras" in message
-    )
-    assert label_index < output_index
 
 
 def test_log_summary_uses_model_load_time_for_fastest_load(
@@ -813,7 +805,7 @@ def test_print_model_result_uses_neutral_cached_unusable_assessment(
         ("empty_output",),
     )
 
-    print_model_result(result, assessment=assessment, verbose=False)
+    print_model_result(result, assessment=assessment)
 
     summary = " ".join(record.message for record in caplog.records)
     assert "org/unusable: completed, unusable output" in summary
@@ -918,7 +910,7 @@ def test_print_model_result_failure_logs_actionable_details(
         captured_output_on_fail="stdout sample\nstderr sample",
     )
 
-    print_model_result(result, verbose=True, run_index=1, total_runs=1)
+    print_model_result(result, run_index=1, total_runs=1)
 
     assert any("Error package: mlx-vlm" in record.message for record in caplog.records)
     assert any("Error type: ValueError" in record.message for record in caplog.records)
@@ -1032,14 +1024,14 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     _assert_report_artifact_log_order(messages)
 
 
-def test_finalize_execution_rules_off_only_failure_blocks_under_verbose(
+def test_finalize_execution_rules_off_only_failure_blocks(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Under --verbose completed models are consecutive lines; a failure's details get a rule."""
+    """Completed models are consecutive lines; a failure's details get a rule."""
     caplog.set_level(logging.INFO)
     args = argparse.Namespace(
-        verbose=True,
+        verbose=False,
         output_dir=tmp_path,
     )
     results = [
@@ -1364,7 +1356,10 @@ def test_console_cap_note_is_neutral_without_degradation_evidence(
 
     generation = _StubGeneration(text=clean_text, generation_tokens=500)
     with caplog.at_level(logging.INFO, logger=check_models.logger.name):
-        check_models._preview_generation(generation, analysis=clean_cap)
+        check_models._log_success_details(
+            PerformanceResult(model_name="m", generation=generation, success=True),
+            analysis=clean_cap,
+        )
 
     assert "Output used the full requested token budget" in caplog.text
     assert "reached requested token limit" not in caplog.text
@@ -1378,17 +1373,21 @@ def test_console_cap_note_is_neutral_without_degradation_evidence(
     assert degraded.token_cap_reasons
     caplog.clear()
     with caplog.at_level(logging.INFO, logger=check_models.logger.name):
-        check_models._preview_generation(
-            _StubGeneration(text="boats boats", generation_tokens=500),
+        check_models._log_success_details(
+            PerformanceResult(
+                model_name="m",
+                generation=_StubGeneration(text="boats boats", generation_tokens=500),
+                success=True,
+            ),
             analysis=degraded,
         )
     assert "reached requested token limit" in caplog.text
 
 
-def test_preview_and_verbose_modes_log_the_same_quality_warnings(
+def test_success_details_log_every_quality_warning(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Changing verbosity must not hide actionable mechanical observations."""
+    """The post-run block must not hide actionable mechanical observations."""
     analysis = GenerationQualityAnalysis(
         is_repetitive=True,
         repeated_token="loop",  # noqa: S106 - generated-text fixture, not a credential
@@ -1413,20 +1412,11 @@ def test_preview_and_verbose_modes_log_the_same_quality_warnings(
     )
 
     with caplog.at_level(logging.INFO, logger=check_models.logger.name):
-        check_models._preview_generation(generation, analysis=analysis)
-    preview_messages = "\n".join(record.message for record in caplog.records)
-    caplog.clear()
-
-    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
-        check_models._log_verbose_success_details(
-            result,
-            analysis=analysis,
-        )
-    verbose_messages = "\n".join(record.message for record in caplog.records)
+        check_models._log_success_details(result, analysis=analysis)
+    messages = "\n".join(record.message for record in caplog.records)
 
     for message in expected:
-        assert message in preview_messages
-        assert message in verbose_messages
+        assert message in messages
 
 
 class TestSystemTelemetry:
