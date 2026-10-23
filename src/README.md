@@ -921,6 +921,21 @@ The `src/tools/` directory contains scripts useful for development and verificat
   python -m tools.validate_env
   ```
 
+- **`retire_old_models.sh`**: Removes retirement candidates from the Hugging
+  Face cache when a newer version of the same model line exists (the list is
+  dated in the script's header). By default it covers models whose successor
+  is already in the roster; `--upstream` adds those whose successor exists
+  only upstream. It previews with `hf cache rm --dry-run` unless given
+  `--apply`, deletes through `hf cache rm` and `hf cache prune` (never
+  `rm -rf`, because of the shared blob store), and refuses to run during a
+  sweep.
+
+  ```bash
+  bash src/tools/retire_old_models.sh              # dry run: in-roster successors
+  bash src/tools/retire_old_models.sh --upstream   # dry run: both tiers
+  bash src/tools/retire_old_models.sh --upstream --apply
+  ```
+
 - **`run_quality_checks.sh`**: Unified quality gate used by local dev and CI.
 
   ```bash

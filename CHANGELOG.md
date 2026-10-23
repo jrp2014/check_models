@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Tooling: `src/tools/retire_old_models.sh` removes the retirement
+  candidates from mlx-vlm#2546 that have a newer version of the same model
+  line: 6 whose successor is in the roster (43.2 GB) by default, and 6 more
+  whose successor exists only upstream (179.9 GB) with `--upstream`. It is a
+  dry run unless given `--apply`, deletes through `hf cache rm` and
+  `hf cache prune`, and refuses to run during a sweep.
 - Docs: the README explains how to cap or raise image resolution without a
   dedicated flag, by passing `min_pixels`/`max_pixels` through
   `--processor-kwargs`. It records what was measured: Qwen2-VL-2B's prompt
