@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Image analysis and caption generation using MLX Vision Language Models."
-version = "0.17.88"
+version = "0.17.89"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -84,7 +84,7 @@ dev = [
     "ty>=0.0.86", # first release with invalid-property-type-override, suppressed in check_models.py
     "pyrefly",
     "vulture>=2.16",
-    "skylos>=4.50.1", # 4.47 verifies editable installs (mlx, mlx-vlm); 4.50.1 stops flagging prose under "token" keys (SKY-S101)
+    "skylos>=5.0.0", # 4.47 verifies editable installs (mlx, mlx-vlm); 4.50.1 fixed SKY-S101 prose; 5.0 skips SKY-C303 in tests
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.5.0", # Parallel test execution

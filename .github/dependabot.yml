@@ -1,4 +1,6 @@
 version: 2
+# Every ecosystem waits a week (cooldown) before proposing a new release, so a
+# compromised or yanked upload is usually caught first (Skylos SKY-D361).
 updates:
   # Python dependencies in src package
   - package-ecosystem: "pip"
@@ -6,6 +8,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
@@ -21,6 +25,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     labels:
       - "dependencies"
@@ -34,6 +40,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     labels:
       - "dependencies"

@@ -103,6 +103,21 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling (0.17.89): the Skylos floor is 5.0.0. Its danger gate found two
+  new things. Report links now render as plain text unless their target has
+  no scheme or uses `https` (SKY-D228); every target check_models builds is a
+  `#anchor`, a relative artifact path or a GitHub URL, so reports are
+  unchanged, but a `javascript:` target or a colon in an odd filename can no
+  longer become a link. Dependabot waits seven days before proposing a new
+  release in every ecosystem (SKY-D361). 5.0 no longer applies SKY-C303 to
+  tests, so that suppression in `test_analyze_output_quality.py` went. It
+  also found `PERFORMANCE_TIMING_FIELDS` unused; the constant is removed.
+  ruff 0.17.2 and ty 0.0.91 need no changes; ty still needs the two
+  `TextIOBase` property ignores. markdownlint-cli2 moves to `^0.24.0`, the
+  range `update.sh` now writes. It pins smol-toml 1.9.1 itself, so the
+  `smol-toml` 1.9.0 override, which had started forcing a downgrade, is gone;
+  the `katex` override stays.
+
 - Suppression audit (0.17.88): the Skylos recheck asks for `--format json-ci`
   instead of `--json`. Plain JSON carries Skylos's dead-code definitions and
   evidence, which made the report 16.9 MB in CI, over the 16 MiB safe-read

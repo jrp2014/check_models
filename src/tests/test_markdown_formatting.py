@@ -4,6 +4,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+import pytest
+
 import check_models
 
 
@@ -95,6 +97,32 @@ def test_shared_report_blocks_render_links_and_safe_model_output() -> None:
     assert captured in markdown
     assert '<a href="#diagnostic-org-model">org/model</a>' in html_output
     assert "&lt;script&gt;bad()&lt;/script&gt;" in html_output
+
+
+@pytest.mark.parametrize("target", ["javascript:alert(1)", "data:text/html,x", "http://x.test/"])
+def test_report_links_with_other_schemes_render_as_plain_labels(target: str) -> None:
+    """Only anchors, relative paths and https URLs become links."""
+    blocks: tuple[check_models.ReportBlock, ...] = (
+        check_models.ReportTable(
+            headers=("Model", "Kept"),
+            rows=(
+                (
+                    check_models.ReportTargetLink("org/model", target),
+                    check_models.ReportTargetLink("log", "../logs/run.log#end"),
+                ),
+            ),
+        ),
+    )
+
+    markdown = "\n".join(check_models.render_report_markdown(blocks))
+    html_output = "\n".join(check_models.render_report_html(blocks))
+
+    assert "org/model" in markdown
+    assert "](" + target not in markdown
+    assert "<td>org/model</td>" in html_output
+    assert target not in html_output
+    assert "[log](../logs/run.log#end)" in markdown
+    assert '<a href="../logs/run.log#end">log</a>' in html_output
 
 
 def test_model_output_raw_fence_preserves_difficult_text_exactly_once() -> None:

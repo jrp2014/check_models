@@ -2558,6 +2558,16 @@ class ReportTargetLink:
 
 type ReportCell = str | ReportTargetLink
 
+# Report links point at "#anchors", relative artifact paths or GitHub https
+# URLs. Any other scheme (javascript:, data:, or a colon in an odd filename)
+# renders as plain text rather than a link.
+_REPORT_LINK_SCHEMES: Final[frozenset[str]] = frozenset({"", "https"})
+
+
+def _report_link_target_allowed(target: str) -> bool:
+    """Return whether a report link target uses no scheme or https."""
+    return urlparse(target).scheme in _REPORT_LINK_SCHEMES
+
 
 @dataclass(frozen=True)
 class ReportTable:
@@ -2729,6 +2739,8 @@ def _render_padded_pipe_table(
 def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
     """Render one table cell as safe Markdown."""
     if isinstance(cell, ReportTargetLink):
+        if not _report_link_target_allowed(cell.target):
+            return escape_markdown_cell(cell.label)
         label = html.escape(cell.label, quote=False).replace("\\", "\\\\")
         label = label.replace("[", r"\[").replace("]", r"\]")
         target = html.escape(cell.target, quote=True).replace("(", "%28").replace(")", "%29")
@@ -2857,7 +2869,9 @@ def _render_report_table_html(block: ReportTable) -> list[str]:
 def _render_report_cell_html(cell: ReportCell) -> str:
     """Render one table cell as escaped HTML."""
     if isinstance(cell, ReportTargetLink):
-        return f'<a href="{html.escape(cell.target, quote=True)}">{html.escape(cell.label)}</a>'
+        if not _report_link_target_allowed(cell.target):
+            return html.escape(cell.label)
+        return f'<a href="{html.escape(cell.target, quote=True)}">{html.escape(cell.label)}</a>'  # skylos: ignore[SKY-D228] scheme allowlisted by _report_link_target_allowed, which Skylos does not follow
     return html.escape(cell)
 
 
@@ -3625,13 +3639,6 @@ SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary ta
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
 
-# Performance timing fields: those from PerformanceResult (not GenerationResult)
-# Automatically derived from FIELD_ABBREVIATIONS for consistency
-PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
-    field
-    for field in FIELD_ABBREVIATIONS
-    if field in {"generation_time", "model_load_time", "total_time", "error_package"}
-]
 # =============================================================================
 # FORMATTING UTILITIES (Numbers, Memory, Time, Tokens/sec, Field Values)
 # =============================================================================
