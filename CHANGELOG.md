@@ -109,6 +109,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Docs: clarify the project's single-image MLX VLM comparison and diagnostics
+  focus in both README openings, link to sample reports from the root README,
+  and align package descriptions, keywords, and documentation links.
+
 - Console (0.17.90): each model's answer streams to the terminal as it is
   generated, with or without `--verbose`. Without it, answers used to appear
   only at the end of the sweep. "Per-model results" is now the same in both

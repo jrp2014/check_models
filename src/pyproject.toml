@@ -1,12 +1,20 @@
 [project]
 name = "check_models"
-description = "Image analysis and caption generation using MLX Vision Language Models."
+description = "Compare and diagnose MLX vision-language models on Apple Silicon: single-image runs, throughput and memory measurements, output comparisons, and reproducible failure reports."
 version = "0.17.90"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
 license = { text = "MIT" }
-keywords = ["mlx", "vision", "language-model", "ai", "image-analysis"]
+keywords = [
+    "mlx",
+    "mlx-vlm",
+    "apple-silicon",
+    "vision-language-model",
+    "model-evaluation",
+    "benchmarking",
+    "image-captioning",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -50,6 +58,8 @@ dependencies = [
 Homepage = "https://github.com/jrp2014/check_models"
 Repository = "https://github.com/jrp2014/check_models"
 Issues = "https://github.com/jrp2014/check_models/issues"
+Documentation = "https://github.com/jrp2014/check_models/blob/main/src/README.md"
+Changelog = "https://github.com/jrp2014/check_models/blob/main/CHANGELOG.md"
 
 [project.scripts]
 # Use fully-qualified module path for the CLI entry point

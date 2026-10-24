@@ -1,6 +1,14 @@
-# MLX Vision Language Model Checker (`check_models.py`)
+# check_models — MLX VLM comparison and diagnostics
 
-`check_models.py` is a comprehensive benchmarking and inspection tool designed for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It streamlines the process of validating model performance, quality, and resource usage across your local model collection.
+Run multiple MLX vision-language models (VLMs) against the same image and prompt
+on an Apple Silicon Mac. Compare generated descriptions, throughput, timings,
+and memory use, and capture diagnostics for investigating failures or changes
+between runs.
+
+Designed for local model comparison and mlx-vlm troubleshooting, with built-in
+photo-cataloguing prompts and support for custom prompts. Each run uses one
+image; macOS with Apple Silicon is required. Output assessment combines
+mechanical checks with human inspection, rather than factual-accuracy scoring.
 
 > [!NOTE]
 > This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default, it discovers and runs locally cached models that pass the `mlx-vlm` server-style cache-layout filter *and* classify as image-consuming text generators, making it effortless to benchmark the local models that actually fit an image-description benchmark.

@@ -1,6 +1,23 @@
-# MLX VLM Check
+# check_models — MLX VLM comparison and diagnostics
 
-Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML, Markdown, and JSONL reports plus maintainer-ready diagnostics, and captures performance metrics (tokens/sec, memory, timings).
+Run multiple MLX vision-language models (VLMs) against the same image and prompt
+on an Apple Silicon Mac. Compare generated descriptions, throughput, timings,
+and memory use, and capture diagnostics for investigating failures or changes
+between runs.
+
+Designed for local model comparison and mlx-vlm troubleshooting, with built-in
+photo-cataloguing prompts and support for custom prompts. Each run uses one
+image; macOS with Apple Silicon is required. Output assessment combines
+mechanical checks with human inspection, rather than factual-accuracy scoring.
+
+**Sample results:** [Run dashboard](src/output/index.md) ·
+[Model output gallery](src/output/reports/model_gallery.md) ·
+[Diagnostics](src/output/reports/diagnostics.md) ·
+[User guide & CLI reference](src/README.md)
+
+The linked results are a recorded sample run. Consult their run date, image,
+prompt, and environment details when interpreting the comparisons; they do not
+establish model quality across other tasks.
 
 > [!NOTE]
 > This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it runs cached models that pass the `mlx-vlm` server-supported cache filter; use `--models` to specify explicit model IDs.
