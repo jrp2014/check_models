@@ -17,10 +17,16 @@ hub reads the way ``check_models`` will judge it once cached:
    they cannot be held) and Metal's recommended working set (a warning when
    larger: expect paging or a load failure). Runtime allocations come on
    top, so fitting weights is necessary, not sufficient.
+5. **Lineage** (facts, never a verdict): the ``base_model`` chain the model
+   cards declare, up to ``_LINEAGE_MAX_DEPTH`` hops, and the cached models
+   that are, or declare, one of those bases. A shared base marks a variant of
+   something already cached (a re-quantisation or fine-tune), worth reading
+   the card before downloading. It depends on publishers declaring bases.
 
-Only ``config.json``, the chat template and the safetensors index are
-fetched, over HTTPS, without touching the local Hugging Face cache. Verdicts
-are hints, never proof.
+Only ``config.json``, the chat template, the safetensors index and the
+model-card metadata of the candidate and its declared bases are fetched,
+over HTTPS; the local Hugging Face cache is only read, for the cached
+models' own declared bases. Verdicts are hints, never proof.
 
 Usage::
 
@@ -32,16 +38,22 @@ Exit status 1 when any candidate is blocked.
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import re
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Final, Literal
 from urllib.request import Request, urlopen
 
+import yaml
+
 _LAYOUT_REQUIRED: Final[tuple[str, ...]] = ("config.json", "tokenizer_config.json")
 _FETCH_TIMEOUT_S: Final[int] = 30
+# Hops of declared base_model followed from a candidate: an MLX conversion of
+# a fine-tune of a base model is three.
+_LINEAGE_MAX_DEPTH: Final[int] = 3
 
 type TemplateShape = Literal["iterates-content", "string-only", "absent", "unknown"]
 
@@ -136,6 +148,14 @@ class HubCandidate:
     pipeline_tag: str | None = None
     # config.json names checkpoint-shipped model code (mlx-vlm loads it as "custom").
     model_file: str | None = None
+    # The declared base_model chain, nearest first (empty when none is declared).
+    base_models: tuple[str, ...] = ()
+    # (cached repo, the shared id): cached models that are, or declare, one of
+    # this candidate's bases, or that declare this candidate as their base.
+    cached_relatives: tuple[tuple[str, str], ...] = ()
+    already_cached: bool = False
+    # Bases whose own card could not be read, so the chain may stop early.
+    lineage_unreadable: tuple[str, ...] = ()
 
     def verdict(self) -> tuple[str, list[str]]:
         """Return ("OK" | "WARN" | "BLOCKED", reasons)."""
@@ -203,6 +223,115 @@ class HubCandidate:
 ArchCheck = Callable[[object], tuple[str | None, str | None, bool | None]]
 MemoryCheck = Callable[[], tuple[int | None, int | None]]
 Fetcher = Callable[[str], HubCandidate]
+# A repo id's declared bases, and every cached model's declared bases.
+BasesLookup = Callable[[str], tuple[str, ...]]
+CachedBases = Callable[[], Mapping[str, tuple[str, ...]]]
+
+
+def declared_bases(card_data: object) -> tuple[str, ...]:
+    """A model card's ``base_model``, which may be one id or a list, as a tuple."""
+    getter = getattr(card_data, "get", None)
+    raw = getter("base_model") if callable(getter) else None
+    items = [raw] if isinstance(raw, str) else raw if isinstance(raw, list) else []
+    return tuple(
+        dict.fromkeys(item.strip() for item in items if isinstance(item, str) and item.strip())
+    )
+
+
+class BaseCardUnreadableError(LookupError):
+    """A declared base's model card could not be read from the hub."""
+
+
+def lineage(first: Sequence[str], bases_of: BasesLookup) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """The declared base chain from a candidate's own bases, and the bases left unread.
+
+    Breadth-first, without repeats, for at most ``_LINEAGE_MAX_DEPTH`` hops,
+    looking up no further than it reports; repo ids compare
+    case-insensitively, as the hub resolves them. A base whose card cannot be
+    read is kept in the chain and also returned as unread, since the chain
+    may continue past it.
+    """
+    chain: list[str] = []
+    unreadable: list[str] = []
+    seen: set[str] = set()
+    frontier = list(first)
+    for hop in range(_LINEAGE_MAX_DEPTH):
+        following: list[str] = []
+        for repo in frontier:
+            if repo.lower() in seen:
+                continue
+            seen.add(repo.lower())
+            chain.append(repo)
+            if hop < _LINEAGE_MAX_DEPTH - 1:
+                try:
+                    following.extend(bases_of(repo))
+                except BaseCardUnreadableError:
+                    unreadable.append(repo)
+        frontier = following
+        if not frontier:
+            break
+    return tuple(chain), tuple(unreadable)
+
+
+def cached_relatives(
+    repo_id: str, chain: Sequence[str], cached: Mapping[str, tuple[str, ...]]
+) -> tuple[tuple[str, str], ...]:
+    """(cached repo, shared id) for cached models related to the candidate by declared bases.
+
+    Related means the cached model is one of the candidate's bases, declares
+    one of them, or declares the candidate itself as its base.
+    """
+    own = repo_id.lower()
+    lineage_ids = {own, *(base.lower() for base in chain)}
+    related: list[tuple[str, str]] = []
+    for cached_id, bases in sorted(cached.items()):
+        if cached_id.lower() == own:
+            continue
+        shared = next((rid for rid in (cached_id, *bases) if rid.lower() in lineage_ids), None)
+        if shared is not None:
+            related.append((cached_id, shared))
+    return tuple(related)
+
+
+def _hub_declared_bases(repo_id: str) -> tuple[str, ...]:
+    """One hub repo's declared bases; raises BaseCardUnreadableError when unreadable."""
+    from huggingface_hub import HfApi  # noqa: PLC0415 - network path only
+
+    try:
+        info = HfApi().model_info(repo_id)
+    except Exception as error:
+        # Any hub failure leaves this base unread; lineage() records it.
+        raise BaseCardUnreadableError(repo_id) from error
+    return declared_bases(getattr(info, "card_data", None))
+
+
+@functools.cache
+def _cached_declared_bases() -> Mapping[str, tuple[str, ...]]:
+    """Every cached model's declared bases, from the README in its main snapshot."""
+    from huggingface_hub import metadata_load, scan_cache_dir  # noqa: PLC0415 - cache path only
+    from huggingface_hub.errors import CacheNotFound  # noqa: PLC0415 - cache path only
+
+    try:
+        cache = scan_cache_dir()
+    except (CacheNotFound, OSError):
+        # No readable cache: nothing cached to relate a candidate to.
+        return {}
+    bases_by_repo: dict[str, tuple[str, ...]] = {}
+    for repo in cache.repos:
+        if repo.repo_type != "model":
+            continue
+        # The main ref's snapshot is the one check_models loads.
+        revisions = sorted(repo.revisions, key=lambda revision: "main" not in revision.refs)
+        card = revisions[0].snapshot_path / "README.md" if revisions else None
+        bases: tuple[str, ...] = ()
+        if card is not None and card.is_file():
+            try:
+                bases = declared_bases(metadata_load(card))
+            except (OSError, ValueError, yaml.YAMLError):
+                # An unreadable or malformed card declares no base.
+                bases = ()
+        bases_by_repo[repo.repo_id] = bases
+    return bases_by_repo
 
 
 def _default_arch_check() -> ArchCheck:
@@ -327,8 +456,10 @@ def fetch_candidate(
     *,
     arch_check: ArchCheck | None = None,
     memory_check: MemoryCheck | None = None,
+    bases_of: BasesLookup | None = None,
+    cached_bases: CachedBases | None = None,
 ) -> HubCandidate:
-    """Read the file list, config.json and chat template of a hub repo."""
+    """Read the file list, config.json, chat template and lineage of a hub repo."""
     from huggingface_hub import HfApi, hf_hub_url  # noqa: PLC0415 - network path only
     from huggingface_hub.utils import build_hf_headers  # noqa: PLC0415 - network path only
 
@@ -355,7 +486,15 @@ def fetch_candidate(
     # mlx-vlm imports a declared model_file from the checkpoint instead of its
     # own packages (get_model_and_args), so the package check does not apply.
     template, template_source = _first_template(files, fetch)
+    chain, unreadable = lineage(
+        declared_bases(getattr(info, "card_data", None)), bases_of or _hub_declared_bases
+    )
+    cached = (cached_bases or _cached_declared_bases)()
     return HubCandidate(
+        base_models=chain,
+        cached_relatives=cached_relatives(repo_id, chain, cached),
+        already_cached=repo_id.lower() in {cached_id.lower() for cached_id in cached},
+        lineage_unreadable=unreadable,
         repo_id=repo_id,
         files=files,
         size_gb=round(sum(sizes) / 1e9, 1) if sizes else None,
@@ -388,11 +527,20 @@ def render(candidates: Sequence[HubCandidate]) -> str:
             for label, value in (
                 ("template from", candidate.template_source),
                 ("pipeline_tag", candidate.pipeline_tag),
+                ("base", " → ".join(candidate.base_models)),
+                ("already cached", "yes" if candidate.already_cached else ""),
+                ("card unreadable, chain may continue", ", ".join(candidate.lineage_unreadable)),
             )
             if value
         ]
         if facts:
             lines.append("          (" + "; ".join(facts) + ")")
+        if candidate.cached_relatives:
+            related = ", ".join(
+                cached_id if shared == cached_id else f"{cached_id} (via {shared})"
+                for cached_id, shared in candidate.cached_relatives
+            )
+            lines.append(f"          (cached models with a shared base: {related})")
         lines.extend(f"          - {reason}" for reason in reasons)
     return "\n".join(lines)
 
@@ -401,7 +549,10 @@ def main(argv: Sequence[str] | None = None, *, fetch: Fetcher = fetch_candidate)
     """CLI entry point; exit 1 when any candidate is blocked."""
     parser = argparse.ArgumentParser(
         prog="python -m tools.hub_precheck",
-        description="Judge hub checkpoints before downloading: layout, architecture, template.",
+        description=(
+            "Judge hub checkpoints before downloading: layout, architecture, template, "
+            "memory and lineage."
+        ),
     )
     parser.add_argument("repos", nargs="+", metavar="REPO", help="hub repo ids (org/name)")
     parser.add_argument("--json", action="store_true", help="emit one JSON object per line")

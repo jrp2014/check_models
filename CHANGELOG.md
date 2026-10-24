@@ -6,6 +6,15 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Tooling: `tools.hub_precheck` reports each candidate's lineage as facts:
+  the `base_model` chain its model cards declare (up to three hops, read
+  from the hub) and the cached models that are, or declare, one of those
+  bases (read from the local cards), plus whether the candidate is already
+  cached. Nemotron-3.5-Bolt-E4B was downloaded before anyone saw that it is
+  a post-trained Gemma-4-E4B-it with Gemma's vision tower; the check now
+  prints "cached models with a shared base: mlx-community/gemma-4-e4b-it-4bit
+  (via google/gemma-4-E4B-it)". Lineage never changes the OK/WARN/BLOCKED
+  verdict, and it depends on publishers declaring their bases.
 - Tooling: `src/tools/retire_old_models.sh` removes the retirement
   candidates from mlx-vlm#2546 that have a newer version of the same model
   line: 6 whose successor is in the roster (43.2 GB) by default, and 6 more

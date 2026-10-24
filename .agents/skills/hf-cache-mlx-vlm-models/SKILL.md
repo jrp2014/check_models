@@ -99,7 +99,10 @@ pre-check tool. It reads remote file lists and small metadata files, not weights
 ```
 
 Check the installed tool's help for current options. Its layout, architecture,
-and template checks are hints, not proof of generation. For server-listing
+and template checks are hints, not proof of generation. It also prints the
+model cards' declared `base_model` chain and any cached model sharing a base:
+read the card before downloading such a variant (a re-quantisation or
+fine-tune of something cached may add nothing new for images). For server-listing
 comparisons, establish whether the server uses served-model or cache discovery;
 start a server only when the requested task needs it. For actual reproduction,
 use `native-mlx-vlm-repro`.

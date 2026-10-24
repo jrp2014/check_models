@@ -3535,8 +3535,14 @@ def _fetch_with_siblings(
     siblings: Mapping[str, int | None],
     fetched: dict[str, str] | None = None,
     pipeline_tag: str | None = None,
+    card_data: dict[str, object] | None = None,
+    bases_of: Mapping[str, tuple[str, ...]] | None = None,
+    cached: Mapping[str, tuple[str, ...]] | None = None,
 ) -> hub_precheck.HubCandidate:
-    """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set)."""
+    """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set).
+
+    Lineage lookups are injected too, so no test reads the hub or the real cache.
+    """
 
     class _Sibling:
         def __init__(self, name: str, size: int | None) -> None:
@@ -3546,7 +3552,11 @@ def _fetch_with_siblings(
     class _Api:
         def model_info(self, _repo_id: str, **_kwargs: object) -> object:
             listing = [_Sibling(n, s) for n, s in siblings.items()]
-            return type("Info", (), {"siblings": listing, "pipeline_tag": pipeline_tag})()
+            return type(
+                "Info",
+                (),
+                {"siblings": listing, "pipeline_tag": pipeline_tag, "card_data": card_data},
+            )()
 
     texts = {"config.json": '{"model_type": "qwen3_vl"}', **(fetched or {})}
     siblings = {**dict.fromkeys(texts, 100), **siblings}
@@ -3558,6 +3568,8 @@ def _fetch_with_siblings(
         "org/repo",
         arch_check=lambda raw: (str(raw), str(raw), True),
         memory_check=lambda: (16_000_000_000, 12_000_000_000),
+        bases_of=lambda repo: (bases_of or {}).get(repo, ()),
+        cached_bases=lambda: cached or {},
     )
 
 
@@ -3641,6 +3653,104 @@ def test_hub_precheck_records_checkpoint_model_code_instead_of_blocking_the_type
     assert any(
         "model_file='modeling.py'" in reason and "runs that file" in reason for reason in reasons
     )
+
+
+def test_hub_precheck_lineage_helpers_follow_declared_bases() -> None:
+    """Card bases normalise, chains stop at the hop limit and cycles, relatives match ids."""
+    assert hub_precheck.declared_bases({"base_model": "org/base"}) == ("org/base",)
+    assert hub_precheck.declared_bases({"base_model": ["a/x", " a/x ", "", 3, "b/y"]}) == (
+        "a/x",
+        "b/y",
+    )
+    assert hub_precheck.declared_bases({"license": "mit"}) == ()
+    assert hub_precheck.declared_bases(None) == ()
+
+    parents = {"q/quant": ("f/tune",), "f/tune": ("g/base",), "g/base": ("g/pre",)}
+    looked_up: list[str] = []
+
+    def bases_of(repo: str) -> tuple[str, ...]:
+        looked_up.append(repo)
+        return parents.get(repo, ())
+
+    # Three hops are reported; the third is never looked up.
+    assert hub_precheck.lineage(("f/tune",), bases_of) == (("f/tune", "g/base", "g/pre"), ())
+    assert looked_up == ["f/tune", "g/base"]
+
+    # A base whose card cannot be read stays in the chain and is reported as unread.
+    def unreadable_base(repo: str) -> tuple[str, ...]:
+        if repo == "g/base":
+            raise hub_precheck.BaseCardUnreadableError(repo)
+        return parents.get(repo, ())
+
+    assert hub_precheck.lineage(("f/tune",), unreadable_base) == (
+        ("f/tune", "g/base"),
+        ("g/base",),
+    )
+    # A cycle, in any letter case, ends the chain instead of repeating it.
+    cyclic = {"a/one": ("A/Two",), "a/two": ("a/ONE",)}
+    assert hub_precheck.lineage(("a/one",), lambda repo: cyclic.get(repo.lower(), ())) == (
+        ("a/one", "A/Two"),
+        (),
+    )
+
+    cached = {
+        "mlx/base-4bit": ("G/Base",),  # declares the shared base (case differs)
+        "g/base": (),  # is the base itself
+        "mlx/finetune-of-candidate": ("org/candidate",),  # declares the candidate
+        "org/candidate": (),  # the candidate itself is never its own relative
+        "mlx/unrelated": ("x/other",),
+    }
+    assert hub_precheck.cached_relatives("org/candidate", ("f/tune", "g/base"), cached) == (
+        ("g/base", "g/base"),
+        ("mlx/base-4bit", "G/Base"),
+        ("mlx/finetune-of-candidate", "org/candidate"),
+    )
+
+
+def test_hub_precheck_reports_lineage_as_facts_not_verdicts(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Regression: a Gemma-4-E4B fine-tune was downloaded before its card showed the base."""
+    template = '{"chat_template": "{% for part in message[\'content\'] %}{% endfor %}"}'
+    candidate = _fetch_with_siblings(
+        monkeypatch,
+        {"tokenizer_config.json": 100, "model.safetensors": 1_000},
+        {"tokenizer_config.json": template},
+        card_data={"base_model": "nvidia/Bolt-E4B-BF16"},
+        bases_of={"nvidia/Bolt-E4B-BF16": ("google/gemma-4-E4B-it",)},
+        cached={"mlx-community/gemma-4-e4b-it-4bit": ("google/gemma-4-E4B-it",)},
+    )
+    assert candidate.base_models == ("nvidia/Bolt-E4B-BF16", "google/gemma-4-E4B-it")
+    assert candidate.cached_relatives == (
+        ("mlx-community/gemma-4-e4b-it-4bit", "google/gemma-4-E4B-it"),
+    )
+    assert candidate.already_cached is False
+    # Lineage prompts a look at the card; it never changes the verdict.
+    assert candidate.verdict() == ("OK", [])
+    rendered = hub_precheck.render([candidate])
+    assert "base: nvidia/Bolt-E4B-BF16 → google/gemma-4-E4B-it" in rendered
+    assert (
+        "cached models with a shared base: mlx-community/gemma-4-e4b-it-4bit "
+        "(via google/gemma-4-E4B-it)"
+    ) in rendered
+
+    assert hub_precheck.main(["org/repo", "--json"], fetch=lambda _repo: candidate) == 0
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["base_models"] == ["nvidia/Bolt-E4B-BF16", "google/gemma-4-E4B-it"]
+    assert payload["cached_relatives"] == [
+        ["mlx-community/gemma-4-e4b-it-4bit", "google/gemma-4-E4B-it"]
+    ]
+
+    # Without a declared base there is no chain, and a cached copy is named as such.
+    plain = _fetch_with_siblings(
+        monkeypatch,
+        {"tokenizer_config.json": 100, "model.safetensors": 1_000},
+        {"tokenizer_config.json": template},
+        cached={"org/repo": ()},
+    )
+    assert (plain.base_models, plain.cached_relatives, plain.already_cached) == ((), (), True)
+    assert "already cached: yes" in hub_precheck.render([plain])
+    assert "base:" not in hub_precheck.render([plain])
 
 
 def test_hub_precheck_weight_selection_mirrors_the_loader() -> None:
