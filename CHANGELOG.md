@@ -19,8 +19,11 @@ Notable changes to this project will be documented in this file.
   candidates from mlx-vlm#2546 that have a newer version of the same model
   line: 6 whose successor is in the roster (43.2 GB) by default, and 6 more
   whose successor exists only upstream (179.9 GB) with `--upstream`. It is a
-  dry run unless given `--apply`, deletes through `hf cache rm` and
-  `hf cache prune`, and refuses to run during a sweep.
+  dry run unless given `--apply`, deletes exactly what the dry run lists
+  through `hf cache rm` (which frees the shared blobs only those repos
+  used), and refuses to run during a sweep. It does not run
+  `hf cache prune`, which would also remove detached revisions anywhere in
+  the cache, such as snapshots kept for reproduction.
 - Docs: the README explains how to cap or raise image resolution without a
   dedicated flag, by passing `min_pixels`/`max_pixels` through
   `--processor-kwargs`. It records what was measured: Qwen2-VL-2B's prompt

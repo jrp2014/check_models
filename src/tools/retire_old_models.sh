@@ -10,8 +10,12 @@
 # InternVL3.5-1B, ERNIE-4.5-VL, X-Reasoner-7B, MolmoPoint-8B, diffusiongemma,
 # llm-jp-4-vl, Muse-Glimmer, Nemotron-3.5-Bolt) are deliberately left alone.
 #
-# Deletion goes through `hf cache rm` and `hf cache prune`, never `rm -rf`:
-# Hub 1.32+ keeps weights in a hub-wide blob store shared between repos.
+# Deletion goes through `hf cache rm`, never `rm -rf`: Hub 1.32+ keeps
+# weights in a hub-wide blob store shared between repos, and `hf cache rm`
+# frees the shared blobs only the removed repos used. --apply deletes exactly
+# what the dry run lists. It never runs `hf cache prune`, which also removes
+# detached revisions across the whole cache (such as snapshots kept for
+# reproduction); preview that separately with `hf cache prune --dry-run`.
 #
 # Usage: bash src/tools/retire_old_models.sh [--upstream] [--apply]
 #   without --apply it is a dry run that prints what would go and its size.
@@ -32,7 +36,7 @@ for arg in "$@"; do
     --apply) apply=1 ;;
     --upstream) upstream=1 ;;
     -h | --help)
-      sed -n '2,17p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+      sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -77,7 +81,6 @@ fi
 
 if ((apply)); then
   "$hf_bin" cache rm "${targets[@]}" --yes
-  "$hf_bin" cache prune --yes
 else
   "$hf_bin" cache rm "${targets[@]}" --dry-run
   echo "Dry run only: nothing was deleted. Re-run with --apply to delete."

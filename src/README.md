@@ -934,9 +934,11 @@ The `src/tools/` directory contains scripts useful for development and verificat
   dated in the script's header). By default it covers models whose successor
   is already in the roster; `--upstream` adds those whose successor exists
   only upstream. It previews with `hf cache rm --dry-run` unless given
-  `--apply`, deletes through `hf cache rm` and `hf cache prune` (never
-  `rm -rf`, because of the shared blob store), and refuses to run during a
-  sweep.
+  `--apply`, then deletes exactly what the preview listed through
+  `hf cache rm` (never `rm -rf`, because of the shared blob store), and
+  refuses to run during a sweep. It never runs `hf cache prune`, which
+  removes detached revisions across the whole cache; preview that on its own
+  with `hf cache prune --dry-run`.
 
   ```bash
   bash src/tools/retire_old_models.sh              # dry run: in-roster successors
