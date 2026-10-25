@@ -2042,7 +2042,7 @@ class PerformanceResult:
         captured_output_on_fail: Stderr/stdout captured when error occurred
         generation_time: Wall-clock time for text generation (excludes model load)
         model_load_time: Wall-clock time to load model into GPU memory
-        total_time: End-to-end time including all stages
+        total_time: End-to-end time including all stages, ending after cleanup
         error_type: Exception class name for error categorization in reports
         quality_analysis: Structured mechanical analysis used by ``ResultAssessment``
         active_memory: GPU memory in use (GB), from mx.get_active_memory()
@@ -14507,11 +14507,20 @@ def _finalize_process_result(
     stop_reason: str | None,
     current_phase: str,
     total_start_time: float,
+    measured_end_time: float,
     upstream_boundary: UpstreamBoundary = "not_started",
     post_cleanup_active_memory_gb: float | None = None,
     post_cleanup_cache_memory_gb: float | None = None,
 ) -> PerformanceResult:
-    """Attach final runtime diagnostics after cleanup has completed."""
+    """Attach final runtime diagnostics after cleanup has completed.
+
+    ``measured_end_time`` is the ``perf_counter`` reading taken as cleanup
+    finished: the model's one end boundary. ``total_time`` spans
+    ``total_start_time`` to it, so it covers every timed phase including
+    cleanup, while the probes that follow (allocator sampling, telemetry,
+    model burden) stay outside the measured workload.
+    """
+    total_time = measured_end_time - total_start_time
     existing = result_payload.runtime_diagnostics if result_payload is not None else None
     if existing is None:
         runtime_diagnostics = _build_runtime_diagnostics(
@@ -14541,13 +14550,14 @@ def _finalize_process_result(
             failure_phase=current_phase,
             generation_time=phase_timer.duration("decode"),
             model_load_time=phase_timer.duration("model_load"),
-            total_time=time.perf_counter() - total_start_time,
+            total_time=total_time,
             runtime_diagnostics=runtime_diagnostics,
             requested_max_tokens=params.max_tokens,
             upstream_boundary=upstream_boundary,
         )
     return replace(
         result_payload,
+        total_time=total_time,
         runtime_diagnostics=runtime_diagnostics,
         requested_revision=params.revision,
         model_burden=_collect_model_burden(params.model_identifier, params.revision),
@@ -16424,6 +16434,7 @@ def _isolated_failure_result(
         stop_reason=stop_reason,
         current_phase=current_phase,
         total_start_time=start,
+        measured_end_time=time.perf_counter(),
         upstream_boundary=boundary,
     )
 
@@ -16585,6 +16596,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         _update_phase("cleanup")
         with phase_timer.track("cleanup"):
             _cleanup_runtime_resources(synchronize_first=cleanup_requires_sync)
+        measured_end_time = time.perf_counter()
         post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = (
             _sample_post_cleanup_memory_gb()
         )
@@ -16601,6 +16613,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         stop_reason=stop_reason or "exception",
         current_phase=current_phase,
         total_start_time=total_start_time,
+        measured_end_time=measured_end_time,
         upstream_boundary=upstream_boundary,
         post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
         post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
@@ -26799,8 +26812,10 @@ def _finalize_retained_run_record(
     stay advertised in the sole machine contract, so the manifest is reduced
     to the artifacts this run produced — matching index.md — and the
     duration and timestamp become end-to-end, ending at ``ended_at`` (default
-    now) so the index can show the same figure. A failed rewrite keeps the
-    earlier header rather than costing the run.
+    now) so the index can show the same figure. The phase totals are
+    recomputed from that duration, so ``per_model_total`` plus
+    ``outside_model_loop`` equals it. A failed rewrite keeps the earlier
+    header rather than costing the run.
     """
     if retained is None or not jsonl_succeeded:
         return False
@@ -26813,8 +26828,11 @@ def _finalize_retained_run_record(
     metadata: JsonlMetadataRecord = {**retained.metadata, "artifacts": manifest}
     if inputs.overall_start_time is not None:
         end = time.time() if ended_at is None else ended_at
-        metadata["total_runtime_seconds"] = round(end - inputs.overall_start_time, 3)
+        runtime = round(end - inputs.overall_start_time, 3)
+        metadata["total_runtime_seconds"] = runtime
         metadata["timestamp"] = local_time_str(end)
+        if "phase_totals_s" in metadata:
+            metadata["phase_totals_s"] = _run_phase_totals(inputs.results, runtime)
     try:
         _write_retained_run(
             RetainedRun(metadata=metadata, results=retained.results), inputs.output_paths.jsonl

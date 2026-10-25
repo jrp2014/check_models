@@ -1273,6 +1273,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Timing (0.17.93): a model's total time ends after cleanup, the one end
+  boundary for every timed phase, so load, preparation, generation and
+  cleanup never add up to more than the total. It used to stop before
+  cleanup: LFM2.5's retained record showed 0.809 s against phases summing to
+  about 0.865 s. The post-cleanup probes (allocator sampling, telemetry,
+  model burden) stay outside it. The run's phase totals are recomputed from
+  the final end-to-end duration, so `per_model_total` plus
+  `outside_model_loop` equals `total_runtime_seconds`; the residual used to
+  come from the pre-report figure (248.422 s against 250.244 s in the
+  2026-10-25 sweep).
 - Run comparison (0.17.92): a model list longer than eight collapses to a
   bare count, "11 models". It used to add "(targeted run against a
   full-sweep baseline)", an explanation inferred from the list's length

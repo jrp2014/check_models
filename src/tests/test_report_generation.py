@@ -2712,6 +2712,11 @@ def test_reported_duration_includes_building_the_run_summary(tmp_path: Path) -> 
     assert header["total_runtime_seconds"] == 720.0
     summary = check_models._run_issue_summary_path(inputs.output_paths).read_text(encoding="utf-8")
     assert f"*Run duration:* {check_models.format_overall_runtime(720.0)}" in summary
+    # The phase residual is taken from the same final duration, so the
+    # models' time and the time outside their loop add up to it.
+    phases = header["phase_totals_s"]
+    assert phases["per_model_total"] + phases["outside_model_loop"] == pytest.approx(720.0)
+    assert phases["outside_model_loop"] > 600.0 - phases["per_model_total"]
 
 
 def test_failed_final_header_leaves_the_summary_matching_the_written_header(

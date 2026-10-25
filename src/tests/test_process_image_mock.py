@@ -1220,6 +1220,60 @@ class TestProcessImageWithModelMock:
         assert "Output repeats the prompt's own hint text" in line
         assert "prompt_hint_echoed" not in line
 
+    @pytest.mark.parametrize("generation_fails", [False, True])
+    def test_model_total_time_ends_after_cleanup_and_before_the_probes(
+        self,
+        test_image: Path,
+        *,
+        generation_fails: bool,
+    ) -> None:
+        """A model's total covers every timed phase, cleanup included, and no probe.
+
+        Regression: the total was taken before cleanup, so a retained record
+        showed load, preparation, generation and cleanup summing to more than
+        its own total.
+        """
+        params = _build_params(test_image)
+        probe_seconds = 0.25
+
+        def _slow_cleanup(*, synchronize_first: bool = True) -> None:
+            del synchronize_first
+            time.sleep(0.05)
+
+        def _slow_probe() -> tuple[float | None, float | None]:
+            time.sleep(probe_seconds)
+            return None, None
+
+        with (
+            patch.object(
+                check_models,
+                "_run_model_generation",
+                side_effect=ValueError("bad config") if generation_fails else None,
+                return_value=None if generation_fails else _fake_run(),
+            ),
+            patch.object(check_models, "_cleanup_runtime_resources", side_effect=_slow_cleanup),
+            patch.object(check_models, "_sample_post_cleanup_memory_gb", side_effect=_slow_probe),
+        ):
+            result = check_models.process_image_with_model(params)
+
+        diagnostics = result.runtime_diagnostics
+        assert diagnostics is not None
+        assert result.total_time is not None
+        assert diagnostics.cleanup_time_s is not None
+        assert diagnostics.cleanup_time_s >= 0.05
+        phase_sum = sum(
+            value
+            for value in (
+                diagnostics.input_validation_time_s,
+                diagnostics.model_load_time_s,
+                diagnostics.prompt_prep_time_s,
+                diagnostics.decode_time_s,
+                diagnostics.cleanup_time_s,
+            )
+            if value is not None
+        )
+        assert phase_sum <= result.total_time < phase_sum + probe_seconds
+
     def test_finalize_process_result_preserves_every_non_cleanup_field(
         self, test_image: Path
     ) -> None:
@@ -1253,6 +1307,7 @@ class TestProcessImageWithModelMock:
             stop_reason="completed",
             current_phase="cleanup",
             total_start_time=0.0,
+            measured_end_time=1.0,
             post_cleanup_active_memory_gb=7.5,
             post_cleanup_cache_memory_gb=8.5,
         )
@@ -1294,6 +1349,7 @@ class TestProcessImageWithModelMock:
             stop_reason="completed",
             current_phase="cleanup",
             total_start_time=0.0,
+            measured_end_time=1.0,
         )
 
         assert finalized.runtime_diagnostics is not None
