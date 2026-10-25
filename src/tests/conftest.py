@@ -263,3 +263,56 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         if "test_e2e_smoke" in str(item.fspath):
             item.add_marker(pytest.mark.slow)
             item.add_marker(pytest.mark.e2e)
+
+
+# Tests must send generated output to tmp_path, never to the tracked
+# src/output/ run artefacts. The controller snapshots that tree before the run
+# and fails the session if any file there was added, removed or rewritten.
+_TRACKED_OUTPUT_DIR = SRC_DIR / "output"
+_OUTPUT_SNAPSHOT = pytest.StashKey[dict[str, tuple[int, int]]]()
+
+
+def _output_snapshot() -> dict[str, tuple[int, int]]:
+    """Map each file under src/output/ to its size and modification time."""
+    if not _TRACKED_OUTPUT_DIR.is_dir():
+        return {}
+    return {
+        path.relative_to(_TRACKED_OUTPUT_DIR).as_posix(): (info.st_size, info.st_mtime_ns)
+        for path in _TRACKED_OUTPUT_DIR.rglob("*")
+        if path.is_file()
+        for info in [path.stat()]
+    }
+
+
+def _is_xdist_worker(config: pytest.Config) -> bool:
+    return hasattr(config, "workerinput")
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Record src/output/ before any test runs."""
+    if not _is_xdist_worker(session.config):
+        session.stash[_OUTPUT_SNAPSHOT] = _output_snapshot()
+
+
+def pytest_sessionfinish(session: pytest.Session) -> None:
+    """Fail the run when tests changed src/output/."""
+    before = session.stash.get(_OUTPUT_SNAPSHOT, None)
+    if before is None:
+        return
+    after = _output_snapshot()
+    changed = sorted(
+        name for name in before.keys() | after.keys() if before.get(name) != after.get(name)
+    )
+    if not changed:
+        return
+    message = (
+        "Tests changed files under src/output/; write generated output to tmp_path instead: "
+        + ", ".join(changed[:20])
+    )
+    reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+    if reporter is not None:
+        reporter.write_line("")
+        reporter.write_line(message, red=True)
+    else:
+        sys.stderr.write(message + "\n")
+    session.exitstatus = pytest.ExitCode.TESTS_FAILED

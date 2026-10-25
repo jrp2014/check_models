@@ -86,7 +86,6 @@ PACKAGED_QUALITY_CONFIG = PKG_ROOT / "check_models_data" / "quality_config.yaml"
 LEGACY_ROOT_QUALITY_CONFIG = PKG_ROOT / "quality_config.yaml"
 ROOT_SKYLOS_CONFIG = REPO_ROOT / ".skylos" / "config.yaml"
 COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
-AGENT_QUALITY_WORKFLOW = REPO_ROOT / ".agents" / "workflows" / "quality.md"
 AGENT_SKILLS_DIR = REPO_ROOT / ".agents" / "skills"
 # Upstream skill names a local skill may cite as its source (skills/skills/ in
 # Blaizzy/mlx-vlm); a cited name outside this set is a typo or a removal.
@@ -104,6 +103,8 @@ UPSTREAM_MLX_VLM_SKILLS = frozenset(
 )
 # transformers keeps its skills under .ai/skills/ (linked into .agents and .claude).
 UPSTREAM_TRANSFORMERS_SKILLS = frozenset({"add-or-fix-type-checking"})
+# Upstream targets the guidance cites by name only (transformers' `make claude`).
+UPSTREAM_MAKE_TARGET_MENTIONS = frozenset({"claude"})
 SKYLOS_DANGER_ADVISORY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_danger_advisory.sh"
 SKYLOS_VERIFY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_verify.sh"
 
@@ -149,6 +150,20 @@ def _extract_manual_block(readme: str) -> str:
         msg = "Manual install markers not found in README.md"
         raise RuntimeError(msg)
     return m.group(1)
+
+
+def _make_targets(makefile: Path) -> set[str]:
+    """Return the explicit rule names a Makefile defines."""
+    text = safe_io.read_text_no_follow(makefile)
+    return set(re.findall(r"^([\w-]+):", text, re.MULTILINE))
+
+
+def _documented_shell_snippets(text: str) -> list[str]:
+    """Return inline code spans and fenced code lines from Markdown text."""
+    fences = re.findall(r"```[a-z]*\n(.*?)```", text, re.DOTALL)
+    without_fences = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    inline = re.findall(r"`([^`\n]+)`", without_fences)
+    return [*inline, *(line.strip() for fence in fences for line in fence.splitlines())]
 
 
 def test_safe_io_read_text_no_follow_rejects_symlinked_file(tmp_path: Path) -> None:
@@ -354,8 +369,6 @@ def test_dependency_docs_do_not_reference_removed_lockfile_workflows() -> None:
         "src_makefile": (PKG_ROOT / "Makefile").read_text(encoding="utf-8"),
     }
     removed_phrases = (
-        "CI uses lock files",
-        "compatible with lock files",
         "make sync-deps",
         "make upgrade-deps",
         "src/requirements.txt",
@@ -366,14 +379,6 @@ def test_dependency_docs_do_not_reference_removed_lockfile_workflows() -> None:
     for doc_name, text in live_docs.items():
         for phrase in removed_phrases:
             assert phrase not in text, (doc_name, phrase)
-
-
-def test_root_readme_describes_supported_cache_filter() -> None:
-    """The quick README should match the detailed supported-cache discovery docs."""
-    root_readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-
-    assert "server-supported cache filter" in root_readme
-    assert "all models found in your local HF cache" not in root_readme
 
 
 def test_package_skylos_scan_excludes_generated_artifacts() -> None:
@@ -758,56 +763,50 @@ def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
     assert "<!-- markdownlint-enable MD034 -->" not in source
 
 
-def test_agent_quality_guidance_avoids_redundant_pytest_after_quality() -> None:
-    """Agent-facing workflow docs should treat make quality as the full pytest gate."""
-    copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
-    quality_workflow = AGENT_QUALITY_WORKFLOW.read_text(encoding="utf-8")
+def test_documented_make_commands_name_existing_targets() -> None:
+    """Every `make` command in contributor and agent guidance must be a real target.
 
-    assert "full pytest" in copilot_text
-    assert "Do not run it again after a successful `make quality`" in copilot_text
-    assert "make skylos-danger" in copilot_text
-    assert "make skylos-danger-llm" in copilot_text
-    assert "make skylos-verify" in copilot_text
-    assert "runs blocking inside `make quality`" in copilot_text
-    assert "`make quality` already runs the full pytest suite" in quality_workflow
-    assert "make skylos-danger-llm" in quality_workflow
-    assert "make skylos-verify" in quality_workflow
-    assert "`make test` — execute unit tests" not in copilot_text
+    Plain ``make X`` may be run from the repo root or ``src/``; ``make -C src X``
+    must exist in ``src/Makefile``.
+    """
+    root_targets = _make_targets(REPO_ROOT / "Makefile")
+    src_targets = _make_targets(PKG_ROOT / "Makefile")
+    docs = [
+        COPILOT_INSTRUCTIONS,
+        REPO_ROOT / "AGENTS.md",
+        REPO_ROOT / "README.md",
+        README,
+        REPO_ROOT / "docs" / "CONTRIBUTING.md",
+        REPO_ROOT / "docs" / "IMPLEMENTATION_GUIDE.md",
+        *sorted((REPO_ROOT / ".agents" / "workflows").glob("*.md")),
+        *sorted(AGENT_SKILLS_DIR.glob("*/SKILL.md")),
+    ]
+    commands = [
+        (doc.relative_to(REPO_ROOT).as_posix(), match.group(1), match.group(2))
+        for doc in docs
+        for snippet in _documented_shell_snippets(safe_io.read_text_no_follow(doc))
+        for match in re.finditer(r"^make( -C src)? ([a-z][\w-]*)", snippet, re.MULTILINE)
+    ]
+    assert commands
+    missing = [
+        (doc, target)
+        for doc, in_src, target in commands
+        if target not in UPSTREAM_MAKE_TARGET_MENTIONS
+        and target not in (src_targets if in_src else root_targets | src_targets)
+    ]
+    assert missing == []
 
 
-def test_agent_monolith_size_note_matches_current_file() -> None:
-    """Agent-facing file map should not drift badly from the monolith size."""
-    copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
-    source_lines = len((PKG_ROOT / "check_models.py").read_text(encoding="utf-8").splitlines())
-    match = re.search(
-        r"`src/check_models\.py` \| \*\*Single-file CLI monolith\*\* \(~([\d,]+) lines\)",
-        copilot_text,
-    )
-
-    assert match is not None
-    documented_lines = int(match.group(1).replace(",", ""))
-    assert abs(source_lines - documented_lines) <= 500
-
-
-def test_output_artifact_policy_is_documented_and_gitignored() -> None:
-    """Generated output docs should match the repo ignore policy."""
-    readme = README.read_text(encoding="utf-8")
+def test_output_scratch_paths_are_gitignored() -> None:
+    """`test_*` scratch output and the append-only history stay untracked."""
     gitignore_lines = {
         line.strip() for line in (REPO_ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
     }
-
-    for phrase in (
-        "production Markdown reports are linted by the quality gate",
-        "use the `test_` prefix",
-        "do not commit ad-hoc debug output",
-    ):
-        assert phrase in readme
 
     assert {
         "src/output/test_*",
         "src/output/reports/test_*",
         "src/output/issues/test_*",
-        # The append-only history is deliberately untracked.
         "src/output/results.history.jsonl",
     }.issubset(gitignore_lines)
 
@@ -845,100 +844,14 @@ def test_readme_documents_only_the_simplified_report_contract() -> None:
     ):
         assert retired not in readme
 
-    for vocabulary in (
-        "`execution`: `completed`, `crashed`, or `indeterminate`",
-        "`usability`: `usable`, `usable_with_caveats`, `unusable`, or `not_evaluated`",
-        ("`maintainer_status`: `actionable_failure`, `observation_needs_reproduction`, or `none`"),
+    # Each documented status field lists every value the code can emit.
+    for alias in (
+        check_models.ExecutionStatus,
+        check_models.ModelUsability,
+        check_models.MaintainerStatus,
     ):
-        assert vocabulary in readme
-
-
-def test_readme_documents_facts_first_evidence_boundaries() -> None:
-    """Public docs should explain neutral, weak, and indeterminate evidence."""
-    readme = README.read_text(encoding="utf-8")
-
-    for phrase in (
-        "Complete model output is retained as evidence",
-        "Crashes prioritize the complete traceback",
-        "Reaching the configured token cap alone is neutral",
-        "Long complete output is not a fault",
-        "task compliance not assessed",
-        "Length ranges are no longer inferred from prose",
-        "External connectivity failures are `indeterminate`",
-        "Configured thinking tokens are not automatically faults",
-        "explicit `eos_tokens`",
-        "no model-name allowlist",
-        "EXIF timestamps are interpreted as capture wall clocks",
-        "`First`, `Remain`, `Clean`, `Total`, `TPS`, and `GB`",
-        "combines image\nand other input preparation with token decoding",
-        "`insufficient sample`",
-        "Issue drafts are created only for hard actionable crashes",
-        "append-only raw history",
-    ):
-        assert phrase in readme
-
-
-def test_validation_artifact_hygiene_policy_is_documented() -> None:
-    """Validation guidance should forbid dirtying tracked benchmark assets."""
-    required_phrase = "Validation tests must not rewrite tracked `src/output/` assets"
-
-    docs = {
-        "copilot instructions": COPILOT_INSTRUCTIONS.read_text(encoding="utf-8"),
-        "agent instructions": (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8"),
-        "claude instructions": (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8"),
-        "quality workflow": (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(
-            encoding="utf-8"
-        ),
-        "contributor guide": (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8"),
-        "cli readme": (PKG_ROOT / "README.md").read_text(encoding="utf-8"),
-    }
-
-    for label, text in docs.items():
-        assert required_phrase in text, label
-
-    for label, text in docs.items():
-        assert "temp directory" in text, label
-
-
-def test_canonical_agent_guidance_orders_matrix_acceptance_after_quality() -> None:
-    """Costly matrices must follow deterministic tests and use a valid Run 1 baseline."""
-    guidance = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
-
-    for phrase in (
-        "Before a costly real-model matrix",
-        "deterministic\n  focused tests",
-        "full `make quality`",
-        "not as substitutes for ordinary tests",
-        "rerun and audit Run 1",
-        "before starting comparative Run 2",
-        "Never compare a known-invalid baseline",
-    ):
-        assert phrase in guidance
-
-
-def test_canonical_agent_guidance_requires_generated_markdown_preflight() -> None:
-    """Generated reports should satisfy repository Markdown style before a matrix."""
-    guidance = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
-
-    for phrase in (
-        "Emit generated Markdown in the repository's markdownlint style directly",
-        "blank lines around headings and lists",
-        "unique headings or an explicitly configured sibling-heading structure",
-        "asterisks rather than underscores for emphasis",
-        "preserve model text, tabs, and trailing spaces",
-        "proper blank-line spacing and a language identifier",
-        "narrow report-local markdownlint configuration",
-        "escape table-cell content",
-        "representative reports from fixtures",
-        "temporary or `test_*` output paths",
-        "run markdownlint before the expensive matrix",
-        "must not need post-run hand editing",
-        "shared render helpers and focused tests",
-        "supported report-only regeneration path",
-        "existing canonical JSONL",
-        "before Run 1",
-    ):
-        assert phrase in guidance
+        for value in typing.get_args(alias.__value__):
+            assert f"`{value}`" in readme, (alias.__name__, value)
 
 
 def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> None:
@@ -1711,8 +1624,6 @@ def test_quality_script_drops_hook_exported_git_dir_before_entering_src() -> Non
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     """Local MLX builds should follow upstream's editable dev install guidance."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
-
     assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in update_script
     assert "macOS SDK" in update_script
     assert "Apple Clang" in update_script
@@ -1723,9 +1634,6 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "HISTORY_BACKUP_DIR" in (PKG_ROOT / "README.md").read_text(encoding="utf-8")
     assert "mlx.metallib" in update_script
     assert "MLX runtime backend provenance" in update_script
-    assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
-    assert "# Skip PyTorch support" in contributing
-    assert "MLX_LOCAL_BUILD_SMOKE=0" in contributing
 
 
 def test_update_script_import_repair_hint_uses_distribution_names() -> None:
@@ -1744,7 +1652,6 @@ def test_update_script_updates_system_packages_and_node_tooling_by_default() -> 
     """The updater refreshes system packages and moves markdownlint-cli2 to latest by default."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
-    contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
 
     assert "UPDATE_SYSTEM_PACKAGES" in update_script
     assert "UPDATE_NODE_TOOLING" in update_script
@@ -1755,16 +1662,9 @@ def test_update_script_updates_system_packages_and_node_tooling_by_default() -> 
     )
     assert "Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)" in update_script
     assert "Installing repo-local markdownlint tooling from package-lock.json" in update_script
-    assert (
-        "`UPDATE_SYSTEM_PACKAGES` | `tools/update.sh` conda base/env and Homebrew updates | `1` (run system updates)"
-        in readme
-    )
-    # The contributor guide no longer repeats README table rows; it points at the table.
-    assert (
-        "`UPDATE_NODE_TOOLING` | Whether `tools/update.sh` moves markdownlint-cli2 to the latest"
-        in readme
-    )
-    assert "environment table (`src/README.md`)" in contributing
+    # Both switches are documented in the README environment table.
+    assert "`UPDATE_SYSTEM_PACKAGES`" in readme
+    assert "`UPDATE_NODE_TOOLING`" in readme
 
     package_latest = "markdownlint-cli2@latest"
     assert package_latest in update_script
@@ -2392,16 +2292,13 @@ def test_precommit_framework_config_installs_both_hooks() -> None:
     """The checked-in pre-commit config is the single hook mechanism."""
     config = yaml.safe_load((REPO_ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8"))
 
-    assert tuple(config["default_install_hook_types"]) == ("pre-commit", "pre-push")
+    assert tuple(config["default_install_hook_types"]) == validate_env.REQUIRED_HOOK_TYPES
     entries = [hook["entry"] for repo in config["repos"] for hook in repo["hooks"]]
     for entry in entries:
         script = entry.removeprefix("bash ").split()[0]
         assert (REPO_ROOT / script).is_file(), entry
     assert any("run_commit_hygiene.sh" in entry for entry in entries)
     assert any("check_quality_simple.sh" in entry for entry in entries)
-    assert (PKG_ROOT / "tools" / "validate_env.py").read_text(encoding="utf-8").count(
-        'REQUIRED_HOOK_TYPES: tuple[str, ...] = ("pre-commit", "pre-push")'
-    ) == 1
 
 
 def test_python_floor_is_single_sourced() -> None:
@@ -2809,12 +2706,10 @@ def test_no_ci_only_mlx_core_stub_generation() -> None:
         encoding="utf-8"
     )
     pyproject_text = (REPO_ROOT / "src" / "pyproject.toml").read_text(encoding="utf-8")
-    copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
 
     for label, text in (
         ("quality.yml", quality_workflow),
         ("pyproject.toml", pyproject_text),
-        ("copilot-instructions.md", copilot_text),
     ):
         assert "nanobind" not in text, f"{label} reintroduces nanobind stub generation"
 
@@ -3291,21 +3186,9 @@ def test_agent_skills_are_well_formed_and_listed() -> None:
     assert claude_skills.resolve() == AGENT_SKILLS_DIR.resolve()
 
 
-def test_typing_skill_commands_use_current_make_targets() -> None:
+def test_typing_skill_does_not_cite_removed_stub_tooling() -> None:
     """Do not direct typing repairs into removed stub-generation infrastructure."""
     text = safe_io.read_text_no_follow(AGENT_SKILLS_DIR / "add-or-fix-type-checking/SKILL.md")
-    makefiles = "\n".join(
-        safe_io.read_text_no_follow(path)
-        for path in (REPO_ROOT / "Makefile", PKG_ROOT / "Makefile")
-    )
-    targets = set(re.findall(r"^([\w-]+):", makefiles, re.MULTILINE))
-    commands = [
-        target
-        for fence in re.findall(r"```bash\n(.*?)```", text, re.DOTALL)
-        for target in re.findall(r"^make(?: -C src)? ([\w-]+)", fence, re.MULTILINE)
-    ]
-    assert commands
-    assert set(commands) <= targets
     assert "../typings" not in text
     assert "tools.generate_stubs" not in text
 

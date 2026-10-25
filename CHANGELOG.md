@@ -118,6 +118,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tests: dropped the tests that froze documentation prose rather than
+  behaviour. Gone: exact agent-guidance sentences (quality order, matrix
+  preflight, Markdown style), the README evidence-boundary sentences, the
+  output-hygiene sentence required in six documents, the README cache-filter
+  wording, exact README table rows and CONTRIBUTING comments, and the
+  approximate `check_models.py` line count (the count is also gone from the
+  agent file map). In their place: every `make` command quoted in the
+  agent and contributor docs and skills must be a real Makefile target; the
+  README must list every value of the `execution`, `usability` and
+  `maintainer_status` types the code emits; the pre-commit hook types are
+  compared with `validate_env.REQUIRED_HOOK_TYPES` itself; and the test
+  session now fails if any test adds, removes or rewrites a file under
+  `src/output/`, which enforces the rule the removed sentence check only
+  required the docs to state. Script-content checks for the updater, setup,
+  packaging and quality tooling are unchanged.
+
 - Docs: clarify the project's single-image MLX VLM comparison and diagnostics
   focus in both README openings, link to sample reports from the root README,
   and align package descriptions, keywords, and documentation links.
