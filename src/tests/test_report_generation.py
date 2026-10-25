@@ -6911,7 +6911,7 @@ def test_run_summary_shows_observation_history_from_retained_metadata(tmp_path: 
 
 
 def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_lists() -> None:
-    """The section names the baseline, shows transitions, and keeps targeted runs tidy."""
+    """The section names the baseline, shows transitions, and collapses long model lists."""
     baseline = _comparison_baseline([_comparison_record(f"org/m{i}") for i in range(12)])
     current = [
         cast(
@@ -6928,7 +6928,9 @@ def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_
     assert "HEAD:src/output/results.jsonl" in rendered
     assert "no concerns detected → major concerns" in rendered
     assert "+repeated text" in rendered
-    assert "In baseline, not run this time: 11 models (targeted run" in rendered
+    # A count alone: list length is no evidence of why the model sets differ.
+    assert "In baseline, not run this time: 11 models" in rendered
+    assert "targeted run" not in rendered
     assert check_models._comparison_model_list(("org/a", "org/b")) == "`org/a`, `org/b`"
 
 

@@ -22536,9 +22536,13 @@ _COMPARISON_MODEL_LIST_LIMIT: Final[int] = 8
 
 
 def _comparison_model_list(models: Sequence[str]) -> str:
-    """List models inline, collapsing long lists (targeted runs) to a count."""
+    """List models inline, collapsing a long list to its count.
+
+    The count says nothing about why the lists differ: a long list can mean a
+    targeted run, models no longer cached, or newly added ones.
+    """
     if len(models) > _COMPARISON_MODEL_LIST_LIMIT:
-        return f"{len(models)} models (targeted run against a full-sweep baseline)"
+        return f"{len(models)} models"
     return ", ".join(f"`{model}`" for model in models)
 
 
