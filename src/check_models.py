@@ -20859,7 +20859,7 @@ def _observation_history_record(
         "runs_read": len(runs),
         "oldest_run": runs[-1].timestamp if runs else None,
         "complete": complete,
-        "entries": [cast("JsonLike", entry._asdict()) for entry in entries],
+        "entries": [_comparison_record_to_json(entry) for entry in entries],
     }
 
 
@@ -20871,18 +20871,7 @@ def _observation_history_from_metadata(
     if not isinstance(block, dict):
         return None
     try:
-        entries = tuple(
-            ObservationHistory(
-                model=_comparison_req_str(entry["model"]),
-                code=_comparison_req_str(entry["code"]),
-                first_observed=_comparison_opt_str(entry.get("first_observed")),
-                first_observed_open_ended=_comparison_req_bool(entry["first_observed_open_ended"]),
-                consecutive_runs=_comparison_req_int(entry["consecutive_runs"]),
-                consecutive_since=_comparison_opt_str(entry.get("consecutive_since")),
-                consecutive_open_ended=_comparison_req_bool(entry["consecutive_open_ended"]),
-            )
-            for entry in _comparison_rows(block.get("entries"))
-        )
+        entries = _comparison_records_from_json(ObservationHistory, block.get("entries"))
     except (KeyError, TypeError, ValueError):
         logger.warning("Retained observation history is malformed; leaving it out.")
         return None
@@ -22143,10 +22132,11 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "models_added": list[JsonLike](comparison.models_added),
         "models_removed": list[JsonLike](comparison.models_removed),
         "models_removed_status": dict[str, JsonLike](comparison.models_removed_status),
-        "crash_continuity": [entry._asdict() for entry in comparison.crash_continuity],
+        "crash_continuity": [
+            _comparison_record_to_json(entry) for entry in comparison.crash_continuity
+        ],
         "architecture_commits": [
-            {**entry._asdict(), "subjects": list(entry.subjects), "imports": list(entry.imports)}
-            for entry in comparison.architecture_commits
+            _comparison_record_to_json(entry) for entry in comparison.architecture_commits
         ],
         "text_changes_by_decoding": {
             group: {"changed": changed, "compared": compared}
@@ -22184,7 +22174,9 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             **_ratio_end_models_json(comparison.prompt_tps_ratio_end_models),
         },
         "text_changed_models": list[JsonLike](comparison.text_changed_models),
-        "text_divergence": [entry._asdict() for entry in comparison.text_divergence],
+        "text_divergence": [
+            _comparison_record_to_json(entry) for entry in comparison.text_divergence
+        ],
         "component_changes": [
             {
                 "component": change.name,
@@ -22208,22 +22200,10 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             for flag in comparison.throughput_flags
         ],
         "prefill_changes": [
-            {
-                "model": change.model,
-                "baseline_s": _r(change.baseline_s),
-                "current_s": _r(change.current_s),
-                "ratio": _r(change.ratio),
-            }
-            for change in comparison.prefill_changes
+            _comparison_record_to_json(change) for change in comparison.prefill_changes
         ],
         "memory_changes": [
-            {
-                "model": change.model,
-                "baseline_peak_gb": _r(change.baseline_peak_gb),
-                "current_peak_gb": _r(change.current_peak_gb),
-                "delta_gb": _r(change.delta_gb),
-            }
-            for change in comparison.memory_changes
+            _comparison_record_to_json(change) for change in comparison.memory_changes
         ],
         "history_runs_used": comparison.history_runs_used,
         "mlx_version": comparison.mlx_version,
@@ -22312,19 +22292,6 @@ def _comparison_req_bool(raw: JsonLike) -> bool:
     return raw
 
 
-def _prefill_changes_from_json(raw: JsonLike) -> tuple[RunComparisonPrefillChange, ...]:
-    """Read the retained prefill-change rows; empty when the record predates them."""
-    return tuple(
-        RunComparisonPrefillChange(
-            model=_comparison_req_str(change["model"]),
-            baseline_s=_comparison_req_float(change["baseline_s"]),
-            current_s=_comparison_req_float(change["current_s"]),
-            ratio=_comparison_req_float(change["ratio"]),
-        )
-        for change in _comparison_rows(raw)
-    )
-
-
 def _prefill_rows(
     changes: Sequence[RunComparisonPrefillChange],
 ) -> tuple[tuple[str, str, str, str], ...]:
@@ -22386,6 +22353,80 @@ def _comparison_group_counts(raw: JsonLike) -> tuple[tuple[str, int, int], ...]:
     )
 
 
+def _comparison_opt_bool(raw: JsonLike) -> bool | None:
+    """Narrow one optional retained comparison boolean."""
+    return None if raw is None else _comparison_req_bool(raw)
+
+
+def _comparison_opt_str_items(raw: JsonLike) -> tuple[str, ...]:
+    """Narrow one retained list of strings, reading absence as an empty list."""
+    return () if raw is None else _comparison_str_items(raw)
+
+
+# How to read each field type that the plain nested records below use.
+_COMPARISON_FIELD_READERS: Final[Mapping[object, Callable[[JsonLike], object]]] = {
+    str: _comparison_req_str,
+    str | None: _comparison_opt_str,
+    int: _comparison_req_int,
+    int | None: _comparison_opt_int,
+    float: _comparison_req_float,
+    bool: _comparison_req_bool,
+    bool | None: _comparison_opt_bool,
+    tuple[str, ...]: _comparison_opt_str_items,
+}
+
+
+def _comparison_record_fields(
+    record_type: type,
+) -> tuple[tuple[str, Callable[[JsonLike], object], object], ...]:
+    """(name, reader, default) for each field of one plain nested record, in field order.
+
+    A plain record is retained under its own field names. Records whose wire
+    format renames or pairs fields (model changes, throughput flags,
+    component changes) keep explicit adapters instead. ``default`` is
+    ``inspect.Parameter.empty`` for a field the record requires.
+    """
+    hints = get_type_hints(record_type)
+    return tuple(
+        (name, _COMPARISON_FIELD_READERS[hints[name]], parameter.default)
+        for name, parameter in inspect.signature(record_type).parameters.items()
+    )
+
+
+def _comparison_record_to_json(record: object) -> dict[str, JsonLike]:
+    """One plain nested record as JSON: floats rounded to 4 places, tuples as lists."""
+    row: dict[str, JsonLike] = {}
+    for name, _read, _default in _comparison_record_fields(type(record)):
+        value = getattr(record, name)
+        if isinstance(value, float):
+            value = round(value, 4)
+        elif isinstance(value, tuple):
+            value = list(value)
+        row[name] = value
+    return row
+
+
+def _comparison_record_from_json[R](record_type: type[R], row: Mapping[str, JsonLike]) -> R:
+    """Rebuild one plain nested record, checking every field's retained type.
+
+    A missing or null field takes the record's own default when it has one
+    (records written before that field existed); otherwise its reader
+    rejects it unless the field is nullable.
+    """
+    values: dict[str, object] = {}
+    for name, read, default in _comparison_record_fields(record_type):
+        raw = row.get(name)
+        values[name] = (
+            default if raw is None and default is not inspect.Parameter.empty else read(raw)
+        )
+    return cast("Callable[..., R]", record_type)(**values)
+
+
+def _comparison_records_from_json[R](record_type: type[R], raw: JsonLike) -> tuple[R, ...]:
+    """Rebuild a retained list of plain nested records; empty when the list is absent."""
+    return tuple(_comparison_record_from_json(record_type, row) for row in _comparison_rows(raw))
+
+
 def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
     """Rehydrate the retained metadata comparison for summary regeneration.
 
@@ -22403,40 +22444,6 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
     comparability = cast("Literal['comparable', 'unknown', 'incomparable']", comparability_value)
     ratio = _comparison_mapping(value.get("generation_tps_ratio"))
     prefill = _comparison_mapping(value.get("prompt_tps_ratio"))
-    changes = tuple(
-        RunComparisonModelChange(
-            model=_comparison_req_str(change["model"]),
-            baseline_execution=_comparison_req_str(_comparison_pair(change["execution"])[0]),
-            current_execution=_comparison_req_str(_comparison_pair(change["execution"])[1]),
-            baseline_usability=_comparison_req_str(_comparison_pair(change["usability"])[0]),
-            current_usability=_comparison_req_str(_comparison_pair(change["usability"])[1]),
-            observations_added=_comparison_str_items(change["observations_added"]),
-            observations_removed=_comparison_str_items(change["observations_removed"]),
-        )
-        for change in _comparison_rows(value.get("changes"))
-    )
-    throughput_flags = tuple(
-        RunComparisonThroughputFlag(
-            model=_comparison_req_str(flag["model"]),
-            baseline_tps=_comparison_req_float(flag["baseline_tps"]),
-            current_tps=_comparison_req_float(flag["current_tps"]),
-            ratio=_comparison_req_float(flag["ratio"]),
-            band_low=_comparison_req_float(_comparison_pair(flag["band"])[0]),
-            band_high=_comparison_req_float(_comparison_pair(flag["band"])[1]),
-            band_source=_comparison_band_source(flag["band_source"]),
-            band_samples=_comparison_req_int(flag["band_samples"]),
-        )
-        for flag in _comparison_rows(value.get("throughput_flags"))
-    )
-    memory_changes = tuple(
-        RunComparisonMemoryChange(
-            model=_comparison_req_str(change["model"]),
-            baseline_peak_gb=_comparison_req_float(change["baseline_peak_gb"]),
-            current_peak_gb=_comparison_req_float(change["current_peak_gb"]),
-            delta_gb=_comparison_req_float(change["delta_gb"]),
-        )
-        for change in _comparison_rows(value.get("memory_changes"))
-    )
     return RunComparison(
         baseline_label=_comparison_req_str(value.get("baseline", "unknown baseline")),
         baseline_timestamp=_comparison_opt_str(value.get("baseline_timestamp")),
@@ -22452,7 +22459,9 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         compared_models=_comparison_req_int(value.get("compared_models", 0)),
         models_added=_comparison_str_items(value.get("models_added") or []),
         models_removed=_comparison_str_items(value.get("models_removed") or []),
-        changes=changes,
+        changes=tuple(
+            _model_change_from_json(row) for row in _comparison_rows(value.get("changes"))
+        ),
         identical_text_models=_comparison_req_int(value.get("identical_text_models", 0)),
         text_compared_models=_comparison_req_int(value.get("text_compared_models", 0)),
         tps_ratio_median=_comparison_opt_float(ratio.get("median")),
@@ -22460,8 +22469,13 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         tps_ratio_max=_comparison_opt_float(ratio.get("max")),
         tps_compared_models=_comparison_req_int(ratio.get("compared_models", 0)),
         tps_ratio_end_models=_ratio_end_models_from_json(ratio),
-        throughput_flags=throughput_flags,
-        memory_changes=memory_changes,
+        throughput_flags=tuple(
+            _throughput_flag_from_json(row)
+            for row in _comparison_rows(value.get("throughput_flags"))
+        ),
+        memory_changes=_comparison_records_from_json(
+            RunComparisonMemoryChange, value.get("memory_changes")
+        ),
         history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
         mlx_version=_comparison_opt_str(value.get("mlx_version")),
         earlier_runs_on_mlx_version=_comparison_opt_int(value.get("earlier_runs_on_mlx_version")),
@@ -22472,25 +22486,12 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             (model, _comparison_req_str(status))
             for model, status in _comparison_mapping(value.get("models_removed_status")).items()
         ),
-        crash_continuity=tuple(
-            CrashContinuity(
-                _comparison_req_str(entry["model"]),
-                _comparison_req_str(entry["status"]),
-                _comparison_opt_str(entry.get("baseline_signature")),
-                _comparison_opt_str(entry.get("current_signature")),
-            )
-            for entry in _comparison_rows(value.get("crash_continuity"))
+        crash_continuity=_comparison_records_from_json(
+            CrashContinuity, value.get("crash_continuity")
         ),
         harness_versions=_comparison_str_items(value.get("harness_versions") or []),
-        architecture_commits=tuple(
-            ArchitectureCommits(
-                _comparison_req_str(entry["model"]),
-                _comparison_req_str(entry["architecture"]),
-                _comparison_req_str(entry["status"]),
-                _comparison_str_items(entry.get("subjects") or []),
-                _comparison_str_items(entry.get("imports") or []),
-            )
-            for entry in _comparison_rows(value.get("architecture_commits"))
+        architecture_commits=_comparison_records_from_json(
+            ArchitectureCommits, value.get("architecture_commits")
         ),
         text_changes_by_decoding=_comparison_group_counts(value.get("text_changes_by_decoding")),
         greedy_text_changes_by_weights=_comparison_group_counts(
@@ -22507,24 +22508,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         throughput_comparable=_comparison_req_bool(value.get("throughput_comparable", True)),
         environment_notes=_comparison_str_items(value.get("environment_notes") or []),
         text_changed_models=_comparison_str_items(value.get("text_changed_models") or []),
-        text_divergence=tuple(
-            TextDivergence(
-                _comparison_req_str(entry["model"]),
-                _comparison_req_int(entry["shared_prefix_chars"]),
-                _comparison_req_int(entry["baseline_chars"]),
-                _comparison_req_int(entry["current_chars"]),
-                (
-                    None
-                    if entry.get("prompt_token_count_unchanged") is None
-                    else _comparison_req_bool(entry["prompt_token_count_unchanged"])
-                ),
-                _comparison_opt_str(entry.get("decoding")) or "unknown",
-                _comparison_opt_str(entry.get("weights")),
-                _comparison_opt_int(entry.get("baseline_output_tokens")),
-                _comparison_opt_int(entry.get("current_output_tokens")),
-            )
-            for entry in _comparison_rows(value.get("text_divergence"))
-        ),
+        text_divergence=_comparison_records_from_json(TextDivergence, value.get("text_divergence")),
         component_changes=tuple(
             ComponentChange(
                 _comparison_req_str(entry["component"]),
@@ -22540,7 +22524,39 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         prompt_tps_ratio_max=_comparison_opt_float(prefill.get("max")),
         prompt_tps_compared_models=_comparison_req_int(prefill.get("compared_models", 0)),
         prompt_tps_ratio_end_models=_ratio_end_models_from_json(prefill),
-        prefill_changes=_prefill_changes_from_json(value.get("prefill_changes")),
+        prefill_changes=_comparison_records_from_json(
+            RunComparisonPrefillChange, value.get("prefill_changes")
+        ),
+    )
+
+
+def _model_change_from_json(row: Mapping[str, JsonLike]) -> RunComparisonModelChange:
+    """Rebuild one model change from its retained before/after pairs."""
+    baseline_execution, current_execution = _comparison_pair(row["execution"])
+    baseline_usability, current_usability = _comparison_pair(row["usability"])
+    return RunComparisonModelChange(
+        model=_comparison_req_str(row["model"]),
+        baseline_execution=_comparison_req_str(baseline_execution),
+        current_execution=_comparison_req_str(current_execution),
+        baseline_usability=_comparison_req_str(baseline_usability),
+        current_usability=_comparison_req_str(current_usability),
+        observations_added=_comparison_str_items(row["observations_added"]),
+        observations_removed=_comparison_str_items(row["observations_removed"]),
+    )
+
+
+def _throughput_flag_from_json(row: Mapping[str, JsonLike]) -> RunComparisonThroughputFlag:
+    """Rebuild one throughput flag from its retained ``band`` pair."""
+    band_low, band_high = _comparison_pair(row["band"])
+    return RunComparisonThroughputFlag(
+        model=_comparison_req_str(row["model"]),
+        baseline_tps=_comparison_req_float(row["baseline_tps"]),
+        current_tps=_comparison_req_float(row["current_tps"]),
+        ratio=_comparison_req_float(row["ratio"]),
+        band_low=_comparison_req_float(band_low),
+        band_high=_comparison_req_float(band_high),
+        band_source=_comparison_band_source(row["band_source"]),
+        band_samples=_comparison_req_int(row["band_samples"]),
     )
 
 
@@ -25171,12 +25187,21 @@ def _run_issue_summary_maintainer_verdict(
 def generate_run_issue_summary_report(
     output_paths: ReportOutputPaths,
     *,
+    run: RetainedRun | None = None,
     issue_reports: Mapping[str, Path] | None = None,
     include_gallery_markdown: bool = True,
     comparison: RunComparison | None = None,
 ) -> Path | None:
-    """Generate a paste-ready whole-run issue from the retained schema-3 artifact."""
-    source = _load_run_issue_summary_source(output_paths)
+    """Generate a paste-ready whole-run issue from the retained schema-3 run.
+
+    A live run passes the ``run`` it is about to retain. Without one (summary
+    regeneration) the retained ``results.jsonl`` is loaded and validated.
+    """
+    source = (
+        _load_run_issue_summary_source(output_paths)
+        if run is None
+        else _run_issue_summary_source_from_run(run)
+    )
     summary_path = _run_issue_summary_path(output_paths)
     actionable = tuple(
         result
@@ -26385,14 +26410,15 @@ def _withdraw_run_issue_summary(
 
 def _generate_run_issue_summary_output(
     inputs: ReportGenerationInputs,
+    run: RetainedRun | None,
     *,
     issue_reports: Mapping[str, Path],
     jsonl_succeeded: bool,
     diagnostics_succeeded: bool,
     gallery_succeeded: bool,
 ) -> tuple[Path | None, ReportArtifactOutcome | None]:
-    """Generate the optional summary only from current-run canonical inputs."""
-    if not jsonl_succeeded:
+    """Generate the optional summary from the run this publication retains."""
+    if run is None or not jsonl_succeeded:
         return _withdraw_run_issue_summary(
             inputs.output_paths, "Skipped because current JSONL generation failed"
         )
@@ -26405,6 +26431,7 @@ def _generate_run_issue_summary_output(
     try:
         generated = generate_run_issue_summary_report(
             inputs.output_paths,
+            run=run,
             issue_reports=issue_reports,
             include_gallery_markdown=gallery_succeeded,
             comparison=inputs.comparison,
@@ -26796,28 +26823,46 @@ def _elapsed_run_seconds(inputs: ReportGenerationInputs, until: float | None = N
     return (time.time() if until is None else until) - inputs.overall_start_time
 
 
+def _with_final_timing(
+    inputs: ReportGenerationInputs, retained: RetainedRun, ended_at: float
+) -> RetainedRun:
+    """The retained run with an end-to-end duration and finish time ending at ``ended_at``.
+
+    The phase totals are recomputed from that duration, so ``per_model_total``
+    plus ``outside_model_loop`` equals it. Without a recorded start the
+    pre-report figures stand.
+    """
+    if inputs.overall_start_time is None:
+        return retained
+    runtime = round(ended_at - inputs.overall_start_time, 3)
+    metadata: JsonlMetadataRecord = {
+        **retained.metadata,
+        "total_runtime_seconds": runtime,
+        "timestamp": local_time_str(ended_at),
+    }
+    if "phase_totals_s" in metadata:
+        metadata["phase_totals_s"] = _run_phase_totals(inputs.results, runtime)
+    return RetainedRun(metadata=metadata, results=retained.results)
+
+
 def _finalize_retained_run_record(
     inputs: ReportGenerationInputs,
-    retained: RetainedRun | None,
+    final_run: RetainedRun | None,
     artifacts: Sequence[ReportArtifact],
     outcomes: Sequence[ReportArtifactOutcome],
     *,
     jsonl_succeeded: bool,
-    ended_at: float | None = None,
 ) -> bool:
     """Rewrite the JSONL header once every report outcome is known; True when rewritten.
 
     The pre-report write lists every planned destination. A renderer that
     failed (leaving nothing, or a stale file from an earlier run) must not
     stay advertised in the sole machine contract, so the manifest is reduced
-    to the artifacts this run produced — matching index.md — and the
-    duration and timestamp become end-to-end, ending at ``ended_at`` (default
-    now) so the index can show the same figure. The phase totals are
-    recomputed from that duration, so ``per_model_total`` plus
-    ``outside_model_loop`` equals it. A failed rewrite keeps the earlier
-    header rather than costing the run.
+    to the artifacts this run produced, matching index.md. ``final_run``
+    already carries the end-to-end timing. A failed rewrite keeps the
+    earlier header rather than costing the run.
     """
-    if retained is None or not jsonl_succeeded:
+    if final_run is None or not jsonl_succeeded:
         return False
     successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
     manifest = {
@@ -26825,17 +26870,12 @@ def _finalize_retained_run_record(
         for artifact in artifacts
         if artifact.key in successful_keys
     }
-    metadata: JsonlMetadataRecord = {**retained.metadata, "artifacts": manifest}
-    if inputs.overall_start_time is not None:
-        end = time.time() if ended_at is None else ended_at
-        runtime = round(end - inputs.overall_start_time, 3)
-        metadata["total_runtime_seconds"] = runtime
-        metadata["timestamp"] = local_time_str(end)
-        if "phase_totals_s" in metadata:
-            metadata["phase_totals_s"] = _run_phase_totals(inputs.results, runtime)
     try:
         _write_retained_run(
-            RetainedRun(metadata=metadata, results=retained.results), inputs.output_paths.jsonl
+            RetainedRun(
+                metadata={**final_run.metadata, "artifacts": manifest}, results=final_run.results
+            ),
+            inputs.output_paths.jsonl,
         )
     except Exception:
         logger.exception(
@@ -26887,30 +26927,27 @@ def _run_jsonl_artifact(
 
 def _rerender_run_issue_summary(
     inputs: ReportGenerationInputs,
+    checkpoint: RetainedRun,
     *,
-    header_final: bool,
-    summary_written: bool,
     issue_reports: Mapping[str, Path],
     include_gallery_markdown: bool,
 ) -> None:
-    """Render the summary again from the final JSONL header so its timing matches.
+    """Render the summary again from the checkpoint run after the final rewrite failed.
 
-    The first render ran before the header gained its end-to-end duration and
-    finish time; re-rendering also makes the shipped summary what a later
-    regeneration from results.jsonl produces. Runs only when both the summary
-    and the final header were written; a failure keeps the first render.
+    The summary was rendered with the final timing, but the pre-report header
+    stands on disk; re-rendering keeps the shipped summary what a later
+    regeneration from results.jsonl produces. A failure keeps the first render.
     """
-    if not (header_final and summary_written):
-        return
     try:
         generate_run_issue_summary_report(
             inputs.output_paths,
+            run=checkpoint,
             issue_reports=issue_reports,
             include_gallery_markdown=include_gallery_markdown,
             comparison=inputs.comparison,
         )
     except Exception:  # report isolation: the first render stands
-        logger.exception("Re-rendering the run summary with final timing failed.")
+        logger.exception("Re-rendering the run summary from the pre-report header failed.")
 
 
 def _generate_reports_and_log_outputs(
@@ -26984,16 +27021,6 @@ def _generate_reports_and_log_outputs(
 
     gallery_succeeded = run_artifact(by_key["markdown_gallery"])
 
-    run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
-        inputs,
-        issue_reports=diagnostics_artifacts.issue_reports,
-        jsonl_succeeded=jsonl_succeeded,
-        diagnostics_succeeded=diagnostics_succeeded,
-        gallery_succeeded=gallery_succeeded,
-    )
-    if summary_outcome is not None:
-        outcomes.append(summary_outcome)
-
     for artifact in artifacts:
         if artifact.job is not None and artifact.key not in {
             "output_index",
@@ -27014,11 +27041,25 @@ def _generate_reports_and_log_outputs(
             )
         )
 
-    # The index runs last so its links are driven by this run's outcomes:
-    # a stale file surviving a failed renderer must not be presented. One end
-    # time serves the index and the final JSONL header so both show the same
-    # duration.
+    # The run ends here. One end time serves the documents that state the
+    # duration (the run summary and the index) and the final JSONL header;
+    # only they and the header rewrite fall after it. The summary renders
+    # once, from the in-memory run the final header will record.
     run_end_time = time.time()
+    final_run = _with_final_timing(inputs, retained, run_end_time) if retained is not None else None
+    run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
+        inputs,
+        final_run,
+        issue_reports=diagnostics_artifacts.issue_reports,
+        jsonl_succeeded=jsonl_succeeded,
+        diagnostics_succeeded=diagnostics_succeeded,
+        gallery_succeeded=gallery_succeeded,
+    )
+    if summary_outcome is not None:
+        outcomes.append(summary_outcome)
+
+    # The index runs last so its links are driven by this run's outcomes:
+    # a stale file surviving a failed renderer must not be presented.
     successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
     available = tuple(artifact for artifact in artifacts if artifact.key in successful_keys)
     index_artifact = replace(
@@ -27044,19 +27085,18 @@ def _generate_reports_and_log_outputs(
     # cover report generation too.
     finalized = _finalize_retained_run_record(
         inputs,
-        retained,
+        final_run,
         artifacts,
         outcomes,
         jsonl_succeeded=jsonl_succeeded,
-        ended_at=run_end_time,
     )
-    _rerender_run_issue_summary(
-        inputs,
-        header_final=finalized,
-        summary_written=run_issue_summary is not None,
-        issue_reports=diagnostics_artifacts.issue_reports,
-        include_gallery_markdown=gallery_succeeded,
-    )
+    if run_issue_summary is not None and retained is not None and not finalized:
+        _rerender_run_issue_summary(
+            inputs,
+            retained,
+            issue_reports=diagnostics_artifacts.issue_reports,
+            include_gallery_markdown=gallery_succeeded,
+        )
 
     _log_report_generation_outcomes(
         artifacts=artifacts,

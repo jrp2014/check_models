@@ -121,6 +121,28 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Report publication (0.17.94): the run summary is rendered once, from the
+  in-memory run that the final `results.jsonl` header records, instead of
+  being rendered from the file, the header rewritten, and the file read and
+  rendered again. Loading and validating `results.jsonl` is now reserved for
+  regeneration (`regenerate_run_issue_summary`), which still reproduces the
+  shipped summary byte for byte. The pre-report checkpoint write and the
+  final atomic header rewrite are unchanged. The run's end time is taken
+  just before the documents that state it (the summary and the index), so
+  every other renderer counts toward the duration and the summary's own
+  render (about 0.03 s for the 43-model sweep) falls outside it, like the
+  index's. If the final rewrite fails, the summary is rendered again from
+  the checkpoint run so it matches the header on disk.
+- Run comparison (0.17.94): the nested records retained under their own
+  field names (prefill and memory changes, crash continuity, text
+  divergence, architecture commits, observation history) are written and
+  read by one helper driven by each record's field types and defaults,
+  instead of naming every field three times. Each field is still
+  type-checked on read, and a missing field takes a default only where the
+  record declares one. Model changes, throughput flags and component
+  changes keep explicit adapters for their renamed or paired wire keys.
+  Retained comparisons serialize byte for byte as before.
+
 - Reports (0.17.92): the Markdown and HTML choosers now read one shared
   column description (header, display text, sort value and cell kind) and one
   set of resource-highlight sentences. Links, escaping, the preview's

@@ -18,7 +18,7 @@ from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast, get_args, get_type_hints
-from unittest.mock import patch
+from unittest.mock import DEFAULT, patch
 
 import pytest
 from PIL import Image
@@ -38,7 +38,7 @@ from check_models import (
 from tools import safe_io
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
 
 type ExpectedUpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 
@@ -536,11 +536,11 @@ def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
         "check_models.ReportGenerationInputs",
         Namespace(output_paths=output_paths, comparison=None),
     )
+    checkpoint = check_models._load_retained_run(output_paths.jsonl)
     with patch.object(check_models, "_write_text_file", _explode):
         check_models._rerender_run_issue_summary(
             inputs,
-            header_final=True,
-            summary_written=True,
+            checkpoint,
             issue_reports={},
             include_gallery_markdown=False,
         )
@@ -1668,6 +1668,29 @@ def _retained_comparison_payload() -> dict[str, object]:
             },
             "band_source",
         ),
+        ({"crash_continuity": [{"model": "org/a", "status": 5}]}, "not a string"),
+        ({"crash_continuity": [{"model": "org/a"}]}, "not a string"),
+        (
+            {
+                "memory_changes": [
+                    {"model": "org/a", "baseline_peak_gb": 1.0, "current_peak_gb": "2"}
+                ]
+            },
+            "not a number",
+        ),
+        (
+            {
+                "text_divergence": [
+                    {
+                        "model": "org/a",
+                        "shared_prefix_chars": True,
+                        "baseline_chars": 3,
+                        "current_chars": 4,
+                    }
+                ]
+            },
+            "not an integer",
+        ),
     ],
 )
 def test_run_comparison_from_json_rejects_malformed_values(
@@ -1680,6 +1703,54 @@ def test_run_comparison_from_json_rejects_malformed_values(
 
     with pytest.raises((TypeError, ValueError), match=match):
         check_models._run_comparison_from_json(cast("dict[str, check_models.JsonLike]", payload))
+
+
+@pytest.mark.parametrize(
+    "record",
+    [
+        check_models.RunComparisonPrefillChange("org/a", 1.234567, 2.0, 0.61728),
+        check_models.RunComparisonMemoryChange("org/a", 3.0, 4.123456, 1.123456),
+        check_models.CrashContinuity("org/a", "same_signature", "sig", None),
+        check_models.ArchitectureCommits("org/a", "qwen2_vl", "commits", ("fix",), ("llava",)),
+        check_models.TextDivergence("org/a", 3, 10, 12, None, "greedy", "4-bit affine", 5, 6),
+        check_models.ObservationHistory(
+            model="org/a",
+            code="repeated_output",
+            first_observed=None,
+            first_observed_open_ended=False,
+            consecutive_runs=2,
+            consecutive_since="2026-10-01 10:00:00 BST",
+            consecutive_open_ended=True,
+        ),
+    ],
+    ids=lambda record: type(record).__name__,
+)
+def test_plain_comparison_records_round_trip_under_their_field_names(record: object) -> None:
+    """Records retained under their own field names come back equal, floats to 4 places."""
+    row = check_models._comparison_record_to_json(record)
+    assert json.loads(json.dumps(row)) == row
+    restored = check_models._comparison_record_from_json(type(record), row)
+    assert check_models._comparison_record_to_json(restored) == row
+    if not any(isinstance(value, float) for value in row.values()):
+        assert restored == record
+
+
+def test_plain_comparison_records_default_only_fields_they_declare() -> None:
+    """A field added after a record was retained takes its declared default when absent."""
+    older: dict[str, check_models.JsonLike] = {
+        "model": "org/a",
+        "shared_prefix_chars": 3,
+        "baseline_chars": 10,
+        "current_chars": 12,
+    }
+    restored = check_models._comparison_record_from_json(check_models.TextDivergence, older)
+    assert restored == check_models.TextDivergence("org/a", 3, 10, 12, None)
+    assert restored.decoding == "unknown"
+    commits = check_models._comparison_record_from_json(
+        check_models.ArchitectureCommits,
+        {"model": "org/a", "architecture": "qwen2_vl", "status": "none"},
+    )
+    assert (commits.subjects, commits.imports) == ((), ())
 
 
 def test_retained_loader_rejects_non_mapping_nested_structures(tmp_path: Path) -> None:
@@ -2628,9 +2699,9 @@ def test_retained_manifest_reflects_report_outcomes_and_final_duration(tmp_path:
 def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Path) -> None:
     """Every surface shows the final header's duration, however long reporting takes.
 
-    The summary is first rendered before the header gains its end-to-end
-    figure, so it is rendered again from the final header; a clock that
-    advances on every read would expose any surface timing itself.
+    The summary renders once, from the in-memory run the final header
+    records; a clock that advances on every read would expose any surface
+    timing itself.
     """
     failure = _make_failure_with_details(
         "org/broken",
@@ -2676,37 +2747,47 @@ def test_run_summary_index_and_header_share_one_end_to_end_duration(tmp_path: Pa
     assert summary_path.read_bytes() == shipped
 
 
-def test_reported_duration_includes_building_the_run_summary(tmp_path: Path) -> None:
-    """Time spent building the summary counts toward the end-to-end duration."""
+def test_run_duration_ends_before_the_documents_that_state_it(tmp_path: Path) -> None:
+    """Every renderer counts toward the duration; the summary that prints it does not.
+
+    The summary renders once, after the end time, from the in-memory run: it
+    never reads results.jsonl back. Its own render (about 0.03 s for a
+    43-model sweep) falls outside the duration, like the index's.
+    """
     failure = _make_failure_with_details("org/broken", error_msg="Model loading failed: boom")
     inputs = _report_generation_inputs(tmp_path, result=failure)
     start = 1_700_000_000.0
     inputs = replace(inputs, overall_start_time=start, overall_time=600.0)
     clock = {"now": start + 600.0}
-    render = check_models.generate_run_issue_summary_report
 
-    def slow_render(
-        output_paths: check_models.ReportOutputPaths,
-        *,
-        issue_reports: Mapping[str, Path] | None = None,
-        include_gallery_markdown: bool = True,
-        comparison: check_models.RunComparison | None = None,
-    ) -> Path | None:
-        if clock["now"] == start + 600.0:
-            clock["now"] += 120.0  # simulated first render, not a measurement
-        return render(
-            output_paths,
-            issue_reports=issue_reports,
-            include_gallery_markdown=include_gallery_markdown,
-            comparison=comparison,
-        )
+    def takes(seconds: float) -> Callable[..., object]:
+        def tick(*_args: object, **_kwargs: object) -> object:
+            clock["now"] += seconds  # simulated renderer time, not a measurement
+            return DEFAULT  # then run the real renderer
+
+        return tick
 
     with (
         patch.object(check_models.time, "time", lambda: clock["now"]),
         patch.object(check_models._LinkStyleState, "value", "relative"),
-        patch.object(check_models, "generate_run_issue_summary_report", slow_render),
+        patch.object(
+            check_models,
+            "generate_html_report",
+            wraps=check_models.generate_html_report,
+            side_effect=takes(120.0),
+        ),
+        patch.object(
+            check_models,
+            "generate_run_issue_summary_report",
+            wraps=check_models.generate_run_issue_summary_report,
+            side_effect=takes(30.0),
+        ) as summary_render,
+        patch.object(check_models, "_load_retained_run", side_effect=AssertionError("reread")),
     ):
         check_models._generate_reports_and_log_outputs(inputs)
+
+    assert summary_render.call_count == 1
+    assert summary_render.call_args.kwargs["run"] is not None
 
     header = json.loads(inputs.output_paths.jsonl.read_text(encoding="utf-8").splitlines()[0])
     assert header["total_runtime_seconds"] == 720.0
