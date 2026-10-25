@@ -1283,11 +1283,12 @@ Notable changes to this project will be documented in this file.
   `outside_model_loop` equals `total_runtime_seconds`; the residual used to
   come from the pre-report figure (248.422 s against 250.244 s in the
   2026-10-25 sweep).
-- Run comparison (0.17.92): a model list longer than eight collapses to a
+- Run comparison (0.17.93): a model list longer than eight collapses to a
   bare count, "11 models". It used to add "(targeted run against a
   full-sweep baseline)", an explanation inferred from the list's length
   alone; the 2026-10-25 summary attached it to models no longer cached, and
-  it would equally have described nine newly added models.
+  it would equally have described nine newly added models. Its commit is
+  titled 0.17.92, a number the chooser refactor had already taken.
 - Tests (0.17.85): `test_shared_flag_defaults_match_mlx_vlm_generate` passes
   against mlx-vlm 73d366e and later. Upstream now defaults `--temperature`,
   `--top-p` and `--top-k` to None, meaning the checkpoint's value or else a
