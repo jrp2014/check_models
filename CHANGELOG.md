@@ -118,6 +118,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reports (0.17.92): the Markdown and HTML choosers now read one shared
+  column description (header, display text, sort value and cell kind) and one
+  set of resource-highlight sentences. Links, escaping, the preview's
+  reasoning disclosure and sorting stay in each renderer. HTML no longer keeps
+  parallel header, cell, sort-value and raw-column-index lists, and chooser
+  rows carry their execution and maintainer status instead of looking them up
+  by model name. The standalone HTML report now builds the same report
+  context as a full run, with no run mode recorded, in place of a second,
+  overlapping context class. It still never measures the machine, and its
+  lane still reads "unknown". Rendered reports are byte-for-byte unchanged.
+
 - Tests: dropped the tests that froze documentation prose rather than
   behaviour. Gone: exact agent-guidance sentences (quality order, matrix
   preflight, Markdown style), the README evidence-boundary sentences, the

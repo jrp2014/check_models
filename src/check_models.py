@@ -7002,18 +7002,15 @@ def _html_class_attr(classes: Sequence[str]) -> str:
     return _html_attr("class", " ".join(classes))
 
 
-def _html_status_attrs(
-    result: PerformanceResult,
-    assessment: ResultAssessment,
-) -> str:
-    """Return presentation-only filter attributes from one cached assessment."""
+def _html_status_attrs(row: GalleryRow) -> str:
+    """Return presentation-only filter attributes from one chooser row."""
     return "".join(
         (
-            _html_attr("data-model", result.model_name.casefold()),
-            _html_attr("data-execution", assessment.execution),
-            _html_attr("data-usability", assessment.usability),
-            _html_attr("data-maintainer-status", assessment.maintainer_status),
-            _html_class_attr((assessment.execution, assessment.usability)),
+            _html_attr("data-model", row.model.casefold()),
+            _html_attr("data-execution", row.execution),
+            _html_attr("data-usability", row.usability),
+            _html_attr("data-maintainer-status", row.maintainer_status),
+            _html_class_attr((row.execution, row.usability)),
         )
     )
 
@@ -8346,7 +8343,9 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
     )
     return GalleryRow(
         model=result.model_name,
+        execution=assessment.execution,
         usability=assessment.usability,
+        maintainer_status=assessment.maintainer_status,
         observations=assessment.observations,
         total_time_s=(
             result.total_time if result.total_time is not None and result.total_time >= 0 else None
@@ -8875,98 +8874,198 @@ def _gallery_chooser_explanation() -> str:
     )
 
 
+type ChooserCellKind = Literal["model", "label", "text", "preview"]
+
+
+@dataclass(frozen=True, slots=True)
+class ChooserColumn:
+    """One chooser column, described once for both report formats.
+
+    ``text`` is the unescaped display value and ``sort_value`` the raw fact
+    behind it. ``kind`` tells each renderer which boundary treatment applies:
+    a model link, a status label (inline code in Markdown), plain text, or the
+    output preview (with its reasoning disclosure in HTML). Escaping, links and
+    sorting stay with the renderer.
+    """
+
+    header: str
+    text: Callable[[GalleryRow], str]
+    sort_value: Callable[[GalleryRow], str | int | float | None]
+    kind: ChooserCellKind = "text"
+
+
+_CHOOSER_MODEL: Final = ChooserColumn(
+    "Model", lambda row: row.model, lambda row: row.model, "model"
+)
+_CHOOSER_CHECKS: Final = ChooserColumn(
+    "Mechanical checks",
+    lambda row: _usability_label(row.usability, row.observations),
+    lambda row: row.usability,
+    "label",
+)
+_CHOOSER_OBSERVATIONS: Final = ChooserColumn(
+    "Observations",
+    lambda row: _gallery_observation_labels(row.observations),
+    lambda row: _gallery_observation_labels(row.observations),
+)
+_CHOOSER_METRICS: Final[tuple[ChooserColumn, ...]] = (
+    ChooserColumn("Total s", _gallery_total_time_cell, lambda row: row.total_time_s),
+    ChooserColumn("Gen TPS", _gallery_throughput_cell, lambda row: row.generation_tps),
+    ChooserColumn(
+        "Prefill/first s",
+        lambda row: _format_float_or_dash(row.first_token_latency_s, digits=2),
+        lambda row: row.first_token_latency_s,
+    ),
+    ChooserColumn(
+        "Peak GB",
+        lambda row: _gallery_metric("peak_memory", row.peak_memory_gb),
+        lambda row: row.peak_memory_gb,
+    ),
+    ChooserColumn(
+        "Prompt tok",
+        lambda row: _gallery_metric("prompt_tokens", row.prompt_tokens),
+        lambda row: row.prompt_tokens,
+    ),
+    ChooserColumn(
+        "Gen tok",
+        lambda row: _gallery_metric("generation_tokens", row.generation_tokens),
+        lambda row: row.generation_tokens,
+    ),
+)
+_CHOOSER_PREVIEW: Final = ChooserColumn(
+    "Output preview", lambda row: row.output_preview, lambda row: row.output_preview, "preview"
+)
+# Markdown keeps the chooser compact: execution and maintainer lanes live in
+# the diagnostics report, and previews in the output-glance table below it.
+MARKDOWN_CHOOSER_COLUMNS: Final[tuple[ChooserColumn, ...]] = (
+    _CHOOSER_MODEL,
+    _CHOOSER_CHECKS,
+    *_CHOOSER_METRICS,
+    _CHOOSER_OBSERVATIONS,
+)
+HTML_CHOOSER_COLUMNS: Final[tuple[ChooserColumn, ...]] = (
+    _CHOOSER_MODEL,
+    ChooserColumn(
+        "Execution",
+        lambda row: _human_status_label(row.execution),
+        lambda row: row.execution,
+    ),
+    _CHOOSER_CHECKS,
+    ChooserColumn(
+        "Maintainer status",
+        lambda row: _human_status_label(row.maintainer_status),
+        lambda row: row.maintainer_status,
+    ),
+    *_CHOOSER_METRICS,
+    _CHOOSER_OBSERVATIONS,
+    _CHOOSER_PREVIEW,
+)
+MARKDOWN_CONCERN_COLUMNS: Final[tuple[ChooserColumn, ...]] = (
+    _CHOOSER_MODEL,
+    _CHOOSER_CHECKS,
+    _CHOOSER_OBSERVATIONS,
+)
+# The concerns table shows the preview text alone; the reasoning disclosure
+# stays in the chooser row above it.
+HTML_CONCERN_COLUMNS: Final[tuple[ChooserColumn, ...]] = (
+    *MARKDOWN_CONCERN_COLUMNS,
+    replace(_CHOOSER_PREVIEW, kind="text"),
+)
+
+# The glance table names the usability lane only; the chooser above it
+# carries the observation detail.
+MARKDOWN_GLANCE_COLUMNS: Final[tuple[ChooserColumn, ...]] = (
+    _CHOOSER_MODEL,
+    ChooserColumn(
+        "Mechanical checks",
+        lambda row: _human_status_label(row.usability),
+        lambda row: row.usability,
+        "label",
+    ),
+    _CHOOSER_PREVIEW,
+)
+
+
+@dataclass(frozen=True, slots=True)
+class ChooserHighlight:
+    """One resource-highlight sentence; without a model the lead is the whole sentence."""
+
+    lead: str
+    model: str | None = None
+    value: str = ""
+
+
+def _gallery_chooser_highlights(data: GalleryChooserData) -> tuple[ChooserHighlight, ...]:
+    """Word the resource highlights once for both report formats."""
+    highlights = [
+        ChooserHighlight(
+            "Quickest completion without detected concerns (end-to-end, including model load)",
+            data.quickest.model,
+            _gallery_total_time_cell(data.quickest),
+        )
+        if data.quickest is not None
+        else ChooserHighlight(
+            "No completion without detected concerns has a captured end-to-end time in this run."
+        )
+    ]
+    if data.lowest_memory is not None:
+        highlights.append(
+            ChooserHighlight(
+                "Lowest peak memory among completions without detected concerns",
+                data.lowest_memory.model,
+                f"{_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb)} GB",
+            )
+        )
+    return tuple(highlights)
+
+
+def _markdown_chooser_cell(column: ChooserColumn, row: GalleryRow) -> str:
+    """Apply the Markdown boundary treatment to one shared chooser cell."""
+    if column.kind == "model":
+        return _gallery_summary_model_link(row.model)
+    if column.kind == "label":
+        return _markdown_inline_code(column.text(row))
+    if column.kind == "preview":
+        return _gallery_preview_cell_markdown(row)
+    return escape_markdown_cell(column.text(row))
+
+
+def _render_markdown_chooser_table(
+    columns: Sequence[ChooserColumn], rows: Sequence[GalleryRow]
+) -> list[str]:
+    """Render chooser rows through the shared column description."""
+    return _render_gallery_table(
+        headers=tuple(column.header for column in columns),
+        rows=[tuple(_markdown_chooser_cell(column, row) for column in columns) for row in rows],
+    )
+
+
 def _render_gallery_chooser(data: GalleryChooserData) -> list[str]:
     """Render the skim-first chooser, resource highlights, and avoid list."""
-    ordered = data.ordered
-    chooser_rows = [
-        (
-            _gallery_summary_model_link(row.model),
-            _markdown_inline_code(_usability_label(row.usability, row.observations)),
-            _gallery_total_time_cell(row),
-            _gallery_throughput_cell(row),
-            _format_float_or_dash(row.first_token_latency_s, digits=2),
-            _gallery_metric("peak_memory", row.peak_memory_gb),
-            _gallery_metric("prompt_tokens", row.prompt_tokens),
-            _gallery_metric("generation_tokens", row.generation_tokens),
-            escape_markdown_cell(_gallery_observation_labels(row.observations)),
-        )
-        for row in ordered
-    ]
     parts = [
         "## Current-run Chooser",
         "",
         _gallery_chooser_explanation(),
         "",
-        *_render_gallery_table(
-            headers=(
-                "Model",
-                "Mechanical checks",
-                "Total s",
-                "Gen TPS",
-                "Prefill/first s",
-                "Peak GB",
-                "Prompt tok",
-                "Gen tok",
-                "Observations",
-            ),
-            rows=chooser_rows,
-        ),
+        *_render_markdown_chooser_table(MARKDOWN_CHOOSER_COLUMNS, data.ordered),
         "",
         "## Resource Highlights",
         "",
     ]
-
     # One sortable row set replaces the former lowest-memory/fastest re-listing
     # tables; the highlights carry the same decisions in a few lines.
-    if data.quickest is not None:
-        parts.extend(
-            [
-                (
-                    "Quickest completion without detected concerns (end-to-end, including "
-                    f"model load): `{data.quickest.model}` at "
-                    f"{_gallery_total_time_cell(data.quickest)}"
-                ),
-                "",
-            ]
+    for highlight in _gallery_chooser_highlights(data):
+        sentence = (
+            f"{highlight.lead}: `{highlight.model}` at {highlight.value}"
+            if highlight.model is not None
+            else highlight.lead
         )
-    else:
-        parts.extend(
-            [
-                (
-                    "No completion without detected concerns has a captured end-to-end time "
-                    "in this run."
-                ),
-                "",
-            ]
-        )
-    if data.lowest_memory is not None:
-        parts.extend(
-            [
-                (
-                    "Lowest peak memory among completions without detected concerns: "
-                    f"`{data.lowest_memory.model}` at "
-                    f"{_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb)} GB"
-                ),
-                "",
-            ]
-        )
+        parts.extend([sentence, ""])
     parts.extend([_GALLERY_THROUGHPUT_CAVEAT, ""])
     parts.extend(["## Major Mechanical Concerns in This Run", ""])
 
     if data.avoided:
-        parts.extend(
-            _render_gallery_table(
-                headers=("Model", "Mechanical checks", "Observations"),
-                rows=[
-                    (
-                        _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(_usability_label(row.usability, row.observations)),
-                        escape_markdown_cell(_gallery_observation_labels(row.observations)),
-                    )
-                    for row in data.avoided
-                ],
-            )
-        )
+        parts.extend(_render_markdown_chooser_table(MARKDOWN_CONCERN_COLUMNS, data.avoided))
     else:
         parts.append("No model had major concerns or went unassessed in this run.")
     parts.append("")
@@ -8998,17 +9097,7 @@ def _render_gallery_output_glance(data: GalleryChooserData) -> list[str]:
             "the model's evidence block below."
         ),
         "",
-        *_render_gallery_table(
-            headers=("Model", "Mechanical checks", "Output preview"),
-            rows=[
-                (
-                    _gallery_summary_model_link(row.model),
-                    _markdown_inline_code(_human_status_label(row.usability)),
-                    _gallery_preview_cell_markdown(row),
-                )
-                for row in ordered
-            ],
-        ),
+        *_render_markdown_chooser_table(MARKDOWN_GLANCE_COLUMNS, ordered),
         "",
     ]
 
@@ -9095,7 +9184,9 @@ class GalleryRow:
     """One facts-only chooser row derived from cached assessment and run metrics."""
 
     model: str
+    execution: ExecutionStatus
     usability: ModelUsability
+    maintainer_status: MaintainerStatus
     observations: tuple[ObservationCode, ...]
     total_time_s: float | None
     generation_tps: float | None
@@ -9292,24 +9383,42 @@ def _default_report_mode_policy() -> ReportModePolicy:
     return _build_report_mode_policy(eval_mode=DEFAULT_EVAL_MODE, metadata=None)
 
 
-class _ReportContextLookups:
-    """Per-model lookups and gallery rows, derived once per report context.
+@dataclass(frozen=True)
+class ReportRenderContext:
+    """Shared cached context for one report operation.
 
-    A context is built for one report operation and both formats render from
-    it, so each derived value is computed on first use and shared by both
-    without a module-level cache. ``replace()`` builds a new context, which
-    derives its own.
+    Both formats render from it, so each derived lookup is computed on first
+    use and shared without a module-level cache; ``replace()`` builds a new
+    context, which derives its own. ``mode_policy`` is ``None`` when the
+    context was built without run metadata (a standalone HTML report): the
+    lane then reads as unknown rather than as an assumed default.
     """
 
-    if TYPE_CHECKING:
-        # Supplied by the frozen dataclass fields of each context; read-only
-        # here so those fields may override them.
-        @property
-        def results(self) -> tuple[PerformanceResult, ...]: ...
-        @property
-        def assessments(self) -> tuple[tuple[str, ResultAssessment], ...]: ...
-        @property
-        def model_provenance(self) -> tuple[tuple[str, ModelProvenanceRecord], ...]: ...
+    results: tuple[PerformanceResult, ...]
+    system_info: dict[str, str]
+    recommended_working_set_bytes: int | None = None
+    image_profile: ImageInputProfile | None = None
+    preflight_issues: tuple[str, ...] = ()
+    mode_policy: ReportModePolicy | None = None
+    assessments: tuple[tuple[str, ResultAssessment], ...] = ()
+    model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
+
+    @property
+    def eval_mode(self) -> EvaluationLane | None:
+        """The run's evaluation lane, or ``None`` when it was not recorded."""
+        return self.mode_policy.eval_mode if self.mode_policy is not None else None
+
+    @property
+    def assessment_profile(self) -> AssessmentProfile:
+        """The recorded assessment profile, else the one the results were assessed under."""
+        if self.mode_policy is not None:
+            return self.mode_policy.assessment_profile
+        return self.results[0].assessment_profile if self.results else "general"
+
+    @property
+    def metadata_exposed_to_prompt(self) -> bool | None:
+        """Whether image metadata reached the prompt, or ``None`` when not recorded."""
+        return self.mode_policy.metadata_exposed_to_prompt if self.mode_policy is not None else None
 
     @cached_property
     def result_by_model(self) -> Mapping[str, PerformanceResult]:
@@ -9340,53 +9449,25 @@ class _ReportContextLookups:
         return _gallery_chooser_data(self.gallery_rows)
 
 
-@dataclass(frozen=True)
-class ReportRenderContext(_ReportContextLookups):
-    """Shared cached context for retained current-run report generation."""
-
-    results: tuple[PerformanceResult, ...]
-    system_info: dict[str, str]
-    recommended_working_set_bytes: int | None = None
-    image_profile: ImageInputProfile | None = None
-    preflight_issues: tuple[str, ...] = ()
-    mode_policy: ReportModePolicy = dataclass_field(default_factory=_default_report_mode_policy)
-    assessments: tuple[tuple[str, ResultAssessment], ...] = ()
-    model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
-
-
-@dataclass(frozen=True)
-class CanonicalHtmlReportContext(_ReportContextLookups):
-    """Minimal cached facts required by the standalone HTML report."""
-
-    results: tuple[PerformanceResult, ...]
-    system_info: dict[str, str]
-    assessments: tuple[tuple[str, ResultAssessment], ...]
-    model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
-
-
-type HtmlReportContext = ReportRenderContext | CanonicalHtmlReportContext
-
-
 def _build_html_report_context(
     *,
     results: Sequence[PerformanceResult],
     prompt: str,
     system_info: dict[str, str] | None = None,
-) -> CanonicalHtmlReportContext:
-    """Build only the canonical gallery and diagnostics facts consumed by HTML."""
-    analyzed_results = [
-        _populate_result_quality_analysis(
-            result,
+) -> ReportRenderContext:
+    """Build the context a standalone HTML report renders from results alone.
+
+    It records no run mode, image profile or provenance, and it never
+    measures the machine now: facts the caller did not supply stay
+    unavailable.
+    """
+    return replace(
+        _build_report_render_context(
+            results=list(results),
             prompt=prompt,
-        )
-        for result in results
-    ]
-    return CanonicalHtmlReportContext(
-        results=tuple(_sort_results_by_time(analyzed_results)),
-        system_info=system_info if system_info is not None else {},
-        assessments=tuple(
-            (result.model_name, _assess_result(result)) for result in analyzed_results
+            system_info=system_info,
         ),
+        mode_policy=None,
     )
 
 
@@ -9949,7 +10030,7 @@ class DiagnosticsPartitions:
         return (*self.actionable, *self.observations, *self.indeterminate)
 
 
-def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
+def _partition_diagnostics(context: ReportRenderContext) -> DiagnosticsPartitions:
     """Partition maintainer evidence using only cached current-run assessments.
 
     One pass places each result in the first bucket its assessment names; the
@@ -10433,7 +10514,7 @@ def _diagnostics_model_blocks(
 
 
 def _diagnostics_counts_blocks(
-    context: HtmlReportContext,
+    context: ReportRenderContext,
 ) -> tuple[ReportBlock, ...]:
     """Build compact outcome and cached-assessment count tables."""
     assessments = [assessment for _model, assessment in context.assessments]
@@ -10579,25 +10660,19 @@ def _diagnostics_partition_blocks(
 
 def _run_input_rows_for_context(
     image_path: Path | None,
-    report_context: HtmlReportContext,
+    report_context: ReportRenderContext,
 ) -> tuple[tuple[str, str], ...]:
-    """Lane and input-image rows from whichever report context a renderer holds."""
-    results = report_context.results
-    mode_policy = getattr(report_context, "mode_policy", None)
+    """Lane and input-image rows, leaving unrecorded run-mode facts unknown."""
     return _run_input_summary_rows(
-        _run_image_record(image_path, getattr(report_context, "image_profile", None)),
-        getattr(mode_policy, "eval_mode", None),
-        getattr(
-            mode_policy,
-            "assessment_profile",
-            results[0].assessment_profile if results else "general",
-        ),
-        metadata_exposed_to_prompt=getattr(mode_policy, "metadata_exposed_to_prompt", None),
+        _run_image_record(image_path, report_context.image_profile),
+        report_context.eval_mode,
+        report_context.assessment_profile,
+        metadata_exposed_to_prompt=report_context.metadata_exposed_to_prompt,
     )
 
 
 def _diagnostics_evidence_blocks(
-    report_context: HtmlReportContext,
+    report_context: ReportRenderContext,
     partitions: DiagnosticsPartitions,
     *,
     run_args: argparse.Namespace | None,
@@ -10606,9 +10681,9 @@ def _diagnostics_evidence_blocks(
     """Build the shared skim-first diagnostics hierarchy from cached assessments."""
     assessments = report_context.assessment_by_model
     provenance = report_context.provenance_by_model
-    # The canonical HTML context carries no image profile; the capacity rows
+    # A standalone HTML context carries no image profile; the capacity rows
     # then simply omit the input-image line rather than re-reading the file.
-    image_profile: ImageInputProfile | None = getattr(report_context, "image_profile", None)
+    image_profile = report_context.image_profile
     triage_rows = tuple(
         (
             ReportTargetLink(result.model_name, "#" + _diagnostics_model_anchor(result.model_name)),
@@ -10778,7 +10853,7 @@ def generate_diagnostics_report(
     del results  # The cached context is the sole classification and result source.
     partitions = _partition_diagnostics(report_context)
     blocks = (
-        ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
+        ReportParagraph(_run_objective_statement(report_context.eval_mode)),
         *_diagnostics_evidence_blocks(
             report_context, partitions, run_args=run_args, image_path=image_path
         ),
@@ -10949,75 +11024,57 @@ def _html_embedded_image(image_path: Path | None) -> str:
     )
 
 
-def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
+def _html_chooser_cell(column: ChooserColumn, row: GalleryRow) -> str:
+    """Apply the HTML boundary treatment to one shared chooser cell.
+
+    Model links and the preview disclosure arrive as built markup; every
+    other cell is escaped by ``_html_table``.
+    """
+    if column.kind == "model":
+        return _html_model_link(row.model)
+    if column.kind == "preview":
+        return _gallery_preview_cell_html(row)
+    return column.text(row)
+
+
+def _html_chooser_table(
+    *,
+    caption: str,
+    columns: Sequence[ChooserColumn],
+    rows: Sequence[GalleryRow],
+    sortable: bool = False,
+) -> str:
+    """Render chooser rows through the shared column description."""
+    return _html_table(
+        caption=caption,
+        headers=tuple(column.header for column in columns),
+        rows=[tuple(_html_chooser_cell(column, row) for column in columns) for row in rows],
+        row_attrs=[_html_status_attrs(row) for row in rows] if sortable else (),
+        raw_columns=frozenset(
+            index for index, column in enumerate(columns) if column.kind in {"model", "preview"}
+        ),
+        sort_values=(
+            [tuple(column.sort_value(row) for column in columns) for row in rows]
+            if sortable
+            else ()
+        ),
+        sortable=sortable,
+    )
+
+
+def _html_gallery_chooser(report_context: ReportRenderContext) -> str:
     """Render the same facts-only chooser and resource highlights as Markdown."""
-    assessments = report_context.assessment_by_model
-    result_by_model = report_context.result_by_model
     data = report_context.gallery_chooser
-    ordered = data.ordered
-    chooser_rows = [
-        (
-            _html_model_link(row.model),
-            _human_status_label(assessments[row.model].execution),
-            _usability_label(row.usability, row.observations),
-            _human_status_label(assessments[row.model].maintainer_status),
-            _gallery_total_time_cell(row),
-            _gallery_throughput_cell(row),
-            _format_float_or_dash(row.first_token_latency_s, digits=2),
-            _gallery_metric("peak_memory", row.peak_memory_gb),
-            _gallery_metric("prompt_tokens", row.prompt_tokens),
-            _gallery_metric("generation_tokens", row.generation_tokens),
-            _gallery_observation_labels(row.observations),
-            _gallery_preview_cell_html(row),
-        )
-        for row in ordered
-    ]
-    chooser_attrs = [
-        _html_status_attrs(result_by_model[row.model], assessments[row.model]) for row in ordered
-    ]
-    chooser_sort_values = [
-        (
-            row.model,
-            assessments[row.model].execution,
-            row.usability,
-            assessments[row.model].maintainer_status,
-            row.total_time_s,
-            row.generation_tps,
-            row.first_token_latency_s,
-            row.peak_memory_gb,
-            row.prompt_tokens,
-            row.generation_tokens,
-            _gallery_observation_labels(row.observations),
-            row.output_preview,
-        )
-        for row in ordered
-    ]
     parts = [
         '<section id="current-run-chooser">',
         "<h2>Current-run Chooser</h2>",
         f"<p>{html.escape(_gallery_chooser_explanation(), quote=True)}</p>",
         _html_filter_controls(),
         '<div id="chooser-table">',
-        _html_table(
+        _html_chooser_table(
             caption="Current-run model chooser",
-            headers=(
-                "Model",
-                "Execution",
-                "Mechanical checks",
-                "Maintainer status",
-                "Total s",
-                "Gen TPS",
-                "Prefill/first s",
-                "Peak GB",
-                "Prompt tok",
-                "Gen tok",
-                "Observations",
-                "Output preview",
-            ),
-            rows=chooser_rows,
-            row_attrs=chooser_attrs,
-            raw_columns=frozenset({0, 11}),
-            sort_values=chooser_sort_values,
+            columns=HTML_CHOOSER_COLUMNS,
+            rows=data.ordered,
             sortable=True,
         ),
         "</div>",
@@ -11025,42 +11082,24 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     ]
     # The chooser table is sortable by every column, so the former
     # lowest-memory/fastest re-listing tables collapse into highlight lines.
-    if data.quickest is not None:
-        parts.append(
-            "<p>Quickest completion without detected concerns (end-to-end, including "
-            f"model load): {_html_model_link(data.quickest.model)} at "
-            f"{html.escape(_gallery_total_time_cell(data.quickest))}.</p>"
+    parts.extend(
+        (
+            f"<p>{html.escape(highlight.lead)}: {_html_model_link(highlight.model)} at "
+            f"{html.escape(highlight.value)}.</p>"
         )
-    else:
-        parts.append(
-            "<p>No completion without detected concerns has a captured end-to-end time "
-            "in this run.</p>"
-        )
-    if data.lowest_memory is not None:
-        parts.append(
-            "<p>Lowest peak memory among completions without detected concerns: "
-            f"{_html_model_link(data.lowest_memory.model)} at "
-            f"{html.escape(_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb))} "
-            "GB.</p>"
-        )
+        if highlight.model is not None
+        else f"<p>{html.escape(highlight.lead)}</p>"
+        for highlight in _gallery_chooser_highlights(data)
+    )
     parts.append(f"<p>{html.escape(_GALLERY_THROUGHPUT_CAVEAT)}</p>")
 
     parts.append("<h3>Major Mechanical Concerns in This Run</h3>")
     if data.avoided:
         parts.append(
-            _html_table(
+            _html_chooser_table(
                 caption="Models with major concerns or not assessed",
-                headers=("Model", "Mechanical checks", "Observations", "Output preview"),
-                rows=[
-                    (
-                        _html_model_link(row.model),
-                        _usability_label(row.usability, row.observations),
-                        _gallery_observation_labels(row.observations),
-                        row.output_preview,
-                    )
-                    for row in data.avoided
-                ],
-                raw_columns=frozenset({0}),
+                columns=HTML_CONCERN_COLUMNS,
+                rows=data.avoided,
             )
         )
     else:
@@ -11098,7 +11137,7 @@ def _html_gallery_model(
 
 
 def _gallery_evidence_entries(
-    report_context: HtmlReportContext,
+    report_context: ReportRenderContext,
 ) -> list[tuple[PerformanceResult, GalleryRow, ResultAssessment, ModelProvenanceRecord | None]]:
     """Per-model evidence inputs in the stable usable-first order both galleries render."""
     # Each row stays paired with the result it was built from.
@@ -11117,7 +11156,7 @@ def _gallery_evidence_entries(
     )
 
 
-def _html_complete_gallery(report_context: HtmlReportContext) -> str:
+def _html_complete_gallery(report_context: ReportRenderContext) -> str:
     """Render complete evidence in the same stable order as the Markdown gallery."""
     parts = [
         '<section id="complete-model-evidence">',
@@ -11130,7 +11169,7 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
 
 
 def _html_maintainer_diagnostics(
-    report_context: HtmlReportContext,
+    report_context: ReportRenderContext,
     partitions: DiagnosticsPartitions,
     *,
     run_args: argparse.Namespace | None,
@@ -11150,7 +11189,7 @@ def _html_maintainer_diagnostics(
     return "\n".join(parts)
 
 
-def _html_run_inputs(image_path: Path | None, report_context: HtmlReportContext) -> str:
+def _html_run_inputs(image_path: Path | None, report_context: ReportRenderContext) -> str:
     """Render the evaluation lane and input-image facts ahead of every table."""
     rows = _run_input_rows_for_context(image_path, report_context)
     return "".join(render_report_html((ReportKeyValues(rows),)))
@@ -11185,7 +11224,7 @@ def _html_runtime_facts(
 
 def _html_provenance(
     *,
-    report_context: HtmlReportContext,
+    report_context: ReportRenderContext,
     highlighted_results: Sequence[PerformanceResult],
     versions: LibraryVersionDict,
     prompt: str,
@@ -11213,7 +11252,7 @@ def _html_provenance(
 
 def _build_full_html_document(
     *,
-    report_context: HtmlReportContext,
+    report_context: ReportRenderContext,
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
@@ -11263,13 +11302,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
                 '<a href="#maintainer-diagnostics">Maintainer diagnostics</a>'
                 '<a href="#provenance">Provenance</a></nav>'
             ),
-            "<p>"
-            + html.escape(
-                _run_objective_statement(
-                    getattr(getattr(report_context, "mode_policy", None), "eval_mode", None)
-                )
-            )
-            + "</p>",
+            "<p>" + html.escape(_run_objective_statement(report_context.eval_mode)) + "</p>",
             _html_run_inputs(image_path, report_context),
             _html_embedded_image(image_path),
             _html_runtime_facts(report_context.results, total_runtime_seconds),
@@ -11307,7 +11340,7 @@ def generate_html_report(
     prompt: str,
     total_runtime_seconds: float,
     image_path: Path | None = None,
-    report_context: HtmlReportContext | None = None,
+    report_context: ReportRenderContext | None = None,
     run_args: argparse.Namespace | None = None,
 ) -> None:
     """Write a standalone HTML mirror of the facts-only gallery and diagnostics.
@@ -11385,7 +11418,7 @@ def generate_markdown_gallery_report(
         for label, value in _run_input_rows_for_context(image_path, report_context)
     )
     md.append("")
-    md.extend(_wrap_markdown_text(_run_objective_statement(report_context.mode_policy.eval_mode)))
+    md.extend(_wrap_markdown_text(_run_objective_statement(report_context.eval_mode)))
     md.append("")
     md.extend(
         _wrap_markdown_text(
@@ -19931,12 +19964,8 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
     """Build the schema-3 retained run: one metadata row plus ordered results."""
     resolved_policy = (
         mode_policy
-        if mode_policy is not None
-        else (
-            report_context.mode_policy
-            if report_context is not None
-            else _default_report_mode_policy()
-        )
+        or (report_context.mode_policy if report_context is not None else None)
+        or _default_report_mode_policy()
     )
     if report_context is None:
         report_context = _build_report_render_context(
@@ -19947,7 +19976,7 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
             system_info=system_info,
         )
     if mode_policy is None:
-        resolved_policy = report_context.mode_policy
+        resolved_policy = report_context.mode_policy or resolved_policy
     cached_results = {result.model_name: result for result in report_context.results}
     assessments = report_context.assessment_by_model
     model_provenance = report_context.provenance_by_model
@@ -26978,13 +27007,11 @@ def _generate_reports_and_log_outputs(
             run_issue_summary=run_issue_summary,
             issue_reports=diagnostics_artifacts.issue_reports,
             assessments=inputs.report_context.assessments,
-            eval_mode=inputs.report_context.mode_policy.eval_mode,
+            eval_mode=inputs.report_context.eval_mode,
             run_duration_seconds=_elapsed_run_seconds(inputs, until=run_end_time),
             image=_run_image_record(inputs.image_path, inputs.report_context.image_profile),
-            assessment_profile=inputs.report_context.mode_policy.assessment_profile,
-            metadata_exposed_to_prompt=(
-                inputs.report_context.mode_policy.metadata_exposed_to_prompt
-            ),
+            assessment_profile=inputs.report_context.assessment_profile,
+            metadata_exposed_to_prompt=inputs.report_context.metadata_exposed_to_prompt,
             run_metadata=retained.metadata if retained is not None else None,
         ),
     )
@@ -27233,7 +27260,11 @@ def finalize_execution(
         # Prepare output paths
         output_paths = _resolve_report_output_paths(args)
         history_path = _history_path_for_jsonl(output_paths.jsonl)
-        eval_mode = report_context.mode_policy.eval_mode
+        mode_policy = report_context.mode_policy
+        if mode_policy is None:  # pragma: no cover - built above from the run's arguments
+            msg = "live report context has no recorded run mode"
+            raise ValueError(msg)
+        eval_mode = mode_policy.eval_mode
 
         for output_path in (
             output_paths.index,

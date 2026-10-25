@@ -4711,18 +4711,19 @@ class TestHtmlReportEdgeCases:
                 )
                 assert f"*Maintainer status:* {status_label}" in diagnostics_entry
 
-    def test_standalone_html_does_not_build_legacy_semantic_context(
+    def test_standalone_html_measures_nothing_and_leaves_the_lane_unknown(
         self,
         tmp_path: Path,
     ) -> None:
-        """Standalone HTML should build only its canonical gallery/diagnostic context."""
+        """Standalone HTML renders supplied results only: no machine probe, no assumed lane."""
         result = _make_success("org/standalone")
         out = tmp_path / "standalone.html"
 
-        with patch.object(
-            check_models,
-            "_build_report_render_context",
-            side_effect=AssertionError,
+        with (
+            patch.object(check_models, "get_system_characteristics", side_effect=AssertionError),
+            patch.object(
+                check_models, "_get_recommended_working_set_bytes", side_effect=AssertionError
+            ),
         ):
             generate_html_report(
                 [result],
@@ -4733,6 +4734,7 @@ class TestHtmlReportEdgeCases:
             )
 
         content = out.read_text(encoding="utf-8")
+        assert "evaluation lane: unknown" in content
         assert 'data-execution="completed"' in content
         assert 'data-usability="usable"' in content
         assert 'data-maintainer-status="none"' in content
@@ -5899,7 +5901,9 @@ class TestMarkdownGalleryReport:
         ) -> check_models.GalleryRow:
             return check_models.GalleryRow(
                 model=model,
+                execution="completed",
                 usability=cast("check_models.ModelUsability", usability),
+                maintainer_status="none",
                 observations=(),
                 total_time_s=1.0,
                 generation_tps=tps,
