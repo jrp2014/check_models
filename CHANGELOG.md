@@ -1318,8 +1318,7 @@ Notable changes to this project will be documented in this file.
 
 - Cruft: `src/tools/retire_old_models.sh` is removed (john's 2026-10-25
   review). Its dated retirement list has been applied: none of its twelve
-  targets is in the 2026-10-25 sweep's cache. Git history keeps it. Nine
-  `claude/*` branches on the remote, all fully merged into main, are deleted.
+  targets is in the 2026-10-25 sweep's cache. Git history keeps it.
 - `ResultSet` (0.17.81) is no longer part of `check_models`'s public names.
   Production read only its sorted `.results`; `.successful`, `.failed` and
   the unused `_fields` slot served tests alone. `ReportRenderContext` and
