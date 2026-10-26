@@ -1,0 +1,12 @@
+# Human accuracy notes on the outputs retained in this directory.
+# Each note applies only while its image, model revision and output digests
+# match a run; the gallery and HTML report then show it beside that output.
+# Add one with: python -m tools.add_accuracy_note MODEL --reviewer NAME --note TEXT
+notes:
+- model: mlx-community/Molmo2-8B-4bit
+  model_revision: 4fcbe926577641af12aa5086cf5c292db9dd9730
+  image_sha256: dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e
+  output_sha256: 7f85f0525231ea0e217844e7617af35e3b7ce1a058bfbf0b1fd3c51522fa78c1
+  reviewer: john
+  reviewed: '2026-10-25'
+  note: Describes the pictured tabby cats as calico cats and gives incorrect positional details.

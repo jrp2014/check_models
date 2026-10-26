@@ -157,7 +157,11 @@ The file is organized in this order — search for these exact landmark headers 
   `issues/run_summary.md`, `issues/issue_*.md`, `reports/assets/`), and the run log (`check_models.log`) — is
   committed each run so it is browsable on GitHub. Only the append-only
   `results.history.jsonl` is gitignored and local-only; no report links to
-  it, so no special link handling exists for it.
+  it, so no special link handling exists for it. `accuracy_notes.yaml` in
+  the output root is person-written input, not a run artifact: runs read it
+  (gallery and HTML show notes whose image, revision and output digests
+  still match) and never write it; only `tools.add_accuracy_note` appends.
+  Do not write accuracy notes on a person's behalf without their words.
 - **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.
 
 ### 5. Make targets (all run from repo root)

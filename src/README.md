@@ -248,6 +248,40 @@ python -m check_models \
 
 </details>
 
+### Image set
+
+`cats.jpg` is a good integration regression image, but one image cannot show
+how well a model captions in general. `tools/image_set.tsv` lists five more
+public images, each pinned to a repository commit with its SHA-256, so every
+run sees the same bytes and reports can give a runnable reproduction:
+
+| Slug | Tests | Source |
+| --- | --- | --- |
+| `beach-people` | small distant people, kites, surf, overcast light | tensorflow/models test image (Michael Miley, Flickr) |
+| `workbench-clutter` | objects and clutter, a hand, shallow focus | tensorflow/models test image (Chris Briggs, Unsplash) |
+| `street-signs` | scene text with French accents and arrows | mlx-vlm `examples/images/scene_1.jpg` |
+| `receipt-text` | printed document text, numbers and a date | mlx-vlm `examples/images/password.jpg` |
+| `night-camera-trap` | infrared night shot, motion blur, timestamp overlay | Snapshot Serengeti via tensorflow/models (CDLA-Permissive-1.0) |
+
+Run each image into its own output directory with the existing flags; there is
+no extra orchestration. Each run is a full sweep, so add `-m` to limit models:
+
+```bash
+cd src
+image_dir="$HOME/Pictures/check_models_image_set"
+mkdir -p "$image_dir"
+grep -v '^#' tools/image_set.tsv | while IFS=$'\t' read -r slug sha256 url _tests; do
+  image="$image_dir/$slug.${url##*.}"
+  [ -f "$image" ] || curl -fsSL -o "$image" "$url" || continue
+  echo "$sha256  $image" | shasum -a 256 -c --quiet - || continue
+  python -m check_models --image "$image" --image-source-url "$url" \
+    --output-dir "output/image_set/$slug" < /dev/null
+done
+```
+
+Each directory then has its own gallery, run summary and `results.jsonl`, and
+`--compare-with auto` compares it with that directory's last committed run.
+
 ### Understanding the Output
 
 The tool generates a deliberately small artifact set in `output/` by default:
@@ -1475,6 +1509,26 @@ GitHub-compatible evidence artifact with:
   captured text in an expandable, dynamically fenced raw block
 - The exact execution, usability, maintainer status, observations, timing, memory,
   and token facts used by the HTML report
+
+### Human accuracy notes
+
+The mechanical checks cannot tell whether an answer is true to the image. A
+person who has checked an output can record that in `accuracy_notes.yaml` in
+the output directory (for example `src/output/accuracy_notes.yaml`):
+
+```bash
+cd src
+python -m tools.add_accuracy_note mlx-community/Molmo2-8B-4bit --reviewer john \
+  --note "Describes the pictured tabby cats as calico cats and gives incorrect positional details."
+```
+
+The tool reads the retained `results.jsonl` and stores the note with the image
+digest, the resolved model revision and the digest of the exact output it
+judged. On later runs into that directory, the gallery and HTML report show
+the note above that model's evidence, and their input summary says how many
+outputs were reviewed. Once the image, revision or output changes, the note
+is shown as out of date instead. Notes never change the mechanical checks,
+and a file that cannot be read is reported rather than ignored.
 
 ### JSONL Report
 

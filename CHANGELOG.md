@@ -6,6 +6,24 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Reports (0.17.95): optional human accuracy notes. A person who has checked
+  an output against the image records it with `python -m
+  tools.add_accuracy_note MODEL --reviewer NAME --note TEXT`, which appends
+  to `accuracy_notes.yaml` in the output directory, keyed to the image
+  digest, resolved model revision and output digest from the retained
+  `results.jsonl`. The gallery and HTML report show a note above that
+  model's evidence only while all three still match, mark it out of date
+  otherwise, and say in the input summary how many outputs were reviewed. A
+  file that cannot be read is reported and no output is shown as reviewed.
+  Notes stay apart from the mechanical checks and are not written to
+  `results.jsonl`. `src/output/accuracy_notes.yaml` starts with john's
+  Molmo2-8B note from the 2026-10-25 review (tabby cats called calico); the
+  retained reports show it from the next sweep.
+- Docs: a fixed five-image set in `src/tools/image_set.tsv` (people,
+  clutter, scene text, document text, infrared night lighting), each a
+  public URL pinned to a repository commit with its SHA-256, and a README
+  loop that runs each into its own `--output-dir` with
+  `--image-source-url`. `cats.jpg` stays the integration regression image.
 - Tooling: `tools.hub_precheck` reports each candidate's lineage as facts:
   the `base_model` chain its model cards declare (up to three hops, read
   from the hub) and the cached models that are, or declare, one of those

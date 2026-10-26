@@ -87,7 +87,7 @@ from contextlib import (
 )
 from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from functools import cached_property, lru_cache, partial
 from importlib import import_module
@@ -3191,6 +3191,7 @@ def _render_gallery_model(
     row: GalleryRow,
     assessment: ResultAssessment,
     model_provenance: ModelProvenanceRecord | None,
+    accuracy_note: AccuracyNoteMatch | None,
 ) -> list[str]:
     """Render complete captured evidence for one model without reclassification."""
     escaped_facts = tuple(
@@ -3203,10 +3204,16 @@ def _render_gallery_model(
         "",
         f"### {result.model_name}",
         "",
-        "<details>",
-        f"<summary>Complete evidence: {html.escape(result.model_name)}</summary>",
-        "",
     ]
+    if note_blocks := _gallery_accuracy_note_blocks(accuracy_note):
+        out.extend([*render_report_markdown(note_blocks), ""])
+    out.extend(
+        [
+            "<details>",
+            f"<summary>Complete evidence: {html.escape(result.model_name)}</summary>",
+            "",
+        ]
+    )
     out.extend(
         render_report_markdown(
             (
@@ -9383,6 +9390,205 @@ def _default_report_mode_policy() -> ReportModePolicy:
     return _build_report_mode_policy(eval_mode=DEFAULT_EVAL_MODE, metadata=None)
 
 
+# Human accuracy notes: optional, person-written judgements kept in the output
+# root beside the reports they annotate. Each note names the exact image,
+# model revision and output it judged, so it stops applying once any of them
+# changes. They are never mixed into the mechanical assessment.
+ACCURACY_NOTES_FILENAME: Final[str] = "accuracy_notes.yaml"
+_ACCURACY_NOTE_KEYS: Final[tuple[str, ...]] = (
+    "model",
+    "model_revision",
+    "image_sha256",
+    "output_sha256",
+    "reviewer",
+    "reviewed",
+    "note",
+)
+_SHA256_HEX_RE: Final[re.Pattern[str]] = re.compile(r"[0-9a-f]{64}")
+
+
+@dataclass(frozen=True)
+class AccuracyNote:
+    """One person's accuracy judgement on an exact image, model revision and output."""
+
+    model: str
+    model_revision: str
+    image_sha256: str
+    output_sha256: str
+    reviewer: str
+    reviewed: str
+    note: str
+
+
+@dataclass(frozen=True)
+class AccuracyNotes:
+    """The output root's accuracy-notes file, matched against this run's image.
+
+    ``read_error`` is set when the file exists but cannot be used; reports
+    then say so and show no output as reviewed.
+    """
+
+    image_sha256: str | None
+    notes: tuple[AccuracyNote, ...] = ()
+    read_error: str | None = None
+
+
+@dataclass(frozen=True)
+class AccuracyNoteMatch:
+    """Notes on one model's output for this image: those that apply and those that no longer do."""
+
+    applies: tuple[AccuracyNote, ...] = ()
+    stale: tuple[tuple[AccuracyNote, str], ...] = ()
+
+
+def _parse_accuracy_note(index: int, entry: object) -> AccuracyNote:
+    """Validate one notes-file entry; every field is required and none is guessed."""
+    where = f"note {index}"
+    if not isinstance(entry, dict):
+        msg = f"{where} is not a mapping"
+        raise ValueError(msg)  # noqa: TRY004 - one error type for every malformed-file reason
+    unknown = sorted(str(key) for key in entry if key not in _ACCURACY_NOTE_KEYS)
+    missing = [key for key in _ACCURACY_NOTE_KEYS if key not in entry]
+    if unknown or missing:
+        msg = f"{where} has unknown keys {unknown} or missing keys {missing}"
+        raise ValueError(msg)
+    values: dict[str, str] = {}
+    for key in _ACCURACY_NOTE_KEYS:
+        value = entry[key]
+        # YAML reads an unquoted 2026-10-25 as a date.
+        if key == "reviewed" and isinstance(value, date):
+            value = value.isoformat()
+        if not isinstance(value, str) or not value.strip():
+            msg = f"{where}: {key} must be non-empty text"
+            raise ValueError(msg)
+        values[key] = " ".join(value.split())
+    for key in ("image_sha256", "output_sha256"):
+        if _SHA256_HEX_RE.fullmatch(values[key]) is None:
+            msg = f"{where}: {key} must be 64 lowercase hex digits"
+            raise ValueError(msg)
+    try:
+        date.fromisoformat(values["reviewed"])
+    except ValueError as error:
+        msg = f"{where}: reviewed must be a YYYY-MM-DD date"
+        raise ValueError(msg) from error
+    return AccuracyNote(**values)
+
+
+def _parse_accuracy_notes(document: object) -> tuple[AccuracyNote, ...]:
+    """Validate a notes document: an empty file, or a mapping with a ``notes`` list."""
+    if document is None:
+        return ()
+    if not isinstance(document, dict) or set(document) - {"notes"}:
+        msg = "the file must be a mapping whose only key is notes"
+        raise ValueError(msg)
+    entries = document.get("notes") or []
+    if not isinstance(entries, list):
+        msg = "notes must be a list"
+        raise ValueError(msg)  # noqa: TRY004 - one error type for every malformed-file reason
+    return tuple(_parse_accuracy_note(index, entry) for index, entry in enumerate(entries, 1))
+
+
+def _load_accuracy_notes(path: Path, *, image_sha256: str | None) -> AccuracyNotes | None:
+    """Read the output root's notes file; ``None`` when there is none."""
+    if not path.exists() and not path.is_symlink():
+        return None
+    try:
+        notes = _parse_accuracy_notes(yaml.safe_load(_read_text_file(path)))
+    except (OSError, ValueError, yaml.YAMLError) as error:
+        reason = " ".join(str(error).split()) or type(error).__name__
+        logger.warning("%s could not be read: %s", ACCURACY_NOTES_FILENAME, reason)
+        return AccuracyNotes(image_sha256=image_sha256, read_error=reason)
+    return AccuracyNotes(image_sha256=image_sha256, notes=notes)
+
+
+def _accuracy_output_sha256(result: PerformanceResult) -> str:
+    """Digest of the exact output text a note judges (the retained ``generated_text``)."""
+    return _sha256_text(_generation_text_value(result.generation))
+
+
+def _match_accuracy_notes(
+    notes: AccuracyNotes,
+    result: PerformanceResult,
+    model_provenance: ModelProvenanceRecord | None,
+) -> AccuracyNoteMatch | None:
+    """Return this model's notes for this image, split by whether they still apply."""
+    candidates = [
+        note
+        for note in notes.notes
+        if note.model == result.model_name and note.image_sha256 == notes.image_sha256
+    ]
+    if not candidates:
+        return None
+    revision = model_provenance.get("resolved_revision") if model_provenance else None
+    output_sha256 = _accuracy_output_sha256(result)
+    applies: list[AccuracyNote] = []
+    stale: list[tuple[AccuracyNote, str]] = []
+    for note in candidates:
+        if revision is None:
+            stale.append((note, "this run's model revision was not captured"))
+        elif note.model_revision != revision:
+            stale.append((note, "the model revision changed"))
+        elif note.output_sha256 != output_sha256:
+            stale.append((note, "the output changed"))
+        else:
+            applies.append(note)
+    return AccuracyNoteMatch(applies=tuple(applies), stale=tuple(stale))
+
+
+def _accuracy_notes_summary(
+    notes: AccuracyNotes,
+    matches: Mapping[str, AccuracyNoteMatch],
+    result_count: int,
+) -> str:
+    """One run-level line: how many outputs a person reviewed, and what did not match."""
+    if notes.read_error is not None:
+        return (
+            f"{ACCURACY_NOTES_FILENAME} could not be read ({notes.read_error}); "
+            "no output is shown as reviewed"
+        )
+    reviewed = sum(bool(match.applies) for match in matches.values())
+    stale = sum(len(match.stale) for match in matches.values())
+    matched = sum(len(match.applies) + len(match.stale) for match in matches.values())
+    parts = [
+        (
+            f"{reviewed} of {_pluralized_count(result_count, 'output')} reviewed by a person "
+            f"for this exact image, model revision and output ({ACCURACY_NOTES_FILENAME}); "
+            "the others are unreviewed"
+        )
+    ]
+    if stale:
+        parts.append(f"{_pluralized_count(stale, 'earlier note')} out of date")
+    if other := len(notes.notes) - matched:
+        parts.append(f"{_pluralized_count(other, 'note')} for other images or models")
+    return "; ".join(parts)
+
+
+def _gallery_accuracy_note_blocks(match: AccuracyNoteMatch | None) -> tuple[ReportBlock, ...]:
+    """Render a model's human notes apart from its mechanical facts."""
+    if match is None:
+        return ()
+    blocks: list[ReportBlock] = []
+    for note in match.applies:
+        blocks.extend(
+            (
+                ReportParagraph(
+                    f"Reviewed by {note.reviewer} on {note.reviewed} for this exact image, "
+                    "model revision and output. This is a person's judgement, not one of the "
+                    "mechanical checks."
+                ),
+                ReportParagraph(note.note),
+            )
+        )
+    blocks.extend(
+        ReportParagraph(
+            f"An earlier note by {note.reviewer} ({note.reviewed}) no longer applies: "
+            f"{reason}. This output has not been reviewed."
+        )
+        for note, reason in match.stale
+    )
+    return (_report_section("Human accuracy note", *blocks, level=4),)
+
+
 @dataclass(frozen=True)
 class ReportRenderContext:
     """Shared cached context for one report operation.
@@ -9402,6 +9608,8 @@ class ReportRenderContext:
     mode_policy: ReportModePolicy | None = None
     assessments: tuple[tuple[str, ResultAssessment], ...] = ()
     model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
+    # Person-written notes from the output root, or ``None`` when it has none.
+    accuracy_notes: AccuracyNotes | None = None
 
     @property
     def eval_mode(self) -> EvaluationLane | None:
@@ -9434,6 +9642,23 @@ class ReportRenderContext:
     def provenance_by_model(self) -> Mapping[str, ModelProvenanceRecord]:
         """Index the cached requested and resolved model identities."""
         return dict(self.model_provenance)
+
+    @cached_property
+    def accuracy_note_by_model(self) -> Mapping[str, AccuracyNoteMatch]:
+        """Each model's human notes for this image, split by whether they still apply."""
+        notes = self.accuracy_notes
+        if notes is None:
+            return {}
+        matches = (
+            (
+                result.model_name,
+                _match_accuracy_notes(
+                    notes, result, self.provenance_by_model.get(result.model_name)
+                ),
+            )
+            for result in self.results
+        )
+        return {model: match for model, match in matches if match is not None}
 
     @cached_property
     def gallery_rows(self) -> tuple[GalleryRow, ...]:
@@ -10663,12 +10888,20 @@ def _run_input_rows_for_context(
     report_context: ReportRenderContext,
 ) -> tuple[tuple[str, str], ...]:
     """Lane and input-image rows, leaving unrecorded run-mode facts unknown."""
-    return _run_input_summary_rows(
+    rows = _run_input_summary_rows(
         _run_image_record(image_path, report_context.image_profile),
         report_context.eval_mode,
         report_context.assessment_profile,
         metadata_exposed_to_prompt=report_context.metadata_exposed_to_prompt,
     )
+    if report_context.accuracy_notes is None:
+        return rows
+    summary = _accuracy_notes_summary(
+        report_context.accuracy_notes,
+        report_context.accuracy_note_by_model,
+        len(report_context.results),
+    )
+    return (*rows, ("Human accuracy notes", summary))
 
 
 def _diagnostics_evidence_blocks(
@@ -11113,6 +11346,7 @@ def _html_gallery_model(
     row: GalleryRow,
     assessment: ResultAssessment,
     model_provenance: ModelProvenanceRecord | None,
+    accuracy_note: AccuracyNoteMatch | None,
 ) -> str:
     """Render one complete, escaped model-evidence entry from shared gallery facts."""
     facts = tuple(
@@ -11123,6 +11357,7 @@ def _html_gallery_model(
     parts = [
         f'<article id="{html.escape(_gallery_model_anchor(result.model_name), quote=True)}">',
         f"<h3>{html.escape(result.model_name, quote=True)}</h3>",
+        *render_report_html(_gallery_accuracy_note_blocks(accuracy_note)),
         f"<details><summary>Complete evidence: {html.escape(result.model_name, quote=True)}</summary>",
         _html_table(
             caption=f"Captured facts for {result.model_name}",
@@ -11138,7 +11373,15 @@ def _html_gallery_model(
 
 def _gallery_evidence_entries(
     report_context: ReportRenderContext,
-) -> list[tuple[PerformanceResult, GalleryRow, ResultAssessment, ModelProvenanceRecord | None]]:
+) -> list[
+    tuple[
+        PerformanceResult,
+        GalleryRow,
+        ResultAssessment,
+        ModelProvenanceRecord | None,
+        AccuracyNoteMatch | None,
+    ]
+]:
     """Per-model evidence inputs in the stable usable-first order both galleries render."""
     # Each row stays paired with the result it was built from.
     entries = [
@@ -11147,6 +11390,7 @@ def _gallery_evidence_entries(
             row,
             report_context.assessment_by_model[result.model_name],
             report_context.provenance_by_model.get(result.model_name),
+            report_context.accuracy_note_by_model.get(result.model_name),
         )
         for result, row in zip(report_context.results, report_context.gallery_rows, strict=True)
     ]
@@ -27341,6 +27585,15 @@ def finalize_execution(
 
         # Preserve raw append-only history without reading it into current reports.
         current_image_record = _run_image_record(image_path, report_context.image_profile)
+        report_context = replace(
+            report_context,
+            accuracy_notes=_load_accuracy_notes(
+                output_paths.index.parent / ACCURACY_NOTES_FILENAME,
+                image_sha256=(
+                    current_image_record["sha256"] if current_image_record is not None else None
+                ),
+            ),
+        )
         history_record = append_history_record(
             history_path=history_path,
             results=results,

@@ -36,6 +36,7 @@ from check_models import (
     generate_markdown_gallery_report,
 )
 from tools import safe_io
+from tools.add_accuracy_note import main as add_accuracy_note
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -9966,3 +9967,138 @@ def test_mlx_version_count_never_claims_a_first_run_from_incomplete_history(
         ]
         == "none recorded on 0.32.4+x"
     )
+
+
+def _accuracy_notes_run(
+    tmp_path: Path, image_path: Path
+) -> tuple[list[PerformanceResult], check_models.ReportRenderContext, Path]:
+    """Two completed models with provenance, retained to results.jsonl under ``tmp_path``."""
+    results = [_make_success("org/reviewed"), _make_success("org/changed")]
+    provenance = {
+        result.model_name: check_models.ModelProvenanceRecord(
+            model=result.model_name,
+            requested_revision=None,
+            resolved_revision="rev-1",
+            snapshot_path="/snapshots/rev-1",
+        )
+        for result in results
+    }
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe the image.",
+        image_path=image_path,
+        system_info={},
+        model_provenance=provenance,
+    )
+    paths = check_models.ReportOutputPaths.from_root(tmp_path / "output")
+    paths.jsonl.parent.mkdir(parents=True)
+    check_models.save_jsonl_report(
+        results,
+        paths.jsonl,
+        prompt="Describe the image.",
+        system_info={},
+        report_context=context,
+        image_path=image_path,
+    )
+    return results, context, paths.jsonl.parent
+
+
+def _render_gallery_and_html(
+    tmp_path: Path,
+    results: list[PerformanceResult],
+    context: check_models.ReportRenderContext,
+    image_path: Path,
+) -> tuple[str, str]:
+    gallery_path = tmp_path / "model_gallery.md"
+    html_path = tmp_path / "results.html"
+    generate_markdown_gallery_report(
+        results, gallery_path, prompt="Describe the image.", report_context=context
+    )
+    generate_html_report(
+        results,
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+        image_path=image_path,
+        report_context=context,
+    )
+    return gallery_path.read_text(encoding="utf-8"), html_path.read_text(encoding="utf-8")
+
+
+def test_accuracy_note_shows_only_while_image_revision_and_output_match(
+    tmp_path: Path, test_image: Path
+) -> None:
+    """A note recorded from the retained run shows beside that output; a changed output voids it."""
+    results, context, output_root = _accuracy_notes_run(tmp_path, test_image)
+    for model in ("org/reviewed", "org/changed"):
+        assert (
+            add_accuracy_note(
+                [
+                    model,
+                    "--reviewer",
+                    "john",
+                    "--reviewed",
+                    "2026-10-25",
+                    "--note",
+                    "Calls the <b>tabby</b> cats calico.",
+                    "--output-dir",
+                    str(output_root),
+                ]
+            )
+            == 0
+        )
+    # The second model's output differs from the one its note judged.
+    changed_generation = _MockGeneration(text="Title: Something else", prompt_tokens=1)
+    results = [
+        replace(result, generation=changed_generation)
+        if result.model_name == "org/changed"
+        else result
+        for result in results
+    ]
+    image_sha256 = check_models._sha256_file(test_image)
+    context = replace(
+        context,
+        results=tuple(results),
+        accuracy_notes=check_models._load_accuracy_notes(
+            output_root / check_models.ACCURACY_NOTES_FILENAME, image_sha256=image_sha256
+        ),
+    )
+
+    gallery, html_report = _render_gallery_and_html(tmp_path, results, context, test_image)
+
+    summary = (
+        "1 of 2 outputs reviewed by a person for this exact image, model revision and "
+        "output (accuracy_notes.yaml); the others are unreviewed; 1 earlier note out of date"
+    )
+    assert summary in " ".join(gallery.split())
+    reviewed = gallery.split("### org/reviewed", 1)[1].split("<details>", 1)[0]
+    assert "#### Human accuracy note" in reviewed
+    assert "Reviewed by john on 2026-10-25" in " ".join(reviewed.split())
+    changed = gallery.split("### org/changed", 1)[1].split("<details>", 1)[0]
+    assert "no longer applies: the output changed" in " ".join(changed.split())
+    assert "Calls the" not in changed
+    # Person-written text is escaped like any other report text.
+    assert "Calls the &lt;b&gt;tabby&lt;/b&gt; cats calico." in html_report
+    assert "<b>tabby</b>" not in html_report
+
+
+def test_accuracy_notes_absent_or_unreadable(tmp_path: Path, test_image: Path) -> None:
+    """No file adds nothing; a malformed file is reported and shows no output as reviewed."""
+    results, context, output_root = _accuracy_notes_run(tmp_path, test_image)
+    notes_path = output_root / check_models.ACCURACY_NOTES_FILENAME
+    assert check_models._load_accuracy_notes(notes_path, image_sha256="0" * 64) is None
+    gallery, _ = _render_gallery_and_html(tmp_path, results, context, test_image)
+    assert "Human accuracy notes" not in gallery
+
+    safe_io.write_text_no_follow(notes_path, "notes:\n- model: org/reviewed\n  note: typo\n")
+    notes = check_models._load_accuracy_notes(notes_path, image_sha256="0" * 64)
+    assert notes is not None
+    assert notes.read_error is not None
+    assert "missing keys" in notes.read_error
+    gallery, html_report = _render_gallery_and_html(
+        tmp_path, results, replace(context, accuracy_notes=notes), test_image
+    )
+    assert "could not be read" in gallery
+    assert "no output is shown as reviewed" in html_report
+    assert "#### Human accuracy note" not in gallery
