@@ -9441,43 +9441,57 @@ class AccuracyNoteMatch:
     stale: tuple[tuple[AccuracyNote, str], ...] = ()
 
 
-def _parse_accuracy_note(index: int, entry: object) -> AccuracyNote:
+def _parse_note_entry(
+    index: int,
+    entry: object,
+    keys: tuple[str, ...],
+    *,
+    date_key: str,
+    sha256_keys: tuple[str, ...] = (),
+    choices: Mapping[str, tuple[str, ...]] | None = None,
+) -> dict[str, str]:
     """Validate one notes-file entry; every field is required and none is guessed."""
     where = f"note {index}"
     if not isinstance(entry, dict):
         msg = f"{where} is not a mapping"
         raise ValueError(msg)  # noqa: TRY004 - one error type for every malformed-file reason
-    unknown = sorted(str(key) for key in entry if key not in _ACCURACY_NOTE_KEYS)
-    missing = [key for key in _ACCURACY_NOTE_KEYS if key not in entry]
+    unknown = sorted(str(key) for key in entry if key not in keys)
+    missing = [key for key in keys if key not in entry]
     if unknown or missing:
-        msg = f"{where} has unknown keys {unknown} or missing keys {missing}"
+        problems = [f"unknown keys: {', '.join(unknown)}"] if unknown else []
+        problems += [f"missing keys: {', '.join(missing)}"] if missing else []
+        msg = f"{where} has {'; '.join(problems)}"
         raise ValueError(msg)
     values: dict[str, str] = {}
-    for key in _ACCURACY_NOTE_KEYS:
+    for key in keys:
         value = entry[key]
         # YAML reads an unquoted 2026-10-25 as a date.
-        if key == "reviewed" and isinstance(value, date):
+        if key == date_key and isinstance(value, date):
             value = value.isoformat()
         if not isinstance(value, str) or not value.strip():
             msg = f"{where}: {key} must be non-empty text"
             raise ValueError(msg)
         values[key] = " ".join(value.split())
-    for key in ("image_sha256", "output_sha256"):
+    for key in sha256_keys:
         if _SHA256_HEX_RE.fullmatch(values[key]) is None:
             msg = f"{where}: {key} must be 64 lowercase hex digits"
             raise ValueError(msg)
+    for key, allowed in (choices or {}).items():
+        if values[key] not in allowed:
+            msg = f"{where}: {key} must be one of {', '.join(allowed)}"
+            raise ValueError(msg)
     try:
-        date.fromisoformat(values["reviewed"])
+        date.fromisoformat(values[date_key])
     except ValueError as error:
-        msg = f"{where}: reviewed must be a YYYY-MM-DD date"
+        msg = f"{where}: {date_key} must be a YYYY-MM-DD date"
         raise ValueError(msg) from error
-    return AccuracyNote(**values)
+    return values
 
 
-def _parse_accuracy_notes(document: object) -> tuple[AccuracyNote, ...]:
-    """Validate a notes document: an empty file, or a mapping with a ``notes`` list."""
+def _note_entries(document: object) -> list[object]:
+    """Return a notes document's entries: an empty file, or a mapping with a ``notes`` list."""
     if document is None:
-        return ()
+        return []
     if not isinstance(document, dict) or set(document) - {"notes"}:
         msg = "the file must be a mapping whose only key is notes"
         raise ValueError(msg)
@@ -9485,20 +9499,46 @@ def _parse_accuracy_notes(document: object) -> tuple[AccuracyNote, ...]:
     if not isinstance(entries, list):
         msg = "notes must be a list"
         raise ValueError(msg)  # noqa: TRY004 - one error type for every malformed-file reason
-    return tuple(_parse_accuracy_note(index, entry) for index, entry in enumerate(entries, 1))
+    return entries
 
 
-def _load_accuracy_notes(path: Path, *, image_sha256: str | None) -> AccuracyNotes | None:
-    """Read the output root's notes file; ``None`` when there is none."""
+def _read_notes_file[NoteT](
+    path: Path, parse: Callable[[object], tuple[NoteT, ...]]
+) -> tuple[tuple[NoteT, ...], str | None] | None:
+    """Read a person-written notes file: ``None`` when absent, else notes or why not."""
     if not path.exists() and not path.is_symlink():
         return None
     try:
-        notes = _parse_accuracy_notes(yaml.safe_load(_read_text_file(path)))
+        return parse(yaml.safe_load(_read_text_file(path))), None
     except (OSError, ValueError, yaml.YAMLError) as error:
         reason = " ".join(str(error).split()) or type(error).__name__
-        logger.warning("%s could not be read: %s", ACCURACY_NOTES_FILENAME, reason)
-        return AccuracyNotes(image_sha256=image_sha256, read_error=reason)
-    return AccuracyNotes(image_sha256=image_sha256, notes=notes)
+        logger.warning("%s could not be read: %s", path.name, reason)
+        return (), reason
+
+
+def _parse_accuracy_notes(document: object) -> tuple[AccuracyNote, ...]:
+    """Validate an accuracy-notes document."""
+    return tuple(
+        AccuracyNote(
+            **_parse_note_entry(
+                index,
+                entry,
+                _ACCURACY_NOTE_KEYS,
+                date_key="reviewed",
+                sha256_keys=("image_sha256", "output_sha256"),
+            )
+        )
+        for index, entry in enumerate(_note_entries(document), 1)
+    )
+
+
+def _load_accuracy_notes(path: Path, *, image_sha256: str | None) -> AccuracyNotes | None:
+    """Read the output root's accuracy-notes file; ``None`` when there is none."""
+    read = _read_notes_file(path, _parse_accuracy_notes)
+    if read is None:
+        return None
+    notes, read_error = read
+    return AccuracyNotes(image_sha256=image_sha256, notes=notes, read_error=read_error)
 
 
 def _accuracy_output_sha256(result: PerformanceResult) -> str:
@@ -24867,16 +24907,199 @@ def _run_issue_summary_provenance_rows(
     return (("Provenance", text),)
 
 
-_NATIVE_REPRO_CELLS: Final[dict[str, str]] = {
-    "actionable_failure": "crash: triage",
-    "observation_needs_reproduction": "candidate",
+# Native reproduction notes: optional, person-written results of rerunning a
+# harness observation outside the harness (python -m mlx_vlm.generate or the
+# load/template/stream_generate path). Each names the model revision and the
+# mlx/mlx-vlm/transformers builds it was checked on, so a rebuild or a new
+# snapshot puts the observation back to "not yet checked". Recurrence in the
+# harness alone never counts as native confirmation.
+NATIVE_REPRO_NOTES_FILENAME: Final[str] = "native_repro_notes.yaml"
+_NATIVE_REPRO_NOTE_KEYS: Final[tuple[str, ...]] = (
+    "model",
+    "model_revision",
+    "observation",
+    "stack",
+    "status",
+    "checker",
+    "checked",
+    "evidence",
+)
+_NATIVE_REPRO_STATUS_LABELS: Final[dict[str, str]] = {
+    "confirmed": "confirmed",
+    "not_reproduced": "not reproduced",
 }
+_NATIVE_REPRO_UNCHECKED: Final[str] = "not yet checked"
+_NATIVE_REPRO_STACK_COMPONENTS: Final[tuple[str, ...]] = ("mlx", "mlx-vlm", "transformers")
+
+
+@dataclass(frozen=True)
+class NativeReproNote:
+    """One person's native rerun of one harness observation on an exact stack."""
+
+    model: str
+    model_revision: str
+    observation: str
+    stack: str
+    status: str
+    checker: str
+    checked: str
+    evidence: str
+
+
+@dataclass(frozen=True)
+class NativeReproNotes:
+    """The output root's native-reproduction notes and the stack this run used."""
+
+    stack: str | None
+    notes: tuple[NativeReproNote, ...] = ()
+    read_error: str | None = None
+
+
+def _parse_native_repro_notes(document: object) -> tuple[NativeReproNote, ...]:
+    """Validate a native-reproduction notes document."""
+    choices = {
+        "observation": (*_literal_choices(ObservationCode), "crashed"),
+        "status": tuple(_NATIVE_REPRO_STATUS_LABELS),
+    }
+    return tuple(
+        NativeReproNote(
+            **_parse_note_entry(
+                index, entry, _NATIVE_REPRO_NOTE_KEYS, date_key="checked", choices=choices
+            )
+        )
+        for index, entry in enumerate(_note_entries(document), 1)
+    )
+
+
+def _native_repro_stack(metadata: JsonlMetadataRecord) -> str | None:
+    """The run's mlx, mlx-vlm and transformers builds as one comparable label."""
+    components = dict(_comparison_component_rows(metadata))
+    if "mlx" not in components or "mlx-vlm" not in components:
+        return None
+    return "; ".join(
+        f"{name} {components[name]}"
+        for name in _NATIVE_REPRO_STACK_COMPONENTS
+        if name in components
+    )
+
+
+def _native_repro_codes(result: JsonlResultRecord) -> tuple[str, ...]:
+    """The observations a native rerun can confirm: a crash, or integration signals."""
+    if result["assessment"]["execution"] == "crashed":
+        return ("crashed",)
+    return tuple(
+        code
+        for code in result["assessment"]["observations"]
+        if code in _INTEGRATION_SIGNAL_OBSERVATIONS
+    )
+
+
+def _load_native_repro_notes(
+    output_paths: ReportOutputPaths, metadata: JsonlMetadataRecord
+) -> NativeReproNotes | None:
+    """Read the output root's native-reproduction notes; ``None`` when there is none."""
+    read = _read_notes_file(
+        output_paths.index.parent / NATIVE_REPRO_NOTES_FILENAME, _parse_native_repro_notes
+    )
+    if read is None:
+        return None
+    notes, read_error = read
+    return NativeReproNotes(stack=_native_repro_stack(metadata), notes=notes, read_error=read_error)
+
+
+def _native_repro_gloss(code: str) -> str:
+    """Short reader label for a native-reproduction observation key."""
+    if code == "crashed":
+        return "crash"
+    return _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", code), code)
+
+
+def _native_repro_note_applies(
+    note: NativeReproNote, result: JsonlResultRecord, stack: str | None
+) -> bool:
+    """Whether a note was checked on this run's model revision and builds."""
+    provenance = result.get("model_provenance")
+    revision = provenance.get("resolved_revision") if provenance is not None else None
+    return stack is not None and note.stack == stack and note.model_revision == revision
+
+
+def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None) -> str:
+    """Per-observation native status: confirmed, not reproduced, or not yet checked."""
+    maintainer_status = result["assessment"]["maintainer_status"]
+    if maintainer_status == "none":
+        return "-"
+    codes = _native_repro_codes(result)
+    by_code: dict[str, str] = {}
+    stale = False
+    for note in notes.notes if notes is not None else ():
+        if note.model != result["model"] or note.observation not in codes:
+            continue
+        if _native_repro_note_applies(note, result, notes.stack if notes else None):
+            # A later applicable note for the same observation supersedes an earlier one.
+            by_code[note.observation] = _NATIVE_REPRO_STATUS_LABELS[note.status]
+        else:
+            stale = True
+    groups: dict[str, list[str]] = {}
+    for code in codes:
+        label = by_code.get(code, _NATIVE_REPRO_UNCHECKED)
+        groups.setdefault(label, []).append(_native_repro_gloss(code))
+    if len(groups) == 1:
+        cell = next(iter(groups))
+    else:
+        cell = "; ".join(f"{label} ({', '.join(glosses)})" for label, glosses in groups.items())
+    if stale and _NATIVE_REPRO_UNCHECKED in groups:
+        cell += " (earlier check out of date)"
+    return cell or _NATIVE_REPRO_UNCHECKED
+
+
+def _native_repro_section(
+    results: Sequence[JsonlResultRecord], notes: NativeReproNotes | None
+) -> ReportSection | None:
+    """List the native checks that apply to this run, with their evidence."""
+    if notes is None:
+        return None
+    if notes.read_error is not None:
+        return ReportSection(
+            "Native reproduction checks",
+            (
+                ReportParagraph(
+                    f"{NATIVE_REPRO_NOTES_FILENAME} could not be read ({notes.read_error}); "
+                    "every observation is shown as not yet checked."
+                ),
+            ),
+        )
+    by_model = {result["model"]: result for result in results}
+    rows = tuple(
+        (
+            note.model,
+            _native_repro_gloss(note.observation),
+            _NATIVE_REPRO_STATUS_LABELS[note.status],
+            f"{note.checker}, {note.checked}",
+            note.evidence,
+        )
+        for note in notes.notes
+        if (result := by_model.get(note.model)) is not None
+        and note.observation in _native_repro_codes(result)
+        and _native_repro_note_applies(note, result, notes.stack)
+    )
+    intro = (
+        f"Recorded in {NATIVE_REPRO_NOTES_FILENAME} for this run's model revisions and "
+        f"builds ({notes.stack or 'builds not recorded'}). A check made on another "
+        "revision or build no longer applies and is not listed."
+    )
+    blocks: list[ReportBlock] = [ReportParagraph(intro)]
+    if rows:
+        blocks.append(ReportTable(("Model", "Observation", "Native", "Checked", "Evidence"), rows))
+    else:
+        blocks.append(ReportParagraph("No recorded check applies to this run."))
+    return ReportSection("Native reproduction checks", tuple(blocks))
 
 
 def _run_issue_summary_quality_section(
     results: Sequence[JsonlResultRecord],
     *,
     token_limit: int | None = None,
+    native_repro: NativeReproNotes | None = None,
 ) -> ReportSection:
     """Rank every attempted model by current-run usability with captured facts."""
     ordered = sorted(
@@ -24914,7 +25137,7 @@ def _run_issue_summary_quality_section(
                 *((_run_issue_summary_keyword_cell(result),) if show_keywords else ()),
                 *((_run_issue_summary_hint_text_cell(result),) if show_hint_text else ()),
                 _run_issue_summary_quality_observed(result),
-                _NATIVE_REPRO_CELLS.get(result["assessment"]["maintainer_status"], "-"),
+                _native_repro_cell(result, native_repro),
             )
         )
     limit_note = f" (limit {token_limit:,})" if token_limit is not None else ""
@@ -24925,7 +25148,9 @@ def _run_issue_summary_quality_section(
         'repeated text, or no final answer); "major concerns: answer format" means an '
         "answer was generated but missed the requested form. Tokens in count the image's "
         "tokens too, which drive prefill time; tokens out are those generated"
-        f"{limit_note}."
+        f"{limit_note}. *Native repro* says whether a person reran an observation outside "
+        "this harness on the same model revision and builds: confirmed, not reproduced, "
+        "or not yet checked. Recurring here alone is not native confirmation."
     )
     if show_keywords:
         intro += " Keywords are counted from the answer's Keywords field" + (
@@ -25532,11 +25757,16 @@ def generate_run_issue_summary_report(
     )
     if comparison is not None:
         blocks.append(_run_issue_summary_comparison_section(comparison))
+    native_repro = _load_native_repro_notes(output_paths, source.metadata)
     blocks.append(
         _run_issue_summary_quality_section(
-            source.results, token_limit=_generation_token_limit(source.generation_settings)
+            source.results,
+            token_limit=_generation_token_limit(source.generation_settings),
+            native_repro=native_repro,
         )
     )
+    if (native_section := _native_repro_section(source.results, native_repro)) is not None:
+        blocks.append(native_section)
     if (constraint_section := _run_issue_summary_constraint_breakdown(source.results)) is not None:
         blocks.append(constraint_section)
 

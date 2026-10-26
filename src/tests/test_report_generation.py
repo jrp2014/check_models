@@ -37,6 +37,7 @@ from check_models import (
 )
 from tools import safe_io
 from tools.add_accuracy_note import main as add_accuracy_note
+from tools.add_native_repro_note import main as add_native_repro_note
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -10102,3 +10103,81 @@ def test_accuracy_notes_absent_or_unreadable(tmp_path: Path, test_image: Path) -
     assert "could not be read" in gallery
     assert "no output is shown as reviewed" in html_report
     assert "#### Human accuracy note" not in gallery
+
+
+def _native_repro_table_row(summary: str, model: str) -> str:
+    """The run summary's mechanical-checks table row for ``model``."""
+    return next(line for line in summary.splitlines() if line.startswith(f"| {model} |"))
+
+
+def test_native_repro_status_follows_model_revision_and_builds(tmp_path: Path) -> None:
+    """A native check shows only on its own revision and builds; otherwise not yet checked."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_root = output_paths.index.parent
+    loop = _issue_summary_result(
+        "org/loop",
+        usability="unusable",
+        maintainer_status="observation_needs_reproduction",
+        observations=["repeated_output", "unexpected_special_token"],
+    )
+    crash = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    _write_issue_summary_fixture(output_paths, results=(loop, crash))
+
+    def record(*args: str) -> int:
+        return add_native_repro_note(
+            [*args, "--checker", "john", "--output-dir", str(output_root), "--evidence", "x"]
+        )
+
+    assert record("org/loop", "repeated_output", "confirmed") == 0
+    assert record("org/crash", "crashed", "not_reproduced") == 0
+    # Only an observation the retained run needs reproduced can be recorded.
+    assert record("org/loop", "empty_output", "confirmed") == 1
+
+    summary_path = check_models.regenerate_run_issue_summary(output_root)
+    assert summary_path is not None
+    summary = safe_io.read_text_no_follow(summary_path)
+    assert _native_repro_table_row(summary, "org/loop").endswith(
+        "| confirmed (repeated text); not yet checked (control tokens visible) |"
+    )
+    assert _native_repro_table_row(summary, "org/crash").endswith("| not reproduced |")
+    assert "## Native reproduction checks" in summary
+    assert "mlx 0.32.1; mlx-vlm 0.6.8; transformers 5.14.1" in summary
+
+    # A rebuilt mlx-vlm voids both checks.
+    metadata, *rows = safe_io.read_text_no_follow(output_paths.jsonl).splitlines()
+    header = json.loads(metadata)
+    header["library_versions"]["mlx-vlm"] = "0.6.9"
+    safe_io.write_text_no_follow(output_paths.jsonl, "\n".join((json.dumps(header), *rows)) + "\n")
+    summary_path = check_models.regenerate_run_issue_summary(output_root)
+    assert summary_path is not None
+    summary = safe_io.read_text_no_follow(summary_path)
+    assert _native_repro_table_row(summary, "org/loop").endswith(
+        "| not yet checked (earlier check out of date) |"
+    )
+    assert "No recorded check applies to this run." in summary
+
+
+def test_unreadable_native_repro_notes_leave_every_observation_unchecked(tmp_path: Path) -> None:
+    """A malformed notes file is reported, and no observation reads as checked."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    loop = _issue_summary_result(
+        "org/loop",
+        usability="unusable",
+        maintainer_status="observation_needs_reproduction",
+        observations=["repeated_output"],
+    )
+    _write_issue_summary_fixture(output_paths, results=(loop,))
+    safe_io.write_text_no_follow(
+        output_paths.index.parent / check_models.NATIVE_REPRO_NOTES_FILENAME,
+        "notes:\n- model: org/loop\n  status: confirmed\n",
+    )
+    summary = safe_io.read_text_no_follow(
+        check_models.generate_run_issue_summary_report(output_paths) or tmp_path / "missing"
+    )
+    assert _native_repro_table_row(summary, "org/loop").endswith("| not yet checked |")
+    assert "native_repro_notes.yaml could not be read" in " ".join(summary.split())

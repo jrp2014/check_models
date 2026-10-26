@@ -6,6 +6,19 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Run summary (0.17.96): the *Native repro* column distinguishes
+  *confirmed*, *not reproduced* and *not yet checked* (replacing
+  "candidate" and "crash: triage"), per observation mlx-vlm can produce.
+  A native rerun is recorded with `python -m tools.add_native_repro_note
+  MODEL OBSERVATION confirmed|not_reproduced --checker NAME --evidence
+  TEXT`, which appends to `native_repro_notes.yaml` in the output directory
+  keyed to the model revision and the mlx, mlx-vlm and transformers builds.
+  A note applies only while all of those match; otherwise the cell reads
+  "not yet checked (earlier check out of date)". A *Native reproduction
+  checks* section lists the applicable checks with their evidence, and an
+  unreadable file is reported with every observation left unchecked.
+  Recurrence in the harness never counts. The accuracy-notes and
+  native-notes files share one strict parser.
 - Reports (0.17.95): optional human accuracy notes. A person who has checked
   an output against the image records it with `python -m
   tools.add_accuracy_note MODEL --reviewer NAME --note TEXT`, which appends

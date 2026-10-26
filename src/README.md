@@ -1530,6 +1530,27 @@ outputs were reviewed. Once the image, revision or output changes, the note
 is shown as out of date instead. Notes never change the mechanical checks,
 and a file that cannot be read is reported rather than ignored.
 
+### Native reproduction checks
+
+The run summary's *Native repro* column says, for each observation that
+mlx-vlm itself could produce, whether someone reran it outside this harness:
+*confirmed*, *not reproduced* or *not yet checked*. Seeing it again in the
+harness does not count. After running a native check, record it:
+
+```bash
+cd src
+python -m tools.add_native_repro_note mlx-community/InternVL3_5-1B-4bit \
+  repeated_output confirmed --checker john \
+  --evidence "mlx_vlm.generate with the same image and prompt repeats the keywords to the token limit."
+```
+
+This appends to `native_repro_notes.yaml` in the output directory, keyed to
+the model revision and the mlx, mlx-vlm and transformers builds of the
+retained run. A *Native reproduction checks* section in the run summary lists
+the checks that apply, with their evidence. After a new snapshot or a rebuild
+the column goes back to *not yet checked (earlier check out of date)*.
+Regenerating the run summary picks up a new note without rerunning models.
+
 ### JSONL Report
 
 Line-delimited JSON for streaming ingestion:

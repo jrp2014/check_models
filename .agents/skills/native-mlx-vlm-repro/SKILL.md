@@ -205,3 +205,9 @@ text from the final cleaned answer when reporting an output discrepancy.
   `test_generate.py` / `test_cli.py` — still with `pip`/`pytest`, not `uv`.
 - After confirming the native repro, switch to
   `upstream-mlx-vlm-issues` if the user wants issue-ready Markdown.
+- Record the outcome against the retained run with
+  `cd src && python -m tools.add_native_repro_note MODEL OBSERVATION
+  confirmed|not_reproduced --checker NAME --evidence "command and result"`.
+  The run summary's *Native repro* column then reads confirmed or not
+  reproduced until the model revision or the mlx/mlx-vlm/transformers build
+  changes. Record only a check that was actually run natively.

@@ -13,6 +13,7 @@ import argparse
 import sys
 from datetime import date, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 
@@ -20,12 +21,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from check_models import (
     ACCURACY_NOTES_FILENAME,
+    JsonlResultRecord,
     ReportOutputPaths,
+    RetainedRun,
     _load_retained_run,
     _parse_accuracy_notes,
     _sha256_text,
 )
 from tools.safe_io import read_text_no_follow, write_text_no_follow
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 _NEW_FILE_HEADER = """\
@@ -63,22 +69,45 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def retained_model_result(
+    output_dir: Path, model: str
+) -> tuple[RetainedRun, JsonlResultRecord, str]:
+    """Load the retained run and one model's record with its resolved revision."""
+    run = _load_retained_run(ReportOutputPaths.from_root(output_dir).jsonl)
+    result = next((record for record in run.results if record["model"] == model), None)
+    if result is None:
+        msg = f"{model} is not in the retained run"
+        raise ValueError(msg)
+    provenance = result.get("model_provenance")
+    revision = provenance.get("resolved_revision") if provenance is not None else None
+    if not revision:
+        msg = f"the retained run does not record {model}'s resolved model revision"
+        raise ValueError(msg)
+    return run, result, revision
+
+
+def append_note(
+    notes_path: Path,
+    header: str,
+    entry: dict[str, str],
+    parse: Callable[[object], tuple[object, ...]],
+) -> str:
+    """Append one entry, checked by the parser the reports use; return the added YAML."""
+    existing = read_text_no_follow(notes_path) if notes_path.exists() else header
+    addition = yaml.safe_dump([entry], sort_keys=False, allow_unicode=True, width=88)
+    updated = existing + ("" if existing.endswith("\n") else "\n") + addition
+    parse(yaml.safe_load(updated))
+    write_text_no_follow(notes_path, updated)
+    return addition
+
+
 def _note_entry(args: argparse.Namespace) -> dict[str, str]:
     """Build the note from the retained run, refusing when a key fact is missing."""
-    run = _load_retained_run(ReportOutputPaths.from_root(args.output_dir).jsonl)
+    run, result, revision = retained_model_result(args.output_dir, args.model)
     image = run.metadata.get("image")
     image_sha256 = image.get("sha256") if image else None
     if not image_sha256:
         msg = "the retained run does not record its image digest"
-        raise ValueError(msg)
-    result = next((record for record in run.results if record["model"] == args.model), None)
-    if result is None:
-        msg = f"{args.model} is not in the retained run"
-        raise ValueError(msg)
-    provenance = result.get("model_provenance")
-    revision = provenance.get("resolved_revision") if provenance else None
-    if not revision:
-        msg = f"the retained run does not record {args.model}'s resolved model revision"
         raise ValueError(msg)
     return {
         "model": args.model,
@@ -96,16 +125,12 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     notes_path = args.output_dir.expanduser().resolve() / ACCURACY_NOTES_FILENAME
     try:
-        entry = _note_entry(args)
-        existing = read_text_no_follow(notes_path) if notes_path.exists() else _NEW_FILE_HEADER
-        addition = yaml.safe_dump([entry], sort_keys=False, allow_unicode=True, width=88)
-        updated = existing + ("" if existing.endswith("\n") else "\n") + addition
-        # The same parser the reports use must accept the result before it is written.
-        _parse_accuracy_notes(yaml.safe_load(updated))
+        addition = append_note(
+            notes_path, _NEW_FILE_HEADER, _note_entry(args), _parse_accuracy_notes
+        )
     except (OSError, ValueError, yaml.YAMLError) as error:
         print(f"Not recorded: {error}", file=sys.stderr)
         return 1
-    write_text_no_follow(notes_path, updated)
     print(f"Appended to {notes_path}:\n{addition}", end="")
     return 0
 
