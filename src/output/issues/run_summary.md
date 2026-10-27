@@ -22,6 +22,8 @@ reproduction.
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
+- *Provenance:* run captured by check_models 0.17.91 @ baa72d7e8; report
+  rendered by 0.17.97 @ e24212e60; original assessments retained
 - *Models attempted:* 43
 - *Sampling settings:* checkpoint generation_config.json values for 18 of 43
   completed models where the command line left them unset; harness defaults
@@ -95,8 +97,7 @@ inference at the checks around 34 of 51 models (up to 38%).
 - New this run (no baseline): `ibm-granite/granite-vision-4.1-4b`,
   `mlx-community/Mistral-Small-4-119B-2603-4bit`,
   `nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`
-- In baseline, no longer in the cache: 11 models (targeted run against a
-  full-sweep baseline)
+- In baseline, no longer in the cache: 11 models
 
 | Model | Execution | Usability | Observation delta |
 | --- | --- | --- | --- |
@@ -180,8 +181,10 @@ the gallery. "Major concerns: generation" means generation itself failed (no
 text, repeated text, or no final answer); "major concerns: answer format"
 means an answer was generated but missed the requested form. Tokens in count
 the image's tokens too, which drive prefill time; tokens out are those
-generated (limit 1,000). Keywords are counted from the answer's Keywords
-field.
+generated (limit 1,000). *Native repro* says whether a person reran an
+observation outside this harness on the same model revision and builds:
+confirmed, not reproduced, or not yet checked. Recurring here alone is not
+native confirmation. Keywords are counted from the answer's Keywords field.
 
 | Model | Mechanical checks | Total | Gen tok/s | Peak GB | Prompt / output tok | Keywords | Observed | Native repro |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -224,10 +227,20 @@ field.
 | TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit | no concerns detected | 6.26s | 39.9 tok/s | 11 | 421 / 94 | 14 | none | - |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | concerns detected | 6.78s | 119 tok/s | 18 | 545 / 540 | 16 | duplicate keywords | - |
 | mlx-community/FastVLM-0.5B-bf16 | major concerns: answer format | 1.34s | 328 tok/s | 2.2 | 120 / 32 | - | labelled fields not detected | - |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit | major concerns: answer format | 3.26s | insufficient sample | 7.0 | 3,512 / 14 | - | control tokens visible; labelled fields not detected | candidate |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit | major concerns: answer format | 3.26s | insufficient sample | 7.0 | 3,512 / 14 | - | control tokens visible; labelled fields not detected | not yet checked |
 | mlx-community/nanoLLaVA-1.5-4bit | major concerns: answer format | 1.27s | 209 tok/s | 1.2 | 116 / 97 | - | labelled fields not detected | - |
-| mlx-community/InternVL3_5-1B-4bit | major concerns: generation | 4.54s | 297 tok/s | 2.3 | 3,438 / 1,000 | 144 | repeated text; cut off at token limit; duplicate keywords | candidate |
-| mlx-community/X-Reasoner-7B-8bit | major concerns: generation | 17.15s | 64.5 tok/s | 10 | 511 / 1,000 | 189 | repeated text; cut off at token limit; duplicate keywords | candidate |
+| mlx-community/InternVL3_5-1B-4bit | major concerns: generation | 4.54s | 297 tok/s | 2.3 | 3,438 / 1,000 | 144 | repeated text; cut off at token limit; duplicate keywords | not yet checked |
+| mlx-community/X-Reasoner-7B-8bit | major concerns: generation | 17.15s | 64.5 tok/s | 10 | 511 / 1,000 | 189 | repeated text; cut off at token limit; duplicate keywords | not yet checked |
+
+## Human accuracy notes
+
+1 of 43 outputs reviewed by a person for this exact image, model revision and
+output (accuracy_notes.yaml); the others are unreviewed. Each note is a
+person's judgement against the image, not one of the mechanical checks.
+
+| Model                        | Reviewed         | Note                                                                                     |
+|------------------------------|------------------|------------------------------------------------------------------------------------------|
+| mlx-community/Molmo2-8B-4bit | john, 2026-10-25 | Describes the pictured tabby cats as calico cats and gives incorrect positional details. |
 
 ## Observation clusters
 
