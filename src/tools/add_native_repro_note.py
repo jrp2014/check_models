@@ -25,7 +25,7 @@ from check_models import (
     _native_repro_stack,
     _parse_native_repro_notes,
 )
-from tools.add_accuracy_note import append_note, retained_model_result
+from tools.add_accuracy_note import append_note, publish_run_summary, retained_model_result
 
 _DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 _NEW_FILE_HEADER = """\
@@ -33,7 +33,6 @@ _NEW_FILE_HEADER = """\
 # Each applies only while its model revision and mlx/mlx-vlm/transformers
 # builds match a run; the run summary then shows its status.
 # Add one with: python -m tools.add_native_repro_note MODEL OBSERVATION STATUS ...
-notes:
 """
 
 
@@ -106,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Not recorded: {error}", file=sys.stderr)
         return 1
     print(f"Appended to {notes_path}:\n{addition}", end="")
+    publish_run_summary(args.output_dir)
     return 0
 
 

@@ -1329,6 +1329,25 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Notes (0.17.97, john's 2026-10-27 review): the note tools parse the
+  existing notes file, append to its `notes` list and write the whole
+  document, keeping its leading comments, so an empty file, `notes: []` or
+  an indented list no longer breaks a save. The file is replaced through a
+  staged sibling inside the error handling, so a failed write leaves earlier
+  notes intact. A stale note no longer says "This output has not been
+  reviewed" when another note applies to the current output. `notes:` set
+  to anything other than a list or null (`false`, `0`, `{}`) is rejected
+  rather than read as empty.
+- Notes are published without a sweep: both note tools re-render
+  `issues/run_summary.md` from the retained run, which gains a *Human
+  accuracy notes* section listing the notes that apply. The gallery and HTML
+  report still show them from the next run, since they render from live
+  results.
+- Tests: the mocked `_run_model_generation` tests no longer import the real
+  `mlx_vlm.utils` (and with it native MLX) through the prompt-token
+  diagnostics, which aborted the suite where Metal is unavailable.
+- Run comparison: the field list of each plain comparison record is
+  reflected once per class rather than once per record.
 - Timing (0.17.93): a model's total time ends after cleanup, the one end
   boundary for every timed phase, so load, preparation, generation and
   cleanup never add up to more than the total. It used to stop before

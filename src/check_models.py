@@ -9495,7 +9495,9 @@ def _note_entries(document: object) -> list[object]:
     if not isinstance(document, dict) or set(document) - {"notes"}:
         msg = "the file must be a mapping whose only key is notes"
         raise ValueError(msg)
-    entries = document.get("notes") or []
+    entries = document.get("notes")
+    if entries is None:
+        return []
     if not isinstance(entries, list):
         msg = "notes must be a list"
         raise ValueError(msg)  # noqa: TRY004 - one error type for every malformed-file reason
@@ -9548,19 +9550,18 @@ def _accuracy_output_sha256(result: PerformanceResult) -> str:
 
 def _match_accuracy_notes(
     notes: AccuracyNotes,
-    result: PerformanceResult,
-    model_provenance: ModelProvenanceRecord | None,
+    model: str,
+    revision: str | None,
+    output_sha256: str,
 ) -> AccuracyNoteMatch | None:
     """Return this model's notes for this image, split by whether they still apply."""
     candidates = [
         note
         for note in notes.notes
-        if note.model == result.model_name and note.image_sha256 == notes.image_sha256
+        if note.model == model and note.image_sha256 == notes.image_sha256
     ]
     if not candidates:
         return None
-    revision = model_provenance.get("resolved_revision") if model_provenance else None
-    output_sha256 = _accuracy_output_sha256(result)
     applies: list[AccuracyNote] = []
     stale: list[tuple[AccuracyNote, str]] = []
     for note in candidates:
@@ -9621,11 +9622,12 @@ def _gallery_accuracy_note_blocks(match: AccuracyNoteMatch | None) -> tuple[Repo
         )
     blocks.extend(
         ReportParagraph(
-            f"An earlier note by {note.reviewer} ({note.reviewed}) no longer applies: "
-            f"{reason}. This output has not been reviewed."
+            f"An earlier note by {note.reviewer} ({note.reviewed}) no longer applies: {reason}."
         )
         for note, reason in match.stale
     )
+    if not match.applies:
+        blocks.append(ReportParagraph("This output has not been reviewed."))
     return (_report_section("Human accuracy note", *blocks, level=4),)
 
 
@@ -9689,16 +9691,18 @@ class ReportRenderContext:
         notes = self.accuracy_notes
         if notes is None:
             return {}
-        matches = (
-            (
+        matches: dict[str, AccuracyNoteMatch] = {}
+        for result in self.results:
+            provenance = self.provenance_by_model.get(result.model_name)
+            match = _match_accuracy_notes(
+                notes,
                 result.model_name,
-                _match_accuracy_notes(
-                    notes, result, self.provenance_by_model.get(result.model_name)
-                ),
+                provenance.get("resolved_revision") if provenance is not None else None,
+                _accuracy_output_sha256(result),
             )
-            for result in self.results
-        )
-        return {model: match for model, match in matches if match is not None}
+            if match is not None:
+                matches[result.model_name] = match
+        return matches
 
     @cached_property
     def gallery_rows(self) -> tuple[GalleryRow, ...]:
@@ -22660,6 +22664,12 @@ _COMPARISON_FIELD_READERS: Final[Mapping[object, Callable[[JsonLike], object]]] 
 }
 
 
+# Reflection runs once per plain record class, not once per retained record.
+_COMPARISON_RECORD_FIELDS: dict[
+    type, tuple[tuple[str, Callable[[JsonLike], object], object], ...]
+] = {}
+
+
 def _comparison_record_fields(
     record_type: type,
 ) -> tuple[tuple[str, Callable[[JsonLike], object], object], ...]:
@@ -22670,11 +22680,14 @@ def _comparison_record_fields(
     component changes) keep explicit adapters instead. ``default`` is
     ``inspect.Parameter.empty`` for a field the record requires.
     """
-    hints = get_type_hints(record_type)
-    return tuple(
-        (name, _COMPARISON_FIELD_READERS[hints[name]], parameter.default)
-        for name, parameter in inspect.signature(record_type).parameters.items()
-    )
+    if (fields := _COMPARISON_RECORD_FIELDS.get(record_type)) is None:
+        hints = get_type_hints(record_type)
+        fields = tuple(
+            (name, _COMPARISON_FIELD_READERS[hints[name]], parameter.default)
+            for name, parameter in inspect.signature(record_type).parameters.items()
+        )
+        _COMPARISON_RECORD_FIELDS[record_type] = fields
+    return fields
 
 
 def _comparison_record_to_json(record: object) -> dict[str, JsonLike]:
@@ -25052,6 +25065,48 @@ def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None
     return cell or _NATIVE_REPRO_UNCHECKED
 
 
+def _run_issue_summary_accuracy_section(
+    output_paths: ReportOutputPaths, source: RunIssueSummarySource
+) -> ReportSection | None:
+    """The output root's accuracy notes that apply to the retained outputs.
+
+    The summary is regenerated from the retained run, so a note recorded
+    after a sweep is published here without rerunning any model; the gallery
+    and HTML report show it from the next sweep.
+    """
+    notes = _load_accuracy_notes(
+        output_paths.index.parent / ACCURACY_NOTES_FILENAME,
+        image_sha256=source.image["sha256"] if source.image is not None else None,
+    )
+    if notes is None:
+        return None
+    matches: dict[str, AccuracyNoteMatch] = {}
+    for result in source.results:
+        provenance = result.get("model_provenance")
+        match = _match_accuracy_notes(
+            notes,
+            result["model"],
+            provenance.get("resolved_revision") if provenance is not None else None,
+            _sha256_text(result["generated_text"]),
+        )
+        if match is not None:
+            matches[result["model"]] = match
+    blocks: list[ReportBlock] = [
+        ReportParagraph(
+            f"{_accuracy_notes_summary(notes, matches, len(source.results))}. Each note is a "
+            "person's judgement against the image, not one of the mechanical checks."
+        )
+    ]
+    rows = tuple(
+        (model, f"{note.reviewer}, {note.reviewed}", note.note)
+        for model, match in matches.items()
+        for note in match.applies
+    )
+    if rows:
+        blocks.append(ReportTable(("Model", "Reviewed", "Note"), rows))
+    return ReportSection("Human accuracy notes", tuple(blocks))
+
+
 def _native_repro_section(
     results: Sequence[JsonlResultRecord], notes: NativeReproNotes | None
 ) -> ReportSection | None:
@@ -25767,6 +25822,8 @@ def generate_run_issue_summary_report(
     )
     if (native_section := _native_repro_section(source.results, native_repro)) is not None:
         blocks.append(native_section)
+    if (accuracy_section := _run_issue_summary_accuracy_section(output_paths, source)) is not None:
+        blocks.append(accuracy_section)
     if (constraint_section := _run_issue_summary_constraint_breakdown(source.results)) is not None:
         blocks.append(constraint_section)
 

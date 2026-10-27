@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast, get_args, get_type_hints
 from unittest.mock import DEFAULT, patch
 
 import pytest
+import yaml
 from PIL import Image
 
 import check_models
@@ -10181,3 +10182,109 @@ def test_unreadable_native_repro_notes_leave_every_observation_unchecked(tmp_pat
     )
     assert _native_repro_table_row(summary, "org/loop").endswith("| not yet checked |")
     assert "native_repro_notes.yaml could not be read" in " ".join(summary.split())
+
+
+def _record_accuracy_note(output_root: Path, model: str = "org/reviewed") -> int:
+    return add_accuracy_note(
+        [model, "--reviewer", "john", "--note", "Accurate.", "--output-dir", str(output_root)]
+    )
+
+
+@pytest.mark.parametrize(
+    "existing",
+    [
+        "",
+        "notes: []\n",
+        "notes:\n",
+        (
+            "# kept\nnotes:\n  - model: org/other\n    model_revision: r\n"
+            f"    image_sha256: {'a' * 64}\n    output_sha256: {'b' * 64}\n"
+            "    reviewer: ann\n    reviewed: 2026-10-01\n    note: Fine.\n"
+        ),
+    ],
+    ids=["empty-file", "empty-list", "null-list", "indented-list"],
+)
+def test_add_accuracy_note_accepts_any_layout_the_reports_accept(
+    tmp_path: Path, test_image: Path, existing: str
+) -> None:
+    """The tool edits the parsed document, so layout never decides whether a note is saved."""
+    _, _, output_root = _accuracy_notes_run(tmp_path, test_image)
+    notes_path = output_root / check_models.ACCURACY_NOTES_FILENAME
+    safe_io.write_text_no_follow(notes_path, existing)
+    assert check_models._parse_accuracy_notes(yaml.safe_load(existing)) is not None
+
+    assert _record_accuracy_note(output_root) == 0
+
+    text = safe_io.read_text_no_follow(notes_path)
+    notes = check_models._parse_accuracy_notes(yaml.safe_load(text))
+    assert [note.model for note in notes][-1] == "org/reviewed"
+    if "org/other" in existing:
+        assert text.startswith("# kept\n")
+        assert [note.model for note in notes] == ["org/other", "org/reviewed"]
+
+
+def test_failed_accuracy_note_write_leaves_earlier_notes_intact(
+    tmp_path: Path, test_image: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An interrupted save is reported and never truncates the person's earlier notes."""
+    _, _, output_root = _accuracy_notes_run(tmp_path, test_image)
+    assert _record_accuracy_note(output_root) == 0
+    notes_path = output_root / check_models.ACCURACY_NOTES_FILENAME
+    before = safe_io.read_text_no_follow(notes_path)
+
+    def fail(*_args: object, **_kwargs: object) -> None:
+        msg = "disk full"
+        raise OSError(msg)
+
+    monkeypatch.setattr(check_models, "_write_text_file", fail)
+    assert _record_accuracy_note(output_root, "org/changed") == 1
+    assert safe_io.read_text_no_follow(notes_path) == before
+    assert list(output_root.glob(".*.tmp")) == []
+
+
+@pytest.mark.parametrize("value", ["false", "0", "{}", "'text'"])
+def test_accuracy_notes_reject_a_notes_value_that_is_not_a_list(value: str) -> None:
+    """Only a missing or null notes key reads as no notes; other wrong types are errors."""
+    with pytest.raises(ValueError, match="notes must be a list"):
+        check_models._parse_accuracy_notes(yaml.safe_load(f"notes: {value}\n"))
+    assert check_models._parse_accuracy_notes(yaml.safe_load("notes:\n")) == ()
+
+
+def test_current_note_is_not_called_unreviewed_beside_a_stale_one() -> None:
+    """A stale note is explained, but the output still counts as reviewed when one applies."""
+    note = check_models.AccuracyNote(
+        model="org/m",
+        model_revision="r",
+        image_sha256="a" * 64,
+        output_sha256="b" * 64,
+        reviewer="john",
+        reviewed="2026-10-26",
+        note="Accurate.",
+    )
+    stale = replace(note, output_sha256="c" * 64, reviewed="2026-10-01")
+    notes = check_models.AccuracyNotes(image_sha256="a" * 64, notes=(note, stale))
+    match = check_models._match_accuracy_notes(notes, "org/m", "r", "b" * 64)
+    assert match is not None
+    text = "\n".join(
+        check_models.render_report_markdown(check_models._gallery_accuracy_note_blocks(match))
+    )
+    assert "no longer applies: the output changed" in text
+    assert "has not been reviewed" not in text
+    only_stale = check_models._match_accuracy_notes(notes, "org/m", "r", "d" * 64)
+    assert "has not been reviewed" in "\n".join(
+        check_models.render_report_markdown(check_models._gallery_accuracy_note_blocks(only_stale))
+    )
+
+
+def test_recorded_accuracy_note_is_published_in_the_run_summary_without_a_sweep(
+    tmp_path: Path, test_image: Path
+) -> None:
+    """Recording a note re-renders run_summary.md from the retained run."""
+    _, _, output_root = _accuracy_notes_run(tmp_path, test_image)
+    assert _record_accuracy_note(output_root) == 0
+    summary = safe_io.read_text_no_follow(output_root / "issues" / "run_summary.md")
+    flat = " ".join(summary.split())
+    assert "## Human accuracy notes" in summary
+    assert "1 of 2 outputs reviewed by a person" in flat
+    assert "| org/reviewed |" in summary
+    assert "Accurate." in summary

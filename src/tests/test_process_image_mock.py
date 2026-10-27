@@ -31,6 +31,17 @@ OPEN_THINK_MARKER = "<think>"
 CLOSE_THINK_MARKER = "</think>"
 
 
+@pytest.fixture(autouse=True)
+def _no_native_mlx_vlm_utils(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep these mocked-runtime tests from importing the real ``mlx_vlm.utils``.
+
+    The prompt-token and prompt-composition diagnostics look it up at run
+    time; importing it loads native MLX, which aborts where Metal is
+    unavailable. Native coverage belongs in the marked e2e tests.
+    """
+    monkeypatch.setattr(check_models, "_optional_mlx_vlm_utils_attribute", lambda _name: None)
+
+
 @dataclass
 class _FakeGenerationResult:
     """Minimal stand-in for mlx_vlm GenerationResult."""

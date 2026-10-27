@@ -1507,9 +1507,12 @@ python -m tools.add_accuracy_note mlx-community/Molmo2-8B-4bit --reviewer john \
 
 The tool reads the retained `results.jsonl` and stores the note with the image
 digest, the resolved model revision and the digest of the exact output it
-judged. On later runs into that directory, the gallery and HTML report show
-the note above that model's evidence, and their input summary says how many
-outputs were reviewed. Once the image, revision or output changes, the note
+judged, then re-renders `issues/run_summary.md` from the retained run, whose
+*Human accuracy notes* section lists the notes that apply, so a note is
+published without rerunning any model. From the next run into that
+directory, the gallery and HTML report also show the note above that
+model's evidence, and their input summary says how many outputs were
+reviewed. Once the image, revision or output changes, the note
 is shown as out of date instead. Notes never change the mechanical checks,
 and a file that cannot be read is reported rather than ignored.
 
@@ -1532,7 +1535,8 @@ the model revision and the mlx, mlx-vlm and transformers builds of the
 retained run. A *Native reproduction checks* section in the run summary lists
 the checks that apply, with their evidence. After a new snapshot or a rebuild
 the column goes back to *not yet checked (earlier check out of date)*.
-Regenerating the run summary picks up a new note without rerunning models.
+The tool re-renders the run summary from the retained run, so a new check
+shows at once, without rerunning models.
 
 ### JSONL Report
 

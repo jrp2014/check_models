@@ -26,9 +26,11 @@ from check_models import (
     RetainedRun,
     _load_retained_run,
     _parse_accuracy_notes,
+    _replace_text_file,
     _sha256_text,
+    regenerate_run_issue_summary,
 )
-from tools.safe_io import read_text_no_follow, write_text_no_follow
+from tools.safe_io import read_text_no_follow
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -39,7 +41,6 @@ _NEW_FILE_HEADER = """\
 # Each note applies only while its image, model revision and output digests
 # match a run; the gallery and HTML report then show it beside that output.
 # Add one with: python -m tools.add_accuracy_note MODEL --reviewer NAME --note TEXT
-notes:
 """
 
 
@@ -92,13 +93,42 @@ def append_note(
     entry: dict[str, str],
     parse: Callable[[object], tuple[object, ...]],
 ) -> str:
-    """Append one entry, checked by the parser the reports use; return the added YAML."""
-    existing = read_text_no_follow(notes_path) if notes_path.exists() else header
-    addition = yaml.safe_dump([entry], sort_keys=False, allow_unicode=True, width=88)
-    updated = existing + ("" if existing.endswith("\n") else "\n") + addition
+    """Add one entry to the notes document and replace the file atomically.
+
+    The existing file is parsed, not appended to as text, so any layout the
+    reports accept (an empty file, ``notes: []``, an indented list) works.
+    Its leading comment block is kept; a failed write leaves it untouched.
+    """
+    existing = (
+        read_text_no_follow(notes_path) if notes_path.exists() or notes_path.is_symlink() else ""
+    )
+    document = yaml.safe_load(existing) if existing else None
+    parse(document)
+    entries = list(document.get("notes") or []) if isinstance(document, dict) else []
+    entries.append(entry)
+    comment_lines = []
+    for line in existing.splitlines(keepends=True):
+        if not line.startswith("#"):
+            break
+        comment_lines.append(line)
+    comments = "".join(comment_lines) or header
+    updated = comments + yaml.safe_dump(
+        {"notes": entries}, sort_keys=False, allow_unicode=True, width=88
+    )
     parse(yaml.safe_load(updated))
-    write_text_no_follow(notes_path, updated)
-    return addition
+    _replace_text_file(notes_path, updated)
+    return yaml.safe_dump([entry], sort_keys=False, allow_unicode=True, width=88)
+
+
+def publish_run_summary(output_dir: Path) -> None:
+    """Re-render run_summary.md from the retained run so the note shows without a sweep."""
+    try:
+        summary = regenerate_run_issue_summary(output_dir.expanduser().resolve())
+    except (OSError, ValueError) as error:
+        print(f"Recorded, but run_summary.md was not refreshed: {error}", file=sys.stderr)
+        return
+    if summary is not None:
+        print(f"Refreshed {summary}")
 
 
 def _note_entry(args: argparse.Namespace) -> dict[str, str]:
@@ -132,6 +162,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Not recorded: {error}", file=sys.stderr)
         return 1
     print(f"Appended to {notes_path}:\n{addition}", end="")
+    publish_run_summary(args.output_dir)
     return 0
 
 
