@@ -46,8 +46,16 @@
 #      stops the run with diagnostics. An unchanged, clean repo whose editable
 #      install still verifies skips its rebuild; FORCE_REINSTALL=1 overrides
 #   2. Install packages in dependency order: mlx → mlx-vlm (mlx-vlm's
-#      requirements.txt is its dependency list, so its install covers it)
-#   3. Verify editable install origins for mlx and mlx-vlm
+#      requirements.txt is its dependency list, so its install covers it).
+#      When mlx-vlm's required mlx-audio carries a bare exact mlx pin that the
+#      pinned local mlx build cannot satisfy (every 0.6.x pins mlx==0.32.4),
+#      the candidate is installed with --no-deps, the pin in its installed
+#      metadata is relaxed to the >= floor (relax_exact_mlx_pin.py) and
+#      mlx-audio is held at that version for the rest of the run. A failed
+#      build/install stops the run (nonzero exit) after the restore attempts
+#   3. Verify editable install origins for mlx and mlx-vlm, and that each
+#      install is the checkout's own build (mlx: compiled extension revision;
+#      mlx-vlm: pip-recorded version matches the checkout's declared version)
 #   4. Skip PyPI MLX updates for these packages
 #   5. Reinstall check_models from pyproject.toml to reconcile shared deps,
 #      then stop with diagnostics if that replaced a verified local install
@@ -490,14 +498,13 @@ pin_local_mlx_build() {
 	echo "[update.sh] Pinned local mlx $pinned_version for the rest of this run"
 }
 
-# A failed local mlx build must not leave the run unpinned. pip builds the
-# editable wheel before uninstalling anything, so a compile failure (a new
-# SDK rejecting a Metal kernel, say) usually leaves the previous local build
-# installed and working; without the pin, the later eager project reinstall
-# would swap it for the PyPI wheel as soon as a release overtakes the local
-# dev version. Pin the survivor when it still verifies as this checkout's
-# editable install; a PyPI fallback restore is not a local build and is left
-# unpinned.
+# A failed local mlx build stops the run (Stage 3), but the stop report must
+# say what survived. pip builds the editable wheel before uninstalling
+# anything, so a compile failure (a new SDK rejecting a Metal kernel, say)
+# usually leaves the previous local build installed and working. Pin the
+# survivor when it still verifies as this checkout's editable install, so
+# nothing else this run touches pip can swap it; a PyPI fallback restore is
+# not a local build and is left unpinned.
 preserve_local_mlx_after_failed_build() {
 	local repo_path="$1"
 	if verify_expected_editable_install mlx "$repo_path" > /dev/null 2>&1; then
@@ -603,11 +610,29 @@ verify_expected_editable_install() {
 # The editable path alone passed on 2026-10-02 after an earlier run had pulled
 # 50 commits and lost the compiled extension: "unchanged upstream" (this run's
 # pull was a no-op), clean, path verified, and no mlx.core. Prints the reason
-# and fails when the build is missing or from another commit; other packages
-# (pure Python) always pass.
+# and fails when the build is missing or from another commit. For mlx-vlm the
+# pip-recorded version must match the one the checkout declares: a failed
+# editable reinstall (2026-10-28, ResolutionImpossible over mlx-audio's exact
+# mlx pin) left 0.7.10 dist-info in site-packages while the .pth already
+# imported the pulled checkout's 0.7.11, and the next run's pull was a no-op
+# on a clean checkout, so nothing would ever have healed the skew. Other
+# packages always pass.
 installed_build_matches_checkout() {
 	local package_name="$1"
 	local repo_path="$2"
+	if [[ "$package_name" == "mlx-vlm" ]]; then
+		# The declared version comes from the file pyproject.toml names
+		# (mlx_vlm/version.py), not from importing mlx_vlm, which drags the
+		# full ML stack into the updater.
+		local declared installed
+		declared="$(sed -nE 's/^__version__ *= *"([^"]+)".*/\1/p' "$repo_path/mlx_vlm/version.py" 2>/dev/null | head -n 1)"
+		installed="$(get_installed_distribution_version mlx-vlm)"
+		if [[ -z "$declared" || "$installed" != "$declared" ]]; then
+			echo "mlx-vlm package metadata reports ${installed:-<unknown>}, not the ${declared:-<unknown>} the checkout declares"
+			return 1
+		fi
+		return 0
+	fi
 	[[ "$package_name" == "mlx" ]] || return 0
 	# mlx.core.__version__ is compiled into the extension (MLX_VERSION), so it
 	# names the binary actually loaded; pip metadata alone can describe a
@@ -1144,6 +1169,126 @@ mlx_build_toolchain_matches() {
 	fi
 }
 
+# Pure decision for reconciling mlx-vlm's mlx-audio requirement with a pinned
+# local mlx build, kept free of side effects so it is unit-testable. Prints:
+#   normal    - no bare exact mlx pin in the candidate: ordinary resolution works
+#   satisfied - the exact pin names the local mlx version already
+#   relax     - the pin conflicts: install --no-deps, relax metadata, hold version
+#   $1 candidate's bare exact mlx pin ("" when none); $2 local mlx version
+mlx_audio_pin_decision() {
+	local exact_pin="$1" local_mlx="$2"
+	if [[ -z "$exact_pin" ]]; then
+		echo "normal"
+	elif [[ "$exact_pin" == "$local_mlx" ]]; then
+		echo "satisfied"
+	else
+		echo "relax"
+	fi
+}
+
+# "<version>\t<bare exact mlx pin or empty>" for the single candidate in a pip
+# install --report JSON file; fails when the report is unreadable.
+#   $1 file holding the report JSON
+mlx_audio_report_candidate() {
+	python - "$1" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+from packaging.requirements import InvalidRequirement, Requirement
+
+try:
+    report = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+    (item,) = report["install"]
+    metadata = item["metadata"]
+    version = str(metadata["version"])
+    requires = metadata.get("requires_dist") or []
+except (OSError, ValueError, KeyError, TypeError):
+    raise SystemExit(1) from None
+exact = ""
+for entry in requires:
+    try:
+        requirement = Requirement(str(entry))
+    except InvalidRequirement:
+        continue
+    if requirement.name.lower() != "mlx" or requirement.extras or requirement.marker:
+        continue
+    clauses = list(requirement.specifier)
+    if len(clauses) == 1 and clauses[0].operator == "==":
+        exact = clauses[0].version
+        break
+print(f"{version}\t{exact}")
+PY
+}
+
+# mlx-vlm >= 0.7.11 requires mlx-audio>=0.6.2, and every release in that range
+# (0.6.2, 0.6.3 - and upstream main, checked 2026-10-28) pins mlx==0.32.4
+# exactly, which a pinned local mlx build can never satisfy (PEP 440:
+# 0.32.5.devN+rev does not match ==0.32.4): the editable mlx-vlm install and
+# the later eager project reinstall both end in ResolutionImpossible. Until
+# upstream relaxes the pin: resolve the mlx-audio candidate pip would pick,
+# and when its exact mlx pin conflicts with the local build, install that
+# candidate with --no-deps, relax the pin in the *installed* metadata to the
+# equivalent >= floor (relax_exact_mlx_pin.py), and hold mlx-audio at that
+# version for the rest of the run, so every later resolver pass reuses the
+# relaxed installed metadata instead of re-resolving the PyPI metadata that
+# still carries the pin. The candidate's own dependencies are installed by
+# the mlx-vlm resolution that follows, which reads the relaxed metadata; any
+# transitive dependency that resolution does not reach surfaces in the
+# project reinstall's `pip check`, not here.
+# This runs every run the local mlx pin is active - also when the mlx-vlm
+# rebuild is skipped - because without the per-run hold a newly released
+# pinned mlx-audio would fail the eager project reinstall.
+reconcile_mlx_audio_with_local_mlx() {
+	local repo_path="$1"
+	local spec
+	spec="$(grep -E '^mlx-audio[<>=!~ ]' "$repo_path/requirements.txt" 2>/dev/null | head -n 1 | cut -d'#' -f1 | tr -d '[:space:]')"
+	if [[ -z "$spec" ]]; then
+		echo "[update.sh] mlx-vlm's requirements declare no mlx-audio; nothing to reconcile"
+		return 0
+	fi
+	local local_mlx
+	local_mlx="$(get_installed_distribution_version mlx)"
+	echo "[update.sh] Reconciling '$spec' with the pinned local mlx $local_mlx..."
+	local report_file candidate
+	report_file="$(mktemp "${TMPDIR:-/tmp}/update-mlx-audio-report.XXXXXX")"
+	if ! pip install --dry-run --no-deps --ignore-installed --quiet \
+		--report "$report_file" "$spec" > /dev/null; then
+		rm -f "$report_file"
+		echo "❌ Could not resolve an mlx-audio candidate for '$spec'; stopping."
+		echo "   See pip's output above. Nothing about mlx-audio was changed."
+		return 1
+	fi
+	if ! candidate="$(mlx_audio_report_candidate "$report_file")"; then
+		rm -f "$report_file"
+		echo "❌ Could not read pip's install report for '$spec'; stopping."
+		return 1
+	fi
+	rm -f "$report_file"
+	local candidate_version="${candidate%%$'\t'*}" exact_pin="${candidate#*$'\t'}"
+	case "$(mlx_audio_pin_decision "$exact_pin" "$local_mlx")" in
+		normal)
+			echo "[update.sh] mlx-audio $candidate_version declares no bare exact mlx pin; ordinary resolution applies"
+			return 0
+			;;
+		satisfied)
+			echo "[update.sh] mlx-audio $candidate_version pins mlx==$exact_pin, which the local build satisfies"
+			return 0
+			;;
+	esac
+	echo "[update.sh] mlx-audio $candidate_version pins mlx==$exact_pin, which conflicts with local mlx $local_mlx"
+	if [[ "$(get_installed_distribution_version mlx-audio)" != "$candidate_version" ]]; then
+		echo "[update.sh] Installing mlx-audio==$candidate_version without dependency resolution..."
+		pip install --no-deps "mlx-audio==$candidate_version"
+	fi
+	python "$SCRIPT_DIR/relax_exact_mlx_pin.py" mlx-audio mlx
+	printf 'mlx-audio==%s\n' "$candidate_version" >> "$LOCAL_MLX_CONSTRAINT_FILE"
+	echo "[update.sh] Holding mlx-audio at $candidate_version for the rest of this run (relaxed metadata in use)"
+	COMPLETED_STEPS+=("relaxed mlx-audio $candidate_version's exact mlx pin for the local mlx build")
+}
+
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
 	# Determine the parent directory (assuming check_models/src/tools/update.sh)
@@ -1247,6 +1392,17 @@ update_local_mlx_repos() {
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
+
+		# The mlx-audio reconciliation precedes both the rebuild/skip decision
+		# and the install: the per-run hold is needed even when the rebuild is
+		# skipped, because the later project reinstall re-resolves mlx-vlm's
+		# requirements eagerly.
+		if [[ "${REPO_NAMES[idx]}" == "mlx-vlm" && -n "$LOCAL_MLX_CONSTRAINT_FILE" ]]; then
+			if ! reconcile_mlx_audio_with_local_mlx "${REPO_PATHS[idx]}"; then
+				cd "$ORIGINAL_DIR"
+				return 1
+			fi
+		fi
 
 		# Nothing new from GitHub, a clean checkout, and an installed package that
 		# is verifiably the editable from this checkout: rebuilding would produce
@@ -1355,7 +1511,7 @@ update_local_mlx_repos() {
 				pin_local_mlx_build
 			fi
 		else
-			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"
+			echo "❌ Failed to install ${REPO_NAMES[idx]}"
 			REPO_SKIP[idx]=1
 			# Check if pip uninstalled the previous version during the failed attempt
 			if ! pip show "${REPO_NAMES[idx]}" >/dev/null 2>&1; then
@@ -1382,8 +1538,21 @@ update_local_mlx_repos() {
 			fi
 		fi
 
-		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
-	
+		# A failed build/install stops the run after the restore attempts above:
+		# a run that continued (as a warning, until 2026-10-28) ended with exit 0
+		# and "critical packages verified" on the stale install, while the pulled
+		# checkout's .pth already imported a different version than pip metadata
+		# recorded (mlx-vlm 0.7.10/0.7.11) - a mixed state the end-of-run change
+		# table never mentioned. The EXIT trap reports the completed steps and
+		# what actually changed.
+		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
+			echo ""
+			echo "❌ ${REPO_NAMES[idx]} failed to build/install from ${REPO_PATHS[idx]}; stopping."
+			echo "   Inspect pip's error above, fix the cause, then re-run update.sh."
+			cd "$ORIGINAL_DIR"
+			return 1
+		fi
+
 		echo ""
 	done
 	cd "$ORIGINAL_DIR"
@@ -1403,6 +1572,18 @@ update_local_mlx_repos() {
 					echo "   local build - typically a new PyPI release overtaking the local"
 					echo "   dev version). Stopping rather than continuing half-local."
 					echo "   Fix: cd ${REPO_PATHS[idx]} && pip install -v -e '.[dev]' then re-run update.sh"
+					cd "$ORIGINAL_DIR"
+					return 1
+				fi
+				# The editable path alone does not prove the install is this
+				# checkout's build (a stale compiled mlx extension, or mlx-vlm
+				# dist-info left by a failed reinstall).
+				local stage3b_mismatch=""
+				if ! stage3b_mismatch="$(installed_build_matches_checkout "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}")"; then
+					echo "❌ ${REPO_NAMES[idx]}: ${stage3b_mismatch}"
+					echo "   The environment is in a mixed state. Stopping rather than"
+					echo "   continuing half-local."
+					echo "   Fix: cd ${REPO_PATHS[idx]} && pip install -v -e . then re-run update.sh"
 					cd "$ORIGINAL_DIR"
 					return 1
 				fi

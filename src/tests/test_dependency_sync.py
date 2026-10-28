@@ -35,6 +35,7 @@ from tools import (
     filter_danger_report,
     hub_precheck,
     quarantine_broken_pip_metadata,
+    relax_exact_mlx_pin,
     safe_io,
     update_readme_deps,
     validate_env,
@@ -1290,13 +1291,180 @@ def test_update_script_skips_a_rebuild_only_for_the_checkouts_own_build(
     )
     assert result.returncode == expected_status
     assert reason in result.stdout
-    pure_python = subprocess.run(  # noqa: S603 - as above
-        ["/bin/bash", "-c", f"{function}\ninstalled_build_matches_checkout mlx-vlm /repo"],
+    other_package = subprocess.run(  # noqa: S603 - as above
+        ["/bin/bash", "-c", f"{function}\ninstalled_build_matches_checkout other-pkg /repo"],
         capture_output=True,
         text=True,
         check=False,
     )
-    assert pure_python.returncode == 0
+    assert other_package.returncode == 0
+
+
+@pytest.mark.parametrize(
+    ("declared", "installed", "expected_status", "reason"),
+    [
+        pytest.param("0.7.11", "0.7.11", 0, "", id="consistent"),
+        # A failed editable reinstall left the previous dist-info behind while
+        # the .pth already imported the pulled checkout (2026-10-28); the next
+        # run's pull was a no-op on a clean checkout, so without this check
+        # the skew never healed.
+        pytest.param(
+            "0.7.11",
+            "0.7.10",
+            1,
+            "mlx-vlm package metadata reports 0.7.10, not the 0.7.11 the checkout declares",
+            id="stale-dist-info",
+        ),
+        pytest.param(
+            None,
+            "0.7.10",
+            1,
+            "not the <unknown> the checkout declares",
+            id="undeclared-version",
+        ),
+    ],
+)
+def test_update_script_rebuild_check_compares_mlx_vlm_declared_version(
+    tmp_path: Path, declared: str | None, installed: str, expected_status: int, reason: str
+) -> None:
+    """mlx-vlm's pip-recorded version must match the checkout's declared one."""
+    repo = tmp_path / "mlx-vlm"
+    (repo / "mlx_vlm").mkdir(parents=True)
+    if declared is not None:
+        safe_io.write_text_no_follow(
+            repo / "mlx_vlm" / "version.py", f'__version__ = "{declared}"\n'
+        )
+    function = _update_script_function("installed_build_matches_checkout")
+    stubs = f"get_installed_distribution_version() {{ echo '{installed}'; }}\n"
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        [
+            "/bin/bash",
+            "-c",
+            f'{stubs}{function}\ninstalled_build_matches_checkout mlx-vlm "$1"',
+            "_",
+            str(repo),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == expected_status
+    assert reason in result.stdout
+
+
+@pytest.mark.parametrize(
+    ("exact_pin", "local_mlx", "expected"),
+    [
+        pytest.param("", "0.32.5.dev20261028+7d2d94a55", "normal", id="no-exact-pin"),
+        pytest.param("0.32.4", "0.32.4", "satisfied", id="pin-matches-local"),
+        # The 2026-10-28 failure: every mlx-audio >=0.6.2 pins mlx==0.32.4,
+        # which a local dev build can never satisfy (ResolutionImpossible).
+        pytest.param("0.32.4", "0.32.5.dev20261028+7d2d94a55", "relax", id="pin-conflicts"),
+    ],
+)
+def test_update_script_mlx_audio_pin_decision(
+    exact_pin: str, local_mlx: str, expected: str
+) -> None:
+    """A conflicting bare exact mlx pin is relaxed; anything else resolves normally."""
+    function = _update_script_function("mlx_audio_pin_decision")
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        [
+            "/bin/bash",
+            "-c",
+            f'{function}\nmlx_audio_pin_decision "$1" "$2"',
+            "_",
+            exact_pin,
+            local_mlx,
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.stdout.strip() == expected
+
+
+@pytest.mark.parametrize(
+    ("requires_dist", "expected_pin"),
+    [
+        pytest.param(["mlx==0.32.4", "numpy>=1.26"], "0.32.4", id="bare-exact-pin"),
+        pytest.param(["mlx>=0.32.4"], "", id="floor-is-not-a-pin"),
+        # Conditional pins (extras or markers) are not the unconditional
+        # resolution blocker the reconcile targets.
+        pytest.param(['mlx==0.32.4; extra == "cuda"'], "", id="marker-pin-ignored"),
+        pytest.param(["mlx>=0.32.1,==0.32.*"], "", id="multi-clause-ignored"),
+    ],
+)
+def test_update_script_mlx_audio_report_candidate(
+    tmp_path: Path, requires_dist: list[str], expected_pin: str
+) -> None:
+    """The report parser surfaces only an unconditional single-clause ``mlx==X``."""
+    report = tmp_path / "report.json"
+    safe_io.write_text_no_follow(
+        report,
+        json.dumps(
+            {
+                "install": [
+                    {"metadata": {"version": "0.6.3", "requires_dist": requires_dist}},
+                ],
+            },
+        ),
+    )
+    function = _update_script_function("mlx_audio_report_candidate")
+    stubs = f'python() {{ {shlex.quote(sys.executable)} "$@"; }}\n'
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        [
+            "/bin/bash",
+            "-c",
+            f'{stubs}{function}\nmlx_audio_report_candidate "$1"',
+            "_",
+            str(report),
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.stdout.rstrip("\n") == f"0.6.3\t{expected_pin}"
+
+
+def _write_metadata_dist_info(site_dir: Path, name: str, version: str, metadata: str) -> Path:
+    metadata_dir = site_dir / f"{name}-{version}.dist-info"
+    metadata_dir.mkdir(parents=True)
+    metadata_file = metadata_dir / "METADATA"
+    safe_io.write_text_no_follow(metadata_file, metadata)
+    return metadata_file
+
+
+def test_relax_exact_mlx_pin_rewrites_only_the_bare_exact_pin(tmp_path: Path) -> None:
+    """``mlx==X`` becomes ``mlx>=X``; conditional and multi-clause lines stay."""
+    metadata_file = _write_metadata_dist_info(
+        tmp_path,
+        "mlx_audio",
+        "0.6.3",
+        "Metadata-Version: 2.4\n"
+        "Name: mlx-audio\n"
+        "Version: 0.6.3\n"
+        "Requires-Dist: mlx==0.32.4\n"
+        "Requires-Dist: numpy>=1.26.4\n"
+        'Requires-Dist: mlx-lm==0.32.2; extra == "parity"\n',
+    )
+    outcomes = relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
+    assert outcomes == [f"relaxed mlx==0.32.4 to mlx>=0.32.4 in {metadata_file}"]
+    rewritten = safe_io.read_text_no_follow(metadata_file)
+    assert "Requires-Dist: mlx>=0.32.4\n" in rewritten
+    assert "mlx==0.32.4" not in rewritten
+    # The conditional mlx-lm pin and the unrelated floor are untouched.
+    assert 'Requires-Dist: mlx-lm==0.32.2; extra == "parity"\n' in rewritten
+    assert "Requires-Dist: numpy>=1.26.4\n" in rewritten
+    # Idempotent: a second run finds nothing left to relax and still succeeds.
+    assert relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path]) == [
+        f"no bare exact mlx pin to relax in {metadata_file}"
+    ]
+
+
+def test_relax_exact_mlx_pin_requires_installed_metadata(tmp_path: Path) -> None:
+    """A missing distribution is an error, not a silent no-op."""
+    with pytest.raises(RuntimeError, match="no installed metadata"):
+        relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
 
 
 def _conflict_probe(function_name: str, repo: Path) -> list[str]:
@@ -3839,10 +4007,13 @@ pip_install somepkg
     assert "--constraint" not in log
 
     script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    failure_branch = script[
-        script.index('echo "\u26a0\ufe0f  Failed to install ${REPO_NAMES[idx]}"') :
-    ]
+    failure_branch = script[script.index('echo "\u274c Failed to install ${REPO_NAMES[idx]}"') :]
     assert 'preserve_local_mlx_after_failed_build "${REPO_PATHS[idx]}"' in failure_branch
+    # A failed Stage 3 install stops the run after the restore attempts: a run
+    # that continued (until 2026-10-28) exited 0 on a stale editable install.
+    stop_block = failure_branch[: failure_branch.index("Stage 3b")]
+    assert "failed to build/install from" in stop_block
+    assert "return 1" in stop_block
 
 
 # ---------------------------------------------------------------------------

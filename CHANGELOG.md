@@ -1329,6 +1329,32 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- update.sh (0.17.98): a failed Stage 3 build/install of a local MLX repo now
+  stops the run (nonzero exit, with the stop report and the end-of-run change
+  table) after the existing restore attempts, instead of warning and
+  continuing — this also changes the failed-*mlx*-build path, which used to
+  preserve-and-continue to exit 0. On 2026-10-28 a failed editable mlx-vlm
+  reinstall (ResolutionImpossible, below) was only a warning: Stage 3b never
+  verified mlx-vlm, "critical packages verified" passed on the stale install,
+  and the run exited 0 while the pulled checkout's `.pth` imported 0.7.11
+  with 0.7.10 dist-info in site-packages (the harness's "mlx-vlm is
+  installed at 2 versions" warning). The rebuild-skip check and Stage 3b now
+  also compare mlx-vlm's pip-recorded version with the checkout's declared
+  `mlx_vlm/version.py`, so a leftover skew forces a rebuild on the next run
+  instead of passing on the editable path alone.
+- update.sh (0.17.98): mlx-vlm >= 0.7.11 requires `mlx-audio>=0.6.2`, and
+  every release in that range (0.6.2, 0.6.3 — and upstream main as of
+  2026-10-28) pins `mlx==0.32.4` exactly, which a pinned local mlx source
+  build can never satisfy, so the editable mlx-vlm install (and the later
+  eager project reinstall) ended in ResolutionImpossible. When the local mlx
+  pin is active, update.sh now resolves the mlx-audio candidate pip would
+  pick and, if its bare exact mlx pin conflicts, installs it with
+  `--no-deps`, relaxes the pin in the installed metadata to the `>=` floor
+  (new `tools/relax_exact_mlx_pin.py`), and holds mlx-audio at that version
+  for the rest of the run, so `pip check` stays green and eager passes reuse
+  the relaxed install. The step runs even when the mlx-vlm rebuild is
+  skipped, and retires itself once upstream ships a release without the
+  exact pin.
 - Notes (0.17.97, john's 2026-10-27 review): the note tools parse the
   existing notes file, append to its `notes` list and write the whole
   document, keeping its leading comments, so an empty file, `notes: []` or
