@@ -24922,16 +24922,18 @@ def _run_issue_summary_provenance_rows(
 
 # Native reproduction notes: optional, person-written results of rerunning a
 # harness observation outside the harness (python -m mlx_vlm.generate or the
-# load/template/stream_generate path). Each names the model revision and the
-# mlx/mlx-vlm/transformers builds it was checked on, so a rebuild or a new
-# snapshot puts the observation back to "not yet checked". Recurrence in the
-# harness alone never counts as native confirmation.
+# load/template/stream_generate path). Each names the model revision, the
+# mlx/mlx-vlm/transformers builds and the experiment inputs (image, prompt,
+# generation settings) it was checked on, so a rebuild, a new snapshot or a
+# different experiment puts the observation back to "not yet checked".
+# Recurrence in the harness alone never counts as native confirmation.
 NATIVE_REPRO_NOTES_FILENAME: Final[str] = "native_repro_notes.yaml"
 _NATIVE_REPRO_NOTE_KEYS: Final[tuple[str, ...]] = (
     "model",
     "model_revision",
     "observation",
     "stack",
+    "experiment",
     "status",
     "checker",
     "checked",
@@ -24953,6 +24955,7 @@ class NativeReproNote:
     model_revision: str
     observation: str
     stack: str
+    experiment: str
     status: str
     checker: str
     checked: str
@@ -24961,9 +24964,10 @@ class NativeReproNote:
 
 @dataclass(frozen=True)
 class NativeReproNotes:
-    """The output root's native-reproduction notes and the stack this run used."""
+    """The output root's native-reproduction notes and this run's stack and inputs."""
 
     stack: str | None
+    experiment: str | None
     notes: tuple[NativeReproNote, ...] = ()
     read_error: str | None = None
 
@@ -24996,6 +25000,25 @@ def _native_repro_stack(metadata: JsonlMetadataRecord) -> str | None:
     )
 
 
+def _native_repro_experiment(metadata: JsonlMetadataRecord) -> str | None:
+    """The run's inputs as one comparable label: image, prompt and settings.
+
+    A native check holds only for the inputs it reran: a different image,
+    prompt or generation setting is a different experiment, so a note from
+    one never confirms (or dismisses) an observation in another. One
+    composite label mirrors ``stack`` rather than three hash fields because
+    the image can legitimately be absent ("image none").
+    """
+    prompt_sha256 = metadata.get("prompt_sha256")
+    settings = metadata.get("generation_settings")
+    if not prompt_sha256 or settings is None:
+        return None
+    image = metadata.get("image")
+    image_sha256 = image.get("sha256") if image is not None else None
+    settings_sha256 = _sha256_text(json.dumps(settings, sort_keys=True, separators=(",", ":")))
+    return f"image {image_sha256 or 'none'}; prompt {prompt_sha256}; settings {settings_sha256}"
+
+
 def _native_repro_codes(result: JsonlResultRecord) -> tuple[str, ...]:
     """The observations a native rerun can confirm: a crash, or integration signals."""
     if result["assessment"]["execution"] == "crashed":
@@ -25017,7 +25040,12 @@ def _load_native_repro_notes(
     if read is None:
         return None
     notes, read_error = read
-    return NativeReproNotes(stack=_native_repro_stack(metadata), notes=notes, read_error=read_error)
+    return NativeReproNotes(
+        stack=_native_repro_stack(metadata),
+        experiment=_native_repro_experiment(metadata),
+        notes=notes,
+        read_error=read_error,
+    )
 
 
 def _native_repro_gloss(code: str) -> str:
@@ -25028,12 +25056,23 @@ def _native_repro_gloss(code: str) -> str:
 
 
 def _native_repro_note_applies(
-    note: NativeReproNote, result: JsonlResultRecord, stack: str | None
+    note: NativeReproNote, result: JsonlResultRecord, notes: NativeReproNotes
 ) -> bool:
-    """Whether a note was checked on this run's model revision and builds."""
+    """Whether a note was checked on this run's revision, builds and inputs.
+
+    The experiment inputs are part of the key: a confirmation on one image,
+    prompt or sampling setup says nothing about another (repetition can be
+    prompt-dependent, failures resolution-dependent, behaviour seed-dependent).
+    """
     provenance = result.get("model_provenance")
     revision = provenance.get("resolved_revision") if provenance is not None else None
-    return stack is not None and note.stack == stack and note.model_revision == revision
+    return (
+        notes.stack is not None
+        and notes.experiment is not None
+        and note.stack == notes.stack
+        and note.experiment == notes.experiment
+        and note.model_revision == revision
+    )
 
 
 def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None) -> str:
@@ -25044,14 +25083,16 @@ def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None
     codes = _native_repro_codes(result)
     by_code: dict[str, str] = {}
     stale = False
-    for note in notes.notes if notes is not None else ():
-        if note.model != result["model"] or note.observation not in codes:
-            continue
-        if _native_repro_note_applies(note, result, notes.stack if notes else None):
-            # A later applicable note for the same observation supersedes an earlier one.
-            by_code[note.observation] = _NATIVE_REPRO_STATUS_LABELS[note.status]
-        else:
-            stale = True
+    if notes is not None:
+        for note in notes.notes:
+            if note.model != result["model"] or note.observation not in codes:
+                continue
+            if _native_repro_note_applies(note, result, notes):
+                # A later applicable note for the same observation supersedes
+                # an earlier one.
+                by_code[note.observation] = _NATIVE_REPRO_STATUS_LABELS[note.status]
+            else:
+                stale = True
     groups: dict[str, list[str]] = {}
     for code in codes:
         label = by_code.get(code, _NATIVE_REPRO_UNCHECKED)
@@ -25135,12 +25176,13 @@ def _native_repro_section(
         for note in notes.notes
         if (result := by_model.get(note.model)) is not None
         and note.observation in _native_repro_codes(result)
-        and _native_repro_note_applies(note, result, notes.stack)
+        and _native_repro_note_applies(note, result, notes)
     )
     intro = (
-        f"Recorded in {NATIVE_REPRO_NOTES_FILENAME} for this run's model revisions and "
-        f"builds ({notes.stack or 'builds not recorded'}). A check made on another "
-        "revision or build no longer applies and is not listed."
+        f"Recorded in {NATIVE_REPRO_NOTES_FILENAME} for this run's model revisions, "
+        f"builds ({notes.stack or 'builds not recorded'}) and experiment inputs (image, "
+        "prompt, generation settings). A check made on another revision, build or "
+        "experiment no longer applies and is not listed."
     )
     blocks: list[ReportBlock] = [ReportParagraph(intro)]
     if rows:

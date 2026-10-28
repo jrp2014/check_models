@@ -49,19 +49,9 @@ class AcceptedAdvisory:
 
 # Each entry is temporary: it stops matching when the version moves, fails once
 # a fix ships, and is reported for removal once Skylos stops finding it.
-ACCEPTED_ADVISORIES: tuple[AcceptedAdvisory, ...] = (
-    AcceptedAdvisory(
-        rule_id="SKY-SCA-GHSA-vfj7-8cjw-p6xm",
-        ecosystem="npm",
-        package="braces",
-        version="3.0.3",
-        manifest="package-lock.json",
-        reason=(
-            "braces 3.0.3 (via markdownlint-cli2 -> micromatch) has no fixed release; "
-            "braces only expands this repo's own markdownlint globs. Accepted 2026-10-03."
-        ),
-    ),
-)
+# (The braces 3.0.3 exception, accepted 2026-10-03, was dropped 2026-10-28
+# once Skylos stopped reporting SKY-SCA-GHSA-vfj7-8cjw-p6xm.)
+ACCEPTED_ADVISORIES: tuple[AcceptedAdvisory, ...] = ()
 
 # Skylos sca_coverage statuses for a finished scan. "complete_with_unresolved_versions"
 # is accepted deliberately: the Python dependencies in pyproject.toml are

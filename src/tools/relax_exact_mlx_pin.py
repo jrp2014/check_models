@@ -14,10 +14,12 @@ version for the rest of the run, so an eager upgrade cannot re-resolve the
 PyPI metadata that still carries the pin.
 
 Scope: only a bare ``Requires-Dist: <package>==X`` line (no extras, no
-environment marker, a single ``==`` clause) is rewritten. Exit 0 when the pin
-was relaxed, was already relaxed, or the distribution no longer declares the
-dependency; exit 1 when the distribution is not installed or its metadata
-cannot be rewritten safely.
+environment marker, a single ``==`` clause, no wildcard — ``==X.*`` has no
+valid ``>=`` form) is rewritten, and the replacement is parsed as a
+requirement before it is written. Exit 0 when the pin was relaxed, was
+already relaxed, or the distribution no longer declares the dependency;
+exit 1 when the distribution is not installed or its metadata cannot be
+rewritten safely.
 """
 
 from __future__ import annotations
@@ -43,7 +45,9 @@ if TYPE_CHECKING:
 DIST_INFO_SUFFIX: Final = ".dist-info"
 NORMALIZE_NAME_RE: Final = re.compile(r"[-_.]+")
 REQUIRES_DIST_PREFIX: Final = "Requires-Dist:"
-EXACT_VERSION_RE: Final = re.compile(r"^==\s*([A-Za-z0-9!+.*]+)$")
+# No "*": a wildcard pin (==X.*) has no valid ">=" form, so it is never
+# relaxed; update.sh's assessment reports it as unsupported instead.
+EXACT_VERSION_RE: Final = re.compile(r"^==\s*([A-Za-z0-9!+.]+)$")
 
 
 def _normalize_distribution_name(name: str) -> str:
@@ -91,13 +95,21 @@ def _bare_exact_pin_version(line: str, package: str) -> str | None:
         requirement = Requirement(line.removeprefix(REQUIRES_DIST_PREFIX).strip())
     except InvalidRequirement:
         return None
-    if _normalize_distribution_name(requirement.name) != _normalize_distribution_name(package):
-        return None
     # Extras or an environment marker mean the pin is conditional; a multi-
     # clause specifier means it is not the plain exact pin this tool targets.
-    if requirement.extras or requirement.marker is not None:
+    if (
+        _normalize_distribution_name(requirement.name) != _normalize_distribution_name(package)
+        or requirement.extras
+        or requirement.marker is not None
+    ):
         return None
     match = EXACT_VERSION_RE.match(str(requirement.specifier))
+    # Never write a replacement that is not itself a valid requirement.
+    try:
+        if match is not None:
+            Requirement(f"{package}>={match.group(1)}")
+    except InvalidRequirement:
+        return None
     return match.group(1) if match else None
 
 

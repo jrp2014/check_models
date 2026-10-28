@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Compare and diagnose MLX vision-language models on Apple Silicon: single-image runs, throughput and memory measurements, output comparisons, and reproducible failure reports."
-version = "0.17.98"
+version = "0.17.99"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"

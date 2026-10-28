@@ -1329,6 +1329,34 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- update.sh (0.17.99, review of 0.17.98): the mlx-audio reconciliation runs
+  inside the caller's `if !`, where `set -e` is inert, so a failed `--no-deps`
+  install or metadata rewrite could be recorded as success with the hold
+  still written; every step now checks its own status, and the hold is
+  written only after the rewrite succeeds. Requirement interpretation moved
+  into one packaging-backed assessment (PEP 440): `mlx==0.32.4` is now
+  recognised as satisfied by a local `0.32.4+local` build, a wildcard pin
+  (`==X.*`, which has no valid `>=` form) or a pin whose `>=` floor the local
+  build cannot meet is reported as unsupported and stops the run instead of
+  being rewritten, and `relax_exact_mlx_pin.py` validates the replacement
+  requirement before writing it.
+- Tooling (0.17.99): temporary npm override `re2js: 2.9.1` (the latest
+  release; exact, as the override-hygiene test requires) in
+  `src/package.json` (john's call, 2026-10-28), clearing GHSA-gg6h-894w-4m9c
+  (high, quadratic-time DoS in re2js lookbehind matching, published
+  2026-10-28): markdownlint 0.42.0 — the latest — pins re2js==2.8.6 exactly,
+  so no newer markdownlint-cli2 release carries the fix (2.8.7+ do). Drop
+  the override once markdownlint's own re2js requirement moves past 2.8.6. The stale braces 3.0.3 exception
+  (SKY-SCA-GHSA-vfj7-8cjw-p6xm, accepted 2026-10-03) is dropped from
+  `ACCEPTED_ADVISORIES`, as the gate had been requesting since Skylos
+  stopped reporting it.
+- Run summary (0.17.99, review of 0.17.96): a native-reproduction check now
+  applies only to the experiment it reran. `native_repro_notes.yaml` entries
+  gain a required `experiment` field (image, prompt and generation-settings
+  digests, recorded by `tools.add_native_repro_note` from the retained run;
+  no earlier file exists to migrate), and a note from a different image,
+  prompt or settings shows as "not yet checked (earlier check out of date)"
+  instead of confirming — or dismissing — an observation it never reran.
 - update.sh (0.17.98): a failed Stage 3 build/install of a local MLX repo now
   stops the run (nonzero exit, with the stop report and the end-of-run change
   table) after the existing restore attempts, instead of warning and

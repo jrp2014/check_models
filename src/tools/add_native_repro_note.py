@@ -1,11 +1,13 @@
 """Record the result of rerunning one harness observation outside the harness.
 
 The note is appended to ``native_repro_notes.yaml`` in the output root, keyed
-to the model revision and the mlx, mlx-vlm and transformers builds of the
-retained run. The run summary's *Native repro* column then shows it as
-confirmed or not reproduced, and goes back to "not yet checked" once the
-revision or any build changes. Record a check only after running it natively
-(see the native-mlx-vlm-repro skill); recurrence in the harness is not one.
+to the model revision, the mlx, mlx-vlm and transformers builds, and the
+experiment inputs (image, prompt, generation settings) of the retained run.
+The run summary's *Native repro* column then shows it as confirmed or not
+reproduced, and goes back to "not yet checked" once the revision, any build
+or any experiment input changes: a check holds only for the inputs it reran.
+Record a check only after running it natively (see the native-mlx-vlm-repro
+skill); recurrence in the harness is not one.
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from check_models import (
     NATIVE_REPRO_NOTES_FILENAME,
     _native_repro_codes,
+    _native_repro_experiment,
     _native_repro_stack,
     _parse_native_repro_notes,
 )
@@ -30,8 +33,9 @@ from tools.add_accuracy_note import append_note, publish_run_summary, retained_m
 _DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 _NEW_FILE_HEADER = """\
 # Native reproduction checks for observations in the run retained here.
-# Each applies only while its model revision and mlx/mlx-vlm/transformers
-# builds match a run; the run summary then shows its status.
+# Each applies only while its model revision, mlx/mlx-vlm/transformers
+# builds and experiment inputs (image, prompt, generation settings) match
+# a run; the run summary then shows its status.
 # Add one with: python -m tools.add_native_repro_note MODEL OBSERVATION STATUS ...
 """
 
@@ -74,6 +78,10 @@ def _note_entry(args: argparse.Namespace) -> dict[str, str]:
     if stack is None:
         msg = "the retained run does not record its mlx and mlx-vlm builds"
         raise ValueError(msg)
+    experiment = _native_repro_experiment(run.metadata)
+    if experiment is None:
+        msg = "the retained run does not record its prompt and generation settings"
+        raise ValueError(msg)
     codes = _native_repro_codes(result)
     if args.observation not in codes:
         msg = (
@@ -86,6 +94,7 @@ def _note_entry(args: argparse.Namespace) -> dict[str, str]:
         "model_revision": revision,
         "observation": args.observation,
         "stack": stack,
+        "experiment": experiment,
         "status": args.status,
         "checker": args.checker,
         "checked": args.checked.isoformat(),

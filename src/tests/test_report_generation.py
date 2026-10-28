@@ -10163,6 +10163,83 @@ def test_native_repro_status_follows_model_revision_and_builds(tmp_path: Path) -
     assert "No recorded check applies to this run." in summary
 
 
+def test_native_repro_status_follows_experiment_inputs(tmp_path: Path) -> None:
+    """A check holds only for the image, prompt and settings it reran.
+
+    Regression: applicability once keyed only on the model revision and
+    builds, so a confirmation from one experiment read as confirmation of a
+    run with a different image, prompt and generation settings — misleading
+    for prompt-dependent repetition or resolution-dependent failures, and an
+    old "not reproduced" could dismiss a newly reproducible problem.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_root = output_paths.index.parent
+    loop = _issue_summary_result(
+        "org/loop",
+        usability="unusable",
+        maintainer_status="observation_needs_reproduction",
+        observations=["repeated_output"],
+    )
+    _write_issue_summary_fixture(output_paths, results=(loop,))
+    assert (
+        add_native_repro_note(
+            [
+                "org/loop",
+                "repeated_output",
+                "confirmed",
+                "--checker",
+                "john",
+                "--output-dir",
+                str(output_root),
+                "--evidence",
+                "x",
+            ]
+        )
+        == 0
+    )
+
+    def summary_with(**header_changes: object) -> str:
+        metadata, *rows = safe_io.read_text_no_follow(output_paths.jsonl).splitlines()
+        header = {**json.loads(metadata), **header_changes}
+        safe_io.write_text_no_follow(
+            output_paths.jsonl, "\n".join((json.dumps(header), *rows)) + "\n"
+        )
+        summary_path = check_models.regenerate_run_issue_summary(output_root)
+        assert summary_path is not None
+        return safe_io.read_text_no_follow(summary_path)
+
+    original = json.loads(safe_io.read_text_no_follow(output_paths.jsonl).splitlines()[0])
+    voided = "| not yet checked (earlier check out of date) |"
+    other_prompt = "a different prompt"
+    assert _native_repro_table_row(summary_with(), "org/loop").endswith("| confirmed |")
+    assert _native_repro_table_row(
+        summary_with(
+            prompt=other_prompt,
+            prompt_sha256=hashlib.sha256(other_prompt.encode("utf-8")).hexdigest(),
+        ),
+        "org/loop",
+    ).endswith(voided)
+    assert _native_repro_table_row(
+        summary_with(
+            prompt=original["prompt"],
+            prompt_sha256=original["prompt_sha256"],
+            generation_settings={"max_tokens": 500, "temperature": 0.7},
+        ),
+        "org/loop",
+    ).endswith(voided)
+    assert _native_repro_table_row(
+        summary_with(
+            generation_settings=original["generation_settings"],
+            image={**original["image"], "sha256": "c" * 64},
+        ),
+        "org/loop",
+    ).endswith(voided)
+    # Restoring every input makes the check apply again.
+    assert _native_repro_table_row(summary_with(image=original["image"]), "org/loop").endswith(
+        "| confirmed |"
+    )
+
+
 def test_unreadable_native_repro_notes_leave_every_observation_unchecked(tmp_path: Path) -> None:
     """A malformed notes file is reported, and no observation reads as checked."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")

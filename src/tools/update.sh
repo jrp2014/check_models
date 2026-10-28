@@ -1169,28 +1169,22 @@ mlx_build_toolchain_matches() {
 	fi
 }
 
-# Pure decision for reconciling mlx-vlm's mlx-audio requirement with a pinned
-# local mlx build, kept free of side effects so it is unit-testable. Prints:
-#   normal    - no bare exact mlx pin in the candidate: ordinary resolution works
-#   satisfied - the exact pin names the local mlx version already
-#   relax     - the pin conflicts: install --no-deps, relax metadata, hold version
-#   $1 candidate's bare exact mlx pin ("" when none); $2 local mlx version
-mlx_audio_pin_decision() {
-	local exact_pin="$1" local_mlx="$2"
-	if [[ -z "$exact_pin" ]]; then
-		echo "normal"
-	elif [[ "$exact_pin" == "$local_mlx" ]]; then
-		echo "satisfied"
-	else
-		echo "relax"
-	fi
-}
-
-# "<version>\t<bare exact mlx pin or empty>" for the single candidate in a pip
-# install --report JSON file; fails when the report is unreadable.
-#   $1 file holding the report JSON
-mlx_audio_report_candidate() {
-	python - "$1" <<'PY'
+# "<version>\t<decision>\t<detail>" for the single candidate in a pip install
+# --report JSON file, judged against the local mlx version with packaging's
+# PEP 440 semantics, so one place interprets requirements (a shell string
+# comparison called ==0.32.4 conflicting with 0.32.4+local, which it in fact
+# accepts). Decisions:
+#   normal      - no unconditional mlx requirement: ordinary resolution works
+#   satisfied   - the local mlx satisfies the requirement as declared
+#   relax       - a bare exact pin (==X, no wildcard) whose >=X floor admits
+#                 the local build: install --no-deps, relax metadata, hold
+#   unsupported - anything else (a wildcard or multi-clause specifier, or a
+#                 pin whose floor the local build cannot meet): stop loudly
+# detail is the pin version for relax, the specifier text otherwise. Fails
+# when the report or the local version is unreadable.
+#   $1 file holding the report JSON; $2 local mlx version
+mlx_audio_pin_assessment() {
+	python - "$1" "$2" <<'PY'
 from __future__ import annotations
 
 import json
@@ -1198,28 +1192,54 @@ import sys
 from pathlib import Path
 
 from packaging.requirements import InvalidRequirement, Requirement
+from packaging.specifiers import SpecifierSet
+from packaging.version import InvalidVersion, Version
 
+report_file, local_text = sys.argv[1:3]
 try:
-    report = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+    report = json.loads(Path(report_file).read_text(encoding="utf-8"))
     (item,) = report["install"]
     metadata = item["metadata"]
     version = str(metadata["version"])
     requires = metadata.get("requires_dist") or []
-except (OSError, ValueError, KeyError, TypeError):
+    local = Version(local_text)
+except (OSError, ValueError, KeyError, TypeError, InvalidVersion):
     raise SystemExit(1) from None
-exact = ""
+
+requirements = []
 for entry in requires:
     try:
         requirement = Requirement(str(entry))
     except InvalidRequirement:
         continue
-    if requirement.name.lower() != "mlx" or requirement.extras or requirement.marker:
-        continue
-    clauses = list(requirement.specifier)
-    if len(clauses) == 1 and clauses[0].operator == "==":
-        exact = clauses[0].version
-        break
-print(f"{version}\t{exact}")
+    # Extras or an environment marker mean the requirement is conditional,
+    # not the unconditional resolution blocker this step reconciles.
+    if requirement.name.lower() == "mlx" and not requirement.extras and not requirement.marker:
+        requirements.append(requirement)
+
+unsatisfied = [r for r in requirements if not r.specifier.contains(local, prereleases=True)]
+if not requirements:
+    decision, detail = "normal", ""
+elif not unsatisfied:
+    decision = "satisfied"
+    detail = "; ".join(str(r.specifier) or "any version" for r in requirements)
+else:
+    decision = "unsupported"
+    detail = "; ".join(str(r.specifier) for r in unsatisfied)
+    clauses = list(unsatisfied[0].specifier)
+    if len(unsatisfied) == 1 and len(clauses) == 1:
+        (clause,) = clauses
+        # Only a plain ==X becomes >=X, and only when that floor actually
+        # admits the local build; relaxing ==X.* would write an invalid
+        # requirement, and relaxing a pin above the local build would leave
+        # the resolution impossible with the metadata already mutated.
+        if (
+            clause.operator == "=="
+            and "*" not in clause.version
+            and SpecifierSet(f">={clause.version}").contains(local, prereleases=True)
+        ):
+            decision, detail = "relax", clause.version
+print(f"{version}\t{decision}\t{detail}")
 PY
 }
 
@@ -1261,30 +1281,54 @@ reconcile_mlx_audio_with_local_mlx() {
 		echo "   See pip's output above. Nothing about mlx-audio was changed."
 		return 1
 	fi
-	if ! candidate="$(mlx_audio_report_candidate "$report_file")"; then
+	if ! candidate="$(mlx_audio_pin_assessment "$report_file" "$local_mlx")"; then
 		rm -f "$report_file"
 		echo "❌ Could not read pip's install report for '$spec'; stopping."
 		return 1
 	fi
 	rm -f "$report_file"
-	local candidate_version="${candidate%%$'\t'*}" exact_pin="${candidate#*$'\t'}"
-	case "$(mlx_audio_pin_decision "$exact_pin" "$local_mlx")" in
+	local candidate_version decision detail
+	IFS=$'\t' read -r candidate_version decision detail <<< "$candidate"
+	case "$decision" in
 		normal)
-			echo "[update.sh] mlx-audio $candidate_version declares no bare exact mlx pin; ordinary resolution applies"
+			echo "[update.sh] mlx-audio $candidate_version declares no unconditional mlx requirement; ordinary resolution applies"
 			return 0
 			;;
 		satisfied)
-			echo "[update.sh] mlx-audio $candidate_version pins mlx==$exact_pin, which the local build satisfies"
+			echo "[update.sh] mlx-audio $candidate_version requires mlx $detail, which the local build satisfies"
 			return 0
 			;;
+		relax)
+			;;
+		*)
+			echo "❌ mlx-audio $candidate_version requires mlx $detail, which local mlx $local_mlx does"
+			echo "   not satisfy and this script cannot safely relax (only a bare ==X pin whose"
+			echo "   >=X floor the local build meets is). Update the local mlx checkout, or"
+			echo "   resolve the requirement by hand, then re-run update.sh. Stopping."
+			return 1
+			;;
 	esac
-	echo "[update.sh] mlx-audio $candidate_version pins mlx==$exact_pin, which conflicts with local mlx $local_mlx"
+	# This function runs inside the caller's `if !`, where set -e is inert, so
+	# every step below checks its own status: recording success after a failed
+	# install, metadata rewrite or hold would hand step 5 a half-applied state.
+	echo "[update.sh] mlx-audio $candidate_version pins mlx==$detail, which conflicts with local mlx $local_mlx"
 	if [[ "$(get_installed_distribution_version mlx-audio)" != "$candidate_version" ]]; then
 		echo "[update.sh] Installing mlx-audio==$candidate_version without dependency resolution..."
-		pip install --no-deps "mlx-audio==$candidate_version"
+		if ! pip install --no-deps "mlx-audio==$candidate_version"; then
+			echo "❌ Could not install mlx-audio==$candidate_version; stopping."
+			return 1
+		fi
 	fi
-	python "$SCRIPT_DIR/relax_exact_mlx_pin.py" mlx-audio mlx
-	printf 'mlx-audio==%s\n' "$candidate_version" >> "$LOCAL_MLX_CONSTRAINT_FILE"
+	if ! python "$SCRIPT_DIR/relax_exact_mlx_pin.py" mlx-audio mlx; then
+		echo "❌ Could not relax the mlx pin in mlx-audio's installed metadata; stopping."
+		return 1
+	fi
+	# The hold is written only after the metadata rewrite succeeded: a hold on
+	# unrelaxed metadata would make step 5's eager reconcile unresolvable.
+	if ! printf 'mlx-audio==%s\n' "$candidate_version" >> "$LOCAL_MLX_CONSTRAINT_FILE"; then
+		echo "❌ Could not hold mlx-audio==$candidate_version in the run's pin file; stopping."
+		return 1
+	fi
 	echo "[update.sh] Holding mlx-audio at $candidate_version for the rest of this run (relaxed metadata in use)"
 	COMPLETED_STEPS+=("relaxed mlx-audio $candidate_version's exact mlx pin for the local mlx build")
 }

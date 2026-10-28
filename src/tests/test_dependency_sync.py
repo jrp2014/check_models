@@ -1352,52 +1352,10 @@ def test_update_script_rebuild_check_compares_mlx_vlm_declared_version(
     assert reason in result.stdout
 
 
-@pytest.mark.parametrize(
-    ("exact_pin", "local_mlx", "expected"),
-    [
-        pytest.param("", "0.32.5.dev20261028+7d2d94a55", "normal", id="no-exact-pin"),
-        pytest.param("0.32.4", "0.32.4", "satisfied", id="pin-matches-local"),
-        # The 2026-10-28 failure: every mlx-audio >=0.6.2 pins mlx==0.32.4,
-        # which a local dev build can never satisfy (ResolutionImpossible).
-        pytest.param("0.32.4", "0.32.5.dev20261028+7d2d94a55", "relax", id="pin-conflicts"),
-    ],
-)
-def test_update_script_mlx_audio_pin_decision(
-    exact_pin: str, local_mlx: str, expected: str
-) -> None:
-    """A conflicting bare exact mlx pin is relaxed; anything else resolves normally."""
-    function = _update_script_function("mlx_audio_pin_decision")
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        [
-            "/bin/bash",
-            "-c",
-            f'{function}\nmlx_audio_pin_decision "$1" "$2"',
-            "_",
-            exact_pin,
-            local_mlx,
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert result.stdout.strip() == expected
+_LOCAL_DEV_MLX = "0.32.5.dev20261028+7d2d94a55"
 
 
-@pytest.mark.parametrize(
-    ("requires_dist", "expected_pin"),
-    [
-        pytest.param(["mlx==0.32.4", "numpy>=1.26"], "0.32.4", id="bare-exact-pin"),
-        pytest.param(["mlx>=0.32.4"], "", id="floor-is-not-a-pin"),
-        # Conditional pins (extras or markers) are not the unconditional
-        # resolution blocker the reconcile targets.
-        pytest.param(['mlx==0.32.4; extra == "cuda"'], "", id="marker-pin-ignored"),
-        pytest.param(["mlx>=0.32.1,==0.32.*"], "", id="multi-clause-ignored"),
-    ],
-)
-def test_update_script_mlx_audio_report_candidate(
-    tmp_path: Path, requires_dist: list[str], expected_pin: str
-) -> None:
-    """The report parser surfaces only an unconditional single-clause ``mlx==X``."""
+def _pin_assessment_report(tmp_path: Path, requires_dist: list[str]) -> Path:
     report = tmp_path / "report.json"
     safe_io.write_text_no_follow(
         report,
@@ -1409,21 +1367,172 @@ def test_update_script_mlx_audio_report_candidate(
             },
         ),
     )
-    function = _update_script_function("mlx_audio_report_candidate")
+    return report
+
+
+@pytest.mark.parametrize(
+    ("requires_dist", "local_mlx", "expected"),
+    [
+        pytest.param([], _LOCAL_DEV_MLX, "0.6.3\tnormal\t", id="no-mlx-requirement"),
+        # Conditional pins (extras or markers) are not the unconditional
+        # resolution blocker the reconcile targets.
+        pytest.param(
+            ['mlx==0.32.4; extra == "cuda"'], _LOCAL_DEV_MLX, "0.6.3\tnormal\t", id="marker-pin"
+        ),
+        pytest.param(
+            ["mlx>=0.32.4"], _LOCAL_DEV_MLX, "0.6.3\tsatisfied\t>=0.32.4", id="floor-satisfied"
+        ),
+        # PEP 440: ==0.32.4 accepts 0.32.4+local; a shell string comparison
+        # called this a conflict.
+        pytest.param(
+            ["mlx==0.32.4"], "0.32.4+local", "0.6.3\tsatisfied\t==0.32.4", id="pin-local-label"
+        ),
+        pytest.param(
+            ["mlx==0.32.*"], _LOCAL_DEV_MLX, "0.6.3\tsatisfied\t==0.32.*", id="wildcard-satisfied"
+        ),
+        # The 2026-10-28 failure: every mlx-audio >=0.6.2 pins mlx==0.32.4,
+        # which a local 0.32.5 dev build can never satisfy.
+        pytest.param(
+            ["mlx==0.32.4", "numpy>=1.26"], _LOCAL_DEV_MLX, "0.6.3\trelax\t0.32.4", id="relaxable"
+        ),
+        # ==0.33.* has no valid >= form; relaxing it would write invalid metadata.
+        pytest.param(
+            ["mlx==0.33.*"], _LOCAL_DEV_MLX, "0.6.3\tunsupported\t==0.33.*", id="wildcard-ahead"
+        ),
+        # A >=X floor the local build cannot meet must not be written either:
+        # the resolution would still be impossible, with metadata already mutated.
+        pytest.param(
+            ["mlx==0.33.0"], _LOCAL_DEV_MLX, "0.6.3\tunsupported\t==0.33.0", id="pin-ahead"
+        ),
+    ],
+)
+def test_update_script_mlx_audio_pin_assessment(
+    tmp_path: Path, requires_dist: list[str], local_mlx: str, expected: str
+) -> None:
+    """Requirement interpretation uses packaging semantics in one place."""
+    report = _pin_assessment_report(tmp_path, requires_dist)
+    function = _update_script_function("mlx_audio_pin_assessment")
     stubs = f'python() {{ {shlex.quote(sys.executable)} "$@"; }}\n'
     result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
         [
             "/bin/bash",
             "-c",
-            f'{stubs}{function}\nmlx_audio_report_candidate "$1"',
+            f'{stubs}{function}\nmlx_audio_pin_assessment "$1" "$2"',
             "_",
             str(report),
+            local_mlx,
         ],
         capture_output=True,
         text=True,
         check=True,
     )
-    assert result.stdout.rstrip("\n") == f"0.6.3\t{expected_pin}"
+    assert result.stdout.rstrip("\n") == expected
+
+
+def _run_reconcile_harness(
+    tmp_path: Path,
+    requires_dist: list[str],
+    *,
+    install_status: int = 0,
+    relax_status: int = 0,
+) -> tuple[int, str, str]:
+    """Run the full reconcile function under set -e inside the caller's `if !`.
+
+    The enclosing conditional is the regression surface: it makes set -e
+    inert inside the function, so only explicit status checks can stop a
+    failed install, metadata rewrite or hold from being recorded as success.
+    Returns (exit status, stdout, final constraint-file content).
+    """
+    repo = tmp_path / "mlx-vlm"
+    repo.mkdir()
+    safe_io.write_text_no_follow(repo / "requirements.txt", "mlx>=0.32.4\nmlx-audio>=0.6.2\n")
+    report = _pin_assessment_report(tmp_path, requires_dist)
+    constraint = tmp_path / "pin.txt"
+    safe_io.write_text_no_follow(constraint, f"mlx=={_LOCAL_DEV_MLX}\n")
+    functions = _update_script_function("mlx_audio_pin_assessment") + _update_script_function(
+        "reconcile_mlx_audio_with_local_mlx"
+    )
+    script = f"""
+set -euo pipefail
+pip() {{
+    local previous="" arg
+    if [[ " $* " == *" --report "* ]]; then
+        for arg in "$@"; do
+            if [[ "$previous" == "--report" ]]; then cp {shlex.quote(str(report))} "$arg"; fi
+            previous="$arg"
+        done
+        return 0
+    fi
+    if [[ " $* " == *" --no-deps "* ]]; then return {install_status}; fi
+    return 0
+}}
+python() {{
+    if [[ "$1" == *relax_exact_mlx_pin.py ]]; then return {relax_status}; fi
+    {shlex.quote(sys.executable)} "$@"
+}}
+get_installed_distribution_version() {{
+    case "$1" in
+        mlx) echo {shlex.quote(_LOCAL_DEV_MLX)} ;;
+        mlx-audio) echo "0.5.9" ;;
+    esac
+}}
+SCRIPT_DIR=/stub-tools
+COMPLETED_STEPS=()
+LOCAL_MLX_CONSTRAINT_FILE={shlex.quote(str(constraint))}
+{functions}
+if ! reconcile_mlx_audio_with_local_mlx {shlex.quote(str(repo))}; then
+    echo STOPPED
+    exit 3
+fi
+"""
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
+        ["/bin/bash", "-c", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.returncode, result.stdout, safe_io.read_text_no_follow(constraint)
+
+
+def test_update_script_reconcile_succeeds_and_holds_only_after_relaxing(tmp_path: Path) -> None:
+    """The happy path relaxes the pin, then holds the version for the run."""
+    status, stdout, constraint = _run_reconcile_harness(tmp_path, ["mlx==0.32.4"])
+    assert status == 0
+    assert "STOPPED" not in stdout
+    assert "Holding mlx-audio at 0.6.3" in stdout
+    assert constraint.endswith("mlx-audio==0.6.3\n")
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "message"),
+    [
+        pytest.param({"install_status": 1}, "Could not install mlx-audio==0.6.3", id="install"),
+        pytest.param({"relax_status": 1}, "Could not relax the mlx pin", id="metadata-rewrite"),
+    ],
+)
+def test_update_script_reconcile_failures_stop_the_caller(
+    tmp_path: Path, kwargs: dict[str, int], message: str
+) -> None:
+    """A failed install or metadata rewrite stops the run and holds nothing.
+
+    Regression: invoked inside `if !`, the function once returned 0 past
+    these failures, recorded the hold, and the run reported success.
+    """
+    status, stdout, constraint = _run_reconcile_harness(tmp_path, ["mlx==0.32.4"], **kwargs)
+    assert status == 3
+    assert "STOPPED" in stdout
+    assert message in stdout
+    assert "Holding" not in stdout
+    assert "mlx-audio" not in constraint
+
+
+def test_update_script_reconcile_refuses_an_unrelaxable_requirement(tmp_path: Path) -> None:
+    """A pin whose >= floor the local build cannot meet stops before any change."""
+    status, stdout, constraint = _run_reconcile_harness(tmp_path, ["mlx==0.33.0"])
+    assert status == 3
+    assert "STOPPED" in stdout
+    assert "cannot safely relax" in stdout
+    assert "mlx-audio" not in constraint
 
 
 def _write_metadata_dist_info(site_dir: Path, name: str, version: str, metadata: str) -> Path:
@@ -1459,6 +1568,20 @@ def test_relax_exact_mlx_pin_rewrites_only_the_bare_exact_pin(tmp_path: Path) ->
     assert relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path]) == [
         f"no bare exact mlx pin to relax in {metadata_file}"
     ]
+
+
+def test_relax_exact_mlx_pin_leaves_wildcard_pins_alone(tmp_path: Path) -> None:
+    """``mlx==0.32.*`` has no valid ``>=`` form and must never be rewritten."""
+    metadata_file = _write_metadata_dist_info(
+        tmp_path,
+        "mlx_audio",
+        "0.6.3",
+        "Metadata-Version: 2.4\nName: mlx-audio\nVersion: 0.6.3\nRequires-Dist: mlx==0.32.*\n",
+    )
+    before = safe_io.read_text_no_follow(metadata_file)
+    outcomes = relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
+    assert outcomes == [f"no bare exact mlx pin to relax in {metadata_file}"]
+    assert safe_io.read_text_no_follow(metadata_file) == before
 
 
 def test_relax_exact_mlx_pin_requires_installed_metadata(tmp_path: Path) -> None:
