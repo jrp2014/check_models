@@ -1380,7 +1380,8 @@ Notable changes to this project will be documented in this file.
   prompt or settings shows as "not yet checked (earlier check out of date)"
   instead of confirming — or dismissing — an observation it never reran.
 - Development tooling: temporarily override markdownlint's exact `re2js` 2.8.6
-  dependency with 2.8.7 to address GHSA-gg6h-894w-4m9c. A dependency test rejects
+  dependency to address GHSA-gg6h-894w-4m9c — first with 2.8.7, then raised to
+  2.9.1, the latest release (john's call, 2026-10-30). A dependency test rejects
   vulnerable resolutions and flags the override for removal when markdownlint
   changes that requirement. Remove the override once upstream resolves a patched
   version without it; no advisory suppression is added.
