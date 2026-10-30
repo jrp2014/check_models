@@ -3,6 +3,14 @@
 import check_models
 
 
+def test_model_link_keeps_hostile_names_in_escaped_text_and_a_fragment() -> None:
+    """The SKY-D228 workaround must not conceal an actual HTML injection."""
+    assert check_models._html_model_link('"><script>bad</script>') == (
+        '<a href="#model-scriptbad-script"><code>'
+        "&quot;&gt;&lt;script&gt;bad&lt;/script&gt;</code></a>"
+    )
+
+
 def test_escape_html_tags_selective_basic() -> None:
     """Should escape < and > in text."""
     result = check_models.escape_html_selectively("Use <model> here")

@@ -1,0 +1,20 @@
+# Native reproduction checks for observations in the run retained here.
+# Each applies only while its model revision and mlx/mlx-vlm/transformers
+# builds match a run; the run summary then shows its status.
+# Add one with: python -m tools.add_native_repro_note MODEL OBSERVATION STATUS ...
+notes:
+- model: mlx-community/llm-jp-4-vl-9b-mlx-4bit
+  model_revision: 9c056d48b1e611dc586139a5deb927ae363cfe6f
+  observation: unexpected_special_token
+  stack: mlx 0.32.5.dev20261030+1ba7f969a @ 1ba7f969a; mlx-vlm 0.7.11 @ 918763c68; transformers
+    5.22.1
+  status: confirmed
+  checker: Claude
+  checked: '2026-10-30'
+  evidence: 'python -m mlx_vlm.generate --model mlx-community/llm-jp-4-vl-9b-mlx-4bit --revision
+    9c056d48b --image <original 63MP JPEG, sha256 ecdd79a7...> --prompt <recorded prompt>
+    --max-tokens 1000 --temperature 0.0 --top-p 1.0 --top-k 0 --seed 0 --prefill-step-size
+    2048 --trust-remote-code reproduced the harness output byte-for-byte: ''<|channel|> analysis<|message|>
+    ...'' visible in decoded text, 29 tokens; <|channel|>(9)/<|message|>(12) are special:true
+    in tokenizer.json but are not stripped, and the processor has no clean_output/Harmony
+    channel parser.'

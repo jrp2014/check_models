@@ -49,8 +49,6 @@ class AcceptedAdvisory:
 
 # Each entry is temporary: it stops matching when the version moves, fails once
 # a fix ships, and is reported for removal once Skylos stops finding it.
-# (The braces 3.0.3 exception, accepted 2026-10-03, was dropped 2026-10-28
-# once Skylos stopped reporting SKY-SCA-GHSA-vfj7-8cjw-p6xm.)
 ACCEPTED_ADVISORIES: tuple[AcceptedAdvisory, ...] = ()
 
 # Skylos sca_coverage statuses for a finished scan. "complete_with_unresolved_versions"

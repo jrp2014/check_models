@@ -6009,7 +6009,9 @@ def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) 
         return Image.open(Path(image_path))
 
     logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-    with urlopen(  # noqa: S310 - scheme is restricted to http/https by caller  # skylos: ignore[SKY-D216] the operator's own --image URL, http(s) only
+    # Skylos 5.2.0 misses the caller's _validate_image_url_scheme guard.
+    # Remove D218 when it follows that proof; the suppression audit enforces this.
+    with urlopen(  # noqa: S310 - scheme is restricted to http/https by caller  # skylos: ignore[SKY-D216,SKY-D218] the operator's own --image URL, http(s) only
         image_str,
         timeout=30,
     ) as response:
@@ -11160,7 +11162,9 @@ def generate_diagnostics_report(
 def _html_model_link(model_name: str) -> str:
     """Return a safe internal link to one complete-evidence entry."""
     anchor = _gallery_model_anchor(model_name)
-    return (
+    # Skylos 5.2.0 distrusts html.escape after unrelated Namespace setattr calls.
+    # Remove D228 once receiver analysis is fixed; the suppression audit enforces this.
+    return (  # skylos: ignore[SKY-D228] both values escaped, literal # fixes URL to a fragment
         f'<a href="#{html.escape(anchor, quote=True)}">'
         f"<code>{html.escape(model_name, quote=True)}</code></a>"
     )

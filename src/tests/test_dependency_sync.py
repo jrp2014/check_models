@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import datetime as dt
+import io
 import json
 import os
 import re
@@ -26,6 +27,7 @@ import huggingface_hub.utils
 import pytest
 import yaml
 from packaging.requirements import Requirement
+from packaging.version import Version
 
 import check_models
 from check_models_data import dependency_policy
@@ -43,6 +45,7 @@ from tools import (
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
+    from urllib.request import Request
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -746,6 +749,26 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
     assert update_script.index("markdownlint-cli2@latest") < update_script.index(
         "package-lock.json..."
     )
+
+
+def test_re2js_security_floor_and_override_retirement() -> None:
+    """Reject the vulnerable dependency and flag its workaround when upstream changes."""
+    lock_path = PKG_ROOT / "package-lock.json"
+    if not lock_path.exists():
+        pytest.skip("npm install is needed to inspect resolved development dependencies")
+    package = json.loads(safe_io.read_text_no_follow(PKG_ROOT / "package.json"))
+    packages = json.loads(safe_io.read_text_no_follow(lock_path))["packages"]
+    re2js = packages.get("node_modules/re2js")
+    if re2js is not None:
+        assert Version(re2js["version"]) >= Version("2.8.7"), "GHSA-gg6h-894w-4m9c"
+    if "re2js" in package.get("overrides", {}):
+        upstream = packages.get("node_modules/markdownlint", {}).get("dependencies", {})
+        # Deliberately scoped to the exact upstream pin that necessitated this
+        # workaround, not a second implementation of npm's range semantics.
+        assert upstream.get("re2js") == "2.8.6", (
+            "markdownlint's re2js requirement changed: remove the temporary re2js "
+            "override if upstream now resolves a patched version; otherwise review it"
+        )
 
 
 def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
@@ -3623,6 +3646,33 @@ _MULTIMODAL_MISTRAL_TEMPLATE = (
     "{%- else %}{%- for block in message['content'] %}{%- if block['type'] == 'text' %}"
     "{{ block['text'] }}{%- endif %}{%- endfor %}{%- endif %}{%- endfor %}"
 )
+
+
+@pytest.mark.parametrize(
+    ("url", "allowed"),
+    [
+        ("https://example.test/config.json", True),
+        ("http://localhost/config.json", True),
+        ("HTTPS://example.test/config.json", True),
+        ("file:///tmp/config.json", False),
+        ("data:text/plain,config", False),
+        ("ftp://example.test/config.json", False),
+    ],
+)
+def test_hub_precheck_fetch_allows_only_http_schemes(
+    monkeypatch: pytest.MonkeyPatch, url: str, *, allowed: bool
+) -> None:
+    """A configured Hub endpoint must not turn metadata fetching into a local read."""
+    calls: list[tuple[str, int, str | None]] = []
+
+    def fetch(request: Request, *, timeout: int) -> io.BytesIO:
+        calls.append((request.full_url, timeout, request.get_header("Authorization")))
+        return io.BytesIO(b'{"model_type":"example"}')
+
+    monkeypatch.setattr(hub_precheck, "urlopen", fetch)
+    result = hub_precheck._fetch_text(url, {"Authorization": "Bearer fixture"})
+    assert result == ('{"model_type":"example"}' if allowed else None)
+    assert calls == ([(url, 30, "Bearer fixture")] if allowed else [])
 
 
 def test_hub_precheck_template_shape_separates_text_only_from_multimodal_templates() -> None:

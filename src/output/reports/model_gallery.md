@@ -1,14 +1,15 @@
 # Model Output Gallery
 
-Generated on: 2026-10-25 01:57:57 BST
+Generated on: 2026-10-30 14:22:29 GMT
 
-- *Evaluation lane:* blind
-- *Prompt hints:* no description or keyword hints
+- *Evaluation lane:* assisted
+- *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
+- *Input image:* JPEG, 6,656 x 9,483 pixels (63.1 MP), 60.5 MB
+- *Human accuracy notes:* 0 of 43 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed; 1 note for other images or models
 
 This run records model responses to one shared image and prompt (evaluation
-lane: blind). Mechanical checks are not factual-accuracy judgments; inspect
+lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
 the image, prompt and final answers before choosing a model. Results do not
 establish fitness for other tasks.
 
@@ -18,7 +19,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-c4aeb8d18432656f.jpg)
+![Reference image](assets/source-image-6973c355665180f8.jpg)
 
 ## Current-run Chooser
 
@@ -26,58 +27,58 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                              |
-|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 0.81s   | 532 tok/s           | 0.27            | 1.3     | 350        | 47      | none                                                      |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 6.26s   | 39.9 tok/s          | 2.56            | 11      | 421        | 94      | none                                                      |
-| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 2.30s   | 68.0 tok/s          | 0.32            | 9.7     | 721        | 55      | none                                                      |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 5.94s   | 33.3 tok/s          | 1.40            | 17      | 421        | 80      | none                                                      |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 2.94s   | 86.2 tok/s          | 0.79            | 8.0     | 499        | 49      | none                                                      |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.10s   | 56.1 tok/s          | 2.29            | 10      | 3,435      | 90      | none                                                      |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected`          | 2.01s   | 217 tok/s           | 0.48            | 3.6     | 344        | 79      | none                                                      |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected`          | 3.16s   | 246 tok/s           | 0.82            | 3.1     | 330        | 331     | none                                                      |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected`          | 1.43s   | 251 tok/s           | 0.13            | 3.6     | 332        | 66      | none                                                      |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 4.28s   | 75.6 tok/s          | 0.36            | 24      | 332        | 92      | none                                                      |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 2.37s   | 106 tok/s           | 0.34            | 7.0     | 177        | 99      | none                                                      |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 3.32s   | 69.6 tok/s          | 0.68            | 9.8     | 1,070      | 72      | none                                                      |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 1.93s   | 201 tok/s           | 0.26            | 4.5     | 1,069      | 102     | none                                                      |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 9.77s   | 81.0 tok/s          | 2.14            | 70      | 549        | 82      | none                                                      |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 4.14s   | 73.4 tok/s          | 1.56            | 7.9     | 873        | 95      | none                                                      |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 5.29s   | 33.0 tok/s          | 1.51            | 12      | 860        | 70      | none                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `no concerns detected`          | 35.14s  | 25.5 tok/s          | 0.96            | 25      | 545        | 786     | none                                                      |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 1.79s   | 160 tok/s           | 0.18            | 3.5     | 418        | 78      | none                                                      |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 2.91s   | 58.8 tok/s          | 0.37            | 9.1     | 883        | 94      | none                                                      |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 3.74s   | 79.6 tok/s          | 0.35            | 23      | 409        | 81      | none                                                      |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 3.24s   | 85.0 tok/s          | 0.33            | 19      | 409        | 83      | none                                                      |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 1.75s   | 106 tok/s           | 0.25            | 6.8     | 409        | 60      | none                                                      |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 4.11s   | 71.5 tok/s          | 0.35            | 21      | 421        | 88      | none                                                      |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 6.24s   | 31.9 tok/s          | 0.69            | 17      | 421        | 109     | none                                                      |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected`          | 1.65s   | 131 tok/s           | 0.65            | 5.6     | 1,204      | 31      | none                                                      |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.12s   | 98.9 tok/s          | 1.45            | 6.5     | 2,909      | 82      | none                                                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 6.25s   | 37.4 tok/s          | 2.78            | 28      | 386        | 72      | none                                                      |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 3.94s   | 62.0 tok/s          | 0.61            | 7.5     | 390        | 88      | none                                                      |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 3.71s   | 110 tok/s           | 0.37            | 16      | 390        | 88      | none                                                      |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 2.53s   | 122 tok/s           | 0.17            | 5.9     | 386        | 67      | none                                                      |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected`          | 1.30s   | 171 tok/s           | 0.30            | 4.7     | 734        | 58      | none                                                      |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 1.63s   | 147 tok/s           | 0.15            | 4.9     | 420        | 89      | none                                                      |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 5.36s   | 36.4 tok/s          | 0.93            | 17      | 538        | 87      | none                                                      |
-| [`nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit`](#model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit)              | `no concerns detected`          | 7.17s   | 61.1 tok/s          | 1.21            | 46      | 420        | 101     | none                                                      |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 3.41s   | 138 tok/s           | 0.34            | 21      | 421        | 65      | none                                                      |
-| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 30.06s  | 29.7 tok/s          | 13.52           | 81      | 420        | 89      | none                                                      |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected`          | 2.67s   | 103 tok/s           | 0.26            | 6.8     | 421        | 111     | none                                                      |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`             | 6.78s   | 119 tok/s           | 0.61            | 18      | 545        | 540     | duplicate keywords                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 1.34s   | 328 tok/s           | 0.56            | 2.2     | 120        | 32      | labelled fields not detected                              |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 4.54s   | 297 tok/s           | 0.54            | 2.3     | 3,438      | 1,000   | repeated text; cut off at token limit; duplicate keywords |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns: generation`    | 17.15s  | 64.5 tok/s          | 0.40            | 10      | 511        | 1,000   | repeated text; cut off at token limit; duplicate keywords |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.26s   | insufficient sample | 1.91            | 7.0     | 3,512      | 14      | control tokens visible; labelled fields not detected      |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 1.27s   | 209 tok/s           | 0.25            | 1.2     | 116        | 97      | labelled fields not detected                              |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                               |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|----------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.90s   | 438 tok/s  | 1.34            | 1.9     | 2,104      | 69      | none                                                                       |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 66.45s  | 33.3 tok/s | 60.44           | 17      | 16,594     | 118     | none                                                                       |
+| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 6.35s   | 64.4 tok/s | 2.58            | 9.6     | 1,430      | 109     | none                                                                       |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 54.23s  | 29.7 tok/s | 47.06           | 21      | 16,594     | 114     | none                                                                       |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 12.08s  | 117 tok/s  | 2.27            | 19      | 1,596      | 855     | none                                                                       |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 10.69s  | 77.6 tok/s | 7.44            | 8.7     | 6,343      | 104     | none                                                                       |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 6.84s   | 56.5 tok/s | 2.88            | 10      | 2,104      | 108     | none                                                                       |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 6.33s   | 76.1 tok/s | 1.36            | 25      | 927        | 108     | none                                                                       |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.62s   | 104 tok/s  | 0.91            | 7.1     | 382        | 94      | none                                                                       |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 7.13s   | 64.5 tok/s | 3.21            | 13      | 3,046      | 119     | none                                                                       |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 4.17s   | 183 tok/s  | 1.66            | 8.2     | 3,045      | 153     | none                                                                       |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 17.22s  | 69.0 tok/s | 6.11            | 73      | 2,525      | 120     | none                                                                       |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 6.63s   | 70.8 tok/s | 2.79            | 8.0     | 1,318      | 133     | none                                                                       |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 10.10s  | 30.2 tok/s | 3.96            | 13      | 3,136      | 112     | none                                                                       |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.66s   | 148 tok/s  | 2.77            | 3.7     | 4,044      | 110     | none                                                                       |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 36.41s  | 78.0 tok/s | 31.18           | 23      | 16,578     | 155     | none                                                                       |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 37.49s  | 67.5 tok/s | 34.03           | 11      | 16,578     | 87      | none                                                                       |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 37.52s  | 75.1 tok/s | 32.30           | 25      | 16,594     | 112     | none                                                                       |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 58.39s  | 29.8 tok/s | 50.86           | 21      | 16,594     | 121     | none                                                                       |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 5.32s   | 101 tok/s  | 1.76            | 6.5     | 2,081      | 117     | none                                                                       |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 8.03s   | 46.8 tok/s | 3.81            | 28      | 586        | 76      | none                                                                       |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.73s   | 62.3 tok/s | 1.42            | 7.6     | 590        | 104     | none                                                                       |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.01s   | 108 tok/s  | 1.02            | 16      | 590        | 75      | none                                                                       |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 4.24s   | 121 tok/s  | 1.05            | 6.0     | 586        | 83      | none                                                                       |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 4.89s   | 127 tok/s  | 2.31            | 5.4     | 4,173      | 99      | none                                                                       |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 7.86s   | 35.3 tok/s | 2.23            | 18      | 1,313      | 111     | none                                                                       |
+| [`nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit`](#model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit)              | `no concerns detected`          | 12.94s  | 63.8 tok/s | 6.06            | 52      | 3,640      | 123     | none                                                                       |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 7.20s   | 139 tok/s  | 3.14            | 23      | 3,641      | 135     | none                                                                       |
+| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 41.40s  | 30.3 tok/s | 19.96           | 87      | 3,640      | 133     | none                                                                       |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.69s   | 208 tok/s  | 1.49            | 4.0     | 2,096      | 83      | prompt hint repeated                                                       |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`             | 6.87s   | 244 tok/s  | 1.95            | 3.2     | 925        | 752     | duplicate keywords                                                         |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `concerns detected`             | 3.37s   | 254 tok/s  | 0.97            | 3.7     | 927        | 114     | duplicate keywords                                                         |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`             | 5.59s   | 52.9 tok/s | 1.10            | 9.3     | 1,120      | 149     | duplicate keywords                                                         |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `concerns detected`             | 23.68s  | 66.0 tok/s | 18.79           | 26      | 12,683     | 90      | prompt hint repeated                                                       |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.64s   | 123 tok/s  | 1.44            | 5.6     | 1,419      | 74      | prompt hint repeated                                                       |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`             | 20.79s  | 58.6 tok/s | 14.45           | 14      | 16,589     | 229     | duplicate keywords                                                         |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.39s   | 179 tok/s  | 1.29            | 4.6     | 1,454      | 68      | prompt hint repeated                                                       |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 5.13s   | 98.1 tok/s | 1.64            | 7.3     | 1,802      | 83      | prompt hint repeated                                                       |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 4.15s   | 301 tok/s  | 2.10            | 1.8     | 325        | 22      | labelled fields not detected; prompt hint repeated                         |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.14s   | 326 tok/s  | 1.10            | 2.1     | 2,107      | 200     | repeated text; stopped early: repeating; duplicate keywords                |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 53.80s  | 24.2 tok/s | 8.72            | 25      | 4,367      | 1,000   | labelled fields not detected; cut off at token limit                       |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.62s   | 101 tok/s  | 1.50            | 6.7     | 2,186      | 29      | control tokens visible; labelled fields not detected; prompt hint repeated |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 3.03s   | 203 tok/s  | 0.92            | 1.5     | 321        | 148     | labelled fields not detected                                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 0.81s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.90s
 
-Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.3 GB
+Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
@@ -85,13 +86,13 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                   | Mechanical checks               | Observations                                              |
-|-----------------------------------------------------------------------------------------|---------------------------------|-----------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)              | `major concerns: answer format` | labelled fields not detected                              |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)          | `major concerns: generation`    | repeated text; cut off at token limit; duplicate keywords |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)           | `major concerns: generation`    | repeated text; cut off at token limit; duplicate keywords |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit) | `major concerns: answer format` | control tokens visible; labelled fields not detected      |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)            | `major concerns: answer format` | labelled fields not detected                              |
+| Model                                                                                           | Mechanical checks               | Observations                                                               |
+|-------------------------------------------------------------------------------------------------|---------------------------------|----------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                      | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                         |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                  | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit) | `major concerns: answer format` | labelled fields not detected; cut off at token limit                       |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)         | `major concerns: answer format` | control tokens visible; labelled fields not detected; prompt hint repeated |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                    | `major concerns: answer format` | labelled fields not detected                                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -102,61 +103,61 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 | Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Cats on a Pink Couch \| Description: Two tabby cats are lying on a bright pink couch, appearing relaxed and comfortable. \| Keywords (6): cats, pink couch, relaxation, tabby, comfortable, cozy                                                                                                                                                                               |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa \| Description: Two tabby cats lie on their sides on a bright pink sofa cushion, with two white remote controls resting ne... \| Keywords (14): tabby cats, sleeping, pink sofa, remote controls, striped fur, relaxed, cushion, indoor, pets, resting, ...                                                                               |
-| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected` | Title: "Cats at Rest on a Pink Sofa" \| Description: Two cats are peacefully sleeping on a pink sofa, with remote controls nearby. \| Keywords (9): cats, sleeping, pink sofa, remote controls, domestic, comfort, tranquility, home, leisure.                                                                                                                                        |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: Two Tabby Cats Sleeping on Pink Couch \| Description: Two tabby cats lie sleeping on a bright pink couch, each positioned beside a white remote control. The... \| Keywords (8): tabby cats, sleeping, pink couch, remote controls, striped fur, indoor pets, relaxed posture, domestic setting                                                                                |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Two tabby cats on pink fabric. \| Description: Two tabby cats lie on a pink fabric surface, with remote controls nearby. \| Keywords (5): tabby cats, pink fabric, remote controls, domestic cats, feline.                                                                                                                                                                     |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Cats Sleeping on Sofa with Remote Controls \| Description: Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft,... \| Keywords (18): cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy, domestic, resting, comfort, ...                                                                                |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Two cats sleeping on a pink couch. \| Description: Two tabby cats are lying on a pink couch, one with a remote nearby. The scene is well-lit, highlighting the cats' fur pat... \| Keywords (10): cats, pink couch, tabby, sleeping, remotes, fur patterns, well-lit, cozy, domestic, relaxation                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Two Sleeping Tabby Cats \| Description: The image shows two tabby cats resting on a pink blanket, with remote controls nearby. \| Keywords (10): cats, tabby, sleeping, pink, remote, control, relaxation, indoor, feline, comfort[1,085 characters of reasoning omitted; complete output in the evidence block]                                                               |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected` | Title: Sleeping Cats on Pink Couch \| Description: Two tabby cats rest on a pink fabric couch, one near a remote, the other beside it, under soft indoor lighting. \| Keywords (13): tabby, cat, sleeping, pink, couch, remote, indoor, light, fur, stretch, curled, alert, relaxed                                                                                                   |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected` | Title: Two Tabby Cats Sleeping on Pink Sofa \| Description: Two tabby cats are lying on a bright pink sofa cover, each positioned near a white remote control.... \| Keywords (18): cats, tabby, sleeping, pink, sofa, remote control, furniture, domestic, animal, striped, resting, cover, white, ...                                                                               |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Two tabby cats sleeping on red couch \| Description: Two tabby cats lie side by side on a red upholstered couch, partially covered by a pink blanket. A remote co... \| Keywords (11): cats, tabby, sleeping, red couch, pink blanket, remote controls, indoor, animals, fur, relaxed, household                                                                               |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: Two Cats Relaxing on Pink Cushion \| Description: Two cats lie stretched out on a pink cushion, positioned near remote controls. The setting appears indo... \| Keywords (10): cats, pink cushion, remote controls, indoor setting, relaxed posture, soft lighting, resting, domestic scene, ...                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Two resting tabby cats on a pink sofa \| Description: Two adult tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft, na... \| Keywords (12): tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-setting, domestic-pets, ...                                                                               |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink sofa \| Description: Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and... \| Keywords (18): cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relaxation, soft lighting, ...                                                                                |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Two Calico Cats Sleeping on Pink Bedding \| Description: Two calico cats are sleeping side by side on pink bedding. They are positioned with their heads facin... \| Keywords (10): calico cats, sleeping, pink bedding, white remotes, black and brown fur, white cats, striped cats, cozy, ...                                                                               |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected` | Title: Two Cats Sleeping on Pink Blanket with Remote Controls \| Description: Two cats are sleeping on a pink blanket. A white remote control is visible behind them. Th... \| Keywords (10): cats, pink blanket, remote controls, sleeping, white remote, comfortable, soft surface, feline, rest, ...                                                                               |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Fabric \| Description: Two tabby-patterned cats lie on a bright pink blanket with two remote controls nearby. One cat appears aslee... \| Keywords (13): cats, tabby, pink blanket, fabric, remote control, sofa, cushion, resting, sleeping, indoor, feline, ...                                                                               |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: "Cats Resting on a Pink Couch" \| Description: "Two cats are comfortably sprawled out on a vibrant pink couch, basking in the soft light of the day. Their relaxed postu... \| Keywords (12): cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, basking, cozy, serene, scene.                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Two Cats Sleeping on Pink Sofa \| Description: Two cats are sleeping on a pink sofa with remote controls beside them. \| Keywords (19): cats, sleeping, pink sofa, remote controls, relaxed, comfortable, indoor, domestic, fur, striped, resting, ...                                                                                                                         |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Two tabby cats sleeping on sofa \| Description: Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats. \| Keywords (18): tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoor, animal, pet, living room, ...                                                                                   |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink surface \| Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with its eyes closed, while... \| Keywords (10): cats, remote controls, pink fabric, lying down, curled up, eyes closed, striped pattern, light, indoor setting, ...                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Two Cats Sleeping on Pink Sofa \| Description: Two tabby cats rest peacefully on a bright pink sofa. Remote controls lie beside them. Natural daylight illuminates the scene. \| Keywords (10): cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feline                                                                                                       |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two Tabby Cats Reclining on Pink Sofa \| Description: Two tabby cats lie stretched on a bright pink sofa; one wears a green collar, and two remote controls re... \| Keywords (10): tabby cat, pink sofa, cat collar, remote control, feline relaxation, domestic interior, pet photography, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Two Tabby Cats Reclining on Pink Sofa Cushion \| Description: Two striped tabby cats recline on a bright pink fabric surface with two white television remote con... \| Keywords (13): tabby cats, pink cushion, reclining, striped coats, remote controls, indoor setting, relaxed posture, ...                                                                               |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | Title: Two Cats on a Couch \| Description: Two cats are sleeping on a pink couch. \| Keywords (4): cats, couch, sleeping, pink                                                                                                                                                                                                                                                        |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Two Cats Relaxing Together \| Description: Two tabby cats are curled up and sleeping side by side on a pink blanket, with a remote control placed nearby on the sofa. The sce... \| Keywords (10): cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, home, indoor, comfortable                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Two tabby cats sleeping on a pink blanket \| Description: Two patterned tabby cats are lying down on a pink surface next to two remote controls. The lightin... \| Keywords (15): cats, tabby, sleeping, pink, blanket, remote, controls, indoors, couch, resting, fur, domestic, patterned, ...                                                                               |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Two Tabby Cats on a Pink Sofa \| Description: Two tabby cats lie on a pink fabric sofa, with one resting horizontally and the other positioned verticall... \| Keywords (18): cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, pink fabric, remote controls, furniture, ...                                                                               |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Two tabby cats lying on a pink surface \| Description: Two tabby cats lie on a pink fabric surface next to two remote controls. One cat is positioned on... \| Keywords (15): tabby cats, pink fabric, remote controls, lying down, domestic cats, striped fur, indoor, two cats, close-up, ...                                                                                |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Two cats rest upon bright pink fabric \| Description: Two cats lie on a vividly coloured pink surface under soft lighting. They are accompanied by a remote... \| Keywords (14): cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, lounged, indoors, tortoiseshell, domestic, ...                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Feline Serenity on a Red Couch" \| Description: Two striped cats resting on a red blanket, one with a remote control nearby. \| Keywords (10): cats, striped, red, blanket, resting, remote control, lounging, comfort, domestic, tranquility.                                                                                                                                |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Two cats sleeping on a red couch with remote controls nearby. \| Description: Two cats are sleeping on a red couch, with one cat lying on its side and the other c... \| Keywords (10): cats, sleeping, red couch, remote controls, living room, natural lighting, side, stomach, remote, living                                                                               |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Two Cats Resting on a Pink Blanket \| Description: Two tabby cats are lying on a pink blanket, one stretched out and the other curled up. A remote contr... \| Keywords (18): cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch, paws, stripes, sleeping, pet, ...                                                                               |
-| [`nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit`](#model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit)              | `no concerns detected` | Title: Two tabby cats sleeping on a pink couch \| Description: Two domestic cats with mackerel tabby markings are lying asleep on a bright pink fabric surface, likely a so... \| Keywords (15): cats, sleeping, tabby, mackerel, pink, couch, remote controls, domestic, animals, resting, fabric, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Two cats sleeping on a sofa \| Description: Two tabby cats are sleeping on a pink sofa, one curled up and the other stretched out, with remote controls nearby. \| Keywords (10): cat, tabby, pink sofa, remote control, sleeping, curled, stretched, pink blanket, pink cushion, cat furniture                                                                                |
-| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected` | Title: Two tabby cats sleeping on a pink sofa \| Description: Two domestic cats rest side by side on a bright pink cushioned surface, each with a striped coat. A white... \| Keywords (13): cats, tabby, pink, sofa, cushion, sleeping, remote controls, striped, animals, domestic, indoor, pets, ...                                                                               |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected` | Title: Two tabby cats sleeping on a pink sofa \| Description: Two tabby cats are curled up asleep on a bright pink fabric surface, likely a sofa or blanket. One cat lies on its side near the left edg... \| Keywords (10): cats, sleeping, tabby, pink, sofa, remote, rest, curled, striped, domestic                                                                               |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Two cats sleeping on a red sofa \| Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on... \| Keywords (16): cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, ...[1,607 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, their fur patterns contrasting against the soft fabric.                                                                                                                                                                                                                             |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Two cats sleeping on a pink couch \| Description: Two striped cats are sleeping on a pink couch, with one cat lying on its side and the other on its back, next to a r... \| Keywords (144): cats, sleeping, pink couch, remote control, striped, British English, British, British-English, ...                                                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: Cats Sleeping on Pink Couch with Remotes \| Description: Two tabby cats rest on a pink couch, one curled up with a remote, the other stretched out. The set... \| Keywords (189): cats, sleeping, pink couch, tabby, remote control, indoor, relaxation, striped fur, comfortable, domestic, ...                                                                               |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The two cats are sleeping on a pink couch.                                                                                                                                                                                                                                                                                                        |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "A Study in Stripes" \| Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting... \| Keywords: (not detected)                                                                                |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Historic Gothic Tower in Oxfordshire \| Description: A historic gothic tower stands amidst lush green trees under an overcast sky, with rooftops partially visible. \| Keywords (8): Historic architecture, Oxfordshire, gothic tower, overcast sky, trees, rooftops, architecture, landscape                                                                                  |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: Historic Gothic Tower Framed by Autumn Trees \| Description: A historic stone Gothic tower with multiple pinnacles and a steep slate roof is partially visible throu... \| Keywords (18): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected` | Title: "Oxfordshire Gothic Tower Amidst Autumn Foliage" \| Description: A historic stone gothic tower stands majestically, partially obscured by dense green trees under an... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: Gothic Tower Peeking Through Autumn Trees \| Description: A historic stone Gothic tower with ornate pinnacles rises above rooftops, partially framed by dense green... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Gothic Tower Framed by Green Foliage \| Description: A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green folia... \| Keywords (18): Tower, Rooftops, Building, Foliage, Sky, Cloud, England, English countryside, Architecture, Historic Building, ...[2,299 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Historic Tower Through Trees \| Description: A historic stone gothic tower and rooftops are partially visible through dense green foliage under an overcast sky... \| Keywords (9): Architecture, Historic Building, Gothic Tower, Foliage, Overcast Sky, Rooftops, Oxford, England, Scenic View                                                                               |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Oxford Gothic Tower Amidst Autumnal Foliage \| Description: The image captures a historic stone Gothic tower in Oxford, England, framed by dense green and y... \| Keywords (18): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Gothic, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected` | Title: Gothic Tower Framed by Autumn Trees in Oxford \| Description: A historic stone Gothic tower with pinnacles is partially visible through dense green and... \| Keywords (18): Architecture, Building, Chimney, Cloudy sky, England, Foliage, Gothic architecture, Historic building, Leaves, ...                                                                                |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Gothic Tower Peeks Through Autumn Trees \| Description: A historic stone Gothic tower is partially visible behind dense green foliage under a cloudy sky,... \| Keywords (19): Architecture, Branch, Building, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, ...                                                                                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **Gothic Tower Framed by Autumn Foliage, Oxford** \| Description: A historic stone Gothic tower with intricate pinnacles and rooftops partially obscured by dense... \| Keywords (16): Gothic architecture, Oxford tower, historic building, overcast sky, autumn foliage, stone structure, ...                                                                                |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Gothic Tower Framed by Autumn Foliage, Oxfordshire \| Description: A historic stone Gothic tower and rooftops are partially obscured by dense green foliage un... \| Keywords (14): Historic stone Gothic tower, Oxfordshire England, dense green foliage, overcast sky, stone architecture, ...                                                                               |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected` | Title: Historic Oxford tower framed by autumn trees under overcast sky \| Description: A view of Oxford’s historic stone tower and rooftops framed by dense gree... \| Keywords (16): Historic stone tower, Oxford rooftops, gothic architecture, dense green foliage, autumn leaves, overcast sky, ...                                                                               |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Gothic Tower and Rooftops Peeking Through Dense Trees in Oxfordshire \| Description: A scenic view of a historic stone gothic tower and rooftops partially framed by... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected` | Title: Gothic Stone Tower Peeks Through Autumn Trees in Oxfordshire \| Description: A historic stone gothic tower with multiple spires stands partially obscured by de... \| Keywords (16): Oxfordshire, historic building, gothic architecture, autumn foliage, overcast sky, stone tower, spires, ...                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: Historic Tower View with Overcast Sky \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast s... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Historic Oxford tower viewed through trees \| Description: A view of a historic stone Gothic tower and surrounding rooftops in Oxford, England, framed by dense gree... \| Keywords (19): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Gothic Tower Peeks Through Autumn Foliage \| Description: A historic stone Gothic tower rises above rooftops, framed by dense green and yellowing foliage und... \| Keywords (10): Gothic tower, autumn foliage, overcast sky, Oxfordshire, England, historic architecture, trees, rooftops, ...                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Stone Gothic Tower Hidden in Trees \| Description: Taken on October 17, 2026, from coordinates near Oxford, this image captures a historic stone building feat... \| Keywords (18): architecture, branch, building, chimney, cloudy sky, english countryside, foliage, gothic tower, leaves, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Gothic tower and rooftops seen through autumn foliage \| Description: A stone Gothic tower featuring crenellated battlements and tall pinnacles rises above a... \| Keywords (17): Architecture, Autumn, Building, Chimney, Cloud, England, Foliage, Gothic, Leaves, Oxford, Pinnacle, Roof, ...                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Gothic Tower Rooftops Amidst Green Canopy \| Description: This image captures a historic stone gothic tower and rooftops partially framed by dense green tre... \| Keywords (14): Gothic architecture, Stone structure, Rooftops, Trees, Overcast sky, Clouds, England, English countryside, ...                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Gothic Stone Tower Framed by Trees in Oxford \| Description: A historic stone gothic tower and rooftops are visible through dense green foliage under an overca... \| Keywords (14): Architecture, Building, Cloud, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, ...                                                                               |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Gothic Architecture Framed by Foliage in Oxford \| Description: A view of a historic stone Gothic tower and rooftops nestled among dense green foliage under a cloud... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Historic Gothic Tower Framed by Green Foliage \| Description: A historic stone gothic tower and rooftops emerge from dense green foliage under an overc... \| Keywords (16): Architecture, Building, Cloudy sky, England, Foliage, Historic Building, Leaves, Oxford, Oxfordshire, Pinnacle, ...                                                                               |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Historic Gothic Tower Framed by Autumn Foliage Under Overcast Sky \| Description: A view captures the pinnacled rooftops of a historic stone building, part... \| Keywords (14): Gothic architecture, historic building, rooftops, foliage, trees, overcast sky, pinnacles, stone structure, ...                                                                               |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Gothic Tower Amidst Lush Foliage Under Overcast Skies \| Description: A historic stone Gothic tower with pointed spires rises above dense green trees and rooftops,... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Gothic Tower Amidst Autumn Foliage \| Description: A historic stone Gothic tower and rooftops peek through dense green and autumnal trees under an overcast s... \| Keywords (19): Gothic tower, Oxfordshire, historic architecture, autumn foliage, overcast sky, stone building, rooftops, ...                                                                               |
+| [`nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit`](#model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit)              | `no concerns detected` | Title: Oxford Historic Tower Peeking Through Autumn Trees \| Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Historic Gothic Tower Through Autumnal Trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an ove... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected` | Title: Historic stone tower framed by trees under cloudy sky \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees und... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: Historic stone tower framed by trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an over... \| Keywords (15): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Oxford, Oxfordshire, Pinnacle, Roof, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`    | Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky \| Description: The historic stone gothic tower is partially framed by dense foliage, seen under... \| Keywords (21): Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, ...[2,499 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `concerns detected`    | Title: Framed Gothic Tower Through Trees \| Description: A historic stone gothic tower with pinnacles and chimneys peeks through dense green foliage under an overcast sk... \| Keywords (25): Gothic tower, trees, foliage, overcast, cloudy sky, England, Oxford, Oxfordshire, historic building, ...                                                                               |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`    | Title: "Overcast Skies Over Oxford's Historic Architecture" \| Description: On October 17, 2026, at 15:44:34 UTC+01:00, a historic stone gothic tower stands as a pinnacle... \| Keywords (20): historic, architecture, gothic, tower, overcast, sky, leaves, foliage, English countryside, Oxford, ...                                                                               |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `concerns detected`    | Title: Historic Tower View Through Autumn Foliage \| Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an... \| Keywords (18): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, ...                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Oxford Castle \| Description: A historic stone gothic tower and rooftops framed by dense green trees under an overcast sky. \| Keywords (18): architecture, branch, building, chimney, cloudy sky, english countryside, foliage, historic building, leaves, ...                                                                                                                |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`    | Title: Gothic Tower Through Foliage \| Description: A historic stone gothic tower and rooftops are framed by dense green trees under an overcast sky, with a v... \| Keywords (51): Oxfordshire, England, Gothic tower, historic building, stone architecture, overcast sky, cloudy, green foliage, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: Gothic Tower Amidst Greenery \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. \| Keywords (11): Gothic tower, stone architecture, green foliage, overcast sky, historic building, rooftops, foliage, trees, ...                                                                               |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`    | Title: Oxford Castle spire seen through trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast... \| Keywords (15): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.                                                                                                                                                                                                                                                                               |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Historic Gothic Tower Under Overcast Sky \| Description: The image showcases a historic stone gothic tower partially obscured by dense green trees, set agains... \| Keywords (57): Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building, England, Pinnacle, Sky, Rooftops, ...                                                                               |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: Gothic Tower Framed by Trees in Oxford \| Description: The view shows a historic stone Gothic tower with pinnacles and crenellations rising above residential rooftops and brick chimneys, partially obscured by dense green and autumnal foliage under a cloudy... \| Keywords: (not detected)                                                                                |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.                                                                                                                                                                                                                 |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: A Historical View of Oxfordshire's Tower and Trees \| Description: A detailed depiction of a historic stone gothic tower and rooftops in Oxfordshire, UK, set against a backdrop of dense green trees under an overcast sky. The image captures the architectural... \| Keywords: (not detected)                                                                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.10`
-- `mlx`: `0.32.5.dev20261024+56c2bf923`
-- `transformers`: `5.20.2`
+- `mlx-vlm`: `0.7.11`
+- `mlx`: `0.32.5.dev20261030+1ba7f969a`
+- `transformers`: `5.22.1`
 - `tokenizers`: `0.23.3`
-- `huggingface-hub`: `2.3.0`
+- `huggingface-hub`: `2.4.0`
 - *Python Version:* 3.14.7
-- *OS:* Darwin 27.0.0
-- *macOS Version:* 27.0.1
+- *OS:* Darwin 27.2.0
+- *macOS Version:* 27.2
 - *GPU/Chip:* Apple M5 Max
 - *MLX Device:* Apple M5 Max
 - *GPU Architecture:* applegpu_g17s
@@ -164,19 +165,53 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 - *Recommended Working Set:* 115 GB
 - *Fused Attention:* Available
 
+## Image Metadata
+
+- *Description:* A view of a historic stone gothic tower and rooftops
+  partially framed by dense green trees under an overcast sky.
+- *Keywords:* Architecture, Branch, Building, Chimney, Cloud, Cloudy sky,
+  England, English countryside, Foliage, Historic Building, Leaves, Outdoors,
+  Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky, Spire,
+  Tower, Townscape, Tree, Trees, United Kingdom, Urban greenery, autumn,
+  branches, british, chapel, chimneys, church, church tower, cityscape,
+  daytime, destination, europe, framed view, gothic, greenery, heritage,
+  hidden, historic, landscape, medieval, nature, old town, outdoor, overcast
+  sky, peek, residential, stone, tourism, traditional, travel, urban
+  landscape, view, viewpoint
+- *Date:* 2026-10-17 15:44:34 UTC+01:00
+- *Time:* 15:44:34
+- *GPS:* 51.751667°N, 1.252222°W
+
 ## Prompt
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Create British-English catalogue metadata using only clearly visible facts.
-> Omit uncertain details and unsupported identity, location, event, brand,
-> species, period, or intent.
+> Create British-English catalogue metadata from the image and supplied
+> context.
+>
+> Treat any capture date/time and GPS as authoritative facts, but do not claim
+> they are visible. Descriptive hints may be incomplete or wrong: retain
+> details supported by the image, correct conflicts, and add important visible
+> details. Prefer image evidence when a hint conflicts, and omit uncertain
+> details.
+>
+> Context: Authoritative context:
+> &#45; Capture date/time: 2026-10-17 15:44:34 UTC+01:00
+> &#45; GPS: 51.751667°N, 1.252222°W
+>
+> &#8203;Descriptive hints:
+> &#45; Description hint: A view of a historic stone gothic tower and rooftops
+> partially framed by dense green trees under an overcast sky.
+> &#45; Keyword hints: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky,
+> England, English countryside, Foliage, Historic Building, Leaves, Outdoors,
+> Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
-> &#45; a 1-2-sentence factual description of the main subject, setting, action,
-> lighting, and distinctive details;
-> &#45; 10-18 unique, comma-separated keywords.
+> &#45; a 1-2-sentence factual description combining relevant context with the
+> main visible subject, setting, action, lighting, and distinctive details;
+> &#45; 10-18 unique, comma-separated keywords covering relevant context and
+> visible details.
 >
 > &#8203;Return exactly these three sections and nothing else:
 > &#8203;Title:
@@ -202,26 +237,26 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.42s
-- *Generation time:* 0.36s
-- *Total time:* 0.81s
-- *Prompt preparation time:* 0.0139
-- *First-token latency:* 0.266
-- *Cleanup time:* 0.0693
-- *Prompt tokens:* 350
-- *Generation tokens:* 47
-- *Total tokens:* 397
-- *Prompt throughput (raw):* 1,315 tok/s
-- *Generation throughput (raw):* 532 tok/s
-- *Peak memory (GB):* 1.3
+- *Model load time:* 0.34s
+- *Generation time:* 1.50s
+- *Total time:* 2.90s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 0.784
+- *Cleanup time:* 0.0767
+- *Prompt tokens:* 2,104
+- *Generation tokens:* 69
+- *Total tokens:* 2,173
+- *Prompt throughput (raw):* 2,683 tok/s
+- *Generation throughput (raw):* 438 tok/s
+- *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.01
+- *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.000133
+- *Post-cleanup active memory (GB):* 0.000134
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 523
+- *Rendered prompt characters:* 1307
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -236,13 +271,13 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-Cats on a Pink Couch
+Historic Gothic Tower in Oxfordshire
 
 Description:
-Two tabby cats are lying on a bright pink couch, appearing relaxed and comfortable.
+A historic gothic tower stands amidst lush green trees under an overcast sky, with rooftops partially visible.
 
 Keywords:
-cats, pink couch, relaxation, tabby, comfortable, cozy
+Historic architecture, Oxfordshire, gothic tower, overcast sky, trees, rooftops, architecture, landscape
 </pre>
 
 </details>
@@ -264,26 +299,26 @@ cats, pink couch, relaxation, tabby, comfortable, cozy
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   prism_hadamard_qwen35)
-- *Model load time:* 1.30s
-- *Generation time:* 4.92s
-- *Total time:* 6.26s
-- *Prompt preparation time:* 0.023
-- *First-token latency:* 2.54
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 421
-- *Generation tokens:* 94
-- *Total tokens:* 515
-- *Prompt throughput (raw):* 166 tok/s
-- *Generation throughput (raw):* 39.9 tok/s
-- *Peak memory (GB):* 11
+- *Model load time:* 1.38s
+- *Generation time:* 63.99s
+- *Total time:* 66.45s
+- *Prompt preparation time:* 0.929
+- *First-token latency:* 59.5
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 16,594
+- *Generation tokens:* 118
+- *Total tokens:* 16,712
+- *Prompt throughput (raw):* 279 tok/s
+- *Generation throughput (raw):* 33.3 tok/s
+- *Peak memory (GB):* 17
 - *Active memory (GB):* 8.6
-- *Cache memory (GB):* 0.59
+- *Cache memory (GB):* 3.3
 - *Model-load active memory (GB):* 8.6
 - *Post-cleanup active memory (GB):* 0.00113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1347
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -296,9 +331,11 @@ cats, pink couch, relaxation, tabby, comfortable, cozy
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats sleeping on pink sofa
-Description: Two tabby cats lie on their sides on a bright pink sofa cushion, with two white remote controls resting nearby. The cats are positioned head-to-head, appearing relaxed and asleep in soft, even lighting.
-Keywords: tabby cats, sleeping, pink sofa, remote controls, striped fur, relaxed, cushion, indoor, pets, resting, two cats, white remotes, fabric, lounging
+Title: Historic Gothic Tower Framed by Autumn Trees
+
+Description: A historic stone Gothic tower with multiple pinnacles and a steep slate roof is partially visible through dense green and yellowing foliage under an overcast sky. The scene is set in Oxford, England, with brick chimneys and residential rooftops visible below the tower.
+
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops
 </pre>
 
 </details>
@@ -319,26 +356,26 @@ Keywords: tabby cats, sleeping, pink sofa, remote controls, striped fur, relaxed
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 1.13s
-- *Generation time:* 1.13s
-- *Total time:* 2.30s
-- *Prompt preparation time:* 0.0335
-- *First-token latency:* 0.3
-- *Cleanup time:* 0.0952
-- *Prompt tokens:* 721
-- *Generation tokens:* 55
-- *Total tokens:* 776
-- *Prompt throughput (raw):* 2,403 tok/s
-- *Generation throughput (raw):* 68.0 tok/s
-- *Peak memory (GB):* 9.7
+- *Model load time:* 1.06s
+- *Generation time:* 4.28s
+- *Total time:* 6.35s
+- *Prompt preparation time:* 0.909
+- *First-token latency:* 1.73
+- *Cleanup time:* 0.0856
+- *Prompt tokens:* 1,430
+- *Generation tokens:* 109
+- *Total tokens:* 1,539
+- *Prompt throughput (raw):* 829 tok/s
+- *Generation throughput (raw):* 64.4 tok/s
+- *Peak memory (GB):* 9.6
 - *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.13
+- *Cache memory (GB):* 0.24
 - *Model-load active memory (GB):* 8
 - *Post-cleanup active memory (GB):* 0.00135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 696
+- *Rendered prompt characters:* 1480
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -352,9 +389,9 @@ Keywords: tabby cats, sleeping, pink sofa, remote controls, striped fur, relaxed
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Cats at Rest on a Pink Sofa"
-Description: Two cats are peacefully sleeping on a pink sofa, with remote controls nearby.
-Keywords: cats, sleeping, pink sofa, remote controls, domestic, comfort, tranquility, home, leisure.
+Title: "Oxfordshire Gothic Tower Amidst Autumn Foliage"
+Description: A historic stone gothic tower stands majestically, partially obscured by dense green trees under an overcast sky, showcasing the blend of nature and architecture in Oxfordshire.
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -375,26 +412,26 @@ Keywords: cats, sleeping, pink sofa, remote controls, domestic, comfort, tranqui
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.11s
-- *Generation time:* 3.81s
-- *Total time:* 5.94s
-- *Prompt preparation time:* 0.00889
-- *First-token latency:* 1.39
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 421
-- *Generation tokens:* 80
-- *Total tokens:* 501
-- *Prompt throughput (raw):* 303 tok/s
-- *Generation throughput (raw):* 33.3 tok/s
-- *Peak memory (GB):* 17
+- *Model load time:* 2.15s
+- *Generation time:* 50.91s
+- *Total time:* 54.23s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 46.2
+- *Cleanup time:* 0.122
+- *Prompt tokens:* 16,594
+- *Generation tokens:* 114
+- *Total tokens:* 16,708
+- *Prompt throughput (raw):* 360 tok/s
+- *Generation throughput (raw):* 29.7 tok/s
+- *Peak memory (GB):* 21
 - *Active memory (GB):* 16
-- *Cache memory (GB):* 0.22
+- *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
 - *Post-cleanup active memory (GB):* 0.00185
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1347
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -407,12 +444,160 @@ Keywords: cats, sleeping, pink sofa, remote controls, domestic, comfort, tranqui
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Sleeping on Pink Couch
-
-Description: Two tabby cats lie sleeping on a bright pink couch, each positioned beside a white remote control. The scene is lit by even indoor light, highlighting the cats' striped coats and relaxed postures.
-
-Keywords: tabby cats, sleeping, pink couch, remote controls, striped fur, indoor pets, relaxed posture, domestic setting
+Title: Gothic Tower Peeking Through Autumn Trees
+Description: A historic stone Gothic tower with ornate pinnacles rises above rooftops, partially framed by dense green and yellowing foliage under an overcast sky. The scene is set in Oxford, England, on a cloudy afternoon.
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.65s
+- *Generation time:* 9.58s
+- *Total time:* 12.08s
+- *Prompt preparation time:* 0.73
+- *First-token latency:* 1.57
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 1,596
+- *Generation tokens:* 855
+- *Total tokens:* 2,451
+- *Prompt throughput (raw):* 1,016 tok/s
+- *Generation throughput (raw):* 117 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.17
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.00207
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1446
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get this done. I need to create some metadata for this image, and it's my job to be thorough.
+
+First, I need to figure out the title. It should be short, catchy, and descriptive. I'm thinking "Historic Townscape with Stone Tower" or "Gothic Tower Framed by Green Foliage." Okay, let's go with "Gothic Tower Framed by Green Foliage." That's a good balance of clarity and visual description.
+
+Now, for the description. I have to include the date, location, the main subject, the setting, and the overall feel. The image is of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. The location is Northamptonshire, England, around 15:44 on October 17, 2026. I need to mention the overcast sky and the light. I will use the description hint as a starting point.
+
+Okay, here's my draft: "A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green foliage under a cloudy sky, captured at 15:44 UTC+01:00 on October 17, 2026." That's solid. It hits all the key points.
+
+Finally, the keywords. I need to be comprehensive. Let's start with the core subjects: Tower, Rooftops, Building, Foliage, Sky, Cloud, Branch, Leaves, Pinnacle, Chimney, Roof. Then, add the location: England, English countryside, Northamptonshire, Oxfordshire. Then, the architectural style: Architecture, Historic Building, Gothic, Stone, Brick. Then the atmosphere: Overcast, Scenic, Outdoors, Historic.
+
+Okay, I'm going to refine the list.
+1.  Tower
+2.  Rooftops
+3.  Building
+4.  Foliage
+5.  Sky
+6.  Cloud
+7.  England
+8.  English countryside
+9.  Architecture
+10. Historic Building
+11. Gothic
+12. Stone
+13. Overcast
+14. Scenic
+15. Branch
+16. Leaves
+17. Pinnacle
+18. Chimney
+
+Now, I'm going to combine them. I'll do this in the correct order.
+
+*   **Title:** Gothic Tower Framed by Green Foliage
+*   **Description:** A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green foliage under an overcast sky, captured at 15:44 UTC+01:00 on October 17, 2026.
+*   **Keywords:** Tower, Rooftops, Building, Foliage, Sky, Cloud, England, English countryside, Architecture, Historic Building, Gothic, Stone, Overcast, Scenic, Branch, Leaves, Pinnacle, Chimney
+
+Perfect. That's exactly what's needed.
+&lt;/think&gt;
+
+Title: Gothic Tower Framed by Green Foliage
+
+Description: A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green foliage under an overcast sky, captured at 15:44 UTC+01:00 on October 17, 2026. The scene includes the rooftops of buildings and architectural details like a pinnacle and a chimney.
+
+Keywords: Tower, Rooftops, Building, Foliage, Sky, Cloud, England, English countryside, Architecture, Historic Building, Gothic, Stone, Overcast, Scenic, Branch, Leaves, Pinnacle, Chimney
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get this done. I need to create some metadata for this image, and it's my job to be thorough.
+
+First, I need to figure out the title. It should be short, catchy, and descriptive. I'm thinking "Historic Townscape with Stone Tower" or "Gothic Tower Framed by Green Foliage." Okay, let's go with "Gothic Tower Framed by Green Foliage." That's a good balance of clarity and visual description.
+
+Now, for the description. I have to include the date, location, the main subject, the setting, and the overall feel. The image is of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. The location is Northamptonshire, England, around 15:44 on October 17, 2026. I need to mention the overcast sky and the light. I will use the description hint as a starting point.
+
+Okay, here's my draft: "A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green foliage under a cloudy sky, captured at 15:44 UTC+01:00 on October 17, 2026." That's solid. It hits all the key points.
+
+Finally, the keywords. I need to be comprehensive. Let's start with the core subjects: Tower, Rooftops, Building, Foliage, Sky, Cloud, Branch, Leaves, Pinnacle, Chimney, Roof. Then, add the location: England, English countryside, Northamptonshire, Oxfordshire. Then, the architectural style: Architecture, Historic Building, Gothic, Stone, Brick. Then the atmosphere: Overcast, Scenic, Outdoors, Historic.
+
+Okay, I'm going to refine the list.
+1.  Tower
+2.  Rooftops
+3.  Building
+4.  Foliage
+5.  Sky
+6.  Cloud
+7.  England
+8.  English countryside
+9.  Architecture
+10. Historic Building
+11. Gothic
+12. Stone
+13. Overcast
+14. Scenic
+15. Branch
+16. Leaves
+17. Pinnacle
+18. Chimney
+
+Now, I'm going to combine them. I'll do this in the correct order.
+
+*   **Title:** Gothic Tower Framed by Green Foliage
+*   **Description:** A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green foliage under an overcast sky, captured at 15:44 UTC+01:00 on October 17, 2026.
+*   **Keywords:** Tower, Rooftops, Building, Foliage, Sky, Cloud, England, English countryside, Architecture, Historic Building, Gothic, Stone, Overcast, Scenic, Branch, Leaves, Pinnacle, Chimney
+
+Perfect. That's exactly what's needed.
+</think>
+
+Title: Gothic Tower Framed by Green Foliage
+
+Description: A historic stone gothic tower in Northamptonshire, England, is partially framed by lush green foliage under an overcast sky, captured at 15:44 UTC+01:00 on October 17, 2026. The scene includes the rooftops of buildings and architectural details like a pinnacle and a chimney.
+
+Keywords: Tower, Rooftops, Building, Foliage, Sky, Cloud, England, English countryside, Architecture, Historic Building, Gothic, Stone, Overcast, Scenic, Branch, Leaves, Pinnacle, Chimney
+```
+
+</details>
 
 </details>
 
@@ -432,26 +617,26 @@ Keywords: tabby cats, sleeping, pink couch, remote controls, striped fur, indoor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.53s
-- *Generation time:* 1.36s
-- *Total time:* 2.94s
-- *Prompt preparation time:* 0.028
-- *First-token latency:* 0.78
-- *Cleanup time:* 0.0956
-- *Prompt tokens:* 499
-- *Generation tokens:* 49
-- *Total tokens:* 548
-- *Prompt throughput (raw):* 639 tok/s
-- *Generation throughput (raw):* 86.2 tok/s
-- *Peak memory (GB):* 8.0
+- *Model load time:* 1.18s
+- *Generation time:* 8.78s
+- *Total time:* 10.69s
+- *Prompt preparation time:* 0.607
+- *First-token latency:* 6.89
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 6,343
+- *Generation tokens:* 104
+- *Total tokens:* 6,447
+- *Prompt throughput (raw):* 921 tok/s
+- *Generation throughput (raw):* 77.6 tok/s
+- *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.06
+- *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 7.08
 - *Post-cleanup active memory (GB):* 0.00269
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
+- *Rendered prompt characters:* 1337
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -465,9 +650,9 @@ Keywords: tabby cats, sleeping, pink couch, remote controls, striped fur, indoor
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats on pink fabric.
-Description: Two tabby cats lie on a pink fabric surface, with remote controls nearby.
-Keywords: tabby cats, pink fabric, remote controls, domestic cats, feline.
+Title: Historic Tower Through Trees
+Description: A historic stone gothic tower and rooftops are partially visible through dense green foliage under an overcast sky, captured on 2026-10-17 at 15:44:34 UTC+01:00 at 51.751667°N, 1.252222°W.
+Keywords: Architecture, Historic Building, Gothic Tower, Foliage, Overcast Sky, Rooftops, Oxford, England, Scenic View
 </pre>
 
 </details>
@@ -488,26 +673,26 @@ Keywords: tabby cats, pink fabric, remote controls, domestic cats, feline.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.16s
-- *Generation time:* 3.90s
-- *Total time:* 5.10s
-- *Prompt preparation time:* 0.0302
-- *First-token latency:* 2.22
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 3,435
-- *Generation tokens:* 90
-- *Total tokens:* 3,525
-- *Prompt throughput (raw):* 1,546 tok/s
-- *Generation throughput (raw):* 56.1 tok/s
+- *Model load time:* 1.22s
+- *Generation time:* 4.80s
+- *Total time:* 6.84s
+- *Prompt preparation time:* 0.701
+- *First-token latency:* 2.2
+- *Cleanup time:* 0.111
+- *Prompt tokens:* 2,104
+- *Generation tokens:* 108
+- *Total tokens:* 2,212
+- *Prompt throughput (raw):* 956 tok/s
+- *Generation throughput (raw):* 56.5 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
-- *Cache memory (GB):* 0.79
+- *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
 - *Post-cleanup active memory (GB):* 0.003
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 477
+- *Rendered prompt characters:* 1261
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -521,247 +706,14 @@ Keywords: tabby cats, pink fabric, remote controls, domestic cats, feline.
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Cats Sleeping on Sofa with Remote Controls
+Title:
+Oxford Gothic Tower Amidst Autumnal Foliage
 
 Description:
-Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft, highlighting the relaxed posture of the cats and the vibrant pink fabric of the sofa.
+The image captures a historic stone Gothic tower in Oxford, England, framed by dense green and yellow foliage under an overcast sky. The scene is set in Oxfordshire, with rooftops visible in the foreground.
 
 Keywords:
-cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy, domestic, resting, comfort, household, feline, nap, indoors, tranquility
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
-
-### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.14s
-- *Generation time:* 0.84s
-- *Total time:* 2.01s
-- *Prompt preparation time:* 0.0164
-- *First-token latency:* 0.468
-- *Cleanup time:* 0.087
-- *Prompt tokens:* 344
-- *Generation tokens:* 79
-- *Total tokens:* 423
-- *Prompt throughput (raw):* 735 tok/s
-- *Generation throughput (raw):* 217 tok/s
-- *Peak memory (GB):* 3.6
-- *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.02
-- *Model-load active memory (GB):* 2.82
-- *Post-cleanup active memory (GB):* 0.00357
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 523
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* b6311011d95c8894a57289bba8b916e6fbae9a61
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/b6311011d95c8894a57289bba8b916e6fbae9a61
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two cats sleeping on a pink couch.
-Description: Two tabby cats are lying on a pink couch, one with a remote nearby. The scene is well-lit, highlighting the cats' fur patterns and the vibrant color of the couch.
-Keywords: cats, pink couch, tabby, sleeping, remotes, fur patterns, well-lit, cozy, domestic, relaxation
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.95s
-- *Generation time:* 2.17s
-- *Total time:* 3.16s
-- *Prompt preparation time:* 0.0242
-- *First-token latency:* 0.794
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 330
-- *Generation tokens:* 331
-- *Total tokens:* 661
-- *Prompt throughput (raw):* 416 tok/s
-- *Generation throughput (raw):* 246 tok/s
-- *Peak memory (GB):* 3.1
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.05
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00408
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 540
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-First, I need to create a title that is 5-10 words. Then, a description that is factual, mentioning the setting, action, and details. Finally, a list of 10-18 unique keywords.
-
-Looking at the image, it shows two tabby cats sleeping on a pink blanket, with remote controls nearby. I should describe the main subject: cats resting, likely indoors.
-
-For the title, I need to be concise. Let's think: "Two Sleeping Tabby Cats on Pink Blanket". That's about 8 words. But I should ensure it's 5-10 words.
-
-Description: The image shows two tabby cats peacefully sleeping on a pink fabric, with remote controls visible.
-
-Keywords: I need to list unique keywords related to the image. Things like cats, tabby, sleeping, pink, remote controls, cat, relaxation, etc.
-
-Count the keywords to be 10-18.
-
-Let's list: cats, tabby, sleeping, pink, remote, control, cat, comfort, leisure, indoor, relaxation.
-
-I should ensure they are unique and cover the main elements.
-
-Now, structure:
-
-Title: [specific title]
-
-Description: [factual description]
-
-Keywords: [list]
-
-I'll write it out.
-&lt;/think&gt;
-
-Title: Two Sleeping Tabby Cats
-Description: The image shows two tabby cats resting on a pink blanket, with remote controls nearby.
-Keywords: cats, tabby, sleeping, pink, remote, control, relaxation, indoor, feline, comfort
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-First, I need to create a title that is 5-10 words. Then, a description that is factual, mentioning the setting, action, and details. Finally, a list of 10-18 unique keywords.
-
-Looking at the image, it shows two tabby cats sleeping on a pink blanket, with remote controls nearby. I should describe the main subject: cats resting, likely indoors.
-
-For the title, I need to be concise. Let's think: "Two Sleeping Tabby Cats on Pink Blanket". That's about 8 words. But I should ensure it's 5-10 words.
-
-Description: The image shows two tabby cats peacefully sleeping on a pink fabric, with remote controls visible.
-
-Keywords: I need to list unique keywords related to the image. Things like cats, tabby, sleeping, pink, remote controls, cat, relaxation, etc.
-
-Count the keywords to be 10-18.
-
-Let's list: cats, tabby, sleeping, pink, remote, control, cat, comfort, leisure, indoor, relaxation.
-
-I should ensure they are unique and cover the main elements.
-
-Now, structure:
-
-Title: [specific title]
-
-Description: [factual description]
-
-Keywords: [list]
-
-I'll write it out.
-</think>
-
-Title: Two Sleeping Tabby Cats
-Description: The image shows two tabby cats resting on a pink blanket, with remote controls nearby.
-Keywords: cats, tabby, sleeping, pink, remote, control, relaxation, indoor, feline, comfort
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-47-1b-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.7-1B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.7-1B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
-- *Model load time:* 0.98s
-- *Generation time:* 0.40s
-- *Total time:* 1.43s
-- *Prompt preparation time:* 0.0277
-- *First-token latency:* 0.105
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 332
-- *Generation tokens:* 66
-- *Total tokens:* 398
-- *Prompt throughput (raw):* 3,172 tok/s
-- *Generation throughput (raw):* 251 tok/s
-- *Peak memory (GB):* 3.6
-- *Active memory (GB):* 2.7
-- *Cache memory (GB):* 0.05
-- *Model-load active memory (GB):* 2.67
-- *Post-cleanup active memory (GB):* 0.00459
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 534
-- *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 13caa569f70e4b68b0ad7dd9574f15a241b34a7d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.7-1B-4bit/snapshots/13caa569f70e4b68b0ad7dd9574f15a241b34a7d
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Sleeping Cats on Pink Couch
-Description: Two tabby cats rest on a pink fabric couch, one near a remote, the other beside it, under soft indoor lighting.
-Keywords: tabby, cat, sleeping, pink, couch, remote, indoor, light, fur, stretch, curled, alert, relaxed
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Gothic, Historic Building, Leaves, Oxford, Oxfordshire, Pinnacle, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -783,25 +735,25 @@ Keywords: tabby, cat, sleeping, pink, couch, remote, indoor, light, fur, stretch
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
 - *Model load time:* 2.68s
-- *Generation time:* 1.58s
-- *Total time:* 4.28s
-- *Prompt preparation time:* 0.0152
-- *First-token latency:* 0.34
-- *Cleanup time:* 0.139
-- *Prompt tokens:* 332
-- *Generation tokens:* 92
-- *Total tokens:* 424
-- *Prompt throughput (raw):* 975 tok/s
-- *Generation throughput (raw):* 75.6 tok/s
-- *Peak memory (GB):* 24
+- *Generation time:* 2.79s
+- *Total time:* 6.33s
+- *Prompt preparation time:* 0.719
+- *First-token latency:* 0.661
+- *Cleanup time:* 0.135
+- *Prompt tokens:* 927
+- *Generation tokens:* 108
+- *Total tokens:* 1,035
+- *Prompt throughput (raw):* 1,402 tok/s
+- *Generation throughput (raw):* 76.1 tok/s
+- *Peak memory (GB):* 25
 - *Active memory (GB):* 24
-- *Cache memory (GB):* 0.09
+- *Cache memory (GB):* 0.11
 - *Model-load active memory (GB):* 23.5
 - *Post-cleanup active memory (GB):* 0.0051
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 534
+- *Rendered prompt characters:* 1318
 - *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -814,11 +766,11 @@ Keywords: tabby, cat, sleeping, pink, couch, remote, indoor, light, fur, stretch
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Sleeping on Pink Sofa
+Title: Gothic Tower Framed by Autumn Trees in Oxford
 
-Description: Two tabby cats are lying on a bright pink sofa cover, each positioned near a white remote control. The scene is lit by indoor lighting, highlighting the striped fur patterns of the cats.
+Description: A historic stone Gothic tower with pinnacles is partially visible through dense green and autumnal foliage, under an overcast sky in Oxford, captured on 17 October 2026.
 
-Keywords: cats, tabby, sleeping, pink, sofa, remote control, furniture, domestic, animal, striped, resting, cover, white, leisure, pet, cozy, indoor, relaxation
+Keywords: Architecture, Building, Chimney, Cloudy sky, England, Foliage, Gothic architecture, Historic building, Leaves, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Trees, Overcast sky, Autumn foliage, Stone tower
 </pre>
 
 </details>
@@ -839,18 +791,18 @@ Keywords: cats, tabby, sleeping, pink, sofa, remote control, furniture, domestic
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.07s
-- *Generation time:* 1.28s
-- *Total time:* 2.37s
-- *Prompt preparation time:* 0.0133
-- *First-token latency:* 0.295
+- *Model load time:* 1.13s
+- *Generation time:* 1.81s
+- *Total time:* 3.62s
+- *Prompt preparation time:* 0.553
+- *First-token latency:* 0.372
 - *Cleanup time:* 0.103
-- *Prompt tokens:* 177
-- *Generation tokens:* 99
-- *Total tokens:* 276
-- *Prompt throughput (raw):* 599 tok/s
-- *Generation throughput (raw):* 106 tok/s
-- *Peak memory (GB):* 7.0
+- *Prompt tokens:* 382
+- *Generation tokens:* 94
+- *Total tokens:* 476
+- *Prompt throughput (raw):* 1,028 tok/s
+- *Generation throughput (raw):* 104 tok/s
+- *Peak memory (GB):* 7.1
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
@@ -858,7 +810,7 @@ Keywords: cats, tabby, sleeping, pink, sofa, remote control, furniture, domestic
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 527
+- *Rendered prompt characters:* 1311
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -872,14 +824,11 @@ Keywords: cats, tabby, sleeping, pink, sofa, remote control, furniture, domestic
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Two tabby cats sleeping on red couch
+Title: Gothic Tower Peeks Through Autumn Trees
 
-Description:
-Two tabby cats lie side by side on a red upholstered couch, partially covered by a pink blanket. A remote control is visible near each cat. Lighting is even and appears to be indoor ambient. One cat is stretched, the other is curled slightly, both appear to be resting.
+Description: A historic stone Gothic tower is partially visible behind dense green foliage under a cloudy sky, captured outdoors in Oxford, England, with overcast lighting.
 
-Keywords:
-cats, tabby, sleeping, red couch, pink blanket, remote controls, indoor, animals, fur, relaxed, household
+Keywords: Architecture, Branch, Building, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -900,26 +849,26 @@ cats, tabby, sleeping, red couch, pink blanket, remote controls, indoor, animals
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.57s
-- *Generation time:* 1.72s
-- *Total time:* 3.32s
-- *Prompt preparation time:* 0.0169
-- *First-token latency:* 0.67
-- *Cleanup time:* 0.105
-- *Prompt tokens:* 1,070
-- *Generation tokens:* 72
-- *Total tokens:* 1,142
-- *Prompt throughput (raw):* 1,596 tok/s
-- *Generation throughput (raw):* 69.6 tok/s
-- *Peak memory (GB):* 9.8
+- *Model load time:* 1.34s
+- *Generation time:* 5.06s
+- *Total time:* 7.13s
+- *Prompt preparation time:* 0.614
+- *First-token latency:* 2.63
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 3,046
+- *Generation tokens:* 119
+- *Total tokens:* 3,165
+- *Prompt throughput (raw):* 1,160 tok/s
+- *Generation throughput (raw):* 64.5 tok/s
+- *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.23
+- *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
 - *Post-cleanup active memory (GB):* 0.00567
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 2910
+- *Rendered prompt characters:* 3694
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -933,13 +882,13 @@ cats, tabby, sleeping, red couch, pink blanket, remote controls, indoor, animals
 
 <pre class="model-output-readable">
 Title:
-Two Cats Relaxing on Pink Cushion
+**Gothic Tower Framed by Autumn Foliage, Oxford**
 
 Description:
-Two cats lie stretched out on a pink cushion, positioned near remote controls. The setting appears indoors with soft, natural lighting.
+A historic stone Gothic tower with intricate pinnacles and rooftops partially obscured by dense green trees, captured under an overcast sky on 17 October 2026 in Oxford, Oxfordshire.
 
 Keywords:
-cats, pink cushion, remote controls, indoor setting, relaxed posture, soft lighting, resting, domestic scene, furry pets, cushioned surface
+Gothic architecture, Oxford tower, historic building, overcast sky, autumn foliage, stone structure, English countryside, rooftops, dense trees, Oxfordshire, cloudy weather, pinnacle details, scenic view, green leaves, Gothic design, UK landmark
 </pre>
 
 </details>
@@ -960,26 +909,26 @@ cats, pink cushion, remote controls, indoor setting, relaxed posture, soft light
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.14s
-- *Generation time:* 0.77s
-- *Total time:* 1.93s
-- *Prompt preparation time:* 0.0167
-- *First-token latency:* 0.23
-- *Cleanup time:* 0.0914
-- *Prompt tokens:* 1,069
-- *Generation tokens:* 102
-- *Total tokens:* 1,171
-- *Prompt throughput (raw):* 4,645 tok/s
-- *Generation throughput (raw):* 201 tok/s
-- *Peak memory (GB):* 4.5
+- *Model load time:* 0.95s
+- *Generation time:* 2.50s
+- *Total time:* 4.17s
+- *Prompt preparation time:* 0.616
+- *First-token latency:* 1.07
+- *Cleanup time:* 0.092
+- *Prompt tokens:* 3,045
+- *Generation tokens:* 153
+- *Total tokens:* 3,198
+- *Prompt throughput (raw):* 2,843 tok/s
+- *Generation throughput (raw):* 183 tok/s
+- *Peak memory (GB):* 8.2
 - *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.16
+- *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 2.75
 - *Post-cleanup active memory (GB):* 0.00593
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 2909
+- *Rendered prompt characters:* 3693
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -993,13 +942,13 @@ cats, pink cushion, remote controls, indoor setting, relaxed posture, soft light
 
 <pre class="model-output-readable">
 Title:
-Two resting tabby cats on a pink sofa
+Gothic Tower Framed by Autumn Foliage, Oxfordshire
 
 Description:
-Two adult tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft, natural lighting highlights their striped fur patterns and relaxed postures.
+A historic stone Gothic tower and rooftops are partially obscured by dense green foliage under an overcast sky, captured on 2026-10-17 at 15:44 UTC+01:00 in Oxfordshire, England. The lighting highlights the muted tones of the stone architecture amid the rich, autumnal hues of the trees.
 
 Keywords:
-tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-setting, domestic-pets, household-items, resting-scene, pet-photography, domestic-interior, soft-lighting
+Historic stone Gothic tower, Oxfordshire England, dense green foliage, overcast sky, stone architecture, rooftops, autumn leaves, scenic countryside, gothic architecture, natural framing, historic building, Oxfordshire landscape, muted lighting, stone pinnacles.
 </pre>
 
 </details>
@@ -1020,26 +969,26 @@ tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-settin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 6.57s
-- *Generation time:* 3.16s
-- *Total time:* 9.77s
-- *Prompt preparation time:* 0.0237
-- *First-token latency:* 1.5
-- *Cleanup time:* 0.223
-- *Prompt tokens:* 549
-- *Generation tokens:* 82
-- *Total tokens:* 631
-- *Prompt throughput (raw):* 366 tok/s
-- *Generation throughput (raw):* 81.0 tok/s
-- *Peak memory (GB):* 70
+- *Model load time:* 8.48s
+- *Generation time:* 7.85s
+- *Total time:* 17.22s
+- *Prompt preparation time:* 0.623
+- *First-token latency:* 4.22
+- *Cleanup time:* 0.242
+- *Prompt tokens:* 2,525
+- *Generation tokens:* 120
+- *Total tokens:* 2,645
+- *Prompt throughput (raw):* 598 tok/s
+- *Generation throughput (raw):* 69.0 tok/s
+- *Peak memory (GB):* 73
 - *Active memory (GB):* 68
-- *Cache memory (GB):* 0.46
+- *Cache memory (GB):* 1.7
 - *Model-load active memory (GB):* 67.8
 - *Post-cleanup active memory (GB):* 0.0062
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 533
+- *Rendered prompt characters:* 1317
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1053,13 +1002,13 @@ tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-settin
 
 <pre class="model-output-readable">
 Title:
-Two cats resting on a pink sofa
+Historic Oxford tower framed by autumn trees under overcast sky
 
 Description:
-Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and the sofa's colour.
+A view of Oxford’s historic stone tower and rooftops framed by dense green and autumnal foliage under a cloudy sky, captured at 3:44 pm on 17 October 2026.
 
 Keywords:
-cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relaxation, soft lighting, living room, animal, comfort, leisure, home decor, sofa cushion, pet accessories
+Historic stone tower, Oxford rooftops, gothic architecture, dense green foliage, autumn leaves, overcast sky, Oxfordshire, England, pinnacle, chimney, branch, building, rooftop, scenic view, cloudy sky, outdoors
 </pre>
 
 </details>
@@ -1080,26 +1029,26 @@ cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relax
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.24s
-- *Generation time:* 2.86s
-- *Total time:* 4.14s
-- *Prompt preparation time:* 0.0189
-- *First-token latency:* 1.55
-- *Cleanup time:* 0.115
-- *Prompt tokens:* 873
-- *Generation tokens:* 95
-- *Total tokens:* 968
-- *Prompt throughput (raw):* 563 tok/s
-- *Generation throughput (raw):* 73.4 tok/s
-- *Peak memory (GB):* 7.9
+- *Model load time:* 1.09s
+- *Generation time:* 4.67s
+- *Total time:* 6.63s
+- *Prompt preparation time:* 0.739
+- *First-token latency:* 2.09
+- *Cleanup time:* 0.12
+- *Prompt tokens:* 1,318
+- *Generation tokens:* 133
+- *Total tokens:* 1,451
+- *Prompt throughput (raw):* 631 tok/s
+- *Generation throughput (raw):* 70.8 tok/s
+- *Peak memory (GB):* 8.0
 - *Active memory (GB):* 6.5
-- *Cache memory (GB):* 0.17
+- *Cache memory (GB):* 0.26
 - *Model-load active memory (GB):* 6.45
 - *Post-cleanup active memory (GB):* 0.00651
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 510
+- *Rendered prompt characters:* 1294
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -1113,11 +1062,11 @@ cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relax
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Calico Cats Sleeping on Pink Bedding
+Title: Gothic Tower and Rooftops Peeking Through Dense Trees in Oxfordshire
 
-Description: Two calico cats are sleeping side by side on pink bedding. They are positioned with their heads facing each other and their tails touching. The cats have white, black, and brown fur. Two white remote controls are visible behind the cats.
+Description: A scenic view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. The image captures the essence of the English countryside with its mix of natural and man-made elements, showcasing the architectural beauty of the tower against the backdrop of lush foliage.
 
-Keywords: calico cats, sleeping, pink bedding, white remotes, black and brown fur, white cats, striped cats, cozy, relaxed, feline
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -1138,26 +1087,26 @@ Keywords: calico cats, sleeping, pink bedding, white remotes, black and brown fu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.61s
-- *Generation time:* 3.65s
-- *Total time:* 5.29s
-- *Prompt preparation time:* 0.0215
-- *First-token latency:* 1.46
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 860
-- *Generation tokens:* 70
-- *Total tokens:* 930
-- *Prompt throughput (raw):* 590 tok/s
-- *Generation throughput (raw):* 33.0 tok/s
-- *Peak memory (GB):* 12
-- *Active memory (GB):* 8.5
-- *Cache memory (GB):* 3.1
+- *Model load time:* 1.44s
+- *Generation time:* 7.68s
+- *Total time:* 10.10s
+- *Prompt preparation time:* 0.853
+- *First-token latency:* 3.11
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 3,136
+- *Generation tokens:* 112
+- *Total tokens:* 3,248
+- *Prompt throughput (raw):* 1,009 tok/s
+- *Generation throughput (raw):* 30.2 tok/s
+- *Peak memory (GB):* 13
+- *Active memory (GB):* 8.6
+- *Cache memory (GB):* 3.9
 - *Model-load active memory (GB):* 7.23
 - *Post-cleanup active memory (GB):* 0.00713
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 510
+- *Rendered prompt characters:* 1294
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -1171,69 +1120,11 @@ Keywords: calico cats, sleeping, pink bedding, white remotes, black and brown fu
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Sleeping on Pink Blanket with Remote Controls
+Title: Gothic Stone Tower Peeks Through Autumn Trees in Oxfordshire
 
-Description: Two cats are sleeping on a pink blanket. A white remote control is visible behind them. The cats are resting comfortably on the soft surface.
+Description: A historic stone gothic tower with multiple spires stands partially obscured by dense green foliage. The scene captures an overcast sky above the rooftops of surrounding buildings, creating a moody, atmospheric view of the English countryside.
 
-Keywords: cats, pink blanket, remote controls, sleeping, white remote, comfortable, soft surface, feline, rest, relaxation
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.30s
-- *Generation time:* 31.80s
-- *Total time:* 35.14s
-- *Prompt preparation time:* 0.0295
-- *First-token latency:* 0.948
-- *Cleanup time:* 0.159
-- *Prompt tokens:* 545
-- *Generation tokens:* 786
-- *Total tokens:* 1,331
-- *Prompt throughput (raw):* 575 tok/s
-- *Generation throughput (raw):* 25.5 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 24
-- *Cache memory (GB):* 0.12
-- *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00754
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 710
-- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 865ee8de65799cc4ee406587e4b607063708f358
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/865ee8de65799cc4ee406587e4b607063708f358
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Two Tabby Cats Resting on Pink Fabric
-Description:
-Two tabby-patterned cats lie on a bright pink blanket with two remote controls nearby. One cat appears asleep with eyes closed while the other rests its head down on the fabric, with red cushions visible above under bright lighting.
-Keywords:
-cats, tabby, pink blanket, fabric, remote control, sofa, cushion, resting, sleeping, indoor, feline, pink textile, domestic pet
+Keywords: Oxfordshire, historic building, gothic architecture, autumn foliage, overcast sky, stone tower, spires, rooftops, English countryside, historic architecture, Oxford, countryside scenery, cloudy weather, tree branches, historic structure, architectural landmark
 </pre>
 
 </details>
@@ -1254,26 +1145,26 @@ cats, tabby, pink blanket, fabric, remote control, sofa, cushion, resting, sleep
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.09s
-- *Generation time:* 0.67s
-- *Total time:* 1.79s
-- *Prompt preparation time:* 0.0163
-- *First-token latency:* 0.152
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 418
-- *Generation tokens:* 78
-- *Total tokens:* 496
-- *Prompt throughput (raw):* 2,753 tok/s
-- *Generation throughput (raw):* 160 tok/s
-- *Peak memory (GB):* 3.5
+- *Model load time:* 1.13s
+- *Generation time:* 3.52s
+- *Total time:* 5.66s
+- *Prompt preparation time:* 0.897
+- *First-token latency:* 1.95
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 4,044
+- *Generation tokens:* 110
+- *Total tokens:* 4,154
+- *Prompt throughput (raw):* 2,073 tok/s
+- *Generation throughput (raw):* 148 tok/s
+- *Peak memory (GB):* 3.7
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.10
+- *Cache memory (GB):* 0.65
 - *Model-load active memory (GB):* 2.18
 - *Post-cleanup active memory (GB):* 0.00806
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 603
+- *Rendered prompt characters:* 1387
 - *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
 - *Requested model revision:* not requested
@@ -1286,129 +1177,11 @@ cats, tabby, pink blanket, fabric, remote control, sofa, cushion, resting, sleep
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Cats Resting on a Pink Couch"
+Title: Historic Tower View with Overcast Sky
 
-Description: "Two cats are comfortably sprawled out on a vibrant pink couch, basking in the soft light of the day. Their relaxed postures and the cozy setting create a serene and tranquil scene."
+Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. The overcast sky adds a subdued lighting to the scene, highlighting the architectural details of the tower and the lush foliage of the surrounding trees.
 
-Keywords: cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, basking, cozy, serene, scene.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.91s
-- *Generation time:* 1.97s
-- *Total time:* 2.91s
-- *Prompt preparation time:* 0.0186
-- *First-token latency:* 0.315
-- *Cleanup time:* 0.0897
-- *Prompt tokens:* 883
-- *Generation tokens:* 94
-- *Total tokens:* 977
-- *Prompt throughput (raw):* 2,799 tok/s
-- *Generation throughput (raw):* 58.8 tok/s
-- *Peak memory (GB):* 9.1
-- *Active memory (GB):* 8.3
-- *Cache memory (GB):* 0.42
-- *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00813
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 493
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Cats Sleeping on Pink Sofa
-
-Description: Two cats are sleeping on a pink sofa with remote controls beside them.
-
-Keywords: cats, sleeping, pink sofa, remote controls, relaxed, comfortable, indoor, domestic, fur, striped, resting, tranquil, domesticated, pet, animal, relaxation, cozy, home, companionship
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.33s
-- *Generation time:* 1.37s
-- *Total time:* 3.74s
-- *Prompt preparation time:* 0.0257
-- *First-token latency:* 0.339
-- *Cleanup time:* 0.141
-- *Prompt tokens:* 409
-- *Generation tokens:* 81
-- *Total tokens:* 490
-- *Prompt throughput (raw):* 1,207 tok/s
-- *Generation throughput (raw):* 79.6 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 22
-- *Cache memory (GB):* 0.07
-- *Model-load active memory (GB):* 21.8
-- *Post-cleanup active memory (GB):* 0.00844
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 544
-- *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 93b3cbddd65ed4babff8f22fba491cdba7a21778
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-Omni-30B-A3B-Instruct-4bit/snapshots/93b3cbddd65ed4babff8f22fba491cdba7a21778
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Two tabby cats sleeping on sofa
-
-Description:
-Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats.
-
-Keywords:
-tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoor, animal, pet, living room, comfort, relaxation, animal companions, domestic animals, household, feline, rest
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -1429,26 +1202,26 @@ tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.90s
-- *Generation time:* 1.31s
-- *Total time:* 3.24s
-- *Prompt preparation time:* 0.0203
-- *First-token latency:* 0.321
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 409
-- *Generation tokens:* 83
-- *Total tokens:* 492
-- *Prompt throughput (raw):* 1,275 tok/s
-- *Generation throughput (raw):* 85.0 tok/s
-- *Peak memory (GB):* 19
+- *Model load time:* 2.05s
+- *Generation time:* 33.17s
+- *Total time:* 36.41s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 30.2
+- *Cleanup time:* 0.135
+- *Prompt tokens:* 16,578
+- *Generation tokens:* 155
+- *Total tokens:* 16,733
+- *Prompt throughput (raw):* 548 tok/s
+- *Generation throughput (raw):* 78.0 tok/s
+- *Peak memory (GB):* 23
 - *Active memory (GB):* 18
-- *Cache memory (GB):* 0.07
+- *Cache memory (GB):* 2.4
 - *Model-load active memory (GB):* 18.3
 - *Post-cleanup active memory (GB):* 0.00875
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 544
+- *Rendered prompt characters:* 1328
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1461,11 +1234,9 @@ tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoo
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two cats resting on a pink surface
-
-Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with its eyes closed, while the other lies on its side. Two remote controls are visible on the surface near the cats.
-
-Keywords: cats, remote controls, pink fabric, lying down, curled up, eyes closed, striped pattern, light, indoor setting, domestic animals
+Title: Historic Oxford tower viewed through trees
+Description: A view of a historic stone Gothic tower and surrounding rooftops in Oxford, England, framed by dense green foliage under a cloudy sky. The scene is captured on 2026-10-17 at 15:44:34 UTC+01:00, with the location at 51.751667°N, 1.252222°W.
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic
 </pre>
 
 </details>
@@ -1486,26 +1257,26 @@ Keywords: cats, remote controls, pink fabric, lying down, curled up, eyes closed
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.91s
-- *Generation time:* 0.82s
-- *Total time:* 1.75s
-- *Prompt preparation time:* 0.0099
-- *First-token latency:* 0.204
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 409
-- *Generation tokens:* 60
-- *Total tokens:* 469
-- *Prompt throughput (raw):* 2,009 tok/s
-- *Generation throughput (raw):* 106 tok/s
-- *Peak memory (GB):* 6.8
+- *Model load time:* 1.01s
+- *Generation time:* 35.32s
+- *Total time:* 37.49s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 33.1
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 16,578
+- *Generation tokens:* 87
+- *Total tokens:* 16,665
+- *Prompt throughput (raw):* 501 tok/s
+- *Generation throughput (raw):* 67.5 tok/s
+- *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
-- *Cache memory (GB):* 0.11
+- *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
 - *Post-cleanup active memory (GB):* 0.00906
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 544
+- *Rendered prompt characters:* 1328
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1518,11 +1289,11 @@ Keywords: cats, remote controls, pink fabric, lying down, curled up, eyes closed
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Sleeping on Pink Sofa
+Title: Gothic Tower Peeks Through Autumn Foliage
 
-Description: Two tabby cats rest peacefully on a bright pink sofa. Remote controls lie beside them. Natural daylight illuminates the scene.
+Description: A historic stone Gothic tower rises above rooftops, framed by dense green and yellowing foliage under an overcast sky in Oxfordshire, England. The scene captures autumnal trees partially obscuring the architectural landmark.
 
-Keywords: cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feline
+Keywords: Gothic tower, autumn foliage, overcast sky, Oxfordshire, England, historic architecture, trees, rooftops, stone building, cloudy day
 </pre>
 
 </details>
@@ -1543,26 +1314,26 @@ Keywords: cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feli
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.49s
-- *Generation time:* 1.58s
-- *Total time:* 4.11s
-- *Prompt preparation time:* 0.026
-- *First-token latency:* 0.337
-- *Cleanup time:* 0.152
-- *Prompt tokens:* 421
-- *Generation tokens:* 88
-- *Total tokens:* 509
-- *Prompt throughput (raw):* 1,250 tok/s
-- *Generation throughput (raw):* 71.5 tok/s
-- *Peak memory (GB):* 21
+- *Model load time:* 2.53s
+- *Generation time:* 33.79s
+- *Total time:* 37.52s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 31.4
+- *Cleanup time:* 0.145
+- *Prompt tokens:* 16,594
+- *Generation tokens:* 112
+- *Total tokens:* 16,706
+- *Prompt throughput (raw):* 529 tok/s
+- *Generation throughput (raw):* 75.1 tok/s
+- *Peak memory (GB):* 25
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.10
+- *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
 - *Post-cleanup active memory (GB):* 0.00957
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1347
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1575,21 +1346,12 @@ Keywords: cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feli
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Reclining on Pink Sofa
-Description: Two tabby cats lie stretched on a bright pink sofa; one wears a green collar, and two remote controls rest nearby. Lighting appears even and indoor, with no shadows or motion blur.
-Keywords: tabby cat, pink sofa, cat collar, remote control, feline relaxation, domestic interior, pet photography, animal rest, fabric texture, dual subjects
+Title: Stone Gothic Tower Hidden in Trees
+
+Description: Taken on October 17, 2026, from coordinates near Oxford, this image captures a historic stone building featuring Gothic architectural details and pinnacles rising above domestic rooftops. Dense green foliage frames the scene against a cloudy, overcast sky.
+
+Keywords: architecture, branch, building, chimney, cloudy sky, english countryside, foliage, gothic tower, leaves, outdoors, overcast, oxford, oxfordshire, pinnacle, roof, rooftops, scenic, trees
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title: Two Tabby Cats Reclining on Pink Sofa  
-Description: Two tabby cats lie stretched on a bright pink sofa; one wears a green collar, and two remote controls rest nearby. Lighting appears even and indoor, with no shadows or motion blur.  
-Keywords: tabby cat, pink sofa, cat collar, remote control, feline relaxation, domestic interior, pet photography, animal rest, fabric texture, dual subjects
-```
-
-</details>
 
 </details>
 
@@ -1609,26 +1371,26 @@ Keywords: tabby cat, pink sofa, cat collar, remote control, feline relaxation, d
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.10s
-- *Generation time:* 4.11s
-- *Total time:* 6.24s
-- *Prompt preparation time:* 0.0106
-- *First-token latency:* 0.682
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 421
-- *Generation tokens:* 109
-- *Total tokens:* 530
-- *Prompt throughput (raw):* 617 tok/s
-- *Generation throughput (raw):* 31.9 tok/s
-- *Peak memory (GB):* 17
+- *Model load time:* 2.23s
+- *Generation time:* 54.94s
+- *Total time:* 58.39s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 49.9
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 16,594
+- *Generation tokens:* 121
+- *Total tokens:* 16,715
+- *Prompt throughput (raw):* 333 tok/s
+- *Generation throughput (raw):* 29.8 tok/s
+- *Peak memory (GB):* 21
 - *Active memory (GB):* 16
-- *Cache memory (GB):* 0.25
+- *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
 - *Post-cleanup active memory (GB):* 0.0101
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1347
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -1641,67 +1403,12 @@ Keywords: tabby cat, pink sofa, cat collar, remote control, feline relaxation, d
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Reclining on Pink Sofa Cushion
-
-Description: Two striped tabby cats recline on a bright pink fabric surface with two white television remote controls placed nearby. The cats lie in opposing orientations with their limbs relaxed, and even indoor lighting illuminates their patterned coats and the vivid upholstery.
-
-Keywords: tabby cats, pink cushion, reclining, striped coats, remote controls, indoor setting, relaxed posture, fabric texture, domestic scene, striped patterns, cat tails, feline rest, two cats
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.69s
-- *Generation time:* 0.90s
-- *Total time:* 1.65s
-- *Prompt preparation time:* 0.0594
-- *First-token latency:* 0.603
-- *Cleanup time:* 0.0957
-- *Prompt tokens:* 1,204
-- *Generation tokens:* 31
-- *Total tokens:* 1,235
-- *Prompt throughput (raw):* 1,995 tok/s
-- *Generation throughput (raw):* 131 tok/s
-- *Peak memory (GB):* 5.6
-- *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.30
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0102
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 504
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Two Cats on a Couch
-Description: Two cats are sleeping on a pink couch.
-Keywords: cats, couch, sleeping, pink
+Title:
+Gothic tower and rooftops seen through autumn foliage
+Description:
+A stone Gothic tower featuring crenellated battlements and tall pinnacles rises above a cluster of chimneys and rooftops in Oxford, England. The structure is partially obscured by the dense green and yellowing branches of trees in the foreground, set against a grey, overcast sky.
+Keywords:
+Architecture, Autumn, Building, Chimney, Cloud, England, Foliage, Gothic, Leaves, Oxford, Pinnacle, Roof, Rooftops, Sky, Stone, Tower, Trees
 </pre>
 
 </details>
@@ -1722,26 +1429,26 @@ Keywords: cats, couch, sleeping, pink
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.28s
-- *Generation time:* 2.28s
-- *Total time:* 4.12s
-- *Prompt preparation time:* 0.547
-- *First-token latency:* 0.983
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 2,909
-- *Generation tokens:* 82
-- *Total tokens:* 2,991
-- *Prompt throughput (raw):* 2,959 tok/s
-- *Generation throughput (raw):* 98.9 tok/s
+- *Model load time:* 1.26s
+- *Generation time:* 2.93s
+- *Total time:* 5.32s
+- *Prompt preparation time:* 0.992
+- *First-token latency:* 0.866
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 2,081
+- *Generation tokens:* 117
+- *Total tokens:* 2,198
+- *Prompt throughput (raw):* 2,403 tok/s
+- *Generation throughput (raw):* 101 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.47
+- *Cache memory (GB):* 0.34
 - *Model-load active memory (GB):* 5.46
 - *Post-cleanup active memory (GB):* 0.011
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3410
+- *Rendered prompt characters:* 4194
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -1755,9 +1462,11 @@ Keywords: cats, couch, sleeping, pink
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Relaxing Together
-Description: Two tabby cats are curled up and sleeping side by side on a pink blanket, with a remote control placed nearby on the sofa. The scene is well-lit, capturing the peaceful atmosphere of a cozy living room.
-Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, home, indoor, comfortable
+Title: Gothic Tower Rooftops Amidst Green Canopy
+
+Description: This image captures a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. The tower, with its distinctive spires and intricate architecture, stands out against the cloudy backdrop, while the lush foliage adds a touch of nature to the scene.
+
+Keywords: Gothic architecture, Stone structure, Rooftops, Trees, Overcast sky, Clouds, England, English countryside, Historic building, Foliage, Pinnacle, Outdoor scene, Oxford, Oxfordshire.
 </pre>
 
 </details>
@@ -1778,17 +1487,17 @@ Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, ho
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.40s
-- *Generation time:* 2.79s
-- *Total time:* 6.25s
-- *Prompt preparation time:* 0.0314
-- *First-token latency:* 0.616
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 386
-- *Generation tokens:* 72
-- *Total tokens:* 458
-- *Prompt throughput (raw):* 627 tok/s
-- *Generation throughput (raw):* 37.4 tok/s
+- *Model load time:* 3.37s
+- *Generation time:* 3.82s
+- *Total time:* 8.03s
+- *Prompt preparation time:* 0.682
+- *First-token latency:* 1.33
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 586
+- *Generation tokens:* 76
+- *Total tokens:* 662
+- *Prompt throughput (raw):* 440 tok/s
+- *Generation throughput (raw):* 46.8 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -1797,7 +1506,7 @@ Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, ho
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
+- *Rendered prompt characters:* 1282
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1811,9 +1520,9 @@ Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, ho
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats sleeping on a pink blanket
-Description: Two patterned tabby cats are lying down on a pink surface next to two remote controls. The lighting is bright.
-Keywords: cats, tabby, sleeping, pink, blanket, remote, controls, indoors, couch, resting, fur, domestic, patterned, lying, soft
+Title: Gothic Stone Tower Framed by Trees in Oxford
+Description: A historic stone gothic tower and rooftops are visible through dense green foliage under an overcast sky in Oxford, Oxfordshire.
+Keywords: Architecture, Building, Cloud, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops
 </pre>
 
 </details>
@@ -1834,26 +1543,26 @@ Keywords: cats, tabby, sleeping, pink, blanket, remote, controls, indoors, couch
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.85s
-- *Generation time:* 2.03s
-- *Total time:* 3.94s
-- *Prompt preparation time:* 0.0337
-- *First-token latency:* 0.595
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 390
-- *Generation tokens:* 88
-- *Total tokens:* 478
-- *Prompt throughput (raw):* 656 tok/s
-- *Generation throughput (raw):* 62.0 tok/s
-- *Peak memory (GB):* 7.5
+- *Model load time:* 1.80s
+- *Generation time:* 3.10s
+- *Total time:* 5.73s
+- *Prompt preparation time:* 0.675
+- *First-token latency:* 0.783
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 590
+- *Generation tokens:* 104
+- *Total tokens:* 694
+- *Prompt throughput (raw):* 753 tok/s
+- *Generation throughput (raw):* 62.3 tok/s
+- *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.25
+- *Cache memory (GB):* 0.32
 - *Model-load active memory (GB):* 6.75
 - *Post-cleanup active memory (GB):* 0.0116
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 526
+- *Rendered prompt characters:* 1310
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1867,11 +1576,14 @@ Keywords: cats, tabby, sleeping, pink, blanket, remote, controls, indoors, couch
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats on a Pink Sofa
+Title:
+Gothic Architecture Framed by Foliage in Oxford
 
-Description: Two tabby cats lie on a pink fabric sofa, with one resting horizontally and the other positioned vertically. Two remote controls are also visible near the cats.
+Description:
+A view of a historic stone Gothic tower and rooftops nestled among dense green foliage under a cloudy sky. The scene captures a glimpse of traditional architecture nestled in an English town setting.
 
-Keywords: cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, pink fabric, remote controls, furniture, tabby cat, resting, indoor, grey and brown, stripes, paws, tail
+Keywords:
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -1892,26 +1604,26 @@ Keywords: cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.50s
-- *Generation time:* 1.17s
-- *Total time:* 3.71s
-- *Prompt preparation time:* 0.0098
-- *First-token latency:* 0.364
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 390
-- *Generation tokens:* 88
-- *Total tokens:* 478
-- *Prompt throughput (raw):* 1,070 tok/s
-- *Generation throughput (raw):* 110 tok/s
+- *Model load time:* 2.47s
+- *Generation time:* 1.71s
+- *Total time:* 5.01s
+- *Prompt preparation time:* 0.65
+- *First-token latency:* 0.387
+- *Cleanup time:* 0.139
+- *Prompt tokens:* 590
+- *Generation tokens:* 75
+- *Total tokens:* 665
+- *Prompt throughput (raw):* 1,524 tok/s
+- *Generation throughput (raw):* 108 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
-- *Cache memory (GB):* 0.17
+- *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 15.4
 - *Post-cleanup active memory (GB):* 0.0121
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 526
+- *Rendered prompt characters:* 1310
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1925,11 +1637,9 @@ Keywords: cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats lying on a pink surface
-
-Description: Two tabby cats lie on a pink fabric surface next to two remote controls. One cat is positioned on the left and the other on the right.
-
-Keywords: tabby cats, pink fabric, remote controls, lying down, domestic cats, striped fur, indoor, two cats, close-up, soft lighting, patterned fur, dark stripes, animal photography, seated, resting
+Title: Historic Gothic Tower Framed by Green Foliage
+Description: A historic stone gothic tower and rooftops emerge from dense green foliage under an overcast sky in Oxford, England.
+Keywords: Architecture, Building, Cloudy sky, England, Foliage, Historic Building, Leaves, Oxford, Oxfordshire, Pinnacle, Rooftops, Scenic, Sky, Trees, Urban, Limestone
 </pre>
 
 </details>
@@ -1950,26 +1660,26 @@ Keywords: tabby cats, pink fabric, remote controls, lying down, domestic cats, s
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.77s
-- *Generation time:* 0.72s
-- *Total time:* 2.53s
-- *Prompt preparation time:* 0.0093
-- *First-token latency:* 0.16
-- *Cleanup time:* 0.125
-- *Prompt tokens:* 386
-- *Generation tokens:* 67
-- *Total tokens:* 453
-- *Prompt throughput (raw):* 2,418 tok/s
-- *Generation throughput (raw):* 122 tok/s
-- *Peak memory (GB):* 5.9
+- *Model load time:* 1.70s
+- *Generation time:* 1.73s
+- *Total time:* 4.24s
+- *Prompt preparation time:* 0.654
+- *First-token latency:* 0.414
+- *Cleanup time:* 0.114
+- *Prompt tokens:* 586
+- *Generation tokens:* 83
+- *Total tokens:* 669
+- *Prompt throughput (raw):* 1,414 tok/s
+- *Generation throughput (raw):* 121 tok/s
+- *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
-- *Cache memory (GB):* 0.07
+- *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
 - *Post-cleanup active memory (GB):* 0.0126
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
+- *Rendered prompt characters:* 1282
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1983,65 +1693,9 @@ Keywords: tabby cats, pink fabric, remote controls, lying down, domestic cats, s
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two cats rest upon bright pink fabric
-Description: Two cats lie on a vividly coloured pink surface under soft lighting. They are accompanied by a remote control device.
-Keywords: cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, lounged, indoors, tortoiseshell, domestic, creature, fluffy
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
-
-### mlx-community/granite-4.0-3b-vision-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.62s
-- *Generation time:* 0.64s
-- *Total time:* 1.30s
-- *Prompt preparation time:* 0.0317
-- *First-token latency:* 0.274
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 734
-- *Generation tokens:* 58
-- *Total tokens:* 792
-- *Prompt throughput (raw):* 2,682 tok/s
-- *Generation throughput (raw):* 171 tok/s
-- *Peak memory (GB):* 4.7
-- *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.13
-- *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0128
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 696
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Feline Serenity on a Red Couch"
-Description: Two striped cats resting on a red blanket, one with a remote control nearby.
-Keywords: cats, striped, red, blanket, resting, remote control, lounging, comfort, domestic, tranquility.
+Title: Historic Gothic Tower Framed by Autumn Foliage Under Overcast Sky
+Description: A view captures the pinnacled rooftops of a historic stone building, partially viewed through dense, leafy trees beneath a dramatic, cloudy sky.
+Keywords: Gothic architecture, historic building, rooftops, foliage, trees, overcast sky, pinnacles, stone structure, English countryside, autumn, cloudy, outdoors, scenery, Oxfordshire
 </pre>
 
 </details>
@@ -2062,26 +1716,26 @@ Keywords: cats, striped, red, blanket, resting, remote control, lounging, comfor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.85s
-- *Generation time:* 0.76s
-- *Total time:* 1.63s
-- *Prompt preparation time:* 0.00864
-- *First-token latency:* 0.123
-- *Cleanup time:* 0.108
-- *Prompt tokens:* 420
-- *Generation tokens:* 89
-- *Total tokens:* 509
-- *Prompt throughput (raw):* 3,411 tok/s
-- *Generation throughput (raw):* 147 tok/s
-- *Peak memory (GB):* 4.9
+- *Model load time:* 0.95s
+- *Generation time:* 3.10s
+- *Total time:* 4.89s
+- *Prompt preparation time:* 0.734
+- *First-token latency:* 1.62
+- *Cleanup time:* 0.102
+- *Prompt tokens:* 4,173
+- *Generation tokens:* 99
+- *Total tokens:* 4,272
+- *Prompt throughput (raw):* 2,583 tok/s
+- *Generation throughput (raw):* 127 tok/s
+- *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
-- *Cache memory (GB):* 0.08
+- *Cache memory (GB):* 0.72
 - *Model-load active memory (GB):* 3.93
 - *Post-cleanup active memory (GB):* 0.0142
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 602
+- *Rendered prompt characters:* 1386
 - *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2094,14 +1748,9 @@ Keywords: cats, striped, red, blanket, resting, remote control, lounging, comfor
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Two cats sleeping on a red couch with remote controls nearby.
-
-Description:
-Two cats are sleeping on a red couch, with one cat lying on its side and the other cat lying on its stomach. The cats are surrounded by remote controls, indicating a living room setting. The lighting is natural, suggesting daytime.
-
-Keywords:
-cats, sleeping, red couch, remote controls, living room, natural lighting, side, stomach, remote, living
+Title: Gothic Tower Amidst Lush Foliage Under Overcast Skies
+Description: A historic stone Gothic tower with pointed spires rises above dense green trees and rooftops, set against a cloudy sky.
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -2122,26 +1771,26 @@ cats, sleeping, red couch, remote controls, living room, natural lighting, side,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.02s
-- *Generation time:* 3.32s
-- *Total time:* 5.36s
-- *Prompt preparation time:* 0.0119
-- *First-token latency:* 0.916
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 538
-- *Generation tokens:* 87
-- *Total tokens:* 625
-- *Prompt throughput (raw):* 587 tok/s
-- *Generation throughput (raw):* 36.4 tok/s
-- *Peak memory (GB):* 17
+- *Model load time:* 1.77s
+- *Generation time:* 5.38s
+- *Total time:* 7.86s
+- *Prompt preparation time:* 0.578
+- *First-token latency:* 1.67
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 1,313
+- *Generation tokens:* 111
+- *Total tokens:* 1,424
+- *Prompt throughput (raw):* 785 tok/s
+- *Generation throughput (raw):* 35.3 tok/s
+- *Peak memory (GB):* 18
 - *Active memory (GB):* 15
-- *Cache memory (GB):* 0.14
+- *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 15.1
 - *Post-cleanup active memory (GB):* 0.0144
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 472
+- *Rendered prompt characters:* 1256
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2155,13 +1804,13 @@ cats, sleeping, red couch, remote controls, living room, natural lighting, side,
 
 <pre class="model-output-readable">
 Title:
-Two Cats Resting on a Pink Blanket
+Gothic Tower Amidst Autumn Foliage
 
 Description:
-Two tabby cats are lying on a pink blanket, one stretched out and the other curled up. A remote control is visible near the cats.
+A historic stone Gothic tower and rooftops peek through dense green and autumnal trees under an overcast sky in Oxfordshire, captured in October 2026.
 
 Keywords:
-cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch, paws, stripes, sleeping, pet, animal, lounge, cushion, relaxed posture, domestic
+Gothic tower, Oxfordshire, historic architecture, autumn foliage, overcast sky, stone building, rooftops, trees, chimney, pinnacles, English countryside, scenic view, outdoors, cloudy sky, leaves, branches, historic building, architecture, Oxford
 </pre>
 
 </details>
@@ -2183,26 +1832,26 @@ cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type nemotron_h_omni via
   nemotron_h_nano_omni)
-- *Model load time:* 4.26s
-- *Generation time:* 2.86s
-- *Total time:* 7.17s
-- *Prompt preparation time:* 0.0222
-- *First-token latency:* 1.2
-- *Cleanup time:* 0.173
-- *Prompt tokens:* 420
-- *Generation tokens:* 101
-- *Total tokens:* 521
-- *Prompt throughput (raw):* 349 tok/s
-- *Generation throughput (raw):* 61.1 tok/s
-- *Peak memory (GB):* 46
+- *Model load time:* 4.01s
+- *Generation time:* 7.99s
+- *Total time:* 12.94s
+- *Prompt preparation time:* 0.757
+- *First-token latency:* 5.1
+- *Cleanup time:* 0.171
+- *Prompt tokens:* 3,640
+- *Generation tokens:* 123
+- *Total tokens:* 3,763
+- *Prompt throughput (raw):* 714 tok/s
+- *Generation throughput (raw):* 63.8 tok/s
+- *Peak memory (GB):* 52
 - *Active memory (GB):* 43
-- *Cache memory (GB):* 0.21
+- *Cache memory (GB):* 0.30
 - *Model-load active memory (GB):* 43.2
-- *Post-cleanup active memory (GB):* 0.0147
+- *Post-cleanup active memory (GB):* 0.0153
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
+- *Rendered prompt characters:* 1337
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2216,11 +1865,11 @@ cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats sleeping on a pink couch
+Title: Oxford Historic Tower Peeking Through Autumn Trees
 
-Description: Two domestic cats with mackerel tabby markings are lying asleep on a bright pink fabric surface, likely a sofa. Each cat has a separate remote control placed nearby on the surface, and both animals are in a relaxed, curled sleeping position.
+Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an overcast sky, captured at 15:44 BST on 17 October 2026 near Oxford, Oxfordshire, England.
 
-Keywords: cats, sleeping, tabby, mackerel, pink, couch, remote controls, domestic, animals, resting, fabric, sleeping positions, furniture, indoor, two cats
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -2242,26 +1891,26 @@ Keywords: cats, sleeping, tabby, mackerel, pink, couch, remote controls, domesti
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.56s
-- *Generation time:* 0.81s
-- *Total time:* 3.41s
-- *Prompt preparation time:* 0.0232
-- *First-token latency:* 0.328
-- *Cleanup time:* 0.124
-- *Prompt tokens:* 421
-- *Generation tokens:* 65
-- *Total tokens:* 486
-- *Prompt throughput (raw):* 1,283 tok/s
-- *Generation throughput (raw):* 138 tok/s
-- *Peak memory (GB):* 21
+- *Model load time:* 2.24s
+- *Generation time:* 4.12s
+- *Total time:* 7.20s
+- *Prompt preparation time:* 0.686
+- *First-token latency:* 2.42
+- *Cleanup time:* 0.13
+- *Prompt tokens:* 3,641
+- *Generation tokens:* 135
+- *Total tokens:* 3,776
+- *Prompt throughput (raw):* 1,507 tok/s
+- *Generation throughput (raw):* 139 tok/s
+- *Peak memory (GB):* 23
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.07
+- *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.0149
+- *Post-cleanup active memory (GB):* 0.0156
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 554
+- *Rendered prompt characters:* 1338
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2276,9 +1925,11 @@ Keywords: cats, sleeping, tabby, mackerel, pink, couch, remote controls, domesti
 
 <pre class="model-output-readable">
 
-Title: Two cats sleeping on a sofa
-Description: Two tabby cats are sleeping on a pink sofa, one curled up and the other stretched out, with remote controls nearby.
-Keywords: cat, tabby, pink sofa, remote control, sleeping, curled, stretched, pink blanket, pink cushion, cat furniture
+Title: Historic Gothic Tower Through Autumnal Trees
+
+Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky, with the scene captured on October 17, 2026, at 15:44:34 UTC+01:00 near Oxford, England.
+
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
 </pre>
 
 </details>
@@ -2300,26 +1951,26 @@ Keywords: cat, tabby, pink sofa, remote control, sleeping, curled, stretched, pi
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type nemotron_h_omni via
   nemotron_h_nano_omni)
-- *Model load time:* 13.47s
-- *Generation time:* 16.53s
-- *Total time:* 30.06s
-- *Prompt preparation time:* 0.0268
-- *First-token latency:* 11.1
-- *Cleanup time:* 0.308
-- *Prompt tokens:* 420
-- *Generation tokens:* 89
-- *Total tokens:* 509
-- *Prompt throughput (raw):* 37.7 tok/s
-- *Generation throughput (raw):* 29.7 tok/s
-- *Peak memory (GB):* 81
+- *Model load time:* 14.98s
+- *Generation time:* 24.35s
+- *Total time:* 41.40s
+- *Prompt preparation time:* 1.77
+- *First-token latency:* 18.1
+- *Cleanup time:* 0.257
+- *Prompt tokens:* 3,640
+- *Generation tokens:* 133
+- *Total tokens:* 3,773
+- *Prompt throughput (raw):* 201 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
+- *Peak memory (GB):* 87
 - *Active memory (GB):* 78
-- *Cache memory (GB):* 0.20
+- *Cache memory (GB):* 0.29
 - *Model-load active memory (GB):* 78.4
-- *Post-cleanup active memory (GB):* 0.0152
+- *Post-cleanup active memory (GB):* 0.0158
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
+- *Rendered prompt characters:* 1337
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2333,11 +1984,623 @@ Keywords: cat, tabby, pink sofa, remote control, sleeping, curled, stretched, pi
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats sleeping on a pink sofa
+Title: Historic stone tower framed by trees under cloudy sky
 
-Description: Two domestic cats rest side by side on a bright pink cushioned surface, each with a striped coat. A white remote control lies beside each animal, with the larger cat stretched out and the smaller one curled.
+Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky. The scene is captured from a high vantage point in Oxford, Oxfordshire, England, with the spires and battlements of the building visible through the foliage.
 
-Keywords: cats, tabby, pink, sofa, cushion, sleeping, remote controls, striped, animals, domestic, indoor, pets, furnishings
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
+
+### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.95s
+- *Generation time:* 1.89s
+- *Total time:* 3.69s
+- *Prompt preparation time:* 0.738
+- *First-token latency:* 0.788
+- *Cleanup time:* 0.0926
+- *Prompt tokens:* 2,096
+- *Generation tokens:* 83
+- *Total tokens:* 2,179
+- *Prompt throughput (raw):* 2,661 tok/s
+- *Generation throughput (raw):* 208 tok/s
+- *Peak memory (GB):* 4.0
+- *Active memory (GB):* 2.8
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 2.82
+- *Post-cleanup active memory (GB):* 0.00357
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1307
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* b6311011d95c8894a57289bba8b916e6fbae9a61
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/b6311011d95c8894a57289bba8b916e6fbae9a61
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Historic stone tower framed by trees
+Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky in England.
+Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky, Foliage
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: foliage
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.98s
+- *Generation time:* 5.03s
+- *Total time:* 6.87s
+- *Prompt preparation time:* 0.734
+- *First-token latency:* 1.25
+- *Cleanup time:* 0.112
+- *Prompt tokens:* 925
+- *Generation tokens:* 752
+- *Total tokens:* 1,677
+- *Prompt throughput (raw):* 741 tok/s
+- *Generation throughput (raw):* 244 tok/s
+- *Peak memory (GB):* 3.2
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00408
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1324
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+Here's a breakdown of the required sections:
+
+Title: I need to create a concise, 5-10 word title that captures the image's main subject (historic gothic tower framed by trees).
+
+Description: I must combine relevant context (British landscape, gothic architecture) with the main subject, setting, action, lighting, and distinctive details. Ensure it's factual based on the visible elements.
+
+Keywords: I need to list 10-18 unique keywords covering the context (architecture, trees, overcast, England, etc.) and visible details (historic building, roof, pinnacles, foliage, etc.).
+
+Let's draft:
+
+Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
+
+Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
+
+Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roof, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, British countryside, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
+
+Now, check word count for title: 6 words. Good.
+
+Description: Combine the visible elements (gothic tower, framed by trees, under overcast sky, in England setting), and mention lighting (cloudy), distinct building details (rooftops, chimneys). Ensure it's 1-2 sentences.
+
+Keywords: Gothic tower, historic building, overcast sky, foliage, England, architecture, roofs, pinnacles, leaves, cloudy, scenic, outdoors, British, Cloddy, chimney, leafy, sky, structure, pinnacles.
+
+I need to ensure 10-18 unique keywords. Let's list them and check uniqueness.
+
+Final check:
+
+Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
+
+Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
+
+Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
+
+Count keywords: Let's list them:
+
+1. Gothic tower
+2. historic stone
+3. gothic architecture
+4. foliage
+5. overcast sky
+6. England
+7. trees
+8. roofs
+9. pinnacles
+10. cloudy
+11. Scenic
+12. Outdoors
+13. Architecture
+14. Foliage
+15. Sky
+16. Cloddy
+17. Pinnacle
+18. Building
+19. Chimney
+20. Leaves
+21. Overhead
+
+That's 21 keywords, which is within 10-18 (but we can adjust to ensure they are unique and cover context and details).
+
+I'll proceed with these.
+&lt;/think&gt;
+
+Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
+Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
+Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+Here's a breakdown of the required sections:
+
+Title: I need to create a concise, 5-10 word title that captures the image's main subject (historic gothic tower framed by trees).
+
+Description: I must combine relevant context (British landscape, gothic architecture) with the main subject, setting, action, lighting, and distinctive details. Ensure it's factual based on the visible elements.
+
+Keywords: I need to list 10-18 unique keywords covering the context (architecture, trees, overcast, England, etc.) and visible details (historic building, roof, pinnacles, foliage, etc.).
+
+Let's draft:
+
+Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
+
+Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
+
+Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roof, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, British countryside, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
+
+Now, check word count for title: 6 words. Good.
+
+Description: Combine the visible elements (gothic tower, framed by trees, under overcast sky, in England setting), and mention lighting (cloudy), distinct building details (rooftops, chimneys). Ensure it's 1-2 sentences.
+
+Keywords: Gothic tower, historic building, overcast sky, foliage, England, architecture, roofs, pinnacles, leaves, cloudy, scenic, outdoors, British, Cloddy, chimney, leafy, sky, structure, pinnacles.
+
+I need to ensure 10-18 unique keywords. Let's list them and check uniqueness.
+
+Final check:
+
+Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
+
+Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
+
+Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
+
+Count keywords: Let's list them:
+
+1. Gothic tower
+2. historic stone
+3. gothic architecture
+4. foliage
+5. overcast sky
+6. England
+7. trees
+8. roofs
+9. pinnacles
+10. cloudy
+11. Scenic
+12. Outdoors
+13. Architecture
+14. Foliage
+15. Sky
+16. Cloddy
+17. Pinnacle
+18. Building
+19. Chimney
+20. Leaves
+21. Overhead
+
+That's 21 keywords, which is within 10-18 (but we can adjust to ensure they are unique and cover context and details).
+
+I'll proceed with these.
+</think>
+
+Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
+Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
+Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-47-1b-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.7-1B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.7-1B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: foliage, england, sky
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
+- *Model load time:* 1.09s
+- *Generation time:* 1.42s
+- *Total time:* 3.37s
+- *Prompt preparation time:* 0.74
+- *First-token latency:* 0.245
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 927
+- *Generation tokens:* 114
+- *Total tokens:* 1,041
+- *Prompt throughput (raw):* 3,786 tok/s
+- *Generation throughput (raw):* 254 tok/s
+- *Peak memory (GB):* 3.7
+- *Active memory (GB):* 2.7
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.67
+- *Post-cleanup active memory (GB):* 0.00459
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1318
+- *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 13caa569f70e4b68b0ad7dd9574f15a241b34a7d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.7-1B-4bit/snapshots/13caa569f70e4b68b0ad7dd9574f15a241b34a7d
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Framed Gothic Tower Through Trees
+
+Description: A historic stone gothic tower with pinnacles and chimneys peeks through dense green foliage under an overcast sky, viewed from outdoors in Oxfordshire’s English countryside.
+
+Keywords: Gothic tower, trees, foliage, overcast, cloudy sky, England, Oxford, Oxfordshire, historic building, architecture, roof, rooftops, Scenic, Sky, Branch, Chimney, Leaves, Pinnacle, Outdoors, Rooflines, Foliage, Cloudy, Sky, England, English countryside
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: sky
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.96s
+- *Generation time:* 3.92s
+- *Total time:* 5.59s
+- *Prompt preparation time:* 0.6
+- *First-token latency:* 0.545
+- *Cleanup time:* 0.0976
+- *Prompt tokens:* 1,120
+- *Generation tokens:* 149
+- *Total tokens:* 1,269
+- *Prompt throughput (raw):* 2,055 tok/s
+- *Generation throughput (raw):* 52.9 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 8.3
+- *Cache memory (GB):* 0.52
+- *Model-load active memory (GB):* 8.3
+- *Post-cleanup active memory (GB):* 0.00813
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1277
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Overcast Skies Over Oxford's Historic Architecture"
+
+Description: On October 17, 2026, at 15:44:34 UTC+01:00, a historic stone gothic tower stands as a pinnacle amidst the English countryside, partially obscured by dense foliage under an overcast sky.
+
+Keywords: historic, architecture, gothic, tower, overcast, sky, leaves, foliage, English countryside, Oxford, Oxfordshire, pinnacle, rooftops, scenic, historic building, building, chimney, outdoors, sky, clouds
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
+- *Model load time:* 2.39s
+- *Generation time:* 20.15s
+- *Total time:* 23.68s
+- *Prompt preparation time:* 0.975
+- *First-token latency:* 17.9
+- *Cleanup time:* 0.142
+- *Prompt tokens:* 12,683
+- *Generation tokens:* 90
+- *Total tokens:* 12,773
+- *Prompt throughput (raw):* 708 tok/s
+- *Generation throughput (raw):* 66.0 tok/s
+- *Peak memory (GB):* 26
+- *Active memory (GB):* 22
+- *Cache memory (GB):* 1.8
+- *Model-load active memory (GB):* 21.8
+- *Post-cleanup active memory (GB):* 0.00844
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1328
+- *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 93b3cbddd65ed4babff8f22fba491cdba7a21778
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-Omni-30B-A3B-Instruct-4bit/snapshots/93b3cbddd65ed4babff8f22fba491cdba7a21778
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Historic Tower View Through Autumn Foliage
+
+Description:
+A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an overcast sky in Oxford, England.
+
+Keywords:
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Pinnacle, Roof, Rooftops, Sky, Stone, Tower
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.66s
+- *Generation time:* 2.04s
+- *Total time:* 3.64s
+- *Prompt preparation time:* 0.829
+- *First-token latency:* 0.643
+- *Cleanup time:* 0.0963
+- *Prompt tokens:* 1,419
+- *Generation tokens:* 74
+- *Total tokens:* 1,493
+- *Prompt throughput (raw):* 2,206 tok/s
+- *Generation throughput (raw):* 123 tok/s
+- *Peak memory (GB):* 5.6
+- *Active memory (GB):* 4.5
+- *Cache memory (GB):* 0.35
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0102
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1288
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Oxford Castle
+Description: A historic stone gothic tower and rooftops framed by dense green trees under an overcast sky.
+Keywords: architecture, branch, building, chimney, cloudy sky, english countryside, foliage, historic building, leaves, outdoors, overcast, oxford, oxfordshire, pinnacle, roof, rooftops, scenic, sky
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: oxfordshire, england, historic building,
+  rooftops, architecture, scenic, english countryside, foliage, leaves,
+  building, chimney, cloud, cloudy sky
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.28s
+- *Generation time:* 18.37s
+- *Total time:* 20.79s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 13.5
+- *Cleanup time:* 0.114
+- *Prompt tokens:* 16,589
+- *Generation tokens:* 229
+- *Total tokens:* 16,818
+- *Prompt throughput (raw):* 1,226 tok/s
+- *Generation throughput (raw):* 58.6 tok/s
+- *Peak memory (GB):* 14
+- *Active memory (GB):* 9.5
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 9.46
+- *Post-cleanup active memory (GB):* 0.0105
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1386
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Gothic Tower Through Foliage
+
+Description:
+A historic stone gothic tower and rooftops are framed by dense green trees under an overcast sky, with a view of neighboring buildings and chimneys, set in England's Oxfordshire countryside.
+
+Keywords:
+Oxfordshire, England, Gothic tower, historic building, stone architecture, overcast sky, cloudy, green foliage, trees, rooftops, chimneys, pinnacles, architecture, outdoors, scenic, England, English countryside, foliage, leaves, building, chimney, cloud, cloudy sky, 2026-10-17 15:44:34 UTC+01:00, GPS: 51.751667°N, 1.252222°W, architecture, branch, building, chimney, cloud, cloudy sky, England, English countryside, foliage, historic building, leaves, outdo, overcast, Oxford, Oxfordshire, pinnacle, roof, rooftops, scenic, sky, stone, tower, tree, urban, view.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title:
+Gothic Tower Through Foliage
+
+Description:
+A historic stone gothic tower and rooftops are framed by dense green trees under an overcast sky, with a view of neighboring buildings and chimneys, set in England's Oxfordshire countryside.
+
+Keywords: 
+Oxfordshire, England, Gothic tower, historic building, stone architecture, overcast sky, cloudy, green foliage, trees, rooftops, chimneys, pinnacles, architecture, outdoors, scenic, England, English countryside, foliage, leaves, building, chimney, cloud, cloudy sky, 2026-10-17 15:44:34 UTC+01:00, GPS: 51.751667°N, 1.252222°W, architecture, branch, building, chimney, cloud, cloudy sky, England, English countryside, foliage, historic building, leaves, outdo, overcast, Oxford, Oxfordshire, pinnacle, roof, rooftops, scenic, sky, stone, tower, tree, urban, view.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
+
+### mlx-community/granite-4.0-3b-vision-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint text: description
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.74s
+- *Generation time:* 1.67s
+- *Total time:* 3.39s
+- *Prompt preparation time:* 0.869
+- *First-token latency:* 0.444
+- *Cleanup time:* 0.0973
+- *Prompt tokens:* 1,454
+- *Generation tokens:* 68
+- *Total tokens:* 1,522
+- *Prompt throughput (raw):* 3,276 tok/s
+- *Generation throughput (raw):* 179 tok/s
+- *Peak memory (GB):* 4.6
+- *Active memory (GB):* 3.0
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 3.03
+- *Post-cleanup active memory (GB):* 0.0128
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1480
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Gothic Tower Amidst Greenery
+Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
+Keywords: Gothic tower, stone architecture, green foliage, overcast sky, historic building, rooftops, foliage, trees, landscape, Oxfordshire, England
 </pre>
 
 </details>
@@ -2352,32 +2615,32 @@ Keywords: cats, tabby, pink, sofa, cushion, sleeping, remote controls, striped, 
 <summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* no concerns detected
+- *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* none
+- *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.30s
-- *Generation time:* 1.34s
-- *Total time:* 2.67s
-- *Prompt preparation time:* 0.00998
-- *First-token latency:* 0.218
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 421
-- *Generation tokens:* 111
-- *Total tokens:* 532
-- *Prompt throughput (raw):* 1,933 tok/s
-- *Generation throughput (raw):* 103 tok/s
-- *Peak memory (GB):* 6.8
+- *Model load time:* 1.31s
+- *Generation time:* 2.50s
+- *Total time:* 5.13s
+- *Prompt preparation time:* 1.19
+- *First-token latency:* 0.984
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 1,802
+- *Generation tokens:* 83
+- *Total tokens:* 1,885
+- *Prompt throughput (raw):* 1,831 tok/s
+- *Generation throughput (raw):* 98.1 tok/s
+- *Peak memory (GB):* 7.3
 - *Active memory (GB):* 5.7
-- *Cache memory (GB):* 0.12
+- *Cache memory (GB):* 0.20
 - *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.0157
+- *Post-cleanup active memory (GB):* 0.0164
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1347
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -2391,128 +2654,14 @@ Keywords: cats, tabby, pink, sofa, cushion, sleeping, remote controls, striped, 
 
 <pre class="model-output-readable">
 Title:
-Two tabby cats sleeping on a pink sofa
+Oxford Castle spire seen through trees
 
 Description:
-Two tabby cats are curled up asleep on a bright pink fabric surface, likely a sofa or blanket. One cat lies on its side near the left edge, while the other rests on its back towards the right, with a white remote control visible between them. The scene is evenly lit, highlighting the striped pattern of their coats against the vivid background.
+A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
 
 Keywords:
-cats, sleeping, tabby, pink, sofa, remote, rest, curled, striped, domestic
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: sofa
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.61s
-- *Generation time:* 5.14s
-- *Total time:* 6.78s
-- *Prompt preparation time:* 0.0197
-- *First-token latency:* 0.599
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 545
-- *Generation tokens:* 540
-- *Total tokens:* 1,085
-- *Prompt throughput (raw):* 909 tok/s
-- *Generation throughput (raw):* 119 tok/s
-- *Peak memory (GB):* 18
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.00207
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 662
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get this done. I need to create some metadata for an image, and it's got to be spot-on.
-
-First, the image itself. I see two cats, definitely on a red sofa, and they're *sleeping*. One's a calico or tortoiseshell, and the other is a tiger-striped or tuxedo. The lighting is soft, probably natural. The image quality looks good.
-
-Okay, the title. It needs to be short and sweet, and in British English. I think "Two cats sleeping on a red sofa" is perfect. Concise and accurate.
-
-Now, the description. I'll cover the main subject (two cats), the setting (red sofa), the action (sleeping), and the lighting (soft, natural). I'll also mention the distinct details, like the different colors and patterns of the cats. I'll make sure to be objective and stick to what I *see*.
-
-Finally, the keywords. I need to be thorough here. I'll include terms like "cat," "cats," "kittens," "sleeping," "sofa," "red," and some breed-related terms. I'll also add words like "pet" and "domestic" to be as specific as possible. I'll make sure the keywords are distinct and relevant to the image.
-
-Let's get this right.
-
-**Title:** Two cats sleeping on a red sofa
-
-**Description:** A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-**Keywords:** cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-
-That should cover it. It's all about clear, factual observations. Nothing speculative, just what's right in front of me.
-&lt;/think&gt;
-
-Title: Two cats sleeping on a red sofa
-
-Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get this done. I need to create some metadata for an image, and it's got to be spot-on.
-
-First, the image itself. I see two cats, definitely on a red sofa, and they're *sleeping*. One's a calico or tortoiseshell, and the other is a tiger-striped or tuxedo. The lighting is soft, probably natural. The image quality looks good.
-
-Okay, the title. It needs to be short and sweet, and in British English. I think "Two cats sleeping on a red sofa" is perfect. Concise and accurate.
-
-Now, the description. I'll cover the main subject (two cats), the setting (red sofa), the action (sleeping), and the lighting (soft, natural). I'll also mention the distinct details, like the different colors and patterns of the cats. I'll make sure to be objective and stick to what I *see*.
-
-Finally, the keywords. I need to be thorough here. I'll include terms like "cat," "cats," "kittens," "sleeping," "sofa," "red," and some breed-related terms. I'll also add words like "pet" and "domestic" to be as specific as possible. I'll make sure the keywords are distinct and relevant to the image.
-
-Let's get this right.
-
-**Title:** Two cats sleeping on a red sofa
-
-**Description:** A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-**Keywords:** cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-
-That should cover it. It's all about clear, factual observations. Nothing speculative, just what's right in front of me.
-</think>
-
-Title: Two cats sleeping on a red sofa
-
-Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-```
-
-</details>
 
 </details>
 
@@ -2531,21 +2680,21 @@ Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-s
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords
+  keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.64s
-- *Generation time:* 0.66s
-- *Total time:* 1.34s
-- *Prompt preparation time:* 0.0264
-- *First-token latency:* 0.54
-- *Cleanup time:* 0.0962
-- *Prompt tokens:* 120
-- *Generation tokens:* 32
-- *Total tokens:* 152
-- *Prompt throughput (raw):* 222 tok/s
-- *Generation throughput (raw):* 328 tok/s
-- *Peak memory (GB):* 2.2
+- *Model load time:* 0.72s
+- *Generation time:* 2.18s
+- *Total time:* 4.15s
+- *Prompt preparation time:* 1.16
+- *First-token latency:* 1
+- *Cleanup time:* 0.0903
+- *Prompt tokens:* 325
+- *Generation tokens:* 22
+- *Total tokens:* 347
+- *Prompt throughput (raw):* 325 tok/s
+- *Generation throughput (raw):* 301 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.02
 - *Model-load active memory (GB):* 1.25
@@ -2553,7 +2702,7 @@ Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-s
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 567
+- *Rendered prompt characters:* 1351
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2567,7 +2716,7 @@ Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-s
 *Readable output:*
 
 <pre class="model-output-readable">
-A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, their fur patterns contrasting against the soft fabric.
+A historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
 </pre>
 
 </details>
@@ -2586,33 +2735,29 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Duplicate keywords: british english, british english
-  examples of metadata, british english examples of details, british english
-  examples of context, british english examples of information, british
-  english examples of data, british english examples of content, british
-  english examples of examples
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: sky, sky view, skyline
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.59s
-- *Generation time:* 3.91s
-- *Total time:* 4.54s
-- *Prompt preparation time:* 0.0278
-- *First-token latency:* 0.512
-- *Cleanup time:* 0.0933
-- *Prompt tokens:* 3,438
-- *Generation tokens:* 1,000
-- *Total tokens:* 4,438
-- *Prompt throughput (raw):* 6,712 tok/s
-- *Generation throughput (raw):* 297 tok/s
-- *Peak memory (GB):* 2.3
+- *Model load time:* 0.62s
+- *Generation time:* 1.71s
+- *Total time:* 3.14s
+- *Prompt preparation time:* 0.704
+- *First-token latency:* 0.417
+- *Cleanup time:* 0.0939
+- *Prompt tokens:* 2,107
+- *Generation tokens:* 200
+- *Total tokens:* 2,307
+- *Prompt throughput (raw):* 5,051 tok/s
+- *Generation throughput (raw):* 326 tok/s
+- *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.1
-- *Cache memory (GB):* 0.56
+- *Cache memory (GB):* 0.61
 - *Model-load active memory (GB):* 1.08
 - *Post-cleanup active memory (GB):* 0.00331
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 515
+- *Rendered prompt characters:* 1299
 - *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2625,76 +2770,66 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two cats sleeping on a pink couch
+Title: Historic Gothic Tower Under Overcast Sky
 
-Description: Two striped cats are sleeping on a pink couch, with one cat lying on its side and the other on its back, next to a remote control.
+Description: The image showcases a historic stone gothic tower partially obscured by dense green trees, set against an overcast sky, with a cloudy backdrop and a view of rooftops in the vicinity.
 
-Keywords: cats, sleeping, pink couch, remote control, striped, British English, British, British-English, British-English catalogue, British-English metadata, British-English details, British-English context, British-English information, British-English data, British-English content, British-English examples, British-English examples of metadata, British-English examples of keywords, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata
+Keywords: Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building, England, Pinnacle, Sky, Rooftops, Dense trees, Cloudy, Oxford, Oxfordshire, Historic England, Outdoors, Sky view, Building details, Skyline, Greenery, Historic landmarks, Skyline, Sky view, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Skyline, Sky, Sky
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
-### mlx-community/X-Reasoner-7B-8bit
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* observation needs reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Duplicate keywords: feline behavior study, feline comfort
-  study, feline rest study, feline lifestyle study, feline domestic life
-  study, feline behavior analysis, feline comfort analysis, feline rest
-  analysis, feline lifestyle analysis, feline domestic life analysis, feline
-  behavior observation, feline comfort observation, feline rest observation,
-  feline lifestyle observation, feline domestic life observation, feline
-  behavior research, feline comfort research, feline rest research, feline
-  lifestyle research, feline domestic life research
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.21s
-- *Generation time:* 15.91s
-- *Total time:* 17.15s
-- *Prompt preparation time:* 0.0153
-- *First-token latency:* 0.388
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 511
+- *Maintainer status:* none
+- *Observations:* Required labelled fields not detected: keywords; Response
+  appears cut off at the token limit
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Model load time:* 2.87s
+- *Generation time:* 50.03s
+- *Total time:* 53.80s
+- *Prompt preparation time:* 0.733
+- *First-token latency:* 8.03
+- *Cleanup time:* 0.141
+- *Prompt tokens:* 4,367
 - *Generation tokens:* 1,000
-- *Total tokens:* 1,511
-- *Prompt throughput (raw):* 1,318 tok/s
-- *Generation throughput (raw):* 64.5 tok/s
-- *Peak memory (GB):* 10
-- *Active memory (GB):* 9.5
-- *Cache memory (GB):* 0.10
-- *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.0105
+- *Total tokens:* 5,367
+- *Prompt throughput (raw):* 544 tok/s
+- *Generation throughput (raw):* 24.2 tok/s
+- *Peak memory (GB):* 25
+- *Active memory (GB):* 24
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 23.9
+- *Post-cleanup active memory (GB):* 0.00754
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 602
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Rendered prompt characters:* 1494
+- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved model revision:* 865ee8de65799cc4ee406587e4b607063708f358
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/865ee8de65799cc4ee406587e4b607063708f358
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Cats Sleeping on Pink Couch with Remotes
-
-Description: Two tabby cats rest on a pink couch, one curled up with a remote, the other stretched out. The setting is indoors, with soft lighting highlighting their relaxed postures. The couch's vibrant color contrasts with the cats' striped fur.
-
-Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxation, striped fur, comfortable, domestic, feline, rest, home setting, cozy, feline behavior, feline companions, feline rest, feline comfort, feline lifestyle, feline relaxation, feline companionship, feline domestic life, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis, feline rest analysis, feline lifestyle analysis, feline domestic life analysis, feline behavior observation, feline comfort observation, feline rest observation, feline lifestyle observation, feline domestic life observation, feline behavior research, feline comfort research, feline rest research, feline lifestyle research, feline domestic life research, feline behavior study, feline comfort study, feline rest study, feline lifestyle study, feline domestic life study, feline behavior analysis, feline comfort analysis,
+Title: Gothic Tower Framed by Trees in Oxford
+Description: The view shows a historic stone Gothic tower with pinnacles and crenellations rising above residential rooftops and brick chimneys, partially obscured by dense green and autumnal foliage under a cloudy overcast sky. Captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N, 1.252222°
 </pre>
 
 </details>
@@ -2714,28 +2849,29 @@ Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxation,
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
-  labelled fields not detected: title, description, keywords
+  labelled fields not detected: title, description, keywords; Repeats the
+  prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.15s
-- *Generation time:* 2.06s
-- *Total time:* 3.26s
-- *Prompt preparation time:* 0.0487
-- *First-token latency:* 1.87
-- *Cleanup time:* 0.178
-- *Prompt tokens:* 3,512
-- *Generation tokens:* 14
-- *Total tokens:* 3,526
-- *Prompt throughput (raw):* 1,875 tok/s
-- *Generation throughput (raw):* 97.1 tok/s
-- *Peak memory (GB):* 7.0
+- *Model load time:* 0.93s
+- *Generation time:* 1.79s
+- *Total time:* 3.62s
+- *Prompt preparation time:* 0.739
+- *First-token latency:* 0.794
+- *Cleanup time:* 0.157
+- *Prompt tokens:* 2,186
+- *Generation tokens:* 29
+- *Total tokens:* 2,215
+- *Prompt throughput (raw):* 2,754 tok/s
+- *Generation throughput (raw):* 101 tok/s
+- *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
-- *Cache memory (GB):* 0.55
+- *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.69
 - *Post-cleanup active memory (GB):* 0.0132
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 731
+- *Rendered prompt characters:* 1515
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2749,14 +2885,14 @@ Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxation,
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The two cats are sleeping on a pink couch.
+&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The two cats are sleeping on a pink couch.
+<|channel|> analysis<|message|> The image shows a view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
 ```
 
 </details>
@@ -2780,26 +2916,26 @@ Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxation,
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.54s
-- *Generation time:* 0.72s
-- *Total time:* 1.27s
-- *Prompt preparation time:* 0.0149
-- *First-token latency:* 0.236
-- *Cleanup time:* 0.108
-- *Prompt tokens:* 116
-- *Generation tokens:* 97
-- *Total tokens:* 213
-- *Prompt throughput (raw):* 492 tok/s
-- *Generation throughput (raw):* 209 tok/s
-- *Peak memory (GB):* 1.2
+- *Model load time:* 0.59s
+- *Generation time:* 1.65s
+- *Total time:* 3.03s
+- *Prompt preparation time:* 0.675
+- *First-token latency:* 0.276
+- *Cleanup time:* 0.0997
+- *Prompt tokens:* 321
+- *Generation tokens:* 148
+- *Total tokens:* 469
+- *Prompt throughput (raw):* 1,164 tok/s
+- *Generation throughput (raw):* 203 tok/s
+- *Peak memory (GB):* 1.5
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.23
+- *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 0.612
 - *Post-cleanup active memory (GB):* 0.0138
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 558
+- *Rendered prompt characters:* 1342
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2813,8 +2949,8 @@ Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxation,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "A Study in Stripes"
-Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
+Title: A Historical View of Oxfordshire's Tower and Trees
+Description: A detailed depiction of a historic stone gothic tower and rooftops in Oxfordshire, UK, set against a backdrop of dense green trees under an overcast sky. The image captures the architectural details of the building, with the surrounding greenery providing a natural frame. The photograph is taken during the day under an overcast sky, and the time is 15:44:34 UTC+01:00. The image is described as a 10-18-sentence caption that covers the main subject, setting, action, lighting, and distinctive details, while also including the context of the location and the photographer's intent.
 </pre>
 
 </details>
