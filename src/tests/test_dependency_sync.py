@@ -751,23 +751,63 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
     )
 
 
-def test_re2js_security_floor_and_override_retirement() -> None:
-    """Reject the vulnerable dependency and flag its workaround when upstream changes."""
+class _NpmOverrideRecord(typing.NamedTuple):
+    """Why one npm override exists, and the upstream condition that retires it."""
+
+    parent: str  # the package whose requirement necessitated the override
+    parent_requirement: str  # that requirement, exactly as the lockfile records it
+    fixed_version: str  # the first release fixing the advisory
+    advisory: str
+
+
+# Every entry in package.json's "overrides" is a temporary displacement of a
+# requirement its parent package cannot yet resolve safely, so each must be
+# recorded here with the exact parent requirement that necessitated it. The
+# test below retires them: it fails when that requirement changes (drop the
+# override if upstream now resolves a fixed release, otherwise re-review),
+# when an override appears without a record, or when a record outlives its
+# override.
+_TRACKED_NPM_OVERRIDES: dict[str, _NpmOverrideRecord] = {
+    "katex": _NpmOverrideRecord(
+        parent="micromark-extension-math",
+        parent_requirement="^0.16.0",
+        fixed_version="0.18.2",
+        advisory="GHSA-238p-pmpm-9mq7",
+    ),
+    "re2js": _NpmOverrideRecord(
+        parent="markdownlint",
+        parent_requirement="2.8.6",
+        fixed_version="2.8.7",
+        advisory="GHSA-gg6h-894w-4m9c",
+    ),
+}
+
+
+def test_every_npm_override_is_tracked_and_retired_when_unneeded() -> None:
+    """Each override names the upstream pin that necessitated it, and dies with it."""
+    package = json.loads(safe_io.read_text_no_follow(PKG_ROOT / "package.json"))
+    overrides = package.get("overrides") or {}
+    assert set(overrides) == set(_TRACKED_NPM_OVERRIDES), (
+        "every npm override needs a retirement record in _TRACKED_NPM_OVERRIDES, "
+        "and every record a live override"
+    )
     lock_path = PKG_ROOT / "package-lock.json"
     if not lock_path.exists():
         pytest.skip("npm install is needed to inspect resolved development dependencies")
-    package = json.loads(safe_io.read_text_no_follow(PKG_ROOT / "package.json"))
     packages = json.loads(safe_io.read_text_no_follow(lock_path))["packages"]
-    re2js = packages.get("node_modules/re2js")
-    if re2js is not None:
-        assert Version(re2js["version"]) >= Version("2.8.7"), "GHSA-gg6h-894w-4m9c"
-    if "re2js" in package.get("overrides", {}):
-        upstream = packages.get("node_modules/markdownlint", {}).get("dependencies", {})
-        # Deliberately scoped to the exact upstream pin that necessitated this
-        # workaround, not a second implementation of npm's range semantics.
-        assert upstream.get("re2js") == "2.8.6", (
-            "markdownlint's re2js requirement changed: remove the temporary re2js "
-            "override if upstream now resolves a patched version; otherwise review it"
+    for name, record in _TRACKED_NPM_OVERRIDES.items():
+        resolved = packages.get(f"node_modules/{name}")
+        if resolved is not None:
+            # The advisory must stay fixed whatever the override says.
+            assert Version(resolved["version"]) >= Version(record.fixed_version), record.advisory
+        upstream = packages.get(f"node_modules/{record.parent}", {}).get("dependencies", {})
+        # Deliberately scoped to the exact upstream requirement that
+        # necessitated the workaround, not a second implementation of npm's
+        # range semantics.
+        assert upstream.get(name) == record.parent_requirement, (
+            f"{record.parent}'s {name} requirement changed: remove the temporary "
+            f"{name} override if upstream now resolves a release fixing "
+            f"{record.advisory}; otherwise re-review it"
         )
 
 
@@ -918,7 +958,10 @@ def test_python_sources_write_variation_selectors_as_escapes() -> None:
     Writing the selector as an escape keeps the rendered glyph identical while
     the source stays ASCII at that position.
     """
-    excluded_parts = {".worktrees", "build", "output", "check_models.egg-info"}
+    # node_modules: third-party npm packages (katex) ship their own Python
+    # sources, which are not this repository's to police — and iCloud can
+    # leave evicted conflict copies there that time out on read.
+    excluded_parts = {".worktrees", "build", "output", "check_models.egg-info", "node_modules"}
     offenders = [
         str(path.relative_to(REPO_ROOT))
         for path in sorted(REPO_ROOT.glob("src/**/*.py"))

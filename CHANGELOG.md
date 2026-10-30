@@ -1385,6 +1385,17 @@ Notable changes to this project will be documented in this file.
   vulnerable resolutions and flags the override for removal when markdownlint
   changes that requirement. Remove the override once upstream resolves a patched
   version without it; no advisory suppression is added.
+- Development tooling (0.17.102): the override-retirement guard now covers
+  every npm override, not just re2js. Each `package.json` override must have
+  a record naming the parent requirement that necessitated it and the
+  advisory's first fixed release; the test fails when that requirement
+  changes (drop or re-review the override), when an override appears without
+  a record, or when a record outlives its override. This closes the gap
+  where the katex 0.19.0 override (GHSA-238p-pmpm-9mq7, necessitated by
+  micromark-extension-math's `^0.16.0`) had no retirement watch and could
+  have outlived its reason silently. The variation-selector source scan now
+  excludes `node_modules` (third-party katex ships Python sources, and an
+  iCloud-evicted conflict copy there timed out the read).
 - Remove the obsolete braces advisory exception, which the dependency scan no
   longer reports; retain the warning for any future stale exceptions.
 - Work around Skylos 5.2.0 false positives with two audited, line-local ignores:
