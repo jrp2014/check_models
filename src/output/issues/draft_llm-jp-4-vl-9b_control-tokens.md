@@ -74,12 +74,13 @@ Special tokens declared in the checkpoint's tokenizer.json are not decoded
 into the user-visible text: either the Harmony channel wrapper is parsed (the
 chat template declares `# Valid channels: analysis, commentary, final`), or at
 minimum the `special: true` tokens are stripped from the decoded output.
-mlx-vlm already understands this wrapper elsewhere —
-`mlx_vlm/tools/parsers/harmony.py` parses `<|channel|>commentary …<|call|>`
-tool calls, and the server tests exercise
-`<|channel|>analysis<|message|>…<|end|><|start|>assistant<|channel|>final<|message|>…`
-responses — but the `generate`/CLI output path leaves the wrapper visible for
-`llmjpvl`.
+mlx-vlm already handles this wrapper for other families: issue #2121 reported
+the same leak for `muse_glimmer` and PR #2129 fixed it with a family
+`clean_output`; PR #2329 parses Harmony channels into reasoning and content
+for gpt-oss; and `mlx_vlm/tools/parsers/harmony.py` parses
+`<|channel|>commentary …<|call|>` tool calls — but the `generate`/CLI output
+path leaves the wrapper visible for `llmjpvl`, whose processor has no
+`clean_output`.
 
 ## Actual behavior
 
