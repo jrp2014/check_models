@@ -10106,6 +10106,17 @@ def test_accuracy_notes_absent_or_unreadable(tmp_path: Path, test_image: Path) -
     assert "#### Human accuracy note" not in gallery
 
 
+def _with_model_inputs(
+    result: dict[str, object], rendered_prompt: str = "<|user|>describe<image>", **kwargs: object
+) -> dict[str, object]:
+    """Give a fixture row the rendered prompt and effective arguments a native check keys on."""
+    result["prompt_diagnostics"] = {
+        "rendered_prompt_hash_sha256": hashlib.sha256(rendered_prompt.encode("utf-8")).hexdigest(),
+        "generate_kwargs": {"max_tokens": 8, "temperature": 0.0, **kwargs},
+    }
+    return result
+
+
 def _native_repro_table_row(summary: str, model: str) -> str:
     """The run summary's mechanical-checks table row for ``model``."""
     return next(line for line in summary.splitlines() if line.startswith(f"| {model} |"))
@@ -10115,11 +10126,13 @@ def test_native_repro_status_follows_model_revision_and_builds(tmp_path: Path) -
     """A native check shows only on its own revision and builds; otherwise not yet checked."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     output_root = output_paths.index.parent
-    loop = _issue_summary_result(
-        "org/loop",
-        usability="unusable",
-        maintainer_status="observation_needs_reproduction",
-        observations=["repeated_output", "unexpected_special_token"],
+    loop = _with_model_inputs(
+        _issue_summary_result(
+            "org/loop",
+            usability="unusable",
+            maintainer_status="observation_needs_reproduction",
+            observations=["repeated_output", "unexpected_special_token"],
+        )
     )
     crash = _issue_summary_result(
         "org/crash",
@@ -10174,11 +10187,13 @@ def test_native_repro_status_follows_experiment_inputs(tmp_path: Path) -> None:
     """
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     output_root = output_paths.index.parent
-    loop = _issue_summary_result(
-        "org/loop",
-        usability="unusable",
-        maintainer_status="observation_needs_reproduction",
-        observations=["repeated_output"],
+    loop = _with_model_inputs(
+        _issue_summary_result(
+            "org/loop",
+            usability="unusable",
+            maintainer_status="observation_needs_reproduction",
+            observations=["repeated_output"],
+        )
     )
     _write_issue_summary_fixture(output_paths, results=(loop,))
     assert (
@@ -10237,6 +10252,62 @@ def test_native_repro_status_follows_experiment_inputs(tmp_path: Path) -> None:
     # Restoring every input makes the check apply again.
     assert _native_repro_table_row(summary_with(image=original["image"]), "org/loop").endswith(
         "| confirmed |"
+    )
+
+
+def test_native_repro_status_follows_each_models_own_inputs(tmp_path: Path) -> None:
+    """A check holds only for the rendered prompt and effective arguments it reran.
+
+    Regression: the experiment key held only the run-level prompt and
+    settings, so a model whose rendered prompt changed (Muse's template
+    embeds the date) or whose effective temperature changed still read as
+    "confirmed", and a "not reproduced" could dismiss an input-dependent
+    problem. Without those facts no exact match is claimed.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_root = output_paths.index.parent
+
+    def loop(rendered_prompt: str | None = None, **kwargs: object) -> dict[str, object]:
+        result = _issue_summary_result(
+            "org/loop",
+            usability="unusable",
+            maintainer_status="observation_needs_reproduction",
+            observations=["repeated_output"],
+        )
+        if rendered_prompt is None:
+            return result
+        return _with_model_inputs(result, rendered_prompt, **kwargs)
+
+    def record() -> int:
+        return add_native_repro_note(
+            [
+                *("org/loop", "repeated_output", "not_reproduced", "--checker", "john"),
+                *("--output-dir", str(output_root), "--evidence", "x"),
+            ]
+        )
+
+    def summary_for(result: dict[str, object]) -> str:
+        _write_issue_summary_fixture(output_paths, results=(result,))
+        summary_path = check_models.regenerate_run_issue_summary(output_root)
+        assert summary_path is not None
+        return _native_repro_table_row(safe_io.read_text_no_follow(summary_path), "org/loop")
+
+    # Without the model's own inputs the tool refuses to record a check.
+    _write_issue_summary_fixture(output_paths, results=(loop(),))
+    assert record() == 1
+    _write_issue_summary_fixture(
+        output_paths, results=(loop(rendered_prompt="2026-10-30 describe"),)
+    )
+    assert record() == 0
+
+    voided = "| not yet checked (earlier check out of date) |"
+    assert summary_for(loop(rendered_prompt="2026-10-30 describe")).endswith("| not reproduced |")
+    assert summary_for(loop(rendered_prompt="2026-10-31 describe")).endswith(voided)
+    assert summary_for(loop(rendered_prompt="2026-10-30 describe", temperature=0.7)).endswith(
+        voided
+    )
+    assert summary_for(loop()).endswith(
+        "| not yet checked (earlier check not comparable: inputs not recorded) |"
     )
 
 

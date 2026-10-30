@@ -1329,6 +1329,21 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Run summary (0.17.101, review of 8e17405): native-reproduction matching
+  now includes each model's own inputs. The experiment label adds the
+  model's rendered-prompt digest and a digest of its effective generation
+  arguments (`prompt_diagnostics.generate_kwargs`) to the run's image,
+  prompt and settings digests, so a changed chat-template render (Muse's
+  template embeds the date) or effective temperature no longer reads as
+  "confirmed", and an old "not reproduced" cannot dismiss an input-dependent
+  problem. When a model's inputs are not recorded, no match is claimed: the
+  cell reads "not yet checked (earlier check not comparable: inputs not
+  recorded)" and `add_native_repro_note` refuses to record. A crash before
+  any input was prepared (import, model, processor or tokenizer load,
+  preflight) keys on "model inputs not reached". The retained llm-jp note
+  gains the digests from the harness record; its evidence says so and why
+  (the native flags are the recorded effective arguments, the template has no
+  date or time variable, and the output matched byte-for-byte).
 - Output data (0.17.100, review of 8e17405): the retained llm-jp
   `native_repro_notes.yaml` note, recorded on a branch before 0.17.99 made
   `experiment` a required key, was merged without it, so the reader rejected

@@ -2,7 +2,8 @@
 
 The note is appended to ``native_repro_notes.yaml`` in the output root, keyed
 to the model revision, the mlx, mlx-vlm and transformers builds, and the
-experiment inputs (image, prompt, generation settings) of the retained run.
+experiment inputs of the retained run: image, prompt and generation settings,
+plus the model's rendered prompt and effective generation arguments.
 The run summary's *Native repro* column then shows it as confirmed or not
 reproduced, and goes back to "not yet checked" once the revision, any build
 or any experiment input changes: a check holds only for the inputs it reran.
@@ -25,6 +26,7 @@ from check_models import (
     NATIVE_REPRO_NOTES_FILENAME,
     _native_repro_codes,
     _native_repro_experiment,
+    _native_repro_run_inputs,
     _native_repro_stack,
     _parse_native_repro_notes,
 )
@@ -34,8 +36,9 @@ _DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 _NEW_FILE_HEADER = """\
 # Native reproduction checks for observations in the run retained here.
 # Each applies only while its model revision, mlx/mlx-vlm/transformers
-# builds and experiment inputs (image, prompt, generation settings) match
-# a run; the run summary then shows its status.
+# builds and experiment inputs (image, prompt, generation settings, and the
+# model's rendered prompt and effective generation arguments) match a run;
+# the run summary then shows its status.
 # Add one with: python -m tools.add_native_repro_note MODEL OBSERVATION STATUS ...
 """
 
@@ -78,9 +81,12 @@ def _note_entry(args: argparse.Namespace) -> dict[str, str]:
     if stack is None:
         msg = "the retained run does not record its mlx and mlx-vlm builds"
         raise ValueError(msg)
-    experiment = _native_repro_experiment(run.metadata)
+    experiment = _native_repro_experiment(_native_repro_run_inputs(run.metadata), result)
     if experiment is None:
-        msg = "the retained run does not record its prompt and generation settings"
+        msg = (
+            f"the retained run does not record the prompt and generation settings, or "
+            f"{args.model}'s rendered prompt and effective generation arguments"
+        )
         raise ValueError(msg)
     codes = _native_repro_codes(result)
     if args.observation not in codes:

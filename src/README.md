@@ -1531,10 +1531,14 @@ python -m tools.add_native_repro_note mlx-community/InternVL3_5-1B-4bit \
 ```
 
 This appends to `native_repro_notes.yaml` in the output directory, keyed to
-the model revision and the mlx, mlx-vlm and transformers builds of the
-retained run. A *Native reproduction checks* section in the run summary lists
-the checks that apply, with their evidence. After a new snapshot or a rebuild
-the column goes back to *not yet checked (earlier check out of date)*.
+the model revision, the mlx, mlx-vlm and transformers builds, and the
+experiment inputs of the retained run: image, prompt and generation settings,
+plus that model's rendered prompt and effective generation arguments (so
+rerun natively with those). A *Native reproduction checks* section in the run
+summary lists the checks that apply, with their evidence. After a new
+snapshot, a rebuild or any input change the column goes back to *not yet
+checked (earlier check out of date)*; when a run does not record a model's
+inputs it reads *earlier check not comparable: inputs not recorded*.
 The tool re-renders the run summary from the retained run, so a new check
 shows at once, without rerunning models.
 

@@ -162,8 +162,9 @@ The file is organized in this order — search for these exact landmark headers 
   (gallery and HTML show notes whose image, revision and output digests
   still match) and never write it; only `tools.add_accuracy_note` appends.
   `native_repro_notes.yaml` (appended by `tools.add_native_repro_note`) works
-  the same way for native reruns, keyed to model revision and the mlx,
-  mlx-vlm and transformers builds, and feeds the run summary's *Native
+  the same way for native reruns, keyed to model revision, the mlx,
+  mlx-vlm and transformers builds and the experiment inputs (including the
+  model's rendered prompt and effective generation arguments), and feeds the run summary's *Native
   repro* column. Do not write either kind of note on a person's behalf
   without their words, or record a native check that was not run.
 - **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.

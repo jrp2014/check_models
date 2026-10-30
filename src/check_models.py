@@ -24928,7 +24928,8 @@ def _run_issue_summary_provenance_rows(
 # harness observation outside the harness (python -m mlx_vlm.generate or the
 # load/template/stream_generate path). Each names the model revision, the
 # mlx/mlx-vlm/transformers builds and the experiment inputs (image, prompt,
-# generation settings) it was checked on, so a rebuild, a new snapshot or a
+# generation settings, and the model's rendered prompt and effective
+# generation arguments) it was checked on, so a rebuild, a new snapshot or a
 # different experiment puts the observation back to "not yet checked".
 # Recurrence in the harness alone never counts as native confirmation.
 NATIVE_REPRO_NOTES_FILENAME: Final[str] = "native_repro_notes.yaml"
@@ -24949,6 +24950,11 @@ _NATIVE_REPRO_STATUS_LABELS: Final[dict[str, str]] = {
 }
 _NATIVE_REPRO_UNCHECKED: Final[str] = "not yet checked"
 _NATIVE_REPRO_STACK_COMPONENTS: Final[tuple[str, ...]] = ("mlx", "mlx-vlm", "transformers")
+# A crash in one of these phases happens before any prompt is rendered or
+# generation argument resolved, so the model had no per-model inputs to match.
+_NATIVE_REPRO_PRE_INPUT_PHASES: Final[frozenset[str]] = frozenset(
+    {"import", "model_load", "processor_load", "tokenizer_load", "model_preflight"}
+)
 
 
 @dataclass(frozen=True)
@@ -24971,7 +24977,7 @@ class NativeReproNotes:
     """The output root's native-reproduction notes and this run's stack and inputs."""
 
     stack: str | None
-    experiment: str | None
+    run_inputs: str | None
     notes: tuple[NativeReproNote, ...] = ()
     read_error: str | None = None
 
@@ -25004,8 +25010,8 @@ def _native_repro_stack(metadata: JsonlMetadataRecord) -> str | None:
     )
 
 
-def _native_repro_experiment(metadata: JsonlMetadataRecord) -> str | None:
-    """The run's inputs as one comparable label: image, prompt and settings.
+def _native_repro_run_inputs(metadata: JsonlMetadataRecord) -> str | None:
+    """The run's shared inputs as one comparable label: image, prompt and settings.
 
     A native check holds only for the inputs it reran: a different image,
     prompt or generation setting is a different experiment, so a note from
@@ -25021,6 +25027,45 @@ def _native_repro_experiment(metadata: JsonlMetadataRecord) -> str | None:
     image_sha256 = image.get("sha256") if image is not None else None
     settings_sha256 = _sha256_text(json.dumps(settings, sort_keys=True, separators=(",", ":")))
     return f"image {image_sha256 or 'none'}; prompt {prompt_sha256}; settings {settings_sha256}"
+
+
+def _native_repro_model_inputs(result: JsonlResultRecord) -> str | None:
+    """One model's own inputs: its rendered prompt and effective generation arguments.
+
+    The run's prompt and settings can stay the same while what a model was
+    given changes: a chat template can embed today's date, and checkpoint
+    sampling defaults or a processor change alter the arguments actually
+    passed. ``None`` when either fact is unrecorded, so no exact match is
+    claimed; a crash before any input was prepared has none to match.
+    """
+    diagnostics = result["prompt_diagnostics"]
+    if diagnostics is None:
+        failure = result["failure"]
+        if (
+            result["assessment"]["execution"] == "crashed"
+            and failure is not None
+            and failure.get("phase") in _NATIVE_REPRO_PRE_INPUT_PHASES
+        ):
+            return "model inputs not reached"
+        return None
+    rendered_sha256 = diagnostics.get("rendered_prompt_hash_sha256")
+    effective = diagnostics.get("generate_kwargs")
+    if (
+        not isinstance(rendered_sha256, str)
+        or not rendered_sha256
+        or not isinstance(effective, dict)
+    ):
+        return None
+    effective_sha256 = _sha256_text(json.dumps(effective, sort_keys=True, separators=(",", ":")))
+    return f"rendered {rendered_sha256}; effective {effective_sha256}"
+
+
+def _native_repro_experiment(run_inputs: str | None, result: JsonlResultRecord) -> str | None:
+    """The full experiment one model ran: the run's inputs plus its own."""
+    model_inputs = _native_repro_model_inputs(result)
+    if run_inputs is None or model_inputs is None:
+        return None
+    return f"{run_inputs}; {model_inputs}"
 
 
 def _native_repro_codes(result: JsonlResultRecord) -> tuple[str, ...]:
@@ -25046,7 +25091,7 @@ def _load_native_repro_notes(
     notes, read_error = read
     return NativeReproNotes(
         stack=_native_repro_stack(metadata),
-        experiment=_native_repro_experiment(metadata),
+        run_inputs=_native_repro_run_inputs(metadata),
         notes=notes,
         read_error=read_error,
     )
@@ -25065,16 +25110,18 @@ def _native_repro_note_applies(
     """Whether a note was checked on this run's revision, builds and inputs.
 
     The experiment inputs are part of the key: a confirmation on one image,
-    prompt or sampling setup says nothing about another (repetition can be
-    prompt-dependent, failures resolution-dependent, behaviour seed-dependent).
+    prompt, rendered prompt or sampling setup says nothing about another
+    (repetition can be prompt-dependent, failures resolution-dependent,
+    behaviour seed-dependent). Without a recorded experiment nothing applies.
     """
     provenance = result.get("model_provenance")
     revision = provenance.get("resolved_revision") if provenance is not None else None
+    experiment = _native_repro_experiment(notes.run_inputs, result)
     return (
         notes.stack is not None
-        and notes.experiment is not None
+        and experiment is not None
         and note.stack == notes.stack
-        and note.experiment == notes.experiment
+        and note.experiment == experiment
         and note.model_revision == revision
     )
 
@@ -25086,7 +25133,7 @@ def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None
         return "-"
     codes = _native_repro_codes(result)
     by_code: dict[str, str] = {}
-    stale = False
+    unmatched = False
     if notes is not None:
         for note in notes.notes:
             if note.model != result["model"] or note.observation not in codes:
@@ -25096,7 +25143,7 @@ def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None
                 # an earlier one.
                 by_code[note.observation] = _NATIVE_REPRO_STATUS_LABELS[note.status]
             else:
-                stale = True
+                unmatched = True
     groups: dict[str, list[str]] = {}
     for code in codes:
         label = by_code.get(code, _NATIVE_REPRO_UNCHECKED)
@@ -25105,8 +25152,17 @@ def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None
         cell = next(iter(groups))
     else:
         cell = "; ".join(f"{label} ({', '.join(glosses)})" for label, glosses in groups.items())
-    if stale and _NATIVE_REPRO_UNCHECKED in groups:
-        cell += " (earlier check out of date)"
+    if unmatched and _NATIVE_REPRO_UNCHECKED in groups:
+        # Out of date only when this run's experiment is known to differ;
+        # unrecorded inputs cannot be compared either way.
+        recorded = notes is not None and (
+            _native_repro_experiment(notes.run_inputs, result) is not None
+        )
+        cell += (
+            " (earlier check out of date)"
+            if recorded
+            else " (earlier check not comparable: inputs not recorded)"
+        )
     return cell or _NATIVE_REPRO_UNCHECKED
 
 
@@ -25185,8 +25241,9 @@ def _native_repro_section(
     intro = (
         f"Recorded in {NATIVE_REPRO_NOTES_FILENAME} for this run's model revisions, "
         f"builds ({notes.stack or 'builds not recorded'}) and experiment inputs (image, "
-        "prompt, generation settings). A check made on another revision, build or "
-        "experiment no longer applies and is not listed."
+        "prompt, generation settings, and each model's rendered prompt and effective "
+        "generation arguments). A check made on another revision, build or experiment, "
+        "or for a model whose inputs were not recorded, does not apply and is not listed."
     )
     blocks: list[ReportBlock] = [ReportParagraph(intro)]
     if rows:

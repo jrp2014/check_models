@@ -1,7 +1,8 @@
 # Native reproduction checks for observations in the run retained here.
 # Each applies only while its model revision, mlx/mlx-vlm/transformers
-# builds and experiment inputs (image, prompt, generation settings) match
-# a run; the run summary then shows its status.
+# builds and experiment inputs (image, prompt, generation settings, and the
+# model's rendered prompt and effective generation arguments) match a run;
+# the run summary then shows its status.
 # Add one with: python -m tools.add_native_repro_note MODEL OBSERVATION STATUS ...
 notes:
 - model: mlx-community/llm-jp-4-vl-9b-mlx-4bit
@@ -10,7 +11,9 @@ notes:
   stack: mlx 0.32.5.dev20261030+1ba7f969a @ 1ba7f969a; mlx-vlm 0.7.11 @ 918763c68; transformers
     5.22.1
   experiment: image ecdd79a7ae793ce2dc0c2fc78e9fb7814dafd1aec110397ca1b1c186631e2fbd; prompt
-    ca9e1bd3f02f7bec3a3edcf85be7c035321060405f47dff1c57d4f9739735bcb; settings 069e961b7fa2e3e85b68573e33ed8ca8cb22876f14e19828dbb50b7c8b446624
+    ca9e1bd3f02f7bec3a3edcf85be7c035321060405f47dff1c57d4f9739735bcb; settings 069e961b7fa2e3e85b68573e33ed8ca8cb22876f14e19828dbb50b7c8b446624;
+    rendered 94a4c3b8fffa728c8f991ec24058591ddda9262b14fa5a9841eca021695f2041; effective
+    79927c1888766620ec48f9694aff2cdfdd231839c2cce7064fae56f1dba8a3cf
   status: confirmed
   checker: Claude
   checked: '2026-10-30'
@@ -20,4 +23,7 @@ notes:
     2048 --trust-remote-code reproduced the harness output byte-for-byte: ''<|channel|> analysis<|message|>
     ...'' visible in decoded text, 29 tokens; <|channel|>(9)/<|message|>(12) are special:true
     in tokenizer.json but are not stripped, and the processor has no clean_output/Harmony
-    channel parser.'
+    channel parser. Rendered-prompt and effective-argument digests added 2026-10-30
+    from the harness record, not measured natively: the native flags above are
+    the recorded effective arguments, the llm-jp template has no date or time
+    variable, and the output matched byte-for-byte.'

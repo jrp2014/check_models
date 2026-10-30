@@ -209,5 +209,7 @@ text from the final cleaned answer when reporting an output discrepancy.
   `cd src && python -m tools.add_native_repro_note MODEL OBSERVATION
   confirmed|not_reproduced --checker NAME --evidence "command and result"`.
   The run summary's *Native repro* column then reads confirmed or not
-  reproduced until the model revision or the mlx/mlx-vlm/transformers build
-  changes. Record only a check that was actually run natively.
+  reproduced until the model revision, the mlx/mlx-vlm/transformers build or
+  an experiment input changes (image, prompt, settings, or the model's
+  rendered prompt and effective generation arguments, so rerun with the
+  recorded ones). Record only a check that was actually run natively.
