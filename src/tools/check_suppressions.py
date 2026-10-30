@@ -21,6 +21,7 @@ import subprocess
 import sys
 import tempfile
 import tokenize
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, Literal
@@ -421,8 +422,11 @@ def _skylos_audit_outputs(
 ) -> dict[tuple[Path, int], str] | None:
     """Return, per ``skylos: ignore`` line, the rules Skylos says it suppressed there.
 
-    One scan of ``src_root`` limited to the rules the comments name (about 45 s
-    on this tree, against minutes for the full gate). Skylos's JSON lists every
+    One scan limited to the rules the comments name and to the files that
+    carry them; ``main`` runs it alongside the other checkers because
+    ``check_models.py`` alone keeps Skylos busy for a minute or more (CPU, not
+    network). Naming the files also keeps the scan off the temporary variants
+    the other checkers write beside them. Skylos's JSON lists every
     finding an inline ignore suppressed, so a comment absent from that list no
     longer suppresses anything. Each value holds bracketed rule IDs, matching
     the ``[CODE]`` check in ``check_if_needed``. Returns ``None`` when Skylos
@@ -437,6 +441,10 @@ def _skylos_audit_outputs(
     if skylos_path is None:
         return None
     rule_ids = sorted({code for finding in skylos_findings for code in finding.codes})
+    targets = [
+        str(path.relative_to(src_root)) if path.is_relative_to(src_root) else str(path)
+        for path in dict.fromkeys(finding.file_path for finding in skylos_findings)
+    ]
     # Skylos refuses to write through a symlinked parent, and macOS's temp
     # directory sits under one (/var -> /private/var), hence the resolve().
     with tempfile.TemporaryDirectory(prefix="suppression-audit.") as report_dir:
@@ -444,7 +452,7 @@ def _skylos_audit_outputs(
         completed = subprocess.run(  # noqa: S603 - resolved skylos binary scanning the package root
             [
                 skylos_path,
-                ".",
+                *targets,
                 "--select",
                 ",".join(rule_ids),
                 # json-ci keeps the "suppressed" list but omits the dead-code
@@ -612,25 +620,44 @@ def main() -> int:
 
     necessary: list[tuple[SuppressionFinding, str]] = []
     unnecessary: list[tuple[SuppressionFinding, str]] = []
-    batched_outputs = _batch_noqa_audit_outputs(findings, src_root=src_root)
-    try:
-        skylos_outputs = _skylos_audit_outputs(findings, src_root=src_root)
-    except RuntimeError as error:
-        print(f"✗ FAIL: {error}")
-        return 1
+    verdicts: dict[int, tuple[bool, str]] = {}
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        # Skylos is the slow checker, so it runs while ruff, mypy, ty and
+        # shellcheck work through the other suppressions.
+        skylos_future = pool.submit(_skylos_audit_outputs, findings, src_root=src_root)
+        print("Skylos scan started; running the other checkers meanwhile...", flush=True)
+        batched_outputs = _batch_noqa_audit_outputs(findings, src_root=src_root)
+        for index, finding in enumerate(findings):
+            if finding.kind != "skylos-ignore":
+                verdicts[index] = check_if_needed(
+                    finding,
+                    repo_root=repo_root,
+                    src_root=src_root,
+                    audit_output=_batched_output_for(finding, batched_outputs),
+                )
+        if not skylos_future.done():
+            print("Waiting for the Skylos scan to finish...", flush=True)
+        try:
+            skylos_outputs = skylos_future.result()
+        except RuntimeError as error:
+            print(f"✗ FAIL: {error}")
+            return 1
+    for index, finding in enumerate(findings):
+        if index not in verdicts:
+            verdicts[index] = check_if_needed(
+                finding,
+                repo_root=repo_root,
+                src_root=src_root,
+                audit_output=_batched_output_for(finding, batched_outputs, skylos_outputs),
+            )
 
-    for finding in findings:
+    for index, finding in enumerate(findings):
         relative_path: Path = finding.file_path.relative_to(repo_root)
         code_display: str = ", ".join(finding.codes) if finding.codes else finding.kind
         print(f"\n{relative_path}:{finding.line_num}: {code_display}")
         print(f"  {finding.line_text[:100]}...")
 
-        needed, reason = check_if_needed(
-            finding,
-            repo_root=repo_root,
-            src_root=src_root,
-            audit_output=_batched_output_for(finding, batched_outputs, skylos_outputs),
-        )
+        needed, reason = verdicts[index]
         if needed:
             print(f"  ✓ NEEDED: {reason}")
             necessary.append((finding, reason))

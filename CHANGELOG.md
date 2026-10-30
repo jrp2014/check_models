@@ -152,6 +152,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Suppression audit: the long silent pause after "Found N inline
+  suppression(s)" was the Skylos scan, which is CPU-bound (no network) and
+  dominated by `check_models.py`. Skylos now scans only the files that carry
+  `skylos: ignore` comments instead of all of `src/`, runs in the background
+  while Ruff, mypy, ty and ShellCheck audit the rest, and the audit prints
+  when it starts and when it is waiting on it. Verdicts are unchanged; on
+  4 cores the audit went from about 116 s to 80 s.
+
 - Report publication (0.17.94): the run summary is rendered once, from the
   in-memory run that the final `results.jsonl` header records, instead of
   being rendered from the file, the header rewritten, and the file read and
