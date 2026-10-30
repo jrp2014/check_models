@@ -40,8 +40,8 @@ Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| major concerns       | 4     |
-| no concerns detected | 30    |
+| major concerns       | 5     |
+| no concerns detected | 29    |
 | concerns detected    | 9     |
 
 Observation counts
@@ -51,7 +51,8 @@ Observation counts
 | Response repeats the same text                               | 1     |
 | Generation was stopped early after sustained repeated output | 1     |
 | Unrecognised model control tokens remain visible             | 1     |
-| Required labelled fields not detected                        | 3     |
+| Required labelled fields not detected                        | 4     |
+| Response appears cut off at the token limit                  | 1     |
 | Repeated keyword entries                                     | 5     |
 | Output repeats the prompt's own hint text                    | 7     |
 
@@ -96,7 +97,7 @@ None.
 - *Processor class:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.191
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.097
 - *Peak memory at first token (GB):* 2.146
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -120,8 +121,8 @@ None.
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); thermal state max nominal over 2
-  sample(s); GPU activity outside harness inference: max 0% at 2 instantaneous
+  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
+  sample(s); GPU activity outside harness inference: max 7% at 2 instantaneous
   check(s); activity between checks is not observed; mode snapshot
 
 #### Complete output
@@ -163,7 +164,7 @@ Keywords: Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building,
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.461
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.501
 - *Peak memory at first token (GB):* 6.727
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -189,8 +190,9 @@ Keywords: Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building,
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); power: AC over 2 sample(s); thermal state max fair over 2
-  sample(s); GPU activity outside harness inference: max 0% at 2 instantaneous
-  check(s); activity between checks is not observed; mode snapshot
+  sample(s); GPU activity outside harness inference: max 30% at 2
+  instantaneous check(s); activity between checks is not observed; mode
+  snapshot
 
 #### Complete output
 
@@ -210,19 +212,20 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                          | Mechanical checks | Observations                                       |
-|------------------------------------------------|-------------------|----------------------------------------------------|
-| mlx-community/FastVLM-0.5B-bf16                | major concerns    | labelled fields not detected; prompt hint repeated |
-| mlx-community/nanoLLaVA-1.5-4bit               | major concerns    | labelled fields not detected                       |
-| mlx-community/MiniCPM-V-4.6-4bit               | concerns detected | duplicate keywords                                 |
-| mlx-community/MiniCPM-V-4.7-1B-4bit            | concerns detected | duplicate keywords                                 |
-| mlx-community/Phi-3.5-vision-instruct-bf16     | concerns detected | duplicate keywords                                 |
-| mlx-community/X-Reasoner-7B-8bit               | concerns detected | duplicate keywords                                 |
-| mlx-community/granite-4.0-3b-vision-4bit       | concerns detected | prompt hint repeated                               |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit          | concerns detected | prompt hint repeated                               |
-| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit | concerns detected | prompt hint repeated                               |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx       | concerns detected | prompt hint repeated                               |
-| sahilchachra/LensVLM-9B-MXFP4                  | concerns detected | prompt hint repeated                               |
+| Model                                          | Mechanical checks | Observations                                         |
+|------------------------------------------------|-------------------|------------------------------------------------------|
+| mlx-community/FastVLM-0.5B-bf16                | major concerns    | labelled fields not detected; prompt hint repeated   |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit      | major concerns    | labelled fields not detected; cut off at token limit |
+| mlx-community/nanoLLaVA-1.5-4bit               | major concerns    | labelled fields not detected                         |
+| mlx-community/MiniCPM-V-4.6-4bit               | concerns detected | duplicate keywords                                   |
+| mlx-community/MiniCPM-V-4.7-1B-4bit            | concerns detected | duplicate keywords                                   |
+| mlx-community/Phi-3.5-vision-instruct-bf16     | concerns detected | duplicate keywords                                   |
+| mlx-community/X-Reasoner-7B-8bit               | concerns detected | duplicate keywords                                   |
+| mlx-community/granite-4.0-3b-vision-4bit       | concerns detected | prompt hint repeated                                 |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit          | concerns detected | prompt hint repeated                                 |
+| mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit | concerns detected | prompt hint repeated                                 |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx       | concerns detected | prompt hint repeated                                 |
+| sahilchachra/LensVLM-9B-MXFP4                  | concerns detected | prompt hint repeated                                 |
 
 ## Context for completions without detected concerns
 
@@ -231,36 +234,35 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                          |
 |-------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------|
-| ibm-granite/granite-vision-4.1-4b                           | rev 37d591f06319; Granite4VisionProcessor; stop completed    | 1430 prompt / 109 generated; 65.1 tok/s; 9.6 GB peak |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2104 prompt / 69 generated; 484 tok/s; 1.9 GB peak   |
-| mlx-community/AREX-2-4bit                                   | rev 02551ee54839; Qwen3VLProcessor; stop completed           | 16594 prompt / 114 generated; 30.3 tok/s; 21 GB peak |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2081 prompt / 117 generated; 103 tok/s; 6.5 GB peak  |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 586 prompt / 76 generated; 48.4 tok/s; 28 GB peak    |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1596 prompt / 855 generated; 119 tok/s; 19 GB peak   |
-| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 590 prompt / 104 generated; 62.7 tok/s; 7.6 GB peak  |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 590 prompt / 75 generated; 114 tok/s; 16 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 586 prompt / 83 generated; 124 tok/s; 6.0 GB peak    |
-| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6343 prompt / 104 generated; 78.6 tok/s; 8.7 GB peak |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2104 prompt / 108 generated; 56.7 tok/s; 10 GB peak  |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 382 prompt / 94 generated; 105 tok/s; 7.1 GB peak    |
-| mlx-community/MiniCPM-V-4.7-35B-A3B-4bit                    | rev 0e3b706c1599; MiniCPMV4_7Processor; stop completed       | 927 prompt / 108 generated; 75.8 tok/s; 25 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 3046 prompt / 119 generated; 65.8 tok/s; 13 GB peak  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 3045 prompt / 153 generated; 185 tok/s; 8.2 GB peak  |
-| mlx-community/Mistral-Small-4-119B-2603-4bit                | rev 87b124920773; Mistral3Processor; stop completed          | 2525 prompt / 120 generated; 69.9 tok/s; 73 GB peak  |
-| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1318 prompt / 133 generated; 72.2 tok/s; 8.0 GB peak |
-| mlx-community/MolmoPoint-8B-4bit                            | rev 9bab196f867c; MolmoPointProcessor; stop completed        | 3136 prompt / 112 generated; 31.2 tok/s; 12 GB peak  |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit                   | rev 865ee8de6579; MuseGlimmerProcessor; stop completed       | 4367 prompt / 973 generated; 24.9 tok/s; 25 GB peak  |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4044 prompt / 110 generated; 155 tok/s; 3.7 GB peak  |
+| ibm-granite/granite-vision-4.1-4b                           | rev 37d591f06319; Granite4VisionProcessor; stop completed    | 1430 prompt / 109 generated; 64.4 tok/s; 9.6 GB peak |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2104 prompt / 69 generated; 438 tok/s; 1.9 GB peak   |
+| mlx-community/AREX-2-4bit                                   | rev 02551ee54839; Qwen3VLProcessor; stop completed           | 16594 prompt / 114 generated; 29.7 tok/s; 21 GB peak |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2081 prompt / 117 generated; 101 tok/s; 6.5 GB peak  |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 586 prompt / 76 generated; 46.8 tok/s; 28 GB peak    |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1596 prompt / 855 generated; 117 tok/s; 19 GB peak   |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 590 prompt / 104 generated; 62.3 tok/s; 7.6 GB peak  |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 590 prompt / 75 generated; 108 tok/s; 16 GB peak     |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 586 prompt / 83 generated; 121 tok/s; 6.0 GB peak    |
+| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6343 prompt / 104 generated; 77.6 tok/s; 8.7 GB peak |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2104 prompt / 108 generated; 56.5 tok/s; 10 GB peak  |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 382 prompt / 94 generated; 104 tok/s; 7.1 GB peak    |
+| mlx-community/MiniCPM-V-4.7-35B-A3B-4bit                    | rev 0e3b706c1599; MiniCPMV4_7Processor; stop completed       | 927 prompt / 108 generated; 76.1 tok/s; 25 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 3046 prompt / 119 generated; 64.5 tok/s; 13 GB peak  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 3045 prompt / 153 generated; 183 tok/s; 8.2 GB peak  |
+| mlx-community/Mistral-Small-4-119B-2603-4bit                | rev 87b124920773; Mistral3Processor; stop completed          | 2525 prompt / 120 generated; 69.0 tok/s; 73 GB peak  |
+| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1318 prompt / 133 generated; 70.8 tok/s; 8.0 GB peak |
+| mlx-community/MolmoPoint-8B-4bit                            | rev 9bab196f867c; MolmoPointProcessor; stop completed        | 3136 prompt / 112 generated; 30.2 tok/s; 13 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4044 prompt / 110 generated; 148 tok/s; 3.7 GB peak  |
 | mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16578 prompt / 155 generated; 78.0 tok/s; 23 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16578 prompt / 87 generated; 68.8 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16594 prompt / 112 generated; 73.3 tok/s; 25 GB peak |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16594 prompt / 121 generated; 30.8 tok/s; 21 GB peak |
-| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4173 prompt / 99 generated; 129 tok/s; 5.4 GB peak   |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1313 prompt / 111 generated; 36.2 tok/s; 18 GB peak  |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3641 prompt / 135 generated; 141 tok/s; 23 GB peak   |
-| nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit       | rev 4bc0a247d78e; NemotronHNanoOmniProcessor; stop completed | 3640 prompt / 123 generated; 63.3 tok/s; 52 GB peak  |
-| nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4         | rev da5b2650a835; NemotronHNanoOmniProcessor; stop completed | 3640 prompt / 133 generated; 30.9 tok/s; 87 GB peak  |
-| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16594 prompt / 118 generated; 35.4 tok/s; 17 GB peak |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16578 prompt / 87 generated; 67.5 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16594 prompt / 112 generated; 75.1 tok/s; 25 GB peak |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16594 prompt / 121 generated; 29.8 tok/s; 21 GB peak |
+| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4173 prompt / 99 generated; 127 tok/s; 5.4 GB peak   |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1313 prompt / 111 generated; 35.3 tok/s; 18 GB peak  |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3641 prompt / 135 generated; 139 tok/s; 23 GB peak   |
+| nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit       | rev 4bc0a247d78e; NemotronHNanoOmniProcessor; stop completed | 3640 prompt / 123 generated; 63.8 tok/s; 52 GB peak  |
+| nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4         | rev da5b2650a835; NemotronHNanoOmniProcessor; stop completed | 3640 prompt / 133 generated; 30.3 tok/s; 87 GB peak  |
+| TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit                 | rev 498775b03b55; Qwen3VLProcessor; stop completed           | 16594 prompt / 118 generated; 33.3 tok/s; 17 GB peak |
 
 </details>
 
@@ -356,26 +358,26 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.7.10                                                                                                                                          |
-| mlx-vlm source revision    | 527c513a0768245644a70266a22126d880767b18                                                                                                        |
-| mlx                        | 0.32.5.dev20261028+7d2d94a55                                                                                                                    |
-| mlx source revision        | 7d2d94a55                                                                                                                                       |
-| mlx-audio                  | 0.5.9                                                                                                                                           |
-| transformers               | 5.21.0                                                                                                                                          |
+| mlx-vlm                    | 0.7.11                                                                                                                                          |
+| mlx-vlm source revision    | 918763c6875c80e82f9f48344dfad4763346fea8                                                                                                        |
+| mlx                        | 0.32.5.dev20261030+1ba7f969a                                                                                                                    |
+| mlx source revision        | 1ba7f969a                                                                                                                                       |
+| mlx-audio                  | 0.6.3                                                                                                                                           |
+| transformers               | 5.22.1                                                                                                                                          |
 | tokenizers                 | 0.23.3                                                                                                                                          |
-| huggingface-hub            | 2.3.0                                                                                                                                           |
+| huggingface-hub            | 2.4.0                                                                                                                                           |
 | Python Version             | 3.14.7                                                                                                                                          |
 | OS                         | Darwin 27.2.0                                                                                                                                   |
 | macOS Version              | 27.2                                                                                                                                            |
-| SDK Version                | 27.0                                                                                                                                            |
-| SDK Path                   | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk                                              |
-| Xcode Version              | 27.1                                                                                                                                            |
-| Xcode Build                | 27A9275                                                                                                                                         |
+| SDK Version                | 27.2                                                                                                                                            |
+| SDK Path                   | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.2.sdk                                              |
+| Xcode Version              | 27.2                                                                                                                                            |
+| Xcode Build                | 27B52                                                                                                                                           |
 | Active Developer Directory | /Applications/Xcode.app/Contents/Developer                                                                                                      |
-| Metal SDK                  | MacOSX27.0.sdk                                                                                                                                  |
-| Metal Compiler Version     | Apple metal version 32023.921 (metalfe-32023.921.6)                                                                                             |
-| Metallib Linker Version    | AIR-LLD 32023.921 (metalfe-32023.921.6) (compatible with legacy metallib linker)                                                                |
-| Apple Clang Version        | Apple clang version 21.0.0 (clang-2100.3.34.2)                                                                                                  |
+| Metal SDK                  | MacOSX27.2.sdk                                                                                                                                  |
+| Metal Compiler Version     | Apple metal version 32023.922 (metalfe-32023.922.4)                                                                                             |
+| Metallib Linker Version    | AIR-LLD 32023.922 (metalfe-32023.922.4) (compatible with legacy metallib linker)                                                                |
+| Apple Clang Version        | Apple clang version 21.0.0 (clang-2100.4.1.1)                                                                                                   |
 | GPU/Chip                   | Apple M5 Max                                                                                                                                    |
 | GPU Cores                  | 40                                                                                                                                              |
 | MLX Device                 | Apple M5 Max                                                                                                                                    |
@@ -387,7 +389,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (223,780,528 bytes, sha256=2b06f9fc06f88246eea4a4c8e991a5987856f3f09d9e85aa64331f0359323b1a) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,102,048 bytes, sha256=464ceb920fe99ec3de22f34934a83f8e01412942167330c90f9ab301c17e8682)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (223,888,896 bytes, sha256=9b8d46c607b73ace0c4493f0ffac07ce9c6c77a764bee28673517c9e875dc787) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,165,360 bytes, sha256=1199f6c15fd9e700c1f7694cc5fecbbef79e0f644da8ed734e66fd9143e09eed)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->
