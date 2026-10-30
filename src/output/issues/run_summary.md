@@ -23,6 +23,8 @@ reproduction.
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Input image:* JPEG, 6,656 x 9,483 pixels (63.1 MP), 60.5 MB
+- *Provenance:* run captured by check_models 0.17.98 @ b93edf990; report
+  rendered by 0.17.100 @ d8c13acf7; original assessments retained
 - *Models attempted:* 43
 - *Sampling settings:* checkpoint generation_config.json values for 18 of 43
   completed models where the command line left them unset; harness defaults
@@ -249,9 +251,10 @@ rounded down; 80% or more is reported as a repeated prompt hint.
 
 ## Native reproduction checks
 
-Recorded in native_repro_notes.yaml for this run's model revisions and builds
+Recorded in native_repro_notes.yaml for this run's model revisions, builds
 (mlx 0.32.5.dev20261030+1ba7f969a @ 1ba7f969a; mlx-vlm 0.7.11 @ 918763c68;
-transformers 5.22.1). A check made on another revision or build no longer
+transformers 5.22.1) and experiment inputs (image, prompt, generation
+settings). A check made on another revision, build or experiment no longer
 applies and is not listed.
 
 | Model                                 | Observation            | Native    | Checked            | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
