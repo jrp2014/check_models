@@ -26,6 +26,7 @@ import huggingface_hub.utils
 import pytest
 import yaml
 from packaging.requirements import Requirement
+from packaging.version import Version
 
 import check_models
 from check_models_data import dependency_policy
@@ -746,6 +747,26 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
     assert update_script.index("markdownlint-cli2@latest") < update_script.index(
         "package-lock.json..."
     )
+
+
+def test_re2js_security_floor_and_override_retirement() -> None:
+    """Reject the vulnerable dependency and flag its workaround when upstream changes."""
+    lock_path = PKG_ROOT / "package-lock.json"
+    if not lock_path.exists():
+        pytest.skip("npm install is needed to inspect resolved development dependencies")
+    package = json.loads(safe_io.read_text_no_follow(PKG_ROOT / "package.json"))
+    packages = json.loads(safe_io.read_text_no_follow(lock_path))["packages"]
+    re2js = packages.get("node_modules/re2js")
+    if re2js is not None:
+        assert Version(re2js["version"]) >= Version("2.8.7"), "GHSA-gg6h-894w-4m9c"
+    if "re2js" in package.get("overrides", {}):
+        upstream = packages.get("node_modules/markdownlint", {}).get("dependencies", {})
+        # Deliberately scoped to the exact upstream pin that necessitated this
+        # workaround, not a second implementation of npm's range semantics.
+        assert upstream.get("re2js") == "2.8.6", (
+            "markdownlint's re2js requirement changed: remove the temporary re2js "
+            "override if upstream now resolves a patched version; otherwise review it"
+        )
 
 
 def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:

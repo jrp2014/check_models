@@ -1329,6 +1329,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Development tooling: temporarily override markdownlint's exact `re2js` 2.8.6
+  dependency with 2.8.7 to address GHSA-gg6h-894w-4m9c. A dependency test rejects
+  vulnerable resolutions and flags the override for removal when markdownlint
+  changes that requirement. Remove the override once upstream resolves a patched
+  version without it; no advisory suppression is added.
+- Remove the obsolete braces advisory exception, which the dependency scan no
+  longer reports; retain the warning for any future stale exceptions.
 - update.sh (0.17.98): a failed Stage 3 build/install of a local MLX repo now
   stops the run (nonzero exit, with the stop report and the end-of-run change
   table) after the existing restore attempts, instead of warning and
