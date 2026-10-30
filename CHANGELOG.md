@@ -1336,6 +1336,12 @@ Notable changes to this project will be documented in this file.
   version without it; no advisory suppression is added.
 - Remove the obsolete braces advisory exception, which the dependency scan no
   longer reports; retain the warning for any future stale exceptions.
+- Work around Skylos 5.2.0 false positives with two audited, line-local ignores:
+  escaped fragment links and image URLs already scheme-checked by their caller.
+  Remove each ignore when upstream recognises the proof; the suppression audit
+  rejects obsolete ignores. Reword an innocuous changelog phrase misclassified
+  as prompt injection. Hub prechecks now explicitly reject non-HTTP(S) URLs,
+  rather than suppressing that separate URL-scheme finding.
 - update.sh (0.17.98): a failed Stage 3 build/install of a local MLX repo now
   stops the run (nonzero exit, with the stop report and the end-of-run change
   table) after the existing restore attempts, instead of warning and
@@ -1345,7 +1351,7 @@ Notable changes to this project will be documented in this file.
   verified mlx-vlm, "critical packages verified" passed on the stale install,
   and the run exited 0 while the pulled checkout's `.pth` imported 0.7.11
   with 0.7.10 dist-info in site-packages (the harness's "mlx-vlm is
-  installed at 2 versions" warning). The rebuild-skip check and Stage 3b now
+  installed at 2 versions" warning). The rebuild eligibility check and Stage 3b now
   also compare mlx-vlm's pip-recorded version with the checkout's declared
   `mlx_vlm/version.py`, so a leftover skew forces a rebuild on the next run
   instead of passing on the editable path alone.

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import datetime as dt
+import io
 import json
 import os
 import re
@@ -44,6 +45,7 @@ from tools import (
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
+    from urllib.request import Request
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -3521,6 +3523,33 @@ _MULTIMODAL_MISTRAL_TEMPLATE = (
     "{%- else %}{%- for block in message['content'] %}{%- if block['type'] == 'text' %}"
     "{{ block['text'] }}{%- endif %}{%- endfor %}{%- endif %}{%- endfor %}"
 )
+
+
+@pytest.mark.parametrize(
+    ("url", "allowed"),
+    [
+        ("https://example.test/config.json", True),
+        ("http://localhost/config.json", True),
+        ("HTTPS://example.test/config.json", True),
+        ("file:///tmp/config.json", False),
+        ("data:text/plain,config", False),
+        ("ftp://example.test/config.json", False),
+    ],
+)
+def test_hub_precheck_fetch_allows_only_http_schemes(
+    monkeypatch: pytest.MonkeyPatch, url: str, *, allowed: bool
+) -> None:
+    """A configured Hub endpoint must not turn metadata fetching into a local read."""
+    calls: list[tuple[str, int, str | None]] = []
+
+    def fetch(request: Request, *, timeout: int) -> io.BytesIO:
+        calls.append((request.full_url, timeout, request.get_header("Authorization")))
+        return io.BytesIO(b'{"model_type":"example"}')
+
+    monkeypatch.setattr(hub_precheck, "urlopen", fetch)
+    result = hub_precheck._fetch_text(url, {"Authorization": "Bearer fixture"})
+    assert result == ('{"model_type":"example"}' if allowed else None)
+    assert calls == ([(url, 30, "Bearer fixture")] if allowed else [])
 
 
 def test_hub_precheck_template_shape_separates_text_only_from_multimodal_templates() -> None:

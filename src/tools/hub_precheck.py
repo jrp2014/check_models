@@ -25,7 +25,7 @@ hub reads the way ``check_models`` will judge it once cached:
 
 Only ``config.json``, the chat template, the safetensors index and the
 model-card metadata of the candidate and its declared bases are fetched,
-over HTTPS; the local Hugging Face cache is only read, for the cached
+over HTTP(S); the local Hugging Face cache is only read, for the cached
 models' own declared bases. Verdicts are hints, never proof.
 
 Usage::
@@ -45,6 +45,7 @@ import re
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Final, Literal
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 import yaml
@@ -360,8 +361,10 @@ def _gigabytes(value: int | None) -> float | None:
 
 
 def _fetch_text(url: str, headers: dict[str, str]) -> str | None:
-    """Fetch one small hub file over HTTPS; None when it does not exist."""
-    request = Request(url, headers=headers)  # noqa: S310 - https hub URL built by hf_hub_url
+    """Fetch one small HTTP(S) hub file; None when unsupported or unavailable."""
+    if urlparse(url).scheme not in {"http", "https"}:
+        return None
+    request = Request(url, headers=headers)  # noqa: S310 - HTTP(S) scheme checked above
     try:
         with urlopen(request, timeout=_FETCH_TIMEOUT_S) as response:  # noqa: S310 - as above
             return response.read().decode("utf-8")
