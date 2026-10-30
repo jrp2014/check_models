@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import os
 import stat
-from typing import TYPE_CHECKING, Final
-
-if TYPE_CHECKING:
-    from pathlib import Path
+import tempfile
+from pathlib import Path
+from typing import Final
 
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
@@ -108,3 +107,33 @@ def write_text_no_follow(path: Path, content: str, *, mode: int = 0o666) -> None
 
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write(content)
+
+
+def replace_text_no_follow(path: Path, content: str) -> None:
+    """Replace an existing regular file's text through a sibling temp file.
+
+    The new text is written and flushed to a temporary file in the same
+    directory, which then replaces ``path`` by an atomic rename. Any failure
+    before the rename leaves the original bytes untouched and removes the
+    temporary file. The original permission bits are kept.
+    """
+    _reject_symlink_parent(path)
+    path = _canonical_file_path(path)
+    _reject_symlink_parent(path)
+    original = os.lstat(path)
+    if not stat.S_ISREG(original.st_mode):
+        msg = f"Refusing to replace non-regular file: {path}"
+        raise OSError(msg)
+
+    fd, staging_name = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    staging = Path(staging_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fchmod(handle.fileno(), stat.S_IMODE(original.st_mode))
+            os.fsync(handle.fileno())
+        staging.replace(path)
+    except BaseException:
+        staging.unlink(missing_ok=True)
+        raise

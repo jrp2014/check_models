@@ -16,7 +16,9 @@ PyPI metadata that still carries the pin.
 Scope: only a bare ``Requires-Dist: <package>==X`` line (no extras, no
 environment marker, a single ``==`` clause, no wildcard — ``==X.*`` has no
 valid ``>=`` form) is rewritten, and the replacement is parsed as a
-requirement before it is written. Exit 0 when the pin was relaxed, was
+requirement before it is written. The rewrite goes through a sibling temporary
+file and an atomic rename, so a failure leaves the original METADATA intact.
+Exit 0 when the pin was relaxed, was
 already relaxed, or the distribution no longer declares the dependency;
 exit 1 when the distribution is not installed or its metadata cannot be
 rewritten safely.
@@ -34,10 +36,10 @@ from typing import TYPE_CHECKING, Final
 from packaging.requirements import InvalidRequirement, Requirement
 
 try:
-    from tools.safe_io import read_text_no_follow, write_text_no_follow
+    from tools.safe_io import read_text_no_follow, replace_text_no_follow
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from tools.safe_io import read_text_no_follow, write_text_no_follow
+    from tools.safe_io import read_text_no_follow, replace_text_no_follow
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
@@ -143,7 +145,7 @@ def relax_exact_pin(
             lines[index] = f"{REQUIRES_DIST_PREFIX} {package}>={pinned_version}{ending}"
             relaxed.append(pinned_version)
         if relaxed:
-            write_text_no_follow(metadata_file, "".join(lines))
+            replace_text_no_follow(metadata_file, "".join(lines))
             versions = ", ".join(relaxed)
             outcomes.append(
                 f"relaxed {package}=={versions} to {package}>={versions} in {metadata_file}"

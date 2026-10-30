@@ -1329,6 +1329,23 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Output data (0.17.100, review of 8e17405): the retained llm-jp
+  `native_repro_notes.yaml` note, recorded on a branch before 0.17.99 made
+  `experiment` a required key, was merged without it, so the reader rejected
+  the whole file and the published native confirmation would have read "not
+  yet checked" on the next summary render (and `add_native_repro_note`
+  refused to append). The note gains the retained run's experiment label,
+  which its recorded evidence matches (same image digest, recorded prompt,
+  `--max-tokens 1000 --seed 0 --prefill-step-size 2048`). A new test parses
+  every committed notes file with the current strict reader, so a schema
+  change must migrate retained notes in the same commit.
+- update.sh tooling (0.17.100, review of 8e17405): `relax_exact_mlx_pin.py`
+  rewrote the installed `METADATA` by truncating it in place, so a failure
+  part-way through left an empty file. It now writes a sibling temporary
+  file (`safe_io.replace_text_no_follow`: flushed, original permissions
+  kept) and renames it over the original only after the write succeeds; a
+  failure-path test checks the original bytes survive and no temporary file
+  is left.
 - update.sh (0.17.99, review of 0.17.98): the mlx-audio reconciliation runs
   inside the caller's `if !`, where `set -e` is inert, so a failed `--no-deps`
   install or metadata rewrite could be recorded as success with the hold

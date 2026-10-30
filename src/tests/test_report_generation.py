@@ -10261,6 +10261,33 @@ def test_unreadable_native_repro_notes_leave_every_observation_unchecked(tmp_pat
     assert "native_repro_notes.yaml could not be read" in " ".join(summary.split())
 
 
+@pytest.mark.parametrize(
+    ("filename", "parse"),
+    [
+        (check_models.NATIVE_REPRO_NOTES_FILENAME, check_models._parse_native_repro_notes),
+        (check_models.ACCURACY_NOTES_FILENAME, check_models._parse_accuracy_notes),
+    ],
+)
+def test_retained_notes_files_match_the_current_schema(
+    filename: str, parse: Callable[[object], tuple[object, ...]]
+) -> None:
+    """The committed person-written notes still parse with today's strict reader.
+
+    Regression: a merge made ``experiment`` a required native-note key while
+    the retained llm-jp note lacked it, so the reader rejected the whole file
+    and the published native confirmation read as "not yet checked". A schema
+    change must migrate the retained notes in the same commit.
+    """
+    path = Path(__file__).parents[1] / "output" / filename
+    if not path.exists():
+        pytest.skip(f"no retained {filename}")
+    read = check_models._read_notes_file(path, parse)
+    assert read is not None
+    notes, read_error = read
+    assert read_error is None
+    assert notes
+
+
 def _record_accuracy_note(output_root: Path, model: str = "org/reviewed") -> int:
     return add_accuracy_note(
         [model, "--reviewer", "john", "--note", "Accurate.", "--output-dir", str(output_root)]

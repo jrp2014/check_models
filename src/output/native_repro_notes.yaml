@@ -1,6 +1,7 @@
 # Native reproduction checks for observations in the run retained here.
-# Each applies only while its model revision and mlx/mlx-vlm/transformers
-# builds match a run; the run summary then shows its status.
+# Each applies only while its model revision, mlx/mlx-vlm/transformers
+# builds and experiment inputs (image, prompt, generation settings) match
+# a run; the run summary then shows its status.
 # Add one with: python -m tools.add_native_repro_note MODEL OBSERVATION STATUS ...
 notes:
 - model: mlx-community/llm-jp-4-vl-9b-mlx-4bit
@@ -8,6 +9,8 @@ notes:
   observation: unexpected_special_token
   stack: mlx 0.32.5.dev20261030+1ba7f969a @ 1ba7f969a; mlx-vlm 0.7.11 @ 918763c68; transformers
     5.22.1
+  experiment: image ecdd79a7ae793ce2dc0c2fc78e9fb7814dafd1aec110397ca1b1c186631e2fbd; prompt
+    ca9e1bd3f02f7bec3a3edcf85be7c035321060405f47dff1c57d4f9739735bcb; settings 069e961b7fa2e3e85b68573e33ed8ca8cb22876f14e19828dbb50b7c8b446624
   status: confirmed
   checker: Claude
   checked: '2026-10-30'

@@ -1607,6 +1607,39 @@ def test_relax_exact_mlx_pin_leaves_wildcard_pins_alone(tmp_path: Path) -> None:
     assert safe_io.read_text_no_follow(metadata_file) == before
 
 
+def test_relax_exact_mlx_pin_failure_keeps_the_original_metadata(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A write that fails part-way leaves the installed METADATA byte-for-byte intact.
+
+    Regression: the rewrite once truncated METADATA in place before writing,
+    so a failure after opening it left an empty file in the environment.
+    """
+    metadata_file = _write_metadata_dist_info(
+        tmp_path,
+        "mlx_audio",
+        "0.6.3",
+        "Metadata-Version: 2.4\nName: mlx-audio\nVersion: 0.6.3\nRequires-Dist: mlx==0.32.4\n",
+    )
+    metadata_file.chmod(0o644)
+    before = metadata_file.read_bytes()
+
+    def fail_after_writing(_fd: int) -> None:
+        raise OSError(28, "No space left on device")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(safe_io.os, "fsync", fail_after_writing)
+        with pytest.raises(OSError, match="No space left"):
+            relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
+    assert metadata_file.read_bytes() == before
+    assert sorted(path.name for path in metadata_file.parent.iterdir()) == ["METADATA"]
+
+    # Once the failure clears, the rewrite lands and keeps the file's permissions.
+    relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
+    assert "Requires-Dist: mlx>=0.32.4\n" in safe_io.read_text_no_follow(metadata_file)
+    assert metadata_file.stat().st_mode & 0o777 == 0o644
+
+
 def test_relax_exact_mlx_pin_requires_installed_metadata(tmp_path: Path) -> None:
     """A missing distribution is an error, not a silent no-op."""
     with pytest.raises(RuntimeError, match="no installed metadata"):
