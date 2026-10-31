@@ -157,6 +157,12 @@ Notable changes to this project will be documented in this file.
   on both, 3.13 on macos-15 and the 3.15 lane on macos-latest, and the
   runtime smoke runs on both. Job and failure-artifact
   names now carry the runner.
+- Image metadata (0.17.103): an `--image` URL download for EXIF reads at
+  most `MAX_IMAGE_URL_BYTES` (64 MiB) and rejects a larger response before
+  Pillow sees it; the EXIF step then logs the failure and continues without
+  metadata. Removed the unused `FIELD_ABBREVIATIONS` table. The Skylos gate
+  comments now say that optional advice rules such as SKY-P401 are reported
+  but not counted by `max_quality = 0`.
 - Tooling: rechecked every inline suppression against Skylos 5.3.0 and
   ty 0.0.95; all 133 are still needed, so the Skylos floor stays 5.0.0.
   5.3.0's Namespace-write fix covers only literal `setattr` names on a fresh

@@ -55,8 +55,8 @@ class _FakeUrlResponse:
     ) -> None:
         _ = (exc_type, exc_value, traceback)
 
-    def read(self) -> bytes:
-        return self._payload
+    def read(self, size: int = -1) -> bytes:
+        return self._payload if size < 0 else self._payload[:size]
 
 
 def test_extract_exif_date_standard_format() -> None:
@@ -117,6 +117,29 @@ def test_get_exif_data_downloads_http_image_with_urllib(
 
     assert exif_data is not None
     assert exif_data["ImageDescription"] == "Remote description"
+
+
+def test_get_exif_data_rejects_oversized_url_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A URL response over the byte cap is rejected before Pillow sees it."""
+    monkeypatch.setattr(check_models, "MAX_IMAGE_URL_BYTES", 8)
+    monkeypatch.setattr(
+        check_models,
+        "urlopen",
+        lambda _url, **_kwargs: _FakeUrlResponse(b"x" * 9),
+    )
+
+    def fail_image_open(_image_data: object) -> _FakeUrlImage:
+        pytest.fail("oversized payload reached Image.open")
+
+    monkeypatch.setattr(Image, "open", fail_image_open)
+
+    with pytest.raises(ValueError, match="exceeds 8 bytes"):
+        check_models._open_image_for_exif(
+            "https://example.com/big.jpg", "https://example.com/big.jpg", is_url=True
+        )
+    assert check_models.get_exif_data("https://example.com/big.jpg") is None
 
 
 def test_extract_exif_date_datetime_original() -> None:

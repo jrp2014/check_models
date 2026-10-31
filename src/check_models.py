@@ -335,6 +335,8 @@ JSONL_FORMAT_VERSION: Final = "3.0"
 HISTORY_FORMAT_VERSION: Final = "1.0"
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
 MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
+# Largest --image URL download read for EXIF; a larger response is rejected.
+MAX_IMAGE_URL_BYTES: Final[int] = 64 * 1024 * 1024
 ROOT_PATH: Final[Path] = Path(os.sep)
 ALLOWED_SYSTEM_SYMLINK_PARENTS: Final[dict[Path, Path]] = {
     ROOT_PATH / "tmp": ROOT_PATH / "private" / "tmp",
@@ -3614,24 +3616,6 @@ MAX_TUPLE_LEN: Final[int] = 10
 MAX_STR_LEN: Final[int] = 60
 STR_TRUNCATE_LEN: Final[int] = 57
 
-# Field display configuration: maps field names to (label, unit) tuples.
-# Used by format_field_label() and table generators for consistent column headers.
-FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
-    "model_name": ("Model", "Name"),
-    "prompt_tokens": ("Prompt", "(tokens)"),
-    "generation_tokens": ("Generation", "(tokens)"),
-    "total_tokens": ("Total", "Tokens"),
-    "prompt_tps": ("Prompt", "Tps"),
-    "generation_tps": ("Gen", "TPS"),
-    "peak_memory": ("Peak", "(GB)"),
-    "generation_time": ("Generation", "(s)"),
-    "model_load_time": ("Load", "(s)"),
-    "total_time": ("Total", "(s)"),
-    "active_memory": ("Active", "Mem (GB)"),
-    "cache_memory": ("Cache", "Mem (GB)"),
-    "error_package": ("Error", "Package"),
-}
-
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
@@ -6009,14 +5993,17 @@ def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) 
         return Image.open(Path(image_path))
 
     logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-    # Skylos 5.2.0 misses the caller's _validate_image_url_scheme guard.
+    # Skylos 5.2.0-5.3.0 misses the caller's _validate_image_url_scheme guard.
     # Remove D218 when it follows that proof; the suppression audit enforces this.
     with urlopen(  # noqa: S310 - scheme is restricted to http/https by caller  # skylos: ignore[SKY-D216,SKY-D218] the operator's own --image URL, http(s) only
         image_str,
         timeout=30,
     ) as response:
-        img_data = io.BytesIO(response.read())
-    return Image.open(img_data)
+        payload = response.read(MAX_IMAGE_URL_BYTES + 1)
+    if len(payload) > MAX_IMAGE_URL_BYTES:
+        msg = f"Image URL response exceeds {MAX_IMAGE_URL_BYTES:,} bytes: {image_str}"
+        raise ValueError(msg)
+    return Image.open(io.BytesIO(payload))
 
 
 def _decode_gps_tag_key(gps_tag_id: object) -> str:

@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Compare and diagnose MLX vision-language models on Apple Silicon: single-image runs, throughput and memory measurements, output comparisons, and reproducible failure reports."
-version = "0.17.102"
+version = "0.17.103"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -153,8 +153,9 @@ fail_on_critical = true
 max_critical = 0
 max_high = 0
 max_security = 0
-# Zero: quality findings block. Version-drift noise is absorbed by the
-# per-rule ignore list above, not by a numeric allowance.
+# Zero: every quality finding Skylos counts blocks. Optional advice rules
+# (e.g. SKY-P401 unbounded read) are reported but not counted. Version-drift
+# noise is absorbed by the per-rule ignore list above, not by a numeric allowance.
 max_quality = 0
 strict = false
 

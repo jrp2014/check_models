@@ -44,7 +44,8 @@ gate:
   max_critical: 0
   max_high: 0
   max_security: 0
-  # Zero: quality findings block. Version-drift noise is absorbed by the
-  # per-rule ignore list, not by a numeric allowance.
+  # Zero: every quality finding Skylos counts blocks. Optional advice rules
+  # (e.g. SKY-P401 unbounded read) are reported but not counted. Version-drift
+  # noise is absorbed by the per-rule ignore list, not by a numeric allowance.
   max_quality: 0
   strict: false
