@@ -152,6 +152,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tooling: rechecked every inline suppression against Skylos 5.3.0 and
+  ty 0.0.95; all 133 are still needed, so the Skylos floor stays 5.0.0.
+  5.3.0's Namespace-write fix covers only literal `setattr` names on a fresh
+  `argparse.Namespace()`, so the SKY-D228 ignore on `_html_model_link`
+  stays and its comment now names the shapes that still trigger it.
 - Suppression audit: the long silent pause after "Found N inline
   suppression(s)" was the Skylos scan, which is CPU-bound (no network) and
   dominated by `check_models.py`. Skylos now scans only the files that carry

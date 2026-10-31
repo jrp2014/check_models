@@ -11162,8 +11162,9 @@ def generate_diagnostics_report(
 def _html_model_link(model_name: str) -> str:
     """Return a safe internal link to one complete-evidence entry."""
     anchor = _gallery_model_anchor(model_name)
-    # Skylos 5.2.0 distrusts html.escape after unrelated Namespace setattr calls.
-    # Remove D228 once receiver analysis is fixed; the suppression audit enforces this.
+    # Skylos 5.2.0-5.3.0 distrusts html.escape after unrelated setattr calls with a
+    # constant attribute name or a Namespace built from vars() (5.3.0 only clears
+    # literal names on Namespace()). The suppression audit fails once it is fixed.
     return (  # skylos: ignore[SKY-D228] both values escaped, literal # fixes URL to a fragment
         f'<a href="#{html.escape(anchor, quote=True)}">'
         f"<code>{html.escape(model_name, quote=True)}</code></a>"
