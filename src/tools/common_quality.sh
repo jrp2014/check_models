@@ -239,6 +239,38 @@ quality_require_command() {
         return "$status"
     }
 
+    # The gated Skylos quality scan. Advice-only rules (e.g. SKY-P401) are
+    # listed but not counted towards max_quality, so a passing gate can still
+    # print findings: keep those lines in QUALITY_SKYLOS_ADVICE for
+    # quality_print_skylos_advice to repeat at the end of the run. The output
+    # goes to a file (shown afterwards) rather than a pipe, so the scan's own
+    # exit status survives set -e and pipefail in the caller. A failing scan
+    # returns its status unchanged.
+    quality_run_skylos_quality_gate() {
+        local gate_log status=0
+        QUALITY_SKYLOS_ADVICE=""
+        gate_log="$(mktemp "${TMPDIR:-/tmp}/skylos-quality-gate.XXXXXX")" || return 1
+        TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+            quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise \
+            </dev/null >"$gate_log" || status=$?
+        cat "$gate_log"
+        if [ "$status" -eq 0 ]; then
+            # Concise finding lines are "<path>:<line>  <SKY-rule>  <message>";
+            # the path may contain spaces.
+            QUALITY_SKYLOS_ADVICE="$(grep -E '^.+:[0-9]+  SKY-' "$gate_log" || true)"
+        fi
+        rm -f "$gate_log"
+        return "$status"
+    }
+
+    quality_print_skylos_advice() {
+        if [ -n "${QUALITY_SKYLOS_ADVICE:-}" ]; then
+            echo "⚠️  Skylos advice (passes the gate, not blocking; fix it or add a reasoned ignore):"
+            printf '%s\n' "$QUALITY_SKYLOS_ADVICE" | sed 's/^/    /'
+            echo ""
+        fi
+    }
+
     quality_resolve_python_path() {
         if [ -n "${QUALITY_PYTHON:-}" ] && [ -x "$QUALITY_PYTHON" ]; then
             printf '%s\n' "$QUALITY_PYTHON"

@@ -1014,19 +1014,21 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     assert quality_script.index('echo "=== Skylos Quality Gate ==="') < quality_script.index(
         'echo "=== Pytest ==="'
     )
+    # The gated scan and its advice capture live in common_quality.sh; see
+    # test_skylos_quality_gate_wrapper_repeats_advice_and_keeps_failures.
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
         r"quality_run_skylos \. --quality --secrets --ai-defects --gate --no-upload "
         r"--format concise",
-        quality_script,
+        common_quality,
     )
-    # Advice-only findings (e.g. SKY-P401) pass the gate but are listed; the
-    # gate keeps Skylos's exit status and repeats them before both final
-    # "passed" lines so they are not scrolled away.
-    assert "skylos_gate_status=${PIPESTATUS[0]}" in quality_script
-    assert quality_script.count("print_skylos_advice") == 3
-    assert 'print_skylos_advice\n    echo "✅ Fast quality checks passed!"' in quality_script
-    assert 'print_skylos_advice\necho "✅ All quality checks passed!"' in quality_script
+    assert 'echo "=== Skylos Quality Gate ==="\nquality_run_skylos_quality_gate\n' in quality_script
+    # Advice is repeated just before both final "passed" lines.
+    assert quality_script.count("quality_print_skylos_advice") == 2
+    assert (
+        'quality_print_skylos_advice\n    echo "✅ Fast quality checks passed!"' in quality_script
+    )
+    assert 'quality_print_skylos_advice\necho "✅ All quality checks passed!"' in quality_script
     # Dependency advisories are gated by their own step (Skylos's ignore list
     # cannot accept one advisory), which must run before pytest too.
     assert re.search(
@@ -1144,6 +1146,81 @@ def test_defusedxml_probe_is_a_real_import_without_suppression() -> None:
     assert "F401" not in defusedxml_probe
     assert "noqa" not in defusedxml_probe
     assert check_models._defusedxml_available is (check_models.defusedxml_etree is not None)
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("scan_output", "scan_status", "expected_advice"),
+    [
+        pytest.param("Quality Gate: PASSED\n", 0, None, id="clean"),
+        pytest.param(
+            "check_models.py:6018  SKY-P401  unbounded read\nQuality Gate: PASSED\n",
+            0,
+            "    check_models.py:6018  SKY-P401  unbounded read",
+            id="advice",
+        ),
+        pytest.param(
+            "tools/my helper.py:12  SKY-P401  unbounded read\nQuality Gate: PASSED\n",
+            0,
+            "    tools/my helper.py:12  SKY-P401  unbounded read",
+            id="advice-path-with-space",
+        ),
+        pytest.param(
+            "check_models.py:1  SKY-Q301  too complex\nQuality Gate: FAILED\n",
+            2,
+            None,
+            id="scanner-failure",
+        ),
+    ],
+)
+def test_skylos_quality_gate_wrapper_repeats_advice_and_keeps_failures(
+    tmp_path: Path,
+    scan_output: str,
+    scan_status: int,
+    expected_advice: str | None,
+) -> None:
+    """The gate shows Skylos's output, repeats passing findings, and keeps its status."""
+    scan_file = tmp_path / "scan.txt"
+    scan_file.write_text(scan_output, encoding="utf-8")
+    run_script = tmp_path / "run_skylos_gate.sh"
+    run_script.write_text(
+        dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            cd \"{PKG_ROOT}\"
+            source tools/common_quality.sh
+            quality_run_skylos() {{
+                cat \"{scan_file}\"
+                return {scan_status}
+            }}
+            quality_run_skylos_quality_gate
+            echo "=== end ==="
+            quality_print_skylos_advice
+            """
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
+        ["/bin/bash", str(run_script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == scan_status, result.stderr
+    assert result.stdout.startswith(scan_output)
+    if scan_status:
+        assert "=== end ===" not in result.stdout
+        return
+    reminder = result.stdout.split("=== end ===\n", 1)[1]
+    if expected_advice is None:
+        assert not reminder
+    else:
+        assert reminder.startswith("\u26a0\ufe0f  Skylos advice (passes the gate, not blocking")
+        assert f"\n{expected_advice}\n" in reminder
 
 
 @pytest.mark.subprocess

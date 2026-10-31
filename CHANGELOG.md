@@ -157,6 +157,16 @@ Notable changes to this project will be documented in this file.
   on both, 3.13 on macos-15 and the 3.15 lane on macos-latest, and the
   runtime smoke runs on both. Job and failure-artifact
   names now carry the runner.
+- Image metadata and quality gate (0.17.105): the URL cap is stated
+  directly as `MAX_IMAGE_URL_BYTES = 315_000_000` (sized for an uncompressed
+  8-bit RGB 105 Mpx image; it is a download cap, not a pixel limit). Tests
+  now fail if the download read is not bounded to cap + 1 and check that a
+  response of exactly the cap is accepted. The Skylos quality-gate step
+  moved into `quality_run_skylos_quality_gate` and
+  `quality_print_skylos_advice` in `common_quality.sh`; advice lines whose
+  path contains spaces are now repeated too, and an executable test covers
+  a clean scan, advice, a path with a space and a failing scan (exit status
+  kept, no reminder).
 - Image metadata and quality gate (0.17.104): the `--image` URL cap is now
   `MAX_IMAGE_URL_PIXELS * 3` bytes (105 Mpx, ~315 MB), enough for an
   uncompressed 8-bit RGB image from a medium-format camera. `make quality`

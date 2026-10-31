@@ -119,16 +119,52 @@ def test_get_exif_data_downloads_http_image_with_urllib(
     assert exif_data["ImageDescription"] == "Remote description"
 
 
-def test_get_exif_data_rejects_oversized_url_response(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """A URL response over the byte cap is rejected before Pillow sees it."""
-    monkeypatch.setattr(check_models, "MAX_IMAGE_URL_BYTES", 8)
+class _BoundedUrlResponse(_FakeUrlResponse):
+    """URL response that requires the caller to bound its read."""
+
+    def __init__(self, payload: bytes, expected_size: int) -> None:
+        super().__init__(payload)
+        self._expected_size = expected_size
+
+    def read(self, size: int = -1) -> bytes:
+        assert size == self._expected_size, "URL download read must be bounded"
+        return super().read(size)
+
+
+def _patch_url_payload(monkeypatch: pytest.MonkeyPatch, payload: bytes, cap: int) -> None:
+    monkeypatch.setattr(check_models, "MAX_IMAGE_URL_BYTES", cap)
     monkeypatch.setattr(
         check_models,
         "urlopen",
-        lambda _url, **_kwargs: _FakeUrlResponse(b"x" * 9),
+        lambda _url, **_kwargs: _BoundedUrlResponse(payload, cap + 1),
     )
+
+
+def test_open_image_for_exif_accepts_url_response_at_the_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A response of exactly the cap reaches Pillow, read with cap + 1."""
+    _patch_url_payload(monkeypatch, b"x" * 8, cap=8)
+    opened: list[bytes] = []
+
+    def fake_image_open(image_data: io.BytesIO) -> _FakeUrlImage:
+        opened.append(image_data.getvalue())
+        return _FakeUrlImage()
+
+    monkeypatch.setattr(Image, "open", fake_image_open)
+
+    check_models._open_image_for_exif(
+        "https://example.com/fit.jpg", "https://example.com/fit.jpg", is_url=True
+    )
+
+    assert opened == [b"x" * 8]
+
+
+def test_get_exif_data_rejects_oversized_url_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A response over the cap is rejected before Pillow, read with cap + 1."""
+    _patch_url_payload(monkeypatch, b"x" * 20, cap=8)
 
     def fail_image_open(_image_data: object) -> _FakeUrlImage:
         pytest.fail("oversized payload reached Image.open")
