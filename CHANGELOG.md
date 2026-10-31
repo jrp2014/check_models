@@ -152,9 +152,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- CI: the macOS jobs stay on `macos-15` and add a `macos-26` lane: static
-  quality runs Python 3.14 on both images (3.13 and the 3.15 lane stay on
-  macos-15), and the runtime smoke runs on both. Job and failure-artifact
+- CI: the macOS jobs stay on `macos-15` and add a `macos-latest` lane
+  (GitHub's current default macOS image): static quality runs Python 3.14
+  on both (3.13 and the 3.15 lane stay on macos-15), and the runtime smoke
+  runs on both. Job and failure-artifact
   names now carry the runner.
 - Tooling: rechecked every inline suppression against Skylos 5.3.0 and
   ty 0.0.95; all 133 are still needed, so the Skylos floor stays 5.0.0.

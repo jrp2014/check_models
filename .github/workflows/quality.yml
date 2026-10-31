@@ -57,10 +57,10 @@ jobs:
         python-version: ["3.13", "3.14"]
         runner: [macos-15]
         include:
-          # The working env's Python on the newest macOS image as well, so a
-          # macOS move is rehearsed too.
+          # The working env's Python on GitHub's current default macOS image
+          # (macos-latest) as well, so a macOS move is rehearsed too.
           - python-version: "3.14"
-            runner: macos-26
+            runner: macos-latest
           # The Python after the working env's (probe_python_next.sh's
           # default). While pip finds no distribution for a requirement (mlx
           # has no cp315 wheel and no sdist yet), the install step warns and
@@ -163,7 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-15, macos-26]
+        runner: [macos-15, macos-latest]
 
     steps:
       - name: Checkout

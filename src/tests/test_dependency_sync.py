@@ -2934,8 +2934,8 @@ def test_ci_install_step_holds_the_next_python_lane_until_its_date(
         assert "checks are held until 9999-12-31." in result.stdout
 
 
-def test_ci_macos_lanes_cover_macos_15_and_26() -> None:
-    """Each macOS CI job runs on macos-15 and keeps a macos-26 lane."""
+def test_ci_macos_lanes_cover_macos_15_and_latest() -> None:
+    """Each macOS CI job runs on macos-15 and keeps a macos-latest lane."""
     workflow = yaml.safe_load(
         (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
     )
@@ -2946,7 +2946,7 @@ def test_ci_macos_lanes_cover_macos_15_and_26() -> None:
         runners = set(matrix.get("runner", [])) | {
             entry["runner"] for entry in matrix.get("include", [])
         }
-        assert runners == {"macos-15", "macos-26"}, job_name
+        assert runners == {"macos-15", "macos-latest"}, job_name
 
 
 def test_ci_next_python_hold_is_a_date() -> None:
