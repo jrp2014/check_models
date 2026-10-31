@@ -2934,6 +2934,21 @@ def test_ci_install_step_holds_the_next_python_lane_until_its_date(
         assert "checks are held until 9999-12-31." in result.stdout
 
 
+def test_ci_macos_lanes_cover_macos_15_and_26() -> None:
+    """Each macOS CI job runs on macos-15 and keeps a macos-26 lane."""
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    for job_name in ("static-quality", "runtime-smoke"):
+        job = workflow["jobs"][job_name]
+        assert job["runs-on"] == "${{ matrix.runner }}"
+        matrix = job["strategy"]["matrix"]
+        runners = set(matrix.get("runner", [])) | {
+            entry["runner"] for entry in matrix.get("include", [])
+        }
+        assert runners == {"macos-15", "macos-26"}, job_name
+
+
 def test_ci_next_python_hold_is_a_date() -> None:
     """The workflow's hold value is empty or an ISO date, so the string comparison holds."""
     workflow = yaml.safe_load(
