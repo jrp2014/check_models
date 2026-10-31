@@ -68,7 +68,7 @@ jobs:
           # once the stack installs, the lane gates like the rest. It is also
           # skipped before NEXT_PYTHON_HOLD_UNTIL (install step).
           - python-version: "3.15"
-            runner: macos-15
+            runner: macos-latest
             next-python: true
 
     steps:
