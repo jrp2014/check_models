@@ -138,8 +138,29 @@ quality_run_python_tool vulture
 sca_report_path=".skylos/skylos-dependency-scan.json"
 rm -f "$sca_report_path"
 echo "=== Skylos Quality Gate ==="
+# Advice-only rules (e.g. SKY-P401) are listed but do not count towards
+# max_quality, so a passing gate can still print findings. Keep them and
+# repeat them at the end of the run, where they are not scrolled away.
+skylos_gate_log="$(mktemp "${TMPDIR:-/tmp}/skylos-quality-gate.XXXXXX")"
+set +e
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise </dev/null
+    quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise </dev/null \
+    | tee "$skylos_gate_log"
+skylos_gate_status=${PIPESTATUS[0]}
+set -e
+skylos_advice="$(grep -E '^[^ ]+:[0-9]+  SKY-' "$skylos_gate_log" || true)"
+rm -f "$skylos_gate_log"
+if [ "$skylos_gate_status" -ne 0 ]; then
+    exit "$skylos_gate_status"
+fi
+
+print_skylos_advice() {
+    if [ -n "$skylos_advice" ]; then
+        echo "⚠️  Skylos advice (passes the gate, not blocking; fix it or add a reasoned ignore):"
+        printf '%s\n' "$skylos_advice" | sed 's/^/    /'
+        echo ""
+    fi
+}
 
 # The dependency scan runs on its own because Skylos's ignore list does not
 # reach dependency advisories: tools.check_dependency_advisories fails on any
@@ -182,6 +203,7 @@ if [ "$QUALITY_MODE" = "fast" ]; then
     run_markdownlint_step
 
     echo ""
+    print_skylos_advice
     echo "✅ Fast quality checks passed!"
     exit 0
 fi
@@ -202,4 +224,5 @@ fi
 run_markdownlint_step
 
 echo ""
+print_skylos_advice
 echo "✅ All quality checks passed!"

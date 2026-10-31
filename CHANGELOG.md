@@ -157,6 +157,14 @@ Notable changes to this project will be documented in this file.
   on both, 3.13 on macos-15 and the 3.15 lane on macos-latest, and the
   runtime smoke runs on both. Job and failure-artifact
   names now carry the runner.
+- Image metadata and quality gate (0.17.104): the `--image` URL cap is now
+  `MAX_IMAGE_URL_PIXELS * 3` bytes (105 Mpx, ~315 MB), enough for an
+  uncompressed 8-bit RGB image from a medium-format camera. `make quality`
+  now repeats any Skylos finding that passes the gate (advice-only rules
+  such as SKY-P401) under a "Skylos advice" heading just before the final
+  "passed" line, without blocking. `--all-advice` showed no further hidden
+  advice on this tree and is not used, because it would count advice
+  against `max_quality = 0`.
 - Image metadata (0.17.103): an `--image` URL download for EXIF reads at
   most `MAX_IMAGE_URL_BYTES` (64 MiB) and rejects a larger response before
   Pillow sees it; the EXIF step then logs the failure and continues without

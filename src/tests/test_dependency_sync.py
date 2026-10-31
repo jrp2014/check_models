@@ -1020,6 +1020,13 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
         r"--format concise",
         quality_script,
     )
+    # Advice-only findings (e.g. SKY-P401) pass the gate but are listed; the
+    # gate keeps Skylos's exit status and repeats them before both final
+    # "passed" lines so they are not scrolled away.
+    assert "skylos_gate_status=${PIPESTATUS[0]}" in quality_script
+    assert quality_script.count("print_skylos_advice") == 3
+    assert 'print_skylos_advice\n    echo "✅ Fast quality checks passed!"' in quality_script
+    assert 'print_skylos_advice\necho "✅ All quality checks passed!"' in quality_script
     # Dependency advisories are gated by their own step (Skylos's ignore list
     # cannot accept one advisory), which must run before pytest too.
     assert re.search(

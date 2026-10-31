@@ -336,7 +336,10 @@ HISTORY_FORMAT_VERSION: Final = "1.0"
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
 MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
 # Largest --image URL download read for EXIF; a larger response is rejected.
-MAX_IMAGE_URL_BYTES: Final[int] = 64 * 1024 * 1024
+# 105 Mpx (medium-format camera output) at 3 bytes per pixel fits even an
+# uncompressed 8-bit RGB file (~315 MB); a JPEG of that size is far smaller.
+MAX_IMAGE_URL_PIXELS: Final[int] = 105_000_000
+MAX_IMAGE_URL_BYTES: Final[int] = MAX_IMAGE_URL_PIXELS * 3
 ROOT_PATH: Final[Path] = Path(os.sep)
 ALLOWED_SYSTEM_SYMLINK_PARENTS: Final[dict[Path, Path]] = {
     ROOT_PATH / "tmp": ROOT_PATH / "private" / "tmp",
