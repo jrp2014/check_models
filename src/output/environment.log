@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-10-30 14:11:30 GMT
+FULL ENVIRONMENT DUMP - 2026-10-31 23:36:41 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -22,7 +22,7 @@ certifi==2026.10.23
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
-check_models==0.17.98
+check_models==0.17.102
 click==8.5.0
 cmake==4.4.4
 coverage==7.17.0
@@ -37,7 +37,7 @@ editor==2.0.1
 einops==0.8.2
 execnet==2.1.2
 fastapi==0.162.0
-filelock==4.2.4
+filelock==4.2.6
 frozenlist==1.8.0
 fsspec==2026.7.0
 h11==0.16.0
@@ -73,7 +73,7 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.5.dev20261030+1ba7f969a
+mlx==0.32.5.dev20261031+339279525
 mlx-audio==0.6.3
 mlx-lm==0.32.2
 mlx-vlm==0.7.11
@@ -85,7 +85,7 @@ multiprocess==0.70.19
 mypy==2.4.1
 mypy_extensions==1.1.0
 networkx==3.7
-nodeenv==1.11.1
+nodeenv==1.12.0
 num2words==0.5.14
 numpy==2.5.4
 opencv-python==5.0.0.93
@@ -99,7 +99,7 @@ pip==26.2.2
 pip-requirements-parser==32.0.1
 pip_api==0.0.35
 pip_audit==2.10.1
-platformdirs==4.14.0
+platformdirs==4.14.2
 pluggy==1.7.0
 pre_commit==4.7.0
 propcache==0.5.4
@@ -121,9 +121,9 @@ pytest==9.2.0
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==3.0.0
-python-discovery==1.6.7
+python-discovery==1.9.0
 python-dotenv==1.2.4
-python-multipart==0.0.32
+python-multipart==0.0.33
 PyYAML==6.0.3
 readchar==4.2.2
 referencing==0.37.0
@@ -139,7 +139,7 @@ sentencepiece==0.2.2
 setuptools==84.2.1
 shellingham==1.5.4
 six==1.17.0
-skylos==5.2.0
+skylos==5.3.0
 sortedcontainers==2.4.0
 sounddevice==0.5.6
 sse-starlette==3.6.0
@@ -169,7 +169,7 @@ typer==0.27.3
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260906
 types-PyYAML==6.0.12.20261030
-types-simplejson==4.2.0.20261006
+types-simplejson==4.2.0.20261031
 types-toml==0.10.8.20260518
 types-tqdm==4.70.0.20260906
 types-urllib3==1.26.25.14
@@ -179,10 +179,10 @@ tzdata==2026.6
 uc-micro-py==2.0.0
 urllib3==2.8.0
 uvicorn==0.54.0
-virtualenv==21.15.1
+virtualenv==21.15.2
 vulture==2.16
 wcwidth==0.9.4
-websockets==17.3
+websockets==17.4
 wheel==0.48.0
 xmod==1.10.0
 xxhash==4.0.2
@@ -190,5 +190,5 @@ yarl==1.25.1
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-10-30 14:11:30 GMT
+Environment dump completed at 2026-10-31 23:36:41 GMT
 ================================================================================
