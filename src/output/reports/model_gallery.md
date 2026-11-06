@@ -1,12 +1,12 @@
 # Model Output Gallery
 
-Generated on: 2026-10-31 23:48:40 GMT
+Generated on: 2026-11-06 14:43:35 GMT
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - *Input image:* JPEG, 6,656 x 9,483 pixels (63.1 MP), 60.5 MB
-- *Human accuracy notes:* 0 of 45 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed; 1 note for other images or models
+- *Human accuracy notes:* 0 of 41 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed; 1 note for other images or models
 
 This run records model responses to one shared image and prompt (evaluation
 lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
@@ -27,58 +27,54 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                               |
-|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|----------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.49s   | 486 tok/s  | 0.68            | 1.9     | 2,104      | 69      | none                                                                       |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 70.09s  | 33.5 tok/s | 63.84           | 17      | 16,594     | 118     | none                                                                       |
-| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 5.39s   | 63.7 tok/s | 1.63            | 9.6     | 1,430      | 106     | none                                                                       |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 58.81s  | 28.8 tok/s | 51.53           | 21      | 16,594     | 114     | none                                                                       |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 11.74s  | 111 tok/s  | 1.57            | 19      | 1,596      | 855     | none                                                                       |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 9.89s   | 75.4 tok/s | 6.57            | 8.7     | 6,343      | 104     | none                                                                       |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 6.48s   | 54.7 tok/s | 2.46            | 10      | 2,104      | 108     | none                                                                       |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 6.35s   | 78.1 tok/s | 1.27            | 25      | 927        | 108     | none                                                                       |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.63s   | 100 tok/s  | 0.82            | 7.1     | 382        | 94      | none                                                                       |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 7.04s   | 63.3 tok/s | 3.09            | 13      | 3,046      | 119     | none                                                                       |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 4.24s   | 179 tok/s  | 1.69            | 8.2     | 3,045      | 153     | none                                                                       |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 23.29s  | 62.8 tok/s | 9.54            | 73      | 2,525      | 120     | none                                                                       |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 5.69s   | 67.4 tok/s | 1.68            | 8.0     | 1,318      | 133     | none                                                                       |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 9.62s   | 27.1 tok/s | 2.99            | 13      | 3,136      | 112     | none                                                                       |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.70s   | 160 tok/s  | 2.71            | 3.7     | 4,044      | 110     | none                                                                       |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 35.33s  | 75.4 tok/s | 30.08           | 23      | 16,578     | 155     | none                                                                       |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 37.09s  | 66.3 tok/s | 33.57           | 11      | 16,578     | 87      | none                                                                       |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 37.18s  | 74.4 tok/s | 31.84           | 25      | 16,594     | 112     | none                                                                       |
-| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected`          | 37.51s  | 73.8 tok/s | 31.98           | 25      | 16,594     | 127     | none                                                                       |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 57.19s  | 29.0 tok/s | 49.63           | 21      | 16,594     | 121     | none                                                                       |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 5.15s   | 97.1 tok/s | 1.55            | 6.5     | 2,081      | 117     | none                                                                       |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 7.20s   | 55.4 tok/s | 2.85            | 28      | 586        | 76      | none                                                                       |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.54s   | 60.3 tok/s | 1.12            | 7.6     | 590        | 104     | none                                                                       |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.08s   | 108 tok/s  | 1.02            | 16      | 590        | 75      | none                                                                       |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 4.13s   | 119 tok/s  | 0.83            | 6.0     | 586        | 83      | none                                                                       |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 4.98s   | 122 tok/s  | 2.40            | 5.4     | 4,173      | 99      | none                                                                       |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 7.81s   | 33.6 tok/s | 1.98            | 18      | 1,313      | 111     | none                                                                       |
-| [`nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit`](#model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit)              | `no concerns detected`          | 13.16s  | 60.3 tok/s | 5.94            | 52      | 3,640      | 123     | none                                                                       |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 7.53s   | 127 tok/s  | 3.31            | 23      | 3,641      | 135     | none                                                                       |
-| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 50.20s  | 30.1 tok/s | 27.72           | 87      | 3,640      | 133     | none                                                                       |
-| [`LiquidAI/LFM3-VL-2B-MLX-8bit`](#model-liquidai-lfm3-vl-2b-mlx-8bit)                                                               | `concerns detected`             | 6.74s   | 191 tok/s  | 4.49            | 5.0     | 16,572     | 91      | prompt hint repeated                                                       |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.38s   | 202 tok/s  | 1.11            | 4.0     | 2,096      | 83      | prompt hint repeated                                                       |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`             | 6.15s   | 240 tok/s  | 1.09            | 3.1     | 925        | 752     | duplicate keywords                                                         |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `concerns detected`             | 3.34s   | 252 tok/s  | 0.96            | 3.7     | 927        | 114     | duplicate keywords                                                         |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`             | 5.27s   | 55.8 tok/s | 0.98            | 9.3     | 1,120      | 149     | duplicate keywords                                                         |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `concerns detected`             | 23.98s  | 66.2 tok/s | 19.14           | 26      | 12,683     | 90      | prompt hint repeated                                                       |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.37s   | 121 tok/s  | 1.19            | 5.6     | 1,419      | 74      | prompt hint repeated                                                       |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`             | 20.56s  | 56.6 tok/s | 14.16           | 14      | 16,589     | 229     | duplicate keywords                                                         |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.39s   | 170 tok/s  | 1.32            | 4.6     | 1,454      | 67      | prompt hint repeated                                                       |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 4.90s   | 98.4 tok/s | 1.53            | 7.3     | 1,802      | 83      | prompt hint repeated                                                       |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 3.45s   | 342 tok/s  | 1.36            | 2.1     | 325        | 22      | labelled fields not detected; prompt hint repeated                         |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.21s   | 303 tok/s  | 0.91            | 2.1     | 2,107      | 200     | repeated text; stopped early: repeating; duplicate keywords                |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 54.83s  | 23.6 tok/s | 8.55            | 25      | 4,367      | 1,000   | labelled fields not detected; cut off at token limit                       |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.72s   | 98.7 tok/s | 1.54            | 6.7     | 2,186      | 29      | control tokens visible; labelled fields not detected; prompt hint repeated |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.89s   | 199 tok/s  | 0.76            | 1.8     | 321        | 148     | labelled fields not detected                                               |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 2.57s   | 487 tok/s  | 0.98            | 1.9     | 2,104      | 69      | none                                                                                              |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 58.33s  | 34.8 tok/s | 52.54           | 17      | 16,594     | 118     | none                                                                                              |
+| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 6.03s   | 65.6 tok/s | 2.24            | 9.6     | 1,430      | 106     | none                                                                                              |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 48.99s  | 30.3 tok/s | 41.81           | 21      | 16,594     | 114     | none                                                                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 11.58s  | 116 tok/s  | 1.58            | 19      | 1,596      | 855     | none                                                                                              |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 9.48s   | 78.5 tok/s | 6.14            | 8.7     | 6,343      | 104     | none                                                                                              |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 6.30s   | 55.2 tok/s | 2.32            | 10      | 2,104      | 108     | none                                                                                              |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 6.53s   | 76.0 tok/s | 1.37            | 25      | 927        | 108     | none                                                                                              |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 3.72s   | 100 tok/s  | 0.92            | 7.1     | 382        | 94      | none                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.81s   | 62.9 tok/s | 2.77            | 13      | 3,046      | 119     | none                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 4.28s   | 177 tok/s  | 1.71            | 8.2     | 3,045      | 153     | none                                                                                              |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 22.59s  | 70.2 tok/s | 8.78            | 73      | 2,525      | 120     | none                                                                                              |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 6.49s   | 67.9 tok/s | 2.45            | 8.0     | 1,318      | 133     | none                                                                                              |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 10.67s  | 26.8 tok/s | 3.94            | 13      | 3,136      | 112     | none                                                                                              |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.60s   | 159 tok/s  | 2.75            | 3.7     | 4,044      | 110     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 34.96s  | 77.1 tok/s | 29.71           | 23      | 16,578     | 155     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 37.26s  | 66.5 tok/s | 33.65           | 11      | 16,578     | 87      | none                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 34.86s  | 73.5 tok/s | 29.29           | 25      | 16,594     | 125     | none                                                                                              |
+| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected`          | 34.23s  | 72.9 tok/s | 29.04           | 25      | 16,594     | 104     | none                                                                                              |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 53.71s  | 29.8 tok/s | 46.34           | 21      | 16,594     | 121     | none                                                                                              |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 5.30s   | 102 tok/s  | 1.76            | 6.5     | 2,081      | 117     | none                                                                                              |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.67s   | 62.7 tok/s | 1.29            | 7.6     | 590        | 104     | none                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.04s   | 111 tok/s  | 0.99            | 16      | 590        | 75      | none                                                                                              |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 4.28s   | 124 tok/s  | 1.05            | 6.0     | 586        | 83      | none                                                                                              |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 4.94s   | 128 tok/s  | 2.33            | 5.4     | 4,173      | 99      | none                                                                                              |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 7.93s   | 35.8 tok/s | 2.34            | 18      | 1,313      | 111     | none                                                                                              |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 7.00s   | 141 tok/s  | 2.90            | 23      | 3,641      | 135     | none                                                                                              |
+| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 51.05s  | 29.0 tok/s | 26.46           | 87      | 3,640      | 133     | none                                                                                              |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`             | 3.49s   | 196 tok/s  | 1.21            | 4.0     | 2,096      | 83      | prompt hint repeated                                                                              |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `concerns detected`             | 4.14s   | 253 tok/s  | 1.75            | 3.6     | 927        | 114     | duplicate keywords                                                                                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`             | 5.39s   | 54.3 tok/s | 0.95            | 9.3     | 1,120      | 149     | duplicate keywords                                                                                |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `concerns detected`             | 22.62s  | 67.8 tok/s | 17.79           | 26      | 12,683     | 85      | prompt hint repeated                                                                              |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`             | 3.59s   | 124 tok/s  | 1.39            | 5.6     | 1,419      | 74      | prompt hint repeated                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`             | 6.71s   | 51.8 tok/s | 2.46            | 28      | 586        | 70      | duplicate keywords                                                                                |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`             | 3.33s   | 179 tok/s  | 1.27            | 4.6     | 1,454      | 67      | prompt hint repeated                                                                              |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`             | 5.23s   | 95.9 tok/s | 1.56            | 7.3     | 1,802      | 83      | prompt hint repeated                                                                              |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 4.04s   | 258 tok/s  | 1.76            | 1.8     | 325        | 22      | labelled fields not detected; prompt hint repeated                                                |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.10s   | 329 tok/s  | 1.07            | 2.1     | 2,107      | 200     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 54.01s  | 23.6 tok/s | 7.79            | 25      | 4,367      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.67s   | 105 tok/s  | 1.46            | 6.7     | 2,186      | 29      | control tokens visible; labelled fields not detected; prompt hint repeated                        |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.93s   | 203 tok/s  | 0.87            | 1.5     | 321        | 148     | labelled fields not detected                                                                      |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.49s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.57s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -88,13 +84,13 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                           | Mechanical checks               | Observations                                                               |
-|-------------------------------------------------------------------------------------------------|---------------------------------|----------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                      | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                         |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                  | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit) | `major concerns: answer format` | labelled fields not detected; cut off at token limit                       |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)         | `major concerns: answer format` | control tokens visible; labelled fields not detected; prompt hint repeated |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                    | `major concerns: answer format` | labelled fields not detected                                               |
+| Model                                                                                           | Mechanical checks               | Observations                                                                                      |
+|-------------------------------------------------------------------------------------------------|---------------------------------|---------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                      | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                                                |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                  | `major concerns: generation`    | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit) | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)         | `major concerns: answer format` | control tokens visible; labelled fields not detected; prompt hint repeated                        |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                    | `major concerns: answer format` | labelled fields not detected                                                                      |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -122,40 +118,36 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: Historic Tower View with Overcast Sky \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast s... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
 | [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Historic Oxford tower viewed through trees \| Description: A view of a historic stone Gothic tower and surrounding rooftops in Oxford, England, framed by dense gree... \| Keywords (19): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
 | [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Gothic Tower Peeks Through Autumn Foliage \| Description: A historic stone Gothic tower rises above rooftops, framed by dense green and yellowing foliage und... \| Keywords (10): Gothic tower, autumn foliage, overcast sky, Oxfordshire, England, historic architecture, trees, rooftops, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Stone Gothic Tower Hidden in Trees \| Description: Taken on October 17, 2026, from coordinates near Oxford, this image captures a historic stone building feat... \| Keywords (18): architecture, branch, building, chimney, cloudy sky, english countryside, foliage, gothic tower, leaves, ...                                                                               |
-| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Stone Gothic Tower and Rooftops Behind Green Trees \| Description: Dense autumnal foliage frames a view of historic stone architecture, featuring a building w... \| Keywords (24): architecture, autumn foliage, building, chimney, cloudy sky, England, foliage, garden, gothic pinnacles, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Gothic tower and rooftops seen through autumn foliage \| Description: A stone Gothic tower featuring crenellated battlements and tall pinnacles rises above a... \| Keywords (17): Architecture, Autumn, Building, Chimney, Cloud, England, Foliage, Gothic, Leaves, Oxford, Pinnacle, Roof, ...                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Stone Gothic Tower Hidden in Trees \| Description: Taken on October 17, 2026, from 51.751667°N 1.252222°W, this view captures the spires and crenellated... \| Keywords (18): Oxford, Gothic, Tower, Spire, Architecture, Foliage, Cloudy, Autumn, England, Countryside, Greenery, Historic, ...                                                                               |
+| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Stone Gothic Tower and Rooftops Behind Green Trees \| Description: Captured on 17 October 2026, this view frames a historic stone building with Gothic pinnacl... \| Keywords (19): Architecture, Building, Chimney, Cloud, Cloudy Sky, England, Foliage, Historic Building, Leaves, Oxford, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Gothic tower and rooftops seen through autumn foliage \| Description: A stone Gothic tower featuring ornate pinnacles and crenellations rises above a slate... \| Keywords (16): Architecture, Building, Chimney, Cloudy sky, England, Foliage, Historic building, Leaves, Oxford, Pinnacle, ...                                                                               |
 | [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Gothic Tower Rooftops Amidst Green Canopy \| Description: This image captures a historic stone gothic tower and rooftops partially framed by dense green tre... \| Keywords (14): Gothic architecture, Stone structure, Rooftops, Trees, Overcast sky, Clouds, England, English countryside, ...                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Gothic Stone Tower Framed by Trees in Oxford \| Description: A historic stone gothic tower and rooftops are visible through dense green foliage under an overca... \| Keywords (14): Architecture, Building, Cloud, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, ...                                                                               |
 | [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Gothic Architecture Framed by Foliage in Oxford \| Description: A view of a historic stone Gothic tower and rooftops nestled among dense green foliage under a cloud... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Historic Gothic Tower Framed by Green Foliage \| Description: A historic stone gothic tower and rooftops emerge from dense green foliage under an overc... \| Keywords (16): Architecture, Building, Cloudy sky, England, Foliage, Historic Building, Leaves, Oxford, Oxfordshire, Pinnacle, ...                                                                               |
 | [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Historic Gothic Tower Framed by Autumn Foliage Under Overcast Sky \| Description: A view captures the pinnacled rooftops of a historic stone building, part... \| Keywords (14): Gothic architecture, historic building, rooftops, foliage, trees, overcast sky, pinnacles, stone structure, ...                                                                               |
 | [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Gothic Tower Amidst Lush Foliage Under Overcast Skies \| Description: A historic stone Gothic tower with pointed spires rises above dense green trees and rooftops,... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
 | [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Gothic Tower Amidst Autumn Foliage \| Description: A historic stone Gothic tower and rooftops peek through dense green and autumnal trees under an overcast s... \| Keywords (19): Gothic tower, Oxfordshire, historic architecture, autumn foliage, overcast sky, stone building, rooftops, ...                                                                               |
-| [`nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit`](#model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit)              | `no concerns detected` | Title: Oxford Historic Tower Peeking Through Autumn Trees \| Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
 | [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Historic Gothic Tower Through Autumnal Trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an ove... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
 | [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected` | Title: Historic stone tower framed by trees under cloudy sky \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees und... \| Keywords (20): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                               |
-| [`LiquidAI/LFM3-VL-2B-MLX-8bit`](#model-liquidai-lfm3-vl-2b-mlx-8bit)                                                               | `concerns detected`    | Title: Historic Gothic Tower Through Autumn Trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overc... \| Keywords (20): architecture, branch, building, chimney, cloud, cloudy sky, England, English countryside, foliage, ...                                                                               |
 | [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `concerns detected`    | Title: Historic stone tower framed by trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an over... \| Keywords (15): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Oxford, Oxfordshire, Pinnacle, Roof, ...                                                                               |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `concerns detected`    | Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky \| Description: The historic stone gothic tower is partially framed by dense foliage, seen under... \| Keywords (21): Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, ...[2,499 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `concerns detected`    | Title: Framed Gothic Tower Through Trees \| Description: A historic stone gothic tower with pinnacles and chimneys peeks through dense green foliage under an overcast sk... \| Keywords (25): Gothic tower, trees, foliage, overcast, cloudy sky, England, Oxford, Oxfordshire, historic building, ...                                                                               |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`    | Title: "Overcast Skies Over Oxford's Historic Architecture" \| Description: On October 17, 2026, at 15:44:34 UTC+01:00, a historic stone gothic tower stands as a pinnacle... \| Keywords (20): historic, architecture, gothic, tower, overcast, sky, leaves, foliage, English countryside, Oxford, ...                                                                               |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `concerns detected`    | Title: Historic Tower View Through Autumn Foliage \| Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an... \| Keywords (18): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, ...                                                                               |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `concerns detected`    | Title: Historic Tower View Through Overcast Trees \| Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an... \| Keywords (16): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, ...                                                                               |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Oxford Castle \| Description: A historic stone gothic tower and rooftops framed by dense green trees under an overcast sky. \| Keywords (18): architecture, branch, building, chimney, cloudy sky, english countryside, foliage, historic building, leaves, ...                                                                                                                |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`    | Title: Gothic Tower Through Foliage \| Description: A historic stone gothic tower and rooftops are framed by dense green trees under an overcast sky, with a v... \| Keywords (51): Oxfordshire, England, Gothic tower, historic building, stone architecture, overcast sky, cloudy, green foliage, ...                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: Gothic Stone Tower Framed by Trees in Oxford \| Description: A historic stone gothic tower and rooftops are visible through the dense green foliage under... \| Keywords (12): Architecture, Oxford, Oxfordshire, Historic Building, Gothic, Stone, Foliage, Trees, Overcast, Sky, England, ...                                                                                |
 | [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `concerns detected`    | Title: Gothic Tower Amidst Greenery \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcas... \| Keywords (10): Gothic tower, stone architecture, green foliage, overcast sky, historic building, rooftops, foliage, greenery, ...                                                                               |
 | [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `concerns detected`    | Title: Oxford Castle spire seen through trees \| Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast... \| Keywords (15): Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, ...                                                                                |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.                                                                                                                                                                                                                                                                               |
 | [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Historic Gothic Tower Under Overcast Sky \| Description: The image showcases a historic stone gothic tower partially obscured by dense green trees, set agains... \| Keywords (57): Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building, England, Pinnacle, Sky, Rooftops, ...                                                                               |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: Gothic Tower Through Autumn Foliage Oxford \| Description: Captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N,1.252222°W in Oxford, Oxfordshire, the view shows a historic stone Gothic tower with pinnacles and crenellations peering above residential ro... \| Keywords: (not detected)                                                                               |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (15): Need title 5-10 words. Concrete., Image shows stone gothic tower with pinnacles, partially framed by trees, ...                                                                                                                                                                                                |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.                                                                                                                                                                                                                 |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: A Historical View of Oxfordshire's Tower and Trees \| Description: A detailed depiction of a historic stone gothic tower and rooftops in Oxfordshire, UK, set against a backdrop of dense green trees under an overcast sky. The image captures the architectural... \| Keywords: (not detected)                                                                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.11`
-- `mlx`: `0.32.5.dev20261031+339279525`
+- `mlx-vlm`: `0.7.12`
+- `mlx`: `0.32.5.dev20261106+9f806b360`
 - `transformers`: `5.22.1`
 - `tokenizers`: `0.23.3`
 - `huggingface-hub`: `2.4.0`
@@ -241,20 +233,20 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.56s
-- *Generation time:* 0.82s
-- *Total time:* 2.49s
-- *Prompt preparation time:* 0.576
-- *First-token latency:* 0.114
-- *Cleanup time:* 0.0745
+- *Model load time:* 0.43s
+- *Generation time:* 1.12s
+- *Total time:* 2.57s
+- *Prompt preparation time:* 0.549
+- *First-token latency:* 0.432
+- *Cleanup time:* 0.0696
 - *Prompt tokens:* 2,104
 - *Generation tokens:* 69
 - *Total tokens:* 2,173
-- *Prompt throughput (raw):* 18,521 tok/s
-- *Generation throughput (raw):* 486 tok/s
+- *Prompt throughput (raw):* 4,869 tok/s
+- *Generation throughput (raw):* 487 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.08
+- *Cache memory (GB):* 0.06
 - *Model-load active memory (GB):* 0.897
 - *Post-cleanup active memory (GB):* 0.000134
 - *Post-cleanup cache memory (GB):* 0.0
@@ -303,22 +295,22 @@ Historic architecture, Oxfordshire, gothic tower, overcast sky, trees, rooftops,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   prism_hadamard_qwen35)
-- *Model load time:* 1.54s
-- *Generation time:* 67.36s
-- *Total time:* 70.09s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 62.9
-- *Cleanup time:* 0.14
+- *Model load time:* 1.33s
+- *Generation time:* 55.94s
+- *Total time:* 58.33s
+- *Prompt preparation time:* 0.91
+- *First-token latency:* 51.7
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 16,594
 - *Generation tokens:* 118
 - *Total tokens:* 16,712
-- *Prompt throughput (raw):* 264 tok/s
-- *Generation throughput (raw):* 33.5 tok/s
+- *Prompt throughput (raw):* 321 tok/s
+- *Generation throughput (raw):* 34.8 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 3.3
 - *Model-load active memory (GB):* 8.6
-- *Post-cleanup active memory (GB):* 0.0014
+- *Post-cleanup active memory (GB):* 0.00113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -360,22 +352,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 1.03s
-- *Generation time:* 3.29s
-- *Total time:* 5.39s
-- *Prompt preparation time:* 0.947
-- *First-token latency:* 0.744
-- *Cleanup time:* 0.0988
+- *Model load time:* 1.13s
+- *Generation time:* 3.87s
+- *Total time:* 6.03s
+- *Prompt preparation time:* 0.933
+- *First-token latency:* 1.35
+- *Cleanup time:* 0.0916
 - *Prompt tokens:* 1,430
 - *Generation tokens:* 106
 - *Total tokens:* 1,536
-- *Prompt throughput (raw):* 1,922 tok/s
-- *Generation throughput (raw):* 63.7 tok/s
+- *Prompt throughput (raw):* 1,061 tok/s
+- *Generation throughput (raw):* 65.6 tok/s
 - *Peak memory (GB):* 9.6
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 8
-- *Post-cleanup active memory (GB):* 0.00161
+- *Post-cleanup active memory (GB):* 0.00135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -416,22 +408,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.13s
-- *Generation time:* 55.49s
-- *Total time:* 58.81s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 50.6
-- *Cleanup time:* 0.142
+- *Model load time:* 2.26s
+- *Generation time:* 45.57s
+- *Total time:* 48.99s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 40.9
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 16,594
 - *Generation tokens:* 114
 - *Total tokens:* 16,708
-- *Prompt throughput (raw):* 328 tok/s
-- *Generation throughput (raw):* 28.8 tok/s
+- *Prompt throughput (raw):* 406 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.00212
+- *Post-cleanup active memory (GB):* 0.00185
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -471,22 +463,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.61s
-- *Generation time:* 9.27s
-- *Total time:* 11.74s
-- *Prompt preparation time:* 0.734
-- *First-token latency:* 0.88
-- *Cleanup time:* 0.116
+- *Model load time:* 1.80s
+- *Generation time:* 8.94s
+- *Total time:* 11.58s
+- *Prompt preparation time:* 0.722
+- *First-token latency:* 0.904
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 1,596
 - *Generation tokens:* 855
 - *Total tokens:* 2,451
-- *Prompt throughput (raw):* 1,814 tok/s
-- *Generation throughput (raw):* 111 tok/s
+- *Prompt throughput (raw):* 1,766 tok/s
+- *Generation throughput (raw):* 116 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.00233
+- *Post-cleanup active memory (GB):* 0.00207
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -621,22 +613,22 @@ Keywords: Tower, Rooftops, Building, Foliage, Sky, Cloud, England, English count
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.19s
-- *Generation time:* 7.95s
-- *Total time:* 9.89s
-- *Prompt preparation time:* 0.629
-- *First-token latency:* 6.01
-- *Cleanup time:* 0.109
+- *Model load time:* 1.28s
+- *Generation time:* 7.47s
+- *Total time:* 9.48s
+- *Prompt preparation time:* 0.611
+- *First-token latency:* 5.57
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 6,343
 - *Generation tokens:* 104
 - *Total tokens:* 6,447
-- *Prompt throughput (raw):* 1,056 tok/s
-- *Generation throughput (raw):* 75.4 tok/s
+- *Prompt throughput (raw):* 1,138 tok/s
+- *Generation throughput (raw):* 78.5 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 7.08
-- *Post-cleanup active memory (GB):* 0.00295
+- *Post-cleanup active memory (GB):* 0.00269
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -678,21 +670,21 @@ Keywords: Architecture, Historic Building, Gothic Tower, Foliage, Overcast Sky, 
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
 - *Model load time:* 1.20s
-- *Generation time:* 4.44s
-- *Total time:* 6.48s
-- *Prompt preparation time:* 0.708
-- *First-token latency:* 1.78
-- *Cleanup time:* 0.121
+- *Generation time:* 4.29s
+- *Total time:* 6.30s
+- *Prompt preparation time:* 0.694
+- *First-token latency:* 1.59
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 2,104
 - *Generation tokens:* 108
 - *Total tokens:* 2,212
-- *Prompt throughput (raw):* 1,183 tok/s
-- *Generation throughput (raw):* 54.7 tok/s
+- *Prompt throughput (raw):* 1,319 tok/s
+- *Generation throughput (raw):* 55.2 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.00326
+- *Post-cleanup active memory (GB):* 0.003
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -738,22 +730,22 @@ Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English cou
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
-- *Model load time:* 2.78s
-- *Generation time:* 2.66s
-- *Total time:* 6.35s
-- *Prompt preparation time:* 0.744
-- *First-token latency:* 0.565
-- *Cleanup time:* 0.152
+- *Model load time:* 2.84s
+- *Generation time:* 2.80s
+- *Total time:* 6.53s
+- *Prompt preparation time:* 0.731
+- *First-token latency:* 0.662
+- *Cleanup time:* 0.147
 - *Prompt tokens:* 927
 - *Generation tokens:* 108
 - *Total tokens:* 1,035
-- *Prompt throughput (raw):* 1,641 tok/s
-- *Generation throughput (raw):* 78.1 tok/s
+- *Prompt throughput (raw):* 1,401 tok/s
+- *Generation throughput (raw):* 76.0 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
-- *Cache memory (GB):* 0.12
+- *Cache memory (GB):* 0.11
 - *Model-load active memory (GB):* 23.5
-- *Post-cleanup active memory (GB):* 0.00536
+- *Post-cleanup active memory (GB):* 0.00459
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -796,21 +788,21 @@ Keywords: Architecture, Building, Chimney, Cloudy sky, England, Foliage, Gothic 
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
 - *Model load time:* 1.17s
-- *Generation time:* 1.76s
-- *Total time:* 3.63s
+- *Generation time:* 1.87s
+- *Total time:* 3.72s
 - *Prompt preparation time:* 0.569
-- *First-token latency:* 0.27
-- *Cleanup time:* 0.113
+- *First-token latency:* 0.375
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 382
 - *Generation tokens:* 94
 - *Total tokens:* 476
-- *Prompt throughput (raw):* 1,415 tok/s
+- *Prompt throughput (raw):* 1,019 tok/s
 - *Generation throughput (raw):* 100 tok/s
 - *Peak memory (GB):* 7.1
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.00567
+- *Post-cleanup active memory (GB):* 0.0049
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -853,22 +845,22 @@ Keywords: Architecture, Branch, Building, Cloud, Cloudy sky, England, English co
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.32s
-- *Generation time:* 4.97s
-- *Total time:* 7.04s
-- *Prompt preparation time:* 0.627
-- *First-token latency:* 2.49
-- *Cleanup time:* 0.111
+- *Model load time:* 1.39s
+- *Generation time:* 4.67s
+- *Total time:* 6.81s
+- *Prompt preparation time:* 0.626
+- *First-token latency:* 2.18
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 3,046
 - *Generation tokens:* 119
 - *Total tokens:* 3,165
-- *Prompt throughput (raw):* 1,225 tok/s
-- *Generation throughput (raw):* 63.3 tok/s
+- *Prompt throughput (raw):* 1,399 tok/s
+- *Generation throughput (raw):* 62.9 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00593
+- *Post-cleanup active memory (GB):* 0.00516
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -913,22 +905,22 @@ Gothic architecture, Oxford tower, historic building, overcast sky, autumn folia
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.93s
-- *Generation time:* 2.55s
-- *Total time:* 4.24s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.0999
+- *Model load time:* 0.95s
+- *Generation time:* 2.58s
+- *Total time:* 4.28s
+- *Prompt preparation time:* 0.628
+- *First-token latency:* 1.11
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 3,045
 - *Generation tokens:* 153
 - *Total tokens:* 3,198
-- *Prompt throughput (raw):* 2,782 tok/s
-- *Generation throughput (raw):* 179 tok/s
+- *Prompt throughput (raw):* 2,751 tok/s
+- *Generation throughput (raw):* 177 tok/s
 - *Peak memory (GB):* 8.2
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.0062
+- *Post-cleanup active memory (GB):* 0.00543
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -973,22 +965,22 @@ Historic stone Gothic tower, Oxfordshire England, dense green foliage, overcast 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 10.87s
-- *Generation time:* 11.45s
-- *Total time:* 23.29s
-- *Prompt preparation time:* 0.642
-- *First-token latency:* 7.22
-- *Cleanup time:* 0.313
+- *Model load time:* 11.20s
+- *Generation time:* 10.49s
+- *Total time:* 22.59s
+- *Prompt preparation time:* 0.623
+- *First-token latency:* 6.46
+- *Cleanup time:* 0.264
 - *Prompt tokens:* 2,525
 - *Generation tokens:* 120
 - *Total tokens:* 2,645
-- *Prompt throughput (raw):* 350 tok/s
-- *Generation throughput (raw):* 62.8 tok/s
+- *Prompt throughput (raw):* 391 tok/s
+- *Generation throughput (raw):* 70.2 tok/s
 - *Peak memory (GB):* 73
 - *Active memory (GB):* 68
 - *Cache memory (GB):* 1.7
 - *Model-load active memory (GB):* 67.8
-- *Post-cleanup active memory (GB):* 0.00646
+- *Post-cleanup active memory (GB):* 0.00569
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1033,22 +1025,22 @@ Historic stone tower, Oxford rooftops, gothic architecture, dense green foliage,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.09s
-- *Generation time:* 3.66s
-- *Total time:* 5.69s
-- *Prompt preparation time:* 0.789
-- *First-token latency:* 0.942
-- *Cleanup time:* 0.126
+- *Model load time:* 1.19s
+- *Generation time:* 4.42s
+- *Total time:* 6.49s
+- *Prompt preparation time:* 0.755
+- *First-token latency:* 1.73
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 1,318
 - *Generation tokens:* 133
 - *Total tokens:* 1,451
-- *Prompt throughput (raw):* 1,399 tok/s
-- *Generation throughput (raw):* 67.4 tok/s
+- *Prompt throughput (raw):* 762 tok/s
+- *Generation throughput (raw):* 67.9 tok/s
 - *Peak memory (GB):* 8.0
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.26
 - *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00677
+- *Post-cleanup active memory (GB):* 0.006
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1091,22 +1083,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.45s
-- *Generation time:* 7.14s
-- *Total time:* 9.62s
-- *Prompt preparation time:* 0.891
-- *First-token latency:* 2.12
-- *Cleanup time:* 0.124
+- *Model load time:* 1.53s
+- *Generation time:* 8.14s
+- *Total time:* 10.67s
+- *Prompt preparation time:* 0.87
+- *First-token latency:* 3.09
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 3,136
 - *Generation tokens:* 112
 - *Total tokens:* 3,248
-- *Prompt throughput (raw):* 1,478 tok/s
-- *Generation throughput (raw):* 27.1 tok/s
+- *Prompt throughput (raw):* 1,015 tok/s
+- *Generation throughput (raw):* 26.8 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 3.9
 - *Model-load active memory (GB):* 7.23
-- *Post-cleanup active memory (GB):* 0.00739
+- *Post-cleanup active memory (GB):* 0.00662
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1149,22 +1141,22 @@ Keywords: Oxfordshire, historic building, gothic architecture, autumn foliage, o
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.35s
-- *Generation time:* 3.40s
-- *Total time:* 5.70s
-- *Prompt preparation time:* 0.832
-- *First-token latency:* 1.9
-- *Cleanup time:* 0.107
+- *Model load time:* 1.18s
+- *Generation time:* 3.44s
+- *Total time:* 5.60s
+- *Prompt preparation time:* 0.844
+- *First-token latency:* 1.94
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 4,044
 - *Generation tokens:* 110
 - *Total tokens:* 4,154
-- *Prompt throughput (raw):* 2,129 tok/s
-- *Generation throughput (raw):* 160 tok/s
+- *Prompt throughput (raw):* 2,090 tok/s
+- *Generation throughput (raw):* 159 tok/s
 - *Peak memory (GB):* 3.7
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00833
+- *Post-cleanup active memory (GB):* 0.00756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1206,22 +1198,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.95s
-- *Generation time:* 32.14s
-- *Total time:* 35.33s
-- *Prompt preparation time:* 1.08
-- *First-token latency:* 29.1
-- *Cleanup time:* 0.141
+- *Model load time:* 2.01s
+- *Generation time:* 31.72s
+- *Total time:* 34.96s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 28.7
+- *Cleanup time:* 0.14
 - *Prompt tokens:* 16,578
 - *Generation tokens:* 155
 - *Total tokens:* 16,733
-- *Prompt throughput (raw):* 569 tok/s
-- *Generation throughput (raw):* 75.4 tok/s
+- *Prompt throughput (raw):* 577 tok/s
+- *Generation throughput (raw):* 77.1 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.4
 - *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00901
+- *Post-cleanup active memory (GB):* 0.00824
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1261,22 +1253,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.98s
-- *Generation time:* 34.89s
-- *Total time:* 37.09s
-- *Prompt preparation time:* 1.09
-- *First-token latency:* 32.6
-- *Cleanup time:* 0.122
+- *Model load time:* 1.09s
+- *Generation time:* 34.97s
+- *Total time:* 37.26s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 32.7
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 16,578
 - *Generation tokens:* 87
 - *Total tokens:* 16,665
-- *Prompt throughput (raw):* 508 tok/s
-- *Generation throughput (raw):* 66.3 tok/s
+- *Prompt throughput (raw):* 507 tok/s
+- *Generation throughput (raw):* 66.5 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00933
+- *Post-cleanup active memory (GB):* 0.00856
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1318,22 +1310,22 @@ Keywords: Gothic tower, autumn foliage, overcast sky, Oxfordshire, England, hist
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.59s
-- *Generation time:* 33.35s
-- *Total time:* 37.18s
-- *Prompt preparation time:* 1.08
-- *First-token latency:* 30.9
-- *Cleanup time:* 0.148
+- *Model load time:* 2.64s
+- *Generation time:* 30.99s
+- *Total time:* 34.86s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 28.3
+- *Cleanup time:* 0.141
 - *Prompt tokens:* 16,594
-- *Generation tokens:* 112
-- *Total tokens:* 16,706
-- *Prompt throughput (raw):* 537 tok/s
-- *Generation throughput (raw):* 74.4 tok/s
+- *Generation tokens:* 125
+- *Total tokens:* 16,719
+- *Prompt throughput (raw):* 586 tok/s
+- *Generation throughput (raw):* 73.5 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00983
+- *Post-cleanup active memory (GB):* 0.00906
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1352,9 +1344,9 @@ Keywords: Gothic tower, autumn foliage, overcast sky, Oxfordshire, England, hist
 <pre class="model-output-readable">
 Title: Stone Gothic Tower Hidden in Trees
 
-Description: Taken on October 17, 2026, from coordinates near Oxford, this image captures a historic stone building featuring Gothic architectural details and pinnacles rising above domestic rooftops. Dense green foliage frames the scene against a cloudy, overcast sky.
+Description: Taken on October 17, 2026, from 51.751667°N 1.252222°W, this view captures the spires and crenellated stone tower of a historic Oxfordshire building emerging from dense green foliage under a cloudy sky.
 
-Keywords: architecture, branch, building, chimney, cloudy sky, english countryside, foliage, gothic tower, leaves, outdoors, overcast, oxford, oxfordshire, pinnacle, roof, rooftops, scenic, trees
+Keywords: Oxford, Gothic, Tower, Spire, Architecture, Foliage, Cloudy, Autumn, England, Countryside, Greenery, Historic, Stone, Sky, Overcast, Oxfordshire, Building, Views
 </pre>
 
 </details>
@@ -1375,22 +1367,22 @@ Keywords: architecture, branch, building, chimney, cloudy sky, english countrysi
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.57s
-- *Generation time:* 33.70s
-- *Total time:* 37.51s
-- *Prompt preparation time:* 1.07
-- *First-token latency:* 31
-- *Cleanup time:* 0.151
+- *Model load time:* 2.58s
+- *Generation time:* 30.47s
+- *Total time:* 34.23s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 28.1
+- *Cleanup time:* 0.146
 - *Prompt tokens:* 16,594
-- *Generation tokens:* 127
-- *Total tokens:* 16,721
-- *Prompt throughput (raw):* 535 tok/s
-- *Generation throughput (raw):* 73.8 tok/s
+- *Generation tokens:* 104
+- *Total tokens:* 16,698
+- *Prompt throughput (raw):* 590 tok/s
+- *Generation throughput (raw):* 72.9 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.0103
+- *Post-cleanup active memory (GB):* 0.00957
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1409,9 +1401,9 @@ Keywords: architecture, branch, building, chimney, cloudy sky, english countrysi
 <pre class="model-output-readable">
 Title: Stone Gothic Tower and Rooftops Behind Green Trees
 
-Description: Dense autumnal foliage frames a view of historic stone architecture, featuring a building with decorative Gothic pinnacles and chimneys. The scene is captured under an overcast sky, emphasizing the textures of the leaves and stone against cloudy grey light.
+Description: Captured on 17 October 2026, this view frames a historic stone building with Gothic pinnacles and chimneys behind dense trees under an overcast sky.
 
-Keywords: architecture, autumn foliage, building, chimney, cloudy sky, England, foliage, garden, gothic pinnacles, historic building, leaves, London, nature, outdoors, Oxford, Oxfordshire, overcast, residential rooftops, scenic, sky, stone, tower, trees, urban greenery
+Keywords: Architecture, Building, Chimney, Cloud, Cloudy Sky, England, Foliage, Historic Building, Leaves, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky, Stone, Trees, Urban
 </pre>
 
 </details>
@@ -1432,22 +1424,22 @@ Keywords: architecture, autumn foliage, building, chimney, cloudy sky, England, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.15s
-- *Generation time:* 53.81s
-- *Total time:* 57.19s
-- *Prompt preparation time:* 1.05
-- *First-token latency:* 48.7
-- *Cleanup time:* 0.153
+- *Model load time:* 2.14s
+- *Generation time:* 50.40s
+- *Total time:* 53.71s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 45.4
+- *Cleanup time:* 0.143
 - *Prompt tokens:* 16,594
 - *Generation tokens:* 121
 - *Total tokens:* 16,715
-- *Prompt throughput (raw):* 341 tok/s
-- *Generation throughput (raw):* 29.0 tok/s
+- *Prompt throughput (raw):* 365 tok/s
+- *Generation throughput (raw):* 29.8 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0108
+- *Post-cleanup active memory (GB):* 0.0101
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1467,9 +1459,9 @@ Keywords: architecture, autumn foliage, building, chimney, cloudy sky, England, 
 Title:
 Gothic tower and rooftops seen through autumn foliage
 Description:
-A stone Gothic tower featuring crenellated battlements and tall pinnacles rises above a cluster of chimneys and rooftops in Oxford, England. The structure is partially obscured by the dense green and yellowing branches of trees in the foreground, set against a grey, overcast sky.
+A stone Gothic tower featuring ornate pinnacles and crenellations rises above a slate roof and brick chimneys, partially obscured by dense deciduous trees against an overcast sky. Captured in Oxford, the view highlights the historic architecture framed by the branches in the mid-afternoon light.
 Keywords:
-Architecture, Autumn, Building, Chimney, Cloud, England, Foliage, Gothic, Leaves, Oxford, Pinnacle, Roof, Rooftops, Sky, Stone, Tower, Trees
+Architecture, Building, Chimney, Cloudy sky, England, Foliage, Historic building, Leaves, Oxford, Pinnacle, Roof, Slate, Sky, Stone, Tower, Trees
 </pre>
 
 </details>
@@ -1490,22 +1482,22 @@ Architecture, Autumn, Building, Chimney, Cloud, England, Foliage, Gothic, Leaves
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.28s
-- *Generation time:* 2.76s
-- *Total time:* 5.15s
-- *Prompt preparation time:* 0.982
-- *First-token latency:* 0.668
-- *Cleanup time:* 0.124
+- *Model load time:* 1.25s
+- *Generation time:* 2.91s
+- *Total time:* 5.30s
+- *Prompt preparation time:* 0.988
+- *First-token latency:* 0.851
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 2,081
 - *Generation tokens:* 117
 - *Total tokens:* 2,198
-- *Prompt throughput (raw):* 3,116 tok/s
-- *Generation throughput (raw):* 97.1 tok/s
+- *Prompt throughput (raw):* 2,445 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.34
 - *Model-load active memory (GB):* 5.46
-- *Post-cleanup active memory (GB):* 0.0118
+- *Post-cleanup active memory (GB):* 0.0107
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1534,62 +1526,6 @@ Keywords: Gothic architecture, Stone structure, Rooftops, Trees, Overcast sky, C
 
 ---
 
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.46s
-- *Generation time:* 2.86s
-- *Total time:* 7.20s
-- *Prompt preparation time:* 0.697
-- *First-token latency:* 0.589
-- *Cleanup time:* 0.155
-- *Prompt tokens:* 586
-- *Generation tokens:* 76
-- *Total tokens:* 662
-- *Prompt throughput (raw):* 995 tok/s
-- *Generation throughput (raw):* 55.4 tok/s
-- *Peak memory (GB):* 28
-- *Active memory (GB):* 27
-- *Cache memory (GB):* 0.01
-- *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0118
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1282
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Gothic Stone Tower Framed by Trees in Oxford
-Description: A historic stone gothic tower and rooftops are visible through dense green foliage under an overcast sky in Oxford, Oxfordshire.
-Keywords: Architecture, Building, Cloud, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
 
 ### mlx-community/gemma-4-12B-it-4bit
@@ -1604,22 +1540,22 @@ Keywords: Architecture, Building, Cloud, England, Foliage, Historic Building, Le
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.84s
-- *Generation time:* 2.85s
-- *Total time:* 5.54s
-- *Prompt preparation time:* 0.696
-- *First-token latency:* 0.46
-- *Cleanup time:* 0.135
+- *Model load time:* 1.87s
+- *Generation time:* 2.96s
+- *Total time:* 5.67s
+- *Prompt preparation time:* 0.683
+- *First-token latency:* 0.656
+- *Cleanup time:* 0.127
 - *Prompt tokens:* 590
 - *Generation tokens:* 104
 - *Total tokens:* 694
-- *Prompt throughput (raw):* 1,282 tok/s
-- *Generation throughput (raw):* 60.3 tok/s
+- *Prompt throughput (raw):* 899 tok/s
+- *Generation throughput (raw):* 62.7 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.32
-- *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.0123
+- *Model-load active memory (GB):* 6.75
+- *Post-cleanup active memory (GB):* 0.0112
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1665,22 +1601,22 @@ Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English cou
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.52s
-- *Generation time:* 1.72s
-- *Total time:* 5.08s
-- *Prompt preparation time:* 0.671
-- *First-token latency:* 0.372
-- *Cleanup time:* 0.148
+- *Model load time:* 2.54s
+- *Generation time:* 1.67s
+- *Total time:* 5.04s
+- *Prompt preparation time:* 0.652
+- *First-token latency:* 0.361
+- *Cleanup time:* 0.144
 - *Prompt tokens:* 590
 - *Generation tokens:* 75
 - *Total tokens:* 665
-- *Prompt throughput (raw):* 1,584 tok/s
-- *Generation throughput (raw):* 108 tok/s
+- *Prompt throughput (raw):* 1,635 tok/s
+- *Generation throughput (raw):* 111 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 15.4
-- *Post-cleanup active memory (GB):* 0.0128
+- *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1721,22 +1657,22 @@ Keywords: Architecture, Building, Cloudy sky, England, Foliage, Historic Buildin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.78s
-- *Generation time:* 1.53s
-- *Total time:* 4.13s
-- *Prompt preparation time:* 0.668
-- *First-token latency:* 0.187
-- *Cleanup time:* 0.126
+- *Model load time:* 1.75s
+- *Generation time:* 1.72s
+- *Total time:* 4.28s
+- *Prompt preparation time:* 0.661
+- *First-token latency:* 0.414
+- *Cleanup time:* 0.117
 - *Prompt tokens:* 586
 - *Generation tokens:* 83
 - *Total tokens:* 669
-- *Prompt throughput (raw):* 3,140 tok/s
-- *Generation throughput (raw):* 119 tok/s
+- *Prompt throughput (raw):* 1,416 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0134
+- *Post-cleanup active memory (GB):* 0.0123
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1777,22 +1713,22 @@ Keywords: Gothic architecture, historic building, rooftops, foliage, trees, over
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.86s
-- *Generation time:* 3.21s
-- *Total time:* 4.98s
-- *Prompt preparation time:* 0.788
-- *First-token latency:* 1.68
-- *Cleanup time:* 0.114
+- *Model load time:* 0.97s
+- *Generation time:* 3.11s
+- *Total time:* 4.94s
+- *Prompt preparation time:* 0.737
+- *First-token latency:* 1.63
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 4,173
 - *Generation tokens:* 99
 - *Total tokens:* 4,272
-- *Prompt throughput (raw):* 2,483 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Prompt throughput (raw):* 2,552 tok/s
+- *Generation throughput (raw):* 128 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.72
 - *Model-load active memory (GB):* 3.93
-- *Post-cleanup active memory (GB):* 0.0149
+- *Post-cleanup active memory (GB):* 0.0138
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1832,22 +1768,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.79s
-- *Generation time:* 5.29s
-- *Total time:* 7.81s
-- *Prompt preparation time:* 0.596
-- *First-token latency:* 1.4
-- *Cleanup time:* 0.13
+- *Model load time:* 1.77s
+- *Generation time:* 5.44s
+- *Total time:* 7.93s
+- *Prompt preparation time:* 0.586
+- *First-token latency:* 1.78
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 1,313
 - *Generation tokens:* 111
 - *Total tokens:* 1,424
-- *Prompt throughput (raw):* 937 tok/s
-- *Generation throughput (raw):* 33.6 tok/s
+- *Prompt throughput (raw):* 739 tok/s
+- *Generation throughput (raw):* 35.8 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 15.1
-- *Post-cleanup active memory (GB):* 0.0152
+- *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1878,65 +1814,6 @@ Gothic tower, Oxfordshire, historic architecture, autumn foliage, overcast sky, 
 
 ---
 
-<a id="model-nativ-community-nvidia-nemotron-35-bolt-74b-a9b-4bit"></a>
-
-### nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type nemotron_h_omni via
-  nemotron_h_nano_omni)
-- *Model load time:* 4.15s
-- *Generation time:* 7.98s
-- *Total time:* 13.16s
-- *Prompt preparation time:* 0.807
-- *First-token latency:* 4.85
-- *Cleanup time:* 0.194
-- *Prompt tokens:* 3,640
-- *Generation tokens:* 123
-- *Total tokens:* 3,763
-- *Prompt throughput (raw):* 751 tok/s
-- *Generation throughput (raw):* 60.3 tok/s
-- *Peak memory (GB):* 52
-- *Active memory (GB):* 43
-- *Cache memory (GB):* 0.29
-- *Model-load active memory (GB):* 43.2
-- *Post-cleanup active memory (GB):* 0.0161
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1337
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4bc0a247d78e3621a1dc8929a3d0172ace572ada
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--NVIDIA-Nemotron-3.5-Bolt-74B-A9B-4bit/snapshots/4bc0a247d78e3621a1dc8929a3d0172ace572ada
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 0, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Oxford Historic Tower Peeking Through Autumn Trees
-
-Description: A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an overcast sky, captured at 15:44 BST on 17 October 2026 near Oxford, Oxfordshire, England.
-
-Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
-</pre>
-
-</details>
-
----
-
 <a id="model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit"></a>
 
 ### nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit
@@ -1952,22 +1829,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.27s
-- *Generation time:* 4.38s
-- *Total time:* 7.53s
-- *Prompt preparation time:* 0.714
-- *First-token latency:* 2.55
-- *Cleanup time:* 0.143
+- *Model load time:* 2.30s
+- *Generation time:* 3.86s
+- *Total time:* 7.00s
+- *Prompt preparation time:* 0.686
+- *First-token latency:* 2.17
+- *Cleanup time:* 0.135
 - *Prompt tokens:* 3,641
 - *Generation tokens:* 135
 - *Total tokens:* 3,776
-- *Prompt throughput (raw):* 1,427 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Prompt throughput (raw):* 1,678 tok/s
+- *Generation throughput (raw):* 141 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.0163
+- *Post-cleanup active memory (GB):* 0.015
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2012,22 +1889,22 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type nemotron_h_omni via
   nemotron_h_nano_omni)
-- *Model load time:* 16.06s
-- *Generation time:* 32.14s
-- *Total time:* 50.20s
-- *Prompt preparation time:* 1.69
-- *First-token latency:* 25.4
-- *Cleanup time:* 0.269
+- *Model load time:* 16.34s
+- *Generation time:* 31.06s
+- *Total time:* 51.05s
+- *Prompt preparation time:* 3.35
+- *First-token latency:* 24.2
+- *Cleanup time:* 0.263
 - *Prompt tokens:* 3,640
 - *Generation tokens:* 133
 - *Total tokens:* 3,773
-- *Prompt throughput (raw):* 143 tok/s
-- *Generation throughput (raw):* 30.1 tok/s
+- *Prompt throughput (raw):* 151 tok/s
+- *Generation throughput (raw):* 29.0 tok/s
 - *Peak memory (GB):* 87
 - *Active memory (GB):* 78
 - *Cache memory (GB):* 0.29
 - *Model-load active memory (GB):* 78.4
-- *Post-cleanup active memory (GB):* 0.0166
+- *Post-cleanup active memory (GB):* 0.0153
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2056,64 +1933,6 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, E
 
 ---
 
-<a id="model-liquidai-lfm3-vl-2b-mlx-8bit"></a>
-
-### LiquidAI/LFM3-VL-2B-MLX-8bit
-
-<details>
-<summary>Complete evidence: LiquidAI/LFM3-VL-2B-MLX-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm3_vl)
-- *Model load time:* 0.71s
-- *Generation time:* 4.97s
-- *Total time:* 6.74s
-- *Prompt preparation time:* 0.97
-- *First-token latency:* 3.59
-- *Cleanup time:* 0.0778
-- *Prompt tokens:* 16,572
-- *Generation tokens:* 91
-- *Total tokens:* 16,663
-- *Prompt throughput (raw):* 4,617 tok/s
-- *Generation throughput (raw):* 191 tok/s
-- *Peak memory (GB):* 5.0
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.68
-- *Model-load active memory (GB):* 2.22
-- *Post-cleanup active memory (GB):* 0.000396
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1354
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.lfm3_vl.processing_lfm3_vl.Lfm3VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 343038aa6c2c16df91b55d114cf374eaccea4b84
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM3-VL-2B-MLX-8bit/snapshots/343038aa6c2c16df91b55d114cf374eaccea4b84
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.1, "top_k": 50, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Historic Gothic Tower Through Autumn Trees
-
-Description: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
-
-Keywords: architecture, branch, building, chimney, cloud, cloudy sky, England, English countryside, foliage, historic building, leaves, outdoors, overcast, Oxford, Oxfordshire, pinnacle, roof, rooftops, scenic, sky
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
 
 ### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
@@ -2128,22 +1947,22 @@ Keywords: architecture, branch, building, chimney, cloud, cloudy sky, England, E
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.01s
-- *Generation time:* 1.53s
-- *Total time:* 3.38s
-- *Prompt preparation time:* 0.731
-- *First-token latency:* 0.408
-- *Cleanup time:* 0.1
+- *Model load time:* 0.96s
+- *Generation time:* 1.64s
+- *Total time:* 3.49s
+- *Prompt preparation time:* 0.765
+- *First-token latency:* 0.502
+- *Cleanup time:* 0.105
 - *Prompt tokens:* 2,096
 - *Generation tokens:* 83
 - *Total tokens:* 2,179
-- *Prompt throughput (raw):* 5,138 tok/s
-- *Generation throughput (raw):* 202 tok/s
+- *Prompt throughput (raw):* 4,174 tok/s
+- *Generation throughput (raw):* 196 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 2.82
-- *Post-cleanup active memory (GB):* 0.00384
+- *Post-cleanup active memory (GB):* 0.00357
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2170,197 +1989,6 @@ Keywords: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, O
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: foliage
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.04s
-- *Generation time:* 4.23s
-- *Total time:* 6.15s
-- *Prompt preparation time:* 0.753
-- *First-token latency:* 0.374
-- *Cleanup time:* 0.115
-- *Prompt tokens:* 925
-- *Generation tokens:* 752
-- *Total tokens:* 1,677
-- *Prompt throughput (raw):* 2,474 tok/s
-- *Generation throughput (raw):* 240 tok/s
-- *Peak memory (GB):* 3.1
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00434
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1324
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-Here's a breakdown of the required sections:
-
-Title: I need to create a concise, 5-10 word title that captures the image's main subject (historic gothic tower framed by trees).
-
-Description: I must combine relevant context (British landscape, gothic architecture) with the main subject, setting, action, lighting, and distinctive details. Ensure it's factual based on the visible elements.
-
-Keywords: I need to list 10-18 unique keywords covering the context (architecture, trees, overcast, England, etc.) and visible details (historic building, roof, pinnacles, foliage, etc.).
-
-Let's draft:
-
-Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
-
-Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
-
-Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roof, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, British countryside, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
-
-Now, check word count for title: 6 words. Good.
-
-Description: Combine the visible elements (gothic tower, framed by trees, under overcast sky, in England setting), and mention lighting (cloudy), distinct building details (rooftops, chimneys). Ensure it's 1-2 sentences.
-
-Keywords: Gothic tower, historic building, overcast sky, foliage, England, architecture, roofs, pinnacles, leaves, cloudy, scenic, outdoors, British, Cloddy, chimney, leafy, sky, structure, pinnacles.
-
-I need to ensure 10-18 unique keywords. Let's list them and check uniqueness.
-
-Final check:
-
-Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
-
-Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
-
-Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
-
-Count keywords: Let's list them:
-
-1. Gothic tower
-2. historic stone
-3. gothic architecture
-4. foliage
-5. overcast sky
-6. England
-7. trees
-8. roofs
-9. pinnacles
-10. cloudy
-11. Scenic
-12. Outdoors
-13. Architecture
-14. Foliage
-15. Sky
-16. Cloddy
-17. Pinnacle
-18. Building
-19. Chimney
-20. Leaves
-21. Overhead
-
-That's 21 keywords, which is within 10-18 (but we can adjust to ensure they are unique and cover context and details).
-
-I'll proceed with these.
-&lt;/think&gt;
-
-Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
-Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
-Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-Here's a breakdown of the required sections:
-
-Title: I need to create a concise, 5-10 word title that captures the image's main subject (historic gothic tower framed by trees).
-
-Description: I must combine relevant context (British landscape, gothic architecture) with the main subject, setting, action, lighting, and distinctive details. Ensure it's factual based on the visible elements.
-
-Keywords: I need to list 10-18 unique keywords covering the context (architecture, trees, overcast, England, etc.) and visible details (historic building, roof, pinnacles, foliage, etc.).
-
-Let's draft:
-
-Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
-
-Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
-
-Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roof, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, British countryside, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
-
-Now, check word count for title: 6 words. Good.
-
-Description: Combine the visible elements (gothic tower, framed by trees, under overcast sky, in England setting), and mention lighting (cloudy), distinct building details (rooftops, chimneys). Ensure it's 1-2 sentences.
-
-Keywords: Gothic tower, historic building, overcast sky, foliage, England, architecture, roofs, pinnacles, leaves, cloudy, scenic, outdoors, British, Cloddy, chimney, leafy, sky, structure, pinnacles.
-
-I need to ensure 10-18 unique keywords. Let's list them and check uniqueness.
-
-Final check:
-
-Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
-
-Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
-
-Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead.
-
-Count keywords: Let's list them:
-
-1. Gothic tower
-2. historic stone
-3. gothic architecture
-4. foliage
-5. overcast sky
-6. England
-7. trees
-8. roofs
-9. pinnacles
-10. cloudy
-11. Scenic
-12. Outdoors
-13. Architecture
-14. Foliage
-15. Sky
-16. Cloddy
-17. Pinnacle
-18. Building
-19. Chimney
-20. Leaves
-21. Overhead
-
-That's 21 keywords, which is within 10-18 (but we can adjust to ensure they are unique and cover context and details).
-
-I'll proceed with these.
-</think>
-
-Title: Gothic Tower Visible Through Lush Trees Under Overcast Sky
-Description: The historic stone gothic tower is partially framed by dense foliage, seen under cloudy skies in an English setting.
-Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast sky, England, trees, roofs, pinnacles, cloudy, Scenic, Outdoors, Architecture, Foliage, Sky, Cloddy, Pinnacle, Building, Chimney, Leaves, Overhead
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-minicpm-v-47-1b-4bit"></a>
 
 ### mlx-community/MiniCPM-V-4.7-1B-4bit
@@ -2375,22 +2003,22 @@ Keywords: Gothic tower, historic stone, gothic architecture, foliage, overcast s
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: foliage, england, sky
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
-- *Model load time:* 1.05s
-- *Generation time:* 1.42s
-- *Total time:* 3.34s
-- *Prompt preparation time:* 0.744
-- *First-token latency:* 0.243
-- *Cleanup time:* 0.113
+- *Model load time:* 1.06s
+- *Generation time:* 2.20s
+- *Total time:* 4.14s
+- *Prompt preparation time:* 0.745
+- *First-token latency:* 1.03
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 927
 - *Generation tokens:* 114
 - *Total tokens:* 1,041
-- *Prompt throughput (raw):* 3,810 tok/s
-- *Generation throughput (raw):* 252 tok/s
-- *Peak memory (GB):* 3.7
+- *Prompt throughput (raw):* 903 tok/s
+- *Generation throughput (raw):* 253 tok/s
+- *Peak memory (GB):* 3.6
 - *Active memory (GB):* 2.7
-- *Cache memory (GB):* 0.05
+- *Cache memory (GB):* 0.06
 - *Model-load active memory (GB):* 2.67
-- *Post-cleanup active memory (GB):* 0.00485
+- *Post-cleanup active memory (GB):* 0.00408
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2432,22 +2060,22 @@ Keywords: Gothic tower, trees, foliage, overcast, cloudy sky, England, Oxford, O
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: sky
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.94s
-- *Generation time:* 3.65s
-- *Total time:* 5.27s
-- *Prompt preparation time:* 0.58
-- *First-token latency:* 0.425
-- *Cleanup time:* 0.0931
+- *Model load time:* 1.00s
+- *Generation time:* 3.70s
+- *Total time:* 5.39s
+- *Prompt preparation time:* 0.583
+- *First-token latency:* 0.386
+- *Cleanup time:* 0.0977
 - *Prompt tokens:* 1,120
 - *Generation tokens:* 149
 - *Total tokens:* 1,269
-- *Prompt throughput (raw):* 2,635 tok/s
-- *Generation throughput (raw):* 55.8 tok/s
+- *Prompt throughput (raw):* 2,901 tok/s
+- *Generation throughput (raw):* 54.3 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00839
+- *Post-cleanup active memory (GB):* 0.00762
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2490,22 +2118,22 @@ Keywords: historic, architecture, gothic, tower, overcast, sky, leaves, foliage,
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.33s
-- *Generation time:* 20.50s
-- *Total time:* 23.98s
-- *Prompt preparation time:* 0.967
-- *First-token latency:* 18.3
-- *Cleanup time:* 0.158
+- *Model load time:* 2.41s
+- *Generation time:* 19.05s
+- *Total time:* 22.62s
+- *Prompt preparation time:* 0.991
+- *First-token latency:* 16.9
+- *Cleanup time:* 0.151
 - *Prompt tokens:* 12,683
-- *Generation tokens:* 90
-- *Total tokens:* 12,773
-- *Prompt throughput (raw):* 694 tok/s
-- *Generation throughput (raw):* 66.2 tok/s
+- *Generation tokens:* 85
+- *Total tokens:* 12,768
+- *Prompt throughput (raw):* 750 tok/s
+- *Generation throughput (raw):* 67.8 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 1.8
 - *Model-load active memory (GB):* 21.8
-- *Post-cleanup active memory (GB):* 0.0087
+- *Post-cleanup active memory (GB):* 0.00793
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2523,13 +2151,13 @@ Keywords: historic, architecture, gothic, tower, overcast, sky, leaves, foliage,
 
 <pre class="model-output-readable">
 Title:
-Historic Tower View Through Autumn Foliage
+Historic Tower View Through Overcast Trees
 
 Description:
 A view of a historic stone Gothic tower and rooftops partially framed by dense green trees under an overcast sky in Oxford, England.
 
 Keywords:
-Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Pinnacle, Roof, Rooftops, Sky, Stone, Tower
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Pinnacle, Roof, Rooftops, Sky
 </pre>
 
 </details>
@@ -2550,22 +2178,22 @@ Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Hi
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.62s
-- *Generation time:* 1.80s
-- *Total time:* 3.37s
-- *Prompt preparation time:* 0.836
-- *First-token latency:* 0.391
-- *Cleanup time:* 0.0992
+- *Model load time:* 0.68s
+- *Generation time:* 1.99s
+- *Total time:* 3.59s
+- *Prompt preparation time:* 0.824
+- *First-token latency:* 0.605
+- *Cleanup time:* 0.0959
 - *Prompt tokens:* 1,419
 - *Generation tokens:* 74
 - *Total tokens:* 1,493
-- *Prompt throughput (raw):* 3,633 tok/s
-- *Generation throughput (raw):* 121 tok/s
+- *Prompt throughput (raw):* 2,345 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 4.51
-- *Post-cleanup active memory (GB):* 0.011
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0102
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2592,76 +2220,65 @@ Keywords: architecture, branch, building, chimney, cloudy sky, english countrysi
 
 ---
 
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
-### mlx-community/X-Reasoner-7B-8bit
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
 <details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: oxfordshire, england, historic building,
-  rooftops, architecture, scenic, english countryside, foliage, leaves,
-  building, chimney, cloud, cloudy sky
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.22s
-- *Generation time:* 18.21s
-- *Total time:* 20.56s
-- *Prompt preparation time:* 1
-- *First-token latency:* 13.2
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 16,589
-- *Generation tokens:* 229
-- *Total tokens:* 16,818
-- *Prompt throughput (raw):* 1,253 tok/s
-- *Generation throughput (raw):* 56.6 tok/s
-- *Peak memory (GB):* 14
-- *Active memory (GB):* 9.5
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.0113
+- *Observations:* Duplicate keywords: england
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.38s
+- *Generation time:* 2.47s
+- *Total time:* 6.71s
+- *Prompt preparation time:* 0.677
+- *First-token latency:* 0.272
+- *Cleanup time:* 0.157
+- *Prompt tokens:* 586
+- *Generation tokens:* 70
+- *Total tokens:* 656
+- *Prompt throughput (raw):* 2,155 tok/s
+- *Generation throughput (raw):* 51.8 tok/s
+- *Peak memory (GB):* 28
+- *Active memory (GB):* 27
+- *Cache memory (GB):* 0.01
+- *Model-load active memory (GB):* 27.2
+- *Post-cleanup active memory (GB):* 0.0107
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1386
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Rendered prompt characters:* 1282
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+- *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Gothic Tower Through Foliage
-
-Description:
-A historic stone gothic tower and rooftops are framed by dense green trees under an overcast sky, with a view of neighboring buildings and chimneys, set in England's Oxfordshire countryside.
-
-Keywords:
-Oxfordshire, England, Gothic tower, historic building, stone architecture, overcast sky, cloudy, green foliage, trees, rooftops, chimneys, pinnacles, architecture, outdoors, scenic, England, English countryside, foliage, leaves, building, chimney, cloud, cloudy sky, 2026-10-17 15:44:34 UTC+01:00, GPS: 51.751667°N, 1.252222°W, architecture, branch, building, chimney, cloud, cloudy sky, England, English countryside, foliage, historic building, leaves, outdo, overcast, Oxford, Oxfordshire, pinnacle, roof, rooftops, scenic, sky, stone, tower, tree, urban, view.
+Title: Gothic Stone Tower Framed by Trees in Oxford
+Description: A historic stone gothic tower and rooftops are visible through the dense green foliage under an overcast sky in Oxfordshire.
+Keywords: Architecture, Oxford, Oxfordshire, Historic Building, Gothic, Stone, Foliage, Trees, Overcast, Sky, England, England
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Title:
-Gothic Tower Through Foliage
-
-Description:
-A historic stone gothic tower and rooftops are framed by dense green trees under an overcast sky, with a view of neighboring buildings and chimneys, set in England's Oxfordshire countryside.
-
-Keywords: 
-Oxfordshire, England, Gothic tower, historic building, stone architecture, overcast sky, cloudy, green foliage, trees, rooftops, chimneys, pinnacles, architecture, outdoors, scenic, England, English countryside, foliage, leaves, building, chimney, cloud, cloudy sky, 2026-10-17 15:44:34 UTC+01:00, GPS: 51.751667°N, 1.252222°W, architecture, branch, building, chimney, cloud, cloudy sky, England, English countryside, foliage, historic building, leaves, outdo, overcast, Oxford, Oxfordshire, pinnacle, roof, rooftops, scenic, sky, stone, tower, tree, urban, view.
+Title: Gothic Stone Tower Framed by Trees in Oxford
+Description: A historic stone gothic tower and rooftops are visible through the dense green foliage under an overcast sky in Oxfordshire. 
+Keywords: Architecture, Oxford, Oxfordshire, Historic Building, Gothic, Stone, Foliage, Trees, Overcast, Sky, England, England
 ```
 
 </details>
@@ -2684,22 +2301,22 @@ Oxfordshire, England, Gothic tower, historic building, stone architecture, overc
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.63s
-- *Generation time:* 1.72s
-- *Total time:* 3.39s
-- *Prompt preparation time:* 0.915
-- *First-token latency:* 0.459
-- *Cleanup time:* 0.109
+- *Model load time:* 0.68s
+- *Generation time:* 1.65s
+- *Total time:* 3.33s
+- *Prompt preparation time:* 0.888
+- *First-token latency:* 0.444
+- *Cleanup time:* 0.1
 - *Prompt tokens:* 1,454
 - *Generation tokens:* 67
 - *Total tokens:* 1,521
-- *Prompt throughput (raw):* 3,166 tok/s
-- *Generation throughput (raw):* 170 tok/s
+- *Prompt throughput (raw):* 3,278 tok/s
+- *Generation throughput (raw):* 179 tok/s
 - *Peak memory (GB):* 4.6
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0136
+- *Post-cleanup active memory (GB):* 0.0125
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2740,22 +2357,22 @@ Keywords: Gothic tower, stone architecture, green foliage, overcast sky, histori
 - *Maintainer status:* none
 - *Observations:* Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.22s
-- *Generation time:* 2.38s
-- *Total time:* 4.90s
-- *Prompt preparation time:* 1.18
-- *First-token latency:* 0.871
-- *Cleanup time:* 0.118
+- *Model load time:* 1.42s
+- *Generation time:* 2.43s
+- *Total time:* 5.23s
+- *Prompt preparation time:* 1.23
+- *First-token latency:* 0.881
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 1,802
 - *Generation tokens:* 83
 - *Total tokens:* 1,885
-- *Prompt throughput (raw):* 2,069 tok/s
-- *Generation throughput (raw):* 98.4 tok/s
+- *Prompt throughput (raw):* 2,044 tok/s
+- *Generation throughput (raw):* 95.9 tok/s
 - *Peak memory (GB):* 7.3
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.20
 - *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.0171
+- *Post-cleanup active memory (GB):* 0.0158
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2802,22 +2419,22 @@ Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English cou
   keywords; Repeats the prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.71s
-- *Generation time:* 1.43s
-- *Total time:* 3.45s
-- *Prompt preparation time:* 1.2
-- *First-token latency:* 0.218
-- *Cleanup time:* 0.0984
+- *Model load time:* 0.89s
+- *Generation time:* 1.85s
+- *Total time:* 4.04s
+- *Prompt preparation time:* 1.19
+- *First-token latency:* 0.577
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 325
 - *Generation tokens:* 22
 - *Total tokens:* 347
-- *Prompt throughput (raw):* 1,488 tok/s
-- *Generation throughput (raw):* 342 tok/s
-- *Peak memory (GB):* 2.1
+- *Prompt throughput (raw):* 563 tok/s
+- *Generation throughput (raw):* 258 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 1.2
-- *Cache memory (GB):* 0.03
+- *Cache memory (GB):* 0.02
 - *Model-load active memory (GB):* 1.25
-- *Post-cleanup active memory (GB):* 0.00264
+- *Post-cleanup active memory (GB):* 0.00238
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2857,22 +2474,22 @@ A historic stone gothic tower and rooftops partially framed by dense green trees
 - *Observations:* Response repeats the same text; Generation was stopped early
   after sustained repeated output; Duplicate keywords: sky, sky view, skyline
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.81s
-- *Generation time:* 1.58s
-- *Total time:* 3.21s
-- *Prompt preparation time:* 0.712
-- *First-token latency:* 0.226
-- *Cleanup time:* 0.103
+- *Model load time:* 0.61s
+- *Generation time:* 1.68s
+- *Total time:* 3.10s
+- *Prompt preparation time:* 0.696
+- *First-token latency:* 0.396
+- *Cleanup time:* 0.105
 - *Prompt tokens:* 2,107
 - *Generation tokens:* 200
 - *Total tokens:* 2,307
-- *Prompt throughput (raw):* 9,304 tok/s
-- *Generation throughput (raw):* 303 tok/s
+- *Prompt throughput (raw):* 5,324 tok/s
+- *Generation throughput (raw):* 329 tok/s
 - *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.1
 - *Cache memory (GB):* 0.61
 - *Model-load active memory (GB):* 1.08
-- *Post-cleanup active memory (GB):* 0.00357
+- *Post-cleanup active memory (GB):* 0.00331
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2911,26 +2528,27 @@ Keywords: Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building,
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: keywords; Response
-  appears cut off at the token limit
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Unrecognised model control tokens remain visible; Required
+  labelled fields not detected: title, description; Response appears cut off
+  at the token limit; Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.92s
-- *Generation time:* 50.97s
-- *Total time:* 54.83s
-- *Prompt preparation time:* 0.757
-- *First-token latency:* 7.84
-- *Cleanup time:* 0.157
+- *Model load time:* 2.94s
+- *Generation time:* 50.14s
+- *Total time:* 54.01s
+- *Prompt preparation time:* 0.765
+- *First-token latency:* 7.08
+- *Cleanup time:* 0.147
 - *Prompt tokens:* 4,367
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,367
-- *Prompt throughput (raw):* 557 tok/s
+- *Prompt throughput (raw):* 616 tok/s
 - *Generation throughput (raw):* 23.6 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.0078
+- *Post-cleanup active memory (GB):* 0.00703
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2947,12 +2565,115 @@ Keywords: Architecture, Gothic, Tower, Overcast sky, Foliage, Historic building,
 *Readable output:*
 
 <pre class="model-output-readable">
+ to=self&lt;|message|&gt;Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-10-17 15:44:34 UTC+01:00
+- GPS: 51.751667°N, 1.252222°W
+
+Descriptive hints:
+- Description hint: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
+- Keyword hints: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
 Title:
-Gothic Tower Through Autumn Foliage Oxford
+Description:
+Keywords:
+
+Need title 5-10 words. Concrete.
+
+Image shows stone gothic tower with pinnacles, partially framed by trees, rooftops, overcast sky. GPS 51.751667°N, 1.252222°W is Oxford? That is around Oxford. The building looks like? Could be St Mary's? Or maybe Christ Church? The tower with pinnacles... Might be St Giles? Actually 51.751667, -1.252222 is near Oxford city centre. The stone tower with pinnacles and crenellations maybe the tower of St Mary's Church? Or? Might be the tower of St John? Let's assume Oxford. The descriptive hint says Oxford, Oxfordshire.
+
+We need description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time is authoritative but do not claim they are visible. So we can mention capture date? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can incorporate date/time in description? Possibly as metadata context. Might be okay to mention when captured? The description should combine relevant context with main visible subject... Might include location. Probably mention captured on 2026-10-17. But "do not claim they are visible." So can't say "the image shows date". Could say "Captured on..." Might be okay. Usually catalogue metadata includes date. Might be safe to include location based on GPS.
+
+Let's produce title: "Gothic Stone Tower Framed by Autumn Trees Oxford" That's 8 words? Gothic(1) Stone(2) Tower(3) Framed(4) by(5) Autumn(6) Trees(7) Oxford(8). Good.
+
+Description: Need 1-2 sentences. Include visible subject: historic stone Gothic tower with pinnacles and crenellations peeking above rooftops and chimneys, partially obscured by dense green and autumnal foliage and branches. Overcast sky. Location Oxford, Oxfordshire, England at GPS. Captured 2026-10-17 15:44:34 UTC+01:00.
+
+Don't claim date visible. Could say "The photograph, taken on 2026-10-17 at 15:44:34 UTC+01:00, shows..." That's okay.
+
+Make sure British English spelling. Use "favour"? Not needed.
+
+Keywords: 10-18 unique comma-separated. Should include Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky. That's many. Need 10-18 unique. Use maybe 15.
+
+Avoid duplicates. Ensure comma-separated.
+
+Let's craft final output.
+
+Title:
+Gothic Stone Tower Framed by Autumn Trees Oxford
 
 Description:
-Captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N,1.252222°W in Oxford, Oxfordshire, the view shows a historic stone Gothic tower with pinnacles and crenellations peering above residential rooftops and chimneys, partially framed by dense green and autumn-ting
+The photograph, captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N, 1.252222°W in Oxford, Oxfordshire, England, shows the crenellated stone Gothic tower with pinnacles of a historic building peeking above residential rooftops and brick chimneys through dense green and autumnal foliage under an overcast sky.
+
+Keywords:
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, P
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-10-17 15:44:34 UTC+01:00
+- GPS: 51.751667°N, 1.252222°W
+
+Descriptive hints:
+- Description hint: A view of a historic stone gothic tower and rooftops partially framed by dense green trees under an overcast sky.
+- Keyword hints: Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, English countryside, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+
+Need title 5-10 words. Concrete.
+
+Image shows stone gothic tower with pinnacles, partially framed by trees, rooftops, overcast sky. GPS 51.751667°N, 1.252222°W is Oxford? That is around Oxford. The building looks like? Could be St Mary's? Or maybe Christ Church? The tower with pinnacles... Might be St Giles? Actually 51.751667, -1.252222 is near Oxford city centre. The stone tower with pinnacles and crenellations maybe the tower of St Mary's Church? Or? Might be the tower of St John? Let's assume Oxford. The descriptive hint says Oxford, Oxfordshire.
+
+We need description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time is authoritative but do not claim they are visible. So we can mention capture date? "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can incorporate date/time in description? Possibly as metadata context. Might be okay to mention when captured? The description should combine relevant context with main visible subject... Might include location. Probably mention captured on 2026-10-17. But "do not claim they are visible." So can't say "the image shows date". Could say "Captured on..." Might be okay. Usually catalogue metadata includes date. Might be safe to include location based on GPS.
+
+Let's produce title: "Gothic Stone Tower Framed by Autumn Trees Oxford" That's 8 words? Gothic(1) Stone(2) Tower(3) Framed(4) by(5) Autumn(6) Trees(7) Oxford(8). Good.
+
+Description: Need 1-2 sentences. Include visible subject: historic stone Gothic tower with pinnacles and crenellations peeking above rooftops and chimneys, partially obscured by dense green and autumnal foliage and branches. Overcast sky. Location Oxford, Oxfordshire, England at GPS. Captured 2026-10-17 15:44:34 UTC+01:00.
+
+Don't claim date visible. Could say "The photograph, taken on 2026-10-17 at 15:44:34 UTC+01:00, shows..." That's okay.
+
+Make sure British English spelling. Use "favour"? Not needed.
+
+Keywords: 10-18 unique comma-separated. Should include Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, Pinnacle, Roof, Rooftops, Scenic, Sky. That's many. Need 10-18 unique. Use maybe 15.
+
+Avoid duplicates. Ensure comma-separated.
+
+Let's craft final output.
+
+Title:
+Gothic Stone Tower Framed by Autumn Trees Oxford
+
+Description:
+The photograph, captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N, 1.252222°W in Oxford, Oxfordshire, England, shows the crenellated stone Gothic tower with pinnacles of a historic building peeking above residential rooftops and brick chimneys through dense green and autumnal foliage under an overcast sky.
+
+Keywords:
+Architecture, Branch, Building, Chimney, Cloud, Cloudy sky, England, Foliage, Historic Building, Leaves, Outdoors, Overcast, Oxford, Oxfordshire, P
+```
+
+</details>
 
 </details>
 
@@ -2974,22 +2695,22 @@ Captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N,1.252222°W in Oxford,
   labelled fields not detected: title, description, keywords; Repeats the
   prompt's hint text: description
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 0.93s
-- *Generation time:* 1.84s
-- *Total time:* 3.72s
-- *Prompt preparation time:* 0.756
-- *First-token latency:* 0.823
-- *Cleanup time:* 0.185
+- *Model load time:* 1.02s
+- *Generation time:* 1.74s
+- *Total time:* 3.67s
+- *Prompt preparation time:* 0.744
+- *First-token latency:* 0.76
+- *Cleanup time:* 0.159
 - *Prompt tokens:* 2,186
 - *Generation tokens:* 29
 - *Total tokens:* 2,215
-- *Prompt throughput (raw):* 2,656 tok/s
-- *Generation throughput (raw):* 98.7 tok/s
+- *Prompt throughput (raw):* 2,877 tok/s
+- *Generation throughput (raw):* 105 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.014
+- *Post-cleanup active memory (GB):* 0.0129
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3038,22 +2759,22 @@ Captured on 2026-10-17 15:44:34 UTC+01:00 at 51.751667°N,1.252222°W in Oxford,
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.56s
-- *Generation time:* 1.50s
-- *Total time:* 2.89s
-- *Prompt preparation time:* 0.709
-- *First-token latency:* 0.0928
-- *Cleanup time:* 0.113
+- *Model load time:* 0.55s
+- *Generation time:* 1.60s
+- *Total time:* 2.93s
+- *Prompt preparation time:* 0.671
+- *First-token latency:* 0.228
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 321
 - *Generation tokens:* 148
 - *Total tokens:* 469
-- *Prompt throughput (raw):* 3,460 tok/s
-- *Generation throughput (raw):* 199 tok/s
-- *Peak memory (GB):* 1.8
+- *Prompt throughput (raw):* 1,408 tok/s
+- *Generation throughput (raw):* 203 tok/s
+- *Peak memory (GB):* 1.5
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.28
-- *Model-load active memory (GB):* 0.613
-- *Post-cleanup active memory (GB):* 0.0146
+- *Model-load active memory (GB):* 0.612
+- *Post-cleanup active memory (GB):* 0.0135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
