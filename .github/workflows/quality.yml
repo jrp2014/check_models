@@ -62,11 +62,12 @@ jobs:
           - python-version: "3.14"
             runner: macos-latest
           # The Python after the working env's (probe_python_next.sh's
-          # default). While pip finds no distribution for a requirement (mlx
-          # has no cp315 wheel and no sdist yet), the install step warns and
-          # skips the checks; any other install failure fails the lane, and
-          # once the stack installs, the lane gates like the rest. It is also
-          # skipped before NEXT_PYTHON_HOLD_UNTIL (install step).
+          # default). It installs wheels only, so it builds nothing from
+          # source: while some requirement has no wheel for this Python, the
+          # install step warns and skips the checks; any other install
+          # failure fails the lane, and once every wheel is published, the
+          # lane gates like the rest. It is also skipped before
+          # NEXT_PYTHON_HOLD_UNTIL (install step).
           - python-version: "3.15"
             runner: macos-latest
             next-python: true
@@ -102,11 +103,12 @@ jobs:
           NEXT_PYTHON: ${{ matrix.next-python == true }}
           # The next-Python lane is held (checks skipped with a warning)
           # before this UTC date; it runs again from that day with no edit.
-          # Clear the value to lift the hold early.
-          NEXT_PYTHON_HOLD_UNTIL: "2026-11-01"
-        # Only the next-Python lane may skip, and only when pip found no
-        # distribution at all for some requirement (no wheel and no sdist
-        # yet). Any other install failure (a build, resolver or packaging
+          # Empty means no hold.
+          NEXT_PYTHON_HOLD_UNTIL: ""
+        # The next-Python lane installs wheels only (--only-binary :all:;
+        # the local editable project still builds), so it never compiles
+        # libraries from sdists. Only that lane may skip, and only when pip
+        # found no wheel for some requirement. Any other install failure (a build, resolver or packaging
         # error) fails the lane like every other. Pip also ends with "No
         # matching distribution found" when it could not read the index
         # (connection, certificate, proxy or HTTP errors), so any sign of
@@ -120,13 +122,17 @@ jobs:
           fi
           python -m pip install --upgrade pip
           pip_log="${RUNNER_TEMP:-/tmp}/pip-install.log"
-          if ! pip install -e "src/.[dev]" 2>&1 | tee "$pip_log"; then
+          binary_only=()
+          if [[ "$NEXT_PYTHON" == "true" ]]; then
+            binary_only=(--only-binary :all:)
+          fi
+          if ! pip install "${binary_only[@]}" -e "src/.[dev]" 2>&1 | tee "$pip_log"; then
             index_errors='Retrying \(Retry\(|Could not fetch URL|Max retries exceeded|HTTP error [0-9]{3}|SSLError|certificate verify failed|ssl certificate|ProxyError|NewConnectionError|ConnectTimeoutError|ReadTimeoutError|Connection(Error|ResetError| refused| aborted)|Temporary failure in name resolution|Name or service not known|nodename nor servname|Network is unreachable|not a trusted or secure host'
             if [[ "$NEXT_PYTHON" != "true" ]] || grep -Eiq "$index_errors" "$pip_log" || ! grep -q "No matching distribution found for" "$pip_log"; then
               exit 1
             fi
             missing="$(grep -o "No matching distribution found for [^[:space:]]*" "$pip_log" | sed 's/^No matching distribution found for //' | sort -u | paste -sd, -)"
-            echo "::warning title=Next Python not installable yet::No distribution for $(python -V) yet: ${missing}. Its static checks are skipped until one is published."
+            echo "::warning title=Next Python not installable yet::No wheel for $(python -V) yet: ${missing}. Its static checks are skipped until one is published."
             echo "available=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi

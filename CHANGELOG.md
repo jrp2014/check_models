@@ -152,6 +152,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- CI: the Python 3.15 lane installs wheels only (`--only-binary :all:`),
+  so it no longer compiles libraries from source (the 6 November run
+  built miniaudio, PyYAML and tree-sitter). Until every requirement has a
+  3.15 wheel it warns "No wheel for Python 3.15 yet" and skips its checks,
+  then gates again with no edit. `NEXT_PYTHON_HOLD_UNTIL` is cleared: the
+  2026-11-01 hold has ended and the wheel check now decides when the lane
+  runs.
 - CI: the macOS jobs stay on `macos-15` and add a `macos-latest` lane
   (GitHub's current default macOS image): static quality runs Python 3.14
   on both, 3.13 on macos-15 and the 3.15 lane on macos-latest, and the

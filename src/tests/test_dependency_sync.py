@@ -2989,7 +2989,11 @@ def test_ci_install_step_skips_only_a_missing_distribution_on_the_next_python_la
         assert outputs == f"available={available}\n"
         assert npm_ran is (available == "true")
     if available == "false":
-        assert "No distribution for Python 3.15.0 yet: mlx>=0.32.3." in result.stdout
+        assert "No wheel for Python 3.15.0 yet: mlx>=0.32.3." in result.stdout
+    pip_installs = [line for line in calls.splitlines() if "src/.[dev]" in line]
+    assert len(pip_installs) == 1
+    # Only the next-Python lane refuses sdists, so it never compiles libraries.
+    assert ("--only-binary :all:" in pip_installs[0]) is (next_python == "true")
 
 
 @pytest.mark.parametrize(
