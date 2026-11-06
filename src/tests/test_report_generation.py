@@ -773,6 +773,7 @@ def _native_repro_args_with_every_setting() -> Namespace:
         enable_thinking=True,
         thinking_budget=24,
         thinking_mode="enabled",
+        reasoning_effort="low",
         thinking_start_token=THINKING_START_TOKEN,
         thinking_end_token=CUSTOM_THINKING_END_TOKEN,
     )
@@ -816,6 +817,7 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
         "prefill_step_size": run_args.prefill_step_size,
         "thinking_budget": run_args.thinking_budget,
         "thinking_mode": run_args.thinking_mode,
+        "reasoning_effort": run_args.reasoning_effort,
         "thinking_start_token": run_args.thinking_start_token,
         "thinking_end_token": run_args.thinking_end_token,
         "processor_kwargs": run_args.processor_kwargs,
@@ -885,6 +887,7 @@ def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
         "--prefill-step-size": "512",
         "--thinking-budget": "24",
         "--thinking-mode": "enabled",
+        "--reasoning-effort": "low",
         "--thinking-start-token": THINKING_START_TOKEN,
         "--thinking-end-token": CUSTOM_THINKING_END_TOKEN,
     }

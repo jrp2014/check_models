@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- CLI (0.17.106): `--reasoning-effort LEVEL` passes a reasoning effort to
+  chat templates, matching the flag mlx-vlm's generate CLI gained in 0.7.12
+  (6dc1562). The value is lowercased and sent as both `reasoning_effort` and
+  `reasoning_strength` (the name Muse Glimmer's template reads); omitted, each
+  template keeps its own default. Like `--thinking-mode`, it turns off the
+  automatic thinking budget and appears in native repro commands. Prompt
+  diagnostics treat the two names as one setting, so a template that reads
+  either is not reported as ignoring it.
 - Run summary (0.17.96): the *Native repro* column distinguishes
   *confirmed*, *not reproduced* and *not yet checked* (replacing
   "candidate" and "crash: triage"), per observation mlx-vlm can produce.

@@ -1622,6 +1622,8 @@ class ChatTemplateKwargs(TypedDict, total=False):
     thinking_end_token: str
     thinking_mode: str
     thinking_start_token: str
+    reasoning_effort: str
+    reasoning_strength: str
 
 
 class LoadExtraKwargs(TypedDict, total=False):
@@ -3285,6 +3287,7 @@ class ProcessImageParams:
     enable_thinking: bool = False
     thinking_budget: int | None = None
     thinking_mode: str | None = None
+    reasoning_effort: str | None = None
     thinking_start_token: str | None = None
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
     auto_thinking_budget: bool = True
@@ -12626,14 +12629,15 @@ def _auto_thinking_budget_kwargs(
     token, so this affects only models whose chat template itself opens a
     thinking block (final marker unmatched, not merely mentioned or closed).
     Chat-template kwargs are untouched: hybrid models keep their default
-    non-thinking behaviour, and any explicit thinking flag or
-    ``--thinking-mode`` hands full control back to the user.
+    non-thinking behaviour, and any explicit thinking flag, ``--thinking-mode``
+    or ``--reasoning-effort`` hands full control back to the user.
     """
     empty = cast("GenerateKwargs", {})
     if (
         not params.auto_thinking_budget
         or params.enable_thinking
         or params.thinking_mode is not None
+        or params.reasoning_effort is not None
     ):
         return empty
     budget = params.max_tokens - AUTO_THINKING_ANSWER_RESERVE_TOKENS
@@ -12751,12 +12755,17 @@ def _is_generation_processor(
 def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
     """Collect optional chat-template kwargs for benchmark runs.
 
-    Mirrors upstream ``mlx_vlm.generate`` semantics: ``thinking_mode`` applies
-    whenever set (templates that support it), independent of enable_thinking.
+    Mirrors upstream ``mlx_vlm.generate`` semantics: ``thinking_mode`` and
+    ``reasoning_effort`` apply whenever set (templates that support them),
+    independent of enable_thinking. The effort also goes out as
+    ``reasoning_strength``, the alias Muse Glimmer's template reads.
     """
     template_kwargs: ChatTemplateKwargs = {}
     if params.thinking_mode is not None:
         template_kwargs["thinking_mode"] = params.thinking_mode
+    if params.reasoning_effort is not None:
+        template_kwargs["reasoning_effort"] = params.reasoning_effort
+        template_kwargs["reasoning_strength"] = params.reasoning_effort
     if not params.enable_thinking:
         return template_kwargs
 
@@ -13164,6 +13173,25 @@ class _GenerationBlockParser(JinjaExtension):
         return caller()
 
 
+# Kwargs sent under two names for one setting; a template reading either reads it.
+_CHAT_TEMPLATE_KWARG_ALIASES: Final[tuple[frozenset[str], ...]] = (
+    frozenset({"reasoning_effort", "reasoning_strength"}),
+)
+
+
+def _unread_chat_template_kwargs(
+    passed: Mapping[str, object], template_variables: tuple[str, ...] | None
+) -> tuple[str, ...]:
+    """Passed chat-template kwargs the template never reads (aliases count as one)."""
+    if template_variables is None:
+        return ()
+    read = set(template_variables)
+    for names in _CHAT_TEMPLATE_KWARG_ALIASES:
+        if read & names:
+            read |= names
+    return tuple(sorted(key for key in passed if key not in read))
+
+
 def _chat_template_variables(processor: object) -> tuple[str, ...] | None:
     """Variables the processor's chat template reads, from its jinja2 syntax tree.
 
@@ -13256,12 +13284,8 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
         declared_eos_token_ids=_declared_eos_token_ids(snapshot_path, generation_config),
         chat_template_sources=_chat_template_sources(snapshot_path),
         chat_template_variables=template_variables,
-        unread_chat_template_kwargs=tuple(
-            sorted(
-                key
-                for key in passed_template_kwargs
-                if template_variables is not None and key not in template_variables
-            )
+        unread_chat_template_kwargs=_unread_chat_template_kwargs(
+            passed_template_kwargs, template_variables
         ),
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
@@ -26317,6 +26341,8 @@ _NATIVE_CLI_OPTIONAL_ARGS: Final[tuple[tuple[str, str], ...]] = (
     ("--prefill-step-size", "prefill_step_size"),
     ("--thinking-budget", "thinking_budget"),
     ("--thinking-mode", "thinking_mode"),
+    # Upstream generate CLI flag since mlx-vlm 6dc1562 (0.7.12); emitted only when set.
+    ("--reasoning-effort", "reasoning_effort"),
     ("--thinking-start-token", "thinking_start_token"),
 )
 _NATIVE_CLI_NONDEFAULT_ARGS: Final[tuple[tuple[str, str, object], ...]] = (
@@ -28454,6 +28480,15 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--thinking-mode",
         help=(
             "Value passed to chat templates that support thinking_mode (matches mlx-vlm upstream)."
+        ),
+    )
+    prompt_group.add_argument(
+        "--reasoning-effort",
+        type=str.lower,
+        help=(
+            "Reasoning effort passed to chat templates that read reasoning_effort "
+            "or its reasoning_strength alias, e.g. low, medium, high (matches "
+            "mlx-vlm upstream). Omitted: each template's own default."
         ),
     )
     prompt_group.add_argument(

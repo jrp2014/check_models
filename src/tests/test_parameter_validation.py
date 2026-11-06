@@ -902,6 +902,38 @@ class TestAutoThinkingBudget:
 
         assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
 
+    def test_explicit_reasoning_effort_disables_auto(self) -> None:
+        """--reasoning-effort is an explicit template control, like --thinking-mode."""
+        params = dataclasses.replace(_thinking_params(max_tokens=1000), reasoning_effort="low")
+
+        assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
+
+    def test_reasoning_effort_reaches_template_under_both_names(self) -> None:
+        """Mirrors mlx-vlm 6dc1562: lowercased, sent as reasoning_effort and reasoning_strength."""
+        args = check_models._build_cli_parser().parse_args(["--reasoning-effort", "LOW"])
+        params = dataclasses.replace(_thinking_params(), reasoning_effort=args.reasoning_effort)
+
+        kwargs = check_models._build_chat_template_kwargs(params)
+
+        assert kwargs == {"reasoning_effort": "low", "reasoning_strength": "low"}
+        assert "reasoning_effort" not in check_models._build_chat_template_kwargs(
+            _thinking_params()
+        )
+
+    def test_reasoning_effort_alias_read_by_template_is_not_unread(self) -> None:
+        """A template reading either effort name reads the setting; neither is unread."""
+        passed = {"reasoning_effort": "low", "reasoning_strength": "low", "thinking_mode": "x"}
+
+        unread = check_models._unread_chat_template_kwargs
+        assert unread(passed, ("reasoning_strength",)) == ("thinking_mode",)
+        assert unread(passed, ("reasoning_effort", "thinking_mode")) == ()
+        assert unread(passed, ("messages",)) == (
+            "reasoning_effort",
+            "reasoning_strength",
+            "thinking_mode",
+        )
+        assert unread(passed, None) == ()
+
     def test_alternate_delimiter_pair_is_matched(self) -> None:
         """Non-default marker pairs map to their own start/end tokens."""
         params = _thinking_params(max_tokens=1000)
