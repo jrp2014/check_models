@@ -1371,6 +1371,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Lint: `_human_observation_labels` combines the catalog-constraint
+  `elif` and its nested `if` into one condition (Ruff SIM102).
 - Run summary (0.17.101, review of 8e17405): native-reproduction matching
   now includes each model's own inputs. The experiment label adds the
   model's rendered-prompt digest and a digest of its effective generation

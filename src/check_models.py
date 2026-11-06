@@ -8711,9 +8711,12 @@ def _human_observation_labels(
         elif code == "unverified_place_name" and details is not None:
             if places := details.get("unverified_place_names"):
                 label = f"Names a place the prompt did not supply: {', '.join(places)}"
-        elif code in {"catalog_constraint_violation", "duplicate_keywords"} and details is not None:
-            if constraint_labels := _constraint_violation_labels(details):
-                label = "; ".join(constraint_labels)
+        elif (
+            code in {"catalog_constraint_violation", "duplicate_keywords"}
+            and details is not None
+            and (constraint_labels := _constraint_violation_labels(details))
+        ):
+            label = "; ".join(constraint_labels)
         labels.append(label)
     return "; ".join(labels) or "none"
 
