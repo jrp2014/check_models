@@ -22,6 +22,9 @@ reports, retired tool notes, completed plans and specifications, restructure
 plans, migration notes, and resolved backlogs) preserved for reference. See
 filenames for dates and topics.
 
+Changelog entries for releases 0.1.0 to 0.15.0 are in
+[archive/CHANGELOG_0.1.0-0.15.0.md](archive/CHANGELOG_0.1.0-0.15.0.md).
+
 Completed Superpowers plans and designs live under
 `archive/superpowers/{plans,specs}/`. There is no active `docs/superpowers/`
 tree; start new planning material there only while work is in flight, then move

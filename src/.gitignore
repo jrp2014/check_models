@@ -1,10 +1,4 @@
 # Entries the root .gitignore does not already cover for the src package.
-__pycache__/
-*.py[cod]
-build/
-dist/
-*.egg-info/
-.coverage
 htmlcov/
 
 # Node.js (markdownlint-cli2); the lockfile is deliberately untracked
