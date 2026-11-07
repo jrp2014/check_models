@@ -2079,22 +2079,29 @@ def test_chat_template_variables_come_from_the_parsed_template() -> None:
         "{% if enable_thinking %}<think>{% endif %}{% if add_generation_prompt %}A:{% endif %}"
     )
     processor = types.SimpleNamespace(chat_template=template)
-    assert check_models._chat_template_variables(processor) == (
+    assert check_models._active_chat_template(processor).variables == (
         "add_generation_prompt",
         "enable_thinking",
         "messages",
     )
+    # Only the template the render selects counts: a named set contributes its default.
     named = types.SimpleNamespace(
-        chat_template={"default": "{{ messages }}", "tool": "{{ tools }}"}
+        chat_template={"default": "{{ messages }}", "tool_use": "{{ tools }}"}
     )
-    assert check_models._chat_template_variables(named) == ("messages", "tools")
+    assert check_models._active_chat_template(named).variables == ("messages",)
+    no_default = types.SimpleNamespace(chat_template={"tool_use": "{{ tools }}"})
+    assert check_models._active_chat_template(no_default).variables is None
     # Unavailable (no template, or one that does not parse) is None, not "reads nothing".
     assert (
-        check_models._chat_template_variables(types.SimpleNamespace(chat_template="{% if")) is None
+        check_models._active_chat_template(types.SimpleNamespace(chat_template="{% if")).variables
+        is None
     )
-    assert check_models._chat_template_variables(types.SimpleNamespace(chat_template=None)) is None
+    assert (
+        check_models._active_chat_template(types.SimpleNamespace(chat_template=None)).variables
+        is None
+    )
     plain = types.SimpleNamespace(chat_template="Hello")
-    assert check_models._chat_template_variables(plain) == ()
+    assert check_models._active_chat_template(plain).variables == ()
 
 
 @pytest.mark.parametrize(
@@ -2121,7 +2128,7 @@ def test_chat_template_variables_parse_transformers_extensions(
 ) -> None:
     """Regression: {% generation %} and loop-control tags made a valid template unparseable."""
     processor = types.SimpleNamespace(chat_template=template)
-    assert check_models._chat_template_variables(processor) == expected
+    assert check_models._active_chat_template(processor).variables == expected
     # Through the diagnostic record: [] and absent stay distinct.
     diagnostics = check_models.PromptDiagnostics(chat_template_variables=expected)
     assert check_models._checkpoint_facts_to_json(diagnostics)["chat_template_variables"] == list(

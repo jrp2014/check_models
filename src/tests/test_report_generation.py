@@ -10595,6 +10595,7 @@ def test_checkpoint_fact_rows_state_reasoning_effort_outcome() -> None:
     """Diagnostics name the declared efforts and what this model's template received."""
     diagnostics = check_models.PromptDiagnostics(
         declared_reasoning_efforts=("none", "high"),
+        declared_reasoning_efforts_enforced=True,
         reasoning_effort=check_models.ReasoningEffortResolution(
             requested="low",
             fallback="higher",
@@ -10606,7 +10607,14 @@ def test_checkpoint_fact_rows_state_reasoning_effort_outcome() -> None:
 
     rows = dict(check_models._checkpoint_fact_rows(diagnostics))
 
-    assert rows["Reasoning efforts the chat template declares"] == "none, high"
+    assert rows["Reasoning efforts the chat template declares"] == "none, high (enforced allowlist)"
+    branch = check_models.PromptDiagnostics(declared_reasoning_efforts=("none",))
+    assert (
+        dict(check_models._checkpoint_fact_rows(branch))[
+            "Reasoning efforts the chat template declares"
+        ]
+        == "none (off-switch branch, not enforced)"
+    )
     assert rows["Reasoning effort (--reasoning-effort)"] == (
         "low mapped to high (fallback higher; declared: none, high), passed as reasoning_effort"
     )

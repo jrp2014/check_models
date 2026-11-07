@@ -921,7 +921,7 @@ class TestAutoThinkingBudget:
 
         def kwargs(variables: tuple[str, ...] | None) -> object:
             resolution = check_models._resolve_reasoning_effort(
-                "low", "higher", template_variables=variables, declared=None
+                "low", "higher", template_variables=variables, allowlist=None
             )
             return check_models._build_chat_template_kwargs(params, resolution)
 
@@ -943,7 +943,7 @@ class TestAutoThinkingBudget:
             "none",
             "higher",
             template_variables=("reasoning_effort", "reasoning_strength"),
-            declared=None,
+            allowlist=None,
         )
         assert check_models._build_chat_template_kwargs(params, resolution) == {
             "reasoning_effort": "none",

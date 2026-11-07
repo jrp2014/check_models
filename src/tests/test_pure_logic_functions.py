@@ -23,6 +23,8 @@ from unittest.mock import MagicMock, patch
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Mapping, Sequence
 
+    from check_models import ProcessImageParams
+
 import mlx.core as mx
 import pytest
 import yaml
@@ -1737,6 +1739,10 @@ _MISTRAL_STYLE_EFFORT_TEMPLATE = (
 _NONE_BRANCH_EFFORT_TEMPLATE = (
     "{%- if reasoning_effort == 'none' %}no thinking{%- else %}think{%- endif %}"
 )
+_NONE_ONLY_ALLOWLIST_TEMPLATE = (
+    "{%- if reasoning_effort not in ['none'] %}"
+    "{{ raise_exception('reasoning cannot be enabled') }}{%- endif %}{{ messages }}"
+)
 _UNDECLARED_STRENGTH_TEMPLATE = (
     "Reasoning strength: {{ reasoning_strength | default('high') }}{{ messages }}"
 )
@@ -1747,6 +1753,15 @@ _CONFLICTING_EFFORT_TEMPLATE = (
     "{%- if reasoning_effort not in ['low'] %}{{ raise_exception('a') }}{%- endif %}"
     "{%- if reasoning_effort not in ['high'] %}{{ raise_exception('b') }}{%- endif %}"
 )
+
+
+def _effort_params(mod: types.ModuleType) -> ProcessImageParams:
+    """ProcessImageParams as the CLI builds them, for reasoning-effort tests."""
+    args = mod._build_cli_parser().parse_args(["--folder", "images"])
+    params = mod._process_image_params_from_args(
+        args, model_identifier="org/model", image_path=Path("image.jpg"), prompt="Describe."
+    )
+    return cast("ProcessImageParams", params)
 
 
 class TestReasoningEffort:
@@ -1771,7 +1786,7 @@ class TestReasoningEffort:
         """Only enforced allowlists (or a none branch) are declarations."""
         processor = types.SimpleNamespace(chat_template=template)
 
-        assert mod._declared_reasoning_efforts(processor) == expected
+        assert mod._active_chat_template(processor).declared_reasoning_efforts == expected
 
     def test_declared_reasoning_efforts_uses_default_named_template(
         self, mod: types.ModuleType
@@ -1788,9 +1803,13 @@ class TestReasoningEffort:
             tokenizer=types.SimpleNamespace(chat_template=_QWEN_STYLE_EFFORT_TEMPLATE),
         )
 
-        assert mod._declared_reasoning_efforts(processor) == ("none", "high")
-        assert mod._declared_reasoning_efforts(tokenizer_only) == ("low", "medium", "xhigh")
-        assert mod._declared_reasoning_efforts(types.SimpleNamespace()) is None
+        def declared(source: object) -> tuple[str, ...] | None:
+            facts = mod._active_chat_template(source)
+            return cast("tuple[str, ...] | None", facts.declared_reasoning_efforts)
+
+        assert declared(processor) == ("none", "high")
+        assert declared(tokenizer_only) == ("low", "medium", "xhigh")
+        assert declared(types.SimpleNamespace()) is None
 
     @pytest.mark.parametrize(
         "template",
@@ -1813,7 +1832,9 @@ class TestReasoningEffort:
             pytest.skip("installed mlx-vlm predates declared reasoning efforts")
         expected = upstream(template)
 
-        ours = mod._declared_reasoning_efforts(types.SimpleNamespace(chat_template=template))
+        ours = mod._active_chat_template(
+            types.SimpleNamespace(chat_template=template)
+        ).declared_reasoning_efforts
 
         assert ours == (tuple(expected) if expected else None)
 
@@ -1845,7 +1866,7 @@ class TestReasoningEffort:
         assert mod._nearest_declared_reasoning_effort(requested, declared, fallback) == expected
 
     @pytest.mark.parametrize(
-        ("variables", "declared", "requested", "fallback", "status", "applied", "names"),
+        ("variables", "allowlist", "requested", "fallback", "status", "applied", "names"),
         [
             (("messages",), None, "high", "higher", "not_read", None, ()),
             (
@@ -1866,15 +1887,17 @@ class TestReasoningEffort:
                 "low",
                 ("reasoning_strength",),
             ),
+            # An enforced none-only allowlist restricts like any other.
             (
                 ("reasoning_effort",),
                 ("none",),
-                "medium",
+                "high",
                 "higher",
-                "unvalidated",
-                "medium",
+                "mapped",
+                "none",
                 ("reasoning_effort",),
             ),
+            (("reasoning_effort",), ("none",), "high", "skip", "not_declared", None, ()),
             (
                 ("reasoning_effort",),
                 ("low", "medium", "xhigh"),
@@ -1900,7 +1923,7 @@ class TestReasoningEffort:
         self,
         mod: types.ModuleType,
         variables: tuple[str, ...] | None,
-        declared: tuple[str, ...] | None,
+        allowlist: tuple[str, ...] | None,
         requested: str,
         fallback: str,
         status: str,
@@ -1909,7 +1932,7 @@ class TestReasoningEffort:
     ) -> None:
         """Each documented status, the passed value and the variables it goes under."""
         resolution = mod._resolve_reasoning_effort(
-            requested, fallback, template_variables=variables, declared=declared
+            requested, fallback, template_variables=variables, allowlist=allowlist
         )
 
         assert (resolution.status, resolution.applied, resolution.template_variables) == (
@@ -1948,6 +1971,71 @@ class TestReasoningEffort:
         assert unrequested.reasoning_effort is None
         assert unrequested.declared_reasoning_efforts == ("none", "high")
 
+    def test_none_only_allowlist_is_enforced_but_none_branch_is_not(
+        self, mod: types.ModuleType
+    ) -> None:
+        """Both read as ("none",) upstream; only the raising one restricts the request.
+
+        Regression (john's 2026-11-07 review): "high" went unchanged to a
+        template that allows only "none", and rendering then raised.
+        """
+        params = replace(_effort_params(mod), reasoning_effort="high")
+        strict = types.SimpleNamespace(chat_template=_NONE_ONLY_ALLOWLIST_TEMPLATE)
+        branch = types.SimpleNamespace(chat_template=_NONE_BRANCH_EFFORT_TEMPLATE)
+
+        strict_facts = mod._chat_template_facts(params, strict)
+        branch_facts = mod._chat_template_facts(params, branch)
+        skipped = mod._chat_template_facts(
+            replace(params, reasoning_effort_fallback="skip"), strict
+        )
+
+        assert strict_facts.declared_reasoning_efforts == ("none",)
+        assert strict_facts.reasoning_effort_allowlist_enforced is True
+        assert strict_facts.kwargs == {"reasoning_effort": "none"}
+        assert strict_facts.reasoning_effort is not None
+        assert strict_facts.reasoning_effort.status == "mapped"
+        assert skipped.kwargs == {}
+        assert skipped.reasoning_effort is not None
+        assert skipped.reasoning_effort.status == "not_declared"
+        assert branch_facts.declared_reasoning_efforts == ("none",)
+        assert branch_facts.reasoning_effort_allowlist_enforced is False
+        assert branch_facts.kwargs == {"reasoning_effort": "high"}
+        assert branch_facts.reasoning_effort is not None
+        assert branch_facts.reasoning_effort.status == "unvalidated"
+
+    def test_effort_read_only_by_another_named_template_keeps_auto_budget(
+        self, mod: types.ModuleType
+    ) -> None:
+        """The selected default template decides; a tool_use-only effort is not read.
+
+        Regression (john's 2026-11-07 review): variables were the union of all
+        named templates, so the effort counted as applied and the expected
+        800-token automatic budget was dropped.
+        """
+        params = replace(_effort_params(mod), reasoning_effort="high", max_tokens=1000)
+        processor = types.SimpleNamespace(
+            chat_template={
+                "default": "{{ messages }}{% if add_generation_prompt %}<think>{% endif %}",
+                "tool_use": _MISTRAL_STYLE_EFFORT_TEMPLATE,
+            }
+        )
+
+        facts = mod._chat_template_facts(params, processor)
+        budget = mod._auto_thinking_budget_kwargs(
+            params,
+            "user: Describe.\nassistant: <think>",
+            reasoning_effort_passed=(
+                facts.reasoning_effort is not None and facts.reasoning_effort.applied is not None
+            ),
+        )
+
+        assert facts.variables == ("add_generation_prompt", "messages")
+        assert facts.declared_reasoning_efforts is None
+        assert facts.reasoning_effort is not None
+        assert facts.reasoning_effort.status == "not_read"
+        assert facts.kwargs == {}
+        assert budget.get("thinking_budget") == 1000 - mod.AUTO_THINKING_ANSWER_RESERVE_TOKENS
+
     def test_prompt_diagnostics_json_records_efforts(self, mod: types.ModuleType) -> None:
         """Declared efforts and the resolution reach the retained JSON; absent stays absent."""
         diagnostics = mod.PromptDiagnostics(
@@ -1964,6 +2052,7 @@ class TestReasoningEffort:
         payload = mod._prompt_diagnostics_to_json(diagnostics)
 
         assert payload["declared_reasoning_efforts"] == ["none", "high"]
+        assert payload["declared_reasoning_efforts_enforced"] is False
         assert payload["reasoning_effort"] == {
             "requested": "low",
             "fallback": "higher",
@@ -1973,4 +2062,5 @@ class TestReasoningEffort:
         }
         empty = mod._prompt_diagnostics_to_json(mod.PromptDiagnostics())
         assert "declared_reasoning_efforts" not in empty
+        assert "declared_reasoning_efforts_enforced" not in empty
         assert "reasoning_effort" not in empty

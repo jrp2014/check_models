@@ -1403,6 +1403,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Reasoning effort (0.17.108, john's 2026-11-07 review): the chat template
+  is now selected and parsed once, and its variables, declared efforts and
+  enforcement come from that one template (the processor's, else the
+  tokenizer's; from a named set, `default`). Previously the variables were
+  the union of every named template, so an effort read only by `tool_use`
+  counted as applied and dropped the automatic thinking budget. An enforced
+  `["none"]` allowlist is now told apart from a bare `== "none"` branch
+  (both read as `none` upstream): only the enforced one restricts the
+  request, so `high` maps to `none` (or is skipped) instead of reaching a
+  template that raises. Diagnostics record `declared_reasoning_efforts_enforced`.
 - Lint: `_human_observation_labels` combines the catalog-constraint
   `elif` and its nested `if` into one condition (Ruff SIM102).
 - Run summary (0.17.101, review of 8e17405): native-reproduction matching

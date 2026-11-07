@@ -2069,9 +2069,11 @@ class PromptDiagnostics:
     # Reasoning efforts the chat template declares (upstream mlx-vlm's
     # model_discovery reading, recorded for every model whether or not
     # --reasoning-effort was given). None when it declares none, or the
-    # installed mlx-vlm cannot read declarations; ("none",) alone names the
-    # value that turns reasoning off without restricting the others.
+    # installed mlx-vlm cannot read declarations. ("none",) is either an
+    # enforced allowlist or a bare off-switch branch; the flag below tells which.
     declared_reasoning_efforts: tuple[str, ...] | None = None
+    # True when the declared efforts are an allowlist the template raises on.
+    declared_reasoning_efforts_enforced: bool = False
     # How --reasoning-effort was handled for this model; None when not given.
     reasoning_effort: ReasoningEffortResolution | None = None
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
@@ -10699,7 +10701,7 @@ def _checkpoint_fact_rows(
         ),
         (
             "Reasoning efforts the chat template declares",
-            ", ".join(diagnostics.declared_reasoning_efforts or ()) or None,
+            _declared_reasoning_efforts_text(diagnostics),
         ),
         (
             "Reasoning effort (--reasoning-effort)",
@@ -12923,8 +12925,10 @@ def _enforced_effort_allowlist(statement: jinja_nodes.Node, aliases: set[str]) -
     return None
 
 
-def _declared_reasoning_efforts(processor: object) -> tuple[str, ...] | None:
-    """Reasoning efforts the processor's default chat template declares.
+def _reasoning_effort_declaration(
+    tree: jinja_nodes.Template,
+) -> tuple[tuple[str, ...] | None, bool]:
+    """Reasoning efforts a parsed chat template declares, and whether it enforces them.
 
     Follows the rules of upstream mlx-vlm's server model metadata
     (``mlx_vlm/server/model_discovery.py``, 09b95b17), reimplemented here so
@@ -12933,20 +12937,11 @@ def _declared_reasoning_efforts(processor: object) -> tuple[str, ...] | None:
     ``raise_exception``, reading ``reasoning_effort``/``reasoning_strength``
     directly, through ``default``/``lower`` filters, or through a variable
     assigned from them. A template that only branches on ``== "none"``
-    declares ``("none",)``. Conflicting allowlists, no declaration, or a
-    template that does not parse give None.
+    declares ``("none",)`` without enforcing it, which upstream reports the
+    same way as an enforced ``["none"]`` allowlist; the second element keeps
+    the two apart (True only for an enforced allowlist). Conflicting
+    allowlists or no declaration give ``(None, False)``.
     """
-    text = _default_chat_template_text(processor)
-    if text is None:
-        return None
-    # Parsed only, never rendered, so autoescaping is moot; on to satisfy S701.
-    environment = JinjaEnvironment(
-        autoescape=True, extensions=[_GenerationBlockParser, jinja_loopcontrols]
-    )
-    try:
-        tree = environment.parse(text)
-    except JinjaTemplateSyntaxError:
-        return None
     aliases = set(REASONING_EFFORT_TEMPLATE_VARIABLES)
     allowlists: list[list[str]] = []
     has_none = False
@@ -12967,8 +12962,8 @@ def _declared_reasoning_efforts(processor: object) -> tuple[str, ...] | None:
         if (allowlist := _enforced_effort_allowlist(statement, aliases)) is not None:
             allowlists.append(allowlist)
     if allowlists and all(set(values) == set(allowlists[0]) for values in allowlists):
-        return tuple(allowlists[0])
-    return ("none",) if has_none and not allowlists else None
+        return tuple(allowlists[0]), True
+    return (("none",) if has_none and not allowlists else None), False
 
 
 def _nearest_declared_reasoning_effort(
@@ -12996,13 +12991,14 @@ def _resolve_reasoning_effort(
     fallback: ReasoningEffortFallback,
     *,
     template_variables: tuple[str, ...] | None,
-    declared: tuple[str, ...] | None,
+    allowlist: tuple[str, ...] | None,
 ) -> ReasoningEffortResolution:
     """Decide what one model's chat template receives for ``--reasoning-effort``.
 
     A template that reads neither ``reasoning_effort`` nor ``reasoning_strength``
     gets nothing. One that reads either gets the value under the names it reads;
-    when it also enforces an allowlist that lacks the value, the fallback maps
+    when it also enforces an ``allowlist`` (only an allowlist the template
+    raises on; a bare ``== "none"`` branch is not one) that lacks the value, the fallback maps
     it to a declared value or, for ``skip`` (or no usable value), passes nothing.
     When the template's variables cannot be read at all, the value is passed
     under both names, as upstream mlx-vlm does.
@@ -13028,9 +13024,7 @@ def _resolve_reasoning_effort(
     )
     if not names:
         return resolution("not_read")
-    # ("none",) alone marks a branch for switching reasoning off, not an allowlist.
-    allowlist = declared if declared and set(declared) != {"none"} else None
-    if allowlist is None:
+    if not allowlist:
         return resolution("unvalidated", requested, names)
     if requested in allowlist:
         return resolution("applied", requested, names)
@@ -13038,6 +13032,18 @@ def _resolve_reasoning_effort(
     if mapped is None:
         return resolution("not_declared")
     return resolution("mapped", mapped, names)
+
+
+def _declared_reasoning_efforts_text(diagnostics: PromptDiagnostics) -> str | None:
+    """Declared efforts, saying whether the template enforces them or only branches on none."""
+    if not diagnostics.declared_reasoning_efforts:
+        return None
+    kind = (
+        "enforced allowlist"
+        if diagnostics.declared_reasoning_efforts_enforced
+        else "off-switch branch, not enforced"
+    )
+    return f"{', '.join(diagnostics.declared_reasoning_efforts)} ({kind})"
 
 
 def _reasoning_effort_log_text(
@@ -13523,41 +13529,45 @@ def _unread_chat_template_kwargs(
     return tuple(sorted(key for key in passed if key not in read))
 
 
-def _chat_template_variables(processor: object) -> tuple[str, ...] | None:
-    """Variables the processor's chat template reads, from its jinja2 syntax tree.
+class _ActiveChatTemplate(NamedTuple):
+    """Facts from the one chat template a render uses, parsed once."""
 
-    Uses the template the processor renders with (processor, else tokenizer);
-    named-template lists contribute every template. Parsed with the same
-    extensions transformers compiles templates with. None when there is no
-    template or it does not parse (analysis unavailable); an empty tuple when
-    it parsed and reads nothing.
+    # Variables it reads; None when there is no template or it does not parse
+    # (analysis unavailable), () when it parsed and reads nothing.
+    variables: tuple[str, ...] | None
+    # Upstream's reading of its declared efforts (see _reasoning_effort_declaration).
+    declared_reasoning_efforts: tuple[str, ...] | None
+    # True only when the declaration is an allowlist the template raises on.
+    reasoning_effort_allowlist_enforced: bool
+
+
+def _active_chat_template(processor: object) -> _ActiveChatTemplate:
+    """Parse the template the processor renders with by default, once.
+
+    That is the processor's template, else the tokenizer's; from a named set,
+    the ``default`` one, which transformers selects when no tools are passed.
+    Variables and declared efforts both come from this template, so an option
+    read only by another named template (``tool_use``) counts as unread.
+    Parsed with the same extensions transformers compiles templates with.
     """
-    template: object = getattr(processor, "chat_template", None) or getattr(
-        getattr(processor, "tokenizer", None), "chat_template", None
-    )
-    if isinstance(template, dict):
-        texts = [value for value in template.values() if isinstance(value, str)]
-    elif isinstance(template, list):
-        texts = [
-            item["template"]
-            for item in template
-            if isinstance(item, dict) and isinstance(item.get("template"), str)
-        ]
-    else:
-        texts = [template] if isinstance(template, str) else []
-    if not texts:
-        return None
+    unavailable = _ActiveChatTemplate(None, None, reasoning_effort_allowlist_enforced=False)
+    text = _default_chat_template_text(processor)
+    if text is None:
+        return unavailable
     # Parsed only, never rendered, so autoescaping is moot; on to satisfy S701.
     environment = JinjaEnvironment(
         autoescape=True, extensions=[_GenerationBlockParser, jinja_loopcontrols]
     )
-    variables: set[str] = set()
-    for text in texts:
-        try:
-            variables |= jinja_meta.find_undeclared_variables(environment.parse(text))
-        except JinjaTemplateSyntaxError:
-            return None
-    return tuple(sorted(variables))
+    try:
+        tree = environment.parse(text)
+    except JinjaTemplateSyntaxError:
+        return unavailable
+    declared, enforced = _reasoning_effort_declaration(tree)
+    return _ActiveChatTemplate(
+        variables=tuple(sorted(jinja_meta.find_undeclared_variables(tree))),
+        declared_reasoning_efforts=declared,
+        reasoning_effort_allowlist_enforced=enforced,
+    )
 
 
 def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is an explicit keyword  # skylos: ignore[SKY-C303]
@@ -13618,6 +13628,7 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
             template.kwargs, template_variables
         ),
         declared_reasoning_efforts=template.declared_reasoning_efforts,
+        declared_reasoning_efforts_enforced=template.reasoning_effort_allowlist_enforced,
         reasoning_effort=template.reasoning_effort,
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
@@ -13719,6 +13730,9 @@ def _checkpoint_facts_to_json(diagnostics: PromptDiagnostics) -> dict[str, JsonL
         facts["chat_template_variables"] = list(diagnostics.chat_template_variables)
     if diagnostics.declared_reasoning_efforts is not None:
         facts["declared_reasoning_efforts"] = list(diagnostics.declared_reasoning_efforts)
+        facts["declared_reasoning_efforts_enforced"] = (
+            diagnostics.declared_reasoning_efforts_enforced
+        )
     if (resolution := diagnostics.reasoning_effort) is not None:
         facts["reasoning_effort"] = {
             "requested": resolution.requested,
@@ -15004,6 +15018,7 @@ class _ChatTemplateFacts(NamedTuple):
     kwargs: ChatTemplateKwargs
     variables: tuple[str, ...] | None
     declared_reasoning_efforts: tuple[str, ...] | None
+    reasoning_effort_allowlist_enforced: bool
     reasoning_effort: ReasoningEffortResolution | None
 
 
@@ -15017,15 +15032,16 @@ class _PreparedPrompt(NamedTuple):
 
 def _chat_template_facts(params: ProcessImageParams, processor: object) -> _ChatTemplateFacts:
     """Resolve one model's chat-template kwargs once, for the render and its record."""
-    variables = _chat_template_variables(processor)
-    declared = _declared_reasoning_efforts(processor)
+    template = _active_chat_template(processor)
+    variables = template.variables
+    declared = template.declared_reasoning_efforts
     resolution: ReasoningEffortResolution | None = None
     if params.reasoning_effort is not None:
         resolution = _resolve_reasoning_effort(
             params.reasoning_effort,
             params.reasoning_effort_fallback,
             template_variables=variables,
-            declared=declared,
+            allowlist=declared if template.reasoning_effort_allowlist_enforced else None,
         )
         logger.info(
             "Reasoning effort for %s: %s",
@@ -15036,6 +15052,7 @@ def _chat_template_facts(params: ProcessImageParams, processor: object) -> _Chat
         kwargs=_build_chat_template_kwargs(params, resolution),
         variables=variables,
         declared_reasoning_efforts=declared,
+        reasoning_effort_allowlist_enforced=template.reasoning_effort_allowlist_enforced,
         reasoning_effort=resolution,
     )
 
