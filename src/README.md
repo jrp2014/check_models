@@ -554,7 +554,8 @@ tools. (The upstream contract this project validates against is
 | Still-image input (`load_image`), one image per run | **Exercised** | Always exactly one image; the chat template is applied with `num_images=1`. |
 | Chat templates (`apply_chat_template`), `--processor-kwargs` passthrough | **Exercised** | Template kwargs are recorded in prompt diagnostics. |
 | Text generation (`generate`), sampling and penalty controls, `--seed`, `--logit-bias` | **Exercised** | Everything sent is listed in `_SENT_GENERATE_KEYWORDS` and drift-checked against the installed `GenerateKwargs`. |
-| Thinking controls (`--enable-thinking`, `--thinking-budget`, start/end tokens, `--thinking-mode`, `--reasoning-effort`, automatic budget) | **Exercised** | See the `--enable-thinking`, `--thinking-budget`, and `--auto-thinking-budget` entries in the Command Line Reference. |
+| Thinking controls (`--enable-thinking`, `--thinking-budget`, start/end tokens, `--thinking-mode`, automatic budget) | **Exercised** | See the `--enable-thinking`, `--thinking-budget`, and `--auto-thinking-budget` entries in the Command Line Reference. |
+| Reasoning effort (`--reasoning-effort`, the server's `reasoning_effort`, declared efforts in model metadata) | **Exercised** | Passed per model only to templates that read it; each template's declared efforts are recorded for every model. See [Reasoning effort](#reasoning-effort). |
 | KV-cache controls (`--max-kv-size`, uniform and per-tensor `--kv-*-bits`/`--kv-*-scheme`, `--quantized-kv-start`) | **Exercised** | Per-tensor fields are sent only when set, so PyPI releases predating them are unaffected. |
 | Timing, throughput, MLX peak/active/cache memory, allocator evidence, system-pressure telemetry | **Exercised** | Harness-side measurement around the direct call, not an upstream surface. |
 | Multi-image, audio, and video inputs | Deliberately unexercised | Out of scope for a single-image description benchmark; use `python -m mlx_vlm.generate` (which accepts multi-image, audio, and video inputs) natively. |
@@ -1356,8 +1357,9 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--thinking-budget` | int | (none) | Maximum number of thinking tokens before forcing the end token. |
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
-| `--reasoning-effort` | str | (none) | Reasoning effort (e.g. `low`, `medium`, `high`; lowercased) passed to chat templates as `reasoning_effort` and its `reasoning_strength` alias, as mlx-vlm's generate CLI does. Omitted: each template's own default. Turns off the automatic thinking budget. |
-| `--auto-thinking-budget` | flag | `True` | When no explicit thinking flags, `--thinking-mode` or `--reasoning-effort` are given, cap thinking for models whose chat template leaves a thinking block open (final start marker unmatched — closed blocks and literal mentions are ignored): budget = max-tokens − 200 (skipped when that leaves under 128). Other models are unaffected and the chat template itself is never altered. The effective per-model budget is recorded in prompt diagnostics and native repro commands. Disable with `--no-auto-thinking-budget`. |
+| `--reasoning-effort` | str | (none) | Reasoning effort (lowercased; for example `low`, `medium`, `high`) passed to chat templates that read `reasoning_effort` or `reasoning_strength`, as mlx-vlm's own `--reasoning-effort` does. Templates that read neither do not receive it. Omitted: each template's own default; an empty value is refused. See [Reasoning effort](#reasoning-effort). |
+| `--reasoning-effort-fallback` | str | `higher` | What to pass when a template declares an allowlist of efforts that lacks the requested one: `higher`, `lower`, or `skip`. Requires `--reasoning-effort`. See [Reasoning effort](#reasoning-effort). |
+| `--auto-thinking-budget` | flag | `True` | When no explicit thinking flags, no `--thinking-mode` and no reasoning effort reaching the model's template are given, cap thinking for models whose chat template leaves a thinking block open (final start marker unmatched — closed blocks and literal mentions are ignored): budget = max-tokens − 200 (skipped when that leaves under 128). Other models are unaffected and the chat template itself is never altered. The effective per-model budget is recorded in prompt diagnostics and native repro commands. Disable with `--no-auto-thinking-budget`. |
 | `--system-telemetry` | flag | snapshot | macOS thermal/memory-pressure telemetry via read-only `pmset -g` / `sysctl -n` probes (sudo-free, no system settings changed). Default: one snapshot probe pair per model taken outside timed inference. Pass `--system-telemetry` for opt-in continuous background sampling (subprocesses overlap timed inference), or `--no-system-telemetry` to disable entirely. Per-probe sample counts are recorded so an unavailable probe is reported as unavailable, never as clean. Each probe also reads the power source and power mode (`pmset -g batt` / `pmset -g`), recorded as facts and noted in the run comparison without withholding it. Independently of telemetry, a model whose wall clock outran the process clock by more than 5 s (the Mac slept or was suspended mid-model; `perf_counter` stops during sleep) gets a `wall_clock_gap_s` fact, a warning, and is excluded from throughput comparison. |
 | `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without descriptive hints, keeping the camera's capture date/time and GPS; `assisted` also supplies descriptive metadata for visual verification. The retired `stress`/`quality` inputs are rejected. |
 | `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (1000; `triage` 200); an explicit value always wins over the lane default. |
@@ -1392,6 +1394,67 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--isolate` | flag | `False` | Run each model in a fresh child interpreter. A native crash (segfault, abort, interpreter-finalization fault) in one model is then recorded as that model's phase-tagged failure — with the signal name and the phase the child reached — instead of ending the sweep. The parent bounds each child by the model timeout plus 120 s start-up/cleanup grace and records an expiry as a phase-tagged timeout, and `--rerun-triage` reruns go through the same boundary. Costs a few seconds of import time per model and frees GPU memory between models; results round-trip through JSON so outputs and reports are identical to in-process runs. Each child starts with cold per-process caches, so treat throughput from isolated and in-process sweeps as separate populations — the JSONL metadata records `execution_mode`, and `--compare-with` says so when the two differ. Like any sweep, keep the machine otherwise idle: concurrent CPU-heavy work (a test suite, type checkers) measurably slows prefill. |
 | `--rerun-triage` | flag | `False` | Add secondary attempts for crashed models and completed models with recorded mechanical observations. Overrides prompt (brief caption), assessment (general), token cap (100), temperature (0), timeout (60 s), and verbose output (off); other settings, including `--isolate`, are retained. First-pass results are never overwritten. See [triage versus reruns](#triage-lane-versus-triage-reruns). |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
+
+### Reasoning effort
+
+Some chat templates take a reasoning effort, read from `reasoning_effort` or
+`reasoning_strength` (Muse Glimmer's name for it). `--reasoning-effort LEVEL`
+passes one to them; without it, every template keeps its own default, as
+before. The value is lowercased and an empty one is refused. The levels that
+mapping understands, lowest to highest, are `none`, `minimal`, `low`,
+`medium`, `high`, `xhigh` and `max`; other values (`off`, say) are passed
+where a template accepts them but never mapped. `--enable-thinking` and
+`--thinking-mode` are unaffected, and `none` does not turn thinking off by
+itself. Like `--thinking-mode`, an effort turns off the automatic thinking
+budget, but only for models whose template received one: a model given
+nothing runs exactly as it would without the option.
+
+Each model is handled from its own chat template, which is parsed but never
+rendered for this:
+
+| Template | What it receives | Recorded status |
+| -------- | ---------------- | --------------- |
+| Reads neither variable | Nothing (an INFO log line names the model) | `not_read` |
+| Reads one, and enforces an allowlist that includes the level | The level, under the variable(s) it reads | `applied` |
+| Reads one, and enforces an allowlist without the level | The fallback's choice, or nothing | `mapped` or `not_declared` |
+| Reads one, and declares no allowlist | The level, unchecked | `unvalidated` |
+| Has no readable template | The level under both names, as mlx-vlm passes it | `unverified` |
+
+A declared allowlist is one the template enforces with `raise_exception`
+(`{% if reasoning_effort not in [...] %}{{ raise_exception(...) }}`),
+including through `default`/`lower` filters or a variable assigned from the
+effort. A template that only branches on `== "none"` declares just `none`:
+that names the value that switches reasoning off, so other levels pass
+unchecked. These are the rules mlx-vlm's server uses for its model metadata
+(`mlx_vlm/server/model_discovery.py`), reimplemented in the harness so that
+nothing depends on server internals.
+
+When the allowlist lacks the requested level, `--reasoning-effort-fallback`
+decides:
+
+- `higher` (default): the nearest declared level above the request; if none
+  is above, the nearest declared level below it. This is the only case in
+  which `higher` gives a lower level.
+- `lower`: the nearest declared level below; if none, the nearest above.
+- `skip`: nothing is passed.
+
+Declared values outside the level list are recorded but never chosen. For
+example, a template declaring `none, high` receives `high` for a request of
+`low` or `medium`, `none` for `none`, and `high` for `xhigh` (the nearest
+lower). One declaring `low, medium, xhigh` receives `xhigh` for `high` or
+`max`, and `low` for `none` or `minimal`.
+
+Every model's declared efforts are recorded in its prompt diagnostics
+(`declared_reasoning_efforts` in `results.jsonl`, and a row in
+`diagnostics.md`) whether or not `--reasoning-effort` was given. With it,
+each record also carries `reasoning_effort` (requested, fallback, status,
+the value passed and the variable names it went under). The run summary
+counts the outcomes, the run header records the request as
+`reasoning_effort_requested` and `reasoning_effort_fallback` (so a run with
+a different request, or none, is reported as a settings change), and each
+model's native reproduction command carries `--reasoning-effort` with the
+value its template received, never the requested one. That flag needs
+mlx-vlm 0.7.12 or later.
 
 ### Selection Logic
 

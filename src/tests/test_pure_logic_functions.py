@@ -14,13 +14,13 @@ import json
 import logging
 import os
 import subprocess
-from dataclasses import dataclass, fields
+import types
+from dataclasses import dataclass, fields, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Never, cast
 from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:  # pragma: no cover
-    import types
     from collections.abc import Mapping, Sequence
 
 import mlx.core as mx
@@ -1719,3 +1719,258 @@ class TestSnapshotNotes:
 
         assert assessment.observations == ()
         assert assessment.usability == "usable"
+
+
+# Chat templates in the shapes the declared-effort reader must recognise.
+_QWEN_STYLE_EFFORT_TEMPLATE = (
+    "{%- set effort = reasoning_effort | default('medium') %}"
+    "{%- if effort not in ['low', 'medium', 'xhigh'] %}"
+    "{{ raise_exception('bad effort') }}{%- endif %}"
+    "{{ messages[0]['content'] }}"
+)
+_MISTRAL_STYLE_EFFORT_TEMPLATE = (
+    "{%- if reasoning_effort is defined and reasoning_effort not in ['none', 'high'] %}"
+    "{{ raise_exception('bad') }}{%- endif %}"
+    "{%- if reasoning_effort not in ['none', 'high'] %}"
+    "{{ raise_exception('bad') }}{%- endif %}{{ messages }}"
+)
+_NONE_BRANCH_EFFORT_TEMPLATE = (
+    "{%- if reasoning_effort == 'none' %}no thinking{%- else %}think{%- endif %}"
+)
+_UNDECLARED_STRENGTH_TEMPLATE = (
+    "Reasoning strength: {{ reasoning_strength | default('high') }}{{ messages }}"
+)
+_FORMATTING_ONLY_EFFORT_TEMPLATE = (
+    "{%- if reasoning_effort not in ['low', 'high'] %}medium{%- endif %}{{ messages }}"
+)
+_CONFLICTING_EFFORT_TEMPLATE = (
+    "{%- if reasoning_effort not in ['low'] %}{{ raise_exception('a') }}{%- endif %}"
+    "{%- if reasoning_effort not in ['high'] %}{{ raise_exception('b') }}{%- endif %}"
+)
+
+
+class TestReasoningEffort:
+    """--reasoning-effort resolution and the chat template's declared efforts."""
+
+    @pytest.mark.parametrize(
+        ("template", "expected"),
+        [
+            (_QWEN_STYLE_EFFORT_TEMPLATE, ("low", "medium", "xhigh")),
+            (_MISTRAL_STYLE_EFFORT_TEMPLATE, ("none", "high")),
+            (_NONE_BRANCH_EFFORT_TEMPLATE, ("none",)),
+            (_UNDECLARED_STRENGTH_TEMPLATE, None),
+            (_FORMATTING_ONLY_EFFORT_TEMPLATE, None),
+            (_CONFLICTING_EFFORT_TEMPLATE, None),
+            ("{% if %}", None),
+            ("{{ messages }}", None),
+        ],
+    )
+    def test_declared_reasoning_efforts_reads_template_declarations(
+        self, mod: types.ModuleType, template: str, expected: tuple[str, ...] | None
+    ) -> None:
+        """Only enforced allowlists (or a none branch) are declarations."""
+        processor = types.SimpleNamespace(chat_template=template)
+
+        assert mod._declared_reasoning_efforts(processor) == expected
+
+    def test_declared_reasoning_efforts_uses_default_named_template(
+        self, mod: types.ModuleType
+    ) -> None:
+        """Named-template lists contribute their default; a missing template reads nothing."""
+        processor = types.SimpleNamespace(
+            chat_template=[
+                {"name": "tool_use", "template": _CONFLICTING_EFFORT_TEMPLATE},
+                {"name": "default", "template": _MISTRAL_STYLE_EFFORT_TEMPLATE},
+            ]
+        )
+        tokenizer_only = types.SimpleNamespace(
+            chat_template=None,
+            tokenizer=types.SimpleNamespace(chat_template=_QWEN_STYLE_EFFORT_TEMPLATE),
+        )
+
+        assert mod._declared_reasoning_efforts(processor) == ("none", "high")
+        assert mod._declared_reasoning_efforts(tokenizer_only) == ("low", "medium", "xhigh")
+        assert mod._declared_reasoning_efforts(types.SimpleNamespace()) is None
+
+    @pytest.mark.parametrize(
+        "template",
+        [
+            _QWEN_STYLE_EFFORT_TEMPLATE,
+            _MISTRAL_STYLE_EFFORT_TEMPLATE,
+            _NONE_BRANCH_EFFORT_TEMPLATE,
+            _UNDECLARED_STRENGTH_TEMPLATE,
+            _FORMATTING_ONLY_EFFORT_TEMPLATE,
+            _CONFLICTING_EFFORT_TEMPLATE,
+        ],
+    )
+    def test_declared_reasoning_efforts_matches_upstream_reading(
+        self, mod: types.ModuleType, template: str
+    ) -> None:
+        """The harness's reader agrees with mlx-vlm's server metadata where it exists."""
+        discovery = pytest.importorskip("mlx_vlm.server.model_discovery")
+        upstream = getattr(discovery, "_declared_reasoning_efforts", None)
+        if upstream is None:
+            pytest.skip("installed mlx-vlm predates declared reasoning efforts")
+        expected = upstream(template)
+
+        ours = mod._declared_reasoning_efforts(types.SimpleNamespace(chat_template=template))
+
+        assert ours == (tuple(expected) if expected else None)
+
+    @pytest.mark.parametrize(
+        ("requested", "fallback", "declared", "expected"),
+        [
+            # The documented "higher" rule: nearest declared level above, else below.
+            ("low", "higher", ("none", "high"), "high"),
+            ("high", "higher", ("low", "medium", "xhigh"), "xhigh"),
+            ("max", "higher", ("low", "medium"), "medium"),
+            ("none", "higher", ("low", "medium", "xhigh"), "low"),
+            # "lower" mirrors it.
+            ("medium", "lower", ("none", "high"), "none"),
+            ("minimal", "lower", ("low", "high"), "low"),
+            # "skip", and declared values outside the ladder, never map.
+            ("medium", "skip", ("low", "high"), None),
+            ("medium", "higher", ("fast", "slow"), None),
+        ],
+    )
+    def test_nearest_declared_reasoning_effort(
+        self,
+        mod: types.ModuleType,
+        requested: str,
+        fallback: str,
+        declared: tuple[str, ...],
+        expected: str | None,
+    ) -> None:
+        """Mapping follows REASONING_EFFORT_LEVELS order and the chosen fallback."""
+        assert mod._nearest_declared_reasoning_effort(requested, declared, fallback) == expected
+
+    @pytest.mark.parametrize(
+        ("variables", "declared", "requested", "fallback", "status", "applied", "names"),
+        [
+            (("messages",), None, "high", "higher", "not_read", None, ()),
+            (
+                None,
+                None,
+                "high",
+                "higher",
+                "unverified",
+                "high",
+                ("reasoning_effort", "reasoning_strength"),
+            ),
+            (
+                ("messages", "reasoning_strength"),
+                None,
+                "low",
+                "higher",
+                "unvalidated",
+                "low",
+                ("reasoning_strength",),
+            ),
+            (
+                ("reasoning_effort",),
+                ("none",),
+                "medium",
+                "higher",
+                "unvalidated",
+                "medium",
+                ("reasoning_effort",),
+            ),
+            (
+                ("reasoning_effort",),
+                ("low", "medium", "xhigh"),
+                "medium",
+                "higher",
+                "applied",
+                "medium",
+                ("reasoning_effort",),
+            ),
+            (
+                ("reasoning_effort",),
+                ("none", "high"),
+                "low",
+                "higher",
+                "mapped",
+                "high",
+                ("reasoning_effort",),
+            ),
+            (("reasoning_effort",), ("none", "high"), "low", "skip", "not_declared", None, ()),
+        ],
+    )
+    def test_resolve_reasoning_effort(
+        self,
+        mod: types.ModuleType,
+        variables: tuple[str, ...] | None,
+        declared: tuple[str, ...] | None,
+        requested: str,
+        fallback: str,
+        status: str,
+        applied: str | None,
+        names: tuple[str, ...],
+    ) -> None:
+        """Each documented status, the passed value and the variables it goes under."""
+        resolution = mod._resolve_reasoning_effort(
+            requested, fallback, template_variables=variables, declared=declared
+        )
+
+        assert (resolution.status, resolution.applied, resolution.template_variables) == (
+            status,
+            applied,
+            names,
+        )
+        assert (resolution.requested, resolution.fallback) == (requested, fallback)
+
+    def test_template_facts_pass_effort_only_under_read_variables(
+        self, mod: types.ModuleType
+    ) -> None:
+        """The render's kwargs carry the resolved value; thinking flags are untouched."""
+        args = mod._build_cli_parser().parse_args(
+            ["--folder", "images", "--reasoning-effort", "LOW"]
+        )
+        params = mod._process_image_params_from_args(
+            args, model_identifier="org/model", image_path=Path("image.jpg"), prompt="Describe."
+        )
+        assert (params.reasoning_effort, params.reasoning_effort_fallback) == ("low", "higher")
+        mistral = types.SimpleNamespace(chat_template=_MISTRAL_STYLE_EFFORT_TEMPLATE)
+        plain = types.SimpleNamespace(chat_template="{{ messages }}")
+
+        mapped = mod._chat_template_facts(params, mistral)
+        skipped = mod._chat_template_facts(params, plain)
+        unrequested = mod._chat_template_facts(replace(params, reasoning_effort=None), mistral)
+
+        assert mapped.kwargs == {"reasoning_effort": "high"}
+        assert mapped.declared_reasoning_efforts == ("none", "high")
+        assert mapped.reasoning_effort is not None
+        assert mapped.reasoning_effort.status == "mapped"
+        assert skipped.kwargs == {}
+        assert skipped.reasoning_effort is not None
+        assert skipped.reasoning_effort.status == "not_read"
+        assert unrequested.kwargs == {}
+        assert unrequested.reasoning_effort is None
+        assert unrequested.declared_reasoning_efforts == ("none", "high")
+
+    def test_prompt_diagnostics_json_records_efforts(self, mod: types.ModuleType) -> None:
+        """Declared efforts and the resolution reach the retained JSON; absent stays absent."""
+        diagnostics = mod.PromptDiagnostics(
+            declared_reasoning_efforts=("none", "high"),
+            reasoning_effort=mod.ReasoningEffortResolution(
+                requested="low",
+                fallback="higher",
+                status="mapped",
+                applied="high",
+                template_variables=("reasoning_effort",),
+            ),
+        )
+
+        payload = mod._prompt_diagnostics_to_json(diagnostics)
+
+        assert payload["declared_reasoning_efforts"] == ["none", "high"]
+        assert payload["reasoning_effort"] == {
+            "requested": "low",
+            "fallback": "higher",
+            "status": "mapped",
+            "applied": "high",
+            "template_variables": ["reasoning_effort"],
+        }
+        empty = mod._prompt_diagnostics_to_json(mod.PromptDiagnostics())
+        assert "declared_reasoning_efforts" not in empty
+        assert "reasoning_effort" not in empty

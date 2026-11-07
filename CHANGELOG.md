@@ -6,6 +6,22 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- CLI (0.17.107): `--reasoning-effort` now reaches only chat templates
+  that read `reasoning_effort` or `reasoning_strength`, under the names each
+  reads; a template reading neither gets nothing, with an INFO line per
+  model, and keeps the automatic thinking budget (0.17.106 sent both names to
+  every model and turned the budget off everywhere). Where a template
+  enforces an allowlist without the value, `--reasoning-effort-fallback`
+  (default `higher`; or `lower`, `skip`) picks the nearest declared level,
+  falling back to the other direction when none lies that way. Each model's
+  declared efforts are recorded for every run (`declared_reasoning_efforts`
+  in prompt diagnostics and a `diagnostics.md` row), read with the rules of
+  mlx-vlm's server model metadata reimplemented in the harness rather than
+  imported from server internals. With the option, each record carries the
+  outcome, the run summary counts outcomes, the run header records the
+  request (a one-sided request is a settings change in `--compare-with`),
+  and each native repro command carries the value that model's template
+  received rather than the requested one.
 - CLI (0.17.106): `--reasoning-effort LEVEL` passes a reasoning effort to
   chat templates, matching the flag mlx-vlm's generate CLI gained in 0.7.12
   (6dc1562). The value is lowercased and sent as both `reasoning_effort` and

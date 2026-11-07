@@ -1510,6 +1510,14 @@ class TestIsolatedExecution:
             special_token_ids=(1, 2),
             snapshot_notes=("note",),
             generate_kwargs={"max_tokens": 5},
+            declared_reasoning_efforts=("none", "high"),
+            reasoning_effort=check_models.ReasoningEffortResolution(
+                requested="low",
+                fallback="higher",
+                status="mapped",
+                applied="high",
+                template_variables=("reasoning_effort",),
+            ),
         )
         result = check_models.PerformanceResult(
             model_name="org/m",

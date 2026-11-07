@@ -902,23 +902,33 @@ class TestAutoThinkingBudget:
 
         assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
 
-    def test_explicit_reasoning_effort_disables_auto(self) -> None:
-        """--reasoning-effort is an explicit template control, like --thinking-mode."""
+    def test_reasoning_effort_disables_auto_only_where_received(self) -> None:
+        """An effort the template received is explicit control; one it was not given is not."""
         params = dataclasses.replace(_thinking_params(max_tokens=1000), reasoning_effort="low")
 
-        assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
+        assert (
+            check_models._auto_thinking_budget_kwargs(
+                params, "<think>", reasoning_effort_passed=True
+            )
+            == {}
+        )
+        assert check_models._auto_thinking_budget_kwargs(params, "<think>")
 
-    def test_reasoning_effort_reaches_template_under_both_names(self) -> None:
-        """Mirrors mlx-vlm 6dc1562: lowercased, sent as reasoning_effort and reasoning_strength."""
+    def test_reasoning_effort_reaches_template_under_the_names_it_reads(self) -> None:
+        """Lowercased; sent under the names the template reads, both when unreadable."""
         args = check_models._build_cli_parser().parse_args(["--reasoning-effort", "LOW"])
         params = dataclasses.replace(_thinking_params(), reasoning_effort=args.reasoning_effort)
 
-        kwargs = check_models._build_chat_template_kwargs(params)
+        def kwargs(variables: tuple[str, ...] | None) -> object:
+            resolution = check_models._resolve_reasoning_effort(
+                "low", "higher", template_variables=variables, declared=None
+            )
+            return check_models._build_chat_template_kwargs(params, resolution)
 
-        assert kwargs == {"reasoning_effort": "low", "reasoning_strength": "low"}
-        assert "reasoning_effort" not in check_models._build_chat_template_kwargs(
-            _thinking_params()
-        )
+        assert kwargs(("reasoning_strength",)) == {"reasoning_strength": "low"}
+        assert kwargs(None) == {"reasoning_effort": "low", "reasoning_strength": "low"}
+        assert kwargs(("messages",)) == {}
+        assert check_models._build_chat_template_kwargs(params) == {}
 
     def test_reasoning_effort_none_is_a_value_not_an_omission(self) -> None:
         """A value of none reaches the template and repro; only an omitted flag sends nothing."""
@@ -929,7 +939,13 @@ class TestAutoThinkingBudget:
         assert disabled.reasoning_effort == "none"
 
         params = dataclasses.replace(_thinking_params(), reasoning_effort="none")
-        assert check_models._build_chat_template_kwargs(params) == {
+        resolution = check_models._resolve_reasoning_effort(
+            "none",
+            "higher",
+            template_variables=("reasoning_effort", "reasoning_strength"),
+            declared=None,
+        )
+        assert check_models._build_chat_template_kwargs(params, resolution) == {
             "reasoning_effort": "none",
             "reasoning_strength": "none",
         }
@@ -999,3 +1015,33 @@ def test_cli_eos_tokens_keep_non_ascii_and_decode_escapes() -> None:
     """unicode_escape on a str turned non-ASCII tokens into mojibake."""
     token = "<\uff5cend\u2581of\u2581sentence\uff5c>"  # DeepSeek-style end token
     assert check_models._decode_cli_eos_tokens([token, "a\\nb"]) == (token, "a\nb")
+
+
+def test_cli_reasoning_effort_choices_and_fallback() -> None:
+    """--reasoning-effort folds case, accepts any non-empty value; the fallback is checked."""
+    parser = check_models._build_cli_parser()
+
+    args = parser.parse_args(["--folder", "images", "--reasoning-effort", "XHigh"])
+    validate_cli_arguments(args)
+
+    assert (args.reasoning_effort, args.reasoning_effort_fallback) == ("xhigh", "higher")
+    # Off-ladder values (upstream's server also treats "off" as an effort) pass;
+    # mapping simply never chooses or crosses them.
+    off = parser.parse_args(["--folder", "images", "--reasoning-effort", "Off"])
+    validate_cli_arguments(off)
+    assert off.reasoning_effort == "off"
+    with pytest.raises(SystemExit):
+        parser.parse_args(
+            ["--folder", "images", "--reasoning-effort", "low", "--reasoning-effort-fallback", "up"]
+        )
+
+
+def test_cli_reasoning_effort_fallback_requires_effort() -> None:
+    """A non-default fallback without --reasoning-effort would silently do nothing."""
+    parser = check_models._build_cli_parser()
+
+    args = parser.parse_args(["--folder", "images", "--reasoning-effort-fallback", "skip"])
+
+    with pytest.raises(ValueError, match="requires --reasoning-effort"):
+        validate_cli_arguments(args)
+    validate_cli_arguments(parser.parse_args(["--folder", "images"]))

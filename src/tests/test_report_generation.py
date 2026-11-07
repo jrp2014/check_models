@@ -773,7 +773,9 @@ def _native_repro_args_with_every_setting() -> Namespace:
         enable_thinking=True,
         thinking_budget=24,
         thinking_mode="enabled",
-        reasoning_effort="low",
+        # The value one model's template received, as _effective_repro_args
+        # overlays it; a run-wide requested effort is never emitted.
+        reasoning_effort_applied="low",
         thinking_start_token=THINKING_START_TOKEN,
         thinking_end_token=CUSTOM_THINKING_END_TOKEN,
     )
@@ -817,7 +819,7 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
         "prefill_step_size": run_args.prefill_step_size,
         "thinking_budget": run_args.thinking_budget,
         "thinking_mode": run_args.thinking_mode,
-        "reasoning_effort": run_args.reasoning_effort,
+        "reasoning_effort": run_args.reasoning_effort_applied,
         "thinking_start_token": run_args.thinking_start_token,
         "thinking_end_token": run_args.thinking_end_token,
         "processor_kwargs": run_args.processor_kwargs,
@@ -10466,3 +10468,148 @@ def test_recorded_accuracy_note_is_published_in_the_run_summary_without_a_sweep(
     assert "1 of 2 outputs reviewed by a person" in flat
     assert "| org/reviewed |" in summary
     assert "Accurate." in summary
+
+
+def _reasoning_effort_result(
+    model: str, status: str, applied: str | None
+) -> check_models.PerformanceResult:
+    """A completed result whose diagnostics record one reasoning-effort resolution."""
+    return check_models.PerformanceResult(
+        model_name=model,
+        generation=None,
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={"max_tokens": 100, "temperature": 0.0},
+            reasoning_effort=check_models.ReasoningEffortResolution(
+                requested="low",
+                fallback="higher",
+                status=cast("Any", status),
+                applied=applied,
+                template_variables=("reasoning_effort",) if applied is not None else (),
+            ),
+        ),
+    )
+
+
+def test_repro_command_uses_applied_reasoning_effort_never_requested() -> None:
+    """A model's command carries what its template received, not the run's request."""
+    run_args = check_models._build_cli_parser().parse_args(
+        ["--folder", "images", "--reasoning-effort", "low"]
+    )
+
+    def command(applied: str | None) -> str:
+        args = check_models._effective_repro_args(run_args, {}, applied)
+        return check_models.build_native_mlx_vlm_repro_command_spec(
+            model_name="org/model", prompt="Describe.", image_ref="image.jpg", run_args=args
+        ).shell_command()
+
+    assert "--reasoning-effort" not in command(None)
+    assert "--reasoning-effort high" in command("high")
+
+
+def test_shared_repro_caveat_lists_reasoning_effort_models() -> None:
+    """The shared MODEL_ID command cannot carry per-model reasoning efforts."""
+    run_args = Namespace(
+        enable_thinking=False,
+        thinking_budget=None,
+        thinking_start_token=None,
+        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
+    )
+    mapped = _reasoning_effort_result("org/mapped", "mapped", "high")
+    skipped = _reasoning_effort_result("org/plain", "not_read", None)
+
+    caveat = check_models._shared_repro_thinking_caveat([mapped, skipped], run_args)
+
+    assert caveat is not None
+    assert "`org/mapped` (--reasoning-effort high)" in caveat.text
+    assert "org/plain" not in caveat.text
+
+
+def test_run_summary_reasoning_effort_note_counts_statuses() -> None:
+    """The run summary states the request and how many templates took it, by outcome."""
+    results = [
+        _reasoning_effort_result("org/a", "applied", "low"),
+        _reasoning_effort_result("org/b", "mapped", "high"),
+        _reasoning_effort_result("org/c", "not_read", None),
+        _reasoning_effort_result("org/d", "not_read", None),
+    ]
+    records = [
+        cast(
+            "check_models.JsonlResultRecord",
+            {
+                "model": result.model_name,
+                "prompt_diagnostics": check_models._prompt_diagnostics_to_json(
+                    result.prompt_diagnostics
+                ),
+            },
+        )
+        for result in results
+    ]
+
+    note = check_models._run_issue_summary_reasoning_effort_note(records)
+
+    assert note == (
+        "low requested (fallback higher): 1 passed (declared); "
+        "1 mapped to a declared value (org/b → high); "
+        "2 not passed (template reads neither variable)"
+    )
+    plain = [cast("check_models.JsonlResultRecord", {"model": "org/x", "prompt_diagnostics": {}})]
+    assert check_models._run_issue_summary_reasoning_effort_note(plain) is None
+
+
+def test_run_generation_settings_record_reasoning_effort_request() -> None:
+    """The header names the run-wide request; runs without it are unchanged."""
+    results = [
+        _reasoning_effort_result("org/a", "applied", "low"),
+        _reasoning_effort_result("org/b", "not_read", None),
+    ]
+    plain = check_models.PerformanceResult(
+        model_name="org/plain",
+        generation=None,
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={"max_tokens": 100, "temperature": 0.0}
+        ),
+    )
+
+    settings = check_models._common_generation_settings(results)
+
+    assert settings["reasoning_effort_requested"] == "low"
+    assert settings["reasoning_effort_fallback"] == "higher"
+    assert "reasoning_effort_requested" not in check_models._common_generation_settings([plain])
+
+
+def test_one_sided_reasoning_effort_request_is_a_changed_input() -> None:
+    """Comparing against a run without --reasoning-effort reports a settings change."""
+    reasons, unknown = check_models._generation_settings_compatibility(
+        {"max_tokens": "100"},
+        {"max_tokens": "100", "reasoning_effort_requested": '"low"'},
+    )
+
+    assert reasons
+    assert "reasoning_effort_requested" in reasons[0]
+    assert not unknown
+
+
+def test_checkpoint_fact_rows_state_reasoning_effort_outcome() -> None:
+    """Diagnostics name the declared efforts and what this model's template received."""
+    diagnostics = check_models.PromptDiagnostics(
+        declared_reasoning_efforts=("none", "high"),
+        reasoning_effort=check_models.ReasoningEffortResolution(
+            requested="low",
+            fallback="higher",
+            status="mapped",
+            applied="high",
+            template_variables=("reasoning_effort",),
+        ),
+    )
+
+    rows = dict(check_models._checkpoint_fact_rows(diagnostics))
+
+    assert rows["Reasoning efforts the chat template declares"] == "none, high"
+    assert rows["Reasoning effort (--reasoning-effort)"] == (
+        "low mapped to high (fallback higher; declared: none, high), passed as reasoning_effort"
+    )
+    plain = dict(check_models._checkpoint_fact_rows(check_models.PromptDiagnostics()))
+    assert plain["Reasoning efforts the chat template declares"] is None
+    assert plain["Reasoning effort (--reasoning-effort)"] is None

@@ -318,6 +318,33 @@ DEFAULT_THINKING_END_MARKER: Final[str] = THINKING_TRACE_DELIMITERS[0].end
 # the mechanism entirely when the cap leaves too little room to think at all.
 AUTO_THINKING_ANSWER_RESERVE_TOKENS: Final[int] = 200
 AUTO_THINKING_BUDGET_MIN_TOKENS: Final[int] = 128
+# --reasoning-effort values, lowest to highest. This order is what "map to a
+# higher (or lower) declared effort" means when a chat template declares an
+# allowlist without the requested value; declared values outside it are kept
+# verbatim in the record but never chosen by mapping.
+REASONING_EFFORT_LEVELS: Final[tuple[str, ...]] = (
+    "none",
+    "minimal",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+)
+# Chat-template variables that carry a reasoning effort. Upstream's server and
+# generate CLI pass the value under both names (Muse Glimmer reads the second);
+# the harness passes it only under the names a template actually reads.
+REASONING_EFFORT_TEMPLATE_VARIABLES: Final[tuple[str, ...]] = (
+    "reasoning_effort",
+    "reasoning_strength",
+)
+type ReasoningEffortFallback = Literal["higher", "lower", "skip"]
+REASONING_EFFORT_FALLBACKS: Final[tuple[ReasoningEffortFallback, ...]] = (
+    "higher",
+    "lower",
+    "skip",
+)
+DEFAULT_REASONING_EFFORT_FALLBACK: Final[ReasoningEffortFallback] = "higher"
 THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = tuple(
     (pair.start, pair.end) for pair in THINKING_TRACE_DELIMITERS
 )
@@ -1618,12 +1645,12 @@ class ChatTemplateKwargs(TypedDict, total=False):
     """Supported optional kwargs forwarded to ``mlx_vlm.apply_chat_template``."""
 
     enable_thinking: bool
+    reasoning_effort: str
+    reasoning_strength: str
     thinking_budget: int
     thinking_end_token: str
     thinking_mode: str
     thinking_start_token: str
-    reasoning_effort: str
-    reasoning_strength: str
 
 
 class LoadExtraKwargs(TypedDict, total=False):
@@ -1960,6 +1987,31 @@ EXIF_OFFSET_TAG_BY_DATE: Final[dict[str, str]] = {
 # =============================================================================
 
 
+# What happened to --reasoning-effort for one model (see _resolve_reasoning_effort):
+#   applied      passed unchanged; the template's declared allowlist includes it
+#   mapped       the allowlist lacks it; the fallback chose ``applied`` instead
+#   unvalidated  passed unchanged; the template reads it but declares no allowlist
+#   unverified   passed unchanged; the template's variables could not be read
+#   not_read     not passed; the template reads neither effort variable
+#   not_declared not passed; the allowlist lacks it and no fallback applied
+type ReasoningEffortStatus = Literal[
+    "applied", "mapped", "unvalidated", "unverified", "not_read", "not_declared"
+]
+
+
+@dataclass(frozen=True)
+class ReasoningEffortResolution:
+    """One model's handling of a requested ``--reasoning-effort``."""
+
+    requested: str
+    fallback: ReasoningEffortFallback
+    status: ReasoningEffortStatus
+    # The value the chat template received, or None when nothing was passed.
+    applied: str | None = None
+    # Template variables the value was passed under (empty when not passed).
+    template_variables: tuple[str, ...] = ()
+
+
 @dataclass(frozen=True)
 class PromptDiagnostics:
     """Bounded prompt/rendering context for maintainer repro artifacts."""
@@ -2014,6 +2066,14 @@ class PromptDiagnostics:
     # parsed and reads no variables.
     chat_template_variables: tuple[str, ...] | None = None
     unread_chat_template_kwargs: tuple[str, ...] = ()
+    # Reasoning efforts the chat template declares (upstream mlx-vlm's
+    # model_discovery reading, recorded for every model whether or not
+    # --reasoning-effort was given). None when it declares none, or the
+    # installed mlx-vlm cannot read declarations; ("none",) alone names the
+    # value that turns reasoning off without restricting the others.
+    declared_reasoning_efforts: tuple[str, ...] | None = None
+    # How --reasoning-effort was handled for this model; None when not given.
+    reasoning_effort: ReasoningEffortResolution | None = None
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
     # processor config). Evidence only: never an observation, never affects
     # usability; retained so a later failure can be traced to a snapshot that
@@ -3287,9 +3347,10 @@ class ProcessImageParams:
     enable_thinking: bool = False
     thinking_budget: int | None = None
     thinking_mode: str | None = None
-    reasoning_effort: str | None = None
     thinking_start_token: str | None = None
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
+    reasoning_effort: str | None = None
+    reasoning_effort_fallback: ReasoningEffortFallback = DEFAULT_REASONING_EFFORT_FALLBACK
     auto_thinking_budget: bool = True
     system_telemetry: SystemTelemetryMode = "snapshot"
     assessment_profile: AssessmentProfile = "general"
@@ -10636,6 +10697,20 @@ def _checkpoint_fact_rows(
             "Chat-template options passed that the template never reads",
             ", ".join(diagnostics.unread_chat_template_kwargs) or None,
         ),
+        (
+            "Reasoning efforts the chat template declares",
+            ", ".join(diagnostics.declared_reasoning_efforts or ()) or None,
+        ),
+        (
+            "Reasoning effort (--reasoning-effort)",
+            (
+                _reasoning_effort_log_text(
+                    diagnostics.reasoning_effort, diagnostics.declared_reasoning_efforts
+                )
+                if diagnostics.reasoning_effort is not None
+                else None
+            ),
+        ),
     )
 
 
@@ -12552,6 +12627,14 @@ def _validate_thinking_params(args: argparse.Namespace) -> None:
         msg = "reasoning_effort must be non-empty if specified (omit it for the template default)"
         raise ValueError(msg)
 
+    fallback = getattr(args, "reasoning_effort_fallback", DEFAULT_REASONING_EFFORT_FALLBACK)
+    if getattr(args, "reasoning_effort", None) is None and fallback not in {
+        None,
+        DEFAULT_REASONING_EFFORT_FALLBACK,
+    }:
+        msg = "--reasoning-effort-fallback requires --reasoning-effort"
+        raise ValueError(msg)
+
 
 def validate_cli_arguments(args: argparse.Namespace) -> None:
     """Validate all CLI arguments before processing begins.
@@ -12628,6 +12711,8 @@ def _prompt_opens_thinking_block(
 def _auto_thinking_budget_kwargs(
     params: ProcessImageParams,
     formatted_prompt: str,
+    *,
+    reasoning_effort_passed: bool = False,
 ) -> GenerateKwargs:
     """Bound template-opened thinking blocks when no explicit flags are set.
 
@@ -12637,14 +12722,17 @@ def _auto_thinking_budget_kwargs(
     thinking block (final marker unmatched, not merely mentioned or closed).
     Chat-template kwargs are untouched: hybrid models keep their default
     non-thinking behaviour, and any explicit thinking flag, ``--thinking-mode``
-    or ``--reasoning-effort`` hands full control back to the user.
+    or a reasoning effort this template received hands full control back to
+    the user. A model whose template was given no effort (it reads neither
+    variable, or the fallback passed nothing) keeps the automatic budget, so
+    --reasoning-effort leaves such models exactly as a run without it.
     """
     empty = cast("GenerateKwargs", {})
     if (
         not params.auto_thinking_budget
         or params.enable_thinking
         or params.thinking_mode is not None
-        or params.reasoning_effort is not None
+        or reasoning_effort_passed
     ):
         return empty
     budget = params.max_tokens - AUTO_THINKING_ANSWER_RESERVE_TOKENS
@@ -12667,12 +12755,16 @@ def _apply_auto_thinking_budget(
     params: ProcessImageParams,
     formatted_prompt: str,
     generate_kwargs: GenerateKwargs,
+    *,
+    reasoning_effort_passed: bool = False,
 ) -> bool:
     """Inject the automatic thinking budget when the template opens thinking.
 
     Returns True when a budget was applied automatically.
     """
-    auto_kwargs = _auto_thinking_budget_kwargs(params, formatted_prompt)
+    auto_kwargs = _auto_thinking_budget_kwargs(
+        params, formatted_prompt, reasoning_effort_passed=reasoning_effort_passed
+    )
     if not auto_kwargs:
         return False
     generate_kwargs.update(auto_kwargs)
@@ -12759,20 +12851,252 @@ def _is_generation_processor(
     )
 
 
-def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
+def _default_chat_template_text(processor: object) -> str | None:
+    """The template the processor renders with by default (processor, else tokenizer)."""
+    template: object = getattr(processor, "chat_template", None) or getattr(
+        getattr(processor, "tokenizer", None), "chat_template", None
+    )
+    if isinstance(template, list):
+        template = next(
+            (
+                item.get("template")
+                for item in template
+                if isinstance(item, dict) and item.get("name") == "default"
+            ),
+            None,
+        )
+    elif isinstance(template, dict):
+        template = template.get("default")
+    return template if isinstance(template, str) else None
+
+
+def _is_reasoning_effort_expression(expression: jinja_nodes.Node | None, aliases: set[str]) -> bool:
+    """Whether a template expression reads an effort variable (through default/lower filters)."""
+    while isinstance(expression, jinja_nodes.Filter) and expression.name in {
+        "default",
+        "d",
+        "lower",
+    }:
+        expression = expression.node
+    return isinstance(expression, jinja_nodes.Name) and expression.name in aliases
+
+
+def _calls_raise_exception(node: jinja_nodes.Node) -> bool:
+    """Whether a template node calls ``raise_exception`` anywhere inside it."""
+    return any(
+        isinstance(call.node, jinja_nodes.Name) and call.node.name == "raise_exception"
+        for call in node.find_all(jinja_nodes.Call)
+    )
+
+
+def _compares_effort_to_none(test: jinja_nodes.Node, aliases: set[str]) -> bool:
+    """Whether a test compares an effort variable ``== "none"``, directly or nested."""
+    return any(
+        isinstance(comparison, jinja_nodes.Compare)
+        and _is_reasoning_effort_expression(comparison.expr, aliases)
+        and len(comparison.ops) == 1
+        and comparison.ops[0].op == "eq"
+        and isinstance(comparison.ops[0].expr, jinja_nodes.Const)
+        and comparison.ops[0].expr.value == "none"
+        for comparison in (test, *test.find_all(jinja_nodes.Compare))
+    )
+
+
+def _enforced_effort_allowlist(statement: jinja_nodes.Node, aliases: set[str]) -> list[str] | None:
+    """The values of ``{% if effort not in [...] %}{{ raise_exception(...) }}``, if that."""
+    test = getattr(statement, "test", None)
+    if not (
+        isinstance(statement, jinja_nodes.If)
+        and isinstance(test, jinja_nodes.Compare)
+        and _is_reasoning_effort_expression(test.expr, aliases)
+        and len(test.ops) == 1
+        and test.ops[0].op == "notin"
+        and isinstance(test.ops[0].expr, jinja_nodes.List | jinja_nodes.Tuple)
+        # A comparison used for formatting is not a declaration of valid values.
+        and any(_calls_raise_exception(body) for body in statement.body)
+    ):
+        return None
+    items = test.ops[0].expr.items
+    values = [item.value for item in items if isinstance(item, jinja_nodes.Const)]
+    if items and len(values) == len(items) and all(isinstance(v, str) and v for v in values):
+        return list(dict.fromkeys(str(value) for value in values))
+    return None
+
+
+def _declared_reasoning_efforts(processor: object) -> tuple[str, ...] | None:
+    """Reasoning efforts the processor's default chat template declares.
+
+    Follows the rules of upstream mlx-vlm's server model metadata
+    (``mlx_vlm/server/model_discovery.py``, 09b95b17), reimplemented here so
+    the harness depends on no server internals: the template is parsed, never
+    rendered. A declaration is an allowlist the template enforces with
+    ``raise_exception``, reading ``reasoning_effort``/``reasoning_strength``
+    directly, through ``default``/``lower`` filters, or through a variable
+    assigned from them. A template that only branches on ``== "none"``
+    declares ``("none",)``. Conflicting allowlists, no declaration, or a
+    template that does not parse give None.
+    """
+    text = _default_chat_template_text(processor)
+    if text is None:
+        return None
+    # Parsed only, never rendered, so autoescaping is moot; on to satisfy S701.
+    environment = JinjaEnvironment(
+        autoescape=True, extensions=[_GenerationBlockParser, jinja_loopcontrols]
+    )
+    try:
+        tree = environment.parse(text)
+    except JinjaTemplateSyntaxError:
+        return None
+    aliases = set(REASONING_EFFORT_TEMPLATE_VARIABLES)
+    allowlists: list[list[str]] = []
+    has_none = False
+    for statement in tree.find_all((jinja_nodes.Assign, jinja_nodes.If, jinja_nodes.CondExpr)):
+        if isinstance(statement, jinja_nodes.Assign):
+            # A variable assigned from an effort (Qwen defaults it) counts as one.
+            if isinstance(statement.target, jinja_nodes.Name) and _is_reasoning_effort_expression(
+                statement.node, aliases
+            ):
+                aliases.add(statement.target.name)
+            continue
+        if not isinstance(statement, jinja_nodes.If | jinja_nodes.CondExpr):
+            continue
+        if not _calls_raise_exception(statement) and _compares_effort_to_none(
+            statement.test, aliases
+        ):
+            has_none = True
+        if (allowlist := _enforced_effort_allowlist(statement, aliases)) is not None:
+            allowlists.append(allowlist)
+    if allowlists and all(set(values) == set(allowlists[0]) for values in allowlists):
+        return tuple(allowlists[0])
+    return ("none",) if has_none and not allowlists else None
+
+
+def _nearest_declared_reasoning_effort(
+    requested: str, declared: Sequence[str], fallback: ReasoningEffortFallback
+) -> str | None:
+    """The declared effort a fallback maps an undeclared request to, if any.
+
+    ``higher`` takes the lowest declared level above the request, and the
+    highest declared level below it when none is above; ``lower`` mirrors
+    that. Only levels in ``REASONING_EFFORT_LEVELS`` take part.
+    """
+    rank = {level: index for index, level in enumerate(REASONING_EFFORT_LEVELS)}
+    if fallback == "skip" or requested not in rank:
+        return None
+    ordered = sorted({value for value in declared if value in rank}, key=rank.__getitem__)
+    above = [value for value in ordered if rank[value] > rank[requested]]
+    below = [value for value in ordered if rank[value] < rank[requested]]
+    if fallback == "higher":
+        return above[0] if above else (below[-1] if below else None)
+    return below[-1] if below else (above[0] if above else None)
+
+
+def _resolve_reasoning_effort(
+    requested: str,
+    fallback: ReasoningEffortFallback,
+    *,
+    template_variables: tuple[str, ...] | None,
+    declared: tuple[str, ...] | None,
+) -> ReasoningEffortResolution:
+    """Decide what one model's chat template receives for ``--reasoning-effort``.
+
+    A template that reads neither ``reasoning_effort`` nor ``reasoning_strength``
+    gets nothing. One that reads either gets the value under the names it reads;
+    when it also enforces an allowlist that lacks the value, the fallback maps
+    it to a declared value or, for ``skip`` (or no usable value), passes nothing.
+    When the template's variables cannot be read at all, the value is passed
+    under both names, as upstream mlx-vlm does.
+    """
+
+    def resolution(
+        status: ReasoningEffortStatus,
+        applied: str | None = None,
+        names: tuple[str, ...] = (),
+    ) -> ReasoningEffortResolution:
+        return ReasoningEffortResolution(
+            requested=requested,
+            fallback=fallback,
+            status=status,
+            applied=applied,
+            template_variables=names if applied is not None else (),
+        )
+
+    if template_variables is None:
+        return resolution("unverified", requested, REASONING_EFFORT_TEMPLATE_VARIABLES)
+    names = tuple(
+        name for name in REASONING_EFFORT_TEMPLATE_VARIABLES if name in template_variables
+    )
+    if not names:
+        return resolution("not_read")
+    # ("none",) alone marks a branch for switching reasoning off, not an allowlist.
+    allowlist = declared if declared and set(declared) != {"none"} else None
+    if allowlist is None:
+        return resolution("unvalidated", requested, names)
+    if requested in allowlist:
+        return resolution("applied", requested, names)
+    mapped = _nearest_declared_reasoning_effort(requested, allowlist, fallback)
+    if mapped is None:
+        return resolution("not_declared")
+    return resolution("mapped", mapped, names)
+
+
+def _reasoning_effort_log_text(
+    resolution: ReasoningEffortResolution, declared: tuple[str, ...] | None
+) -> str:
+    """Factual one-line account of a reasoning-effort resolution."""
+    declared_text = ", ".join(declared) if declared else "no values"
+    passed_as = " and ".join(resolution.template_variables)
+    match resolution.status:
+        case "applied":
+            return f"{resolution.requested} passed as {passed_as} (declared: {declared_text})"
+        case "mapped":
+            return (
+                f"{resolution.requested} mapped to {resolution.applied} "
+                f"(fallback {resolution.fallback}; declared: {declared_text}), "
+                f"passed as {passed_as}"
+            )
+        case "unvalidated":
+            return (
+                f"{resolution.requested} passed as {passed_as}; the template declares "
+                "no allowlist, so the value is unvalidated"
+            )
+        case "unverified":
+            return (
+                f"{resolution.requested} passed as {passed_as}; the chat template's "
+                "variables could not be read"
+            )
+        case "not_read":
+            return (
+                f"{resolution.requested} not passed: the chat template reads neither "
+                "reasoning_effort nor reasoning_strength"
+            )
+        case "not_declared":
+            return (
+                f"{resolution.requested} not passed: the template declares only "
+                f"{declared_text} (fallback {resolution.fallback})"
+            )
+
+
+def _build_chat_template_kwargs(
+    params: ProcessImageParams,
+    reasoning_effort: ReasoningEffortResolution | None = None,
+) -> ChatTemplateKwargs:
     """Collect optional chat-template kwargs for benchmark runs.
 
-    Mirrors upstream ``mlx_vlm.generate`` semantics: ``thinking_mode`` and
-    ``reasoning_effort`` apply whenever set (templates that support them),
-    independent of enable_thinking. The effort also goes out as
-    ``reasoning_strength``, the alias Muse Glimmer's template reads.
+    Mirrors upstream ``mlx_vlm.generate`` semantics: ``thinking_mode`` applies
+    whenever set (templates that support it), independent of enable_thinking.
+    A resolved reasoning effort is passed under the template variables its
+    resolution names, also independent of enable_thinking.
     """
     template_kwargs: ChatTemplateKwargs = {}
     if params.thinking_mode is not None:
         template_kwargs["thinking_mode"] = params.thinking_mode
-    if params.reasoning_effort is not None:
-        template_kwargs["reasoning_effort"] = params.reasoning_effort
-        template_kwargs["reasoning_strength"] = params.reasoning_effort
+    if reasoning_effort is not None and reasoning_effort.applied is not None:
+        for name in reasoning_effort.template_variables:
+            if name == "reasoning_effort":
+                template_kwargs["reasoning_effort"] = reasoning_effort.applied
+            elif name == "reasoning_strength":
+                template_kwargs["reasoning_strength"] = reasoning_effort.applied
     if not params.enable_thinking:
         return template_kwargs
 
@@ -13238,7 +13562,7 @@ def _chat_template_variables(processor: object) -> tuple[str, ...] | None:
 
 def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is an explicit keyword  # skylos: ignore[SKY-C303]
     *,
-    params: ProcessImageParams,
+    template: _ChatTemplateFacts,
     processor: ProcessorMixin,
     config: PreTrainedConfig | Mapping[str, object] | None,
     formatted_prompt: str,
@@ -13258,8 +13582,7 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
     model_type_raw = _get_config_value(config, "model_type")
     model_type = str(model_type_raw) if model_type_raw is not None else None
     eos_token = getattr(tokenizer, "eos_token", None)
-    template_variables = _chat_template_variables(processor)
-    passed_template_kwargs = _build_chat_template_kwargs(params)
+    template_variables = template.variables
     return PromptDiagnostics(
         model_type=model_type,
         processor_class=_qualified_class_name(processor),
@@ -13292,8 +13615,10 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
         chat_template_sources=_chat_template_sources(snapshot_path),
         chat_template_variables=template_variables,
         unread_chat_template_kwargs=_unread_chat_template_kwargs(
-            passed_template_kwargs, template_variables
+            template.kwargs, template_variables
         ),
+        declared_reasoning_efforts=template.declared_reasoning_efforts,
+        reasoning_effort=template.reasoning_effort,
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
@@ -13392,6 +13717,16 @@ def _checkpoint_facts_to_json(diagnostics: PromptDiagnostics) -> dict[str, JsonL
     # (no template, or it did not parse).
     if diagnostics.chat_template_variables is not None:
         facts["chat_template_variables"] = list(diagnostics.chat_template_variables)
+    if diagnostics.declared_reasoning_efforts is not None:
+        facts["declared_reasoning_efforts"] = list(diagnostics.declared_reasoning_efforts)
+    if (resolution := diagnostics.reasoning_effort) is not None:
+        facts["reasoning_effort"] = {
+            "requested": resolution.requested,
+            "fallback": resolution.fallback,
+            "status": resolution.status,
+            "applied": resolution.applied,
+            "template_variables": list(resolution.template_variables),
+        }
     return facts
 
 
@@ -14663,11 +14998,46 @@ def _build_runtime_diagnostics(
     )
 
 
+class _ChatTemplateFacts(NamedTuple):
+    """The chat-template kwargs one render used, and the facts that chose them."""
+
+    kwargs: ChatTemplateKwargs
+    variables: tuple[str, ...] | None
+    declared_reasoning_efforts: tuple[str, ...] | None
+    reasoning_effort: ReasoningEffortResolution | None
+
+
 class _PreparedPrompt(NamedTuple):
     """Rendered prompt payload plus neutral snapshot notes from preflight."""
 
     prompt: str | list[object]
     snapshot_notes: tuple[str, ...]
+    template: _ChatTemplateFacts
+
+
+def _chat_template_facts(params: ProcessImageParams, processor: object) -> _ChatTemplateFacts:
+    """Resolve one model's chat-template kwargs once, for the render and its record."""
+    variables = _chat_template_variables(processor)
+    declared = _declared_reasoning_efforts(processor)
+    resolution: ReasoningEffortResolution | None = None
+    if params.reasoning_effort is not None:
+        resolution = _resolve_reasoning_effort(
+            params.reasoning_effort,
+            params.reasoning_effort_fallback,
+            template_variables=variables,
+            declared=declared,
+        )
+        logger.info(
+            "Reasoning effort for %s: %s",
+            params.model_identifier,
+            _reasoning_effort_log_text(resolution, declared),
+        )
+    return _ChatTemplateFacts(
+        kwargs=_build_chat_template_kwargs(params, resolution),
+        variables=variables,
+        declared_reasoning_efforts=declared,
+        reasoning_effort=resolution,
+    )
 
 
 def _prepare_generation_prompt(
@@ -14680,7 +15050,8 @@ def _prepare_generation_prompt(
 ) -> _PreparedPrompt:
     """Run preflight checks and build the prompt payload for generation."""
     try:
-        chat_template_kwargs = _build_chat_template_kwargs(params)
+        template = _chat_template_facts(params, processor)
+        chat_template_kwargs = template.kwargs
         timer_scope = phase_timer.track("prompt_prep") if phase_timer is not None else nullcontext()
         with timer_scope:
             snapshot_notes = _run_model_preflight_validators(
@@ -14701,7 +15072,9 @@ def _prepare_generation_prompt(
                     **chat_template_kwargs,
                 ),
             )
-            return _PreparedPrompt(prompt=rendered, snapshot_notes=snapshot_notes)
+            return _PreparedPrompt(
+                prompt=rendered, snapshot_notes=snapshot_notes, template=template
+            )
     except ValueError as preflight_err:
         message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
         logger.exception("Model preflight validation failed for %s", params.model_identifier)
@@ -14952,7 +15325,13 @@ def _prepare_generation(
             params.model_identifier,
             ", ".join(f"{key} {effective.get(key)}" for key in taken),
         )
-    auto_budget_applied = _apply_auto_thinking_budget(params, formatted_prompt, generate_kwargs)
+    effort = prepared_prompt.template.reasoning_effort
+    auto_budget_applied = _apply_auto_thinking_budget(
+        params,
+        formatted_prompt,
+        generate_kwargs,
+        reasoning_effort_passed=effort is not None and effort.applied is not None,
+    )
     if auto_budget_applied:
         thinking_budget_source: Literal["auto", "explicit"] | None = "auto"
     elif generate_kwargs.get("thinking_budget") is not None:
@@ -14971,7 +15350,7 @@ def _prepare_generation(
             processor_passthrough_kwargs=processor_passthrough_kwargs,
         )
     prompt_diagnostics = _build_prompt_diagnostics(
-        params=params,
+        template=prepared_prompt.template,
         processor=processor,
         config=config,
         formatted_prompt=formatted_prompt,
@@ -20455,6 +20834,20 @@ def _common_generation_settings(results: Sequence[PerformanceResult]) -> dict[st
     common = dict(captured[0])
     for settings in captured[1:]:
         common = {key: value for key, value in common.items() if settings.get(key) == value}
+    # The requested effort is run-wide even though each template received its
+    # own resolution; named so the native CLI builder never reads it as the
+    # value a particular model received. Absent when not requested, so runs
+    # without it keep their comparison fingerprint.
+    requests = {
+        (resolution.requested, resolution.fallback)
+        for result in results
+        if (diagnostics := result.prompt_diagnostics) is not None
+        and (resolution := diagnostics.reasoning_effort) is not None
+    }
+    if len(requests) == 1:
+        requested, fallback = next(iter(requests))
+        common["reasoning_effort_requested"] = requested
+        common["reasoning_effort_fallback"] = fallback
     return common
 
 
@@ -22336,8 +22729,16 @@ def _comparison_fingerprint_from_metadata(metadata: JsonlMetadataRecord) -> str:
 
 
 # Run-level settings recorded only when the user passes them, and that change
-# the image input itself (--processor-kwargs, --resize-shape).
-_INPUT_SHAPING_SETTING_KEYS: Final[frozenset[str]] = frozenset({"processor_kwargs", "resize_shape"})
+# the model's input itself: the image (--processor-kwargs, --resize-shape) or
+# the rendered prompt (--reasoning-effort and its fallback).
+_INPUT_SHAPING_SETTING_KEYS: Final[frozenset[str]] = frozenset(
+    {
+        "processor_kwargs",
+        "resize_shape",
+        "reasoning_effort_requested",
+        "reasoning_effort_fallback",
+    }
+)
 
 
 def _comparison_compatibility(
@@ -24157,12 +24558,14 @@ def _repro_thinking_overrides(
 def _effective_repro_args(
     run_args: argparse.Namespace | None,
     effective_generate_kwargs: Mapping[str, object] | None,
+    reasoning_effort_applied: str | None = None,
 ) -> argparse.Namespace | None:
     """Overlay per-model effective generate kwargs onto global repro args.
 
     The auto thinking budget is applied per model at generation time, so a
     repro built from global CLI arguments alone would not reproduce the
-    recorded output. The per-model kwargs captured in prompt diagnostics win.
+    recorded output. The per-model kwargs captured in prompt diagnostics win,
+    as does the reasoning effort this model's chat template received.
     """
     # Checkpoint sampling values too: mlx-vlm before 73d366e does not read
     # generation_config.json, so the command must state what the run used.
@@ -24171,6 +24574,8 @@ def _effective_repro_args(
         effective_generate_kwargs,
         (*_REPRO_THINKING_KWARG_KEYS, *_CHECKPOINT_SAMPLING_DESTS),
     )
+    if run_args is not None and reasoning_effort_applied is not None:
+        overrides["reasoning_effort_applied"] = reasoning_effort_applied
     if run_args is None or not overrides:
         return run_args
     merged = argparse.Namespace(**vars(run_args))
@@ -24195,19 +24600,36 @@ def _shared_repro_thinking_caveat(
             run_args,
             diagnostics.generate_kwargs if diagnostics is not None else None,
         )
+        flags: list[str] = []
         if overrides:
-            budget = overrides.get("thinking_budget")
-            flags = "--enable-thinking"
-            if budget is not None:
-                flags += f" --thinking-budget {budget}"
-            affected.append(f"`{result.model_name}` ({flags})")
+            flags.append("--enable-thinking")
+            if (budget := overrides.get("thinking_budget")) is not None:
+                flags.append(f"--thinking-budget {budget}")
+        if (effort := _applied_reasoning_effort(diagnostics)) is not None:
+            flags.append(f"--reasoning-effort {effort}")
+        if flags:
+            affected.append(f"`{result.model_name}` ({' '.join(flags)})")
     if not affected:
         return None
     return ReportParagraph(
-        "The shared command omits per-model automatic thinking flags. When "
+        "The shared command omits per-model thinking and reasoning-effort flags. When "
         "substituting these models, append the flags recorded in their "
         "diagnostics blocks: " + "; ".join(affected) + "."
     )
+
+
+def _applied_reasoning_effort(diagnostics: PromptDiagnostics | None) -> str | None:
+    """The reasoning effort a model's chat template received, if any."""
+    resolution = diagnostics.reasoning_effort if diagnostics is not None else None
+    return resolution.applied if resolution is not None else None
+
+
+def _retained_applied_reasoning_effort(result: JsonlResultRecord) -> str | None:
+    """The retained record's applied reasoning effort (unvalidated JSON)."""
+    diagnostics = result.get("prompt_diagnostics") or {}
+    resolution = diagnostics.get("reasoning_effort") if isinstance(diagnostics, dict) else None
+    applied = resolution.get("applied") if isinstance(resolution, dict) else None
+    return applied if isinstance(applied, str) else None
 
 
 def _preview_asset_name(suffix: str, data: bytes) -> str:
@@ -24293,6 +24715,7 @@ def _reproduction_input_blocks(
     crash_phase: str | None = None,
     effective_generate_kwargs: Mapping[str, object] | None = None,
     published_preview: RunImageRecord | None = None,
+    reasoning_effort_applied: str | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Describe exact inputs and render a command only when it is exact evidence.
 
@@ -24301,7 +24724,7 @@ def _reproduction_input_blocks(
     When the original is unpublished but the run's committed preview is known,
     a clearly labelled stand-in command is rendered against that public file.
     """
-    run_args = _effective_repro_args(run_args, effective_generate_kwargs)
+    run_args = _effective_repro_args(run_args, effective_generate_kwargs, reasoning_effort_applied)
     blocks: list[ReportBlock] = [
         ReportKeyValues(_reproduction_image_facts(image)),
         ReportDetails("Exact prompt", (ReportCodeBlock(prompt),)),
@@ -24565,6 +24988,7 @@ def _run_issue_summary_crash_section(
                         "Mapping[str, object] | None",
                         (result.get("prompt_diagnostics") or {}).get("generate_kwargs"),
                     ),
+                    reasoning_effort_applied=_retained_applied_reasoning_effort(result),
                 ),
                 level=4,
             ),
@@ -24617,6 +25041,45 @@ def _run_issue_summary_sampling_note(results: Sequence[JsonlResultRecord]) -> st
             "harness defaults elsewhere"
         )
     return "harness defaults (or command-line values) for every model"
+
+
+_REASONING_EFFORT_SUMMARY_LABELS: Final[tuple[tuple[str, str], ...]] = (
+    ("applied", "passed (declared)"),
+    ("unvalidated", "passed (template declares no allowlist)"),
+    ("unverified", "passed (template variables unreadable)"),
+    ("mapped", "mapped to a declared value"),
+    ("not_read", "not passed (template reads neither variable)"),
+    ("not_declared", "not passed (not declared; no fallback value)"),
+)
+
+
+def _run_issue_summary_reasoning_effort_note(results: Sequence[JsonlResultRecord]) -> str | None:
+    """Count how each model's template handled --reasoning-effort; None when not given."""
+    requested: str | None = None
+    fallback: str | None = None
+    by_status: dict[str, list[str]] = {}
+    for record in results:
+        diagnostics = record.get("prompt_diagnostics") or {}
+        resolution = diagnostics.get("reasoning_effort") if isinstance(diagnostics, dict) else None
+        if not isinstance(resolution, dict):
+            continue
+        requested = str(resolution.get("requested"))
+        fallback = str(resolution.get("fallback"))
+        status = str(resolution.get("status"))
+        entry = record["model"]
+        if status == "mapped":
+            entry = f"{entry} → {resolution.get('applied')}"
+        by_status.setdefault(status, []).append(entry)
+    if requested is None:
+        return None
+    parts = []
+    for status, label in _REASONING_EFFORT_SUMMARY_LABELS:
+        if models := by_status.get(status):
+            part = f"{len(models)} {label}"
+            if status == "mapped":
+                part += " (" + ", ".join(models) + ")"
+            parts.append(part)
+    return f"{requested} requested (fallback {fallback}): " + "; ".join(parts)
 
 
 def _count_stop_reason(results: Sequence[JsonlResultRecord], reason: str) -> int:
@@ -25907,6 +26370,16 @@ def generate_run_issue_summary_report(
                             *_run_issue_summary_provenance_rows(source.producer),
                             ("Models attempted", str(len(source.results))),
                             ("Sampling settings", _run_issue_summary_sampling_note(source.results)),
+                            *(
+                                (("Reasoning effort", effort_note),)
+                                if (
+                                    effort_note := _run_issue_summary_reasoning_effort_note(
+                                        source.results
+                                    )
+                                )
+                                is not None
+                                else ()
+                            ),
                             ("Completed", str(counts["completed"])),
                             ("Crashed", str(counts["crashed"])),
                             ("Indeterminate", str(counts["indeterminate"])),
@@ -26348,9 +26821,12 @@ _NATIVE_CLI_OPTIONAL_ARGS: Final[tuple[tuple[str, str], ...]] = (
     ("--prefill-step-size", "prefill_step_size"),
     ("--thinking-budget", "thinking_budget"),
     ("--thinking-mode", "thinking_mode"),
-    # Upstream generate CLI flag since mlx-vlm 6dc1562 (0.7.12); emitted only when set.
-    ("--reasoning-effort", "reasoning_effort"),
     ("--thinking-start-token", "thinking_start_token"),
+    # The value one model's template received (set per model by
+    # _effective_repro_args), never the requested --reasoning-effort: a model
+    # whose template does not read it, or that mapped it, ran without it or
+    # with another value. The upstream CLI flag exists from mlx-vlm 0.7.12.
+    ("--reasoning-effort", "reasoning_effort_applied"),
 )
 _NATIVE_CLI_NONDEFAULT_ARGS: Final[tuple[tuple[str, str, object], ...]] = (
     # Sampling flags exist on the upstream generate CLI since #1994 (post-0.6.15).
@@ -26817,6 +27293,7 @@ def _generate_github_issue_reports(
                         if result.prompt_diagnostics is not None
                         else None
                     ),
+                    reasoning_effort_applied=_applied_reasoning_effort(result.prompt_diagnostics),
                 ),
             ),
         )
@@ -28493,9 +28970,21 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--reasoning-effort",
         type=str.lower,
         help=(
-            "Reasoning effort passed to chat templates that read reasoning_effort "
-            "or its reasoning_strength alias, e.g. low, medium, high (matches "
-            "mlx-vlm upstream). Omitted: each template's own default."
+            "Reasoning effort passed to chat templates that read reasoning_effort or "
+            "reasoning_strength (as mlx-vlm's --reasoning-effort), e.g. low, medium, high. "
+            "Templates that read neither do not receive it; omitted, each template keeps "
+            "its default. See --reasoning-effort-fallback for values a template does not "
+            "declare."
+        ),
+    )
+    prompt_group.add_argument(
+        "--reasoning-effort-fallback",
+        choices=REASONING_EFFORT_FALLBACKS,
+        default=DEFAULT_REASONING_EFFORT_FALLBACK,
+        help=(
+            "When a template declares an allowlist without the requested effort: 'higher' "
+            "(default) uses the nearest declared higher level, else the nearest lower; "
+            "'lower' the reverse; 'skip' passes nothing."
         ),
     )
     prompt_group.add_argument(

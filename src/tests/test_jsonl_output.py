@@ -2054,9 +2054,10 @@ class TestRerunEvidence:
             enable_thinking=True,
             thinking_budget=24,
             thinking_mode="budget",
-            reasoning_effort="low",
             thinking_start_token="<think>",  # noqa: S106 - protocol delimiter, not a credential
             thinking_end_token="</think>",  # noqa: S106 - protocol delimiter, not a credential
+            reasoning_effort="low",
+            reasoning_effort_fallback="lower",
             assessment_profile="metadata",
         )
 
@@ -2100,9 +2101,9 @@ class TestRerunEvidence:
         assert params.enable_thinking is True
         assert params.thinking_budget == 24
         assert params.thinking_mode == "budget"
-        assert params.reasoning_effort == "low"
         assert params.thinking_start_token == "<think>"
         assert params.thinking_end_token == "</think>"
+        assert (params.reasoning_effort, params.reasoning_effort_fallback) == ("low", "lower")
         assert params.assessment_profile == "general"  # Triage overrides the metadata first pass.
 
 
