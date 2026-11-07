@@ -920,6 +920,29 @@ class TestAutoThinkingBudget:
             _thinking_params()
         )
 
+    def test_reasoning_effort_none_is_a_value_not_an_omission(self) -> None:
+        """A value of none reaches the template and repro; only an omitted flag sends nothing."""
+        parser = check_models._build_cli_parser()
+        omitted = parser.parse_args([])
+        disabled = parser.parse_args(["--reasoning-effort", "None"])
+        assert omitted.reasoning_effort is None
+        assert disabled.reasoning_effort == "none"
+
+        params = dataclasses.replace(_thinking_params(), reasoning_effort="none")
+        assert check_models._build_chat_template_kwargs(params) == {
+            "reasoning_effort": "none",
+            "reasoning_strength": "none",
+        }
+        tokens: list[str] = []
+        check_models._append_native_cli_optional_pair(tokens, "--reasoning-effort", "none")
+        check_models._append_native_cli_optional_pair(tokens, "--thinking-mode", None)
+        assert tokens == ["--reasoning-effort", "none"]
+
+        with pytest.raises(ValueError, match="reasoning_effort must be non-empty"):
+            check_models._validate_thinking_params(parser.parse_args(["--reasoning-effort", " "]))
+        check_models._validate_thinking_params(disabled)
+        check_models._validate_thinking_params(omitted)
+
     def test_reasoning_effort_alias_read_by_template_is_not_unread(self) -> None:
         """A template reading either effort name reads the setting; neither is unread."""
         passed = {"reasoning_effort": "low", "reasoning_strength": "low", "thinking_mode": "x"}

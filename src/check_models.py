@@ -12545,6 +12545,13 @@ def _validate_thinking_params(args: argparse.Namespace) -> None:
         msg = "thinking_end_token must be non-empty when thinking mode is enabled"
         raise ValueError(msg)
 
+    # Omitted (None) leaves the template default; "none" or "off" is a value the
+    # template receives. An empty value would be neither, so it is refused.
+    reasoning_effort = getattr(args, "reasoning_effort", None)
+    if reasoning_effort is not None and not reasoning_effort.strip():
+        msg = "reasoning_effort must be non-empty if specified (omit it for the template default)"
+        raise ValueError(msg)
+
 
 def validate_cli_arguments(args: argparse.Namespace) -> None:
     """Validate all CLI arguments before processing begins.
