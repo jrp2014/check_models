@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Compare and diagnose MLX vision-language models on Apple Silicon: single-image runs, throughput and memory measurements, output comparisons, and reproducible failure reports."
-version = "0.17.109"
+version = "0.17.110"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -94,7 +94,7 @@ dev = [
     "ty>=0.0.100", # renamed invalid-property-type-override to incompatible-property-override, suppressed in check_models.py
     "pyrefly",
     "vulture>=2.16",
-    "skylos>=5.0.0", # 4.47 verifies editable installs (mlx, mlx-vlm); 4.50.1 fixed SKY-S101 prose; 5.0 skips SKY-C303 in tests
+    "skylos>=5.5.0", # 4.47 verifies editable installs (mlx, mlx-vlm); 5.0 skips SKY-C303 in tests and adds SKYLOS_NO_CLIPBOARD; 5.5 widened SKY-D212 and SKY-D213, suppressed in tests
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.5.0", # Parallel test execution

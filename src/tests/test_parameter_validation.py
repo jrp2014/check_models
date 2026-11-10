@@ -796,7 +796,7 @@ def _thinking_params(
     auto_thinking_budget: bool = True,
 ) -> check_models.ProcessImageParams:
     """Build minimal ProcessImageParams for auto-thinking-budget tests."""
-    return check_models.ProcessImageParams(
+    return check_models.ProcessImageParams(  # skylos: ignore[SKY-D213] setting only, no model load
         model_identifier="org/thinker",
         image_path="image.jpg",
         prompt="Describe this image.",

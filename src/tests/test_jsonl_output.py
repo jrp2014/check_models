@@ -2174,7 +2174,7 @@ def _retained_run_fixture(tmp_path: Path) -> check_models.RetainedRun:
             generate_kwargs={"max_tokens": 32, "temperature": 0.0}
         ),
     )
-    return check_models._build_retained_run(
+    return check_models._build_retained_run(  # skylos: ignore[SKY-D213] setting only, no model load
         [result],
         prompt="Describe the image.",
         system_info={"OS": "test"},

@@ -192,7 +192,7 @@ class _SequencedMxRuntime(_RecordingMxRuntime):
 
 def _build_params(image_path: Path) -> check_models.ProcessImageParams:
     """Return default ProcessImageParams for testing."""
-    return check_models.ProcessImageParams(
+    return check_models.ProcessImageParams(  # skylos: ignore[SKY-D213] setting only, no model load
         model_identifier="test/fake-model",
         image_path=str(image_path),
         prompt="Describe this image.",

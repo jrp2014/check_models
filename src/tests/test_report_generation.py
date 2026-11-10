@@ -658,7 +658,7 @@ def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: P
         usability="not_evaluated",
         maintainer_status="actionable_failure",
     )
-    _write_issue_summary_fixture(
+    _write_issue_summary_fixture(  # skylos: ignore[SKY-D213] setting only, no model load
         output_paths,
         results=(result,),
         image_source_url="https://example.test/images/cats.jpg",
@@ -741,7 +741,7 @@ def test_run_issue_summary_withholds_command_for_post_load_crash(tmp_path: Path)
 
 def _native_repro_args_with_every_setting() -> Namespace:
     """Run arguments exercising every setting the native repro command can carry."""
-    return Namespace(
+    return Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
         max_tokens=321,
         temperature=0.25,
         top_p=0.81,
@@ -4429,7 +4429,7 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
         check_models._sha256_file(image_path)
         == "251712968e443405f6e1ff145de15a91a082dc073209938c5305db0e8e80134c"
     )
-    run_args = Namespace(
+    run_args = Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
         max_tokens=321,
         temperature=0.25,
         top_p=0.81,
@@ -4542,7 +4542,7 @@ def test_crash_issue_draft_builds_complete_public_image_reproduction(tmp_path: P
             }
         },
     )
-    run_args = Namespace(
+    run_args = Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
         image_source_url="https://example.test/images/cats.jpg",
         max_tokens=321,
         temperature=0.0,
@@ -6344,7 +6344,7 @@ class TestEmptyRecommendedBucketExplanation:
 
 def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
     """Per-model effective thinking kwargs must reach the native repro command."""
-    run_args = Namespace(
+    run_args = Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
         max_tokens=1000,
         temperature=0.0,
         enable_thinking=False,

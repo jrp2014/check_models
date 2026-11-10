@@ -992,8 +992,8 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     # grade card; its one extra check (ai-defects) rides on the gated pass.
     assert 'echo "=== Skylos Audit Gate ==="' not in quality_script
     assert "SKYLOS_JOBS" not in quality_script
-    # Every Skylos call goes through the wrapper, which raises the 4.36+ grep
-    # verification cap (default 30 s) so the slower CI runner does not turn a
+    # Every Skylos call goes through the wrapper, which raises the grep
+    # verification cap (Skylos default 120 s) so the slower CI runner does not turn a
     # clean tree into SKY-ANALYSIS-INCOMPLETE (exit 2).
     common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
     assert 'SKYLOS_GREP_BUDGET="${SKYLOS_GREP_BUDGET:-300}"' in common_quality
@@ -1352,6 +1352,29 @@ def _update_script_function(name: str) -> str:
     return match.group(0)
 
 
+def _run_bash_script(
+    script: str,
+    *args: str,
+    check: bool = False,
+    env: typing.Mapping[str, str] | None = None,
+    cwd: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
+    """Run shell text under the fixed ``/bin/bash -c`` and capture its output.
+
+    Callers build ``script`` from shell functions extracted from this
+    repository's tracked scripts plus their own literals; ``args`` become the
+    script's ``$0``, ``$1`` and so on.
+    """
+    return subprocess.run(  # noqa: S603 - fixed /bin/bash runs this repository's shell functions  # skylos: ignore[SKY-D212] only this module's tests call it, with repository shell text.
+        ["/bin/bash", "-c", script, *args],
+        capture_output=True,
+        text=True,
+        check=check,
+        env=env,
+        cwd=cwd,
+    )
+
+
 @pytest.mark.parametrize(
     ("inputs", "expected"),
     [
@@ -1375,16 +1398,7 @@ def test_update_script_rebuild_decision(inputs: str, expected: str) -> None:
     the source the provenance claims; it must always rebuild.
     """
     function = _update_script_function("mlx_repo_rebuild_decision")
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        [
-            "/bin/bash",
-            "-c",
-            f"{function}\nmlx_repo_rebuild_decision {inputs}",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    result = _run_bash_script(f"{function}\nmlx_repo_rebuild_decision {inputs}", check=True)
     assert result.stdout.strip() == expected
 
 
@@ -1433,19 +1447,11 @@ def test_update_script_skips_a_rebuild_only_for_the_checkouts_own_build(
         f"get_installed_distribution_version() {{ echo '{metadata}'; }}\n"
         f"git() {{ echo '{_HEAD_255328713}'; }}\n"
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", f"{stubs}{function}\ninstalled_build_matches_checkout mlx /repo"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = _run_bash_script(f"{stubs}{function}\ninstalled_build_matches_checkout mlx /repo")
     assert result.returncode == expected_status
     assert reason in result.stdout
-    other_package = subprocess.run(  # noqa: S603 - as above
-        ["/bin/bash", "-c", f"{function}\ninstalled_build_matches_checkout other-pkg /repo"],
-        capture_output=True,
-        text=True,
-        check=False,
+    other_package = _run_bash_script(
+        f"{function}\ninstalled_build_matches_checkout other-pkg /repo"
     )
     assert other_package.returncode == 0
 
@@ -1486,17 +1492,8 @@ def test_update_script_rebuild_check_compares_mlx_vlm_declared_version(
         )
     function = _update_script_function("installed_build_matches_checkout")
     stubs = f"get_installed_distribution_version() {{ echo '{installed}'; }}\n"
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        [
-            "/bin/bash",
-            "-c",
-            f'{stubs}{function}\ninstalled_build_matches_checkout mlx-vlm "$1"',
-            "_",
-            str(repo),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
+    result = _run_bash_script(
+        f'{stubs}{function}\ninstalled_build_matches_checkout mlx-vlm "$1"', "_", str(repo)
     )
     assert result.returncode == expected_status
     assert reason in result.stdout
@@ -1563,17 +1560,11 @@ def test_update_script_mlx_audio_pin_assessment(
     report = _pin_assessment_report(tmp_path, requires_dist)
     function = _update_script_function("mlx_audio_pin_assessment")
     stubs = f'python() {{ {shlex.quote(sys.executable)} "$@"; }}\n'
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        [
-            "/bin/bash",
-            "-c",
-            f'{stubs}{function}\nmlx_audio_pin_assessment "$1" "$2"',
-            "_",
-            str(report),
-            local_mlx,
-        ],
-        capture_output=True,
-        text=True,
+    result = _run_bash_script(
+        f'{stubs}{function}\nmlx_audio_pin_assessment "$1" "$2"',
+        "_",
+        str(report),
+        local_mlx,
         check=True,
     )
     assert result.stdout.rstrip("\n") == expected
@@ -1635,12 +1626,7 @@ if ! reconcile_mlx_audio_with_local_mlx {shlex.quote(str(repo))}; then
     exit 3
 fi
 """
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
-        ["/bin/bash", "-c", script],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    result = _run_bash_script(script)
     return result.returncode, result.stdout, safe_io.read_text_no_follow(constraint)
 
 
@@ -1776,10 +1762,10 @@ def test_relax_exact_mlx_pin_requires_installed_metadata(tmp_path: Path) -> None
 def _conflict_probe(function_name: str, repo: Path) -> list[str]:
     """Run one extracted update.sh detector against a repo; return the paths it reports."""
     function = _update_script_function(function_name)
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", f'set -euo pipefail\n{function}\n{function_name} "$1"', "_", str(repo)],
-        capture_output=True,
-        text=True,
+    result = _run_bash_script(
+        f'set -euo pipefail\n{function}\n{function_name} "$1"',
+        "_",
+        str(repo),
         check=True,  # nothing found must not trip errexit/pipefail
     )
     return [line.removeprefix(f"{repo}/") for line in result.stdout.splitlines()]
@@ -3502,11 +3488,8 @@ def _run_update_pip_wrapper_harness(driver: str, tmp_path: Path) -> str:
         mode=0o755,
     )
 
-    completed = subprocess.run(  # noqa: S603 - test harness, fixed bash, temp files
-        ["/bin/bash", "-c", helpers + "\n" + driver],
-        capture_output=True,
-        text=True,
-        check=False,
+    completed = _run_bash_script(
+        helpers + "\n" + driver,
         env={**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"},
         cwd=tmp_path,
     )
@@ -3628,12 +3611,8 @@ def test_pip_show_helpers_survive_set_e_pipefail_with_chatty_pip(tmp_path: Path)
         + 'echo "VERSION: $version"\n'
         + 'echo "LOCATION: $location"\n'
     )
-    completed = subprocess.run(  # noqa: S603 - test harness, fixed bash, temp files
-        ["/bin/bash", "-c", driver],
-        capture_output=True,
-        text=True,
-        check=False,
-        env={**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"},
+    completed = _run_bash_script(
+        driver, env={**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"}
     )
     assert completed.returncode == 0, completed.stderr
     assert "VERSION: 0.32.2.dev1+abc" in completed.stdout
@@ -4264,19 +4243,11 @@ def test_update_pull_failure_stops_with_diagnostics(tmp_path: Path) -> None:
     _git(checkout, "commit", "-q", "-m", "local change")
 
     function = _update_script_function("report_git_pull_failure")
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        [
-            "/bin/bash",
-            "-c",
-            (
-                f"{function}\ngit pull -q --ff-only 2>/dev/null && exit 9\n"
-                f'report_git_pull_failure mlx "{checkout}"'
-            ),
-        ],
-        cwd=checkout,
-        capture_output=True,
-        text=True,
+    result = _run_bash_script(
+        f"{function}\ngit pull -q --ff-only 2>/dev/null && exit 9\n"
+        f'report_git_pull_failure mlx "{checkout}"',
         check=True,
+        cwd=checkout,
     )
     report = result.stdout
     assert "git pull --ff-only failed for mlx" in report
@@ -4307,13 +4278,7 @@ echo "status=$?"
 VERIFIED_LOCAL_INSTALLS=()
 verify_local_installs_survived_reconcile && echo "empty-ok"
 """
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", driver],
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    result = _run_bash_script(driver, check=True, cwd=tmp_path)
     assert "replaced the local mlx-vlm build from /repo/mlx-vlm" in result.stdout
     assert "Installed now: 0.7.4" in result.stdout
     assert "status=1" in result.stdout
@@ -4402,13 +4367,7 @@ def _resolve_update_target(env: Mapping[str, str], path: str) -> tuple[int, dict
         'echo "STATUS=$status"; echo "TYPE=${UPDATE_ENV_TYPE:-}"\n'
         'echo "NAME=${UPDATE_ENV_NAME:-}"; echo "PYTHON=${UPDATE_PYTHON:-}"\n'
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", driver],
-        capture_output=True,
-        text=True,
-        check=True,
-        env={"PATH": path, "CONDA_ENV": "mlx-vlm", **env},
-    )
+    result = _run_bash_script(driver, check=True, env={"PATH": path, "CONDA_ENV": "mlx-vlm", **env})
     fields = dict(
         line.split("=", 1) for line in result.stdout.splitlines() if line.split("=", 1)[0].isupper()
     )
@@ -4544,9 +4503,7 @@ def test_update_script_failure_reports_the_steps_already_completed() -> None:
         'run_step "Homebrew update and upgrade" false\n'
         'run_step "never reached" true\n'
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
-        ["/bin/bash", "-c", driver], capture_output=True, text=True, check=False
-    )
+    result = _run_bash_script(driver)
     assert result.returncode == 1
     assert (
         "Completed before the stop:\n     - conda base and environment updates\n" in result.stdout
@@ -4597,9 +4554,7 @@ def _run_update_change_report(tmp_path: Path, before: str, after: str) -> str:
         f"set -euo pipefail\nSCRIPT_DIR={script.parent}\n{functions}"
         f"report_update_changes {tmp_path / 'before.tsv'} {tmp_path / 'after.tsv'}\n"
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
-        ["/bin/bash", "-c", driver], capture_output=True, text=True, check=False
-    )
+    result = _run_bash_script(driver)
     assert result.returncode == 0, result.stderr + result.stdout
     return result.stdout
 
@@ -4705,11 +4660,8 @@ def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
         f"UPDATE_PYTHON={sys.executable}\nUPDATE_ENV_TYPE=conda\nCONDA_ENV=mlx-vlm\n"
         f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", driver],
-        capture_output=True,
-        text=True,
-        check=False,
+    result = _run_bash_script(
+        driver,
         env={
             **os.environ,
             "PATH": f"{fake_bin}:{os.environ['PATH']}",
@@ -4743,11 +4695,8 @@ def test_update_state_snapshot_leaves_an_unreadable_checkout_unmarked(tmp_path: 
         f"UPDATE_PYTHON={sys.executable}\nUPDATE_SYSTEM_PACKAGES=0\n"
         f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", driver],
-        capture_output=True,
-        text=True,
-        check=False,
+    result = _run_bash_script(
+        driver,
         env={key: value for key, value in os.environ.items() if key != "CONDA_DEFAULT_ENV"},
         cwd=tmp_path,
     )
@@ -4783,9 +4732,7 @@ def test_update_outcome_reports_changes_on_success_and_after_a_stop(tmp_path: Pa
             'run_step "packaging tools" true\n'
             f'run_step "project reinstall" {final}\n'
         )
-        result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
-            ["/bin/bash", "-c", driver], capture_output=True, text=True, check=False
-        )
+        result = _run_bash_script(driver)
         assert result.returncode == expected_status, result.stderr
         assert "[update.sh] What changed in this run:" in result.stdout
         assert re.search(r"pip\s+numpy\s+2\.3\.0\s+2\.3\.1", result.stdout)
@@ -4833,12 +4780,7 @@ def _conda_update_decision(
         'echo "$ownership"\n'
         f'echo "DECISION $(conda_update_all_decision {force} "$ownership")"\n'
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
-        ["/bin/bash", "-c", driver, "_", str(records_file), *changes],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    result = _run_bash_script(driver, "_", str(records_file), *changes, check=True)
     lines = dict(line.split(" ", 1) for line in result.stdout.splitlines())
     return lines, lines.pop("DECISION")
 
@@ -4937,10 +4879,8 @@ def _run_update_conda_packages(
         f"{functions}"
         "UPDATE_ENV_TYPE=conda UPDATE_ENV_NAME=review-target update_conda_packages\n"
     )
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates extracted repo functions
-        ["/bin/bash", "-c", driver],
-        capture_output=True,
-        text=True,
+    result = _run_bash_script(
+        driver,
         check=True,
         env={
             "PATH": "/usr/bin:/bin",
@@ -5014,12 +4954,7 @@ def test_conda_update_never_applies_an_unusable_or_empty_plan(
 def test_conda_update_skips_without_an_ownership_answer() -> None:
     """No ownership lines (a failed lookup) is not evidence that conda owns anything."""
     function = _update_script_function("conda_update_all_decision")
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
-        ["/bin/bash", "-c", f'{function}\nconda_update_all_decision 0 ""'],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    result = _run_bash_script(f'{function}\nconda_update_all_decision 0 ""', check=True)
     assert result.stdout.strip() == "skip"
 
 

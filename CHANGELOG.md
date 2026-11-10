@@ -1434,6 +1434,19 @@ Notable changes to this project will be documented in this file.
   report with no danger list would have stopped the script under `set -e`
   with an empty count. It now prints `0` and exits 0. `$QUALITY_PYTHON` is
   quoted there.
+- Quality gate (0.17.110): Skylos 5.5.0 (10 November) made the danger gate
+  report 21 findings in tests that 5.3.0 and 5.4.0 pass, all false
+  positives. SKY-D213 now flags a literal `trust_remote_code=True` on any
+  callee, here `argparse.Namespace` and the project's own settings objects
+  in eight fixtures that load nothing; each carries a reasoned ignore.
+  SKY-D212 now also checks the script handed to `["/bin/bash", "-c", ...]`
+  and counts a function's parameters as untrusted, which caught thirteen
+  tests that run `update.sh` functions with pytest's own values. Those twenty call sites now share one helper,
+  `_run_bash_script`, with one reasoned ignore, which also removes twenty
+  repeated `noqa: S603` comments (inline suppressions fall from 134 to
+  124). The floor is `skylos>=5.5.0`, in `pyproject.toml` and
+  `setup_conda_env.sh`, because older releases would report the new
+  ignores as unused. Gate thresholds are unchanged.
 - Quality gate (0.17.109): ty 0.0.100 renamed `invalid-property-type-override`
   to `incompatible-property-override`, so the two stream-property ignores in
   `check_models.py` stopped matching and the suppression audit failed on a
