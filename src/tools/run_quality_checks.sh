@@ -22,6 +22,8 @@ if [ "$#" -eq 1 ]; then
     esac
 fi
 
+# The mode is parsed. Clear the positional parameters so a helper called with
+# "$@" (as ShellCheck SC2119 asks of helpers that read arguments) gets none.
 set --
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -84,11 +86,7 @@ quality_validate_yaml_files \
 echo "=== Dependency Sync (Check) ==="
 "$QUALITY_PYTHON" -m tools.update_readme_deps --check
 
-if [ "$QUALITY_MODE" = "fast" ]; then
-    echo "=== Ruff Format (Check) ==="
-else
-    echo "=== Ruff Format ==="
-fi
+echo "=== Ruff Format (Check) ==="
 "$QUALITY_PYTHON" -m ruff format --check .
 
 echo "=== Ruff Lint ==="

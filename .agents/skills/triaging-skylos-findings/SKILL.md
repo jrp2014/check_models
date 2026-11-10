@@ -25,7 +25,7 @@ were checked against Skylos 4.43.2.
 | `skylos-advisory` CI job | `run_skylos_danger_advisory.sh`, diff-aware on PRs | nothing (annotations only) |
 
 All of them go through `quality_run_skylos` in `common_quality.sh`, which
-shims the clipboard and sets `SKYLOS_GREP_BUDGET`. Configuration lives twice
+sets `SKYLOS_NO_CLIPBOARD=1` and `SKYLOS_GREP_BUDGET`. Configuration lives twice
 and must stay mirrored: `.skylos/config.yaml` (repo-root scans) and
 `[tool.skylos]` in `src/pyproject.toml` (package-local scans).
 

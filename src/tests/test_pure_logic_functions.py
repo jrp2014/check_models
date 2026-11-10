@@ -1553,6 +1553,19 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
         )
         assert "missing-dependency placeholder" not in issues[0]
 
+    def test_missing_runtime_dependency_raises_its_own_error_type(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """main() tells this failure from other RuntimeErrors by type, not by message text."""
+        monkeypatch.setattr(mod, "MISSING_DEPENDENCIES", {"mlx-vlm": "import failed"})
+
+        with pytest.raises(mod.MissingRuntimeDependenciesError, match="mlx-vlm"):
+            mod._raise_for_missing_runtime_dependencies()
+
+        assert issubclass(mod.MissingRuntimeDependenciesError, RuntimeError)
+
     def test_runtime_api_drift_reports_a_moved_generation_config_key_list(
         self,
         mod: types.ModuleType,

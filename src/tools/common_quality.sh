@@ -157,167 +157,140 @@ quality_require_command() {
     return 1
 }
 
-    quality_find_python_tool() {
-        local tool_name="$1"
-        local python_bin_dir=""
+quality_find_python_tool() {
+    local tool_name="$1"
+    local python_bin_dir=""
 
-        python_bin_dir="$(dirname "$QUALITY_PYTHON")"
-        if [ -x "$python_bin_dir/$tool_name" ]; then
-            printf '%s\n' "$python_bin_dir/$tool_name"
-            return 0
-        fi
+    python_bin_dir="$(dirname "$QUALITY_PYTHON")"
+    if [ -x "$python_bin_dir/$tool_name" ]; then
+        printf '%s\n' "$python_bin_dir/$tool_name"
+        return 0
+    fi
 
-        if quality_path_tool_fallback_allowed && command -v "$tool_name" >/dev/null 2>&1; then
-            command -v "$tool_name"
-            return 0
-        fi
+    if quality_path_tool_fallback_allowed && command -v "$tool_name" >/dev/null 2>&1; then
+        command -v "$tool_name"
+        return 0
+    fi
 
-        return 1
-    }
+    return 1
+}
 
-    quality_require_python_tool() {
-        local tool_name="$1"
-        local install_hint="$2"
+quality_require_python_tool() {
+    local tool_name="$1"
+    local install_hint="$2"
 
-        if quality_find_python_tool "$tool_name" >/dev/null 2>&1; then
-            return 0
-        fi
+    if quality_find_python_tool "$tool_name" >/dev/null 2>&1; then
+        return 0
+    fi
 
-        echo "❌ Required command '$tool_name' not found." >&2
-        if [ -n "$install_hint" ]; then
-            echo "   $install_hint" >&2
-        fi
-        return 1
-    }
+    echo "❌ Required command '$tool_name' not found." >&2
+    if [ -n "$install_hint" ]; then
+        echo "   $install_hint" >&2
+    fi
+    return 1
+}
 
-    quality_run_python_tool() {
-        local tool_name="$1"
-        local tool_path=""
+quality_run_python_tool() {
+    local tool_name="$1"
+    local tool_path=""
 
-        tool_path="$(quality_find_python_tool "$tool_name")" || return 1
-        shift
-        "$tool_path" "$@"
-    }
+    tool_path="$(quality_find_python_tool "$tool_name")" || return 1
+    shift
+    "$tool_path" "$@"
+}
 
-    # Skylos's grade renderer copies its README badge to the system clipboard
-    # (pyperclip, copy_badge=True with no CLI switch), overwriting whatever the
-    # user had there. pyperclip is a hard Skylos dependency, but the import is
-    # lazy and the copy is wrapped in `except pyperclip.PyperclipException`, so
-    # a throwaway stub module that raises it turns the copy into a silent
-    # no-op. The stub lives only for the duration of the call and is never a
-    # tracked source file, so it is invisible to the linters and to Skylos.
-    quality_run_skylos() {
-        local stub_dir status
-        # Explicit template: GNU mktemp (Linux CI) requires the X's, BSD mktemp
-        # (macOS) accepts them; `-t prefix` alone is BSD-only.
-        stub_dir="$(mktemp -d "${TMPDIR:-/tmp}/skylos-clipboard-shim.XXXXXX")" || return 1
-        printf '%s\n' \
-            '"""Clipboard shim: keep Skylos from overwriting the user clipboard."""' \
-            '' \
-            '' \
-            'class PyperclipException(RuntimeError):' \
-            '    """Raised so Skylos takes its quiet no-clipboard branch."""' \
-            '' \
-            '' \
-            'def copy(_text):' \
-            '    raise PyperclipException("clipboard disabled by check_models quality tooling")' \
-            '' \
-            '' \
-            'def paste():' \
-            '    return ""' \
-            > "$stub_dir/pyperclip.py"
-        # Skylos 4.36+ caps its dead-code grep verification (SKYLOS_GREP_BUDGET,
-        # default 30 s) and exits 2 as "analysis incomplete" when the cap is
-        # hit; the 3-core CI runner exceeds 30 s on this tree while a laptop
-        # needs ~12 s. The value is a cap, not a duration, so a generous one
-        # costs nothing when verification finishes early.
-        SKYLOS_GREP_BUDGET="${SKYLOS_GREP_BUDGET:-300}" \
-            PYTHONPATH="$stub_dir${PYTHONPATH:+:$PYTHONPATH}" \
-            quality_run_python_tool skylos "$@"
-        status=$?
-        rm -rf "$stub_dir"
-        return "$status"
-    }
+# Every Skylos call in the gate goes through here.
+# SKYLOS_NO_CLIPBOARD=1 (Skylos 5.0+) keeps it off the system clipboard: an
+# interactive run would otherwise copy its README badge there, overwriting
+# whatever the user had.
+# SKYLOS_GREP_BUDGET caps the dead-code grep verification (Skylos's default
+# is 120 s) and Skylos exits 2 as "analysis incomplete" when the cap is hit.
+# The value is a cap, not a duration, so a generous one costs nothing when
+# verification finishes early and keeps a slow CI runner from tripping it.
+quality_run_skylos() {
+    SKYLOS_NO_CLIPBOARD=1 SKYLOS_GREP_BUDGET="${SKYLOS_GREP_BUDGET:-300}" \
+        quality_run_python_tool skylos "$@"
+}
 
-    # The gated Skylos quality scan. Advice-only rules (e.g. SKY-P401) are
-    # listed but not counted towards max_quality, so a passing gate can still
-    # print findings: keep those lines in QUALITY_SKYLOS_ADVICE for
-    # quality_print_skylos_advice to repeat at the end of the run. The output
-    # goes to a file (shown afterwards) rather than a pipe, so the scan's own
-    # exit status survives set -e and pipefail in the caller. A failing scan
-    # returns its status unchanged.
-    quality_run_skylos_quality_gate() {
-        local gate_log status=0
-        QUALITY_SKYLOS_ADVICE=""
-        gate_log="$(mktemp "${TMPDIR:-/tmp}/skylos-quality-gate.XXXXXX")" || return 1
-        TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-            quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise \
-            </dev/null >"$gate_log" || status=$?
-        cat "$gate_log"
-        if [ "$status" -eq 0 ]; then
-            # Concise finding lines are "<path>:<line>  <SKY-rule>  <message>";
-            # the path may contain spaces.
-            QUALITY_SKYLOS_ADVICE="$(grep -E '^.+:[0-9]+  SKY-' "$gate_log" || true)"
-        fi
-        rm -f "$gate_log"
-        return "$status"
-    }
+# The gated Skylos quality scan. Advice-only rules (e.g. SKY-P401) are
+# listed but not counted towards max_quality, so a passing gate can still
+# print findings: keep those lines in QUALITY_SKYLOS_ADVICE for
+# quality_print_skylos_advice to repeat at the end of the run. The output
+# goes to a file (shown afterwards) rather than a pipe, so the scan's own
+# exit status survives set -e and pipefail in the caller. A failing scan
+# returns its status unchanged.
+quality_run_skylos_quality_gate() {
+    local gate_log status=0
+    QUALITY_SKYLOS_ADVICE=""
+    gate_log="$(mktemp "${TMPDIR:-/tmp}/skylos-quality-gate.XXXXXX")" || return 1
+    TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+        quality_run_skylos . --quality --secrets --ai-defects --gate --no-upload --format concise \
+        </dev/null >"$gate_log" || status=$?
+    cat "$gate_log"
+    if [ "$status" -eq 0 ]; then
+        # Concise finding lines are "<path>:<line>  <SKY-rule>  <message>";
+        # the path may contain spaces.
+        QUALITY_SKYLOS_ADVICE="$(grep -E '^.+:[0-9]+  SKY-' "$gate_log" || true)"
+    fi
+    rm -f "$gate_log"
+    return "$status"
+}
 
-    quality_print_skylos_advice() {
-        if [ -n "${QUALITY_SKYLOS_ADVICE:-}" ]; then
-            echo "⚠️  Skylos advice (passes the gate, not blocking; fix it or add a reasoned ignore):"
-            printf '%s\n' "$QUALITY_SKYLOS_ADVICE" | sed 's/^/    /'
-            echo ""
-        fi
-    }
+quality_print_skylos_advice() {
+    if [ -n "${QUALITY_SKYLOS_ADVICE:-}" ]; then
+        echo "⚠️  Skylos advice (passes the gate, not blocking; fix it or add a reasoned ignore):"
+        printf '%s\n' "$QUALITY_SKYLOS_ADVICE" | sed 's/^/    /'
+        echo ""
+    fi
+}
 
-    quality_resolve_python_path() {
-        if [ -n "${QUALITY_PYTHON:-}" ] && [ -x "$QUALITY_PYTHON" ]; then
-            printf '%s\n' "$QUALITY_PYTHON"
-            return 0
-        fi
+quality_resolve_python_path() {
+    if [ -n "${QUALITY_PYTHON:-}" ] && [ -x "$QUALITY_PYTHON" ]; then
+        printf '%s\n' "$QUALITY_PYTHON"
+        return 0
+    fi
 
-        if [ -n "${QUALITY_PYTHON:-}" ] && command -v "$QUALITY_PYTHON" >/dev/null 2>&1; then
-            command -v "$QUALITY_PYTHON"
-            return 0
-        fi
+    if [ -n "${QUALITY_PYTHON:-}" ] && command -v "$QUALITY_PYTHON" >/dev/null 2>&1; then
+        command -v "$QUALITY_PYTHON"
+        return 0
+    fi
 
-        return 1
-    }
+    return 1
+}
 
-    quality_print_ty_diagnostics() {
-        local python_path="$1"
-        local ty_path="$2"
-        shift 2
+quality_print_ty_diagnostics() {
+    local python_path="$1"
+    local ty_path="$2"
+    shift 2
 
-        echo "[ty] target conda env: ${CONDA_ENV}"
-        echo "[ty] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
-        echo "[ty] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
-        echo "[ty] resolved ty: ${ty_path}"
-        echo "[ty] check targets: ${*:-check_models.py}"
+    echo "[ty] target conda env: ${CONDA_ENV}"
+    echo "[ty] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
+    echo "[ty] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
+    echo "[ty] resolved ty: ${ty_path}"
+    echo "[ty] check targets: ${*:-check_models.py}"
 
-        if [ "${QUALITY_PYTHON_SOURCE:-}" != "conda-env:${CONDA_ENV}" ]; then
-            echo "[ty] warning: target env '${CONDA_ENV}' was not resolved directly; import resolution may differ from the expected repo conda environment." >&2
-        fi
-    }
+    if [ "${QUALITY_PYTHON_SOURCE:-}" != "conda-env:${CONDA_ENV}" ]; then
+        echo "[ty] warning: target env '${CONDA_ENV}' was not resolved directly; import resolution may differ from the expected repo conda environment." >&2
+    fi
+}
 
-    quality_run_ty_check() {
-        local python_path=""
-        local ty_path=""
+quality_run_ty_check() {
+    local python_path=""
+    local ty_path=""
 
-        python_path="$(quality_resolve_python_path)" || return 1
-        ty_path="$(quality_find_python_tool ty)" || return 1
-        quality_print_ty_diagnostics "$python_path" "$ty_path" "$@"
-        "$ty_path" check --python "$python_path" "$@"
-    }
+    python_path="$(quality_resolve_python_path)" || return 1
+    ty_path="$(quality_find_python_tool ty)" || return 1
+    quality_print_ty_diagnostics "$python_path" "$ty_path" "$@"
+    "$ty_path" check --python "$python_path" "$@"
+}
 
-    quality_write_pyrefly_config() {
-        local config_path="$1"
-        local python_path="$2"
-        local pyproject_path=""
+quality_write_pyrefly_config() {
+    local config_path="$1"
+    local python_path="$2"
+    local pyproject_path=""
 
-        pyproject_path="$(quality_src_root)/pyproject.toml"
-        "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" <<'PY'
+    pyproject_path="$(quality_src_root)/pyproject.toml"
+    "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" <<'PY'
 from __future__ import annotations
 
 import json
@@ -401,97 +374,97 @@ for key, value in tool_config.items():
 
 config_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
-    }
+}
 
-    quality_print_pyrefly_diagnostics() {
-        local python_path="$1"
-        local pyrefly_path="$2"
-        local config_path="$3"
-        local target_display=""
-        shift 3
+quality_print_pyrefly_diagnostics() {
+    local python_path="$1"
+    local pyrefly_path="$2"
+    local config_path="$3"
+    local target_display=""
+    shift 3
 
-        if [ "$#" -eq 0 ]; then
-            target_display="<project discovery>"
-        elif [ "$#" -gt 8 ]; then
-            target_display="$# explicit files (git ls-files enumeration)"
-        else
-            target_display="$*"
-        fi
+    if [ "$#" -eq 0 ]; then
+        target_display="<project discovery>"
+    elif [ "$#" -gt 8 ]; then
+        target_display="$# explicit files (git ls-files enumeration)"
+    else
+        target_display="$*"
+    fi
 
-        echo "[pyrefly] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
-        echo "[pyrefly] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
-        echo "[pyrefly] resolved pyrefly: ${pyrefly_path}"
-        echo "[pyrefly] generated config: ${config_path}"
-        echo "[pyrefly] check targets: ${target_display}"
-    }
+    echo "[pyrefly] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
+    echo "[pyrefly] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
+    echo "[pyrefly] resolved pyrefly: ${pyrefly_path}"
+    echo "[pyrefly] generated config: ${config_path}"
+    echo "[pyrefly] check targets: ${target_display}"
+}
 
-    # Explicit targets switch Pyrefly to single-file checking mode, which
-    # skips filesystem discovery entirely — so the gate's file set cannot be
-    # eaten by ignore files or future discovery heuristics, independent of the
-    # generated config neutralizing the known ones. git ls-files is the same
-    # authority the other gates align with and keeps gitignore semantics
-    # without hand-mirrored exclude globs.
-    quality_pyrefly_default_targets() {
-        git -C "$(quality_src_root)" ls-files --cached --others --exclude-standard -- '*.py' '*.pyi' \
-            | LC_ALL=C sort -u \
-            | grep -v '^tools/\.archived/' || true
-    }
+# Explicit targets switch Pyrefly to single-file checking mode, which
+# skips filesystem discovery entirely — so the gate's file set cannot be
+# eaten by ignore files or future discovery heuristics, independent of the
+# generated config neutralizing the known ones. git ls-files is the same
+# authority the other gates align with and keeps gitignore semantics
+# without hand-mirrored exclude globs.
+quality_pyrefly_default_targets() {
+    git -C "$(quality_src_root)" ls-files --cached --others --exclude-standard -- '*.py' '*.pyi' \
+        | LC_ALL=C sort -u \
+        | grep -v '^tools/\.archived/' || true
+}
 
-    quality_run_pyrefly_check() {
-        local python_path=""
-        local pyrefly_path=""
-        local config_path=""
-        local output_path=""
-        local exit_code=0
-        local -a targets=("$@")
+quality_run_pyrefly_check() {
+    local python_path=""
+    local pyrefly_path=""
+    local config_path=""
+    local output_path=""
+    local exit_code=0
+    local -a targets=("$@")
 
+    if [ "${#targets[@]}" -eq 0 ]; then
+        local src_root=""
+        src_root="$(quality_src_root)"
+        while IFS= read -r target; do
+            targets+=("$src_root/$target")
+        done < <(quality_pyrefly_default_targets)
         if [ "${#targets[@]}" -eq 0 ]; then
-            local src_root=""
-            src_root="$(quality_src_root)"
-            while IFS= read -r target; do
-                targets+=("$src_root/$target")
-            done < <(quality_pyrefly_default_targets)
-            if [ "${#targets[@]}" -eq 0 ]; then
-                echo "❌ Pyrefly target enumeration found no Python files (git ls-files returned nothing)." >&2
-                return 1
-            fi
-        fi
-
-        python_path="$(quality_resolve_python_path)" || return 1
-        pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
-        # Throwaway files belong in $TMPDIR: an aborted run then leaves
-        # nothing behind in the tree for git status or a later checker to
-        # find. The generated config carries absolute paths, so its location
-        # does not matter to Pyrefly.
-        config_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-quality.XXXXXX")"
-        output_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-output.XXXXXX")"
-
-        if ! quality_write_pyrefly_config "$config_path" "$python_path"; then
-            rm -f "$config_path"
-            rm -f "$output_path"
+            echo "❌ Pyrefly target enumeration found no Python files (git ls-files returned nothing)." >&2
             return 1
         fi
+    fi
 
-        quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "${targets[@]}"
-        if "$pyrefly_path" check \
-            -c "$config_path" \
-            --min-severity warn \
-            --output-format full-text \
-            "${targets[@]}" 2>&1 | tee "$output_path"; then
-            exit_code=0
-        else
-            exit_code=$?
-        fi
+    python_path="$(quality_resolve_python_path)" || return 1
+    pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
+    # Throwaway files belong in $TMPDIR: an aborted run then leaves
+    # nothing behind in the tree for git status or a later checker to
+    # find. The generated config carries absolute paths, so its location
+    # does not matter to Pyrefly.
+    config_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-quality.XXXXXX")"
+    output_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-output.XXXXXX")"
 
-        if [ "$exit_code" -eq 0 ] && grep -Eq '^[[:space:]]*WARN([[:space:]]|$)' "$output_path"; then
-            echo "❌ Pyrefly emitted warnings; treat warnings as quality failures." >&2
-            exit_code=1
-        fi
-
+    if ! quality_write_pyrefly_config "$config_path" "$python_path"; then
         rm -f "$config_path"
         rm -f "$output_path"
-        return "$exit_code"
-    }
+        return 1
+    fi
+
+    quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "${targets[@]}"
+    if "$pyrefly_path" check \
+        -c "$config_path" \
+        --min-severity warn \
+        --output-format full-text \
+        "${targets[@]}" 2>&1 | tee "$output_path"; then
+        exit_code=0
+    else
+        exit_code=$?
+    fi
+
+    if [ "$exit_code" -eq 0 ] && grep -Eq '^[[:space:]]*WARN([[:space:]]|$)' "$output_path"; then
+        echo "❌ Pyrefly emitted warnings; treat warnings as quality failures." >&2
+        exit_code=1
+    fi
+
+    rm -f "$config_path"
+    rm -f "$output_path"
+    return "$exit_code"
+}
 
 quality_validate_yaml_files() {
     "$QUALITY_PYTHON" - "$@" <<'PY'

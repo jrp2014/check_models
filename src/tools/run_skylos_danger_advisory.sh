@@ -158,7 +158,7 @@ if [ "$gate_exit_code" -gt 1 ]; then
     exit "$gate_exit_code"
 fi
 
-danger_count="$($QUALITY_PYTHON - "$report_path" <<'PY'
+danger_count="$("$QUALITY_PYTHON" - "$report_path" <<'PY'
 from __future__ import annotations
 
 import json
@@ -170,7 +170,8 @@ report = json.loads(report_path.read_text(encoding="utf-8"))
 danger_findings = report.get("danger", [])
 
 if not isinstance(danger_findings, list):
-    raise SystemExit("0")
+    print(0)
+    raise SystemExit(0)
 
 print(sum(1 for finding in danger_findings if isinstance(finding, dict)))
 PY

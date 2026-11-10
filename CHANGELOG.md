@@ -177,6 +177,24 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Code quality review (0.17.109): `_classify_error` reads its fourteen
+  status rules from one table (`_ERROR_STATUS_RULES`) instead of a chain of
+  `if` statements, with the same statuses in the same order. `main()` tells
+  a missing runtime dependency from other fatal errors by a
+  `MissingRuntimeDependenciesError` type, not by the start of the message
+  text. `PhaseTimer.duration` is a plain lookup, and unowned errors return
+  the shared `_UNKNOWN_OWNER` constant.
+- Quality gate (0.17.109): Skylos runs with `SKYLOS_NO_CLIPBOARD=1`, the
+  opt-out it has had since 5.0.0, in place of a stub `pyperclip` module on
+  `PYTHONPATH`. The `SKYLOS_GREP_BUDGET` comment gives Skylos's real default
+  (120 s). `common_quality.sh` loses a stray level of indentation left by a
+  removed wrapper (whitespace only), and `run_quality_checks.sh` prints one
+  heading for `ruff format --check` in both modes and says why it clears
+  its arguments before calling pyrefly with `"$@"` (ShellCheck SC2119).
+- `update.sh` (0.17.109): the two remaining `pip show | grep | awk` version
+  lookups use `get_installed_distribution_version`, the helper written
+  because that pipeline once ended the script under `pipefail`.
+
 - Docs: releases 0.1.0 to 0.15.0 moved from `CHANGELOG.md` to
   `docs/notes/archive/CHANGELOG_0.1.0-0.15.0.md` unchanged, halving the live
   changelog (332 KB to 163 KB); a closing "Older releases" section links
@@ -1394,6 +1412,10 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- Dead code (0.17.109): `format_field_label` and `log_generated_text` had no
+  callers in the script, the tools or the tests and are removed, along with
+  their `__all__` entries (which had hidden them from vulture).
+
 - Cruft: `src/tools/retire_old_models.sh` is removed (john's 2026-10-25
   review). Its dated retirement list has been applied: none of its twelve
   targets is in the 2026-10-25 sweep's cache. Git history keeps it.
@@ -1406,6 +1428,19 @@ Notable changes to this project will be documented in this file.
   must now sort its own results. Report order is unchanged.
 
 ### Fixed
+
+- `run_skylos_danger_advisory.sh` (0.17.109): the "no findings" branch ran
+  `raise SystemExit("0")`, which prints `0` to stderr and exits 1, so a
+  report with no danger list would have stopped the script under `set -e`
+  with an empty count. It now prints `0` and exits 0. `$QUALITY_PYTHON` is
+  quoted there.
+- Quality gate (0.17.109): ty 0.0.100 renamed `invalid-property-type-override`
+  to `incompatible-property-override`, so the two stream-property ignores in
+  `check_models.py` stopped matching and the suppression audit failed on a
+  fresh install. The ignores use the new name and the floor is `ty>=0.0.100`
+  (0.0.99 and older do not know it).
+- Agent instructions: the section table named a `DiagnosticsConfig` class
+  that does not exist; it now names `ResultAssessment`.
 
 - Reasoning effort (0.17.108, john's 2026-11-07 review): the chat template
   is now selected and parsed once, and its variables, declared efforts and

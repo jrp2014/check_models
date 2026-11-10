@@ -190,7 +190,6 @@ __all__ = [
     "exit_with_cli_error",
     "extract_image_metadata",
     "find_most_recent_file",
-    "format_field_label",
     "format_field_value",
     "format_overall_runtime",
     "generate_diagnostics_report",
@@ -205,7 +204,6 @@ __all__ = [
     "log_blank",
     "log_failure",
     "log_file_path",
-    "log_generated_text",
     "log_metric_label",
     "log_model_name",
     "log_success",
@@ -2431,10 +2429,7 @@ class PhaseTimer:
 
     def duration(self, phase: FailurePhaseName) -> float | None:
         """Return the accumulated duration for a phase, if available."""
-        duration = self._durations.get(phase)
-        if duration is None:
-            return None
-        return duration
+        return self._durations.get(phase)
 
 
 # Set on a thread while the harness's own console log handler writes, so a
@@ -2485,13 +2480,13 @@ class _TeeCaptureStream(io.TextIOBase):
     # both makes a captured bar render exactly as an uncaptured one.
     # Typeshed declares TextIOBase.encoding and .errors as writable attributes,
     # but CPython's are read-only descriptors, so a property is the only way to
-    # forward them. mypy and pyrefly honour the type: ignore; ty (0.0.86+) needs its own.
+    # forward them. mypy and pyrefly honour the type: ignore; ty needs its own (rule renamed in 0.0.100).
     @property
-    def encoding(self) -> str:  # type: ignore[override]  # ty: ignore[invalid-property-type-override]  # inaccurate stub
+    def encoding(self) -> str:  # type: ignore[override]  # ty: ignore[incompatible-property-override]  # inaccurate stub
         return getattr(self._stream, "encoding", None) or "utf-8"
 
     @property
-    def errors(self) -> str | None:  # type: ignore[override]  # ty: ignore[invalid-property-type-override]  # as encoding
+    def errors(self) -> str | None:  # type: ignore[override]  # ty: ignore[incompatible-property-override]  # as encoding
         return getattr(self._stream, "errors", None)
 
     def fileno(self) -> int:
@@ -3716,11 +3711,6 @@ def fmt_num(val: float | str) -> str:
         return str(val)
     except (ValueError, TypeError, OverflowError):
         return str(val)
-
-
-def format_field_label(field_name: str) -> str:
-    """Return a human-friendly label for a metric field name."""
-    return field_name.replace("_", " ").title()
 
 
 # =============================================================================
@@ -14346,10 +14336,58 @@ def _build_error_signature(
     return f"{error_code}:{digest}"
 
 
+# (status, needles, quantifier): the first rule that matches wins, so order is
+# precedence. An ``any`` rule matches on one needle; an ``all`` rule needs
+# every needle. Needles are lowercase.
+_ERROR_STATUS_RULES: Final[
+    tuple[tuple[str, tuple[str, ...], Callable[[Iterable[bool]], bool]], ...]
+] = (
+    # Critical infrastructure errors
+    ("Network Error", _EXTERNAL_CONNECTIVITY_NEEDLES, any),
+    ("OOM", _OOM_MESSAGE_NEEDLES, any),
+    ("Timeout", ("timeout",), any),
+    # Dependency/version errors
+    ("Missing Dep", ("requires", "packages", "pip install"), all),
+    ("Lib Version", ("cannot import name", "importerror"), any),
+    (
+        "API Drift",
+        (
+            "generation runtime api drift",
+            "missing-dependency placeholder",
+            "missing required keyword parameter",
+            "positional-only parameter",
+            "required field(s)",
+            "signature could not be inspected for api drift checks",
+        ),
+        any,
+    ),
+    # API compatibility errors
+    ("API Mismatch", ("unexpected keyword argument", "got an unexpected keyword"), any),
+    # Model configuration/file errors
+    (
+        "Config Missing",
+        ("does not appear to have a file named", "missing required file", "config is missing"),
+        any,
+    ),
+    ("No Chat Template", ("chat_template is not set", "no template argument was passed"), any),
+    # Architecture support (upstream raises "Model type {x} not supported.")
+    # Must precede Weight Mismatch / Model Error to avoid misclassification.
+    ("Unsupported Arch", ("model type", "not supported"), all),
+    # Weight/parameter errors
+    ("Weight Mismatch", ("missing", "parameters"), all),
+    # MLX core errors
+    ("Type Cast Error", ("std::bad_cast",), any),
+    # Processor/tokenizer errors
+    ("Processor Error", ("imageprocessor", "image_processor"), any),
+    ("Tokenizer Error", ("tokenizer class", "does not exist"), all),
+)
+
+
 def _classify_error(error_msg: str) -> str:
     """Classify error message into a short, readable status code.
 
-    Categories (in order of precedence):
+    Categories (in order of precedence, see ``_ERROR_STATUS_RULES``):
+        - Network Error: Hub/network connectivity failures
         - OOM: Metal memory allocation failures
         - Timeout: Operation timed out
         - Missing Dep: Missing pip packages
@@ -14367,83 +14405,12 @@ def _classify_error(error_msg: str) -> str:
         - Error: Unclassified errors
     """
     msg_lower = error_msg.lower()
-
-    # (Error Type, List of lowercase keywords that trigger this type)
-    # Order matters: first match wins
-    error_definitions = [
-        # Critical infrastructure errors
-        ("Network Error", list(_EXTERNAL_CONNECTIVITY_NEEDLES)),
-        ("OOM", list(_OOM_MESSAGE_NEEDLES)),
-        ("Timeout", ["timeout"]),
-        # Dependency/version errors
-        (
-            "Missing Dep",
-            ["requires", "packages", "pip install"],
-        ),  # All must be present logic handled below
-        ("Lib Version", ["cannot import name", "importerror"]),
-        (
-            "API Drift",
-            [
-                "generation runtime api drift",
-                "missing-dependency placeholder",
-                "missing required keyword parameter",
-                "positional-only parameter",
-                "required field(s)",
-                "signature could not be inspected for api drift checks",
-            ],
-        ),
-        # API compatibility errors
-        ("API Mismatch", ["unexpected keyword argument", "got an unexpected keyword"]),
-        # Model configuration/file errors
-        (
-            "Config Missing",
-            ["does not appear to have a file named", "missing required file", "config is missing"],
-        ),
-        ("No Chat Template", ["chat_template is not set", "no template argument was passed"]),
-        # Architecture support (upstream raises "Model type {x} not supported.")
-        # Must precede Weight Mismatch / Model Error to avoid misclassification.
-        ("Unsupported Arch", ["model type", "not supported"]),
-        # Weight/parameter errors
-        ("Weight Mismatch", ["missing", "parameters"]),
-        # MLX core errors
-        ("Type Cast Error", ["std::bad_cast"]),
-        # Processor/tokenizer errors
-        ("Processor Error", ["imageprocessor", "image_processor"]),
-        ("Tokenizer Error", ["tokenizer class", "does not exist"]),
-        # Generic model errors
-        ("Model Error", ["model", "loading", "failed"]),
-    ]
-
-    for error_type, patterns in error_definitions:
-        # Special case for multi-keyword AND logic (Missing Dep, Unsupported
-        # Arch, Model Error)
-        if error_type in {"Missing Dep", "Unsupported Arch"}:
-            if all(p in msg_lower for p in patterns):
-                return error_type
-            continue
-
-        if error_type == "Model Error":
-            # "model" AND ("loading" OR "failed")
-            if "model" in msg_lower and ("loading" in msg_lower or "failed" in msg_lower):
-                return error_type
-            continue
-
-        if error_type == "Tokenizer Error":
-            # "tokenizer class" AND "does not exist"
-            if all(p in msg_lower for p in patterns):
-                return error_type
-            continue
-
-        if error_type == "Weight Mismatch":
-            # "missing" AND "parameters"
-            if all(p in msg_lower for p in patterns):
-                return error_type
-            continue
-
-        # Default OR logic for other patterns
-        if any(p in msg_lower for p in patterns):
-            return error_type
-
+    for status, needles, quantifier in _ERROR_STATUS_RULES:
+        if quantifier(needle in msg_lower for needle in needles):
+            return status
+    # Generic model errors: "model" with either "loading" or "failed".
+    if "model" in msg_lower and ("loading" in msg_lower or "failed" in msg_lower):
+        return "Model Error"
     return "Error"
 
 
@@ -14597,7 +14564,7 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     if "missing" in combined and "parameters" in combined:
         return "model-config"
 
-    return "unknown"
+    return _UNKNOWN_OWNER
 
 
 def _load_model(
@@ -17413,57 +17380,6 @@ def log_metric_label(label: str, *, emoji: str = "", indent: str = "") -> None:
     )
 
 
-def log_generated_text(
-    text: str,
-    *,
-    wrap: bool = True,
-    indent: str = "",
-    max_lines: int | None = None,
-) -> None:
-    """Log generated model output with cyan styling and optional wrapping.
-
-    Preserves original line breaks in the text. Each line is wrapped independently
-    to terminal width if needed.
-
-    Args:
-        text: The generated text to display
-        wrap: Whether to wrap long lines to terminal width
-        indent: Indentation prefix for each line
-        max_lines: Maximum number of lines to log (truncates if exceeded)
-    """
-    lines = text.splitlines()
-    if max_lines is not None and len(lines) > max_lines:
-        lines = lines[:max_lines]
-        lines.append("... (truncated)")
-
-    if wrap:
-        width = get_terminal_width(max_width=100)
-        avail_width = max(20, width - len(indent))
-
-        for line in lines:
-            if not line.strip():
-                logger.info("", extra={"style_hint": LogStyles.GENERATED_TEXT})
-                continue
-
-            if len(line) <= avail_width:
-                formatted = f"{indent}{line}"
-                logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
-            else:
-                wrapped = textwrap.wrap(
-                    line,
-                    width=avail_width,
-                    break_long_words=False,
-                    break_on_hyphens=False,
-                ) or [line]
-                for wrapped_line in wrapped:
-                    formatted = f"{indent}{wrapped_line}"
-                    logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
-    else:
-        for line in lines:
-            formatted = f"{indent}{line}"
-            logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
-
-
 def log_model_name(name: str, *, label: str = "") -> None:
     """Log a model identifier with magenta highlight.
 
@@ -17925,8 +17841,12 @@ def setup_environment(args: argparse.Namespace) -> RunStartFacts:
     )
 
 
+class MissingRuntimeDependenciesError(RuntimeError):
+    """Core inference dependencies are missing or too old; no model can run."""
+
+
 def _raise_for_missing_runtime_dependencies() -> None:
-    """Raise a fatal runtime error when core inference dependencies are unavailable."""
+    """Raise ``MissingRuntimeDependenciesError`` when core inference dependencies are unavailable."""
     transformers_version = get_library_versions().get("transformers")
     if transformers_version is None:
         MISSING_DEPENDENCIES.setdefault(
@@ -17951,7 +17871,7 @@ def _raise_for_missing_runtime_dependencies() -> None:
         f"Required runtime dependencies unavailable: {missing_list}. "
         "Install/repair these packages before running model checks."
     )
-    raise RuntimeError(error_message)
+    raise MissingRuntimeDependenciesError(error_message)
 
 
 # Path() collapses "://" to ":/", so a URL given to --image arrives as
@@ -28657,25 +28577,19 @@ def main(args: argparse.Namespace) -> None:
     except KeyboardInterrupt:
         logger.warning("Execution interrupted by user.")
         sys.exit(130)
-    except SystemExit:
-        raise
-    except RuntimeError as main_err:
-        message = str(main_err)
-        if message.startswith("Required runtime dependencies unavailable:"):
-            log_failure("Required runtime dependencies unavailable; no models were run.")
-            log_warning_note(
-                "Install/repair the missing packages and re-run. Environment details and a "
-                "minimal diagnostics report have been written for triage.",
-            )
-            _write_environment_failure_diagnostics(
-                args=args,
-                run_facts=run_facts,
-                error_message=message,
-            )
-        else:
-            logger.critical("Fatal error in main execution: %s", main_err, exc_info=True)
+    except MissingRuntimeDependenciesError as missing_err:
+        log_failure("Required runtime dependencies unavailable; no models were run.")
+        log_warning_note(
+            "Install/repair the missing packages and re-run. Environment details and a "
+            "minimal diagnostics report have been written for triage.",
+        )
+        _write_environment_failure_diagnostics(
+            args=args,
+            run_facts=run_facts,
+            error_message=str(missing_err),
+        )
         sys.exit(1)
-    except (OSError, ValueError) as main_err:
+    except (OSError, RuntimeError, ValueError) as main_err:
         logger.critical("Fatal error in main execution: %s", main_err, exc_info=True)
         sys.exit(1)
 

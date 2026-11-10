@@ -89,7 +89,7 @@ The file is organized in this order — search for these exact landmark headers 
 | Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
 | Metrics and field formatting | `analyze_generation_text`, mechanical observation helpers, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |
 | Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | `SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS` |
-| Diagnostics/report context builders | `DiagnosticsConfig`, `ReportRenderContext`, native repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
+| Diagnostics/report context builders | `ResultAssessment`, `ReportRenderContext`, native repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
 | Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_gallery_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
 | Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` | `SECTION: MODEL PROCESSING` |
 | Isolated model execution | `--isolate` child-interpreter worker: `_run_model_isolated`, `_run_isolated_worker`, JSON round-trip of `PerformanceResult` | `SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)` |

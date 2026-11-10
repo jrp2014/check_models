@@ -1494,7 +1494,7 @@ update_local_mlx_repos() {
 		
 		# Record the currently installed version so we can restore on failure
 		local CURRENT_VERSION
-		CURRENT_VERSION=$(pip show "${REPO_NAMES[idx]}" 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
+		CURRENT_VERSION="$(get_installed_distribution_version "${REPO_NAMES[idx]}")"
 
 		PREV_CMAKE_ARGS=""
 		CMAKE_ARGS_WAS_SET=0
@@ -2110,7 +2110,7 @@ if local_mlx_repos_present; then
 else
 	echo "[update.sh] No local MLX development repositories found"
 	# Check if MLX is a dev build (contains .dev or +commit)
-	MLX_VERSION=$(pip show mlx 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
+	MLX_VERSION="$(get_installed_distribution_version mlx)"
 	if [[ "$MLX_VERSION" == *".dev"* ]] || [[ "$MLX_VERSION" == *"+"* ]]; then
 		SKIP_MLX_PYPI=1
 		echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
