@@ -1435,6 +1435,53 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- `update.sh` local-MLX stage (0.17.112, step 2 of john's 2026-11-11 plan):
+  three workarounds are gone; `update.sh` is 2,000 lines, from 2,201.
+  - The mlx-audio pin relaxer (`mlx_audio_pin_assessment`,
+    `reconcile_mlx_audio_with_local_mlx` and `tools/relax_exact_mlx_pin.py`).
+    It installed mlx-audio with `--no-deps` and rewrote its installed
+    metadata, because 0.6.2-0.6.4 pinned `mlx==0.32.4`, which a local
+    `0.32.5.devN` build cannot satisfy. mlx-audio 0.6.5 declares
+    `mlx>=0.32.4`, so pip resolves mlx-vlm's requirements under the local
+    mlx pin unaided. Should a later mlx-audio pin mlx exactly again, the
+    mlx-vlm install fails with pip's `ResolutionImpossible` and the run
+    stops; nothing rewrites installed metadata any more.
+  - The PyPI fallback after a failed build. It ran only when `pip show`
+    failed after the failed install, asked PyPI for the local build's dev
+    version (which PyPI never has), then installed the newest release, and
+    the run stopped anyway. Its premise, that pip uninstalls before
+    building, is wrong: pip builds the editable wheel first, so a failed
+    build leaves the previous install in place (checked with a package whose
+    build raises: exit 1, the old version still installed).
+  - `REPO_SKIP`. It was set only on the failure that already stops the run,
+    so every loop that consulted it saw zeros; a local `install_failed` flag
+    carries the failure past the `CMAKE_ARGS` restore to the stop.
+
+  Behaviour preserved: mlx builds before mlx-vlm; mlx-vlm installs under the
+  local mlx pin; an unchanged, clean, verified checkout skips its rebuild and
+  mlx is still pinned; a failed build or install stops the run with a
+  nonzero status after the caller's `CMAKE_ARGS` is put back, pinning a
+  surviving local mlx; the editable-origin and build-match checks are
+  untouched. Benefit: the stage no longer edits another package's installed
+  metadata or installs a PyPI wheel where a local build was asked for, and
+  its failure path is one flag. Evidence: six tests run the shipped
+  `update_local_mlx_repos` against fake `git` and `pip`, checking exit
+  status, pip arguments, `CMAKE_ARGS` and the pin file; run against the old
+  script they show the fallback's `pip install mlx==<dev version>` and the
+  relaxer's dry-run probe. Resolution was checked in three fresh
+  environments holding an editable stand-in `mlx 0.32.5.dev20261110+abc123456`
+  under the same pin (Linux, Python 3.13): empty, mlx-audio 0.6.4 as
+  published (`mlx==0.32.4`), and mlx-audio 0.6.4 with its metadata relaxed by
+  the removed tool (`mlx>=0.32.4`, the state of john's environment). In each,
+  the stage's own install command on mlx-vlm main (0.8.0) exited 0, moved
+  mlx-audio to 0.6.5 with its published metadata, left the stand-in mlx
+  editable at the pinned version, and `pip check` was clean; a dry run of the
+  eager project reinstall under the pin then planned no mlx, mlx-vlm or
+  mlx-audio install. Not checked here: macOS markers and a real compiled
+  mlx, which a full `update.sh` run on the Mac covers.
+  The relaxer's tests and the source-text checks on the failure branch are
+  replaced by those behavioural tests.
+
 - Dead code (0.17.109): `format_field_label` and `log_generated_text` had no
   callers in the script, the tools or the tests and are removed, along with
   their `__all__` entries (which had hidden them from vulture).

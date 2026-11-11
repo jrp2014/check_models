@@ -37,7 +37,6 @@ from tools import (
     filter_danger_report,
     hub_precheck,
     quarantine_broken_pip_metadata,
-    relax_exact_mlx_pin,
     safe_io,
     update_readme_deps,
     validate_env,
@@ -1499,266 +1498,6 @@ def test_update_script_rebuild_check_compares_mlx_vlm_declared_version(
     assert reason in result.stdout
 
 
-_LOCAL_DEV_MLX = "0.32.5.dev20261028+7d2d94a55"
-
-
-def _pin_assessment_report(tmp_path: Path, requires_dist: list[str]) -> Path:
-    report = tmp_path / "report.json"
-    safe_io.write_text_no_follow(
-        report,
-        json.dumps(
-            {
-                "install": [
-                    {"metadata": {"version": "0.6.3", "requires_dist": requires_dist}},
-                ],
-            },
-        ),
-    )
-    return report
-
-
-@pytest.mark.parametrize(
-    ("requires_dist", "local_mlx", "expected"),
-    [
-        pytest.param([], _LOCAL_DEV_MLX, "0.6.3\tnormal\t", id="no-mlx-requirement"),
-        # Conditional pins (extras or markers) are not the unconditional
-        # resolution blocker the reconcile targets.
-        pytest.param(
-            ['mlx==0.32.4; extra == "cuda"'], _LOCAL_DEV_MLX, "0.6.3\tnormal\t", id="marker-pin"
-        ),
-        pytest.param(
-            ["mlx>=0.32.4"], _LOCAL_DEV_MLX, "0.6.3\tsatisfied\t>=0.32.4", id="floor-satisfied"
-        ),
-        # PEP 440: ==0.32.4 accepts 0.32.4+local; a shell string comparison
-        # called this a conflict.
-        pytest.param(
-            ["mlx==0.32.4"], "0.32.4+local", "0.6.3\tsatisfied\t==0.32.4", id="pin-local-label"
-        ),
-        pytest.param(
-            ["mlx==0.32.*"], _LOCAL_DEV_MLX, "0.6.3\tsatisfied\t==0.32.*", id="wildcard-satisfied"
-        ),
-        # The 2026-10-28 failure: every mlx-audio >=0.6.2 pins mlx==0.32.4,
-        # which a local 0.32.5 dev build can never satisfy.
-        pytest.param(
-            ["mlx==0.32.4", "numpy>=1.26"], _LOCAL_DEV_MLX, "0.6.3\trelax\t0.32.4", id="relaxable"
-        ),
-        # ==0.33.* has no valid >= form; relaxing it would write invalid metadata.
-        pytest.param(
-            ["mlx==0.33.*"], _LOCAL_DEV_MLX, "0.6.3\tunsupported\t==0.33.*", id="wildcard-ahead"
-        ),
-        # A >=X floor the local build cannot meet must not be written either:
-        # the resolution would still be impossible, with metadata already mutated.
-        pytest.param(
-            ["mlx==0.33.0"], _LOCAL_DEV_MLX, "0.6.3\tunsupported\t==0.33.0", id="pin-ahead"
-        ),
-    ],
-)
-def test_update_script_mlx_audio_pin_assessment(
-    tmp_path: Path, requires_dist: list[str], local_mlx: str, expected: str
-) -> None:
-    """Requirement interpretation uses packaging semantics in one place."""
-    report = _pin_assessment_report(tmp_path, requires_dist)
-    function = _update_script_function("mlx_audio_pin_assessment")
-    stubs = f'python() {{ {shlex.quote(sys.executable)} "$@"; }}\n'
-    result = _run_bash_script(
-        f'{stubs}{function}\nmlx_audio_pin_assessment "$1" "$2"',
-        "_",
-        str(report),
-        local_mlx,
-        check=True,
-    )
-    assert result.stdout.rstrip("\n") == expected
-
-
-def _run_reconcile_harness(
-    tmp_path: Path,
-    requires_dist: list[str],
-    *,
-    install_status: int = 0,
-    relax_status: int = 0,
-) -> tuple[int, str, str]:
-    """Run the full reconcile function under set -e inside the caller's `if !`.
-
-    The enclosing conditional is the regression surface: it makes set -e
-    inert inside the function, so only explicit status checks can stop a
-    failed install, metadata rewrite or hold from being recorded as success.
-    Returns (exit status, stdout, final constraint-file content).
-    """
-    repo = tmp_path / "mlx-vlm"
-    repo.mkdir()
-    safe_io.write_text_no_follow(repo / "requirements.txt", "mlx>=0.32.4\nmlx-audio>=0.6.2\n")
-    report = _pin_assessment_report(tmp_path, requires_dist)
-    constraint = tmp_path / "pin.txt"
-    safe_io.write_text_no_follow(constraint, f"mlx=={_LOCAL_DEV_MLX}\n")
-    functions = _update_script_function("mlx_audio_pin_assessment") + _update_script_function(
-        "reconcile_mlx_audio_with_local_mlx"
-    )
-    script = f"""
-set -euo pipefail
-pip() {{
-    local previous="" arg
-    if [[ " $* " == *" --report "* ]]; then
-        for arg in "$@"; do
-            if [[ "$previous" == "--report" ]]; then cp {shlex.quote(str(report))} "$arg"; fi
-            previous="$arg"
-        done
-        return 0
-    fi
-    if [[ " $* " == *" --no-deps "* ]]; then return {install_status}; fi
-    return 0
-}}
-python() {{
-    if [[ "$1" == *relax_exact_mlx_pin.py ]]; then return {relax_status}; fi
-    {shlex.quote(sys.executable)} "$@"
-}}
-get_installed_distribution_version() {{
-    case "$1" in
-        mlx) echo {shlex.quote(_LOCAL_DEV_MLX)} ;;
-        mlx-audio) echo "0.5.9" ;;
-    esac
-}}
-SCRIPT_DIR=/stub-tools
-COMPLETED_STEPS=()
-LOCAL_MLX_CONSTRAINT_FILE={shlex.quote(str(constraint))}
-{functions}
-if ! reconcile_mlx_audio_with_local_mlx {shlex.quote(str(repo))}; then
-    echo STOPPED
-    exit 3
-fi
-"""
-    result = _run_bash_script(script)
-    return result.returncode, result.stdout, safe_io.read_text_no_follow(constraint)
-
-
-def test_update_script_reconcile_succeeds_and_holds_only_after_relaxing(tmp_path: Path) -> None:
-    """The happy path relaxes the pin, then holds the version for the run."""
-    status, stdout, constraint = _run_reconcile_harness(tmp_path, ["mlx==0.32.4"])
-    assert status == 0
-    assert "STOPPED" not in stdout
-    assert "Holding mlx-audio at 0.6.3" in stdout
-    assert constraint.endswith("mlx-audio==0.6.3\n")
-
-
-@pytest.mark.parametrize(
-    ("kwargs", "message"),
-    [
-        pytest.param({"install_status": 1}, "Could not install mlx-audio==0.6.3", id="install"),
-        pytest.param({"relax_status": 1}, "Could not relax the mlx pin", id="metadata-rewrite"),
-    ],
-)
-def test_update_script_reconcile_failures_stop_the_caller(
-    tmp_path: Path, kwargs: dict[str, int], message: str
-) -> None:
-    """A failed install or metadata rewrite stops the run and holds nothing.
-
-    Regression: invoked inside `if !`, the function once returned 0 past
-    these failures, recorded the hold, and the run reported success.
-    """
-    status, stdout, constraint = _run_reconcile_harness(tmp_path, ["mlx==0.32.4"], **kwargs)
-    assert status == 3
-    assert "STOPPED" in stdout
-    assert message in stdout
-    assert "Holding" not in stdout
-    assert "mlx-audio" not in constraint
-
-
-def test_update_script_reconcile_refuses_an_unrelaxable_requirement(tmp_path: Path) -> None:
-    """A pin whose >= floor the local build cannot meet stops before any change."""
-    status, stdout, constraint = _run_reconcile_harness(tmp_path, ["mlx==0.33.0"])
-    assert status == 3
-    assert "STOPPED" in stdout
-    assert "cannot safely relax" in stdout
-    assert "mlx-audio" not in constraint
-
-
-def _write_metadata_dist_info(site_dir: Path, name: str, version: str, metadata: str) -> Path:
-    metadata_dir = site_dir / f"{name}-{version}.dist-info"
-    metadata_dir.mkdir(parents=True)
-    metadata_file = metadata_dir / "METADATA"
-    safe_io.write_text_no_follow(metadata_file, metadata)
-    return metadata_file
-
-
-def test_relax_exact_mlx_pin_rewrites_only_the_bare_exact_pin(tmp_path: Path) -> None:
-    """``mlx==X`` becomes ``mlx>=X``; conditional and multi-clause lines stay."""
-    metadata_file = _write_metadata_dist_info(
-        tmp_path,
-        "mlx_audio",
-        "0.6.3",
-        "Metadata-Version: 2.4\n"
-        "Name: mlx-audio\n"
-        "Version: 0.6.3\n"
-        "Requires-Dist: mlx==0.32.4\n"
-        "Requires-Dist: numpy>=1.26.4\n"
-        'Requires-Dist: mlx-lm==0.32.2; extra == "parity"\n',
-    )
-    outcomes = relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
-    assert outcomes == [f"relaxed mlx==0.32.4 to mlx>=0.32.4 in {metadata_file}"]
-    rewritten = safe_io.read_text_no_follow(metadata_file)
-    assert "Requires-Dist: mlx>=0.32.4\n" in rewritten
-    assert "mlx==0.32.4" not in rewritten
-    # The conditional mlx-lm pin and the unrelated floor are untouched.
-    assert 'Requires-Dist: mlx-lm==0.32.2; extra == "parity"\n' in rewritten
-    assert "Requires-Dist: numpy>=1.26.4\n" in rewritten
-    # Idempotent: a second run finds nothing left to relax and still succeeds.
-    assert relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path]) == [
-        f"no bare exact mlx pin to relax in {metadata_file}"
-    ]
-
-
-def test_relax_exact_mlx_pin_leaves_wildcard_pins_alone(tmp_path: Path) -> None:
-    """``mlx==0.32.*`` has no valid ``>=`` form and must never be rewritten."""
-    metadata_file = _write_metadata_dist_info(
-        tmp_path,
-        "mlx_audio",
-        "0.6.3",
-        "Metadata-Version: 2.4\nName: mlx-audio\nVersion: 0.6.3\nRequires-Dist: mlx==0.32.*\n",
-    )
-    before = safe_io.read_text_no_follow(metadata_file)
-    outcomes = relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
-    assert outcomes == [f"no bare exact mlx pin to relax in {metadata_file}"]
-    assert safe_io.read_text_no_follow(metadata_file) == before
-
-
-def test_relax_exact_mlx_pin_failure_keeps_the_original_metadata(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """A write that fails part-way leaves the installed METADATA byte-for-byte intact.
-
-    Regression: the rewrite once truncated METADATA in place before writing,
-    so a failure after opening it left an empty file in the environment.
-    """
-    metadata_file = _write_metadata_dist_info(
-        tmp_path,
-        "mlx_audio",
-        "0.6.3",
-        "Metadata-Version: 2.4\nName: mlx-audio\nVersion: 0.6.3\nRequires-Dist: mlx==0.32.4\n",
-    )
-    metadata_file.chmod(0o644)
-    before = metadata_file.read_bytes()
-
-    def fail_after_writing(_fd: int) -> None:
-        raise OSError(28, "No space left on device")
-
-    with monkeypatch.context() as patch:
-        patch.setattr(safe_io.os, "fsync", fail_after_writing)
-        with pytest.raises(OSError, match="No space left"):
-            relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
-    assert metadata_file.read_bytes() == before
-    assert sorted(path.name for path in metadata_file.parent.iterdir()) == ["METADATA"]
-
-    # Once the failure clears, the rewrite lands and keeps the file's permissions.
-    relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
-    assert "Requires-Dist: mlx>=0.32.4\n" in safe_io.read_text_no_follow(metadata_file)
-    assert metadata_file.stat().st_mode & 0o777 == 0o644
-
-
-def test_relax_exact_mlx_pin_requires_installed_metadata(tmp_path: Path) -> None:
-    """A missing distribution is an error, not a silent no-op."""
-    with pytest.raises(RuntimeError, match="no installed metadata"):
-        relax_exact_mlx_pin.relax_exact_pin("mlx-audio", "mlx", site_dirs=[tmp_path])
-
-
 def _conflict_probe(function_name: str, repo: Path) -> list[str]:
     """Run one extracted update.sh detector against a repo; return the paths it reports."""
     function = _update_script_function(function_name)
@@ -2271,10 +2010,7 @@ def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
 
     mlx_build_start = update_script.index("# MLX build controls are passed to pip via CMAKE_ARGS.")
-    mlx_build_end = update_script.index(
-        "[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue",
-        mlx_build_start,
-    )
+    mlx_build_end = update_script.index("local install_failed=0", mlx_build_start)
     mlx_build = update_script[mlx_build_start:mlx_build_end]
 
     assert "MACOSX_DEPLOYMENT_TARGET" not in mlx_build
@@ -4295,10 +4031,11 @@ verify_local_installs_survived_reconcile && echo "empty-ok"
 def test_update_failed_mlx_build_pins_the_surviving_local_install(tmp_path: Path) -> None:
     """A compile failure leaves the old editable build installed; later installs stay pinned.
 
-    Regression: the failure branch set REPO_SKIP without pinning, so the final
+    Regression: the failure branch did not pin the survivor, so the final
     eager project reinstall ran unconstrained and would have replaced the
     working local build with the PyPI wheel once a release overtook the local
-    dev version.
+    dev version. The stage's own stop is exercised by the
+    ``test_update_local_stage_*`` tests below.
     """
     survivor = """
 get_installed_distribution_version() { echo "0.32.3.dev20260912+229f5b430"; }
@@ -4324,14 +4061,193 @@ pip_install somepkg
     assert "nothing to pin" in log
     assert "--constraint" not in log
 
+
+_LOCAL_MLX_VERSION = "0.32.5.dev20261110+abc123456"
+
+
+def _run_local_mlx_stage(
+    tmp_path: Path,
+    *,
+    failing_repo: str = "",
+    pulled: bool = True,
+    editable_survives: bool = True,
+    caller_cmake_args: str | None = None,
+) -> tuple[dict[str, list[str]], list[str]]:
+    """Run update.sh's real Stage 1-3b function against fake ``git`` and ``pip``.
+
+    The pin state, the pip wrappers and ``update_local_mlx_repos`` are the
+    shipped text; only the helpers that inspect a real environment (editable
+    origin, compiled revision, Metal toolchain) are replaced.
+    ``editable_survives=False`` models an environment where the local install
+    is gone: the editable-origin check and ``pip show`` both fail. Returns the
+    final state the driver prints, keyed by name, and the fake pip's calls as
+    ``<checkout> CMAKE_ARGS=<value> :: <arguments>``.
+    """
     script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    failure_branch = script[script.index('echo "\u274c Failed to install ${REPO_NAMES[idx]}"') :]
-    assert 'preserve_local_mlx_after_failed_build "${REPO_PATHS[idx]}"' in failure_branch
-    # A failed Stage 3 install stops the run after the restore attempts: a run
-    # that continued (until 2026-10-28) exited 0 on a stale editable install.
-    stop_block = failure_branch[: failure_branch.index("Stage 3b")]
-    assert "failed to build/install from" in stop_block
-    assert "return 1" in stop_block
+    start = script.index('LOCAL_MLX_CONSTRAINT_FILE=""')
+    end = script.index("# pip-show helpers must be safe under live")
+    helpers = (
+        script[start:end]
+        + _update_script_function("mlx_repo_rebuild_decision")
+        + _update_script_function("update_local_mlx_repos")
+    )
+
+    work = tmp_path / "work"
+    tools_dir = work / "check_models" / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    for repo in ("mlx", "mlx-vlm"):
+        (work / repo / ".git").mkdir(parents=True)
+    safe_io.write_text_no_follow(work / "mlx-vlm" / "requirements.txt", "mlx-audio>=0.6.2\n")
+
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    pip_log = tmp_path / "pip.log"
+    safe_io.write_text_no_follow(
+        fake_bin / "pip",
+        "#!/bin/bash\n"
+        f'echo "$(basename "$PWD") CMAKE_ARGS=${{CMAKE_ARGS:-unset}} :: $*" >> "{pip_log}"\n'
+        f'[[ "$1" == "show" ]] && exit {0 if editable_survives else 1}\n'
+        '[[ "$*" == *" -e "* && "$(basename "$PWD")" == "$FAKE_FAILING_REPO" ]] && exit 1\n'
+        "exit 0\n",
+        mode=0o755,
+    )
+    safe_io.write_text_no_follow(
+        fake_bin / "git",
+        "#!/bin/bash\n"
+        'case "$*" in\n'
+        '    "pull --ff-only") [[ "$FAKE_PULLED" == "1" ]] && touch "$PWD/.git/pulled" ;;\n'
+        '    "rev-parse HEAD") [[ -f "$PWD/.git/pulled" ]] && echo bbbbbbbbbbbb || echo aaaaaaaaaaaa ;;\n'
+        '    "rev-parse --short=9 HEAD") echo bbbbbbbbb ;;\n'
+        "esac\n"
+        "exit 0\n",
+        mode=0o755,
+    )
+
+    driver = f"""
+COMPLETED_STEPS=()
+VERIFIED_LOCAL_INSTALLS=()
+LOCAL_MLX_READY=0
+get_installed_distribution_version() {{ echo "{_LOCAL_MLX_VERSION}"; }}
+verify_expected_editable_install() {{ return {0 if editable_survives else 1}; }}
+installed_build_matches_checkout() {{ return 0; }}
+mlx_build_toolchain_matches() {{ echo 1; }}
+metal_compiler_version() {{ echo "fake-metal 1"; }}
+mlx_build_toolchain_stamp() {{ echo "{tmp_path}/toolchain-stamp"; }}
+log_editable_install_provenance() {{ :; }}
+pip_install_tool() {{ pip install -U "$@"; }}
+update_local_mlx_repos
+echo "status=$?"
+echo "ready=$LOCAL_MLX_READY"
+echo "cmake_after=${{CMAKE_ARGS:-unset}}"
+echo "pin=$(cat "${{LOCAL_MLX_CONSTRAINT_FILE:-/dev/null}}" 2>/dev/null)"
+printf 'verified=%s\\n' ${{VERIFIED_LOCAL_INSTALLS[@]+"${{VERIFIED_LOCAL_INSTALLS[@]}}"}}
+"""
+    env = {
+        "PATH": f"{fake_bin}:/usr/bin:/bin",
+        "TMPDIR": str(tmp_path),
+        "FAKE_FAILING_REPO": failing_repo,
+        "FAKE_PULLED": "1" if pulled else "0",
+        "MLX_METAL_JIT": "on",
+    }
+    if caller_cmake_args is not None:
+        env["CMAKE_ARGS"] = caller_cmake_args
+    result = _run_bash_script(helpers + driver, env=env, cwd=tools_dir)
+    assert result.returncode == 0, result.stderr + result.stdout
+    state: dict[str, list[str]] = {"output": [result.stdout]}
+    for line in result.stdout.splitlines():
+        key, separator, value = line.partition("=")
+        if separator and key in {"status", "ready", "cmake_after", "pin", "verified"}:
+            state.setdefault(key, []).append(value)
+    pip_calls = safe_io.read_text_no_follow(pip_log).splitlines() if pip_log.exists() else []
+    return state, pip_calls
+
+
+@pytest.mark.subprocess
+def test_update_local_stage_builds_in_order_and_restores_cmake_args(tmp_path: Path) -> None:
+    """Both checkouts advanced: mlx builds first, mlx-vlm installs under the mlx pin."""
+    state, pip_calls = _run_local_mlx_stage(tmp_path, caller_cmake_args="-DCALLER=1")
+
+    assert state["status"] == ["0"]
+    assert state["ready"] == ["1"]
+    assert state["pin"] == [f"mlx=={_LOCAL_MLX_VERSION}"]
+    assert [entry.partition("=")[0] for entry in state["verified"]] == ["mlx", "mlx-vlm"]
+    installs = [call for call in pip_calls if " -e " in call]
+    assert [call.split(" ", 1)[0] for call in installs] == ["mlx", "mlx-vlm"]
+    # The build setting is applied for the mlx build only and the caller's value comes back.
+    assert "CMAKE_ARGS=-DCALLER=1 -DMLX_METAL_JIT=ON :: install -v -U" in installs[0]
+    assert "-e .[dev]" in installs[0]
+    assert "CMAKE_ARGS=-DCALLER=1 :: install -U --upgrade-strategy eager -e ." in installs[1]
+    assert "--constraint" in installs[1]
+    assert state["cmake_after"] == ["-DCALLER=1"]
+    # mlx-audio is left to mlx-vlm's ordinary dependency resolution: no dry-run
+    # probe, no --no-deps install, no metadata rewrite.
+    assert not [call for call in pip_calls if "mlx-audio" in call or "--no-deps" in call]
+
+
+@pytest.mark.subprocess
+def test_update_local_stage_skips_verified_unchanged_checkouts_but_still_pins(
+    tmp_path: Path,
+) -> None:
+    """Nothing pulled and both installs verified: no installs, and mlx is still pinned."""
+    state, pip_calls = _run_local_mlx_stage(tmp_path, pulled=False)
+
+    assert state["status"] == ["0"]
+    assert state["ready"] == ["1"]
+    assert state["pin"] == [f"mlx=={_LOCAL_MLX_VERSION}"]
+    assert pip_calls == []
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    "editable_survives", [True, False], ids=["previous-build-survives", "no-local-install-left"]
+)
+def test_update_local_stage_stops_on_a_failed_mlx_build_without_a_pypi_install(
+    tmp_path: Path, *, editable_survives: bool
+) -> None:
+    """A failed mlx build stops the stage; nothing is fetched from PyPI in its place."""
+    state, pip_calls = _run_local_mlx_stage(
+        tmp_path, failing_repo="mlx", editable_survives=editable_survives
+    )
+
+    assert state["status"] == ["1"]
+    assert state["ready"] == ["0"]
+    assert "failed to build/install from" in state["output"][0]
+    # A surviving editable build is pinned for anything else that touches pip.
+    assert state["pin"] == ([f"mlx=={_LOCAL_MLX_VERSION}"] if editable_survives else [""])
+    # The temporary build setting does not outlive the failed build.
+    assert state["cmake_after"] == ["unset"]
+    installs = [call for call in pip_calls if " :: install " in call]
+    assert installs[-1].startswith("mlx CMAKE_ARGS=-DMLX_METAL_JIT=ON :: install -v -U")
+    # No install after the failed build: not mlx-vlm, and no PyPI mlx in place of the local one.
+    assert not [call for call in installs if call.startswith("mlx-vlm ")]
+    assert not [call for call in installs if re.search(r" mlx(==\S+)?$", call)]
+
+
+@pytest.mark.subprocess
+def test_update_local_stage_stops_when_a_built_install_is_not_the_local_editable(
+    tmp_path: Path,
+) -> None:
+    """Both installs report success, yet the editable-origin check still gates the stage."""
+    state, pip_calls = _run_local_mlx_stage(tmp_path, editable_survives=False)
+
+    assert [call.split(" ", 1)[0] for call in pip_calls if " -e " in call] == ["mlx", "mlx-vlm"]
+    assert state["status"] == ["1"]
+    assert state["ready"] == ["0"]
+    assert state["verified"] == [""]
+    assert "Local build verification failed for mlx" in state["output"][0]
+
+
+@pytest.mark.subprocess
+def test_update_local_stage_stops_on_a_failed_mlx_vlm_install_with_mlx_pinned(
+    tmp_path: Path,
+) -> None:
+    """A failed mlx-vlm install stops the stage with the freshly built mlx still pinned."""
+    state, pip_calls = _run_local_mlx_stage(tmp_path, failing_repo="mlx-vlm")
+
+    assert state["status"] == ["1"]
+    assert state["pin"] == [f"mlx=={_LOCAL_MLX_VERSION}"]
+    assert state.get("verified", [""]) == [""]
+    assert pip_calls[-1].startswith("mlx-vlm CMAKE_ARGS=unset :: install -U")
 
 
 # ---------------------------------------------------------------------------
