@@ -203,7 +203,7 @@ Notable changes to this project will be documented in this file.
 
   Benefit: this Python is now covered by Ruff, the three type checkers and
   Skylos, and can be tested without a shell harness. It is not a line
-  saving: the four scripts lose 265 lines (`update.sh` 2,000 to 1,856,
+  saving: the four scripts lose 264 lines (`update.sh` 2,000 to 1,857,
   `common_quality.sh` 429 to 401, `run_commit_hygiene.sh` 170 to 124,
   `run_runtime_smoke.sh` 61 to 14) and the three files add 439.
 
