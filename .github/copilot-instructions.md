@@ -82,22 +82,42 @@ The file is organized in this order — search for these exact landmark headers 
 
 | Section | Key contents | Landmark Header / Search Tag |
 | --------- | ------------- | ---------------------------- |
-| Imports, config & optional dependency guards | `MISSING_DEPENDENCIES`, `QualityThresholds`, `load_quality_config()` | `SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS` |
-| Type aliases, protocols & JSONL records | `SupportsGenerationResult`, `SupportsExifIfd`, `JsonlResultRecord` | `SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS` |
-| App constants & core result types | `PerformanceResult`, `ProcessImageParams`, report block primitives | `SECTION: APP CONSTANTS & CORE RESULT TYPES` |
-| Timing, logging & Rich console plumbing | `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler` | `SECTION: TIMING, LOGGING & RICH CONSOLE PLUMBING` |
-| Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
-| Metrics and field formatting | `analyze_generation_text`, mechanical observation helpers, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |
-| Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | `SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS` |
-| Diagnostics/report context builders | `ResultAssessment`, `ReportRenderContext`, native repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
-| Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_gallery_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
-| Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` | `SECTION: MODEL PROCESSING` |
-| Isolated model execution | `--isolate` child-interpreter worker: `_run_model_isolated`, `_run_isolated_worker`, JSON round-trip of `PerformanceResult` | `SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)` |
-| CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | `SECTION: CLI RUN HELPERS & LOGGING` |
-| Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |
+| Imports, config & optional dependency guards | `MISSING_DEPENDENCIES`, module constants, symlink-safe file helpers (`_write_text_file`, `_read_text_file`), `QualityThresholds`, `load_quality_config()`, import probes | `SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS` |
+| Type aliases, protocols & JSONL records | `SupportsGenerationResult`, `SupportsExifIfd`, `JsonlResultRecord`, `RetainedRun`, `ReportOutputPaths`, generation-metric narrowing | `SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS` |
+| App constants & core result types | `PerformanceResult`, `PromptDiagnostics`, `RuntimeDiagnostics`, prompt burden, `PhaseTimer`, `_TeeCaptureStream` | `SECTION: APP CONSTANTS & CORE RESULT TYPES` |
+| Report block model & renderers | `ReportSection`, `ReportTable` and the other block primitives, `render_report_markdown`, `render_report_html`, `_render_gallery_model` | `SECTION: REPORT BLOCK MODEL & RENDERERS (Markdown, HTML, gallery entry)` |
+| Per-model run parameters | `ProcessImageParams` | `SECTION: PER-MODEL RUN PARAMETERS` |
+| Timing, logging & Rich console plumbing | `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler`, console and file log handlers | `SECTION: TIMING, LOGGING & RICH CONSOLE PLUMBING` |
+| Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, thinking and final-answer splitting, catalog parsing, cutoff and prompt-hint detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
+| Output quality analysis & field formatting | `_detect_special_token_leakage`, `GenerationQualityAnalysis`, `analyze_generation_text`, timestamps, `format_field_value` | `SECTION: OUTPUT QUALITY ANALYSIS & FIELD FORMATTING` |
+| Console width, library versions, provenance & preflight | `get_terminal_width`, `log_rule`, `get_library_versions`, distribution and component provenance, upstream API-drift and version-conflict checks | `SECTION: CONSOLE WIDTH, LIBRARY VERSIONS, PROVENANCE & PREFLIGHT CHECKS` |
+| Device info & image metadata | `get_device_info`, `print_version_info`, image discovery, EXIF/GPS/IPTC/XMP extraction, `extract_image_metadata`, `pretty_print_exif` | `SECTION: DEVICE INFO & IMAGE METADATA (EXIF, IPTC, XMP)` |
+| Report context construction, HTML primitives & runtime timing | `_build_report_render_context`, `_html_table`, `_build_runtime_analysis_summary`, runtime timing facts | `SECTION: REPORT CONTEXT CONSTRUCTION, HTML PRIMITIVES & RUNTIME TIMING ANALYSIS` |
+| Artifact links, component provenance & connectivity signals | Markdown and GitHub artifact targets, `_collect_report_component_rows`, `_public_model_provenance`, `_is_indeterminate_connectivity_failure` | `SECTION: ARTIFACT LINKS, COMPONENT PROVENANCE & CONNECTIVITY SIGNALS` |
+| Model snapshot facts | `_read_snapshot_json`, `_template_declares_thinking`, `ModelBurdenFacts`, `WeightShardStatus`, incomplete-cache and download-timeout checks | `SECTION: MODEL SNAPSHOT FACTS (thinking template, burden, weight shards, cache failures)` |
+| Gallery rows, observation labels & model chooser | `_run_outcome_counts`, `_gallery_row`, `ObservationDisplaySpec`, usability labels, `_render_gallery_table`, `_render_gallery_chooser` | `SECTION: GALLERY ROWS, OBSERVATION LABELS & MODEL CHOOSER` |
+| Result assessment, report mode policy & accuracy notes | `ResultAssessment`, `_assess_result`, `ReportModePolicy`, `AccuracyNotes`, `_match_accuracy_notes` | `SECTION: RESULT ASSESSMENT, REPORT MODE POLICY & ACCURACY NOTES` |
+| Report render context, Markdown helpers & diagnostics report | `ReportRenderContext`, Markdown section and blockquote helpers, `ReproCommandSpec`, file hashing, `generate_diagnostics_report` | `SECTION: REPORT RENDER CONTEXT, MARKDOWN HELPERS & DIAGNOSTICS REPORT` |
+| HTML report assembly | `_html_model_link`, filter controls, chooser and gallery HTML, `_build_full_html_document` | `SECTION: HTML REPORT ASSEMBLY` |
+| Report generators & runtime fingerprints | `generate_html_report`, `generate_markdown_gallery_report`, `get_system_info`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
+| CLI argument validation | `validate_sampling_params`, `validate_kv_params`, `validate_cli_arguments`, `_validate_unique_model_ids` | `SECTION: CLI ARGUMENT VALIDATION` |
+| Generation kwargs, thinking budget & reasoning effort | `_build_generate_kwargs`, `_apply_auto_thinking_budget`, `_resolve_reasoning_effort`, `_build_chat_template_kwargs` | `SECTION: GENERATION KWARGS, THINKING BUDGET & REASONING EFFORT` |
+| Prompt diagnostics, sampling defaults & chat template inspection | `_build_prompt_diagnostics`, `_apply_declared_sampling`, `_active_chat_template`, `_prompt_diagnostics_to_json` | `SECTION: PROMPT DIAGNOSTICS, SAMPLING DEFAULTS & CHAT TEMPLATE INSPECTION` |
+| Image access check & HF cache state | `validate_image_accessible`, `HFCacheScanState`, `ImageCapability`, `CachedModelEligibility`, `_check_hf_cache_integrity` | `SECTION: IMAGE ACCESS CHECK & HF CACHE STATE` |
+| Failure phases, exception records & error classification | failure-phase tagging, `_failure_exception_record`, `_build_error_signature`, `_classify_error`, `_attribute_error_to_package` | `SECTION: FAILURE PHASES, EXCEPTION RECORDS & ERROR CLASSIFICATION` |
+| Model loading, snapshot resolution & preflight | `_load_model`, `_resolve_model_snapshot`, `_collect_model_provenance`, `_run_model_preflight_validators` | `SECTION: MODEL LOADING, SNAPSHOT RESOLUTION & PREFLIGHT` |
+| Generation | `_prepare_generation_prompt`, memory sampling, `_generate_with_repetition_guard`, `_run_model_generation`, stream capture, success and failure result builders | `SECTION: GENERATION: PROMPT PREPARATION, STREAMING & RESULT ASSEMBLY` |
+| System telemetry | thermal, memory-pressure, power and GPU probes, `_SystemTelemetrySampler`, `_attach_system_telemetry` | `SECTION: SYSTEM TELEMETRY (thermal, memory pressure, power, GPU)` |
+| Isolated model execution | `--isolate` child-interpreter worker: `_run_model_isolated`, `_run_isolated_worker`, JSON round-trip of `PerformanceResult`, `process_image_with_model` | `SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)` |
+| CLI logging helpers & result printing | `print_cli_header`, `log_success`, `log_failure`, `_log_rich_table`, `print_model_result` | `SECTION: CLI LOGGING HELPERS & RESULT PRINTING` |
+| Run setup | `setup_environment`, `MissingRuntimeDependenciesError`, `find_and_validate_image`, `handle_metadata`, `_apply_eval_mode_defaults`, `prepare_prompt` | `SECTION: RUN SETUP: ENVIRONMENT, IMAGE, EVAL MODE & PROMPT` |
+| Cached model discovery, image capability & model selection | cache scan, `_classify_image_capability`, `get_cached_model_eligibility`, `get_cached_model_ids`, `validate_and_warn_model_selection`, `apply_exclusions` | `SECTION: CACHED MODEL DISCOVERY, IMAGE CAPABILITY & MODEL SELECTION` |
+| Model loop & result text enrichment | `_process_image_params_from_args`, `process_models`, `_final_answer_text`, `_populate_result_quality_analysis` | `SECTION: MODEL LOOP & RESULT TEXT ENRICHMENT` |
+| End-of-run summary tables & logging | model comparison table and charts, performance highlights, `log_summary` | `SECTION: END-OF-RUN SUMMARY TABLES & LOGGING` |
+| History, results JSONL & retained run records | `append_history_record`, `_build_jsonl_result_record`, `_build_retained_run`, `save_jsonl_report`, run image and run-input rows | `SECTION: HISTORY, RESULTS JSONL & RETAINED RUN RECORDS` |
 | Run comparison | `--compare-with` baseline resolution, `compare_run_results`, history noise bands, comparison JSON and summary section | `SECTION: RUN COMPARISON (current sweep vs a retained baseline)` |
-| Retained run validation | `RunIssueSummaryValidationError`, `_validate_run_issue_result`, `_run_issue_summary_source_from_run` | `SECTION: RETAINED RUN VALIDATION (results.jsonl to summary source)` |
-| Run issue summary | reproduction facts, quality table, clusters, `generate_run_issue_summary_report`, `regenerate_run_issue_summary` | `SECTION: RUN ISSUE SUMMARY (paste-ready whole-run report)` |
+| Retained run validation | `_validate_run_issue_metadata`, `RunIssueSummaryValidationError`, `_validate_run_issue_result`, `_run_issue_summary_source_from_run` | `SECTION: RETAINED RUN VALIDATION (results.jsonl to summary source)` |
+| Run issue summary | reproduction facts, quality table, clusters, native repro notes, `generate_run_issue_summary_report`, `regenerate_run_issue_summary` | `SECTION: RUN ISSUE SUMMARY (paste-ready whole-run report)` |
 | Output index | `_output_index_dashboard_lines`, `generate_output_index_report` | `SECTION: OUTPUT INDEX` |
 | Native reproduction commands & issue drafts | `build_native_mlx_vlm_repro_command_spec`, `_generate_github_issue_reports` | `SECTION: NATIVE REPRODUCTION COMMANDS & ISSUE DRAFTS` |
 | Report publication | `_build_report_artifacts`, `_compute_run_comparison`, `_build_retained_run_guarded`, `_generate_reports_and_log_outputs` | `SECTION: REPORT PUBLICATION (artifact plan, retained run, comparison wiring)` |
@@ -370,7 +390,7 @@ this table lists it.
 
 **Add a new quality detector:**
 
-1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns under `SECTION: METRICS, SCORING & FIELD FORMATTING`
+1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns under `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS`
 2. Wire it into the quality analysis pipeline
 3. Add thresholds to `src/check_models_data/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`

@@ -177,6 +177,29 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Section landmarks (0.17.111, step 1 of john's 2026-11-11 plan): the
+  `# SECTION:` map of `check_models.py` now describes what is under each
+  heading. Twenty sections are added and six renamed (21 to 41), so the
+  3,200 lines once under an EXIF heading and the 4,400-line "MODEL
+  PROCESSING" stretch are named for their contents (report context, model
+  snapshot facts, gallery chooser; argument validation, prompt diagnostics,
+  error classification, model loading, generation, telemetry). The
+  logging classes that sat under "FORMATTING" are back under the logging
+  heading, and "RETAINED RUN VALIDATION" starts at its first validator.
+  The agent instructions' section table lists all 41 in order. Behaviour
+  preserved: no code moved or changed; the parsed program (AST) before and
+  after the landmark edits is identical. Benefit: the file's own table of
+  contents can be trusted for navigation. Evidence: the AST comparison,
+  the existing test that keeps banners and table in step, and a check that
+  every name the table quotes is defined in the section it is listed under.
+- Timeout help (0.17.111): `--timeout` help, the README and the
+  `TimeoutManager` docstring now say what each limit can do. In-process the
+  limit is a `SIGALRM` timer covering load, prompt preparation and
+  generation; it cannot interrupt a call stuck in native code until that
+  call returns (a 3.9 s native call under a 1 s limit raised after 4.1 s).
+  With `--isolate` the parent ends the child 120 s after the limit
+  regardless. Behaviour preserved: wording only. A test ties the help's
+  grace period to `_ISOLATION_TIMEOUT_GRACE_SECONDS`.
 - Code quality review (0.17.109): `_classify_error` reads its fourteen
   status rules from one table (`_ERROR_STATUS_RULES`) instead of a chain of
   `if` statements, with the same statuses in the same order. `main()` tells

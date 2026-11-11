@@ -374,6 +374,11 @@ ALLOWED_DISTRIBUTION_TEXT_FILES: Final[frozenset[str]] = frozenset(
 )
 
 
+# =============================================================================
+# SYMLINK-SAFE FILE I/O HELPERS
+# =============================================================================
+
+
 def _is_allowed_system_symlink_parent(path: Path) -> bool:
     """Return true for trusted macOS root aliases such as /var."""
     expected_target = ALLOWED_SYSTEM_SYMLINK_PARENTS.get(path)
@@ -2504,7 +2509,11 @@ class _TeeCaptureStream(io.TextIOBase):
         return self._external_buffer.getvalue()
 
 
-# Gallery rendering helpers (outside class)
+# =============================================================================
+# SECTION: REPORT BLOCK MODEL & RENDERERS (Markdown, HTML, gallery entry)
+# =============================================================================
+
+
 def _wrap_markdown_text(
     text: str,
     *,
@@ -3288,6 +3297,11 @@ def _render_gallery_model(
     return out
 
 
+# =============================================================================
+# SECTION: PER-MODEL RUN PARAMETERS
+# =============================================================================
+
+
 @dataclass(frozen=True)
 class ProcessImageParams:
     """Parameters for processing an image with a model.
@@ -3362,7 +3376,13 @@ class ProcessImageParams:
 # Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
 # Uses SIGALRM which is Unix-only - Windows doesn't support this signal mechanism
 class TimeoutManager(ContextDecorator):
-    """Apply a SIGALRM-based timeout around synchronous code on Unix."""
+    """Apply a SIGALRM-based timeout around synchronous code on Unix.
+
+    Python runs the signal handler between bytecodes on the main thread, so
+    the ``TimeoutError`` is raised only when control is back in Python: a call
+    stuck inside native code is not interrupted until it returns. The
+    ``--isolate`` worker deadline (``_run_model_isolated``) is the hard limit.
+    """
 
     def __init__(self, seconds: float) -> None:
         """Store the timeout window that ``__enter__`` arms via SIGALRM.
@@ -3461,7 +3481,7 @@ def _display_align(text: str, width: int, *, alignment: Literal["left", "center"
 
 
 # =============================================================================
-# SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS
+# RICH CONSOLE STATE, LOG STYLES & LOG HANDLERS
 # =============================================================================
 
 
@@ -3693,7 +3713,7 @@ SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
 
 # =============================================================================
-# FORMATTING UTILITIES (Numbers, Memory, Time, Tokens/sec, Field Values)
+# SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS
 # =============================================================================
 
 
@@ -4510,7 +4530,7 @@ def _instruction_echo_fields(
 
 
 # =============================================================================
-# SECTION: METRICS, SCORING & FIELD FORMATTING
+# SECTION: OUTPUT QUALITY ANALYSIS & FIELD FORMATTING
 # =============================================================================
 # These detect issues that are likely bugs in mlx-vlm or model integration,
 # NOT inherent model quality problems. Separating them helps users know
@@ -4560,7 +4580,7 @@ def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
 
 
 # =============================================================================
-# CATALOGING QUALITY METRICS, LIBRARY VERSIONS & PROVENANCE SNAPSHOTS
+# GENERATION QUALITY ANALYSIS, TIMESTAMPS & FIELD VALUES
 # =============================================================================
 
 
@@ -4969,6 +4989,11 @@ def _format_peak_memory_context(
         f"{peak} GB ({fmt_num(percentage)}% of {fmt_num(working_set_gb)} GB "
         "recommended working set)"
     )
+
+
+# =============================================================================
+# SECTION: CONSOLE WIDTH, LIBRARY VERSIONS, PROVENANCE & PREFLIGHT CHECKS
+# =============================================================================
 
 
 # --- Console UI helpers (rules/separators) ---
@@ -5811,7 +5836,7 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 
 
 # =============================================================================
-# SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS
+# SECTION: DEVICE INFO & IMAGE METADATA (EXIF, IPTC, XMP)
 # =============================================================================
 
 
@@ -5917,8 +5942,7 @@ def print_version_info(versions: LibraryVersionDict, system_info: Mapping[str, s
 
 
 # =============================================================================
-# IMAGE & EXIF METADATA PROCESSING (file handling, GPS, EXIF) plus HTML
-# helpers, runtime analysis, artifact URLs, and the observation registry
+# IMAGE FILES & EXIF/IPTC/XMP METADATA (file handling, GPS, EXIF)
 # =============================================================================
 
 
@@ -6907,6 +6931,11 @@ def _prompt_builder_exposes_metadata(
     return provenance.has_authoritative_context or provenance.has_draft
 
 
+# =============================================================================
+# SECTION: REPORT CONTEXT CONSTRUCTION, HTML PRIMITIVES & RUNTIME TIMING ANALYSIS
+# =============================================================================
+
+
 def _build_report_mode_policy(
     *,
     eval_mode: str,
@@ -7450,6 +7479,11 @@ def _runtime_timing_snapshot_facts(
     return facts
 
 
+# =============================================================================
+# SECTION: ARTIFACT LINKS, COMPONENT PROVENANCE & CONNECTIVITY SIGNALS
+# =============================================================================
+
+
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
     """Return a relative path for links between Markdown artifacts."""
     try:
@@ -7695,6 +7729,11 @@ def _is_indeterminate_connectivity_failure(result: PerformanceResult) -> bool:
         part.casefold() for part in (result.error_message, result.error_traceback, captured) if part
     )
     return _has_external_connectivity_signal(combined)
+
+
+# =============================================================================
+# SECTION: MODEL SNAPSHOT FACTS (thinking template, burden, weight shards, cache failures)
+# =============================================================================
 
 
 # huggingface-hub download progress markers that show a load-phase timeout
@@ -8215,6 +8254,11 @@ def _advance_upstream_boundary(
     if phase == "model_load" and boundary == "not_started":
         return "load_started"
     return boundary
+
+
+# =============================================================================
+# SECTION: GALLERY ROWS, OBSERVATION LABELS & MODEL CHOOSER
+# =============================================================================
 
 
 def _run_outcome_counts(
@@ -9159,7 +9203,7 @@ def _render_gallery_output_glance(data: GalleryChooserData) -> list[str]:
 
 
 # =============================================================================
-# SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS
+# SECTION: RESULT ASSESSMENT, REPORT MODE POLICY & ACCURACY NOTES
 # =============================================================================
 
 
@@ -9678,6 +9722,11 @@ def _gallery_accuracy_note_blocks(match: AccuracyNoteMatch | None) -> tuple[Repo
     if not match.applies:
         blocks.append(ReportParagraph("This output has not been reviewed."))
     return (_report_section("Human accuracy note", *blocks, level=4),)
+
+
+# =============================================================================
+# SECTION: REPORT RENDER CONTEXT, MARKDOWN HELPERS & DIAGNOSTICS REPORT
+# =============================================================================
 
 
 @dataclass(frozen=True)
@@ -11220,6 +11269,11 @@ def generate_diagnostics_report(
     _write_text_file(filename, "\n".join(parts) + "\n")
 
 
+# =============================================================================
+# SECTION: HTML REPORT ASSEMBLY
+# =============================================================================
+
+
 def _html_model_link(model_name: str) -> str:
     """Return a safe internal link to one complete-evidence entry."""
     anchor = _gallery_model_anchor(model_name)
@@ -11871,6 +11925,11 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
     return "\n".join(out_lines)
 
 
+# =============================================================================
+# SYSTEM INFO, TOOLCHAIN & RUNTIME FINGERPRINT
+# =============================================================================
+
+
 @lru_cache(maxsize=1)
 def get_system_info() -> tuple[str, str | None]:
     """Get system architecture and GPU information.
@@ -12324,7 +12383,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
 
 
 # =============================================================================
-# SECTION: MODEL PROCESSING
+# SECTION: CLI ARGUMENT VALIDATION
 # =============================================================================
 def validate_inputs(
     image_path: PathLike,
@@ -12682,6 +12741,11 @@ def _validate_unique_model_ids(models: Sequence[str] | None) -> None:
     if repeated:
         msg = f"--models lists the same model more than once: {', '.join(repeated)}"
         raise ValueError(msg)
+
+
+# =============================================================================
+# SECTION: GENERATION KWARGS, THINKING BUDGET & REASONING EFFORT
+# =============================================================================
 
 
 def _prompt_opens_thinking_block(
@@ -13103,6 +13167,11 @@ def _build_chat_template_kwargs(
     if params.thinking_start_token is not None:
         template_kwargs["thinking_start_token"] = params.thinking_start_token
     return template_kwargs
+
+
+# =============================================================================
+# SECTION: PROMPT DIAGNOSTICS, SAMPLING DEFAULTS & CHAT TEMPLATE INSPECTION
+# =============================================================================
 
 
 _IMAGE_PLACEHOLDER_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
@@ -13734,6 +13803,11 @@ def _checkpoint_facts_to_json(diagnostics: PromptDiagnostics) -> dict[str, JsonL
     return facts
 
 
+# =============================================================================
+# SECTION: IMAGE ACCESS CHECK & HF CACHE STATE
+# =============================================================================
+
+
 _IMAGE_VALIDATION_CACHE: dict[str, tuple[int, int] | None] = {}
 
 
@@ -14030,6 +14104,11 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
             )
     except (OSError, ValueError) as cache_err:  # HFValidationError is a ValueError
         logger.debug("Could not check HF cache integrity: %s", cache_err)
+
+
+# =============================================================================
+# SECTION: FAILURE PHASES, EXCEPTION RECORDS & ERROR CLASSIFICATION
+# =============================================================================
 
 
 _FAILURE_PHASE_ATTR: Final[str] = "_check_models_failure_phase"
@@ -14567,6 +14646,11 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     return _UNKNOWN_OWNER
 
 
+# =============================================================================
+# SECTION: MODEL LOADING, SNAPSHOT RESOLUTION & PREFLIGHT
+# =============================================================================
+
+
 def _load_model(
     params: ProcessImageParams,
 ) -> tuple[nn.Module, ProcessorMixin, PreTrainedConfig | Mapping[str, object] | None]:
@@ -14903,6 +14987,11 @@ def _run_model_preflight_validators(
         snapshot_path=snapshot_path,
         tokenizer=tokenizer,
     )
+
+
+# =============================================================================
+# SECTION: GENERATION: PROMPT PREPARATION, STREAMING & RESULT ASSEMBLY
+# =============================================================================
 
 
 def _ensure_generation_runtime_symbols() -> None:
@@ -16201,6 +16290,11 @@ def _build_exception_process_result(
     return result_payload, stop_reason
 
 
+# =============================================================================
+# SECTION: SYSTEM TELEMETRY (thermal, memory pressure, power, GPU)
+# =============================================================================
+
+
 _TELEMETRY_CPU_SPEED_RE: Final[re.Pattern[str]] = re.compile(r"CPU_Speed_Limit\s*=\s*(\d+)")
 _TELEMETRY_SAMPLE_INTERVAL_S: Final[float] = 2.0
 # Snapshot mode takes one probe before load and one after cleanup.
@@ -17300,7 +17394,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 
 # =============================================================================
-# SECTION: CLI RUN HELPERS & LOGGING
+# SECTION: CLI LOGGING HELPERS & RESULT PRINTING
 # =============================================================================
 
 
@@ -17669,6 +17763,11 @@ def print_cli_separator() -> None:
     """Print a visually distinct separator line using unicode box-drawing characters."""
     width = get_terminal_width(max_width=100)
     log_rule(width, char="─", style="blue")
+
+
+# =============================================================================
+# SECTION: RUN SETUP: ENVIRONMENT, IMAGE, EVAL MODE & PROMPT
+# =============================================================================
 
 
 def _dump_environment_to_log(output_path: Path) -> bool:
@@ -18195,6 +18294,11 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     )
     logger.info("Assessment: %s", _assessment_scope(getattr(args, "assessment_profile", None)))
     return prompt
+
+
+# =============================================================================
+# SECTION: CACHED MODEL DISCOVERY, IMAGE CAPABILITY & MODEL SELECTION
+# =============================================================================
 
 
 def _hf_cache_file_name(cache_file: object) -> str:
@@ -19191,6 +19295,11 @@ def apply_exclusions(
     return filtered
 
 
+# =============================================================================
+# SECTION: MODEL LOOP & RESULT TEXT ENRICHMENT
+# =============================================================================
+
+
 # ProcessImageParams fields that are not the same-named CLI value: per-run
 # identity and overrides, a renamed flag (lazy_load), defaulted optionals, and
 # derived values. Everything else is copied from args by field enumeration.
@@ -19638,7 +19747,7 @@ def _verified_image_token_count(
 
 
 # =============================================================================
-# SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION
+# SECTION: END-OF-RUN SUMMARY TABLES & LOGGING
 # =============================================================================
 
 
@@ -20185,6 +20294,11 @@ def log_summary(
     if indeterminate:
         log_blank()
         _log_indeterminate_models_summary(indeterminate)
+
+
+# =============================================================================
+# SECTION: HISTORY, RESULTS JSONL & RETAINED RUN RECORDS
+# =============================================================================
 
 
 def _history_path_for_jsonl(jsonl_path: Path) -> Path:
@@ -23883,6 +23997,11 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info("No changes beyond noise against the baseline sweep.")
 
 
+# =============================================================================
+# SECTION: RETAINED RUN VALIDATION (results.jsonl to summary source)
+# =============================================================================
+
+
 def _validate_run_issue_metadata(
     metadata_value: JsonLike,
     jsonl_path: Path,
@@ -23996,11 +24115,6 @@ def _validate_schema3_metadata_fields(metadata_value: dict[str, JsonLike]) -> No
     ):
         message = "JSONL metadata comparison field is missing or invalid"
         raise RunIssueSummaryValidationError(message)
-
-
-# =============================================================================
-# SECTION: RETAINED RUN VALIDATION (results.jsonl to summary source)
-# =============================================================================
 
 
 class RunIssueSummaryValidationError(ValueError):
@@ -29184,7 +29298,14 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         "--timeout",
         type=float,
         default=DEFAULT_TIMEOUT,
-        help="Timeout in seconds for model operations.",
+        help=(
+            "Per-model time limit in seconds, covering model load, prompt preparation and "
+            "generation. In-process it is a SIGALRM timer: it stops Python code, but a call "
+            "stuck inside native code (a model load, a Metal operation) is interrupted only "
+            "once that call returns. With --isolate the parent also ends the child "
+            f"interpreter {_ISOLATION_TIMEOUT_GRACE_SECONDS:.0f} s after this limit (start-up "
+            "and cleanup grace), which holds even when native code never returns."
+        ),
     )
 
     quality_group = parser.add_argument_group("Quality and Workflow")

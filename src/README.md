@@ -751,7 +751,7 @@ version; pass a different seed for an independent draw.
 #### Generation Control
 
 - `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. When omitted, the resolved evaluation lane supplies the default (`1000`; `triage` `200`); an explicit value always wins over the lane default.
-- `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `300.0` (5 minutes).
+- `--timeout <float>`: Per-model time limit in seconds, covering model load, prompt preparation and generation. Default: `300.0` (5 minutes). In-process it is a `SIGALRM` timer: it stops Python code, but a call stuck inside native code (a model load, a Metal operation) is interrupted only once that call returns. With `--isolate` the parent also ends the child interpreter 120 s after this limit (start-up and cleanup grace), which holds even when native code never returns, so use `--isolate` when a hard deadline matters.
 
 **Example**:
 
@@ -1384,7 +1384,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
 | `--quantized-kv-start` | int | 5000 | Start position for KV cache quantization. |
 | `--prefill-step-size` | int | 4096 | Step size for prompt prefill. |
-| `-T`, `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
+| `-T`, `--timeout` | float | 300 | Per-model time limit (seconds) for load, prompt preparation and generation. In-process it cannot interrupt a call stuck in native code until that call returns; with `--isolate` the parent ends the child 120 s after the limit regardless. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |
 | `--force-color` | flag | `False` | Force-enable ANSI colors even if stderr is not a TTY. |

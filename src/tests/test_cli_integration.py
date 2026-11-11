@@ -59,6 +59,18 @@ def test_cli_help_structure(capsys: pytest.CaptureFixture[str]) -> None:
     assert "usage" in output.lower() or "--folder" in output
 
 
+def test_timeout_help_distinguishes_the_in_process_timer_from_the_isolated_deadline() -> None:
+    """The help names both limits, with the grace period taken from the code."""
+    parser = check_models._build_cli_parser()
+    timeout_action = next(a for a in parser._actions if "--timeout" in a.option_strings)
+    help_text = " ".join((timeout_action.help or "").split())
+
+    assert "SIGALRM" in help_text
+    assert "native code" in help_text
+    assert "--isolate" in help_text
+    assert f"{check_models._ISOLATION_TIMEOUT_GRACE_SECONDS:.0f} s after this limit" in help_text
+
+
 def test_cli_parser_accumulates_repeated_exclude_flags() -> None:
     """Repeated -e/--exclude flags should accumulate all excluded models."""
     parser = check_models._build_cli_parser()
