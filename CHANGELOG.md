@@ -177,6 +177,46 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Value checks (0.17.118, step 6 of john's 2026-11-11 plan): the rule "an
+  integer, or a number, that is not a boolean" was written out at 30 places
+  in four spellings (`isinstance(x, int) and not isinstance(x, bool)`, its
+  two negations, and the `int | float` forms). It is now two predicates,
+  `_is_int` and `_is_number`, and each of the 30 places calls one. They are
+  `TypeGuard`s, not `TypeIs`: `bool` is an `int` to a type checker, so a
+  `TypeIs[int]` that answers False for `True` would narrow the other branch
+  wrongly. `_is_detail_count`, which was the same rule under a third name,
+  is gone. Nothing else in the three JSON mechanisms is merged: the
+  comparison readers raise, the image and metric readers return None or a
+  default, and the generic dataclass decoder does not validate primitives,
+  so their rules differ and they stay separate.
+
+  Behaviour preserved: every one of the 30 places accepts and rejects
+  exactly what it did; the rewrite was done by a script over the syntax
+  tree and each replacement is the same boolean expression.
+
+  Benefit: a reader sees what is being asked instead of decoding one of
+  four spellings, and a new check cannot forget the boolean half.
+
+  Evidence: before the change, each of the 30 checks was weakened in turn
+  (made to accept booleans) and the suite run: 3 were noticed, 27 were not.
+  Tests were then written at the level of each check's caller (a retained
+  header with `true` for the duration or a count is refused; a `true` token
+  count, image width, quantisation width, memory figure, token id or
+  logit bias is not read as 1; a float is not read as an integer where an
+  integer is required), all passing on the unchanged code, and the
+  weakening repeated: all 30 are now noticed. The same tests pass after
+  the rewrite, with mypy, ty and pyrefly.
+
+  Observed, not changed: about 25 other places test `isinstance(value,
+  int)` or `int | float` with no boolean exclusion, several of them on
+  retained records or `config.json` values (`_prefill_seconds`,
+  `_record_on_battery`, `_result_generation_tps` and
+  `_result_peak_memory_gb` among them); a `true` there is read as 1. They
+  are a different rule today, so they were not folded in: tightening them
+  changes what damaged data does, which is a decision and not a
+  simplification. The loader already refuses `true` in the header fields
+  it validates.
+
 - Start-up (0.17.117, step 5 of john's 2026-11-11 plan, second part):
   importing `check_models` no longer imports `mlx` or `mlx-vlm` and no
   longer spawns the import probes. `load_mlx_runtime(probe_first=...)` does

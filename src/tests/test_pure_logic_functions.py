@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING, Any, Never, cast
 from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Iterator, Mapping, Sequence
+    from collections.abc import Callable, Iterator, Mapping, Sequence
 
     from check_models import ProcessImageParams
 
@@ -2301,3 +2301,125 @@ class TestReasoningEffort:
         assert "declared_reasoning_efforts" not in empty
         assert "declared_reasoning_efforts_enforced" not in empty
         assert "reasoning_effort" not in empty
+
+
+# ── a boolean is not a number ──────────────────────────────────────────────
+#
+# ``bool`` subclasses ``int``, so a bare ``isinstance(value, int)`` reads a
+# ``True`` from a runtime, a tokenizer or a JSON document as the number 1.
+# Each reader below is called with a usable value, with ``True``, and (where
+# the reader wants an integer) with a float.
+
+
+def _memory_limit_recorded(mod: types.ModuleType, value: object) -> object:
+    with patch.object(mod, "mx", types.SimpleNamespace(get_memory_limit=lambda: value)):
+        return "MLX Memory Limit" in mod._get_memory_limit_facts({})
+
+
+def _logit_bias(mod: types.ModuleType, value: object) -> object:
+    try:
+        return mod._parse_logit_bias_arg(json.dumps({"5": value}))
+    except argparse.ArgumentTypeError:
+        return "refused"
+
+
+def _image_positions(mod: types.ModuleType, value: object) -> object:
+    upstream = {
+        "prepare_inputs": lambda *_args, **_kwargs: {
+            "input_ids": [[1, 1, 5]],
+            "image_token_id": value,
+        },
+        "should_add_special_tokens": lambda *_args: True,
+    }
+    with patch.object(mod, "_optional_mlx_vlm_utils_attribute", upstream.get):
+        return mod._exact_prompt_composition(
+            processor=object(),
+            config={"model_type": "fixture"},
+            params=types.SimpleNamespace(
+                image_path="image.jpg", resize_shape=None, model_identifier="org/model"
+            ),
+            formatted_prompt="prompt",
+            processor_passthrough_kwargs={},
+        )
+
+
+def _active_memory_gb(mod: types.ModuleType, value: object) -> object:
+    with patch.object(mod, "mx", types.SimpleNamespace(get_active_memory=lambda: value)):
+        return mod._sample_mlx_memory_gb("get_active_memory")
+
+
+def _weight_buffer_gb(mod: types.ModuleType, value: object) -> object:
+    model = types.SimpleNamespace(parameters=dict)
+    with patch.object(mod, "mx", types.SimpleNamespace(get_array_buffer_size=lambda _p: value)):
+        return mod._sample_model_weight_buffer_gb(model)
+
+
+def _chunk_carries_token(mod: types.ModuleType, value: object) -> object:
+    return mod._chunk_carries_token(types.SimpleNamespace(token=None, generation_tokens=value))
+
+
+def _first_token_peak_gb(mod: types.ModuleType, value: object) -> object:
+    observations = mod.StreamObservations()
+    mod._observe_first_token(observations, types.SimpleNamespace(peak_memory=value))
+    return observations.first_token_peak_memory_gb
+
+
+def _observed_token_ids(mod: types.ModuleType, value: object) -> object:
+    observations = mod.StreamObservations()
+    mod._observe_token(observations, types.SimpleNamespace(token=value))
+    return observations.token_ids
+
+
+def _stop_token_ids(mod: types.ModuleType, value: object) -> object:
+    criteria = types.SimpleNamespace(eos_token_ids=[value, 2])
+    stop_ids = mod._upstream_stop_token_ids(types.SimpleNamespace(stopping_criteria=criteria))
+    return sorted(stop_ids)
+
+
+def _special_tokens_emitted(mod: types.ModuleType, value: object) -> object:
+    tokenizer = types.SimpleNamespace(
+        all_special_ids=[value, 5], convert_ids_to_tokens=lambda ident: f"<{ident}>"
+    )
+    return mod._emitted_special_tokens([1, 5], tokenizer, excluded=())
+
+
+@pytest.mark.parametrize(
+    ("read", "value", "expected"),
+    [
+        (_memory_limit_recorded, 8_000_000_000, True),
+        (_memory_limit_recorded, True, False),
+        (_memory_limit_recorded, 8e9, False),
+        (_logit_bias, -1.5, {5: -1.5}),
+        (_logit_bias, True, "refused"),
+        (_image_positions, 1, (3, 2)),
+        (_image_positions, True, (3, None)),
+        (_image_positions, 1.0, (3, None)),
+        (_active_memory_gb, 2_500_000_000, 2.5),
+        (_active_memory_gb, True, None),
+        (_weight_buffer_gb, 3_000_000_000, 3.0),
+        (_weight_buffer_gb, True, None),
+        (_weight_buffer_gb, 3e9, None),
+        (_chunk_carries_token, 1, True),
+        (_chunk_carries_token, True, False),
+        (_chunk_carries_token, 1.0, False),
+        (_first_token_peak_gb, 1.5, 1.5),
+        (_first_token_peak_gb, True, None),
+        (_observed_token_ids, 7, [7]),
+        (_observed_token_ids, True, []),
+        (_observed_token_ids, 7.0, []),
+        (_stop_token_ids, 1, [1, 2]),
+        (_stop_token_ids, True, [2]),
+        (_stop_token_ids, 1.0, [2]),
+        (_special_tokens_emitted, 1, ("<1>", "<5>")),
+        (_special_tokens_emitted, True, ("<5>",)),
+        (_special_tokens_emitted, 1.0, ("<5>",)),
+    ],
+)
+def test_a_boolean_from_the_runtime_is_not_read_as_a_number(
+    mod: types.ModuleType,
+    read: Callable[[types.ModuleType, object], object],
+    value: object,
+    expected: object,
+) -> None:
+    """Runtime, tokenizer and command-line values: ``True`` is never the number 1."""
+    assert read(mod, value) == expected

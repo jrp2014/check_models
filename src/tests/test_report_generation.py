@@ -1718,6 +1718,14 @@ def _retained_comparison_payload() -> dict[str, object]:
         ),
         (
             {
+                "memory_changes": [
+                    {"model": "org/a", "baseline_peak_gb": 1.0, "current_peak_gb": True}
+                ]
+            },
+            "not a number",
+        ),
+        (
+            {
                 "text_divergence": [
                     {
                         "model": "org/a",
@@ -1849,6 +1857,189 @@ def test_retained_loader_rejects_mistyped_observation_details(
 
     with pytest.raises(ValueError, match=f"invalid observation detail {field}"):
         check_models.generate_run_issue_summary_report(output_paths)
+
+
+@pytest.mark.parametrize(
+    ("damage", "message"),
+    [
+        ({"total_runtime_seconds": True}, "total_runtime_seconds is missing or invalid"),
+        ({"counts": {"models_attempted": True}}, "counts are missing or invalid"),
+        ({"counts": {"models_attempted": 1.0}}, "counts are missing or invalid"),
+    ],
+)
+def test_retained_loader_rejects_a_header_number_that_is_not_one(
+    tmp_path: Path, damage: dict[str, object], message: str
+) -> None:
+    """A header whose duration or count is ``true`` (or a float count) is refused."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    result = _issue_summary_result("org/model")
+    metadata = _issue_summary_metadata((result,))
+    for key, value in damage.items():
+        if isinstance(value, dict):
+            cast("dict[str, object]", metadata[key]).update(value)
+        else:
+            metadata[key] = value
+    check_models._write_text_file(
+        output_paths.jsonl, json.dumps(metadata) + "\n" + json.dumps(result) + "\n"
+    )
+
+    with pytest.raises(ValueError, match=message):
+        check_models._load_retained_run(output_paths.jsonl)
+
+
+# ``bool`` subclasses ``int``, so a bare ``isinstance(value, int)`` reads a JSON
+# ``true`` as the number 1. Each reader of retained data below is called with a
+# usable value, with ``True``, and (where it wants an integer) with a float.
+
+
+def _retained_wall_clock_gap(value: object) -> object:
+    return check_models._telemetry_wall_clock_gap({"wall_clock_gap_s": value})
+
+
+def _retained_weights_label(value: object) -> object:
+    record = {"model_burden": {"quantization_bits": value, "quantization_mode": "affine"}}
+    return check_models._weights_label(cast("check_models.JsonlResultRecord", record))
+
+
+def _retained_prompt_count_unchanged(value: object) -> object:
+    before, now = _issue_summary_result("org/a"), _issue_summary_result("org/a")
+    before["generated_text"], now["generated_text"] = "one", "another"
+    before["metrics"] = now["metrics"] = {"prompt_tokens": value}
+    pairs = [("org/a", now, before)]
+    _compared, changed = check_models._generated_text_changes(
+        cast("Sequence[tuple[str, check_models.JsonlResultRecord, Any]]", pairs)
+    )
+    return changed[0].prompt_token_count_unchanged
+
+
+def _retained_generation_tokens(value: object) -> object:
+    record = {"metrics": {"generation_tokens": value}}
+    return check_models._generation_token_count(cast("check_models.JsonlResultRecord", record))
+
+
+def _retained_image_width(value: object) -> object:
+    image = check_models._narrow_run_issue_image({"name": "a.jpg", "width": cast("Any", value)})
+    return image["width"] if image is not None else "no image"
+
+
+def _retained_image_megapixels(value: object) -> object:
+    image = check_models._narrow_run_issue_image(
+        {"name": "a.jpg", "megapixels": cast("Any", value)}
+    )
+    return image["megapixels"] if image is not None else "no image"
+
+
+def _retained_window_known(value: object) -> object:
+    metadata = {"timestamp": "2026-07-31 12:02:00 BST", "total_runtime_seconds": value}
+    window = check_models._retained_run_window(cast("check_models.JsonlMetadataRecord", metadata))
+    return window is not None
+
+
+def _constraint_breakdown_shown(count: object, bounds: object) -> object:
+    result = _issue_summary_result(
+        "org/a",
+        observations=["catalog_constraint_violation"],
+        details={"title_word_count": count, "title_word_range": bounds},
+    )
+    section = check_models._run_issue_summary_constraint_breakdown(
+        [cast("check_models.JsonlResultRecord", result)]
+    )
+    return section is not None
+
+
+def _constraint_count_outside(value: object) -> object:
+    return _constraint_breakdown_shown(value, [5, 10])
+
+
+def _constraint_bound_usable(value: object) -> object:
+    return _constraint_breakdown_shown(40, [value, 10])
+
+
+def _summary_keyword_cell(value: object) -> object:
+    record = {"assessment": {"details": {"keyword_count": value}}}
+    return check_models._run_issue_summary_keyword_cell(
+        cast("check_models.JsonlResultRecord", record)
+    )
+
+
+def _summary_keyword_hints_cell(value: object) -> object:
+    record = {"assessment": {"details": {"keyword_count": 12, "keywords_from_hints": value}}}
+    return check_models._run_issue_summary_keyword_cell(
+        cast("check_models.JsonlResultRecord", record)
+    )
+
+
+def _summary_tokens_cell(value: object) -> object:
+    record = {"metrics": {"prompt_tokens": value, "generation_tokens": 20}}
+    return check_models._run_issue_summary_tokens_cell(
+        cast("check_models.JsonlResultRecord", record)
+    )
+
+
+def _summary_duration_row_shown(value: object) -> object:
+    metadata = {"timestamp": "2026-07-31 12:02:00 BST", "total_runtime_seconds": value}
+    rows = check_models._run_issue_summary_timing_rows(
+        cast("check_models.JsonlMetadataRecord", metadata)
+    )
+    return "Run duration" in dict(rows)
+
+
+def _closing_line_seconds(value: object) -> object:
+    paths = _issue_summary_output_paths(Path("unused"))
+    outcomes = [check_models.ReportArtifactOutcome("jsonl", paths.jsonl, succeeded=True)]
+    retained = argparse.Namespace(metadata={"total_runtime_seconds": value})
+    with patch.object(check_models, "_load_retained_run", return_value=retained):
+        return check_models._recorded_run_seconds(paths, outcomes)
+
+
+@pytest.mark.parametrize(
+    ("read", "value", "expected"),
+    [
+        (_retained_wall_clock_gap, 12, 12.0),
+        (_retained_wall_clock_gap, True, None),
+        (_retained_weights_label, 4, "4-bit affine"),
+        (_retained_weights_label, True, "affine"),
+        (_retained_weights_label, 4.0, "affine"),
+        (_retained_prompt_count_unchanged, 10, True),
+        (_retained_prompt_count_unchanged, True, None),
+        (_retained_prompt_count_unchanged, 10.0, None),
+        (_retained_generation_tokens, 5, 5),
+        (_retained_generation_tokens, True, None),
+        (_retained_generation_tokens, 5.0, None),
+        (_retained_image_width, 640, 640),
+        (_retained_image_width, True, None),
+        (_retained_image_width, 640.0, None),
+        (_retained_image_megapixels, 0.3, 0.3),
+        (_retained_image_megapixels, True, None),
+        (_retained_window_known, 60, True),
+        (_retained_window_known, True, False),
+        (_constraint_count_outside, 40, True),
+        (_constraint_count_outside, True, False),
+        (_constraint_count_outside, 40.0, False),
+        (_constraint_bound_usable, 5, True),
+        (_constraint_bound_usable, True, False),
+        (_constraint_bound_usable, 5.0, False),
+        (_summary_keyword_cell, 12, "12"),
+        (_summary_keyword_cell, True, "-"),
+        (_summary_keyword_cell, 12.0, "-"),
+        (_summary_keyword_hints_cell, 3, "12 (3 from hints)"),
+        (_summary_keyword_hints_cell, True, "12"),
+        (_summary_keyword_hints_cell, 3.0, "12"),
+        (_summary_tokens_cell, 1_500, "1,500 / 20"),
+        (_summary_tokens_cell, True, "- / 20"),
+        (_summary_tokens_cell, 1_500.0, "- / 20"),
+        (_summary_duration_row_shown, 90, True),
+        (_summary_duration_row_shown, True, False),
+        (_closing_line_seconds, 90, 90.0),
+        (_closing_line_seconds, True, None),
+    ],
+)
+def test_a_boolean_in_retained_data_is_not_read_as_a_number(
+    read: Callable[[object], object], value: object, expected: object
+) -> None:
+    """Retained records: a JSON ``true`` is never the number 1, nor a float an integer."""
+    assert read(value) == expected
 
 
 def test_retained_loader_permits_unknown_observation_detail_keys(tmp_path: Path) -> None:

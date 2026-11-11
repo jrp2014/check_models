@@ -6435,6 +6435,20 @@ def _extract_iptc_metadata(image_path: PathLike) -> IPTCMetadata:
     return result
 
 
+def _is_int(value: object) -> TypeGuard[int]:
+    """Return True for an integer that is not a boolean.
+
+    ``bool`` subclasses ``int``, so ``isinstance(True, int)`` holds and a JSON
+    ``true`` (or a ``True`` from a runtime) would otherwise be read as 1.
+    """
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_number(value: object) -> TypeGuard[int | float]:
+    """Return True for an int or float that is not a boolean (see ``_is_int``)."""
+    return isinstance(value, int | float) and not isinstance(value, bool)
+
+
 def _is_str_object_mapping(value: object) -> TypeGuard[Mapping[str, object]]:
     """Return True when ``value`` is a mapping with string keys."""
     return isinstance(value, Mapping) and all(isinstance(key, str) for key in value)
@@ -11974,7 +11988,7 @@ def _get_memory_limit_facts(device_info: MlxDeviceInfo) -> dict[str, str]:
             raw_limit: object = get_memory_limit()
         except (RuntimeError, TypeError, ValueError):
             raw_limit = 0
-        limit = raw_limit if isinstance(raw_limit, int) and not isinstance(raw_limit, bool) else 0
+        limit = raw_limit if _is_int(raw_limit) else 0
         if limit > 0:
             facts["MLX Memory Limit"] = f"{fmt_num(limit / DECIMAL_GB)} GB"
     wired = _get_macos_sysctl_value("iogpu.wired_limit_mb")
@@ -12509,7 +12523,7 @@ def _parse_logit_bias_arg(value: str) -> LogitBiasDict:
         except (TypeError, ValueError) as exc:
             msg = f"logit_bias keys must be integer token ids, got {raw_key!r}"
             raise argparse.ArgumentTypeError(msg) from exc
-        if not isinstance(raw_value, int | float) or isinstance(raw_value, bool):
+        if not _is_number(raw_value):
             msg = f"logit_bias values must be numeric, got {raw_value!r}"
             raise argparse.ArgumentTypeError(msg)
         logit_bias[token_id] = float(raw_value)
@@ -13299,7 +13313,7 @@ def _declared_sampling_value_is_valid(key: str, value: object) -> bool:
     JSON admits numbers Python parses to ``inf`` (``1e400``) or to integers too
     wide for a float; both are rejected rather than forwarded or raised.
     """
-    if isinstance(value, bool) or not isinstance(value, int | float):
+    if not _is_number(value):
         return False
     within_bounds = _DECLARED_SAMPLING_BOUNDS.get(key)
     if within_bounds is None:
@@ -13411,7 +13425,7 @@ def _exact_prompt_composition(
         raw_id = inputs.get("image_token_id")
         item = getattr(raw_id, "item", None)
         token_id = item() if callable(item) else raw_id
-    known_id = token_id if isinstance(token_id, int) and not isinstance(token_id, bool) else None
+    known_id = token_id if _is_int(token_id) else None
     # A vocabulary has no negative ids, so a negative id in the prepared input
     # is a placeholder the model fills with image features (Phi-3-vision marks
     # every image position this way) and counts whatever the configured id.
@@ -15155,7 +15169,7 @@ def _sample_mlx_memory_gb(getter_name: MlxMemoryGetterName) -> float | None:
     except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
         logger.debug("Unable to sample mx.%s", getter_name, exc_info=True)
         return None
-    if isinstance(raw_value, bool) or not isinstance(raw_value, int | float) or raw_value < 0:
+    if not _is_number(raw_value) or raw_value < 0:
         return None
     return float(raw_value) / DECIMAL_GB
 
@@ -15184,7 +15198,7 @@ def _sample_model_weight_buffer_gb(model: object) -> float | None:
             "Unable to measure loaded weights with mx.get_array_buffer_size", exc_info=True
         )
         return None
-    if isinstance(raw_value, bool) or not isinstance(raw_value, int) or raw_value < 0:
+    if not _is_int(raw_value) or raw_value < 0:
         return None
     return raw_value / DECIMAL_GB
 
@@ -15519,7 +15533,7 @@ def _chunk_carries_token(chunk: object) -> bool:
     if getattr(chunk, "token", None) is not None:
         return True
     generated = getattr(chunk, "generation_tokens", None)
-    return isinstance(generated, int) and not isinstance(generated, bool) and generated > 0
+    return _is_int(generated) and generated > 0
 
 
 def _observe_first_token(observations: StreamObservations | None, chunk: object) -> None:
@@ -15528,7 +15542,7 @@ def _observe_first_token(observations: StreamObservations | None, chunk: object)
         return
     observations.first_token_at = time.perf_counter()
     peak = getattr(chunk, "peak_memory", None)
-    if isinstance(peak, int | float) and not isinstance(peak, bool) and peak >= 0:
+    if _is_number(peak) and peak >= 0:
         observations.first_token_peak_memory_gb = float(peak)
 
 
@@ -15537,7 +15551,7 @@ def _observe_token(observations: StreamObservations | None, chunk: object) -> No
     if observations is None:
         return
     token = getattr(chunk, "token", None)
-    if isinstance(token, int) and not isinstance(token, bool):
+    if _is_int(token):
         observations.token_ids.append(token)
 
 
@@ -15547,9 +15561,7 @@ def _upstream_stop_token_ids(tokenizer: object) -> frozenset[int]:
     raw_ids = getattr(criteria, "eos_token_ids", None)
     if not isinstance(raw_ids, Sequence | set | frozenset):
         return frozenset()
-    return frozenset(
-        ident for ident in raw_ids if isinstance(ident, int) and not isinstance(ident, bool)
-    )
+    return frozenset(ident for ident in raw_ids if _is_int(ident))
 
 
 def _emitted_special_tokens(
@@ -15571,7 +15583,7 @@ def _emitted_special_tokens(
     convert = getattr(tokenizer, "convert_ids_to_tokens", None)
     if not raw_ids or not callable(convert):
         return ()
-    special = {ident for ident in raw_ids if isinstance(ident, int) and not isinstance(ident, bool)}
+    special = {ident for ident in raw_ids if _is_int(ident)}
     special -= _upstream_stop_token_ids(tokenizer)
     seen: list[str] = []
     for token_id in token_ids:
@@ -16509,7 +16521,7 @@ def _attach_wall_clock_gap(
 def _telemetry_wall_clock_gap(telemetry: Mapping[str, object] | None) -> float | None:
     """Return the recorded wall-clock gap for a model, if any."""
     gap = telemetry.get("wall_clock_gap_s") if telemetry else None
-    return float(gap) if isinstance(gap, int | float) and not isinstance(gap, bool) else None
+    return float(gap) if _is_number(gap) else None
 
 
 class _SystemTelemetrySampler:
@@ -21975,7 +21987,7 @@ def _weights_label(record: JsonlResultRecord) -> str | None:
         return None
     bits = burden.get("quantization_bits")
     mode = burden.get("quantization_mode")
-    parts = [f"{bits}-bit"] if isinstance(bits, int) and not isinstance(bits, bool) else []
+    parts = [f"{bits}-bit"] if _is_int(bits) else []
     if isinstance(mode, str):
         parts.append(mode)
     return " ".join(parts) or "not quantized"
@@ -22020,11 +22032,7 @@ def _generated_text_changes(
         if baseline_text == current_text:
             continue
         counts = [(record.get("metrics") or {}).get("prompt_tokens") for record in (before, now)]
-        unchanged = (
-            counts[0] == counts[1]
-            if all(isinstance(count, int) and not isinstance(count, bool) for count in counts)
-            else None
-        )
+        unchanged = counts[0] == counts[1] if all(_is_int(count) for count in counts) else None
         # Character-level shared prefix of two texts (not paths, so no os.path).
         shared_prefix_chars = next(
             (
@@ -22053,7 +22061,7 @@ def _generated_text_changes(
 def _generation_token_count(record: JsonlResultRecord) -> int | None:
     """The record's generated token count, or None when absent or not an integer."""
     count = (record.get("metrics") or {}).get("generation_tokens")
-    return count if isinstance(count, int) and not isinstance(count, bool) else None
+    return count if _is_int(count) else None
 
 
 def _prefill_tps_ratios(
@@ -22926,7 +22934,7 @@ def _comparison_opt_float(raw: JsonLike) -> float | None:
     """Narrow one optional retained comparison number, rejecting non-numbers."""
     if raw is None:
         return None
-    if isinstance(raw, bool) or not isinstance(raw, int | float):
+    if not _is_number(raw):
         message = f"comparison field is not a number: {raw!r}"
         raise TypeError(message)
     return float(raw)
@@ -22943,7 +22951,7 @@ def _comparison_req_float(raw: JsonLike) -> float:
 
 def _comparison_req_int(raw: JsonLike) -> int:
     """Narrow one required retained comparison integer."""
-    if isinstance(raw, bool) or not isinstance(raw, int):
+    if not _is_int(raw):
         message = f"comparison field is not an integer: {raw!r}"
         raise TypeError(message)
     return raw
@@ -23984,10 +23992,7 @@ def _validate_schema3_counts(counts: JsonLike) -> None:
         "models_indeterminate",
     )
     if not isinstance(counts, dict) or any(
-        not isinstance(counts.get(key), int)
-        or isinstance(counts.get(key), bool)
-        or cast("int", counts.get(key)) < 0
-        for key in count_keys
+        not _is_int(counts.get(key)) or cast("int", counts.get(key)) < 0 for key in count_keys
     ):
         message = "JSONL metadata counts are missing or invalid"
         raise ValueError(message)
@@ -24015,7 +24020,7 @@ def _validate_schema3_metadata_fields(metadata_value: dict[str, JsonLike]) -> No
         message = "JSONL metadata prompt_sha256 is missing or does not match the prompt"
         raise ValueError(message)
     runtime = metadata_value.get("total_runtime_seconds")
-    if not isinstance(runtime, int | float) or isinstance(runtime, bool) or runtime < 0:
+    if not _is_number(runtime) or runtime < 0:
         message = "JSONL metadata total_runtime_seconds is missing or invalid"
         raise ValueError(message)
     _validate_schema3_counts(metadata_value.get("counts"))
@@ -24077,7 +24082,7 @@ def _require_optional_str_fields(
 
 def _json_int_or_none(value: JsonLike) -> int | None:
     """Narrow a JSON value to int, rejecting bools."""
-    return value if isinstance(value, int) and not isinstance(value, bool) else None
+    return value if _is_int(value) else None
 
 
 def _validate_run_issue_failure(value: JsonLike, line_number: int) -> None:
@@ -24149,11 +24154,6 @@ _DETAIL_RANGE_FIELDS: Final[tuple[str, ...]] = _detail_fields_declared_as(list[i
 _DETAIL_RANGE_LENGTH: Final[int] = 2
 
 
-def _is_detail_count(value: JsonLike) -> bool:
-    """A count is an int and never a bool (bool subclasses int)."""
-    return isinstance(value, int) and not isinstance(value, bool)
-
-
 def _is_detail_string_list(value: JsonLike) -> bool:
     return isinstance(value, list) and all(isinstance(item, str) for item in value)
 
@@ -24166,7 +24166,7 @@ def _is_detail_int_pair(value: JsonLike) -> bool:
     return (
         isinstance(value, list)
         and len(value) == _DETAIL_RANGE_LENGTH
-        and all(_is_detail_count(item) for item in value)
+        and all(_is_int(item) for item in value)
     )
 
 
@@ -24181,7 +24181,7 @@ def _validate_run_issue_details(details: dict[str, JsonLike], line_number: int) 
     checks: tuple[tuple[tuple[str, ...], Callable[[JsonLike], bool]], ...] = (
         (_DETAIL_STRING_LIST_FIELDS, _is_detail_string_list),
         (_DETAIL_TEXT_FIELDS, _is_detail_text),
-        (_DETAIL_COUNT_FIELDS, _is_detail_count),
+        (_DETAIL_COUNT_FIELDS, _is_int),
         (_DETAIL_RANGE_FIELDS, _is_detail_int_pair),
     )
     for field_names, is_valid in checks:
@@ -24292,11 +24292,7 @@ def _narrow_run_issue_image(value: JsonLike) -> RunImageRecord | None:
         "size_bytes": _json_int_or_none(value.get("size_bytes")),
         "width": _json_int_or_none(value.get("width")),
         "height": _json_int_or_none(value.get("height")),
-        "megapixels": (
-            float(megapixels)
-            if isinstance(megapixels, int | float) and not isinstance(megapixels, bool)
-            else None
-        ),
+        "megapixels": float(megapixels) if _is_number(megapixels) else None,
     }
     source_url = value.get("source_url")
     if isinstance(source_url, str):
@@ -24395,7 +24391,7 @@ def _retained_run_window(
     if started is not None and started <= run_end:
         return started, run_end
     runtime = metadata.get("total_runtime_seconds")
-    if not isinstance(runtime, int | float) or isinstance(runtime, bool) or runtime < 0:
+    if not _is_number(runtime) or runtime < 0:
         return None
     run_start = run_end - timedelta(seconds=runtime)
     row_times = [
@@ -25123,7 +25119,7 @@ def _run_issue_summary_constraint_breakdown(
         if (
             isinstance(value, list)
             and len(value) == pair_length
-            and all(isinstance(item, int) and not isinstance(item, bool) for item in value)
+            and all(_is_int(item) for item in value)
         ):
             return cast("int", value[0]), cast("int", value[1])
         return None
@@ -25138,12 +25134,7 @@ def _run_issue_summary_constraint_breakdown(
         bounds_value: JsonLike,
     ) -> None:
         bounds = _int_pair(bounds_value)
-        if (
-            isinstance(count, int)
-            and not isinstance(count, bool)
-            and bounds is not None
-            and not bounds[0] <= count <= bounds[1]
-        ):
+        if _is_int(count) and bounds is not None and not bounds[0] <= count <= bounds[1]:
             groups.setdefault(bounds, []).append(count)
 
     for result in results:
@@ -25298,10 +25289,10 @@ def _run_issue_summary_keyword_cell(result: JsonlResultRecord) -> str:
     """Keyword count, with how many were taken verbatim from the prompt's hints."""
     details = result["assessment"].get("details") or {}
     count = details.get("keyword_count")
-    if not isinstance(count, int) or isinstance(count, bool):
+    if not _is_int(count):
         return "-"
     from_hints = details.get("keywords_from_hints")
-    if isinstance(from_hints, int) and not isinstance(from_hints, bool):
+    if _is_int(from_hints):
         return f"{count} ({from_hints} from hints)"
     return str(count)
 
@@ -25312,8 +25303,7 @@ def _run_issue_summary_tokens_cell(result: JsonlResultRecord) -> str:
 
     def _count(key: str) -> str:
         value = metrics.get(key)
-        # bool subclasses int; a count is a plain int.
-        return f"{value:,}" if isinstance(value, int) and not isinstance(value, bool) else "-"
+        return f"{value:,}" if _is_int(value) else "-"
 
     prompt, output = _count("prompt_tokens"), _count("generation_tokens")
     return "-" if prompt == output == "-" else f"{prompt} / {output}"
@@ -25323,7 +25313,7 @@ def _run_issue_summary_hint_text_cell(result: JsonlResultRecord) -> str:
     """Percent of the description copied from the description hint, in four-word runs."""
     details = result["assessment"].get("details") or {}
     percent = details.get("description_hint_percent")
-    if not _is_detail_count(percent):
+    if not _is_int(percent):
         return "-"
     # A count of the whole answer when no field was labelled says so.
     return (
@@ -25364,7 +25354,7 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
         rows.append(("Run started", started))
     rows.append(("Run finished", metadata["timestamp"]))
     runtime = metadata.get("total_runtime_seconds")
-    if isinstance(runtime, int | float) and not isinstance(runtime, bool) and runtime >= 0:
+    if _is_number(runtime) and runtime >= 0:
         rows.append(("Run duration", format_overall_runtime(float(runtime))))
     phases = metadata.get("phase_totals_s")
     if isinstance(phases, dict) and phases:
@@ -28043,7 +28033,7 @@ def _recorded_run_seconds(
         runtime = _load_retained_run(output_paths.jsonl).metadata.get("total_runtime_seconds")
     except (OSError, ValueError, TypeError, KeyError):
         return None
-    if isinstance(runtime, int | float) and not isinstance(runtime, bool) and runtime >= 0:
+    if _is_number(runtime) and runtime >= 0:
         return float(runtime)
     return None
 
