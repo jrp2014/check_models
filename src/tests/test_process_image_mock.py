@@ -24,7 +24,7 @@ from transformers.processing_utils import ProcessorMixin
 
 if TYPE_CHECKING:
     import argparse
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterator, Mapping, Sequence
     from typing import Any, TextIO
 
 import check_models
@@ -1804,6 +1804,8 @@ _RECORD_IMPORT = (
 # Dies as a native crash does: no Python exception, nothing to catch.
 # SIGKILL rather than abort(), so that no crash report is written.
 _DIE_ON_IMPORT = "import os, signal\nos.kill(os.getpid(), signal.SIGKILL)\n"
+# What Python raises for a package that is not installed.
+_ABSENT_MODULE = "raise ModuleNotFoundError(\"No module named '{name}'\", name='{name}')\n"
 _FAKE_WORKING_SET_BYTES = 12_884_901_888
 _FAKE_RUNTIME_MODULES = {
     "mlx/__init__.py": "",
@@ -1848,10 +1850,11 @@ def _run_against_fake_runtime(
     *,
     dies_on_import: bool = False,
     skip_probe: bool = False,
+    replaced_modules: Mapping[str, str] | None = None,
 ) -> _FakeRuntimeRun:
     """Run a command in a new interpreter that finds fake ``mlx`` and ``mlx_vlm`` first."""
     runtime = tmp_path / "fake-runtime"
-    for relative_path, source in _FAKE_RUNTIME_MODULES.items():
+    for relative_path, source in (_FAKE_RUNTIME_MODULES | dict(replaced_modules or {})).items():
         module_path = runtime / relative_path
         module_path.parent.mkdir(parents=True, exist_ok=True)
         dies = dies_on_import and relative_path in {"mlx/core.py", "mlx_vlm/__init__.py"}
@@ -1956,6 +1959,85 @@ class TestMlxRuntimeBoundary:
             "Required runtime dependencies unavailable: mlx, mlx-vlm"
             in check_models._read_text_file(diagnostics)
         )
+
+    @pytest.mark.parametrize(
+        ("replaced_modules", "skip_probe", "reported", "not_reported"),
+        [
+            pytest.param(
+                {"mlx_vlm/utils.py": "def load(*args, **kwargs):\n    return None\n"},
+                False,
+                f"[mlx-vlm] {check_models.ERROR_MLX_VLM_IMPORT_FAILED} "
+                "ImportError: cannot import name 'load_image' from 'mlx_vlm.utils'",
+                check_models.ERROR_MLX_VLM_MISSING,
+                id="mlx-vlm-moved-a-name-this-script-imports",
+            ),
+            pytest.param(
+                {"mlx_vlm/generate.py": "import a_module_nobody_installed\n"},
+                False,
+                f"[mlx-vlm] {check_models.ERROR_MLX_VLM_IMPORT_FAILED} "
+                "ModuleNotFoundError: No module named 'a_module_nobody_installed'",
+                check_models.ERROR_MLX_VLM_MISSING,
+                id="a-module-mlx-vlm-needs-is-absent",
+            ),
+            pytest.param(
+                {"mlx_vlm/__init__.py": _ABSENT_MODULE.format(name="mlx_vlm")},
+                True,
+                f"[mlx-vlm] {check_models.ERROR_MLX_VLM_MISSING}",
+                check_models.ERROR_MLX_VLM_IMPORT_FAILED,
+                id="mlx-vlm-is-absent",
+            ),
+            pytest.param(
+                {"mlx/core.py": "raise ImportError('libmlx could not be loaded')\n"},
+                True,
+                f"[mlx] {check_models.ERROR_MLX_IMPORT_FAILED} "
+                "ImportError: libmlx could not be loaded",
+                check_models.ERROR_MLX_MISSING,
+                id="mlx-is-found-and-fails-to-import",
+            ),
+            pytest.param(
+                {"mlx/core.py": _ABSENT_MODULE.format(name="mlx.core")},
+                True,
+                f"[mlx] {check_models.ERROR_MLX_MISSING}",
+                check_models.ERROR_MLX_IMPORT_FAILED,
+                id="mlx-is-absent",
+            ),
+        ],
+    )
+    def test_a_failed_import_is_called_absent_only_when_the_package_is(
+        self,
+        tmp_path: Path,
+        replaced_modules: dict[str, str],
+        reported: str,
+        not_reported: str,
+        *,
+        skip_probe: bool,
+    ) -> None:
+        """An installed dependency that fails to import is reported with its own error.
+
+        "Not found, please install it" is the wrong repair when mlx-vlm has
+        moved a name or one of its own dependencies is absent, and the import
+        probe passes in the first two cases, so a run reaches this path.
+        """
+        image_path = tmp_path / "image.jpg"
+        check_models.Image.new("RGB", (32, 32), color=(10, 120, 200)).save(image_path, "JPEG")
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [
+                _CLI,
+                "--image",
+                str(image_path),
+                "--models",
+                "org/model",
+                "--output-dir",
+                str(tmp_path / "out"),
+            ],
+            skip_probe=skip_probe,
+            replaced_modules=replaced_modules,
+        )
+        assert run.returncode == 1, run.output
+        assert reported in run.output
+        assert not_reported not in run.output
+        assert "no models were run" in run.output
 
     def test_an_unprobed_crash_on_import_ends_a_dry_run(self, tmp_path: Path) -> None:
         """The stated cost of not probing a dry run: the crash is the process's own."""

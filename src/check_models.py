@@ -259,6 +259,12 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
+ERROR_MLX_IMPORT_FAILED: Final[str] = (
+    "Core dependency import failed: mlx was found but could not be imported."
+)
+ERROR_MLX_VLM_IMPORT_FAILED: Final[str] = (
+    "Core dependency import failed: mlx-vlm was found but could not be imported."
+)
 ISOLATED_WORKER_FLAG: Final[str] = "--isolated-worker"
 ISOLATION_CRASH_TEST_ENV: Final[str] = "CHECK_MODELS_ISOLATION_CRASH_MODEL"
 # Set to "1" to skip the subprocess import probes that shield a long-lived
@@ -739,6 +745,25 @@ upstream_generation_config_keys_imported: bool = False
 _mlx_runtime_loaded: bool = False
 
 
+def _import_failure_message(
+    error: ImportError,
+    *,
+    package: str,
+    absent: str,
+    found_but_failed: str,
+) -> str:
+    """Say whether ``package`` is absent, or was found and failed to import.
+
+    Only a ``ModuleNotFoundError`` naming the package itself means it is not
+    installed. Anything else (a module it needs is absent, a name this script
+    imports from it has moved, a library it links cannot be loaded) is a
+    different repair, so the error's own text is kept.
+    """
+    if isinstance(error, ModuleNotFoundError) and (error.name or "").partition(".")[0] == package:
+        return absent
+    return f"{found_but_failed} {type(error).__name__}: {error}"
+
+
 def _import_mlx_core(*, probe_first: bool) -> None:
     """Bind ``mx`` to ``mlx.core``, or record why it could not be imported."""
     global mx  # noqa: PLW0603 - bound once, by load_mlx_runtime
@@ -756,8 +781,13 @@ def _import_mlx_core(*, probe_first: bool) -> None:
         return
     try:
         mx = cast("Any", import_module("mlx.core"))
-    except ImportError:
-        MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
+    except ImportError as mlx_import_err:
+        MISSING_DEPENDENCIES["mlx"] = _import_failure_message(
+            mlx_import_err,
+            package="mlx",
+            absent=ERROR_MLX_MISSING,
+            found_but_failed=ERROR_MLX_IMPORT_FAILED,
+        )
     except (OSError, RuntimeError, ValueError) as mlx_init_err:
         MISSING_DEPENDENCIES["mlx"] = f"{ERROR_MLX_RUNTIME_INIT} {mlx_init_err}"
 
@@ -784,8 +814,13 @@ def _import_mlx_vlm(*, probe_first: bool) -> None:
         from mlx_vlm.utils import load as _mlx_vlm_load  # noqa: PLC0415 - as above
         from mlx_vlm.utils import load_image as _mlx_vlm_load_image  # noqa: PLC0415 - as above
         from mlx_vlm.version import __version__ as _mlx_vlm_version  # noqa: PLC0415 - as above
-    except ImportError:
-        MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
+    except ImportError as mlx_vlm_import_err:
+        MISSING_DEPENDENCIES["mlx-vlm"] = _import_failure_message(
+            mlx_vlm_import_err,
+            package="mlx_vlm",
+            absent=ERROR_MLX_VLM_MISSING,
+            found_but_failed=ERROR_MLX_VLM_IMPORT_FAILED,
+        )
         return
 
     def _typed_mlx_vlm_load(

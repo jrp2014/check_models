@@ -1776,6 +1776,23 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Start-up (0.17.119): an mlx or mlx-vlm import that failed in this process
+  was always reported as "not found, please install it", whatever went
+  wrong. A module mlx-vlm needs being absent, or mlx-vlm having moved a name
+  this script imports, read the same as an uninstalled package, beside an
+  environment table listing the package as installed. The message now says
+  "not found" only when Python reports the package itself absent; otherwise
+  it says the package was found but could not be imported and gives the
+  error. The import probe passes when mlx-vlm has moved a name or one of its
+  submodules fails, so an ordinary run reached the wrong message too, as
+  did a dry run with any import failure. *Evidence:* five runs of the real
+  command line against fake `mlx` and `mlx_vlm` packages (a moved name, an
+  absent module, a library that cannot be loaded, and each package absent);
+  three fail on the previous code, the two "absent" ones pass on both.
+  Found by running the tool with numpy made unimportable: a dry run said
+  mlx-vlm was not installed. *Unchanged:* a probed failure keeps its
+  message, and the placeholder functions still raise the "not found" text.
+
 - Quality gate (0.17.114): `quality_run_pyrefly_check` took its exit status
   from a `pyrefly | tee` pipeline, which is `tee`'s status unless the caller
   set `pipefail`. Every current caller does, so no run was affected, but the
