@@ -8,7 +8,7 @@ import pytest
 from PIL import Image
 
 import check_models
-from tools import safe_io
+from check_models_data import safe_io
 
 
 def test_find_most_recent_file_in_directory(tmp_path: Path) -> None:

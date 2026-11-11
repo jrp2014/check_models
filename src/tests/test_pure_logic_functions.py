@@ -9,11 +9,16 @@ from __future__ import annotations
 import argparse
 import builtins
 import contextlib
+import errno
 import importlib
 import json
 import logging
 import os
+import shutil
+import stat
 import subprocess
+import sys
+import tomllib
 import types
 from dataclasses import dataclass, fields, replace
 from pathlib import Path
@@ -21,7 +26,7 @@ from typing import TYPE_CHECKING, Any, Never, cast
 from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Iterator, Mapping, Sequence
 
     from check_models import ProcessImageParams
 
@@ -29,6 +34,8 @@ import mlx.core as mx
 import pytest
 import yaml
 from mlx import nn
+
+from check_models_data import safe_io
 
 
 @pytest.fixture(scope="module")
@@ -209,65 +216,282 @@ class TestDistributionMetadataHelpers:
         }
 
 
-class TestSafeTextFileIO:
-    """Tests for symlink-resistant text file helpers."""
+@pytest.fixture
+def umask_027() -> Iterator[None]:
+    """Run a test under umask 027, so a default-mode file is created 0o640."""
+    previous = os.umask(0o027)
+    try:
+        yield
+    finally:
+        os.umask(previous)
 
-    def test_write_text_file_rejects_symlink_target(
-        self,
-        mod: types.ModuleType,
-        tmp_path: Path,
+
+def _mode(path: Path) -> int:
+    return stat.S_IMODE(path.lstat().st_mode)
+
+
+def _names(directory: Path) -> list[str]:
+    return sorted(entry.name for entry in directory.iterdir())
+
+
+@pytest.fixture
+def box(tmp_path: Path) -> Path:
+    """Return an empty directory (``tmp_path`` itself holds the suite's fake HF cache)."""
+    directory = tmp_path / "box"
+    directory.mkdir()
+    return directory
+
+
+class TestFileHelperContract:
+    """The one file-I/O contract in ``check_models_data.safe_io``, row by row."""
+
+    # ── creation ──
+
+    @pytest.mark.usefixtures("umask_027")
+    def test_write_creates_parents_and_a_file_with_mode_less_umask(self, box: Path) -> None:
+        """A new file gets the requested mode less the umask; parents are created."""
+        default = box / "a" / "b" / "default.txt"
+        script = box / "a" / "tool.sh"
+
+        safe_io.write_text_no_follow(default, "héllo\n")
+        safe_io.write_text_no_follow(script, "#!/bin/bash\n", mode=0o755)
+
+        assert default.read_bytes() == "héllo\n".encode()
+        assert _mode(default) == 0o640
+        assert _mode(script) == 0o750
+
+    def test_write_truncates_an_existing_file_and_keeps_its_mode(self, box: Path) -> None:
+        """Rewriting does not widen a file the user restricted."""
+        path = box / "private.txt"
+        path.write_text("a much longer earlier text", encoding="utf-8")
+        path.chmod(0o600)
+
+        safe_io.write_text_no_follow(path, "new")
+
+        assert path.read_text(encoding="utf-8") == "new"
+        assert _mode(path) == 0o600
+
+    def test_append_adds_to_the_end_and_bytes_are_written_unchanged(self, box: Path) -> None:
+        """Append keeps earlier content; bytes get no newline or encoding treatment."""
+        log = box / "history.jsonl"
+        safe_io.write_text_no_follow(log, "one\n", append=True)
+        safe_io.write_text_no_follow(log, "two\n", append=True)
+        blob = box / "asset.bin"
+        safe_io.write_bytes_no_follow(blob, b"\x89PNG\r\n\x00")
+
+        assert log.read_text(encoding="utf-8") == "one\ntwo\n"
+        assert blob.read_bytes() == b"\x89PNG\r\n\x00"
+
+    # ── replacement ──
+
+    @pytest.mark.usefixtures("umask_027")
+    def test_replace_creates_a_missing_file_with_the_default_mode(self, box: Path) -> None:
+        """The first write of a replace-managed artifact needs no separate create."""
+        path = box / "out" / "run_summary.md"
+
+        safe_io.replace_text_no_follow(path, "first\n")
+
+        assert path.read_text(encoding="utf-8") == "first\n"
+        assert _mode(path) == 0o640
+        assert _names(path.parent) == ["run_summary.md"]
+
+    def test_replace_swaps_the_content_and_keeps_the_permission_bits(self, box: Path) -> None:
+        """Replacement goes through a rename and does not reset the file's mode."""
+        path = box / "notes.yaml"
+        path.write_text("old\n", encoding="utf-8")
+        path.chmod(0o600)
+        inode_before = path.stat().st_ino
+
+        safe_io.replace_text_no_follow(path, "new\n")
+
+        assert path.read_text(encoding="utf-8") == "new\n"
+        assert _mode(path) == 0o600
+        assert path.stat().st_ino != inode_before
+        assert _names(box) == ["notes.yaml"]
+
+    # ── failure cleanup ──
+
+    def test_replace_that_cannot_encode_leaves_the_original_alone(self, box: Path) -> None:
+        """Unencodable text fails before anything on disk changes."""
+        path = box / "results.jsonl"
+        path.write_text("kept\n", encoding="utf-8")
+
+        with pytest.raises(UnicodeEncodeError):
+            safe_io.replace_text_no_follow(path, "lone surrogate \ud800")
+
+        assert path.read_text(encoding="utf-8") == "kept\n"
+        assert _names(box) == ["results.jsonl"]
+
+    def test_replace_that_fails_on_disk_leaves_the_original_and_no_sibling(
+        self, box: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """Generated artifacts should not follow a symlink target."""
-        target = tmp_path / "target.txt"
-        link = tmp_path / "artifact.txt"
+        """A write that cannot reach the disk never becomes the file."""
+        path = box / "results.jsonl"
+        path.write_text("kept\n", encoding="utf-8")
+
+        def disk_full(_fd: int) -> None:
+            raise OSError(errno.ENOSPC, "No space left on device")
+
+        monkeypatch.setattr(safe_io.os, "fsync", disk_full)
+        with pytest.raises(OSError, match="No space left"):
+            safe_io.replace_text_no_follow(path, "never visible\n")
+
+        assert path.read_text(encoding="utf-8") == "kept\n"
+        assert _names(box) == ["results.jsonl"]
+
+    # ── symlinks and non-regular files ──
+
+    @pytest.mark.parametrize("dangling", [False, True], ids=["existing-target", "dangling"])
+    def test_no_helper_follows_a_symlink_in_the_final_position(
+        self, box: Path, *, dangling: bool
+    ) -> None:
+        """Read, write, append and replace all refuse the link and leave its target alone."""
+        target = box / "target.txt"
+        if not dangling:
+            target.write_text("payload", encoding="utf-8")
+        link = box / "artifact.txt"
         link.symlink_to(target)
 
         with pytest.raises(OSError, match="symlink"):
-            mod._write_text_file(link, "unsafe")
-
-        assert not target.exists()
-
-    def test_read_text_file_rejects_symlink_target(
-        self,
-        mod: types.ModuleType,
-        tmp_path: Path,
-    ) -> None:
-        """History reads should not follow a symlink target."""
-        target = tmp_path / "target.txt"
-        target.write_text("payload", encoding="utf-8")
-        link = tmp_path / "history.jsonl"
-        link.symlink_to(target)
-
+            safe_io.read_text_no_follow(link)
         with pytest.raises(OSError, match="symlink"):
-            mod._read_text_file(link)
+            safe_io.write_text_no_follow(link, "unsafe")
+        with pytest.raises(OSError, match="symlink"):
+            safe_io.write_bytes_no_follow(link, b"unsafe", append=True)
+        with pytest.raises(OSError, match="non-regular"):
+            safe_io.replace_text_no_follow(link, "unsafe")
+        with pytest.raises(OSError, match="symlink"):
+            safe_io.open_regular_file_no_follow(link, os.O_RDONLY)
 
-    def test_write_text_file_rejects_symlink_parent(
-        self,
-        mod: types.ModuleType,
-        tmp_path: Path,
-    ) -> None:
-        """Generated artifacts should not follow a symlinked parent."""
-        real_dir = tmp_path / "real"
+        assert link.is_symlink()
+        assert target.exists() is not dangling
+        if not dangling:
+            assert target.read_text(encoding="utf-8") == "payload"
+        assert _names(box) == (["artifact.txt"] if dangling else ["artifact.txt", "target.txt"])
+
+    def test_no_helper_reaches_a_file_through_a_symlinked_directory(self, box: Path) -> None:
+        """A symlinked parent is refused for every helper, and nothing is created behind it."""
+        real_dir = box / "real"
         real_dir.mkdir()
-        link_dir = tmp_path / "linked"
+        (real_dir / "existing.txt").write_text("payload", encoding="utf-8")
+        link_dir = box / "linked"
         link_dir.symlink_to(real_dir, target_is_directory=True)
 
         with pytest.raises(OSError, match="symlinked directory"):
-            mod._write_text_file(link_dir / "artifact.txt", "unsafe")
+            safe_io.read_text_no_follow(link_dir / "existing.txt")
+        with pytest.raises(OSError, match="symlinked directory"):
+            safe_io.write_text_no_follow(link_dir / "sub" / "artifact.txt", "unsafe")
+        with pytest.raises(OSError, match="symlinked directory"):
+            safe_io.replace_text_no_follow(link_dir / "existing.txt", "unsafe")
+        with pytest.raises(OSError, match="symlinked directory"):
+            safe_io.open_regular_file_no_follow(link_dir / "existing.txt", os.O_RDONLY)
 
-        assert not (real_dir / "artifact.txt").exists()
+        assert _names(real_dir) == ["existing.txt"]
+        assert (real_dir / "existing.txt").read_text(encoding="utf-8") == "payload"
 
-    def test_read_text_file_enforces_size_cap(
-        self,
-        mod: types.ModuleType,
-        tmp_path: Path,
+    def test_a_trusted_root_alias_is_allowed_only_while_it_has_its_expected_target(
+        self, box: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """History reads should reject oversized files before decoding."""
-        path = tmp_path / "history.jsonl"
-        path.write_text("abcdef", encoding="utf-8")
+        """The macOS /tmp and /var aliases work; the same link retargeted does not."""
+        real_dir = box / "private-var"
+        real_dir.mkdir()
+        elsewhere = box / "elsewhere"
+        elsewhere.mkdir()
+        alias = box / "var"
+        alias.symlink_to(real_dir, target_is_directory=True)
+        monkeypatch.setattr(safe_io, "ALLOWED_SYSTEM_SYMLINK_PARENTS", {alias: real_dir.resolve()})
 
-        with pytest.raises(OSError, match="exceeds"):
-            mod._read_text_file(path, max_bytes=3)
+        safe_io.write_text_no_follow(alias / "run" / "note.txt", "ok")
+        assert safe_io.read_text_no_follow(alias / "run" / "note.txt") == "ok"
+
+        alias.unlink()
+        alias.symlink_to(elsewhere, target_is_directory=True)
+        with pytest.raises(OSError, match="symlinked directory"):
+            safe_io.write_text_no_follow(alias / "note.txt", "redirected")
+        assert _names(elsewhere) == []
+
+    def test_a_directory_is_refused_as_a_file(self, box: Path) -> None:
+        """Only regular files are read, written or replaced."""
+        directory = box / "not-a-file"
+        directory.mkdir()
+
+        with pytest.raises(OSError, match="non-regular"):
+            safe_io.read_text_no_follow(directory)
+        with pytest.raises(IsADirectoryError):
+            safe_io.write_text_no_follow(directory, "unsafe")
+        with pytest.raises(OSError, match="non-regular"):
+            safe_io.replace_text_no_follow(directory, "unsafe")
+        assert _names(box) == ["not-a-file"]
+
+    # ── reading ──
+
+    def test_read_returns_utf8_text_and_enforces_the_byte_cap(self, box: Path) -> None:
+        """The cap is in bytes, checked before the content is decoded."""
+        path = box / "history.jsonl"
+        path.write_bytes("héllo".encode())
+
+        assert safe_io.read_text_no_follow(path) == "héllo"
+        assert safe_io.read_text_no_follow(path, max_bytes=6) == "héllo"
+        with pytest.raises(OSError, match="exceeds 5 bytes"):
+            safe_io.read_text_no_follow(path, max_bytes=5)
+        with pytest.raises(FileNotFoundError):
+            safe_io.read_text_no_follow(box / "missing.txt")
+
+    # ── one implementation, checkout and installed ──
+
+    def test_the_script_uses_the_shared_helpers(self, mod: types.ModuleType) -> None:
+        """check_models.py has no file helpers of its own."""
+        assert mod._read_text_file is safe_io.read_text_no_follow
+        assert mod._write_text_file is safe_io.write_text_no_follow
+        assert mod._write_bytes_file is safe_io.write_bytes_no_follow
+        assert mod._replace_text_file is safe_io.replace_text_no_follow
+
+    @pytest.mark.subprocess
+    def test_an_installed_copy_works_without_the_checkout_or_third_party_packages(
+        self, box: Path
+    ) -> None:
+        """What the wheel ships runs on the standard library alone, away from the checkout.
+
+        The wheel's contents are the modules and packages pyproject.toml
+        declares; they are copied to an empty directory and exercised by an
+        interpreter started with ``-I -S`` (no working directory, no
+        ``PYTHONPATH``, no site-packages) from a directory outside the checkout.
+        """
+        src = Path(__file__).resolve().parent.parent
+        declared = tomllib.loads((src / "pyproject.toml").read_text(encoding="utf-8"))["tool"][
+            "setuptools"
+        ]
+        assert "check_models_data" in declared["packages"]
+        assert "tools" not in declared["packages"]
+        site = box / "site"
+        for package in declared["packages"]:
+            shutil.copytree(
+                src / package, site / package, ignore=shutil.ignore_patterns("__pycache__")
+            )
+        workdir = box / "elsewhere"
+        workdir.mkdir()
+        probe = (
+            "import sys\n"
+            "sys.path.insert(0, sys.argv[1])\n"
+            "from pathlib import Path\n"
+            "from check_models_data import safe_io\n"
+            "assert Path(safe_io.__file__).is_relative_to(sys.argv[1]), safe_io.__file__\n"
+            "target = Path('out') / 'note.txt'\n"
+            "safe_io.replace_text_no_follow(target, 'first')\n"
+            "safe_io.replace_text_no_follow(target, 'second')\n"
+            "safe_io.write_text_no_follow(target, '\\nthird', append=True)\n"
+            "print(safe_io.read_text_no_follow(target))\n"
+            "print(sorted(p.name for p in Path('out').iterdir()))\n"
+        )
+        result = subprocess.run(  # noqa: S603 - this interpreter, fixed arguments
+            [sys.executable, "-I", "-S", "-c", probe, str(site)],
+            capture_output=True,
+            text=True,
+            check=False,
+            cwd=workdir,
+        )
+        assert result.returncode == 0, result.stderr
+        assert result.stdout == "second\nthird\n['note.txt']\n"
 
 
 # ── apply_exclusions ───────────────────────────────────────────────────────

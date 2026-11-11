@@ -28,7 +28,7 @@ from check_models import (
     analyze_generation_text,
     load_quality_config,
 )
-from tools.safe_io import read_text_no_follow
+from check_models_data.safe_io import read_text_no_follow
 
 
 def _build_parser() -> argparse.ArgumentParser:

@@ -14,7 +14,7 @@ import pytest
 from huggingface_hub.errors import CacheNotFound
 
 import check_models
-from tools import safe_io
+from check_models_data import safe_io
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

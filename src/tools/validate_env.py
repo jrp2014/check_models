@@ -31,7 +31,7 @@ from check_models_data.dependency_policy import (
     VALIDATE_ENV_CORE_FALLBACK_SPECS,
     VALIDATE_ENV_EXTRAS_FALLBACK_SPECS,
 )
-from tools.safe_io import read_text_no_follow
+from check_models_data.safe_io import read_text_no_follow
 
 # Hook types the checked-in .pre-commit-config.yaml installs.
 REQUIRED_HOOK_TYPES: tuple[str, ...] = ("pre-commit", "pre-push")

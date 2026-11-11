@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from tools.safe_io import read_text_no_follow
+from check_models_data.safe_io import read_text_no_follow
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

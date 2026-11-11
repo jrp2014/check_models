@@ -26,7 +26,7 @@ from check_models import (
     append_history_record,
     save_jsonl_report,
 )
-from tools import safe_io
+from check_models_data import safe_io
 
 
 def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord]]:
@@ -2225,14 +2225,9 @@ def test_failed_retained_run_rewrite_leaves_the_previous_file_intact(tmp_path: P
     check_models._write_retained_run(retained, path)
     before = path.read_bytes()
 
-    def _explode(target: Path, content: str, *, append: bool = False) -> None:
-        del content, append
-        safe_io.write_text_no_follow(target, "partial")
-        msg = "disk full"
-        raise OSError(msg)
-
+    # The staged copy is fully written, then the flush to disk fails.
     with (
-        patch.object(check_models, "_write_text_file", _explode),
+        patch.object(safe_io.os, "fsync", side_effect=OSError("disk full")),
         pytest.raises(OSError, match="disk full"),
     ):
         check_models._write_retained_run(retained, path)

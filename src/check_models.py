@@ -55,7 +55,6 @@ import platform
 import re
 import shutil
 import signal
-import stat
 import subprocess
 import sys
 import tempfile
@@ -151,6 +150,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from check_models_data import safe_io
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
     PROJECT_RUNTIME_STACK_MINIMUMS,
@@ -353,21 +353,14 @@ _REPORTING_EMPTY_WRAPPER_PATTERNS: Final[
     for pair in THINKING_TRACE_DELIMITERS
     if pair.reports_when_empty
 )
-MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 # Artifact schema versions. Three distinct schemas; writers and readers must
 # reference these constants, never bare "2.0"/"1.0" literals.
 JSONL_FORMAT_VERSION: Final = "3.0"
 HISTORY_FORMAT_VERSION: Final = "1.0"
-SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
 MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
 # Byte cap on an --image URL download read for EXIF; a larger response is
 # rejected. Sized for an uncompressed 8-bit RGB 105 Mpx image (3 bytes/pixel).
 MAX_IMAGE_URL_BYTES: Final[int] = 315_000_000
-ROOT_PATH: Final[Path] = Path(os.sep)
-ALLOWED_SYSTEM_SYMLINK_PARENTS: Final[dict[Path, Path]] = {
-    ROOT_PATH / "tmp": ROOT_PATH / "private" / "tmp",
-    ROOT_PATH / "var": ROOT_PATH / "private" / "var",
-}
 DISTRIBUTION_DIRECT_URL_METADATA_FILE: Final[str] = "direct_url.json"
 ALLOWED_DISTRIBUTION_TEXT_FILES: Final[frozenset[str]] = frozenset(
     {DISTRIBUTION_DIRECT_URL_METADATA_FILE},
@@ -377,122 +370,14 @@ ALLOWED_DISTRIBUTION_TEXT_FILES: Final[frozenset[str]] = frozenset(
 # =============================================================================
 # SYMLINK-SAFE FILE I/O HELPERS
 # =============================================================================
-
-
-def _is_allowed_system_symlink_parent(path: Path) -> bool:
-    """Return true for trusted macOS root aliases such as /var."""
-    expected_target = ALLOWED_SYSTEM_SYMLINK_PARENTS.get(path)
-    if expected_target is None:
-        return False
-    try:
-        return path.resolve(strict=True) == expected_target
-    except OSError:
-        return False
-
-
-def _reject_symlink_parent(path: Path) -> None:
-    """Reject symlinked parent directories before artifact file I/O."""
-    for parent in (path.parent, *path.parent.parents):
-        if parent.is_symlink() and not _is_allowed_system_symlink_parent(parent):
-            msg = f"Refusing to access file through symlinked directory: {parent}"
-            raise OSError(msg)
-
-
-def _canonical_file_path(path: Path) -> Path:
-    """Resolve existing parent links without following the final artifact path."""
-    return path.parent.resolve(strict=False) / path.name
-
-
-def _open_regular_file_no_symlink(path: Path, flags: int, mode: int = 0o666) -> int:
-    """Open a regular file descriptor without following final symlinks."""
-    if path.is_symlink():
-        msg = f"Refusing to follow symlink: {path}"
-        raise OSError(msg)
-
-    fd = os.open(  # skylos: ignore[SKY-D215] local CLI output path, guarded below.
-        path,
-        flags | getattr(os, "O_NOFOLLOW", 0),
-        mode,
-    )
-    try:
-        file_stat = os.fstat(fd)
-    except OSError:
-        os.close(fd)
-        raise
-    if not stat.S_ISREG(file_stat.st_mode):
-        os.close(fd)
-        msg = f"Refusing to access non-regular file: {path}"
-        raise OSError(msg)
-    return fd
-
-
-def _write_bytes_file(path: Path, content: bytes, *, append: bool = False) -> None:
-    """Write bytes to a regular file without following symlinks."""
-    _reject_symlink_parent(path)
-    path = _canonical_file_path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    _reject_symlink_parent(path)
-
-    flags = os.O_WRONLY | os.O_CREAT | (os.O_APPEND if append else os.O_TRUNC)
-    fd = _open_regular_file_no_symlink(path, flags)
-    with os.fdopen(fd, "ab") as handle:
-        handle.write(content)
-
-
-def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
-    """Write UTF-8 text to a regular file without following symlinks."""
-    _write_bytes_file(path, content.encode("utf-8"), append=append)
-
-
-def _replace_text_file(path: Path, content: str) -> None:
-    """Replace a file's whole content through a staged sibling and a rename.
-
-    A failed write (serialisation, disk full, interrupt) leaves the previous
-    file untouched rather than truncated.
-    """
-    staging = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    try:
-        _write_text_file(staging, content)
-        staging.replace(path)
-    finally:
-        staging.unlink(missing_ok=True)
-
-
-def _read_text_file(path: Path, *, max_bytes: int = MAX_SAFE_TEXT_FILE_BYTES) -> str:
-    """Read UTF-8 text from a regular file with a byte-size cap."""
-    _reject_symlink_parent(path)
-    path = _canonical_file_path(path)
-    _reject_symlink_parent(path)
-    fd = _open_regular_file_no_symlink(path, os.O_RDONLY)
-    try:
-        file_size = os.fstat(fd).st_size
-    except OSError:
-        os.close(fd)
-        raise
-    if file_size > max_bytes:
-        os.close(fd)
-        msg = f"Refusing to read {path}: file size {file_size} exceeds {max_bytes} bytes"
-        raise OSError(msg)
-
-    chunks: list[bytes] = []
-    remaining = max_bytes + 1
-    try:
-        while remaining > 0:
-            chunk = os.read(
-                fd,
-                min(remaining, SAFE_TEXT_FILE_READ_CHUNK_BYTES),
-            )
-            if not chunk:
-                break
-            chunks.append(chunk)
-            remaining -= len(chunk)
-    finally:
-        os.close(fd)
-    data = b"".join(chunks)
-    if len(data) > max_bytes:
-        msg = f"Refusing to read {path}: content exceeds {max_bytes} bytes"
-        raise OSError(msg)
-    return data.decode("utf-8")
+# One implementation, in the packaged check_models_data.safe_io and shared with
+# the maintenance tools. That module's docstring is the contract: no symlinks
+# followed, regular files only, all-or-nothing replacement.
+_open_regular_file = safe_io.open_regular_file_no_follow
+_read_text_file = safe_io.read_text_no_follow
+_write_text_file = safe_io.write_text_no_follow
+_write_bytes_file = safe_io.write_bytes_no_follow
+_replace_text_file = safe_io.replace_text_no_follow
 
 
 # =============================================================================
@@ -26170,10 +26055,7 @@ def _run_issue_artifact_is_stale(
     if run_window is None:
         return False
     try:
-        _reject_symlink_parent(path)
-        canonical_path = _canonical_file_path(path)
-        _reject_symlink_parent(canonical_path)
-        fd = _open_regular_file_no_symlink(canonical_path, os.O_RDONLY)
+        fd = _open_regular_file(path, os.O_RDONLY)
         with os.fdopen(fd, "rb") as handle:
             prefix = b"".join(handle.readline(4096) for _ in range(4)).decode("utf-8")
     except (OSError, UnicodeDecodeError):

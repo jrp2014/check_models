@@ -177,6 +177,47 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- File I/O (0.17.113, step 3 of john's 2026-11-11 plan): one implementation
+  of the symlink-safe file helpers, in the packaged
+  `check_models_data/safe_io.py`, whose docstring is the contract.
+  `check_models.py` had its own copy and the tools had `tools/safe_io.py`
+  (deleted); the script cannot import `tools`, which is not in the wheel. The
+  script binds the shared functions under its existing private names, and
+  tools and tests import them from the package.
+
+  Behaviour preserved: no symlinked parent directory (bar the macOS `/tmp`
+  and `/var` aliases, for the script), no symlink or non-regular file in the
+  final position, parents created on write, a new file gets its mode less
+  the umask, the read byte cap, and all-or-nothing replacement with no
+  staging file left behind.
+
+  Behaviour changed, where the two copies disagreed:
+  - Replacement keeps an existing file's permission bits (the script's copy
+    reset them to the default) and flushes the staged copy to disk before
+    the rename (the script's copy did not).
+  - Replacement refuses a symlink or other non-regular file at the target.
+    The script's copy renamed over the link; every other write already
+    refused one.
+  - Replacement creates a missing file (the tools' copy required one), and
+    the tools accept the macOS `/tmp` and `/var` aliases as the script does.
+  - `read_text_no_follow` lost its unused `encoding` parameter; writes
+    gained `append` and `mode` everywhere.
+
+  Benefit: one place defines what "safe" means for every artifact, note and
+  report the project writes, and a fix there reaches the script and the
+  tools alike. Evidence: 15 contract tests in `TestFileHelperContract`
+  (creation, replacement, failure cleanup, symlinks, permissions, reading,
+  and a copy of the declared wheel contents exercised by an interpreter
+  with no site-packages, outside the checkout). Run against the two old
+  copies, 6 of the 13 behavioural rows failed on each: the differences
+  above, the parameters each lacked, and one differently worded refusal. A wheel
+  built from these sources held exactly `check_models.py` and the four
+  `check_models_data` files; installed into an empty directory, it passed
+  the same tests from outside the checkout, with `check_models` and the
+  helpers both loading from the installed copy. The three caller tests that
+  injected a failure by patching the script's writer now fail the disk
+  flush instead, so they still prove the callers keep the previous file.
+
 - Section landmarks (0.17.111, step 1 of john's 2026-11-11 plan): the
   `# SECTION:` map of `check_models.py` now describes what is under each
   heading. Twenty sections are added and six renamed (21 to 41), so the

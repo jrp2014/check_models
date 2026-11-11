@@ -27,7 +27,7 @@ from huggingface_hub.errors import CacheNotFound
 from PIL import Image
 
 import check_models
-from tools import safe_io
+from check_models_data import safe_io
 
 if TYPE_CHECKING:
     from pathlib import Path

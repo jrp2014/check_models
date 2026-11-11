@@ -12,10 +12,10 @@ from pathlib import Path
 from typing import Final
 
 try:
-    from tools.safe_io import read_text_no_follow
+    from check_models_data.safe_io import read_text_no_follow
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from tools.safe_io import read_text_no_follow
+    from check_models_data.safe_io import read_text_no_follow
 
 OUTDATED_TIMEOUT_SECONDS: Final[int] = int(os.environ.get("CHECK_OUTDATED_TIMEOUT", "20"))
 NETWORK_ERROR_HINTS: Final[tuple[str, ...]] = (

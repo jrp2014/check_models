@@ -26,11 +26,10 @@ from check_models import (
     RetainedRun,
     _load_retained_run,
     _parse_accuracy_notes,
-    _replace_text_file,
     _sha256_text,
     regenerate_run_issue_summary,
 )
-from tools.safe_io import read_text_no_follow
+from check_models_data.safe_io import read_text_no_follow, replace_text_no_follow
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -116,7 +115,7 @@ def append_note(
         {"notes": entries}, sort_keys=False, allow_unicode=True, width=88
     )
     parse(yaml.safe_load(updated))
-    _replace_text_file(notes_path, updated)
+    replace_text_no_follow(notes_path, updated)
     return yaml.safe_dump([entry], sort_keys=False, allow_unicode=True, width=88)
 
 

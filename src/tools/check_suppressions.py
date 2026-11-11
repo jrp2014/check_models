@@ -30,10 +30,10 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 try:
-    from tools.safe_io import read_text_no_follow
+    from check_models_data.safe_io import read_text_no_follow
 except ModuleNotFoundError:  # pragma: no cover - direct script execution
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from tools.safe_io import read_text_no_follow
+    from check_models_data.safe_io import read_text_no_follow
 
 SuppressionKind = Literal[
     "noqa",

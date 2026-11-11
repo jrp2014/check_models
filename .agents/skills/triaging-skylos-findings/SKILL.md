@@ -62,8 +62,9 @@ the code path from input to sink, not on the finding's message.
 Then take the first option that holds:
 
 1. **Fix the code.** For file I/O findings (SKY-D215/D324/D325) that means
-   `read_text_no_follow`/`write_text_no_follow` from `tools/safe_io.py`, or
-   `_open_regular_file_no_symlink` in `check_models.py`, as
+   the helpers in `check_models_data/safe_io.py` (`read_text_no_follow`,
+   `write_text_no_follow`, `replace_text_no_follow`, or
+   `open_regular_file_no_follow` for a descriptor), as
    `.github/copilot-instructions.md` requires.
 2. **Dead-code findings:** rule them out in this order before deleting or
    suppressing: static references and imports, pytest fixtures and hooks,

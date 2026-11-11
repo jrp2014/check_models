@@ -1186,21 +1186,19 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
         runtime_fingerprint={},
     )
     events: list[str] = []
-    real_write_text = check_models._write_text_file
+    real_replace_text = check_models._replace_text_file
 
-    def record_writes(path: Path, content: str, *, append: bool = False) -> None:
-        # The retained run is staged beside its target and renamed into place.
-        staged_jsonl = path.parent == paths.jsonl.parent and paths.jsonl.name in path.name
-        if staged_jsonl and '"_type": "metadata"' in content:
+    def record_replacements(path: Path, content: str) -> None:
+        if path == paths.jsonl and '"_type": "metadata"' in content:
             events.append("jsonl")
-        real_write_text(path, content, append=append)
+        real_replace_text(path, content)
 
     def fail_renderer(*_args: object, **_kwargs: object) -> None:
         events.append(failing_renderer)
         message = f"synthetic {failing_renderer} failure"
         raise ValueError(message)
 
-    monkeypatch.setattr(check_models, "_write_text_file", record_writes)
+    monkeypatch.setattr(check_models, "_replace_text_file", record_replacements)
     monkeypatch.setattr(
         check_models,
         "generate_html_report" if failing_renderer == "html" else "generate_diagnostics_report",

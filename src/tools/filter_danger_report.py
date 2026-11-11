@@ -19,7 +19,7 @@ import json
 import sys
 from pathlib import Path
 
-from tools.safe_io import read_text_no_follow, write_text_no_follow
+from check_models_data.safe_io import read_text_no_follow, write_text_no_follow
 
 WORKTREE_MARKERS = ("/.worktrees/", "/.claude/worktrees/")
 # Danger reports for this repo run ~10 MB; cap well above that.

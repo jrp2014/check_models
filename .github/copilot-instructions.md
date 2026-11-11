@@ -278,11 +278,17 @@ The file is organized in this order — search for these exact landmark headers 
 - `Final` for constants: `TIMEOUT: Final[float] = 5.0`
 - `pathlib.Path` for all paths; convert to `str` only at library call boundaries
 - File I/O goes through the bounded, non-link-following helpers, never raw
-  `Path.read_text`/`write_text` or `open()`: `_read_text_file`/`_write_text_file`
-  in `check_models.py` (and `_read_snapshot_json` for model-cache JSON, which
-  also enforces cache containment), `tools.safe_io.read_text_no_follow`/
-  `write_text_no_follow` in tools and tests. They reject symlinked parents,
-  require a regular file and cap the size; Skylos flags raw reads and writes
+  `Path.read_text`/`write_text` or `open()`. There is one implementation, in
+  the packaged `check_models_data/safe_io.py`, whose docstring is the
+  contract: `read_text_no_follow`, `write_text_no_follow`,
+  `write_bytes_no_follow`, `replace_text_no_follow` (all-or-nothing, for a
+  file that must survive a failed rewrite) and `open_regular_file_no_follow`.
+  Tools and tests import them from there; `check_models.py` binds them as
+  `_read_text_file`, `_write_text_file`, `_write_bytes_file`,
+  `_replace_text_file` and `_open_regular_file` (and has `_read_snapshot_json`
+  for model-cache JSON, which also enforces cache containment). They reject
+  symlinked parents and symlinked or non-regular files, and reads cap the
+  size; Skylos flags raw reads and writes
   (SKY-D324/SKY-D325) and the danger gate blocks on them. This applies to
   files the project itself ships or installs too (mlx-vlm package sources,
   config files), not only user input.

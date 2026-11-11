@@ -17,7 +17,7 @@ from check_models import (
     validate_sampling_params,
     validate_temperature,
 )
-from tools import safe_io
+from check_models_data import safe_io
 
 
 class TestTemperatureValidation:

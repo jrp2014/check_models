@@ -36,7 +36,7 @@ from check_models import (
     generate_html_report,
     generate_markdown_gallery_report,
 )
-from tools import safe_io
+from check_models_data import safe_io
 from tools.add_accuracy_note import main as add_accuracy_note
 from tools.add_native_repro_note import main as add_native_repro_note
 
@@ -529,18 +529,13 @@ def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
         pytest.fail("the fixture must produce a summary")
     first = summary.read_bytes()
 
-    def _explode(target: Path, content: str, *, append: bool = False) -> None:
-        del content, append
-        safe_io.write_text_no_follow(target, "partial")
-        msg = "disk full"
-        raise OSError(msg)
-
     inputs = cast(
         "check_models.ReportGenerationInputs",
         Namespace(output_paths=output_paths, comparison=None),
     )
     checkpoint = check_models._load_retained_run(output_paths.jsonl)
-    with patch.object(check_models, "_write_text_file", _explode):
+    # The staged copy is fully written, then the flush to disk fails.
+    with patch.object(safe_io.os, "fsync", side_effect=OSError("disk full")) as failed_flush:
         check_models._rerender_run_issue_summary(
             inputs,
             checkpoint,
@@ -548,6 +543,7 @@ def test_failed_summary_rerender_keeps_the_first_render(tmp_path: Path) -> None:
             include_gallery_markdown=False,
         )
 
+    assert failed_flush.called
     assert summary.read_bytes() == first
     assert [p.name for p in summary.parent.iterdir() if p.suffix == ".tmp"] == []
 
@@ -10416,7 +10412,8 @@ def test_failed_accuracy_note_write_leaves_earlier_notes_intact(
         msg = "disk full"
         raise OSError(msg)
 
-    monkeypatch.setattr(check_models, "_write_text_file", fail)
+    # The staged copy is fully written, then the flush to disk fails.
+    monkeypatch.setattr(safe_io.os, "fsync", fail)
     assert _record_accuracy_note(output_root, "org/changed") == 1
     assert safe_io.read_text_no_follow(notes_path) == before
     assert list(output_root.glob(".*.tmp")) == []

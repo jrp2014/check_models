@@ -30,14 +30,13 @@ from packaging.requirements import Requirement
 from packaging.version import Version
 
 import check_models
-from check_models_data import dependency_policy
+from check_models_data import dependency_policy, safe_io
 from tools import (
     check_dependency_advisories,
     check_suppressions,
     filter_danger_report,
     hub_precheck,
     quarantine_broken_pip_metadata,
-    safe_io,
     update_readme_deps,
     validate_env,
 )
@@ -167,26 +166,6 @@ def _documented_shell_snippets(text: str) -> list[str]:
     without_fences = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     inline = re.findall(r"`([^`\n]+)`", without_fences)
     return [*inline, *(line.strip() for fence in fences for line in fence.splitlines())]
-
-
-def test_safe_io_read_text_no_follow_rejects_symlinked_file(tmp_path: Path) -> None:
-    """Maintenance-tool text reads should not follow attacker-swapped symlinks."""
-    target_path = tmp_path / "target.txt"
-    target_path.write_text("safe text", encoding="utf-8")
-    symlink_path = tmp_path / "link.txt"
-    symlink_path.symlink_to(target_path)
-
-    with pytest.raises(OSError, match="Refusing to follow symlink"):
-        safe_io.read_text_no_follow(symlink_path)
-
-
-def test_safe_io_read_text_no_follow_enforces_byte_cap(tmp_path: Path) -> None:
-    """Maintenance-tool text reads should reject unexpectedly large files."""
-    text_path = tmp_path / "large.txt"
-    text_path.write_text("abcdef", encoding="utf-8")
-
-    with pytest.raises(OSError, match=r"exceeds 3 bytes"):
-        safe_io.read_text_no_follow(text_path, max_bytes=3)
 
 
 def test_readme_runtime_block_matches_pyproject() -> None:
@@ -1064,9 +1043,14 @@ def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> No
     script = tools_dir / SKYLOS_DANGER_ADVISORY_SCRIPT.name
     script.write_bytes(SKYLOS_DANGER_ADVISORY_SCRIPT.read_bytes())
     (tools_dir / "__init__.py").write_text("", encoding="utf-8")
-    for helper_name in ("filter_danger_report.py", "safe_io.py"):
-        helper = PKG_ROOT / "tools" / helper_name
-        (tools_dir / helper_name).write_bytes(helper.read_bytes())
+    # The report filter and the packaged file helpers it imports, as siblings under src/.
+    (repo_root / "src" / "check_models_data").mkdir()
+    for helper_name in (
+        "tools/filter_danger_report.py",
+        "check_models_data/__init__.py",
+        "check_models_data/safe_io.py",
+    ):
+        (repo_root / "src" / helper_name).write_bytes((PKG_ROOT / helper_name).read_bytes())
     call_log = tmp_path / "skylos-calls.log"
     (tools_dir / "common_quality.sh").write_text(
         dedent(
