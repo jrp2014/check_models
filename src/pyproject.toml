@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Compare and diagnose MLX vision-language models on Apple Silicon: single-image runs, throughput and memory measurements, output comparisons, and reproducible failure reports."
-version = "0.17.113"
+version = "0.17.114"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -355,13 +355,13 @@ markers = [
 
 [tool.pyrefly]
 python-version = "3.13"
-# The package root itself: without it, editor Pyrefly infers an import root of
-# src/src and cannot find `check_models` or `check_models_data` (the gate's
-# generated config already leads with this directory).
+# The package root itself: without it, Pyrefly infers an import root of
+# src/src and cannot find `check_models` or `check_models_data`.
 search-path = ["."]
-# Shared quality scripts inject `python-interpreter-path` from the resolved
-# QUALITY_PYTHON so local and CI runs use the same site-packages without
-# hardcoding a machine-specific interpreter path here.
+# This table is the whole configuration for editors and for the quality gate.
+# The gate adds only `--python-interpreter-path` (the resolved QUALITY_PYTHON),
+# so local and CI runs read the same site-packages without a machine-specific
+# interpreter path here.
 
 
 [tool.setuptools.package-data]

@@ -177,6 +177,29 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Quality gate (0.17.114, step 4 of john's 2026-11-11 plan, first part):
+  the Pyrefly step reads `[tool.pyrefly]` from `pyproject.toml` directly and
+  adds only `--python-interpreter-path`. The gate used to generate a
+  temporary config on every run (a 95-line Python heredoc) that switched off
+  ignore files and the hidden-directory heuristic and restored the default
+  excludes by hand, so that a worktree under `.claude/worktrees/` was not
+  skipped. With the explicit file list the gate already passes, Pyrefly
+  1.4.1 does not need that.
+
+  Behaviour preserved: the same files are checked (`git ls-files`, tracked
+  and untracked), with the same interpreter, version and search path, and
+  warnings still fail the gate. Benefit: one configuration for editors and
+  the gate, and `common_quality.sh` is 429 lines, from 524. Evidence: a new
+  test builds a real repository whose `.git/info/exclude` ignores
+  `.claude/`, adds a linked worktree under it, and runs the real gate
+  function with the real Pyrefly: a clean worktree passes, and a type error
+  in a tracked file and another in an untracked file both fail it. The test
+  passed on the old generated config first. On a hidden worktree of this
+  repository (53 files, two planted errors, one import of a worktree-only
+  name), the old and new invocations printed identical diagnostics; on the
+  checkout both report 0 diagnostics, 4 suppressed. The generated-config
+  test and a source-text check of the target list are replaced by that test.
+
 - File I/O (0.17.113, step 3 of john's 2026-11-11 plan): one implementation
   of the symlink-safe file helpers, in the packaged
   `check_models_data/safe_io.py`, whose docstring is the contract.
@@ -1539,6 +1562,13 @@ Notable changes to this project will be documented in this file.
   must now sort its own results. Report order is unchanged.
 
 ### Fixed
+
+- Quality gate (0.17.114): `quality_run_pyrefly_check` took its exit status
+  from a `pyrefly | tee` pipeline, which is `tee`'s status unless the caller
+  set `pipefail`. Every current caller does, so no run was affected, but the
+  hidden-worktree test, calling it without, saw Pyrefly print two errors
+  and the function return 0. The output now goes to a file and is printed
+  afterwards, so the status is Pyrefly's own.
 
 - `run_skylos_danger_advisory.sh` (0.17.109): the "no findings" branch ran
   `raise SystemExit("0")`, which prints `0` to stderr and exits 1, so a

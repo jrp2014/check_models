@@ -295,26 +295,6 @@ def test_pillow_floor_uses_security_fixed_release() -> None:
     )
 
 
-def test_pyrefly_quality_check_passes_explicit_targets() -> None:
-    """Pyrefly must run in single-file mode, not project discovery.
-
-    Explicit targets enumerated via ``git ls-files`` bypass Pyrefly's
-    filesystem discovery entirely, so the gate's file set cannot be eaten by
-    parent-repo ignore files or future discovery heuristics. This is the
-    second layer of the worktree defense; the generated config additionally
-    neutralizes the known discovery pitfalls (see the companion generated-
-    config test).
-    """
-    common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
-
-    assert "quality_pyrefly_default_targets" in common_quality
-    assert (
-        'git -C "$(quality_src_root)" ls-files --cached --others --exclude-standard'
-        in common_quality
-    )
-    assert '"${targets[@]}" 2>&1 | tee "$output_path"' in common_quality
-
-
 def test_mypy_follows_imports_for_their_types() -> None:
     """Imported packages must keep their types; "skip" silently turned them into Any.
 
@@ -1269,60 +1249,62 @@ def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
 
 
 @pytest.mark.subprocess
-def test_pyrefly_generated_config_neutralizes_parent_repo_ignore_files(
-    tmp_path: Path,
-) -> None:
-    """The generated Pyrefly config must not inherit parent-repo ignore files.
+def test_pyrefly_gate_finds_type_errors_in_a_hidden_linked_worktree(tmp_path: Path) -> None:
+    """The real gate and the real Pyrefly see every file of a worktree under a hidden directory.
 
-    Linked worktrees (for example .claude/worktrees/*) sit under a hidden
-    directory that the parent repo's .git/info/exclude ignores, so project
-    discovery finds zero files unless the generated config disables ignore-file
-    collection and Pyrefly's hidden-directory exclude heuristic, restoring the
-    dropped default excludes explicitly.
+    Agent worktrees live in ``.claude/worktrees/*``: a hidden directory that
+    the parent repository's ``.git/info/exclude`` ignores. A checker that
+    honoured either would find nothing to check there and pass. The gate must
+    pass a clean worktree and fail one with a type error, in a tracked file
+    and in a file git does not yet track.
     """
-    config_path = tmp_path / "pyrefly-generated.toml"
-    run_script = tmp_path / "write_pyrefly_config.sh"
-    run_script.write_text(
-        dedent(
-            f"""\
-            #!/usr/bin/env bash
-            set -euo pipefail
-            cd \"{PKG_ROOT}\"
-            source tools/common_quality.sh
-            QUALITY_PYTHON=\"{sys.executable}\"
-            quality_write_pyrefly_config \"{config_path}\" \"{sys.executable}\"
-            """
-        ),
-        encoding="utf-8",
+    repo = tmp_path / "repo"
+    (repo / "src" / "tools").mkdir(parents=True)
+    for name in ("pyproject.toml", "tools/common_quality.sh"):
+        (repo / "src" / name).write_bytes((PKG_ROOT / name).read_bytes())
+    safe_io.write_text_no_follow(
+        repo / "src" / "tracked_module.py",
+        '"""Tracked module."""\n\nVALUE: int = 1\n',
     )
-    run_script.chmod(0o755)
+    _git(repo, "init", "-q")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "initial")
+    safe_io.write_text_no_follow(repo / ".git" / "info" / "exclude", ".claude/\n", append=True)
+    worktree = repo / ".claude" / "worktrees" / "probe"
+    _git(repo, "worktree", "add", "-q", str(worktree), "-b", "probe")
 
-    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
-        ["/bin/bash", str(run_script)],
-        capture_output=True,
-        text=True,
-        check=False,
-        cwd=PKG_ROOT,
-    )
-
-    assert result.returncode == 0, result.stderr or result.stdout
-    generated = tomllib.loads(config_path.read_text(encoding="utf-8"))
-
-    assert generated["use-ignore-files"] is False
-    assert generated["disable-project-excludes-heuristics"] is True
-
-    # The generated config is a throwaway that lives in $TMPDIR, so every
-    # pattern and path is anchored to the package root rather than resolved
-    # relative to the config file.
-    project_excludes = generated["project-excludes"]
-    for restored_default in ("**/node_modules/", "**/__pycache__/", "**/.*/**"):
-        assert f"{PKG_ROOT.resolve()}/{restored_default}" in project_excludes, (
-            f"disabled exclude heuristics must be restored explicitly: {restored_default}"
+    def run_gate() -> subprocess.CompletedProcess[str]:
+        return _run_bash_script(
+            "source tools/common_quality.sh\n"
+            'QUALITY_PYTHON="$1"\n'
+            "QUALITY_PYTHON_SOURCE=synthetic-test\n"
+            "quality_run_pyrefly_check\n",
+            "_",
+            sys.executable,
+            cwd=worktree / "src",
         )
-    assert generated["project-includes"] == [f"{PKG_ROOT.resolve()}/**/*.py"]
-    assert generated["search-path"][0] == str(PKG_ROOT.resolve())
-    for entry in generated["search-path"]:
-        assert Path(entry).is_absolute(), entry
+
+    clean = run_gate()
+    assert clean.returncode == 0, clean.stdout + clean.stderr
+    # The gate names its targets itself (git ls-files) rather than leaving discovery to Pyrefly.
+    assert f"check targets: {worktree / 'src' / 'tracked_module.py'}" in clean.stdout
+
+    safe_io.write_text_no_follow(
+        worktree / "src" / "tracked_module.py",
+        'WRONG: int = "tracked file error"\n',
+        append=True,
+    )
+    safe_io.write_text_no_follow(
+        worktree / "src" / "tools" / "untracked_module.py",
+        '"""Untracked module."""\n\nfrom tracked_module import VALUE\n\n'
+        'COPY: int = VALUE\nALSO_WRONG: int = "untracked file error"\n',
+    )
+    broken = run_gate()
+    assert broken.returncode == 1, broken.stdout + broken.stderr
+    assert "`Literal['tracked file error']` is not assignable to `int`" in broken.stdout
+    assert "`Literal['untracked file error']` is not assignable to `int`" in broken.stdout
+    # The sibling import resolved inside the worktree, so those are the only findings.
+    assert broken.stdout.count("ERROR ") == len(("tracked", "untracked"))
 
 
 def _update_script_function(name: str) -> str:

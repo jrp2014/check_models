@@ -284,98 +284,6 @@ quality_run_ty_check() {
     "$ty_path" check --python "$python_path" "$@"
 }
 
-quality_write_pyrefly_config() {
-    local config_path="$1"
-    local python_path="$2"
-    local pyproject_path=""
-
-    pyproject_path="$(quality_src_root)/pyproject.toml"
-    "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" <<'PY'
-from __future__ import annotations
-
-import json
-import sys
-import tomllib
-from pathlib import Path
-from typing import Any
-
-config_path = Path(sys.argv[1])
-python_path = Path(sys.argv[2]).resolve()
-pyproject_path = Path(sys.argv[3])
-
-tool_config = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))["tool"]["pyrefly"]
-tool_config = dict(tool_config)
-tool_config.pop("conda-environment", None)
-tool_config["python-interpreter-path"] = str(python_path)
-
-# Project discovery must work from linked worktrees under hidden directories
-# (for example .claude/worktrees/*), where parent-repo ignore files such as
-# .git/info/exclude and Pyrefly's hidden-directory heuristic would otherwise
-# match the entire checkout and leave nothing to check.
-tool_config["use-ignore-files"] = False
-tool_config["disable-project-excludes-heuristics"] = True
-
-# Disabling the heuristics/ignore files drops Pyrefly's default excludes and
-# the gitignore-driven ones, so restore them explicitly to keep the gate as
-# strict as the primary checkout without scanning generated junk.
-# Anchored to the package root (the config file itself lives outside the
-# tree, so relative globs would resolve against the wrong directory).
-src_root = pyproject_path.parent.resolve()
-explicit_excludes = [
-    f"{src_root}/{pattern}"
-    for pattern in (
-        "**/node_modules/",
-        "**/__pycache__/",
-        "**/venv/**/*",
-        "**/.*/**",
-        "**/build/",
-        "**/dist/",
-        "**/*.egg-info/",
-        "**/output/test*",
-    )
-]
-project_excludes = [
-    pattern if Path(pattern).is_absolute() else f"{src_root}/{pattern}"
-    for pattern in tool_config.get("project-excludes", [])
-]
-project_excludes.extend(
-    pattern for pattern in explicit_excludes if pattern not in project_excludes
-)
-tool_config["project-excludes"] = project_excludes
-
-# The config file lives outside the tree, so tell Pyrefly where the project
-# is instead of letting it infer an import root from the config's directory.
-tool_config.setdefault("project-includes", [f"{src_root}/**/*.py"])
-
-# Absolutize search-path entries. The package root itself always leads so
-# `check_models`, `check_models_data` and `tools` resolve.
-search_path_entries: list[str] = [str(src_root)]
-for entry in tool_config.get("search-path", []):
-    entry_path = Path(entry)
-    resolved = entry_path if entry_path.is_absolute() else (src_root / entry_path).resolve()
-    if str(resolved) not in search_path_entries:
-        search_path_entries.append(str(resolved))
-tool_config["search-path"] = search_path_entries
-
-
-def format_toml(value: Any) -> str:
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, int):
-        return str(value)
-    if isinstance(value, str):
-        return json.dumps(value)
-    if isinstance(value, list):
-        return "[" + ", ".join(format_toml(item) for item in value) + "]"
-    raise TypeError(f"Unsupported Pyrefly config value type: {type(value).__name__}")
-lines: list[str] = []
-for key, value in tool_config.items():
-    lines.append(f"{key} = {format_toml(value)}")
-
-config_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-PY
-}
-
 quality_print_pyrefly_diagnostics() {
     local python_path="$1"
     local pyrefly_path="$2"
@@ -394,16 +302,16 @@ quality_print_pyrefly_diagnostics() {
     echo "[pyrefly] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
     echo "[pyrefly] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
     echo "[pyrefly] resolved pyrefly: ${pyrefly_path}"
-    echo "[pyrefly] generated config: ${config_path}"
+    echo "[pyrefly] config: ${config_path}"
     echo "[pyrefly] check targets: ${target_display}"
 }
 
 # Explicit targets switch Pyrefly to single-file checking mode, which
 # skips filesystem discovery entirely — so the gate's file set cannot be
-# eaten by ignore files or future discovery heuristics, independent of the
-# generated config neutralizing the known ones. git ls-files is the same
-# authority the other gates align with and keeps gitignore semantics
-# without hand-mirrored exclude globs.
+# eaten by ignore files or discovery heuristics (a linked worktree under
+# .claude/worktrees is hidden and ignored by its parent repository). git
+# ls-files is the same authority the other gates align with and keeps
+# gitignore semantics without hand-mirrored exclude globs.
 quality_pyrefly_default_targets() {
     git -C "$(quality_src_root)" ls-files --cached --others --exclude-standard -- '*.py' '*.pyi' \
         | LC_ALL=C sort -u \
@@ -432,36 +340,32 @@ quality_run_pyrefly_check() {
 
     python_path="$(quality_resolve_python_path)" || return 1
     pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
-    # Throwaway files belong in $TMPDIR: an aborted run then leaves
-    # nothing behind in the tree for git status or a later checker to
-    # find. The generated config carries absolute paths, so its location
-    # does not matter to Pyrefly.
-    config_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-quality.XXXXXX")"
+    # [tool.pyrefly] in pyproject.toml is the whole configuration; only the
+    # interpreter (whose site-packages Pyrefly reads) is decided per run.
+    config_path="$(quality_src_root)/pyproject.toml"
+    # The output goes to a file in $TMPDIR and is then printed, rather than
+    # through `| tee`: a pipeline reports tee's status unless the caller set
+    # pipefail, which would turn Pyrefly's errors into a pass.
     output_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-output.XXXXXX")"
-
-    if ! quality_write_pyrefly_config "$config_path" "$python_path"; then
-        rm -f "$config_path"
-        rm -f "$output_path"
-        return 1
-    fi
 
     quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "${targets[@]}"
     if "$pyrefly_path" check \
         -c "$config_path" \
+        --python-interpreter-path "$python_path" \
         --min-severity warn \
         --output-format full-text \
-        "${targets[@]}" 2>&1 | tee "$output_path"; then
+        "${targets[@]}" > "$output_path" 2>&1; then
         exit_code=0
     else
         exit_code=$?
     fi
+    cat "$output_path"
 
     if [ "$exit_code" -eq 0 ] && grep -Eq '^[[:space:]]*WARN([[:space:]]|$)' "$output_path"; then
         echo "❌ Pyrefly emitted warnings; treat warnings as quality failures." >&2
         exit_code=1
     fi
 
-    rm -f "$config_path"
     rm -f "$output_path"
     return "$exit_code"
 }
