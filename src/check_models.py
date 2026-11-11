@@ -201,6 +201,7 @@ __all__ = [
     "get_system_characteristics",
     "get_system_info",
     "get_terminal_width",
+    "load_mlx_runtime",
     "log_blank",
     "log_failure",
     "log_file_path",
@@ -261,9 +262,9 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
 ISOLATED_WORKER_FLAG: Final[str] = "--isolated-worker"
 ISOLATION_CRASH_TEST_ENV: Final[str] = "CHECK_MODELS_ISOLATION_CRASH_MODEL"
 # Set to "1" to skip the subprocess import probes that shield a long-lived
-# parent from a hard-crashing dependency import. The test suite sets it: every
-# worker already imports mlx-vlm in-process, so the probe only adds ~2 s of
-# start-up per worker (and contention-driven timeouts) without protecting it.
+# parent from a hard-crashing dependency import (see ``load_mlx_runtime``).
+# The test suite sets it for the command lines it spawns: a test run has no
+# sweep to shield, and many probes at once time out under contention.
 IMPORT_PROBE_SKIP_ENV: Final[str] = "CHECK_MODELS_SKIP_IMPORT_PROBE"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 IMPORT_PROBE_OUTPUT_EXCERPT_CHARS: Final[int] = 220
@@ -568,24 +569,6 @@ def _format_import_probe_output_excerpt(
     return f"{lines[0]} ... {exception_line[: tail_budget - 3]}..."
 
 
-_NO_MODEL_RUN_FLAGS: Final[frozenset[str]] = frozenset({"-h", "--help", "-n", "--dry-run"})
-
-
-def _import_probe_unneeded(argv: Sequence[str]) -> bool:
-    """Return whether this invocation has no long-lived sweep for the probe to shield.
-
-    The probe loads the dependency in a child first, so that a dependency
-    which hard-crashes while loading never takes down a sweep in progress; it
-    costs a second full ``mlx_vlm`` load (about 2 s). An ``--isolate`` worker
-    is already the crash boundary, and ``--help`` / ``--dry-run`` invoke no
-    models, so a crash there loses nothing and reports itself. Only this
-    CLI's own command line counts: under pytest ``-n`` means something else.
-    """
-    if len(argv) >= 2 and argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0] + flag
-        return True
-    return Path(argv[0]).stem == "check_models" and not _NO_MODEL_RUN_FLAGS.isdisjoint(argv[1:])
-
-
 def _probe_import_runtime(
     *,
     import_target: str,
@@ -594,13 +577,12 @@ def _probe_import_runtime(
 ) -> str | None:
     """Run a subprocess import probe and return an actionable error message when it fails.
 
-    Skipped where there is nothing to shield (see ``_import_probe_unneeded``).
     A probe that merely *times out* is inconclusive, not a
     failure: under load (many test workers probing at once, a busy machine)
     the import finishes after the deadline, and treating that as "unavailable"
     produced false negatives both in real runs and in the parallel test suite.
     """
-    if _import_probe_unneeded(sys.argv) or os.environ.get(IMPORT_PROBE_SKIP_ENV) == "1":
+    if os.environ.get(IMPORT_PROBE_SKIP_ENV) == "1":
         return None
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
@@ -643,23 +625,9 @@ def _probe_import_runtime(
     )
 
 
+# ``mlx.core`` once ``load_mlx_runtime`` has run; None before that, and after
+# it when mlx could not be imported (``MISSING_DEPENDENCIES`` then says why).
 mx: Any = cast("Any", None)
-mlx_probe_error = _probe_import_runtime(
-    import_target="mlx.core",
-    error_prefix=ERROR_MLX_RUNTIME_INIT,
-    detect_metal_nsrange=True,
-)
-if mlx_probe_error is None:
-    try:
-        _mx_runtime = import_module("mlx.core")
-    except ImportError:
-        MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
-    except (OSError, RuntimeError, ValueError) as mlx_init_err:
-        MISSING_DEPENDENCIES["mlx"] = f"{ERROR_MLX_RUNTIME_INIT} {mlx_init_err}"
-    else:
-        mx = cast("Any", _mx_runtime)
-else:
-    MISSING_DEPENDENCIES["mlx"] = mlx_probe_error
 
 ExifTags: SupportsExifTagsModule
 GPSTAGS: Mapping[int, str]
@@ -768,60 +736,117 @@ upstream_generation_config_keys: tuple[str, ...] = (
 upstream_generation_config_keys_imported: bool = False
 
 
-mlx_vlm_probe_error = _probe_import_runtime(
-    import_target="mlx_vlm",
-    error_prefix=ERROR_MLX_VLM_RUNTIME_INIT,
-)
-if mlx_vlm_probe_error is None:
-    try:
-        from mlx_vlm.generate import stream_generate as _mlx_vlm_stream_generate
-        from mlx_vlm.prompt_utils import apply_chat_template as _mlx_vlm_apply_chat_template
-        from mlx_vlm.utils import load as _mlx_vlm_load
-        from mlx_vlm.utils import load_image as _mlx_vlm_load_image
-        from mlx_vlm.version import __version__ as _mlx_vlm_version
+_mlx_runtime_loaded: bool = False
 
-        def _typed_mlx_vlm_load(
-            path_or_hf_repo: str,
-            adapter_path: str | None = None,
-            lazy: bool = False,
-            revision: str | None = None,
-            strict: bool = True,
-            *,
-            trust_remote_code: bool = True,
-            **kwargs: object,
-        ) -> tuple[nn.Module, ProcessorMixin]:
-            loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                path_or_hf_repo=path_or_hf_repo,
-                adapter_path=adapter_path,
-                lazy=lazy,
-                revision=revision,
-                strict=strict,
-                trust_remote_code=trust_remote_code,
-                **kwargs,
-            )
-            return loaded
 
-        stream_generate = cast(
-            "Callable[..., Iterator[GenerationResult]]", _mlx_vlm_stream_generate
+def _import_mlx_core(*, probe_first: bool) -> None:
+    """Bind ``mx`` to ``mlx.core``, or record why it could not be imported."""
+    global mx  # noqa: PLW0603 - bound once, by load_mlx_runtime
+    probe_error = (
+        _probe_import_runtime(
+            import_target="mlx.core",
+            error_prefix=ERROR_MLX_RUNTIME_INIT,
+            detect_metal_nsrange=True,
         )
-        apply_chat_template = _mlx_vlm_apply_chat_template
-        load = _typed_mlx_vlm_load
-        load_image = _mlx_vlm_load_image
-        vlm_version = _mlx_vlm_version
+        if probe_first
+        else None
+    )
+    if probe_error is not None:
+        MISSING_DEPENDENCIES["mlx"] = probe_error
+        return
+    try:
+        mx = cast("Any", import_module("mlx.core"))
+    except ImportError:
+        MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
+    except (OSError, RuntimeError, ValueError) as mlx_init_err:
+        MISSING_DEPENDENCIES["mlx"] = f"{ERROR_MLX_RUNTIME_INIT} {mlx_init_err}"
+
+
+def _import_mlx_vlm(*, probe_first: bool) -> None:
+    """Bind the mlx-vlm entry points this harness calls, or record why it could not."""
+    global stream_generate, apply_chat_template, load, load_image, vlm_version  # noqa: PLW0603 - bound once, by load_mlx_runtime
+    global upstream_generation_config_keys, upstream_generation_config_keys_imported  # noqa: PLW0603 - as above
+    probe_error = (
+        _probe_import_runtime(import_target="mlx_vlm", error_prefix=ERROR_MLX_VLM_RUNTIME_INIT)
+        if probe_first
+        else None
+    )
+    if probe_error is not None:
+        MISSING_DEPENDENCIES["mlx-vlm"] = probe_error
+        return
+    try:
+        from mlx_vlm.generate import (  # noqa: PLC0415 - deferred: see load_mlx_runtime
+            stream_generate as _mlx_vlm_stream_generate,
+        )
+        from mlx_vlm.prompt_utils import (  # noqa: PLC0415 - as above
+            apply_chat_template as _mlx_vlm_apply_chat_template,
+        )
+        from mlx_vlm.utils import load as _mlx_vlm_load  # noqa: PLC0415 - as above
+        from mlx_vlm.utils import load_image as _mlx_vlm_load_image  # noqa: PLC0415 - as above
+        from mlx_vlm.version import __version__ as _mlx_vlm_version  # noqa: PLC0415 - as above
     except ImportError:
         MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
-    else:
-        try:
-            from mlx_vlm.utils import (
-                GENERATION_CONFIG_DEFAULT_KEYS as _MLX_VLM_GENERATION_CONFIG_KEYS,
-            )
-        except ImportError:
-            pass  # keep the copy above; the drift check reports the move
-        else:
-            upstream_generation_config_keys = tuple(_MLX_VLM_GENERATION_CONFIG_KEYS)
-            upstream_generation_config_keys_imported = True
-else:
-    MISSING_DEPENDENCIES["mlx-vlm"] = mlx_vlm_probe_error
+        return
+
+    def _typed_mlx_vlm_load(
+        path_or_hf_repo: str,
+        adapter_path: str | None = None,
+        lazy: bool = False,
+        revision: str | None = None,
+        strict: bool = True,
+        *,
+        trust_remote_code: bool = True,
+        **kwargs: object,
+    ) -> tuple[nn.Module, ProcessorMixin]:
+        loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+            path_or_hf_repo=path_or_hf_repo,
+            adapter_path=adapter_path,
+            lazy=lazy,
+            revision=revision,
+            strict=strict,
+            trust_remote_code=trust_remote_code,
+            **kwargs,
+        )
+        return loaded
+
+    stream_generate = cast("Callable[..., Iterator[GenerationResult]]", _mlx_vlm_stream_generate)
+    apply_chat_template = _mlx_vlm_apply_chat_template
+    load = _typed_mlx_vlm_load
+    load_image = _mlx_vlm_load_image
+    vlm_version = _mlx_vlm_version
+    try:
+        from mlx_vlm.utils import (  # noqa: PLC0415 - as above
+            GENERATION_CONFIG_DEFAULT_KEYS as _MLX_VLM_GENERATION_CONFIG_KEYS,
+        )
+    except ImportError:
+        return  # keep the copy above; the drift check reports the move
+    upstream_generation_config_keys = tuple(_MLX_VLM_GENERATION_CONFIG_KEYS)
+    upstream_generation_config_keys_imported = True
+
+
+def load_mlx_runtime(*, probe_first: bool) -> None:
+    """Import mlx and mlx-vlm into this process and bind the names above; once per process.
+
+    Importing this module loads neither, so ``--help`` and the tools that
+    only read retained output never initialise Metal. ``main`` and the
+    isolated worker call this before anything else; a tool that needs a
+    runtime fact calls it itself. What could not be imported is recorded in
+    ``MISSING_DEPENDENCIES``, and a run stops on that before its first model.
+
+    ``probe_first`` loads each dependency in a child process first, so that
+    one which hard-crashes while loading is recorded as missing instead of
+    killing this process. That costs a second full ``mlx_vlm`` load (about
+    2 s). Pass False where a crash loses nothing and reports itself: an
+    ``--isolate`` worker is already the crash boundary, and a dry run invokes
+    no models.
+    """
+    global _mlx_runtime_loaded  # noqa: PLW0603 - set once, here
+    if _mlx_runtime_loaded:
+        return
+    _mlx_runtime_loaded = True
+    _import_mlx_core(probe_first=probe_first)
+    _import_mlx_vlm(probe_first=probe_first)
+
 
 # =============================================================================
 # SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS
@@ -12275,7 +12300,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
     except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as exc:
         probes["mlx_framework"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
 
-    # mlx-vlm importability was captured during module initialization.
+    # mlx-vlm importability was captured by load_mlx_runtime.
     if "mlx-vlm" not in MISSING_DEPENDENCIES:
         probes["mlx_vlm"] = RuntimeProbeResult(status="ok")
     else:
@@ -17142,6 +17167,8 @@ def _read_text_tail(path: Path, max_chars: int) -> str:
 def _run_isolated_worker(spec_path: Path) -> int:
     """Child entry point: run one model from a spec file and write its result JSON."""
     global _ISOLATION_PHASE_SINK  # noqa: PLW0603 - process-local hook for this worker only
+    # This process is its parent's crash boundary, so nothing probes for it.
+    load_mlx_runtime(probe_first=False)
     # The parent created the spec's directory; the child only ever touches
     # sibling files there, never paths named inside the spec.
     worker_dir = spec_path.resolve().parent
@@ -28572,6 +28599,9 @@ def _explicit_cli_dests(argv: Sequence[str]) -> frozenset[str]:
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
     _LinkStyleState.value = getattr(args, "link_style", "github")
+    # Before the clock starts: loading the runtime is not part of a run's
+    # duration. A dry run invokes no models, so it is not probed.
+    load_mlx_runtime(probe_first=not getattr(args, "dry_run", False))
 
     # Wall clock, not a perf counter: the reported run duration must match
     # what a person experienced, including any time the machine was asleep.

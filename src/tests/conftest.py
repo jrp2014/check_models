@@ -33,9 +33,9 @@ from typing import TYPE_CHECKING
 # 3. Else create temp cache (CI environment without cache)
 _DEFAULT_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
 
-# Every worker imports check_models, which imports mlx-vlm in-process anyway;
-# the subprocess import probe would only add ~2 s of start-up per worker and,
-# with many workers probing at once, contention-driven timeouts.
+# For the command lines tests spawn: a test run has no sweep to shield, and
+# the subprocess import probe would add ~2 s to each and, with many workers
+# probing at once, contention-driven timeouts.
 os.environ.setdefault("CHECK_MODELS_SKIP_IMPORT_PROBE", "1")
 
 if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
@@ -53,6 +53,12 @@ from huggingface_hub.errors import CacheNotFound  # noqa: E402 - after HF cache 
 from PIL import Image  # noqa: E402 - after HF cache env setup
 
 import check_models  # noqa: E402 - after HF cache env setup
+
+# Importing check_models no longer loads MLX. Tests have always run with it
+# loaded, and a few need it (the tiny-checkpoint end-to-end run, the weight
+# measurement, the upstream drift check), so each worker loads it once here.
+# Loading it mid-test instead would rebind names a test has patched.
+check_models.load_mlx_runtime(probe_first=False)
 
 if TYPE_CHECKING:
     from collections.abc import Generator

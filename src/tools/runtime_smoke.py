@@ -2,7 +2,7 @@
 
 Run by ``tools/run_runtime_smoke.sh``. Passes when the MLX packages that
 ``pyproject.toml`` declares as runtime dependencies are installed and
-``check_models`` imports them without recording any as missing.
+``check_models`` loads them without recording any as missing.
 """
 
 from __future__ import annotations
@@ -51,8 +51,10 @@ def main() -> int:
         )
         return 1
 
-    # Imported only now: its import is the probe, and it is slow.
+    # Loaded as a run loads it: each dependency in a child process first, so
+    # that one which crashes while loading is named here instead of ending this.
     check_models = importlib.import_module("check_models")
+    check_models.load_mlx_runtime(probe_first=True)
     not_importable = {
         name: message
         for name, message in check_models.MISSING_DEPENDENCIES.items()

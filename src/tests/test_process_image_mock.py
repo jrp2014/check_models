@@ -7,6 +7,8 @@ import io
 import itertools
 import json
 import logging
+import os
+import signal
 import subprocess
 import sys
 import time
@@ -1786,24 +1788,220 @@ class TestImportProbe:
                 is None
             )
 
+
+_SRC_ROOT = Path(check_models.__file__).resolve().parent
+_CLI = str(_SRC_ROOT / "check_models.py")
+
+# Each fake dependency appends one line when it is imported: its name, and
+# whether the importing process is a bare probe child (``python -c ...``
+# with no further argument) or anything else.
+_RECORD_IMPORT = (
+    "import os, sys\n"
+    "with open(os.environ['FAKE_RUNTIME_IMPORT_LOG'], 'a', encoding='utf-8') as log:\n"
+    "    where = 'probe' if sys.argv == ['-c'] else 'in-process'\n"
+    "    log.write(f'{__name__} {where}\\n')\n"
+)
+# Dies as a native crash does: no Python exception, nothing to catch.
+# SIGKILL rather than abort(), so that no crash report is written.
+_DIE_ON_IMPORT = "import os, signal\nos.kill(os.getpid(), signal.SIGKILL)\n"
+_FAKE_WORKING_SET_BYTES = 12_884_901_888
+_FAKE_RUNTIME_MODULES = {
+    "mlx/__init__.py": "",
+    "mlx/core.py": (
+        _RECORD_IMPORT
+        + "__version__ = '0.0.fake'\n"
+        + "def device_info():\n"
+        + "    return {'memory_size': 17_179_869_184, "
+        + f"'max_recommended_working_set_size': {_FAKE_WORKING_SET_BYTES}}}\n"
+    ),
+    "mlx_vlm/__init__.py": _RECORD_IMPORT,
+    "mlx_vlm/generate.py": "def stream_generate(*args, **kwargs):\n    return iter(())\n",
+    "mlx_vlm/prompt_utils.py": "def apply_chat_template(*args, **kwargs):\n    return ''\n",
+    "mlx_vlm/utils.py": (
+        "GENERATION_CONFIG_DEFAULT_KEYS = ('temperature',)\n"
+        "def load(*args, **kwargs):\n    raise RuntimeError('fake runtime loads nothing')\n"
+        "def load_image(*args, **kwargs):\n    raise RuntimeError('fake runtime loads nothing')\n"
+    ),
+    "mlx_vlm/version.py": "__version__ = '0.0.fake'\n",
+}
+_PROBED_THEN_IMPORTED = [
+    "mlx.core probe",
+    "mlx.core in-process",
+    "mlx_vlm probe",
+    "mlx_vlm in-process",
+]
+_IMPORTED_UNPROBED = ["mlx.core in-process", "mlx_vlm in-process"]
+
+
+@dataclass(frozen=True)
+class _FakeRuntimeRun:
+    """What one command did when run against a fake MLX runtime."""
+
+    returncode: int
+    output: str
+    imports: list[str]
+
+
+def _run_against_fake_runtime(
+    tmp_path: Path,
+    command: Sequence[str],
+    *,
+    dies_on_import: bool = False,
+    skip_probe: bool = False,
+) -> _FakeRuntimeRun:
+    """Run a command in a new interpreter that finds fake ``mlx`` and ``mlx_vlm`` first."""
+    runtime = tmp_path / "fake-runtime"
+    for relative_path, source in _FAKE_RUNTIME_MODULES.items():
+        module_path = runtime / relative_path
+        module_path.parent.mkdir(parents=True, exist_ok=True)
+        dies = dies_on_import and relative_path in {"mlx/core.py", "mlx_vlm/__init__.py"}
+        check_models._write_text_file(module_path, _DIE_ON_IMPORT if dies else source)
+    import_log = tmp_path / "runtime-imports.log"
+    env = {
+        name: value
+        for name, value in os.environ.items()
+        if name not in {check_models.IMPORT_PROBE_SKIP_ENV, "PYTHONPATH"}
+    }
+    env |= {"PYTHONPATH": str(runtime), "FAKE_RUNTIME_IMPORT_LOG": str(import_log)}
+    if skip_probe:
+        env[check_models.IMPORT_PROBE_SKIP_ENV] = "1"
+    completed = subprocess.run(  # noqa: S603 - this interpreter, repo-owned entry points
+        [sys.executable, *command],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        cwd=_SRC_ROOT,
+        env=env,
+        timeout=120,
+    )
+    imports = check_models._read_text_file(import_log).splitlines() if import_log.exists() else []
+    return _FakeRuntimeRun(
+        returncode=completed.returncode,
+        output=" ".join((completed.stdout + completed.stderr).split()),
+        imports=imports,
+    )
+
+
+class TestMlxRuntimeBoundary:
+    """When MLX is loaded, behind what protection, and who never loads it.
+
+    Each test runs a real entry point in a new interpreter against fake
+    ``mlx`` and ``mlx_vlm`` packages that either record their import or kill
+    the process as a native crash would.
+    """
+
+    def test_a_run_loads_each_dependency_in_a_child_before_itself(self, tmp_path: Path) -> None:
+        """A model run probes mlx, imports it, then does the same for mlx-vlm."""
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [_CLI, "--image", str(tmp_path / "absent.jpg"), "--output-dir", str(tmp_path / "out")],
+        )
+        assert run.returncode == 1, run.output
+        assert run.imports == _PROBED_THEN_IMPORTED
+
     @pytest.mark.parametrize(
-        ("argv", "unneeded"),
+        ("arguments", "skip_probe"),
         [
-            (["check_models.py", "--help"], True),
-            (["/x/bin/check_models", "-n", "--image", "a.jpg"], True),
-            (["check_models.py", "--image", "a.jpg", "--dry-run"], True),
-            (["check_models.py", check_models.ISOLATED_WORKER_FLAG, "spec.json"], True),
-            (["check_models.py", "--image", "a.jpg"], False),
-            (["check_models.py"], False),
-            # pytest's own -n (xdist workers) must not read as this CLI's --dry-run.
-            (["/x/bin/pytest", "-n", "4"], False),
+            # No model is invoked, so a crash loses nothing and reports itself.
+            (["--dry-run", "--image", "absent.jpg"], False),
+            (["-n", "--image", "absent.jpg"], False),
+            # The worker is the crash boundary of its parent.
+            ([check_models.ISOLATED_WORKER_FLAG, "absent/spec.json"], False),
+            # The documented opt-out.
+            (["--image", "absent.jpg"], True),
         ],
     )
-    def test_probe_is_skipped_only_where_no_sweep_needs_shielding(
-        self, argv: list[str], *, unneeded: bool
+    def test_no_probe_where_a_crash_loses_nothing(
+        self, tmp_path: Path, arguments: list[str], *, skip_probe: bool
     ) -> None:
-        """Help and dry-run pay for one mlx_vlm import, not two; real runs keep the probe."""
-        assert check_models._import_probe_unneeded(argv) is unneeded
+        """Dry runs, isolated workers and the opt-out import once, unprobed."""
+        output_arguments = (
+            []
+            if arguments[0] == check_models.ISOLATED_WORKER_FLAG
+            else ["--output-dir", str(tmp_path / "out")]
+        )
+        run = _run_against_fake_runtime(
+            tmp_path, [_CLI, *arguments, *output_arguments], skip_probe=skip_probe
+        )
+        assert run.returncode != 0, run.output
+        assert run.imports == _IMPORTED_UNPROBED
+
+    def test_a_runtime_that_crashes_on_import_is_reported_not_fatal(self, tmp_path: Path) -> None:
+        """The probe turns a native crash into the missing-dependency exit and its report."""
+        output_dir = tmp_path / "out"
+        image_path = tmp_path / "image.jpg"
+        check_models.Image.new("RGB", (32, 32), color=(10, 120, 200)).save(image_path, "JPEG")
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [
+                _CLI,
+                "--image",
+                str(image_path),
+                "--models",
+                "org/model",
+                "--output-dir",
+                str(output_dir),
+            ],
+            dies_on_import=True,
+        )
+        assert run.returncode == 1, run.output
+        died = f"Import probe exited with code {-signal.SIGKILL}"
+        assert f"[mlx] {check_models.ERROR_MLX_RUNTIME_INIT} {died}" in run.output
+        assert f"[mlx-vlm] {check_models.ERROR_MLX_VLM_RUNTIME_INIT} {died}" in run.output
+        assert "no models were run" in run.output
+        diagnostics = check_models.ReportOutputPaths.from_root(output_dir).diagnostics
+        assert (
+            "Required runtime dependencies unavailable: mlx, mlx-vlm"
+            in check_models._read_text_file(diagnostics)
+        )
+
+    def test_an_unprobed_crash_on_import_ends_a_dry_run(self, tmp_path: Path) -> None:
+        """The stated cost of not probing a dry run: the crash is the process's own."""
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [_CLI, "--dry-run", "--image", "absent.jpg", "--output-dir", str(tmp_path / "out")],
+            dies_on_import=True,
+        )
+        assert run.returncode == -signal.SIGKILL
+
+    @pytest.mark.parametrize(
+        "command",
+        [
+            ["-c", "import check_models", "not-a-probe"],
+            [_CLI, "--help"],
+            ["tools/analyze_output_quality.py", "--help"],
+            ["-m", "tools.add_accuracy_note", "--help"],
+            ["-m", "tools.add_native_repro_note", "--help"],
+        ],
+    )
+    def test_importing_the_script_never_loads_mlx(self, tmp_path: Path, command: list[str]) -> None:
+        """Help and the tools that read retained output work where MLX cannot load."""
+        for dies_on_import in (False, True):
+            run = _run_against_fake_runtime(tmp_path, command, dies_on_import=dies_on_import)
+            assert run.returncode == 0, run.output
+            assert run.imports == []
+
+    def test_hub_precheck_reads_the_working_set_from_mlx(self, tmp_path: Path) -> None:
+        """A tool that needs a runtime fact loads the runtime itself, unprobed."""
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [
+                "-c",
+                "from tools import hub_precheck; print(hub_precheck._default_memory_check()[1])",
+                "not-a-probe",
+            ],
+        )
+        assert run.returncode == 0, run.output
+        assert run.output.endswith(str(_FAKE_WORKING_SET_BYTES))
+        assert run.imports == _IMPORTED_UNPROBED
+
+    def test_runtime_smoke_reports_a_runtime_that_crashes_on_import(self, tmp_path: Path) -> None:
+        """The smoke check keeps its probe: a crashing dependency is a named failure."""
+        run = _run_against_fake_runtime(tmp_path, ["tools/runtime_smoke.py"], dies_on_import=True)
+        assert run.returncode == 1, run.output
+        assert f"[mlx] {check_models.ERROR_MLX_RUNTIME_INIT} Import probe exited" in run.output
 
 
 class TestRepetitionGuard:

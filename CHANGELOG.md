@@ -177,6 +177,75 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Start-up (0.17.117, step 5 of john's 2026-11-11 plan, second part):
+  importing `check_models` no longer imports `mlx` or `mlx-vlm` and no
+  longer spawns the import probes. `load_mlx_runtime(probe_first=...)` does
+  what the module body did, once per process, and is called by `main()`
+  (before the run clock starts, and before environment set-up, as before),
+  by the isolated worker as its first step, by `tests/conftest.py` once per
+  test worker, and by the two tools that need the runtime
+  (`runtime_smoke.py`, probed; `hub_precheck.py`'s memory check, unprobed
+  as before). Whether to probe is now the caller's statement instead of a
+  guess from `sys.argv` at import time: `_import_probe_unneeded` and its
+  flag list are gone, and `main()` passes `not args.dry_run`. The Pillow,
+  numpy and defusedxml guards are untouched; they are a separate decision.
+
+  Behaviour preserved: a run probes each dependency in a child process and
+  then imports it, in the same order and with the same messages and
+  `MISSING_DEPENDENCIES` entries; a dry run, an isolated worker and
+  `CHECK_MODELS_SKIP_IMPORT_PROBE=1` import unprobed; a dependency that
+  kills the probe is still reported as missing, with the minimal
+  diagnostics report, instead of ending the run. Deliberately changed:
+  `--help`, an argument error caught by the parser, and every program that
+  only imports the script (`add_accuracy_note`, `add_native_repro_note`,
+  `analyze_output_quality`, `hub_precheck`'s architecture check) no longer
+  load MLX at all; a dry run given through an abbreviation (`--dry`) or a
+  differently named launcher is no longer probed, where the `sys.argv`
+  guess missed it; a probe-timeout warning now appears after argument
+  parsing rather than before it; Pillow and numpy are imported before
+  `mlx.core`, where they used to come between it and `mlx-vlm`.
+
+  Benefit: a tool that reads retained output works where MLX cannot
+  initialise (a headless or virtualised session, a broken install), and
+  starts in about a tenth of the time (below). The crash protection has one
+  named owner with a docstring, and the conditions for skipping it are
+  arguments at three call sites. The dependence of the test suite on a
+  working runtime is one explicit line in `conftest.py`.
+
+  Evidence: 14 tests run the real entry points in new interpreters against
+  fake `mlx` and `mlx_vlm` packages that record each import or kill the
+  process on import. Nine were written first and pass on the unchanged
+  code (probe then import for a run; no probe for `--dry-run`, `-n`, the
+  worker and the opt-out; a killed probe becomes the missing-dependency
+  exit and report; an unprobed dry run dies with the dependency;
+  `hub_precheck` reads the working set from MLX; `runtime_smoke` names a
+  dependency that kills its probe). Five fail on the unchanged code and
+  pass now: importing the script, `--help` and the three tools load
+  nothing, with a recording runtime and with one that kills on import. They
+  replace the test of the removed argv-guessing function. Real plain,
+  `--isolate` and `--dry-run` runs of a tiny local checkpoint in new
+  processes, and an `add_accuracy_note` run on the retained output, give
+  the same files before and after once clock times, measured durations,
+  rates and digests are masked (9, 9, 1 and 12 files), and the JSONL
+  records are structurally identical apart from clock times and measured
+  floats. `--help` output is byte-identical. Measured in the Linux sandbox
+  (best of three, CPU-only MLX): `import check_models` 3.42 s to 0.36 s,
+  `--help` 2.07 s to 0.63 s, `add_accuracy_note --help` 3.40 s to 0.34 s,
+  `hub_precheck`'s architecture check 1.92 s to 0.50 s; `runtime_smoke`
+  (3.6 s) and `hub_precheck`'s memory check (1.7 s) are unchanged, as
+  intended.
+
+  Cost, and what is not claimed: the six deferred import statements and
+  four `global` statements each carry a lint suppression (121 to 131 in
+  all: ten added in the script and one in the new test helper, one
+  removed with the argv guess).
+  The test suite still loads MLX in every worker: with loading
+  left out, 3 tests of the whole suite fail (the tiny-checkpoint end-to-end
+  run, the weight measurement and the upstream drift check), but loading
+  inside a test would rebind names another test has patched, so making
+  the pure tests independent of the runtime is a separate change. Not
+  checked: a run on macOS with Metal, and the times there.
+
 - Reports (0.17.116, step 5 of john's 2026-11-11 plan, first part): report
   and reproduction code no longer receives the parsed-arguments namespace.
   `ProcessImageParams` is split in two without repeating a field:
