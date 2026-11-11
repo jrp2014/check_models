@@ -29,11 +29,11 @@ from typing import TYPE_CHECKING, Final, Literal
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-try:
-    from check_models_data.safe_io import read_text_no_follow
-except ModuleNotFoundError:  # pragma: no cover - direct script execution
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from check_models_data.safe_io import read_text_no_follow
+# This checkout's packages first: the tool may be run by path, and an installed
+# copy of the project may be older than the checkout.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from check_models_data.safe_io import read_text_no_follow
 
 SuppressionKind = Literal[
     "noqa",

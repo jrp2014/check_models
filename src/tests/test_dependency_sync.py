@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import datetime as dt
+import importlib.metadata
 import io
 import json
 import os
@@ -33,10 +34,13 @@ import check_models
 from check_models_data import dependency_policy, safe_io
 from tools import (
     check_dependency_advisories,
+    check_file_syntax,
     check_suppressions,
     filter_danger_report,
     hub_precheck,
     quarantine_broken_pip_metadata,
+    runtime_smoke,
+    update_helpers,
     update_readme_deps,
     validate_env,
 )
@@ -1839,15 +1843,147 @@ def test_update_script_updates_system_packages_and_node_tooling_by_default() -> 
     )
 
 
-def test_update_script_cleans_stale_pip_invalid_distribution_backups() -> None:
-    """update.sh should clean pip '~package' backups that cause invalid-distribution warnings."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+def test_stale_pip_backups_are_removed_and_everything_else_is_left(tmp_path: Path) -> None:
+    """Only pip's ``~name`` leftovers go; a symlink with that name is reported, not removed."""
+    site = tmp_path / "site-packages"
+    (site / "~umpy").mkdir(parents=True)
+    safe_io.write_text_no_follow(site / "~umpy" / "__init__.py", "")
+    safe_io.write_text_no_follow(site / "~-stale.dist-info", "leftover file\n")
+    (site / "numpy").mkdir()
+    outside = tmp_path / "kept-target"
+    outside.mkdir()
+    (site / "~linked").symlink_to(outside, target_is_directory=True)
 
-    assert "cleanup_pip_invalid_distribution_backups" in update_script
-    assert 'if not name.startswith("~"):' in update_script
-    assert "path.is_symlink()" in update_script
-    assert "Removed stale pip invalid-distribution backup" in update_script
-    assert "CLEAN_PIP_INVALID_DISTS=0" in update_script
+    removed, skipped = update_helpers.remove_stale_pip_backups([site, tmp_path / "no-such-dir"])
+
+    assert [path.name for path in removed] == ["~-stale.dist-info", "~umpy"]
+    assert [path.name for path in skipped] == ["~linked"]
+    assert sorted(path.name for path in site.iterdir()) == ["numpy", "~linked"]
+    assert outside.is_dir()
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("setting", "expected"),
+    [("1", ""), ("0", "Skipping stale pip invalid-distribution cleanup")],
+    ids=["runs-the-helper", "opt-out"],
+)
+def test_update_pip_backup_cleanup_step_runs_the_checked_helper(
+    tmp_path: Path, setting: str, expected: str
+) -> None:
+    """update.sh's step reaches the helper by path from another directory, or skips on request.
+
+    The interpreter is one whose site-packages is an empty directory, so the
+    step has something real to scan and nothing to remove.
+    """
+    venv_python = tmp_path / "python"
+    safe_io.write_text_no_follow(
+        venv_python,
+        "#!/bin/bash\n"
+        f'echo "helper: $(basename "$1") $2" >> "{tmp_path / "calls.log"}"\n'
+        f'exec "{sys.executable}" "$@"\n',
+        mode=0o755,
+    )
+    driver = (
+        f'SCRIPT_DIR="{PKG_ROOT / "tools"}"\n'
+        f'python() {{ "{venv_python}" "$@"; }}\n'
+        f"{_update_script_function('cleanup_pip_invalid_distribution_backups')}"
+        "cleanup_pip_invalid_distribution_backups\n"
+    )
+    result = _run_bash_script(
+        driver,
+        cwd=tmp_path,
+        env={"PATH": "/usr/bin:/bin", "CLEAN_PIP_INVALID_DISTS": setting},
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "Unable to clean" not in result.stdout
+    assert expected in result.stdout
+    calls = tmp_path / "calls.log"
+    if setting == "1":
+        assert safe_io.read_text_no_follow(calls) == "helper: update_helpers.py clean-pip-backups\n"
+    else:
+        assert not calls.exists()
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("fake_output", "fake_status", "passes", "message"),
+    [
+        ("Hello! How can I help you today?", 0, True, "Local MLX runtime smoke passed"),
+        ("Hel\ufffd\ufffd", 0, False, "did not produce the expected deterministic output"),
+        ("Metal library not found", 3, False, "Local MLX runtime smoke failed"),
+    ],
+    ids=["expected-output", "wrong-output", "generate-fails"],
+)
+def test_update_local_backend_smoke_judges_the_generate_run(
+    tmp_path: Path, fake_output: str, fake_status: int, *, passes: bool, message: str
+) -> None:
+    """The smoke step passes only when ``mlx_vlm generate`` succeeds with the expected text."""
+    fake_package = tmp_path / "fake-site" / "mlx_vlm"
+    safe_io.write_text_no_follow(fake_package / "__init__.py", "")
+    safe_io.write_text_no_follow(
+        fake_package / "__main__.py",
+        "import sys\n"
+        'print("ARGS", sys.argv[1:])\n'
+        f"print({fake_output!r})\n"
+        f"raise SystemExit({fake_status})\n",
+    )
+    driver = (
+        f'SCRIPT_DIR="{PKG_ROOT / "tools"}"\n'
+        f'python() {{ "{sys.executable}" "$@"; }}\n'
+        f"{_update_script_function('run_local_mlx_backend_smoke')}"
+        "run_local_mlx_backend_smoke\n"
+    )
+    result = _run_bash_script(
+        driver,
+        cwd=tmp_path,
+        env={
+            "PATH": "/usr/bin:/bin",
+            "PYTHONPATH": str(fake_package.parent),
+            "PYTHONIOENCODING": "utf-8",
+            # Force: the cache probe for the real model is not part of this test.
+            "MLX_LOCAL_BUILD_SMOKE": "1",
+            "MLX_LOCAL_BUILD_SMOKE_MODEL": "org/smoke-model",
+        },
+    )
+
+    assert (result.returncode == 0) is passes, result.stdout + result.stderr
+    assert message in result.stdout + result.stderr
+    assert (
+        "ARGS ['generate', '--model', 'org/smoke-model', '--prompt', 'Hi', '--max-tokens', '10']"
+        in result.stdout
+    )
+
+
+@pytest.mark.parametrize(
+    ("plan", "expected"),
+    [
+        ({"success": True, "actions": {"LINK": [{"name": "b"}], "UNLINK": [{"name": "a"}]}}, "a b"),
+        ({"success": True, "actions": [{"LINK": [{"name": "z"}]}, {"UNLINK": []}]}, "z"),
+        ({"success": True}, ""),
+        ({"success": True, "error": "boom", "actions": {}}, None),
+        ({"success": False}, None),
+        ({"success": True, "actions": {"LINK": [{"version": "1"}]}}, None),
+        ([], None),
+    ],
+    ids=[
+        "link-and-unlink",
+        "per-prefix-list",
+        "nothing",
+        "error",
+        "failed",
+        "unnamed",
+        "not-a-plan",
+    ],
+)
+def test_conda_plan_package_names(plan: object, expected: str | None) -> None:
+    """Every linked or unlinked name is listed; anything unreadable is not a plan."""
+    progress = '{"fetch": "numpy", "finished": true}\0'
+    names = update_helpers.conda_plan_package_names(progress + json.dumps(plan))
+    assert names == (None if expected is None else expected.split())
+    assert update_helpers.conda_plan_package_names("not json") is None
+    assert update_helpers.conda_plan_package_names("") is None
 
 
 def test_update_script_quarantines_broken_packaging_metadata_before_upgrade() -> None:
@@ -4656,9 +4792,10 @@ def _conda_update_decision(
         for name in ("conda_change_ownership", "conda_update_all_decision")
     )
     driver = (
+        f'SCRIPT_DIR="{PKG_ROOT / "tools"}"\n'
         f'python() {{ "{sys.executable}" "$@"; }}\n'
         f"{functions}"
-        'ownership="$(conda_change_ownership "$@")"\n'
+        'ownership="$(conda_change_ownership "${@:2}" < "$1")"\n'
         'echo "$ownership"\n'
         f'echo "DECISION $(conda_update_all_decision {force} "$ownership")"\n'
     )
@@ -4750,6 +4887,7 @@ def _run_update_conda_packages(
         )
     )
     driver = (
+        f'SCRIPT_DIR="{PKG_ROOT / "tools"}"\n'
         f'python() {{ "{sys.executable}" "$@"; }}\n'
         "conda() {\n"
         f'    echo "conda $*" >> "{log}"\n'
@@ -4859,8 +4997,15 @@ def _hygiene_repo(tmp_path: Path) -> Path:
     repo = tmp_path / "repo"
     tools_dir = repo / "src" / "tools"
     tools_dir.mkdir(parents=True)
-    for name in ("run_commit_hygiene.sh", "common_quality.sh"):
-        shutil.copy2(PKG_ROOT / "tools" / name, tools_dir / name)
+    (repo / "src" / "check_models_data").mkdir()
+    for name in (
+        "tools/run_commit_hygiene.sh",
+        "tools/common_quality.sh",
+        "tools/check_file_syntax.py",
+        "check_models_data/__init__.py",
+        "check_models_data/safe_io.py",
+    ):
+        shutil.copy2(PKG_ROOT / name, repo / "src" / name)
     _hygiene_git(tmp_path, "init", "-q", str(repo))
     _hygiene_git(repo, "config", "user.email", "test@example.com")
     _hygiene_git(repo, "config", "user.name", "Test")
@@ -4888,6 +5033,162 @@ def _run_hygiene(repo: Path) -> subprocess.CompletedProcess[str]:
             "QUALITY_ALLOW_PYTHON_FALLBACK": "1",
         },
     )
+
+
+@pytest.mark.parametrize(
+    ("name", "content", "executable", "problem"),
+    [
+        ("ok.yml", "a: 1\n---\nb: [1, 2]\n", False, None),
+        ("bad.yaml", "a: 1\n---\nb: [1, 2\n", False, "invalid YAML"),
+        ("ok.toml", '[project]\nname = "x"\n', False, None),
+        ("bad.toml", "[project\n", False, "invalid TOML"),
+        ("latin1.yml", b"name: caf\xe9\n", False, "is not UTF-8 text"),
+        ("tool.sh", "#!/bin/bash\necho hi\n", True, None),
+        ("tool-not-executable.sh", "#!/bin/bash\necho hi\n", False, "has a shebang"),
+        ("image.bin", b"\x89PNG\r\n\x00\xff", False, None),
+    ],
+)
+def test_file_syntax_check_reports_each_kind_of_problem(
+    tmp_path: Path, name: str, content: str | bytes, problem: str | None, *, executable: bool
+) -> None:
+    """YAML and TOML must parse and a shebang needs the executable bit; other files pass."""
+    path = tmp_path / name
+    data = content if isinstance(content, bytes) else content.encode()
+    safe_io.write_bytes_no_follow(path, data, mode=0o755 if executable else 0o644)
+
+    problems = check_file_syntax.file_problems(path, check_shebang=True)
+
+    if problem is None:
+        assert problems == []
+    else:
+        assert len(problems) == 1
+        assert problem in problems[0]
+
+
+def test_file_syntax_check_names_unreadable_files_and_skips_shebangs_unless_asked(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A missing file is a reported problem; the shebang rule is opt-in."""
+    script = tmp_path / "tool.sh"
+    safe_io.write_text_no_follow(script, "#!/bin/bash\n", mode=0o644)
+    missing = tmp_path / "gone.yml"
+
+    assert check_file_syntax.main(["--", str(script)]) == 0
+    assert check_file_syntax.main(["--shebang", "--", str(script), str(missing)]) == 1
+    output = capsys.readouterr().out
+    assert f"{script}: has a shebang but is not executable" in output
+    assert f"{missing}: could not read file" in output
+
+
+@pytest.mark.subprocess
+def test_quality_gate_file_syntax_step_runs_from_another_directory(tmp_path: Path) -> None:
+    """The gate's helper finds the checked tool by its own location, through a symlinked path."""
+    real = tmp_path / "real"
+    safe_io.write_text_no_follow(real / "workflow.yml", "on: push\njobs: {}\n")
+    safe_io.write_text_no_follow(real / "broken.yml", "jobs: [\n")
+    linked = tmp_path / "linked"
+    linked.symlink_to(real, target_is_directory=True)
+    script = (
+        f'source "{PKG_ROOT / "tools" / "common_quality.sh"}"\n'
+        f'QUALITY_PYTHON="{sys.executable}"\n'
+        'quality_check_file_syntax -- "$@"\n'
+    )
+
+    good = _run_bash_script(script, "_", str(linked / "workflow.yml"), cwd=tmp_path)
+    bad = _run_bash_script(
+        script, "_", str(linked / "workflow.yml"), str(linked / "broken.yml"), cwd=tmp_path
+    )
+
+    assert good.returncode == 0, good.stdout + good.stderr
+    assert bad.returncode == 1
+    assert f"{linked / 'broken.yml'}: invalid YAML" in bad.stdout
+    assert "workflow.yml:" not in bad.stdout
+
+
+def test_hygiene_run_rejects_broken_config_and_non_executable_scripts(tmp_path: Path) -> None:
+    """The commit hook's staged-file check stops a commit that carries either problem."""
+    repo = _hygiene_repo(tmp_path)
+    safe_io.write_text_no_follow(repo / "src" / "settings.toml", "[project\n")
+    safe_io.write_text_no_follow(repo / "src" / "run.sh", "#!/bin/bash\n", mode=0o644)
+    safe_io.write_text_no_follow(repo / "src" / "ci.yml", "jobs: [\n")
+    _hygiene_git(repo, "add", "-A")
+
+    result = _run_hygiene(repo)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "src/settings.toml: invalid TOML" in result.stdout
+    assert "src/ci.yml: invalid YAML" in result.stdout
+    assert "src/run.sh: has a shebang but is not executable" in result.stdout
+
+
+def test_runtime_smoke_requires_only_the_declared_mlx_packages() -> None:
+    """The smoke set is the MLX packages the project declares, whatever their specifiers."""
+    pyproject = 'project.dependencies = ["mlx>=0.32.3", "Pillow[xmp]>=12", "mlx-vlm ==0.7.12"]\n'
+    assert runtime_smoke.required_runtime_packages(pyproject) == ("mlx", "mlx-vlm")
+    assert runtime_smoke.required_runtime_packages('project.dependencies = ["mlx-lm"]\n') == ()
+    assert runtime_smoke.required_runtime_packages("") == ()
+
+
+def test_runtime_smoke_passes_here_and_fails_on_each_kind_of_missing_dependency(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Installed and importable passes; not installed, or recorded missing on import, fails."""
+    assert runtime_smoke.main() == 0
+    assert "Runtime dependencies ready: mlx==" in capsys.readouterr().out
+
+    monkeypatch.setitem(check_models.MISSING_DEPENDENCIES, "mlx-vlm", "import failed: boom")
+    assert runtime_smoke.main() == 1
+    assert "[mlx-vlm] import failed: boom" in capsys.readouterr().out
+    monkeypatch.undo()
+
+    real_version = importlib.metadata.version
+
+    def version_without_mlx(name: str) -> str:
+        if name == "mlx":
+            raise importlib.metadata.PackageNotFoundError(name)
+        return real_version(name)
+
+    monkeypatch.setattr(runtime_smoke.importlib.metadata, "version", version_without_mlx)
+    assert runtime_smoke.main() == 1
+    assert "Required runtime dependencies unavailable: mlx." in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    "tool",
+    [
+        "check_file_syntax.py",
+        "check_outdated.py",
+        "check_suppressions.py",
+        "runtime_smoke.py",
+        "update_readme_deps.py",
+    ],
+)
+def test_path_run_tool_uses_its_checkout_over_an_older_installed_copy(
+    tmp_path: Path, tool: str
+) -> None:
+    """An installed project that predates ``safe_io`` must not break a tool run by path."""
+    stale_package = tmp_path / "site" / "check_models_data"
+    stale_package.mkdir(parents=True)
+    safe_io.write_text_no_follow(stale_package / "__init__.py", '"""Older release."""\n')
+    probe = (
+        "import runpy, sys\n"
+        "runpy.run_path(sys.argv[1], run_name='loaded_by_path')\n"
+        "import check_models_data.safe_io\n"
+        "print(check_models_data.safe_io.__file__)\n"
+    )
+
+    result = subprocess.run(  # noqa: S603 - this interpreter loads a checked-in tool
+        # -S: no site-packages, so an editable install cannot supply the module.
+        [sys.executable, "-S", "-c", probe, str(PKG_ROOT / "tools" / tool)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=tmp_path,
+        env={"PATH": os.environ["PATH"], "PYTHONPATH": str(stale_package.parent)},
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == str(PKG_ROOT / "check_models_data" / "safe_io.py")
 
 
 def test_direct_hygiene_run_still_fixes_fully_staged_files(tmp_path: Path) -> None:

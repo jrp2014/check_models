@@ -177,6 +177,66 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Shell tools (0.17.115, step 4 of john's 2026-11-11 plan, second part):
+  seven Python heredocs moved out of the shell scripts into three checked
+  files under `src/tools/`, each run by path so it works from any directory
+  and, for the updater, before the project is reinstalled.
+  `update_helpers.py` (standard library only, never touches `sys.path`)
+  holds four updater steps: the conda plan's package names, who owns each
+  package conda would change, removal of pip's stale `~name` backups, and
+  the local-build smoke generation. `check_file_syntax.py` replaces the
+  gate's YAML heredoc and the commit hook's YAML/TOML/shebang heredoc.
+  `runtime_smoke.py` is the body of `run_runtime_smoke.sh`.
+
+  Behaviour preserved: each step prints the same lines and returns the same
+  status to its caller; the updater's conda guard still treats an
+  unreadable plan or package list as "do not proceed"; a symlinked `~name`
+  entry is still skipped, not removed. Deliberate differences: the two conda
+  shell functions read their document from standard input, and the caller
+  that made the temporary file redirects it (with the redirect inside the
+  functions, Skylos reported SKY-D215 on the function parameter); PyYAML is needed only when a YAML file is checked; a YAML or
+  TOML file that is not UTF-8 is now an error in the commit hook (it was
+  decoded with replacement characters); the hook reads two bytes of other
+  staged files for the shebang check rather than the whole file; both
+  callers print one heading, "File syntax checks failed"; and the smoke
+  generation decodes mlx-vlm's output as UTF-8 whatever the locale.
+
+  Benefit: this Python is now covered by Ruff, the three type checkers and
+  Skylos, and can be tested without a shell harness. It is not a line
+  saving: the four scripts lose 265 lines (`update.sh` 2,000 to 1,856,
+  `common_quality.sh` 429 to 401, `run_commit_hygiene.sh` 170 to 124,
+  `run_runtime_smoke.sh` 61 to 14) and the three files add 439.
+
+  Left inline on purpose: three short updater heredocs. The package
+  snapshot (25 lines) must run with an untouched `sys.path`, because
+  `src/check_models.egg-info` would otherwise be listed as an installed
+  distribution; the MLX provenance report (31) and the model-cache probe
+  (13) are small and only report. The 14- and 15-line heredocs in
+  `probe_python_next.sh` and `run_skylos_danger_advisory.sh` also stay.
+
+  Evidence: tests run the real callers, not only the functions. The
+  updater's backup-cleanup step is run from another directory, with and
+  without its opt-out, and the removal itself against a scratch
+  site-packages; the smoke step runs against a fake `mlx_vlm` for pass,
+  wrong output and failure; the existing conda-guard tests now go through
+  the file; the gate's
+  syntax step is run from another directory; the commit hook is run in a
+  scratch repository with a broken TOML file, a broken YAML file and a
+  non-executable script; `run_runtime_smoke.sh` printed the same line
+  before and after, also from `/`. One source-text test (that `update.sh`
+  contained the cleanup code) is replaced by those. Not checked: a full
+  `update.sh` run on macOS, and the runtime smoke job on a Mac runner.
+
+- Tools (0.17.115): `check_outdated.py`, `check_suppressions.py` and
+  `update_readme_deps.py` put their own checkout first on `sys.path` before
+  importing `check_models_data.safe_io`, as `add_accuracy_note.py` already
+  did. Since 0.17.113 they tried the import first and added the checkout
+  only on failure, which cannot recover when an older, non-editable
+  `check_models` without `safe_io` is installed: the stale package is
+  already loaded. A test runs each path-run tool with such a package ahead
+  on the path; it failed for those three before the change. An editable
+  install, which is what the setup scripts create, was not affected.
+
 - Quality gate (0.17.114, step 4 of john's 2026-11-11 plan, first part):
   the Pyrefly step reads `[tool.pyrefly]` from `pyproject.toml` directly and
   adds only `--python-interpreter-path`. The gate used to generate a

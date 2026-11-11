@@ -132,45 +132,7 @@ cleanup_pip_invalid_distribution_backups() {
 		return 0
 	fi
 
-	if ! python - <<'PY'
-from __future__ import annotations
-
-import shutil
-import sys
-import sysconfig
-from pathlib import Path
-
-site_dirs = {
-    value
-    for key in ("purelib", "platlib")
-    if (value := sysconfig.get_path(key)) is not None
-}
-removed: list[Path] = []
-
-for site_dir_value in sorted(site_dirs):
-    site_dir = Path(site_dir_value)
-    if not site_dir.is_dir():
-        continue
-
-    for path in site_dir.iterdir():
-        name = path.name
-        if not name.startswith("~"):
-            continue
-        if path.is_symlink():
-            print(f"[update.sh] Skipping stale pip backup symlink: {path}", file=sys.stderr)
-            continue
-        if path.is_dir():
-            shutil.rmtree(path)
-        else:
-            path.unlink()
-        removed.append(path)
-
-if removed:
-    print("[update.sh] Removed stale pip invalid-distribution backup(s):")
-    for path in removed:
-        print(f"   - {path}")
-PY
-	then
+	if ! python "$SCRIPT_DIR/update_helpers.py" clean-pip-backups; then
 		echo "⚠️  Unable to clean stale pip invalid-distribution backups; continuing"
 	fi
 }
@@ -179,35 +141,9 @@ PY
 # updates, new installs and removals alike, so no part of the transaction goes
 # unchecked. Prints one name per line (nothing when the env is up to date);
 # fails when the plan is unreadable or conda reported an error.
-#   $1 file holding the dry-run JSON
+#   stdin: the dry-run JSON
 conda_plan_packages() {
-	python - "$1" <<'PY'
-from __future__ import annotations
-
-import json
-import sys
-from pathlib import Path
-
-try:
-    # Progress records, when conda emits any, come first, NUL-separated.
-    text = Path(sys.argv[1]).read_text(encoding="utf-8")
-    plan = json.loads([chunk for chunk in text.split("\0") if chunk.strip()][-1])
-except (OSError, ValueError, IndexError):
-    raise SystemExit(1) from None
-if not isinstance(plan, dict) or not plan.get("success") or "error" in plan:
-    raise SystemExit(1)
-actions = plan.get("actions", [])
-names: set[str] = set()
-for prefix_actions in actions if isinstance(actions, list) else [actions]:
-    if not isinstance(prefix_actions, dict):
-        raise SystemExit(1)
-    for key in ("LINK", "UNLINK"):
-        for record in prefix_actions.get(key, []):
-            if not isinstance(record, dict) or not record.get("name"):
-                raise SystemExit(1)
-            names.add(str(record["name"]))
-print("\n".join(sorted(names)), end="\n" if names else "")
-PY
+	python "$SCRIPT_DIR/update_helpers.py" conda-plan-packages
 }
 
 # Which manager owns each package conda plans to change, from conda's own
@@ -219,44 +155,9 @@ PY
 # every name when the records are unreadable. A name with no record is not
 # installed, so the plan adds it without replacing anything: "absent".
 # Prints "<name> <owner>" per name.
-#   $1 file holding the conda list --json output; $2... package names
+#   stdin: the conda list --json output; $1... package names
 conda_change_ownership() {
-	local records_file="$1"
-	shift
-	python - "$records_file" "$@" <<'PY'
-from __future__ import annotations
-
-import json
-import re
-import sys
-from pathlib import Path
-
-records_file, *changes = sys.argv[1:]
-
-
-def normalize(name: str) -> str:
-    return re.sub(r"[-_.]+", "-", name).lower()
-
-
-owners: dict[str, set[str]] = {}
-try:
-    records = json.loads(Path(records_file).read_text(encoding="utf-8"))
-except (OSError, ValueError):
-    records = None
-readable = isinstance(records, list) and bool(records)
-for record in records if readable else []:
-    if not isinstance(record, dict) or not record.get("name"):
-        continue
-    pip = record.get("platform") == "pypi" or record.get("channel") in ("pypi", "<develop>")
-    owners.setdefault(normalize(record["name"]), set()).add("pip" if pip else "conda")
-
-for change in changes:
-    found = owners.get(normalize(change), set())
-    if not readable or len(found) > 1:
-        print(change, "ambiguous")
-    else:
-        print(change, next(iter(found)) if found else "absent")
-PY
+	python "$SCRIPT_DIR/update_helpers.py" conda-change-ownership "$@"
 }
 
 # Pure update/skip decision for `conda update --all`, kept apart from the
@@ -338,7 +239,7 @@ update_conda_packages() {
 	local plan_file records_file changes_text ownership not_conda_owned changes=()
 	plan_file="$(mktemp "${TMPDIR:-/tmp}/update-conda-plan.XXXXXX")"
 	conda update -n "$CONDA_ENV" --all --dry-run --json --quiet > "$plan_file" 2>/dev/null || true
-	if ! changes_text="$(conda_plan_packages "$plan_file")"; then
+	if ! changes_text="$(conda_plan_packages < "$plan_file")"; then
 		rm -f "$plan_file"
 		echo "⚠️  conda's dry-run plan could not be read; skipping conda update --all."
 		echo "   See it with: conda update -n $CONDA_ENV --all --dry-run"
@@ -357,7 +258,7 @@ update_conda_packages() {
 	conda list -n "$CONDA_ENV" --json > "$records_file" 2>/dev/null || : > "$records_file"
 	# A lookup that fails or answers for fewer packages than asked is no
 	# evidence of ownership: treat every change as ambiguous.
-	if ! ownership="$(conda_change_ownership "$records_file" "${changes[@]}")" ||
+	if ! ownership="$(conda_change_ownership "${changes[@]}" < "$records_file")" ||
 		[[ "$(printf '%s\n' "$ownership" | grep -c .)" -ne ${#changes[@]} ]]; then
 		ownership="$(printf '%s ambiguous\n' "${changes[@]}")"
 	fi
@@ -814,52 +715,8 @@ run_local_mlx_backend_smoke() {
 	fi
 
 	echo "[update.sh] Running local MLX runtime smoke with $smoke_model..."
-	if python - "$smoke_model" "$smoke_prompt" "$smoke_max_tokens" "$smoke_expected" <<'PY'
-from __future__ import annotations
-
-import os
-import subprocess
-import sys
-
-model, prompt, max_tokens, expected = sys.argv[1:5]
-timeout = int(os.environ.get("MLX_LOCAL_BUILD_SMOKE_TIMEOUT", "240"))
-cmd = [
-    sys.executable,
-    "-m",
-    "mlx_vlm",
-    "generate",
-    "--model",
-    model,
-    "--prompt",
-    prompt,
-    "--max-tokens",
-    max_tokens,
-]
-result = subprocess.run(
-    cmd,
-    capture_output=True,
-    check=False,
-    text=True,
-    timeout=timeout,
-)
-output = f"{result.stdout}\n{result.stderr}"
-print(output)
-if result.returncode != 0:
-    raise SystemExit(result.returncode)
-if expected and expected not in output:
-    print(
-        "[update.sh] ERROR: local MLX runtime smoke did not produce the "
-        "expected deterministic output.",
-        file=sys.stderr,
-    )
-    print(f"[update.sh] Expected substring: {expected!r}", file=sys.stderr)
-    print(
-        "[update.sh] This usually points at a broken local MLX backend artifact "
-        "such as mlx.metallib.",
-        file=sys.stderr,
-    )
-    raise SystemExit(1)
-PY
+	if python "$SCRIPT_DIR/update_helpers.py" mlx-backend-smoke \
+		"$smoke_model" "$smoke_prompt" "$smoke_max_tokens" "$smoke_expected"
 	then
 		echo "✓ Local MLX runtime smoke passed"
 	else

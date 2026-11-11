@@ -79,7 +79,7 @@ if [ "${#workflow_yaml_files[@]}" -eq 0 ]; then
     echo "❌ No workflow files found under .github/workflows" >&2
     exit 1
 fi
-quality_validate_yaml_files \
+quality_check_file_syntax -- \
     "${workflow_yaml_files[@]}" \
     "$(quality_repo_root)/.pre-commit-config.yaml"
 

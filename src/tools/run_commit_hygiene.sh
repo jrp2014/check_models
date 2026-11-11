@@ -102,53 +102,7 @@ if [ "$needs_readme_sync" -eq 1 ]; then
 fi
 
 echo "[commit] Checking staged YAML/TOML/shebang files"
-"$QUALITY_PYTHON" - "${staged_files[@]}" <<'PY'
-from __future__ import annotations
-
-import os
-import sys
-import tomllib
-from pathlib import Path
-
-try:
-    import yaml
-except ModuleNotFoundError as err:
-    print("❌ PyYAML is required for commit hygiene checks.")
-    print("   Activate the repo conda env first: conda activate mlx-vlm")
-    raise SystemExit(1) from err
-
-errors: list[str] = []
-
-for raw_path in sys.argv[1:]:
-    path = Path(raw_path)
-    try:
-        text = path.read_text(encoding="utf-8")
-    except UnicodeDecodeError:
-        text = path.read_text(encoding="utf-8", errors="replace")
-    except OSError as err:
-        errors.append(f"{path}: could not read file ({err})")
-        continue
-
-    if path.suffix in {".yaml", ".yml"}:
-        try:
-            list(yaml.safe_load_all(text))
-        except yaml.YAMLError as err:
-            errors.append(f"{path}: invalid YAML ({err})")
-    elif path.suffix == ".toml":
-        try:
-            tomllib.loads(text)
-        except tomllib.TOMLDecodeError as err:
-            errors.append(f"{path}: invalid TOML ({err})")
-
-    if text.startswith("#!") and not os.access(path, os.X_OK):
-        errors.append(f"{path}: has a shebang but is not executable")
-
-if errors:
-    print("❌ Commit hygiene checks failed:")
-    for error in errors:
-        print(f"   - {error}")
-    raise SystemExit(1)
-PY
+quality_check_file_syntax --shebang -- "${staged_files[@]}"
 
 if [ "${#python_files[@]}" -gt 0 ]; then
     echo "[commit] Formatting staged Python files"

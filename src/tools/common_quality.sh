@@ -370,38 +370,10 @@ quality_run_pyrefly_check() {
     return "$exit_code"
 }
 
-quality_validate_yaml_files() {
-    "$QUALITY_PYTHON" - "$@" <<'PY'
-from __future__ import annotations
-
-import sys
-from pathlib import Path
-
-try:
-    import yaml
-except ModuleNotFoundError as err:
-    print("❌ PyYAML is required for YAML validation in quality hooks.")
-    print("   Activate the repo conda env first: conda activate mlx-vlm")
-    raise SystemExit(1) from err
-
-errors: list[str] = []
-
-for raw_path in sys.argv[1:]:
-    path = Path(raw_path)
-    try:
-        text = path.read_text(encoding="utf-8")
-        list(yaml.safe_load_all(text))
-    except OSError as err:
-        errors.append(f"{path}: could not read file ({err})")
-    except yaml.YAMLError as err:
-        errors.append(f"{path}: invalid YAML ({err})")
-
-if errors:
-    print("❌ YAML validation failed:")
-    for error in errors:
-        print(f"   - {error}")
-    raise SystemExit(1)
-PY
+# YAML and TOML syntax (and, with --shebang first, executable shebangs) for the
+# named files; see tools/check_file_syntax.py.
+quality_check_file_syntax() {
+    "$QUALITY_PYTHON" "$(quality_tools_dir)/check_file_syntax.py" "$@"
 }
 
 quality_run_markdownlint() {
