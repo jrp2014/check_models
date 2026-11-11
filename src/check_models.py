@@ -274,6 +274,7 @@ DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_PENALTY_CONTEXT_SIZE: Final[int] = 20
+DEFAULT_COMPARE_WITH: Final[str] = "auto"
 
 
 class ThinkingDelimiterPair(NamedTuple):
@@ -1480,7 +1481,12 @@ class ReportGenerationInputs:
     image_path: Path | None
     report_context: ReportRenderContext
     output_paths: ReportOutputPaths
-    run_args: argparse.Namespace | None = None
+    # What reports restate from the command line. The defaults describe a
+    # report rendered without one (a test, or one built from retained data).
+    settings: ModelRunSettings | None = None
+    image_source_url: str | None = None
+    compare_with: str = DEFAULT_COMPARE_WITH
+    isolated: bool = False
     model_revision: str | None = None
     trust_remote_code: bool = True
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
@@ -3187,32 +3193,26 @@ def _render_gallery_model(
 # =============================================================================
 
 
-@dataclass(frozen=True)
-class ProcessImageParams:
-    """Parameters for processing an image with a model.
+@dataclass(frozen=True, kw_only=True)
+class ModelRunSettings:
+    """How every model of a run is loaded and asked to generate.
 
-    Centralizes all parameters needed for model inference into a single
-    immutable structure. This approach:
-        - Reduces function signature complexity (single param vs many)
-        - Makes parameter passing explicit and type-safe
-        - Simplifies testing (one object to mock/construct)
-        - Documents expected inputs clearly
+    Each field is the command-line value of the same name, after validation
+    and the eval-mode defaults, and is the same for every model. Reports
+    receive this record, never the parsed-arguments namespace, and native
+    reproduction commands restate it. What one model alone ran with (an
+    automatic thinking budget, a checkpoint's sampling values, the reasoning
+    effort its template received) is in that model's prompt diagnostics.
     """
 
-    model_identifier: str
-    image_path: str | Path  # Support both file paths and URLs
-    prompt: str
     max_tokens: int
     temperature: float
-    timeout: float
-    verbose: bool
     trust_remote_code: bool
     top_p: float
     min_p: float
     top_k: int
     repetition_penalty: float | None
     repetition_context_size: int
-    lazy: bool
     max_kv_size: int | None
     kv_bits: float | None
     kv_quant_scheme: KvQuantScheme
@@ -3223,9 +3223,6 @@ class ProcessImageParams:
     kv_key_scheme: KvQuantScheme | None = None
     kv_value_scheme: KvQuantScheme | None = None
     seed: int | None = None
-    # Sampling dests the user gave explicitly (CLI or a per-run override);
-    # everything else may be filled from the checkpoint's generation_config.json.
-    explicit_sampling: frozenset[str] = frozenset()
     presence_penalty: float | None = None
     presence_context_size: int = DEFAULT_PENALTY_CONTEXT_SIZE
     frequency_penalty: float | None = None
@@ -3245,8 +3242,30 @@ class ProcessImageParams:
     thinking_mode: str | None = None
     thinking_start_token: str | None = None
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
+    # The requested effort; each model's template may receive another value
+    # or none (see ReasoningEffortResolution).
     reasoning_effort: str | None = None
     reasoning_effort_fallback: ReasoningEffortFallback = DEFAULT_REASONING_EFFORT_FALLBACK
+
+
+@dataclass(frozen=True, kw_only=True)
+class ProcessImageParams(ModelRunSettings):
+    """One model's execution: the run's settings plus what is particular to it.
+
+    A single immutable structure for model inference, so signatures stay
+    short and a test has one object to construct. ``max_tokens`` and
+    ``temperature`` may differ from the run's here (a triage rerun pins them).
+    """
+
+    model_identifier: str
+    image_path: str | Path  # Support both file paths and URLs
+    prompt: str
+    timeout: float
+    verbose: bool
+    lazy: bool
+    # Sampling dests the user gave explicitly (CLI or a per-run override);
+    # everything else may be filled from the checkpoint's generation_config.json.
+    explicit_sampling: frozenset[str] = frozenset()
     auto_thinking_budget: bool = True
     system_telemetry: SystemTelemetryMode = "snapshot"
     assessment_profile: AssessmentProfile = "general"
@@ -10396,7 +10415,7 @@ def _diagnostics_result_facts(
     result: PerformanceResult,
     assessment: ResultAssessment,
     *,
-    run_args: argparse.Namespace | None,
+    requested_revision: str | None,
     model_provenance: ModelProvenanceRecord | None,
 ) -> tuple[tuple[str, str], ...]:
     """Return exact per-model runtime and provenance fields for maintainers."""
@@ -10408,7 +10427,7 @@ def _diagnostics_result_facts(
     )
     requested_revision = (
         model_provenance["requested_revision"] if model_provenance is not None else None
-    ) or getattr(run_args, "revision", None)
+    ) or requested_revision
     processor = prompt_diagnostics.processor_class if prompt_diagnostics is not None else None
     tokenizer = prompt_diagnostics.tokenizer_class if prompt_diagnostics is not None else None
     rows: list[tuple[str, str]] = [
@@ -10712,7 +10731,7 @@ def _diagnostics_model_blocks(
     result: PerformanceResult,
     assessment: ResultAssessment,
     *,
-    run_args: argparse.Namespace | None,
+    requested_revision: str | None,
     model_provenance: ModelProvenanceRecord | None,
     system_info: Mapping[str, str] | None = None,
     image_profile: ImageInputProfile | None = None,
@@ -10747,7 +10766,7 @@ def _diagnostics_model_blocks(
                 _diagnostics_result_facts(
                     result,
                     assessment,
-                    run_args=run_args,
+                    requested_revision=requested_revision,
                     model_provenance=model_provenance,
                 )
             ),
@@ -10882,7 +10901,7 @@ def _diagnostics_partition_blocks(
     presentation: DiagnosticsPresentation,
     assessments: Mapping[str, ResultAssessment],
     provenance: Mapping[str, ModelProvenanceRecord],
-    run_args: argparse.Namespace | None,
+    requested_revision: str | None,
     system_info: Mapping[str, str] | None = None,
     image_profile: ImageInputProfile | None = None,
 ) -> tuple[ReportBlock, ...]:
@@ -10898,7 +10917,7 @@ def _diagnostics_partition_blocks(
         evidence = _diagnostics_model_blocks(
             result,
             assessment,
-            run_args=run_args,
+            requested_revision=requested_revision,
             model_provenance=provenance.get(result.model_name),
             system_info=system_info,
             image_profile=image_profile,
@@ -10949,7 +10968,7 @@ def _diagnostics_evidence_blocks(
     report_context: ReportRenderContext,
     partitions: DiagnosticsPartitions,
     *,
-    run_args: argparse.Namespace | None,
+    requested_revision: str | None,
     image_path: Path | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Build the shared skim-first diagnostics hierarchy from cached assessments."""
@@ -10990,7 +11009,7 @@ def _diagnostics_evidence_blocks(
                 presentation="expanded",
                 assessments=assessments,
                 provenance=provenance,
-                run_args=run_args,
+                requested_revision=requested_revision,
                 system_info=report_context.system_info,
                 image_profile=image_profile,
             ),
@@ -11002,7 +11021,7 @@ def _diagnostics_evidence_blocks(
                 presentation="observation",
                 assessments=assessments,
                 provenance=provenance,
-                run_args=run_args,
+                requested_revision=requested_revision,
                 system_info=report_context.system_info,
                 image_profile=image_profile,
             ),
@@ -11014,7 +11033,7 @@ def _diagnostics_evidence_blocks(
                 presentation="indeterminate",
                 assessments=assessments,
                 provenance=provenance,
-                run_args=run_args,
+                requested_revision=requested_revision,
                 system_info=report_context.system_info,
                 image_profile=image_profile,
             ),
@@ -11121,7 +11140,8 @@ def generate_diagnostics_report(
     system_info: Mapping[str, str],
     report_context: ReportRenderContext,
     image_path: Path | None = None,
-    run_args: argparse.Namespace | None = None,
+    settings: ModelRunSettings | None = None,
+    image_source_url: str | None = None,
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
@@ -11129,7 +11149,10 @@ def generate_diagnostics_report(
     blocks = (
         ReportParagraph(_run_objective_statement(report_context.eval_mode)),
         *_diagnostics_evidence_blocks(
-            report_context, partitions, run_args=run_args, image_path=image_path
+            report_context,
+            partitions,
+            requested_revision=settings.revision if settings is not None else None,
+            image_path=image_path,
         ),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
@@ -11138,7 +11161,8 @@ def generate_diagnostics_report(
             library_versions=library_versions,
             system_info=system_info,
             image_path=image_path,
-            run_args=run_args,
+            settings=settings,
+            image_source_url=image_source_url,
         ),
     )
     # MD004/MD037: verbatim model-output evidence (repeated fragments,
@@ -11465,7 +11489,7 @@ def _html_maintainer_diagnostics(
     report_context: ReportRenderContext,
     partitions: DiagnosticsPartitions,
     *,
-    run_args: argparse.Namespace | None,
+    requested_revision: str | None,
     image_path: Path | None,
 ) -> str:
     """Render the same cached diagnostic block hierarchy used by Markdown."""
@@ -11474,7 +11498,10 @@ def _html_maintainer_diagnostics(
         "<h2>Maintainer Diagnostics</h2>",
         *render_report_html(
             _diagnostics_evidence_blocks(
-                report_context, partitions, run_args=run_args, image_path=image_path
+                report_context,
+                partitions,
+                requested_revision=requested_revision,
+                image_path=image_path,
             )
         ),
         "</section>",
@@ -11522,7 +11549,8 @@ def _html_provenance(
     versions: LibraryVersionDict,
     prompt: str,
     image_path: Path | None,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
+    image_source_url: str | None,
 ) -> str:
     """Render the same single-copy reproduction context used by Markdown."""
     blocks = _diagnostics_shared_context_blocks(
@@ -11532,7 +11560,8 @@ def _html_provenance(
         library_versions=versions,
         system_info=report_context.system_info,
         image_path=image_path,
-        run_args=run_args,
+        settings=settings,
+        image_source_url=image_source_url,
     )
     return "\n".join(
         (
@@ -11550,7 +11579,8 @@ def _build_full_html_document(
     prompt: str,
     total_runtime_seconds: float,
     image_path: Path | None,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
+    image_source_url: str | None,
 ) -> str:
     """Build standalone HTML from cached gallery and diagnostic facts only."""
     css = """
@@ -11604,7 +11634,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
             _html_maintainer_diagnostics(
                 report_context,
                 partitions,
-                run_args=run_args,
+                requested_revision=settings.revision if settings is not None else None,
                 image_path=image_path,
             ),
             _html_provenance(
@@ -11613,7 +11643,8 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
                 versions=versions,
                 prompt=prompt,
                 image_path=image_path,
-                run_args=run_args,
+                settings=settings,
+                image_source_url=image_source_url,
             ),
             "</body>",
             "</html>",
@@ -11634,7 +11665,8 @@ def generate_html_report(
     total_runtime_seconds: float,
     image_path: Path | None = None,
     report_context: ReportRenderContext | None = None,
-    run_args: argparse.Namespace | None = None,
+    settings: ModelRunSettings | None = None,
+    image_source_url: str | None = None,
 ) -> None:
     """Write a standalone HTML mirror of the facts-only gallery and diagnostics.
 
@@ -11646,7 +11678,8 @@ def generate_html_report(
         total_runtime_seconds: Total wall-clock runtime for the full run.
         image_path: Optional input image path for the report header.
         report_context: Optional cached shared report context built in finalization.
-        run_args: Original CLI arguments used to preserve diagnostic reproduction settings.
+        settings: The run's settings, restated in diagnostic reproduction commands.
+        image_source_url: Public source of the input image, when the run named one.
     """
     if not results:
         log_warning_note("No results to generate HTML report.")
@@ -11664,7 +11697,8 @@ def generate_html_report(
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
         image_path=image_path,
-        run_args=run_args,
+        settings=settings,
+        image_source_url=image_source_url,
     )
 
     _write_text_file(filename, html_content)
@@ -19185,25 +19219,18 @@ def apply_exclusions(
 # =============================================================================
 
 
-# ProcessImageParams fields that are not the same-named CLI value: per-run
-# identity and overrides, a renamed flag (lazy_load), defaulted optionals, and
-# derived values. Everything else is copied from args by field enumeration.
-_PARAMS_NOT_COPIED_FROM_ARGS: Final[frozenset[str]] = frozenset(
-    {
-        "model_identifier",
-        "image_path",
-        "prompt",
-        "max_tokens",
-        "temperature",
-        "timeout",
-        "verbose",
-        "lazy",
-        "auto_thinking_budget",
-        "system_telemetry",
-        "assessment_profile",
-        "explicit_sampling",
+def _model_run_settings_from_args(args: argparse.Namespace) -> ModelRunSettings:
+    """The run's settings: each field is the CLI value of the same name.
+
+    Copied by field enumeration so a new setting cannot be forgotten. argparse
+    yields lists for ``nargs`` options; the dataclass declares tuples, and the
+    isolated worker's JSON round trip restores the declared type.
+    """
+    values: dict[str, Any] = {
+        spec.name: tuple(value) if isinstance(value := getattr(args, spec.name), list) else value
+        for spec in fields(ModelRunSettings)
     }
-)
+    return ModelRunSettings(**values)
 
 
 def _process_image_params_from_args(
@@ -19238,21 +19265,18 @@ def _process_image_params_from_args(
             # deliberate and wins over a checkpoint's declared value.
             explicit.add("temperature")
     explicit &= set(_CHECKPOINT_SAMPLING_DESTS)
-    # Every other field is the CLI value of the same name, copied by field
-    # enumeration so a new parameter cannot be forgotten here. argparse yields
-    # lists for ``nargs`` options; the dataclass declares tuples, and the
-    # isolated worker's JSON round trip restores the declared type.
-    copied: dict[str, Any] = {
-        spec.name: tuple(value) if isinstance(value := getattr(args, spec.name), list) else value
-        for spec in fields(ProcessImageParams)
-        if spec.name not in _PARAMS_NOT_COPIED_FROM_ARGS
+    settings = _model_run_settings_from_args(args)
+    run_settings: dict[str, Any] = {
+        spec.name: getattr(settings, spec.name) for spec in fields(settings)
     }
+    if max_tokens is not None:
+        run_settings["max_tokens"] = max_tokens
+    if temperature is not None:
+        run_settings["temperature"] = temperature
     return ProcessImageParams(
         model_identifier=model_identifier,
         image_path=image_path,
         prompt=prompt,
-        max_tokens=args.max_tokens if max_tokens is None else max_tokens,
-        temperature=args.temperature if temperature is None else temperature,
         timeout=args.timeout if timeout is None else timeout,
         verbose=args.verbose if verbose is None else verbose,
         lazy=args.lazy_load,
@@ -19260,7 +19284,7 @@ def _process_image_params_from_args(
         system_telemetry=_resolve_system_telemetry_mode(getattr(args, "system_telemetry", None)),
         assessment_profile=getattr(args, "assessment_profile", None) or "general",
         explicit_sampling=frozenset(explicit),
-        **copied,
+        **run_settings,
     )
 
 
@@ -20905,7 +20929,6 @@ _RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = _OBSERVATION_CODE_VALUES
 # SECTION: RUN COMPARISON (current sweep vs a retained baseline)
 # =============================================================================
 
-DEFAULT_COMPARE_WITH: Final[str] = "auto"
 _COMPARISON_HISTORY_WINDOW: Final[int] = 10
 _COMPARISON_MIN_BAND_SAMPLES: Final[int] = 4
 _COMPARISON_TPS_RATIO_FALLBACK_BAND: Final[tuple[float, float]] = (0.85, 1.15)
@@ -24460,11 +24483,39 @@ def _public_reproduction_filename(image: RunImageRecord, source_url: str) -> str
     return f"repro-image{suffix or '.img'}"
 
 
-def _retained_generation_args(source: RunIssueSummarySource) -> argparse.Namespace:
-    """Restore JSON-rendered common generation values for native CLI rendering."""
-    values = {key: json.loads(value) for key, value in source.generation_settings}
-    values["trust_remote_code"] = source.trust_remote_code is True
-    return argparse.Namespace(**values)
+# What a native command states for a setting the retained record does not
+# hold: mlx-vlm's own defaults, and no remote code.
+_UNRECORDED_RUN_SETTINGS: Final[ModelRunSettings] = ModelRunSettings(
+    max_tokens=DEFAULT_MAX_TOKENS,
+    temperature=DEFAULT_TEMPERATURE,
+    trust_remote_code=False,
+    top_p=1.0,
+    min_p=0.0,
+    top_k=0,
+    repetition_penalty=None,
+    repetition_context_size=DEFAULT_PENALTY_CONTEXT_SIZE,
+    max_kv_size=None,
+    kv_bits=None,
+    kv_quant_scheme=DEFAULT_KV_QUANT_SCHEME,
+    kv_group_size=DEFAULT_KV_GROUP_SIZE,
+    quantized_kv_start=DEFAULT_QUANTIZED_KV_START,
+)
+
+
+def _retained_run_settings(source: RunIssueSummarySource) -> ModelRunSettings:
+    """The settings a retained record lets a native command restate.
+
+    The record keeps the generation settings every model shared, as JSON, and
+    whether remote code was trusted; anything else is unrecorded. Values are
+    restated as retained, without checking their types: the command builder
+    only prints them.
+    """
+    names = {spec.name for spec in fields(ModelRunSettings)}
+    recorded: dict[str, Any] = {
+        key: json.loads(value) for key, value in source.generation_settings if key in names
+    }
+    recorded["trust_remote_code"] = source.trust_remote_code is True
+    return replace(_UNRECORDED_RUN_SETTINGS, **recorded)
 
 
 _REPRO_THINKING_KWARG_KEYS: Final[tuple[str, ...]] = (
@@ -24476,53 +24527,50 @@ _REPRO_THINKING_KWARG_KEYS: Final[tuple[str, ...]] = (
 
 
 def _repro_thinking_overrides(
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
     effective_generate_kwargs: Mapping[str, object] | None,
     keys: Sequence[str] = _REPRO_THINKING_KWARG_KEYS,
 ) -> dict[str, object]:
-    """Return per-model kwargs (thinking by default) that differ from the global CLI args."""
-    if run_args is None or not effective_generate_kwargs:
+    """Return per-model kwargs (thinking by default) that differ from the run's settings."""
+    if settings is None or not effective_generate_kwargs:
         return {}
     return {
         key: effective_generate_kwargs[key]
         for key in keys
         if key in effective_generate_kwargs
-        and effective_generate_kwargs[key] != getattr(run_args, key, None)
+        and effective_generate_kwargs[key] != getattr(settings, key)
     }
 
 
-def _effective_repro_args(
-    run_args: argparse.Namespace | None,
+def _effective_repro_settings(
+    settings: ModelRunSettings | None,
     effective_generate_kwargs: Mapping[str, object] | None,
-    reasoning_effort_applied: str | None = None,
-) -> argparse.Namespace | None:
-    """Overlay per-model effective generate kwargs onto global repro args.
+) -> ModelRunSettings | None:
+    """Overlay one model's effective generate kwargs onto the run's settings.
 
     The auto thinking budget is applied per model at generation time, so a
-    repro built from global CLI arguments alone would not reproduce the
-    recorded output. The per-model kwargs captured in prompt diagnostics win,
-    as does the reasoning effort this model's chat template received.
+    repro built from the run's settings alone would not reproduce the
+    recorded output. The per-model kwargs captured in prompt diagnostics win.
+    The run's settings are returned unchanged when the model ran with them.
     """
     # Checkpoint sampling values too: mlx-vlm before 73d366e does not read
     # generation_config.json, so the command must state what the run used.
     overrides = _repro_thinking_overrides(
-        run_args,
+        settings,
         effective_generate_kwargs,
         (*_REPRO_THINKING_KWARG_KEYS, *_CHECKPOINT_SAMPLING_DESTS),
     )
-    if run_args is not None and reasoning_effort_applied is not None:
-        overrides["reasoning_effort_applied"] = reasoning_effort_applied
-    if run_args is None or not overrides:
-        return run_args
-    merged = argparse.Namespace(**vars(run_args))
-    for key, value in overrides.items():
-        setattr(merged, key, value)
-    return merged
+    if settings is None or not overrides:
+        return settings
+    # Recorded values laid over the typed settings: the command restates them
+    # as recorded and nothing interprets them.
+    recorded: dict[str, Any] = overrides
+    return replace(settings, **recorded)
 
 
 def _shared_repro_thinking_caveat(
     highlighted_results: Sequence[PerformanceResult],
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
 ) -> ReportParagraph | None:
     """Warn when per-model automatic thinking flags diverge from the shared command.
 
@@ -24533,7 +24581,7 @@ def _shared_repro_thinking_caveat(
     for result in highlighted_results:
         diagnostics = result.prompt_diagnostics
         overrides = _repro_thinking_overrides(
-            run_args,
+            settings,
             diagnostics.generate_kwargs if diagnostics is not None else None,
         )
         flags: list[str] = []
@@ -24617,8 +24665,9 @@ def _verified_public_reproduction_blocks(
     sha256: str,
     model_name: str,
     prompt: str,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
     resolved_revision: str | None,
+    reasoning_effort_applied: str | None,
     lead: str,
 ) -> tuple[ReportBlock, ...]:
     """Download-verify-run command for a public image whose digest is known."""
@@ -24634,8 +24683,9 @@ def _verified_public_reproduction_blocks(
             model_name=model_name,
             prompt=prompt,
             image_ref=filename,
-            run_args=run_args,
+            settings=settings,
             resolved_revision=resolved_revision,
+            reasoning_effort_applied=reasoning_effort_applied,
         ).shell_command()
     )
     return (ReportParagraph(lead), ReportCodeBlock("\n".join(commands), language="bash"))
@@ -24646,7 +24696,7 @@ def _reproduction_input_blocks(
     model_name: str,
     prompt: str,
     image: RunImageRecord | None,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
     resolved_revision: str | None,
     crash_phase: str | None = None,
     effective_generate_kwargs: Mapping[str, object] | None = None,
@@ -24660,7 +24710,7 @@ def _reproduction_input_blocks(
     When the original is unpublished but the run's committed preview is known,
     a clearly labelled stand-in command is rendered against that public file.
     """
-    run_args = _effective_repro_args(run_args, effective_generate_kwargs, reasoning_effort_applied)
+    settings = _effective_repro_settings(settings, effective_generate_kwargs)
     blocks: list[ReportBlock] = [
         ReportKeyValues(_reproduction_image_facts(image)),
         ReportDetails("Exact prompt", (ReportCodeBlock(prompt),)),
@@ -24681,7 +24731,7 @@ def _reproduction_input_blocks(
                             model_name=model_name,
                             prompt=prompt,
                             image_ref="any-local-image.jpg",
-                            run_args=run_args,
+                            settings=settings,
                             resolved_revision=resolved_revision,
                             minimal_load=True,
                         ).shell_command(),
@@ -24720,8 +24770,9 @@ def _reproduction_input_blocks(
                     sha256=preview_sha256,
                     model_name=model_name,
                     prompt=prompt,
-                    run_args=run_args,
+                    settings=settings,
                     resolved_revision=resolved_revision,
+                    reasoning_effort_applied=reasoning_effort_applied,
                     lead=(
                         "Shareable stand-in: the retained gallery preview is a downscaled "
                         "re-encoding of the original, so an observation reproduced on it "
@@ -24752,8 +24803,9 @@ def _reproduction_input_blocks(
             sha256=sha256,
             model_name=model_name,
             prompt=prompt,
-            run_args=run_args,
+            settings=settings,
             resolved_revision=resolved_revision,
+            reasoning_effort_applied=reasoning_effort_applied,
             lead="Download and verify the exact public input, then run one native mlx-vlm process.",
         )
     )
@@ -24917,7 +24969,7 @@ def _run_issue_summary_crash_section(
                     model_name=result["model"],
                     prompt=source.metadata["prompt"],
                     image=source.image,
-                    run_args=_retained_generation_args(source),
+                    settings=_retained_run_settings(source),
                     resolved_revision=resolved_revision or requested_revision,
                     crash_phase=failure.get("phase") if failure is not None else None,
                     effective_generate_kwargs=cast(
@@ -26699,9 +26751,8 @@ def _issue_repro_portable_path_ref(raw_ref: str, *, fallback: str) -> str:
         return candidate_path.name or fallback
 
 
-def _issue_public_image_source_url(run_args: argparse.Namespace | None) -> str | None:
-    """Return validated public source metadata from an executed argument set."""
-    source_url = getattr(run_args, "image_source_url", None) if run_args is not None else None
+def _issue_public_image_source_url(source_url: str | None) -> str | None:
+    """Return the run's ``--image-source-url`` when it is a valid public source."""
     if not isinstance(source_url, str):
         return None
     try:
@@ -26755,11 +26806,6 @@ _NATIVE_CLI_OPTIONAL_ARGS: Final[tuple[tuple[str, str], ...]] = (
     ("--thinking-budget", "thinking_budget"),
     ("--thinking-mode", "thinking_mode"),
     ("--thinking-start-token", "thinking_start_token"),
-    # The value one model's template received (set per model by
-    # _effective_repro_args), never the requested --reasoning-effort: a model
-    # whose template does not read it, or that mapped it, ran without it or
-    # with another value. The upstream CLI flag exists from mlx-vlm 0.7.12.
-    ("--reasoning-effort", "reasoning_effort_applied"),
 )
 _NATIVE_CLI_NONDEFAULT_ARGS: Final[tuple[tuple[str, str, object], ...]] = (
     # Sampling flags exist on the upstream generate CLI since #1994 (post-0.6.15).
@@ -26780,34 +26826,34 @@ _NATIVE_CLI_BOOLEAN_FLAGS: Final[tuple[tuple[str, str], ...]] = (
     ("--skip-special-tokens", "skip_special_tokens"),
     ("--enable-thinking", "enable_thinking"),
 )
-_NATIVE_CLI_LOAD_BOOLEAN_FLAGS: Final[tuple[tuple[str, str, bool], ...]] = (
-    ("--force-download", "force_download", False),
-    ("--trust-remote-code", "trust_remote_code", True),
-    ("--quantize-activations", "quantize_activations", False),
+_NATIVE_CLI_LOAD_BOOLEAN_FLAGS: Final[tuple[tuple[str, str], ...]] = (
+    ("--force-download", "force_download"),
+    ("--trust-remote-code", "trust_remote_code"),
+    ("--quantize-activations", "quantize_activations"),
 )
 _NATIVE_GENERATION_KWARG_DEFAULTS: Final[tuple[tuple[str, object], ...]] = (("logit_bias", None),)
 
 
 def _append_native_cli_load_args(
     tokens: list[str],
-    run_args: argparse.Namespace,
+    settings: ModelRunSettings,
     resolved_revision: str | None,
 ) -> None:
     """Append model-loading arguments shared by full and load-only repros."""
-    if (adapter_path := getattr(run_args, "adapter_path", None)) is not None:
+    if (adapter_path := settings.adapter_path) is not None:
         tokens.extend(
             [
                 "--adapter-path",
-                _issue_repro_portable_path_ref(str(adapter_path), fallback="path/to/adapter"),
+                _issue_repro_portable_path_ref(adapter_path, fallback="path/to/adapter"),
             ]
         )
     _append_native_cli_optional_pair(
         tokens,
         "--revision",
-        resolved_revision or getattr(run_args, "revision", None),
+        resolved_revision or settings.revision,
     )
-    for flag, attribute, default in _NATIVE_CLI_LOAD_BOOLEAN_FLAGS:
-        if bool(getattr(run_args, attribute, default)):
+    for flag, attribute in _NATIVE_CLI_LOAD_BOOLEAN_FLAGS:
+        if bool(getattr(settings, attribute)):
             tokens.append(flag)
 
 
@@ -26816,15 +26862,21 @@ def _build_native_mlx_vlm_cli_tokens(
     model_name: str,
     prompt: str,
     image_ref: str,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
     resolved_revision: str | None = None,
     minimal_load: bool = False,
+    reasoning_effort_applied: str | None = None,
 ) -> list[str]:
     """Build a native ``python -m mlx_vlm.generate`` command for issue drafts.
 
     ``--verbose`` makes upstream print prompt/generation tokens, tok/s and peak
     memory (it prints only the text by default), so a maintainer can set the
     native run's numbers beside the harness's.
+
+    ``reasoning_effort_applied`` is the value one model's template received,
+    never the run's requested ``settings.reasoning_effort``: a model whose
+    template does not read it, or that mapped it, ran without it or with
+    another value. The upstream flag exists from mlx-vlm 0.7.12.
     """
     tokens = [
         "python",
@@ -26841,52 +26893,45 @@ def _build_native_mlx_vlm_cli_tokens(
         str(
             8
             if minimal_load
-            else (
-                getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
-                if run_args is not None
-                else DEFAULT_MAX_TOKENS
-            )
+            else (settings.max_tokens if settings is not None else DEFAULT_MAX_TOKENS)
         ),
         "--temperature",
         str(
-            DEFAULT_TEMPERATURE
-            if minimal_load
-            else (
-                getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
-                if run_args is not None
-                else DEFAULT_TEMPERATURE
-            )
+            settings.temperature
+            if settings is not None and not minimal_load
+            else DEFAULT_TEMPERATURE
         ),
     ]
-    if run_args is None:
+    if settings is None:
         _append_native_cli_optional_pair(tokens, "--revision", resolved_revision)
         return tokens
 
-    _append_native_cli_load_args(tokens, run_args, resolved_revision)
+    _append_native_cli_load_args(tokens, settings, resolved_revision)
     if minimal_load:
         return tokens
 
     for flag, attribute in _NATIVE_CLI_SEQUENCE_ARGS:
-        _append_native_cli_sequence(tokens, flag, getattr(run_args, attribute, None))
+        _append_native_cli_sequence(tokens, flag, getattr(settings, attribute))
     for flag, attribute in _NATIVE_CLI_OPTIONAL_ARGS:
-        _append_native_cli_optional_pair(tokens, flag, getattr(run_args, attribute, None))
+        _append_native_cli_optional_pair(tokens, flag, getattr(settings, attribute))
+    _append_native_cli_optional_pair(tokens, "--reasoning-effort", reasoning_effort_applied)
     # A sampled run states top_p and top_k even at their defaults: since
     # mlx-vlm 73d366e the CLI fills omitted ones from generation_config.json.
-    sampled = float(getattr(run_args, "temperature", DEFAULT_TEMPERATURE)) > 0
+    sampled = float(settings.temperature) > 0
     for flag, attribute, default in _NATIVE_CLI_NONDEFAULT_ARGS:
-        value = getattr(run_args, attribute, default)
+        value = getattr(settings, attribute)
         if value != default or (sampled and attribute in {"top_p", "top_k"}):
             tokens.extend([flag, str(value)])
     for flag, attribute in _NATIVE_CLI_BOOLEAN_FLAGS:
-        if bool(getattr(run_args, attribute, False)):
+        if bool(getattr(settings, attribute)):
             tokens.append(flag)
-    processor_kwargs = getattr(run_args, "processor_kwargs", None)
+    processor_kwargs = settings.processor_kwargs
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
     generation_kwargs = {
         attribute: value
         for attribute, default in _NATIVE_GENERATION_KWARG_DEFAULTS
-        if (value := getattr(run_args, attribute, default)) != default
+        if (value := getattr(settings, attribute)) != default
     }
     if generation_kwargs:
         tokens.extend(["--gen-kwargs", json.dumps(generation_kwargs, sort_keys=True)])
@@ -26898,18 +26943,20 @@ def build_native_mlx_vlm_repro_command_spec(
     model_name: str,
     prompt: str,
     image_ref: str,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
     resolved_revision: str | None = None,
     minimal_load: bool = False,
+    reasoning_effort_applied: str | None = None,
 ) -> ReproCommandSpec:
     """Build a native ``mlx_vlm.generate`` CLI repro command spec."""
     tokens = _build_native_mlx_vlm_cli_tokens(
         model_name=model_name,
         prompt=prompt,
         image_ref=image_ref,
-        run_args=run_args,
+        settings=settings,
         resolved_revision=resolved_revision,
         minimal_load=minimal_load,
+        reasoning_effort_applied=reasoning_effort_applied,
     )
     return ReproCommandSpec(
         base_tokens=tuple(tokens[:3]),
@@ -26925,13 +26972,14 @@ def _diagnostics_shared_context_blocks(
     library_versions: LibraryVersionDict,
     system_info: Mapping[str, str],
     image_path: Path | None,
-    run_args: argparse.Namespace | None,
+    settings: ModelRunSettings | None,
+    image_source_url: str | None,
 ) -> tuple[ReportBlock, ...]:
     """Build single-copy prompt, reproduction, and environment context."""
     image = _run_image_record(
         image_path,
         _load_image_input_profile(image_path),
-        source_url=_issue_public_image_source_url(run_args),
+        source_url=_issue_public_image_source_url(image_source_url),
     )
     model_rows = tuple(
         (
@@ -26963,12 +27011,12 @@ def _diagnostics_shared_context_blocks(
         if component_rows
         else ReportParagraph("Environment and component provenance unavailable.")
     )
-    thinking_caveat = _shared_repro_thinking_caveat(highlighted_results, run_args)
+    thinking_caveat = _shared_repro_thinking_caveat(highlighted_results, settings)
     reproduction_blocks: tuple[ReportBlock, ...] = _reproduction_input_blocks(
         model_name="MODEL_ID",
         prompt=prompt,
         image=image,
-        run_args=run_args,
+        settings=settings,
         resolved_revision="RESOLVED_REVISION",
         published_preview=_published_preview_record(image_path),
     )
@@ -27148,7 +27196,8 @@ def _generate_github_issue_reports(
     system_info: Mapping[str, str],
     prompt: str,
     image_path: Path | None = None,
-    run_args: argparse.Namespace | None = None,
+    settings: ModelRunSettings | None = None,
+    image_source_url: str | None = None,
 ) -> Mapping[str, Path]:
     """Write one factual issue draft per crashed actionable result."""
     issues_dir = output_dir / "issues"
@@ -27173,7 +27222,7 @@ def _generate_github_issue_reports(
     issue_image = _run_image_record(
         image_path,
         report_context.image_profile or _load_image_input_profile(image_path),
-        source_url=_issue_public_image_source_url(run_args),
+        source_url=_issue_public_image_source_url(image_source_url),
     )
     for result in crashes:
         issue_path = issue_paths[result.model_name]
@@ -27201,7 +27250,7 @@ def _generate_github_issue_reports(
                     _diagnostics_model_blocks(
                         result,
                         assessments[result.model_name],
-                        run_args=run_args,
+                        requested_revision=settings.revision if settings is not None else None,
                         model_provenance=provenance,
                         system_info=report_context.system_info,
                         image_profile=report_context.image_profile,
@@ -27215,7 +27264,7 @@ def _generate_github_issue_reports(
                     model_name=result.model_name,
                     prompt=prompt,
                     image=issue_image,
-                    run_args=run_args,
+                    settings=settings,
                     resolved_revision=(
                         provenance["resolved_revision"] if provenance is not None else None
                     ),
@@ -27255,7 +27304,8 @@ def _generate_github_issue_reports(
 
 def _write_diagnostics_artifacts(
     *,
-    args: argparse.Namespace,
+    settings: ModelRunSettings | None,
+    image_source_url: str | None,
     library_versions: LibraryVersionDict,
     system_info: dict[str, str],
     prompt: str,
@@ -27272,7 +27322,8 @@ def _write_diagnostics_artifacts(
         system_info=system_info,
         report_context=report_context,
         image_path=image_path,
-        run_args=args,
+        settings=settings,
+        image_source_url=image_source_url,
     )
     issue_reports = _generate_github_issue_reports(
         report_context=report_context,
@@ -27281,7 +27332,8 @@ def _write_diagnostics_artifacts(
         system_info=system_info,
         prompt=prompt,
         image_path=image_path,
-        run_args=args,
+        settings=settings,
+        image_source_url=image_source_url,
     )
     if issue_reports:
         logger.info("GitHub Issue reports generated for %d issue(s).", len(issue_reports))
@@ -27377,7 +27429,8 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 total_runtime_seconds=inputs.overall_time,
                 image_path=inputs.image_path,
                 report_context=inputs.report_context,
-                run_args=inputs.run_args,
+                settings=inputs.settings,
+                image_source_url=inputs.image_source_url,
             ),
         ),
         ReportArtifact(
@@ -27533,7 +27586,8 @@ def _run_diagnostics_artifact(
     diagnostics_path = inputs.output_paths.diagnostics
     try:
         artifacts = _write_diagnostics_artifacts(
-            args=inputs.run_args or argparse.Namespace(),
+            settings=inputs.settings,
+            image_source_url=inputs.image_source_url,
             library_versions=inputs.library_versions,
             system_info=inputs.system_info,
             prompt=inputs.prompt,
@@ -27792,7 +27846,7 @@ def _compute_run_comparison(
     reports. ``KeyboardInterrupt``/``SystemExit`` still propagate.
     """
     try:
-        spec = getattr(inputs.run_args, "compare_with", DEFAULT_COMPARE_WITH)
+        spec = inputs.compare_with
         baseline = _resolve_comparison_baseline(spec, inputs.output_paths.jsonl)
         if baseline is None:
             return None
@@ -27865,18 +27919,12 @@ def _build_retained_run_guarded(
             runtime_fingerprint=inputs.runtime_fingerprint,
             requested_revision=inputs.model_revision,
             report_context=inputs.report_context,
-            execution_mode=(
-                "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
-            ),
+            execution_mode=("isolated" if inputs.isolated else "in_process"),
             total_runtime_seconds=inputs.overall_time,
             started_at=inputs.started_at,
             artifacts=manifest,
             image_path=inputs.image_path,
-            image_source_url=(
-                getattr(inputs.run_args, "image_source_url", None)
-                if inputs.run_args is not None
-                else None
-            ),
+            image_source_url=inputs.image_source_url,
             trust_remote_code=inputs.trust_remote_code,
             comparison=inputs.comparison,
         )
@@ -28454,7 +28502,10 @@ def finalize_execution(
             image_path=image_path,
             report_context=report_context,
             output_paths=output_paths,
-            run_args=args,
+            settings=_model_run_settings_from_args(args),
+            image_source_url=args.image_source_url,
+            compare_with=args.compare_with,
+            isolated=args.isolate,
             history_appended=history_record is not None,
             environment_logged=run_facts.environment_logged,
             model_revision=requested_revision,

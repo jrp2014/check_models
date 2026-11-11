@@ -2217,15 +2217,25 @@ class TestRepetitionGuard:
         ]
         assert differing == []
 
-    def test_params_not_copied_from_args_names_only_real_fields(self) -> None:
-        """The exclusion set must track the dataclass, and every other field is a CLI dest."""
-        names = {
-            spec_field.name for spec_field in dataclasses.fields(check_models.ProcessImageParams)
-        }
-        assert names >= check_models._PARAMS_NOT_COPIED_FROM_ARGS
-        args = check_models._build_cli_parser().parse_args(["--models", "org/m"])
-        copied = names - check_models._PARAMS_NOT_COPIED_FROM_ARGS
-        assert [name for name in sorted(copied) if not hasattr(args, name)] == []
+    def test_every_run_setting_is_the_command_line_value_of_its_name(self) -> None:
+        """Run settings are copied from the parsed arguments by name, so each must be a dest."""
+        args = check_models._build_cli_parser().parse_args(
+            ["--models", "org/m", "--max-tokens", "64", "--eos-tokens", "<a>", "<b>"]
+        )
+        names = [
+            spec_field.name for spec_field in dataclasses.fields(check_models.ModelRunSettings)
+        ]
+        assert [name for name in names if not hasattr(args, name)] == []
+
+        settings = check_models._model_run_settings_from_args(args)
+
+        assert settings.max_tokens == 64
+        assert settings.eos_tokens == ("<a>", "<b>")  # argparse's list, as the declared tuple
+        assert [
+            name
+            for name in names
+            if name != "eos_tokens" and getattr(settings, name) != getattr(args, name)
+        ] == []
 
     @pytest.mark.parametrize("verbose", [True, False])
     def test_wrapper_echoes_stream_live(

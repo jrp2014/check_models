@@ -177,6 +177,50 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reports (0.17.116, step 5 of john's 2026-11-11 plan, first part): report
+  and reproduction code no longer receives the parsed-arguments namespace.
+  `ProcessImageParams` is split in two without repeating a field:
+  `ModelRunSettings` holds the load and generation settings that are the
+  same for every model (each field is the command-line value of its name),
+  and `ProcessImageParams` extends it with what belongs to one execution
+  (model, image, prompt, timeout, verbosity, lazy loading, explicit-sampling
+  provenance and the derived options). Reports receive `ModelRunSettings`;
+  the three other values they read from the command line are typed fields of
+  `ReportGenerationInputs` (`image_source_url`, `compare_with`,
+  `isolated`). The per-model evidence chain, which carried the whole
+  namespace through five functions to read one attribute, takes
+  `requested_revision`. The per-model overlay is `dataclasses.replace`
+  rather than a copied namespace with attributes set on it, and the
+  reasoning effort a model's template received is an explicit argument of
+  the command builder, so the requested effort cannot be printed by
+  mistake. `_PARAMS_NOT_COPIED_FROM_ARGS` is gone: the class boundary now
+  says which fields are copied from the arguments by name.
+
+  Behaviour preserved: requested values, the explicit-sampling set and each
+  model's effective values keep their meaning, and every report file is
+  unchanged. A retained record still yields a command from the settings
+  every model shared plus that model's own; the values a record does not
+  hold are now one named record, `_UNRECORDED_RUN_SETTINGS`, in place of
+  defaults repeated in `getattr` calls. Retained values are restated
+  without checking their types, as before.
+
+  Benefit: a report function's signature says what it reads, the type
+  checkers see the settings, and a setting missing from the arguments fails
+  at the conversion instead of silently taking a default in a report.
+
+  Evidence: two tests written first, and passing before the change, run the
+  real finalisation from a parsed command line (every load and generation
+  option in one; isolation, no remote code, an adapter and sampling in the
+  other) and pin the per-model, shared and retained-record commands and the
+  recorded execution mode, trust setting and image source. A scratch
+  harness wrote every output of three such runs (index, issue drafts, run
+  summary, diagnostics, gallery, HTML, JSONL, history) before and after:
+  identical once timestamps and durations are masked. Existing tests keep
+  their expected commands; only how they build their input changed (37
+  tests), and those that called finalisation with a one-attribute namespace
+  now pass parsed arguments. Not changed: start-up, validation and the
+  model loop still read the namespace.
+
 - Shell tools (0.17.115, step 4 of john's 2026-11-11 plan, second part):
   seven Python heredocs moved out of the shell scripts into three checked
   files under `src/tools/`, each run by path so it works from any directory

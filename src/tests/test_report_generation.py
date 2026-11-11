@@ -735,9 +735,15 @@ def test_run_issue_summary_withholds_command_for_post_load_crash(tmp_path: Path)
     assert "any-local-image.jpg" not in content
 
 
-def _native_repro_args_with_every_setting() -> Namespace:
-    """Run arguments exercising every setting the native repro command can carry."""
-    return Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
+def _run_settings(**overrides: object) -> check_models.ModelRunSettings:
+    """Settings as a native command assumes them, with remote code trusted and ``overrides``."""
+    values: dict[str, Any] = {"trust_remote_code": True, **overrides}
+    return replace(check_models._UNRECORDED_RUN_SETTINGS, **values)
+
+
+def _run_settings_with_every_setting() -> check_models.ModelRunSettings:
+    """Run settings exercising every setting the native repro command can carry."""
+    return _run_settings(
         max_tokens=321,
         temperature=0.25,
         top_p=0.81,
@@ -762,19 +768,49 @@ def _native_repro_args_with_every_setting() -> Namespace:
         skip_special_tokens=True,
         force_download=True,
         revision="requested-revision",
-        trust_remote_code=True,
         quantize_activations=True,
         processor_kwargs={"cropping": False},
         prefill_step_size=512,
         enable_thinking=True,
         thinking_budget=24,
         thinking_mode="enabled",
-        # The value one model's template received, as _effective_repro_args
-        # overlays it; a run-wide requested effort is never emitted.
-        reasoning_effort_applied="low",
+        # The requested effort, which no command may restate: only the value
+        # one model's template received is emitted, passed beside the settings.
+        reasoning_effort="requested-and-never-printed",
         thinking_start_token=THINKING_START_TOKEN,
         thinking_end_token=CUSTOM_THINKING_END_TOKEN,
     )
+
+
+def test_native_repro_flag_tables_name_run_settings() -> None:
+    """The command builder reads settings by name, so each named one must exist.
+
+    The requested reasoning effort is deliberately in no table: only the value
+    one model's template received is restated.
+    """
+    names = {spec.name for spec in dataclasses.fields(check_models.ModelRunSettings)}
+    tables = (
+        check_models._NATIVE_CLI_SEQUENCE_ARGS,
+        check_models._NATIVE_CLI_OPTIONAL_ARGS,
+        check_models._NATIVE_CLI_NONDEFAULT_ARGS,
+        check_models._NATIVE_CLI_BOOLEAN_FLAGS,
+        check_models._NATIVE_CLI_LOAD_BOOLEAN_FLAGS,
+    )
+    named = {row[1] for table in tables for row in table} | {
+        name for name, _default in check_models._NATIVE_GENERATION_KWARG_DEFAULTS
+    }
+    assert named <= names
+    assert "reasoning_effort" not in named
+    # Unrecorded settings print nothing beyond the fixed arguments.
+    assert check_models._build_native_mlx_vlm_cli_tokens(
+        model_name="m",
+        prompt="p",
+        image_ref="i.jpg",
+        settings=check_models._UNRECORDED_RUN_SETTINGS,
+    ) == [
+        *("python", "-m", "mlx_vlm.generate", "--verbose", "--model", "m", "--image", "i.jpg"),
+        *("--prompt", "p", "--max-tokens", "1000", "--temperature", "0.0"),
+    ]
 
 
 def test_native_repro_command_parses_with_upstream_cli() -> None:
@@ -785,13 +821,14 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
     here instead of in a maintainer's terminal, and the values round-trip.
     """
     dispatch = pytest.importorskip("mlx_vlm.generate.dispatch")
-    run_args = _native_repro_args_with_every_setting()
+    settings = _run_settings_with_every_setting()
     tokens = check_models._build_native_mlx_vlm_cli_tokens(
         model_name="org/model",
         prompt="Describe this image.",
         image_ref="image.jpg",
-        run_args=run_args,
+        settings=settings,
         resolved_revision="resolved-revision",
+        reasoning_effort_applied="low",
     )
     assert tokens[:3] == ["python", "-m", "mlx_vlm.generate"]
     with patch.object(sys, "argv", ["mlx_vlm.generate", *tokens[3:]]):
@@ -800,25 +837,25 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
     expected = {
         "model": "org/model",
         "prompt": ["Describe this image."],
-        "max_tokens": run_args.max_tokens,
-        "temperature": run_args.temperature,
-        "top_p": run_args.top_p,
-        "min_p": run_args.min_p,
-        "top_k": run_args.top_k,
-        "seed": run_args.seed,
-        "repetition_penalty": run_args.repetition_penalty,
-        "max_kv_size": run_args.max_kv_size,
-        "kv_quant_scheme": run_args.kv_quant_scheme,
-        "resize_shape": list(run_args.resize_shape),
-        "eos_tokens": list(run_args.eos_tokens),
+        "max_tokens": settings.max_tokens,
+        "temperature": settings.temperature,
+        "top_p": settings.top_p,
+        "min_p": settings.min_p,
+        "top_k": settings.top_k,
+        "seed": settings.seed,
+        "repetition_penalty": settings.repetition_penalty,
+        "max_kv_size": settings.max_kv_size,
+        "kv_quant_scheme": settings.kv_quant_scheme,
+        "resize_shape": list(settings.resize_shape or ()),
+        "eos_tokens": list(settings.eos_tokens or ()),
         "revision": "resolved-revision",
-        "prefill_step_size": run_args.prefill_step_size,
-        "thinking_budget": run_args.thinking_budget,
-        "thinking_mode": run_args.thinking_mode,
-        "reasoning_effort": run_args.reasoning_effort_applied,
-        "thinking_start_token": run_args.thinking_start_token,
-        "thinking_end_token": run_args.thinking_end_token,
-        "processor_kwargs": run_args.processor_kwargs,
+        "prefill_step_size": settings.prefill_step_size,
+        "thinking_budget": settings.thinking_budget,
+        "thinking_mode": settings.thinking_mode,
+        "reasoning_effort": "low",
+        "thinking_start_token": settings.thinking_start_token,
+        "thinking_end_token": settings.thinking_end_token,
+        "processor_kwargs": settings.processor_kwargs,
         # Upstream then prints token counts, tok/s and peak memory, not only text.
         "verbose": True,
     }
@@ -835,15 +872,13 @@ def test_native_repro_states_default_top_p_and_top_k_only_when_sampled() -> None
     """mlx-vlm 73d366e fills omitted --top-p/--top-k from generation_config.json."""
 
     def sampling_flags(temperature: float) -> dict[str, str]:
-        run_args = argparse.Namespace(
-            **{**vars(_native_repro_args_with_every_setting()), "top_p": 1.0, "top_k": 0},
-        )
-        run_args.temperature = temperature
         tokens = check_models._build_native_mlx_vlm_cli_tokens(
             model_name="org/model",
             prompt="Describe this image.",
             image_ref="image.jpg",
-            run_args=run_args,
+            settings=replace(
+                _run_settings_with_every_setting(), top_p=1.0, top_k=0, temperature=temperature
+            ),
         )
         return {
             flag: tokens[index + 1]
@@ -857,14 +892,13 @@ def test_native_repro_states_default_top_p_and_top_k_only_when_sampled() -> None
 
 def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
     """The native command must retain every harness setting exposed by its CLI."""
-    run_args = _native_repro_args_with_every_setting()
-
     tokens = check_models._build_native_mlx_vlm_cli_tokens(
         model_name="org/model",
         prompt="Describe this image.",
         image_ref="image.jpg",
-        run_args=run_args,
+        settings=_run_settings_with_every_setting(),
         resolved_revision="resolved-revision",
+        reasoning_effort_applied="low",
     )
 
     expected_pairs = {
@@ -2502,10 +2536,7 @@ def _report_generation_inputs(
     result: check_models.PerformanceResult,
 ) -> check_models.ReportGenerationInputs:
     """Build minimal orchestration inputs writing under tmp_path only."""
-    args = Namespace(
-        output_dir=tmp_path / "output",
-        compare_with="none",
-    )
+    args = Namespace(output_dir=tmp_path / "output")
     context = _build_report_render_context(results=[result], prompt="Describe the image.")
     return check_models.ReportGenerationInputs(
         library_versions=_stub_versions(),
@@ -2515,7 +2546,7 @@ def _report_generation_inputs(
         image_path=None,
         report_context=context,
         output_paths=check_models._resolve_report_output_paths(args),
-        run_args=args,
+        compare_with="none",
         runtime_fingerprint={},
     )
 
@@ -2593,7 +2624,7 @@ def test_comparison_rendering_failure_does_not_block_reports(
 ) -> None:
     """A crash while displaying the comparison degrades to no comparison."""
     inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
-    inputs = replace(inputs, run_args=replace_namespace(inputs.run_args, compare_with="auto"))
+    inputs = replace(inputs, compare_with="auto")
     with (
         patch.object(
             check_models,
@@ -2611,13 +2642,6 @@ def test_comparison_rendering_failure_does_not_block_reports(
     assert _report_outcome(outcomes, "jsonl").succeeded is True
     assert inputs.output_paths.index.is_file()
     assert "Comparison skipped: unexpected comparison rendering failure" in caplog.text
-
-
-def replace_namespace(args: object, **overrides: object) -> Namespace:
-    """Copy a Namespace with overrides (argparse has no replace helper)."""
-    merged = vars(args).copy()
-    merged.update(overrides)
-    return Namespace(**merged)
 
 
 def test_stale_environment_log_is_not_presented_as_current(tmp_path: Path) -> None:
@@ -2866,7 +2890,6 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         image_path=None,
         report_context=context,
         output_paths=output_paths,
-        run_args=args,
         runtime_fingerprint={},
     )
 
@@ -3827,7 +3850,7 @@ def test_diagnostics_facts_surface_exact_observation_evidence_without_empty_nois
         check_models._diagnostics_result_facts(
             result,
             assessment,
-            run_args=None,
+            requested_revision=None,
             model_provenance=None,
         )
     )
@@ -3864,7 +3887,7 @@ def test_diagnostics_facts_render_catalog_constraint_evidence() -> None:
         check_models._diagnostics_result_facts(
             result,
             assessment,
-            run_args=None,
+            requested_revision=None,
             model_provenance=None,
         )
     )
@@ -4425,7 +4448,7 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
         check_models._sha256_file(image_path)
         == "251712968e443405f6e1ff145de15a91a082dc073209938c5305db0e8e80134c"
     )
-    run_args = Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
+    settings = _run_settings(
         max_tokens=321,
         temperature=0.25,
         top_p=0.81,
@@ -4448,7 +4471,6 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
         eos_tokens=[EOS_OVERRIDE_TOKEN],
         skip_special_tokens=True,
         revision="run-revision",
-        trust_remote_code=True,
         force_download=True,
         quantize_activations=True,
         processor_kwargs={"cropping": False},
@@ -4458,7 +4480,6 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
         thinking_end_token=CUSTOM_THINKING_END_TOKEN,
         logit_bias={42: -1.5},
         adapter_path=None,
-        lazy_load=False,
     )
 
     with patch.object(check_models, "_collect_model_provenance", side_effect=AssertionError):
@@ -4470,7 +4491,7 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
             system_info={},
             report_context=context,
             image_path=image_path,
-            run_args=run_args,
+            settings=settings,
         )
         issue_reports = _generate_github_issue_reports(
             report_context=context,
@@ -4479,7 +4500,7 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
             system_info={},
             prompt="Describe the image.",
             image_path=image_path,
-            run_args=run_args,
+            settings=settings,
         )
 
     diagnostics_content = output.read_text(encoding="utf-8")
@@ -4538,14 +4559,6 @@ def test_crash_issue_draft_builds_complete_public_image_reproduction(tmp_path: P
             }
         },
     )
-    run_args = Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
-        image_source_url="https://example.test/images/cats.jpg",
-        max_tokens=321,
-        temperature=0.0,
-        revision="main",
-        trust_remote_code=True,
-    )
-
     issue_reports = _generate_github_issue_reports(
         report_context=context,
         output_dir=tmp_path,
@@ -4553,7 +4566,8 @@ def test_crash_issue_draft_builds_complete_public_image_reproduction(tmp_path: P
         system_info={},
         prompt="Describe the image exactly.",
         image_path=image_path,
-        run_args=run_args,
+        settings=_run_settings(max_tokens=321, temperature=0.0, revision="main"),
+        image_source_url="https://example.test/images/cats.jpg",
     )
 
     content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
@@ -4629,12 +4643,8 @@ def test_diagnostics_writer_never_exports_repro_bundles(
         raising=False,
     )
     artifacts = check_models._write_diagnostics_artifacts(
-        args=Namespace(
-            max_tokens=32,
-            temperature=0.0,
-            trust_remote_code=False,
-            revision=None,
-        ),
+        settings=_run_settings(max_tokens=32, temperature=0.0, trust_remote_code=False),
+        image_source_url=None,
         library_versions=_stub_versions(),
         system_info={},
         prompt="Describe the image.",
@@ -4839,8 +4849,8 @@ class TestHtmlReportEdgeCases:
         output = tmp_path / "results.html"
         image_path = tmp_path / "sample image.jpg"
         Image.new("RGB", (12, 8), "blue").save(image_path)
-        run_args = Namespace(
-            adapter_path=tmp_path / "adapter",
+        settings = _run_settings(
+            adapter_path=str(tmp_path / "adapter"),
             revision="refs/pr/42",
             trust_remote_code=False,
             enable_thinking=True,
@@ -4850,7 +4860,6 @@ class TestHtmlReportEdgeCases:
             max_tokens=321,
             temperature=0.42,
             processor_kwargs={"cropping": False},
-            image_source_url="https://example.test/images/cats.jpg",
         )
 
         generate_html_report(
@@ -4861,7 +4870,8 @@ class TestHtmlReportEdgeCases:
             1.0,
             image_path=image_path,
             report_context=context,
-            run_args=run_args,
+            settings=settings,
+            image_source_url="https://example.test/images/cats.jpg",
         )
 
         content = html.unescape(output.read_text(encoding="utf-8"))
@@ -6340,15 +6350,7 @@ class TestEmptyRecommendedBucketExplanation:
 
 def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
     """Per-model effective thinking kwargs must reach the native repro command."""
-    run_args = Namespace(  # skylos: ignore[SKY-D213] setting only, no model load
-        max_tokens=1000,
-        temperature=0.0,
-        enable_thinking=False,
-        thinking_budget=None,
-        thinking_start_token=None,
-        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
-        trust_remote_code=True,
-    )
+    settings = _run_settings(max_tokens=1000, temperature=0.0)
     effective = {
         "enable_thinking": True,
         "thinking_budget": 800,
@@ -6357,11 +6359,11 @@ def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
         "max_tokens": 1000,  # non-thinking keys must not leak into the overlay
     }
 
-    merged = check_models._effective_repro_args(run_args, effective)
+    merged = check_models._effective_repro_settings(settings, effective)
 
     assert merged is not None
-    assert merged is not run_args  # the global namespace is never mutated
-    assert run_args.enable_thinking is False
+    assert merged is not settings  # the run's settings are never changed
+    assert settings.enable_thinking is False
     assert merged.enable_thinking is True
     assert merged.thinking_budget == 800
 
@@ -6369,7 +6371,7 @@ def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
         model_name="org/thinker",
         prompt="p",
         image_ref="img.jpg",
-        run_args=merged,
+        settings=merged,
     )
     command = " ".join(tokens)
     assert "--enable-thinking" in command
@@ -6378,22 +6380,17 @@ def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
 
 
 def test_repro_args_overlay_is_identity_without_thinking_kwargs() -> None:
-    """No effective thinking kwargs means the global args pass through as-is."""
-    run_args = Namespace(max_tokens=1000)
+    """No effective thinking kwargs means the run's settings pass through as they are."""
+    settings = _run_settings(max_tokens=1000)
 
-    assert check_models._effective_repro_args(run_args, None) is run_args
-    assert check_models._effective_repro_args(run_args, {"max_tokens": 500}) is run_args
-    assert check_models._effective_repro_args(None, {"enable_thinking": True}) is None
+    assert check_models._effective_repro_settings(settings, None) is settings
+    assert check_models._effective_repro_settings(settings, {"max_tokens": 500}) is settings
+    assert check_models._effective_repro_settings(None, {"enable_thinking": True}) is None
 
 
 def test_shared_repro_caveat_lists_auto_thinking_models() -> None:
     """The shared MODEL_ID command must disclose per-model auto thinking flags."""
-    run_args = Namespace(
-        enable_thinking=False,
-        thinking_budget=None,
-        thinking_start_token=None,
-        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
-    )
+    settings = _run_settings()
     auto_result = check_models.PerformanceResult(
         model_name="org/auto-thinker",
         generation=None,
@@ -6414,7 +6411,7 @@ def test_shared_repro_caveat_lists_auto_thinking_models() -> None:
         prompt_diagnostics=check_models.PromptDiagnostics(generate_kwargs={}),
     )
 
-    caveat = check_models._shared_repro_thinking_caveat([auto_result, plain_result], run_args)
+    caveat = check_models._shared_repro_thinking_caveat([auto_result, plain_result], settings)
 
     assert caveat is not None
     text = caveat.text
@@ -6422,25 +6419,20 @@ def test_shared_repro_caveat_lists_auto_thinking_models() -> None:
     assert "--thinking-budget 800" in text
     assert "org/plain" not in text
 
-    assert check_models._shared_repro_thinking_caveat([plain_result], run_args) is None
+    assert check_models._shared_repro_thinking_caveat([plain_result], settings) is None
 
 
 def test_repro_overrides_require_value_difference() -> None:
     """Kwargs equal to the global args are not treated as per-model overrides."""
-    run_args = Namespace(
-        enable_thinking=True,
-        thinking_budget=500,
-        thinking_start_token=None,
-        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
-    )
+    settings = _run_settings(enable_thinking=True, thinking_budget=500)
     same = {
         "enable_thinking": True,
         "thinking_budget": 500,
         "thinking_end_token": check_models.DEFAULT_THINKING_END_MARKER,
     }
 
-    assert check_models._repro_thinking_overrides(run_args, same) == {}
-    assert check_models._effective_repro_args(run_args, same) is run_args
+    assert check_models._repro_thinking_overrides(settings, same) == {}
+    assert check_models._effective_repro_settings(settings, same) is settings
 
 
 def test_component_rows_surface_editable_source_revision() -> None:
@@ -6947,7 +6939,7 @@ def test_observation_history_ignores_the_comparison_baseline(tmp_path: Path) -> 
         "check_models.ReportGenerationInputs",
         Namespace(
             output_paths=check_models.ReportOutputPaths.from_root(repo),
-            run_args=Namespace(compare_with="HEAD~2"),
+            compare_with="HEAD~2",
         ),
     )
     retained = check_models._with_observation_history(inputs, current)
@@ -7333,7 +7325,7 @@ def test_oom_crash_gets_a_capacity_context_block_beside_the_exception() -> None:
     blocks = check_models._diagnostics_model_blocks(
         crash,
         assessment,
-        run_args=None,
+        requested_revision=None,
         model_provenance=None,
         system_info={"RAM": "128.0 GB", "Recommended Working Set": "110.1 GB"},
         image_profile=check_models.ImageInputProfile(width=8693, height=5796, megapixels=50.4),
@@ -7382,7 +7374,7 @@ def test_oom_crash_gets_a_capacity_context_block_beside_the_exception() -> None:
                 check_models._diagnostics_model_blocks(
                     buffer_count,
                     check_models._assess_result(buffer_count),
-                    run_args=None,
+                    requested_revision=None,
                     model_provenance=None,
                     system_info={"Metal Buffer-Count Limit": "499,000 buffers"},
                     image_profile=None,
@@ -8005,7 +7997,7 @@ def test_reproduction_inputs_offer_the_published_preview_as_a_stand_in() -> None
         model_name="org/m",
         prompt="p",
         image=original,
-        run_args=None,
+        settings=None,
         resolved_revision="rev",
         published_preview=preview,
     )
@@ -8023,7 +8015,7 @@ def test_reproduction_inputs_offer_the_published_preview_as_a_stand_in() -> None
                 model_name="org/m",
                 prompt="p",
                 image=original,
-                run_args=None,
+                settings=None,
                 resolved_revision="rev",
             )
         )
@@ -8116,7 +8108,7 @@ def test_diagnostics_facts_show_measured_first_token_and_declared_sampling() -> 
     assessment = check_models._assess_result(result)
     facts = dict(
         check_models._diagnostics_result_facts(
-            result, assessment, run_args=None, model_provenance=None
+            result, assessment, requested_revision=None, model_provenance=None
         )
     )
     ttft_key = next(key for key in facts if key.startswith("Time to first token"))
@@ -8144,7 +8136,10 @@ def test_diagnostics_facts_show_text_delivery_only_after_a_long_empty_stretch() 
         )
         return dict(
             check_models._diagnostics_result_facts(
-                result, check_models._assess_result(result), run_args=None, model_provenance=None
+                result,
+                check_models._assess_result(result),
+                requested_revision=None,
+                model_provenance=None,
             )
         )
 
@@ -8888,9 +8883,9 @@ def test_decoding_split_counts_the_same_pairs_as_the_text_count() -> None:
 
 def test_repro_args_carry_the_models_effective_sampling() -> None:
     """Native mlx-vlm ignores generation_config.json, so the command must state it."""
-    run_args = argparse.Namespace(temperature=0.0, top_p=1.0, top_k=0, enable_thinking=False)
-    merged = check_models._effective_repro_args(
-        run_args, {"temperature": 1.0, "top_p": 0.95, "top_k": 64}
+    settings = _run_settings(temperature=0.0, top_p=1.0, top_k=0)
+    merged = check_models._effective_repro_settings(
+        settings, {"temperature": 1.0, "top_p": 0.95, "top_k": 64}
     )
     assert merged is not None
     assert (merged.temperature, merged.top_p, merged.top_k) == (1.0, 0.95, 64)
@@ -10490,14 +10485,20 @@ def _reasoning_effort_result(
 
 def test_repro_command_uses_applied_reasoning_effort_never_requested() -> None:
     """A model's command carries what its template received, not the run's request."""
-    run_args = check_models._build_cli_parser().parse_args(
-        ["--folder", "images", "--reasoning-effort", "low"]
+    settings = check_models._model_run_settings_from_args(
+        check_models._build_cli_parser().parse_args(
+            ["--folder", "images", "--reasoning-effort", "low", "--max-tokens", "64"]
+        )
     )
+    assert settings.reasoning_effort == "low"
 
     def command(applied: str | None) -> str:
-        args = check_models._effective_repro_args(run_args, {}, applied)
         return check_models.build_native_mlx_vlm_repro_command_spec(
-            model_name="org/model", prompt="Describe.", image_ref="image.jpg", run_args=args
+            model_name="org/model",
+            prompt="Describe.",
+            image_ref="image.jpg",
+            settings=settings,
+            reasoning_effort_applied=applied,
         ).shell_command()
 
     assert "--reasoning-effort" not in command(None)
@@ -10506,16 +10507,11 @@ def test_repro_command_uses_applied_reasoning_effort_never_requested() -> None:
 
 def test_shared_repro_caveat_lists_reasoning_effort_models() -> None:
     """The shared MODEL_ID command cannot carry per-model reasoning efforts."""
-    run_args = Namespace(
-        enable_thinking=False,
-        thinking_budget=None,
-        thinking_start_token=None,
-        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
-    )
+    settings = _run_settings()
     mapped = _reasoning_effort_result("org/mapped", "mapped", "high")
     skipped = _reasoning_effort_result("org/plain", "not_read", None)
 
-    caveat = check_models._shared_repro_thinking_caveat([mapped, skipped], run_args)
+    caveat = check_models._shared_repro_thinking_caveat([mapped, skipped], settings)
 
     assert caveat is not None
     assert "`org/mapped` (--reasoning-effort high)" in caveat.text
@@ -10618,3 +10614,195 @@ def test_checkpoint_fact_rows_state_reasoning_effort_outcome() -> None:
     plain = dict(check_models._checkpoint_fact_rows(check_models.PromptDiagnostics()))
     assert plain["Reasoning efforts the chat template declares"] is None
     assert plain["Reasoning effort (--reasoning-effort)"] is None
+
+
+_FULL_COMMAND_LINE: tuple[str, ...] = (
+    *("--max-tokens", "321", "--temperature", "0.25", "--top-p", "0.81", "--min-p", "0.12"),
+    *("--top-k", "7", "--seed", "73", "--repetition-penalty", "1.15"),
+    *("--repetition-context-size", "48", "--presence-penalty", "0.3"),
+    *("--presence-context-size", "96", "--frequency-penalty", "0.2"),
+    *("--frequency-context-size", "80", "--max-kv-size", "4096", "--kv-bits", "4"),
+    *("--kv-quant-scheme", "turboquant", "--kv-group-size", "32", "--quantized-kv-start", "128"),
+    *("--prefill-step-size", "512", "--resize-shape", "64", "32", "--eos-tokens", "<eos-x>"),
+    *("--skip-special-tokens", "--revision", "run-revision", "--force-download"),
+    *("--quantize-activations", "--processor-kwargs", '{"cropping": false}'),
+    *("--thinking-mode", "deep", "--reasoning-effort", "high"),
+    *("--image-source-url", "https://example.org/pictures/street.jpg"),
+)
+_FULL_COMMAND_LINE_REPRO_FLAGS: str = (
+    "--revision run-revision --force-download --trust-remote-code --quantize-activations "
+    "--resize-shape 64 32 --eos-tokens '<eos-x>' --seed 73 --repetition-penalty 1.15 "
+    "--max-kv-size 4096 --kv-bits 4.0 --presence-penalty 0.3 --frequency-penalty 0.2 "
+    "--prefill-step-size 512 {per_model}--thinking-mode deep {effort}--top-p 0.81 --min-p 0.12 "
+    "--top-k 7 --repetition-context-size 48 --presence-context-size 96 "
+    "--frequency-context-size 80 --kv-quant-scheme turboquant --kv-group-size 32 "
+    "--quantized-kv-start 128 --skip-special-tokens {thinking}"
+    """--processor-kwargs '{{"cropping": false}}'"""
+)
+
+
+def _finalise_from_command_line(tmp_path: Path, *argv: str) -> Path:
+    """Run the real finalisation as ``main`` would after these arguments; return the output dir.
+
+    Three crashes: one at model load, one in generation whose template opened
+    a thinking block and mapped the requested effort, and one whose checkpoint
+    declared its own sampling values.
+    """
+    output_dir = tmp_path / "output"
+    full_argv = [*argv, "--compare-with", "none", "--output-dir", str(output_dir)]
+    args = check_models._build_cli_parser().parse_args(full_argv)
+    args.explicit_cli = check_models._explicit_cli_dests(full_argv)
+    check_models.validate_cli_arguments(args)
+    check_models._apply_eval_mode_defaults(args, None)
+    kwargs: dict[str, check_models.JsonLike] = {
+        "max_tokens": 321,
+        "temperature": 0.25,
+        "top_p": 0.81,
+        "top_k": 7,
+        "seed": 73,
+    }
+    thinking = check_models.PromptDiagnostics(
+        generate_kwargs={
+            **kwargs,
+            "enable_thinking": True,
+            "thinking_budget": 256,
+            "thinking_end_token": check_models.DEFAULT_THINKING_END_MARKER,
+        },
+        thinking_budget_source="auto",
+        reasoning_effort=check_models.ReasoningEffortResolution(
+            requested="high",
+            fallback="higher",
+            status="mapped",
+            applied="max",
+            template_variables=("reasoning_effort",),
+        ),
+    )
+    sampled = check_models.PromptDiagnostics(
+        generate_kwargs={**kwargs, "temperature": 1.0, "top_p": 0.95, "top_k": 64}
+    )
+    results = [
+        _make_failure_with_details("org/load-crash", failure_phase="model_load"),
+        replace(
+            _make_failure_with_details("org/gen-crash", failure_phase="generation"),
+            prompt_diagnostics=thinking,
+        ),
+        replace(
+            _make_failure_with_details("org/sampled-crash", failure_phase="generation"),
+            prompt_diagnostics=sampled,
+        ),
+    ]
+    with (
+        patch.object(check_models, "collect_runtime_fingerprint", return_value={}),
+        patch.object(check_models, "_GITHUB_REF_OVERRIDE", "a" * 40),
+    ):
+        check_models.finalize_execution(
+            args=args,
+            results=results,
+            run_facts=check_models.RunStartFacts(
+                library_versions=_stub_versions(), system_info={"Model": "Test Mac"}
+            ),
+            overall_start_time=0.0,
+            prompt="Describe the image.",
+            image_path=Path(__file__).parent / "fixtures/check_models-task9-fixture.jpg",
+        )
+    return output_dir
+
+
+def test_finalised_reports_restate_the_whole_command_line_in_native_commands(
+    tmp_path: Path,
+) -> None:
+    """Every generation and load option given on the command line reaches the commands.
+
+    The per-model command adds what that model alone ran with (the automatic
+    thinking budget, the effort its template received, a checkpoint's
+    sampling values); the shared ``MODEL_ID`` command carries none of it.
+    """
+    output_dir = _finalise_from_command_line(tmp_path, *_FULL_COMMAND_LINE)
+    prefix = (
+        "python -m mlx_vlm.generate --verbose --model {model} --image repro-image.jpg "
+        "--prompt 'Describe the image.' --max-tokens 321 --temperature 0.25 "
+    )
+    flags = _FULL_COMMAND_LINE_REPRO_FLAGS
+    download = (
+        "curl --fail --location --output repro-image.jpg https://example.org/pictures/street.jpg"
+    )
+
+    issue = safe_io.read_text_no_follow(output_dir / "issues" / "issue_org_gen-crash.md")
+    assert download in issue
+    assert (
+        prefix.format(model="org/gen-crash")
+        + flags.format(
+            per_model="--thinking-budget 256 ",
+            effort="--reasoning-effort max ",
+            thinking="--enable-thinking ",
+        )
+    ) in issue
+
+    load_issue = safe_io.read_text_no_follow(output_dir / "issues" / "issue_org_load-crash.md")
+    assert (
+        prefix.format(model="org/load-crash") + flags.format(per_model="", effort="", thinking="")
+    ) in load_issue
+
+    diagnostics = safe_io.read_text_no_follow(output_dir / "reports" / "diagnostics.md")
+    assert download in diagnostics
+    assert (
+        prefix.format(model="MODEL_ID")
+        + flags.format(per_model="", effort="", thinking="").replace(
+            "--revision run-revision", "--revision RESOLVED_REVISION"
+        )
+    ) in diagnostics
+    assert "`org/gen-crash` (--enable-thinking --thinking-budget 256 --reasoning-effort max)" in (
+        " ".join(diagnostics.split())
+    )
+    assert "- *Requested model revision:* run-revision" in diagnostics
+
+    # The summary is rendered from the retained record, which keeps only the
+    # generation settings every model shared plus each model's own.
+    summary = safe_io.read_text_no_follow(output_dir / "issues" / "run_summary.md")
+    assert (
+        "--model org/gen-crash --image repro-image.jpg --prompt 'Describe the image.' "
+        "--max-tokens 321 --temperature 0.25 --revision run-revision --trust-remote-code "
+        "--seed 73 --thinking-budget 256 --reasoning-effort max --top-p 0.81 --top-k 7 "
+        "--enable-thinking"
+    ) in summary
+    assert (
+        "--model org/sampled-crash --image repro-image.jpg --prompt 'Describe the image.' "
+        "--max-tokens 321 --temperature 1.0 --revision run-revision --trust-remote-code "
+        "--seed 73 --top-p 0.95 --top-k 64"
+    ) in summary
+
+    metadata = json.loads(safe_io.read_text_no_follow(output_dir / "results.jsonl").splitlines()[0])
+    assert metadata["execution_mode"] == "in_process"
+    assert metadata["trust_remote_code"] is True
+    assert metadata["image"]["source_url"] == "https://example.org/pictures/street.jpg"
+
+
+def test_finalised_reports_follow_isolation_trust_and_adapter_options(tmp_path: Path) -> None:
+    """Options that are not generation settings reach the record and the commands too."""
+    output_dir = _finalise_from_command_line(
+        tmp_path,
+        *("--isolate", "--no-trust-remote-code", "--adapter-path", "/abs/adapters/a1"),
+        *("--temperature", "0.9", "--enable-thinking", "--thinking-budget", "64"),
+        *("--thinking-end-token", "</done>", "--logit-bias", '{"42": -1.5}'),
+    )
+
+    metadata = json.loads(safe_io.read_text_no_follow(output_dir / "results.jsonl").splitlines()[0])
+    assert metadata["execution_mode"] == "isolated"
+    assert metadata["trust_remote_code"] is False
+    assert "source_url" not in metadata["image"]
+
+    # A sampled run states top_p and top_k at their defaults; an absolute
+    # adapter path is reduced to its name; no --trust-remote-code.
+    diagnostics = safe_io.read_text_no_follow(output_dir / "reports" / "diagnostics.md")
+    assert (
+        "--model MODEL_ID --image repro-image.jpg --prompt 'Describe the image.' "
+        "--max-tokens 1000 --temperature 0.9 --adapter-path a1 --revision RESOLVED_REVISION "
+        "--seed 0 --prefill-step-size 2048 --thinking-budget 64 --top-p 1.0 --top-k 0 "
+        "--thinking-end-token '</done>' --enable-thinking "
+        """--gen-kwargs '{"logit_bias": {"42": -1.5}}'"""
+    ) in diagnostics
+    load_issue = safe_io.read_text_no_follow(output_dir / "issues" / "issue_org_load-crash.md")
+    assert (
+        "python -m mlx_vlm.generate --verbose --model org/load-crash --image "
+        "any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --adapter-path a1\n"
+    ) in load_issue

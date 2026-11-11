@@ -104,6 +104,13 @@ _EXPECTED_REPORT_ARTIFACT_LOG_LABELS = (
 )
 
 
+def _finalisation_args(output_dir: Path) -> argparse.Namespace:
+    """Arguments as finalisation receives them: parsed, with the token cap resolved."""
+    return check_models._build_cli_parser().parse_args(
+        ["--output-dir", str(output_dir), "--max-tokens", str(check_models.DEFAULT_MAX_TOKENS)]
+    )
+
+
 def _finalize_history_stub() -> dict[str, object]:
     return {
         "_type": "run",
@@ -995,7 +1002,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     derived = check_models.ReportOutputPaths.from_root(tmp_path)
     derived.environment.write_text("env", encoding="utf-8")
 
-    args = argparse.Namespace(output_dir=tmp_path)
+    args = _finalisation_args(tmp_path)
     result = PerformanceResult(
         model_name="dummy/model",
         generation=_StubGeneration(),
@@ -1030,10 +1037,7 @@ def test_finalize_execution_rules_off_only_failure_blocks(
 ) -> None:
     """Completed models are consecutive lines; a failure's details get a rule."""
     caplog.set_level(logging.INFO)
-    args = argparse.Namespace(
-        verbose=False,
-        output_dir=tmp_path,
-    )
+    args = _finalisation_args(tmp_path)
     results = [
         PerformanceResult(
             model_name="dummy/broken",
@@ -1182,7 +1186,6 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
         image_path=None,
         report_context=context,
         output_paths=paths,
-        run_args=args,
         runtime_fingerprint={},
     )
     events: list[str] = []
@@ -1314,9 +1317,7 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
 
 def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: Path) -> None:
     """Current report statuses must not depend on append-only history."""
-    args = argparse.Namespace(
-        output_dir=tmp_path,
-    )
+    args = _finalisation_args(tmp_path)
     result = PerformanceResult(
         model_name="dummy/model",
         generation=_StubGeneration(text="A complete response."),
@@ -1970,7 +1971,7 @@ def test_run_start_system_facts_are_reused_not_re_read(
             )
         )
         finalize_execution(
-            args=argparse.Namespace(output_dir=tmp_path),
+            args=_finalisation_args(tmp_path),
             results=[result],
             run_facts=check_models.RunStartFacts(
                 library_versions={"mlx": "0.0.0"},

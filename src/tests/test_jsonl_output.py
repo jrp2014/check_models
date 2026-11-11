@@ -2020,6 +2020,9 @@ class TestRerunEvidence:
             success=True,
         )
         args = argparse.Namespace(
+            # The run's own cap and temperature; the triage rerun overrides both.
+            max_tokens=1000,
+            temperature=0.7,
             trust_remote_code=False,
             top_p=0.8,
             min_p=0.1,
