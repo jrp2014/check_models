@@ -187,6 +187,21 @@ Notable changes to this project will be documented in this file.
   a week); CI's npm 10 ignores it. Clears Skylos 5.6.0's
   `install_scripts_disabled` posture check and the npm half of
   `release_age_cooldown`.
+- Docs: `src/README.md` (Requirements) now states when the next Python
+  counts as ready. Every compiled dependency must publish a wheel for it on
+  Apple Silicon; a pure-Python package without one (multiprocess, docopt) is
+  not a blocker, and dev-only tools (Skylos and its tree-sitter bindings)
+  are tracked apart from the runtime. The CI lane's `--only-binary :all:`
+  and the probe's source builds are both cruder than that rule, so their
+  verdicts need reading package by package; `copilot-instructions.md`
+  points there. The stale "mlx has none yet" note is gone. Status for 3.15
+  on 2026-11-12: PyYAML is the only compiled runtime dependency without a
+  3.15 macOS wheel (miniaudio 1.73 and sentencepiece 0.2.3 now have them).
+  The CI lane, which installs `.[dev]`, stops at PyYAML. After that it
+  would stop at multiprocess (pure Python, not a blocker by this rule) and
+  tree-sitter (dev only). tree-sitter's master builds 3.15 wheels for its
+  next release (likely 0.27), but Skylos 5.6.0 still requires
+  `tree-sitter<0.27`.
 - Quality gate (0.17.123): the Skylos dependency scan targets
   `pyproject.toml` instead of `.`. Skylos finds manifests by walking the
   project root whatever the target, so the report is the same; a `.` target

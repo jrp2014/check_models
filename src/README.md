@@ -884,8 +884,9 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "Jinja2>=3.1.0
 ## Requirements
 
 - **Python**: 3.13+ (the floor); the working `mlx-vlm` env runs 3.14, and CI
-  tests both. A third CI lane rehearses 3.15: until the stack's wheels exist
-  for it (mlx has none yet), it warns and skips its checks instead of failing
+  tests both. A third CI lane rehearses 3.15: it installs wheels only, and
+  while some requirement has no 3.15 wheel it warns and skips its checks
+  instead of failing
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
 To see whether the next Python has become viable without touching the working
@@ -912,6 +913,23 @@ the fast test lane. `PROBE_PYTHON=3.16` targets a later version. Two opt-in chec
   failure from both is reported as "torch extra unavailable: about half the
   roster would fail" and stays outside the core verdict. The exit status
   covers only the build, install and test checks.
+
+**When the next Python counts as ready.** The working env moves only once
+every *compiled* dependency publishes a wheel for that Python on Apple
+Silicon: a switch never compiles a library from source. A *pure-Python*
+package that publishes only a source package, or wheels tagged for earlier
+Pythons, is not a blocker, because installing it builds nothing (for example
+`multiprocess`, whose wheels are tagged per Python version and stop at the
+last one it was released for, and `docopt`, source-only since 2014). Dev-only
+tools (Skylos and the tree-sitter bindings it requires) are tracked apart from
+the runtime: they hold up the quality tooling, not running models. The CI lane
+and the probe both apply a cruder test. The lane's `--only-binary :all:`
+counts a pure-Python source package as missing, so a skip warning naming only
+such packages does not mean the stack is unready. The probe builds whatever
+lacks a wheel and passes, so a green probe does not mean every compiled
+dependency has a wheel. Check each package the warning or the probe's build
+output names: does it compile anything (a C, C++ or Rust extension) or is it
+pure Python?
 
 ### Advanced Configuration
 
