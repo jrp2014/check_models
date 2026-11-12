@@ -1993,6 +1993,68 @@ def _closing_line_seconds(value: object) -> object:
         return check_models._recorded_run_seconds(paths, outcomes)
 
 
+def _retained_record(**sections: object) -> check_models.JsonlResultRecord:
+    return cast("check_models.JsonlResultRecord", sections)
+
+
+def _history_tps_sample(value: object) -> object:
+    return check_models._history_band_tps_sample({"generation_tps": value})
+
+
+def _decoding_settings_known(value: object) -> object:
+    record = _retained_record(prompt_diagnostics={"generate_kwargs": {"temperature": value}})
+    return check_models._decoding_settings(record) is not None
+
+
+def _prefill_seconds_for_tokens(value: object) -> object:
+    record = _retained_record(metrics={"prompt_tokens": value, "prompt_tps": 50.0})
+    return check_models._prefill_seconds(record)
+
+
+def _prefill_seconds_for_rate(value: object) -> object:
+    record = _retained_record(metrics={"prompt_tokens": 100, "prompt_tps": value})
+    return check_models._prefill_seconds(record)
+
+
+def _prefill_rate_ratio(value: object) -> object:
+    now = _retained_record(metrics={"prompt_tps": value})
+    before = _retained_record(metrics={"prompt_tps": 50.0})
+    return check_models._prefill_tps_ratio(now, before)
+
+
+def _ran_on_battery(value: object) -> object:
+    record = _retained_record(system_telemetry={"on_battery_samples": value})
+    return check_models._record_on_battery(record)
+
+
+def _compared_generation_tps(value: object) -> object:
+    return check_models._result_generation_tps(_retained_record(metrics={"generation_tps": value}))
+
+
+def _compared_peak_memory_gb(value: object) -> object:
+    return check_models._result_peak_memory_gb(_retained_record(metrics={"peak_memory_gb": value}))
+
+
+def _summary_total_time_cell(value: object) -> object:
+    record = _retained_record(timing={"total_time_s": value})
+    return check_models._run_issue_summary_quality_cells(record)[0]
+
+
+def _summary_rate_cell_for_rate(value: object) -> object:
+    record = _retained_record(metrics={"generation_tps": value, "generation_tokens": 100})
+    return check_models._run_issue_summary_quality_cells(record)[1]
+
+
+def _summary_rate_cell_for_tokens(value: object) -> object:
+    record = _retained_record(metrics={"generation_tps": 50.0, "generation_tokens": value})
+    return check_models._run_issue_summary_quality_cells(record)[1]
+
+
+def _summary_peak_cell(value: object) -> object:
+    record = _retained_record(metrics={"peak_memory_gb": value})
+    return check_models._run_issue_summary_quality_cells(record)[2]
+
+
 @pytest.mark.parametrize(
     ("read", "value", "expected"),
     [
@@ -2033,6 +2095,33 @@ def _closing_line_seconds(value: object) -> object:
         (_summary_duration_row_shown, True, False),
         (_closing_line_seconds, 90, 90.0),
         (_closing_line_seconds, True, None),
+        (_history_tps_sample, 40.0, 40.0),
+        (_history_tps_sample, True, None),
+        (_decoding_settings_known, 0.0, True),
+        (_decoding_settings_known, True, False),
+        (_prefill_seconds_for_tokens, 100, 2.0),
+        (_prefill_seconds_for_tokens, True, None),
+        (_prefill_seconds_for_tokens, 100.0, None),
+        (_prefill_seconds_for_rate, 50.0, 2.0),
+        (_prefill_seconds_for_rate, True, None),
+        (_prefill_rate_ratio, 100.0, 2.0),
+        (_prefill_rate_ratio, True, None),
+        (_ran_on_battery, 2, True),
+        (_ran_on_battery, True, False),
+        (_ran_on_battery, 2.0, False),
+        (_compared_generation_tps, 40.0, 40.0),
+        (_compared_generation_tps, True, None),
+        (_compared_peak_memory_gb, 6.5, 6.5),
+        (_compared_peak_memory_gb, True, None),
+        (_summary_total_time_cell, 12.5, "12.50s"),
+        (_summary_total_time_cell, True, "-"),
+        (_summary_rate_cell_for_rate, 50.0, "50.0 tok/s"),
+        (_summary_rate_cell_for_rate, True, "insufficient sample"),
+        (_summary_rate_cell_for_tokens, 100, "50.0 tok/s"),
+        (_summary_rate_cell_for_tokens, True, "-"),
+        (_summary_rate_cell_for_tokens, 100.0, "-"),
+        (_summary_peak_cell, 6.5, "6.5"),
+        (_summary_peak_cell, True, "-"),
     ],
 )
 def test_a_boolean_in_retained_data_is_not_read_as_a_number(

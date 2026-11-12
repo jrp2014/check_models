@@ -1795,6 +1795,26 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Value checks (0.17.122): 23 more readers of JSON and runtime values
+  tested `isinstance(value, int)` or `int | float` without excluding
+  booleans, so a `true` was read as 1: one parameter in a `config.json`,
+  1-bit quantization, a 1 s first-token time, 1 tok/s in a comparison or a
+  history band, a 1 GB peak, a run "on battery". They now call `_is_int` /
+  `_is_number`, the predicates from 0.17.118. The readers: model burden
+  from `config.json` (4), runtime durations, the declared-sampling fact (2),
+  the repetition guard's token count, history-band samples (2), decoding
+  settings, prefill seconds and ratio (3), thermal and battery telemetry
+  (2), comparison throughput and peak memory (2), and the run summary's
+  quality cells (5). *Behaviour changed:* only for a boolean where a
+  number belongs, which is now treated as not recorded. *Evidence:* 19 new
+  cases, one per check, each failing before and passing after; with the
+  change in place each check was weakened back in turn and 19 of 23 were
+  noticed. The other four compare the value with a threshold above 1
+  (thermal state 2, 200 tokens, 16 tokens), so a boolean never passed them
+  and the change there is spelling only. *Left as they are:* EXIF tag ids
+  and GPS values read through Pillow (TIFF has no boolean type), and
+  `_generation_int_metric`, whose input is already checked.
+
 - System facts (0.17.121): a run without psutil completed with its CPU core
   counts, available memory and swap use missing and nothing saying why.
   psutil is an optional extra, absent from CI and from a plain install. The

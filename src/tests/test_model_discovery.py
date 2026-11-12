@@ -1608,6 +1608,32 @@ class TestModelBurdenFacts:
         assert burden.context_length_source == "text_config.max_position_embeddings"
         assert burden.weight_bytes == 5
 
+    @pytest.mark.parametrize(
+        "config",
+        [
+            {"num_parameters": True},
+            {"quantization": {"bits": True, "mode": "affine"}},
+            {"quantization": {"group_size": True, "mode": "affine"}},
+            {"max_position_embeddings": True},
+        ],
+    )
+    def test_a_true_in_config_json_is_not_a_count(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, config: dict[str, object]
+    ) -> None:
+        """``bool`` subclasses ``int``: a JSON ``true`` is not 1 parameter, bit or token."""
+        snapshot = self._snapshot(tmp_path)
+        safe_io.write_text_no_follow(snapshot / "config.json", json.dumps(config))
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("org/model")
+        assert burden is not None
+        assert (
+            burden.parameter_count,
+            burden.quantization_bits,
+            burden.quantization_group_size,
+            burden.context_length,
+        ) == (None, None, None, None)
+
     def test_name_estimate_fallback_is_labelled_and_skips_bit_suffixes(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     ) -> None:

@@ -2383,6 +2383,21 @@ def _special_tokens_emitted(mod: types.ModuleType, value: object) -> object:
     return mod._emitted_special_tokens([1, 5], tokenizer, excluded=())
 
 
+def _first_token_seconds(mod: types.ModuleType, value: object) -> object:
+    runtime = mod.RuntimeDiagnostics(first_token_latency_s=value)
+    return mod._runtime_upstream_prefill_first_token_time_s(runtime)
+
+
+def _run_temperature_against_declared(mod: types.ModuleType, value: object) -> object:
+    diagnostics = mod.PromptDiagnostics(declared_sampling={"temperature": 0.7})
+    return mod._declared_sampling_fact(diagnostics, {"temperature": value})
+
+
+def _declared_temperature_against_run(mod: types.ModuleType, value: object) -> object:
+    diagnostics = mod.PromptDiagnostics(declared_sampling={"temperature": value})
+    return mod._declared_sampling_fact(diagnostics, {"temperature": 0.5})
+
+
 @pytest.mark.parametrize(
     ("read", "value", "expected"),
     [
@@ -2413,6 +2428,12 @@ def _special_tokens_emitted(mod: types.ModuleType, value: object) -> object:
         (_special_tokens_emitted, 1, ("<1>", "<5>")),
         (_special_tokens_emitted, True, ("<5>",)),
         (_special_tokens_emitted, 1.0, ("<5>",)),
+        (_first_token_seconds, 0.4, 0.4),
+        (_first_token_seconds, True, None),
+        (_run_temperature_against_declared, 0.5, "temperature 0.7; run used temperature 0.5"),
+        (_run_temperature_against_declared, True, "temperature 0.7"),
+        (_declared_temperature_against_run, 0.7, "temperature 0.7; run used temperature 0.5"),
+        (_declared_temperature_against_run, True, "temperature True"),
     ],
 )
 def test_a_boolean_from_the_runtime_is_not_read_as_a_number(

@@ -7211,7 +7211,7 @@ _RUNTIME_PHASE_ACTIONS: Final[dict[RuntimePhaseName, tuple[str, str]]] = {
 
 def _positive_runtime_duration(value: float | None) -> float | None:
     """Return a finite positive runtime duration, or None when unavailable."""
-    if not isinstance(value, int | float):
+    if not _is_number(value):
         return None
     duration = float(value)
     if not math.isfinite(duration) or duration <= 0.0:
@@ -7924,7 +7924,7 @@ def _collect_model_burden(
     parameter_count_source: str | None = None
     for key in ("num_parameters", "total_params", "n_params"):
         value = config.get(key)
-        if isinstance(value, int) and value > 0:
+        if _is_int(value) and value > 0:
             parameter_count = value
             parameter_count_source = key
             break
@@ -7942,8 +7942,8 @@ def _collect_model_burden(
         bits = quantization.get("bits")
         group_size = quantization.get("group_size")
         mode = quantization.get("mode")
-        quantization_bits = bits if isinstance(bits, int) else None
-        quantization_group_size = group_size if isinstance(group_size, int) else None
+        quantization_bits = bits if _is_int(bits) else None
+        quantization_group_size = group_size if _is_int(group_size) else None
         quantization_mode = mode if isinstance(mode, str) else None
 
     context_length: int | None = None
@@ -7955,7 +7955,7 @@ def _collect_model_burden(
     for prefix, space in search_spaces:
         for key in _CONTEXT_LENGTH_CONFIG_KEYS:
             value = space.get(key)
-            if isinstance(value, int) and value > 0:
+            if _is_int(value) and value > 0:
                 context_length = value
                 context_length_source = f"{prefix}{key}"
                 break
@@ -10787,8 +10787,8 @@ def _declared_sampling_fact(
     effective = generation_kwargs.get("temperature")
     declared_temperature = declared.get("temperature")
     if (
-        isinstance(effective, int | float)
-        and isinstance(declared_temperature, int | float)
+        _is_number(effective)
+        and _is_number(declared_temperature)
         and float(effective) != float(declared_temperature)
     ):
         parts.append(f"run used temperature {effective}")
@@ -15474,7 +15474,7 @@ def _stream_tail_repeats(tail: str, chunk: object, chunk_count: int) -> bool:
     if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
         return False
     generated = getattr(chunk, "generation_tokens", None)
-    if not isinstance(generated, int) or generated < _REPETITION_ABORT_MIN_TOKENS:
+    if not _is_int(generated) or generated < _REPETITION_ABORT_MIN_TOKENS:
         return False
     return _detect_streaming_repetition(tail)
 
@@ -21694,10 +21694,10 @@ def _history_band_tps_sample(facts: object) -> float | None:
     if facts.get("wall_clock_gap_s") is not None:
         return None
     thermal = facts.get("thermal_state_max")
-    if isinstance(thermal, int) and thermal >= _THERMAL_STATE_THROTTLED:
+    if _is_int(thermal) and thermal >= _THERMAL_STATE_THROTTLED:
         return None
     tps = facts.get("generation_tps")
-    if isinstance(tps, (int, float)) and tps > 0:
+    if _is_number(tps) and tps > 0:
         return float(tps)
     return None
 
@@ -21948,7 +21948,7 @@ def _decoding_settings(record: JsonlResultRecord) -> tuple[JsonLike, ...] | None
     """Return the effective decoding settings a result ran with, when recorded."""
     diagnostics = record.get("prompt_diagnostics")
     settings = diagnostics.get("generate_kwargs") if isinstance(diagnostics, dict) else None
-    if not isinstance(settings, dict) or not isinstance(settings.get("temperature"), int | float):
+    if not isinstance(settings, dict) or not _is_number(settings.get("temperature")):
         return None
     values = [settings.get(key) for key in _DECODING_KEYS]
     declared = diagnostics.get("declared_sampling") if isinstance(diagnostics, dict) else None
@@ -22134,7 +22134,7 @@ def _prefill_seconds(record: JsonlResultRecord) -> float | None:
     """Prompt tokens divided by prefill tok/s, when both were recorded."""
     metrics = record.get("metrics") or {}
     tokens, rate = metrics.get("prompt_tokens"), metrics.get("prompt_tps")
-    if isinstance(tokens, int) and isinstance(rate, int | float) and rate > 0:
+    if _is_int(tokens) and _is_number(rate) and rate > 0:
         return tokens / float(rate)
     return None
 
@@ -22144,7 +22144,7 @@ def _prefill_tps_ratio(now: JsonlResultRecord, before: JsonlResultRecord) -> flo
     if _record_timing_untrusted(now) or _record_timing_untrusted(before):
         return None
     rates = [(record.get("metrics") or {}).get("prompt_tps") for record in (now, before)]
-    if not all(isinstance(rate, int | float) and rate > 0 for rate in rates):
+    if not all(_is_number(rate) and rate > 0 for rate in rates):
         return None
     return float(cast("float", rates[0])) / float(cast("float", rates[1]))
 
@@ -22159,7 +22159,7 @@ def _record_thermal_throttled(record: JsonlResultRecord) -> bool:
     """Return whether macOS reached a performance-reducing thermal state around this model."""
     telemetry = record.get("system_telemetry")
     state = telemetry.get("thermal_state_max") if isinstance(telemetry, dict) else None
-    return isinstance(state, int) and state >= _THERMAL_STATE_THROTTLED
+    return _is_int(state) and state >= _THERMAL_STATE_THROTTLED
 
 
 def _record_timing_untrusted(record: JsonlResultRecord) -> bool:
@@ -22205,7 +22205,7 @@ def _record_on_battery(record: JsonlResultRecord) -> bool:
     if not isinstance(telemetry, dict):
         return False
     samples = telemetry.get("on_battery_samples")
-    return isinstance(samples, int) and samples > 0
+    return _is_int(samples) and samples > 0
 
 
 def _os_change_notes(
@@ -22258,13 +22258,13 @@ def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> 
 def _result_generation_tps(record: JsonlResultRecord) -> float | None:
     metrics = record.get("metrics") or {}
     value = metrics.get("generation_tps") if isinstance(metrics, dict) else None
-    return float(value) if isinstance(value, (int, float)) and value > 0 else None
+    return float(value) if _is_number(value) and value > 0 else None
 
 
 def _result_peak_memory_gb(record: JsonlResultRecord) -> float | None:
     metrics = record.get("metrics") or {}
     value = metrics.get("peak_memory_gb") if isinstance(metrics, dict) else None
-    return float(value) if isinstance(value, (int, float)) and value > 0 else None
+    return float(value) if _is_number(value) and value > 0 else None
 
 
 def _model_revision_change(
@@ -25340,25 +25340,25 @@ def _run_issue_summary_quality_cells(result: JsonlResultRecord) -> tuple[str, st
     total_time = timing.get("total_time_s")
     total_cell = (
         _format_time_seconds(float(total_time))
-        if isinstance(total_time, (int, float)) and total_time >= 0
+        if _is_number(total_time) and total_time >= 0
         else "-"
     )
     generation_tokens = metrics.get("generation_tokens")
     generation_tps = metrics.get("generation_tps")
     if (
-        isinstance(generation_tps, (int, float))
-        and isinstance(generation_tokens, int)
+        _is_number(generation_tps)
+        and _is_int(generation_tokens)
         and generation_tokens >= MIN_THROUGHPUT_SAMPLE_TOKENS
     ):
         tps_cell = f"{_format_tps(float(generation_tps))} tok/s"
-    elif isinstance(generation_tokens, int):
+    elif _is_int(generation_tokens):
         tps_cell = "insufficient sample"
     else:
         tps_cell = "-"
     peak_memory = metrics.get("peak_memory_gb")
     peak_cell = (
         _gallery_metric("peak_memory", float(peak_memory))
-        if isinstance(peak_memory, (int, float)) and peak_memory >= 0
+        if _is_number(peak_memory) and peak_memory >= 0
         else "-"
     )
     return total_cell, tps_cell, peak_cell
