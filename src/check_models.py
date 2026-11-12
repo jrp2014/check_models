@@ -158,7 +158,8 @@ from check_models_data.dependency_policy import (
 )
 
 # Optional dependency: psutil for system info; degrade gracefully if missing.
-# Keep a nullable module binding so downstream checks can stay simple.
+# Keep a nullable module binding so downstream checks can stay simple. A run
+# without it says so (PSUTIL_UNAVAILABLE_NOTE, among the start-up warnings).
 psutil: Any | None
 try:
     import psutil as _psutil_runtime
@@ -166,6 +167,10 @@ except ImportError:  # pragma: no cover - optional
     psutil = None
 else:
     psutil = _psutil_runtime
+PSUTIL_UNAVAILABLE_NOTE: Final[str] = (
+    "psutil could not be imported (optional: pip install psutil); CPU core counts, "
+    "available memory and swap use were not read and are missing from this run's system facts"
+)
 
 
 if TYPE_CHECKING:
@@ -705,13 +710,6 @@ if not _defusedxml_available:
         "defusedxml not installed — XMP metadata extraction will be disabled. "
         "Install with: pip install defusedxml",
     )
-
-try:
-    import numpy as np
-
-    numpy_version: str = getattr(np, "__version__", NOT_AVAILABLE)
-except ImportError:
-    numpy_version = NOT_AVAILABLE
 
 
 def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
@@ -5113,7 +5111,7 @@ def get_library_versions() -> LibraryVersionDict:
     mlx_vlm_ver = _get_version("mlx-vlm", vlm_version if "vlm_version" in globals() else None)
 
     return {
-        "numpy": _none_if_na(_get_version("numpy", numpy_version)),
+        "numpy": _none_if_na(_get_version("numpy")),
         "mlx": _none_if_na(mlx_ver),
         "mlx-metal": _none_if_na(_get_version("mlx-metal")),
         "mlx-vlm": _none_if_na(mlx_vlm_ver),
@@ -5767,6 +5765,8 @@ def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]
 
     issues.extend(_detect_runtime_api_drift_issues())
     issues.extend(_detect_distribution_version_conflicts())
+    if psutil is None:
+        issues.append(PSUTIL_UNAVAILABLE_NOTE)
 
     return issues
 

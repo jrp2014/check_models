@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import importlib.metadata
 import io
 import itertools
 import json
@@ -1804,6 +1805,16 @@ _RECORD_IMPORT = (
 # Dies as a native crash does: no Python exception, nothing to catch.
 # SIGKILL rather than abort(), so that no crash report is written.
 _DIE_ON_IMPORT = "import os, signal\nos.kill(os.getpid(), signal.SIGKILL)\n"
+# psutil is an optional extra, so neither state can be taken from the
+# environment the tests run in.
+_FAKE_PSUTIL = (
+    "from types import SimpleNamespace\n"
+    "def cpu_count(logical=True):\n    return 8 if logical else 4\n"
+    "def virtual_memory():\n"
+    "    return SimpleNamespace(total=17_179_869_184, available=8_589_934_592)\n"
+    "def swap_memory():\n    return SimpleNamespace(total=0, used=0)\n"
+)
+_UNIMPORTABLE_PSUTIL = "raise ImportError('psutil is absent in this test')\n"
 # What Python raises for a package that is not installed.
 _ABSENT_MODULE = "raise ModuleNotFoundError(\"No module named '{name}'\", name='{name}')\n"
 _FAKE_WORKING_SET_BYTES = 12_884_901_888
@@ -2039,6 +2050,55 @@ class TestMlxRuntimeBoundary:
         assert not_reported not in run.output
         assert "no models were run" in run.output
 
+    @pytest.mark.parametrize("psutil_importable", [True, False])
+    def test_a_run_without_psutil_says_which_facts_it_did_not_read(
+        self, tmp_path: Path, *, psutil_importable: bool
+    ) -> None:
+        """Missing CPU, available-memory and swap facts are stated, not just absent.
+
+        The run completes either way. Without psutil the same sentence is on
+        the console, in the record's header and in the run summary.
+        """
+        output_dir = tmp_path / "out"
+        image_path = tmp_path / "image.jpg"
+        check_models.Image.new("RGB", (32, 32), color=(10, 120, 200)).save(image_path, "JPEG")
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [
+                _CLI,
+                "--image",
+                str(image_path),
+                "--models",
+                "org/model",
+                "--output-dir",
+                str(output_dir),
+            ],
+            replaced_modules={
+                "psutil/__init__.py": _FAKE_PSUTIL if psutil_importable else _UNIMPORTABLE_PSUTIL
+            },
+        )
+        assert run.returncode == 0, run.output
+        paths = check_models.ReportOutputPaths.from_root(output_dir)
+        header = json.loads(check_models._read_text_file(paths.jsonl).splitlines()[0])
+        summary = " ".join(
+            check_models._read_text_file(output_dir / "issues" / "run_summary.md").split()
+        )
+        said = [
+            check_models.PSUTIL_UNAVAILABLE_NOTE in run.output,
+            check_models.PSUTIL_UNAVAILABLE_NOTE in header.get("preflight_issues", []),
+            check_models.PSUTIL_UNAVAILABLE_NOTE in summary,
+        ]
+        assert said == [not psutil_importable] * len(said)
+        system = header["system"]
+        recorded = [
+            system.get("CPU Cores (Physical)"),
+            system.get("CPU Cores (Logical)"),
+            system.get("Available Memory (run start)"),
+            system.get("Swap Used (run start)"),
+        ]
+        expected = ["4", "8", "8.0 GB", "0.0 GB of 0.0 GB"] if psutil_importable else [None] * 4
+        assert recorded == expected
+
     def test_an_unprobed_crash_on_import_ends_a_dry_run(self, tmp_path: Path) -> None:
         """The stated cost of not probing a dry run: the crash is the process's own."""
         run = _run_against_fake_runtime(
@@ -2059,11 +2119,34 @@ class TestMlxRuntimeBoundary:
         ],
     )
     def test_importing_the_script_never_loads_mlx(self, tmp_path: Path, command: list[str]) -> None:
-        """Help and the tools that read retained output work where MLX cannot load."""
+        """Help and the tools that read retained output work where MLX cannot load.
+
+        They do not import numpy either: the script itself has no use for it.
+        """
         for dies_on_import in (False, True):
-            run = _run_against_fake_runtime(tmp_path, command, dies_on_import=dies_on_import)
+            run = _run_against_fake_runtime(
+                tmp_path,
+                command,
+                dies_on_import=dies_on_import,
+                replaced_modules={"numpy/__init__.py": _RECORD_IMPORT},
+            )
             assert run.returncode == 0, run.output
             assert run.imports == []
+
+    def test_numpy_version_is_reported_without_importing_numpy(self, tmp_path: Path) -> None:
+        """The version table reads numpy's installed metadata, as it does for other packages."""
+        run = _run_against_fake_runtime(
+            tmp_path,
+            [
+                "-c",
+                "import check_models; print('numpy', check_models.get_library_versions()['numpy'])",
+                "not-a-probe",
+            ],
+            replaced_modules={"numpy/__init__.py": _RECORD_IMPORT},
+        )
+        assert run.returncode == 0, run.output
+        assert f"numpy {importlib.metadata.version('numpy')}" in run.output
+        assert run.imports == []
 
     def test_hub_precheck_reads_the_working_set_from_mlx(self, tmp_path: Path) -> None:
         """A tool that needs a runtime fact loads the runtime itself, unprobed."""

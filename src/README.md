@@ -1129,7 +1129,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 <!-- markdownlint-disable MD028 -->
 
 > [!NOTE]
-> `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
+> `psutil` is optional (installed with `extras`). Without it a run completes, but CPU core counts, available memory and swap use are not read; the run says so among its start-up warnings, in the `results.jsonl` header and in `run_summary.md`. Total RAM is still read from `sysctl` or MLX.
 
 > [!NOTE]
 > The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece; tokenizers and sentencepiece follow the `transformers>=5.14.0` compatibility floor. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.

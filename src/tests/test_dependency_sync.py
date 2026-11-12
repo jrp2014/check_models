@@ -1103,7 +1103,7 @@ def test_defusedxml_probe_is_a_real_import_without_suppression() -> None:
     check_models_source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
     defusedxml_probe = check_models_source[
         check_models_source.index("defusedxml is required") : check_models_source.index(
-            "try:\n    import numpy as np",
+            "def _raise_mlx_vlm_missing",
         )
     ]
 

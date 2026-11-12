@@ -177,6 +177,25 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Dependencies (0.17.121): `check_models.py` no longer imports numpy. Its
+  only use was a fallback for numpy's version when the installed metadata
+  could not be read, behind a guard for numpy being absent; the script
+  calls nothing in numpy, and mlx-vlm, which does, cannot be imported
+  without it. The version table now reads numpy's installed metadata, as it
+  does for transformers and tokenizers. *Behaviour preserved:* the numpy
+  version in every report, for any install that has metadata (pip, conda);
+  a numpy importable from a path with no metadata now shows as unavailable.
+  *Benefit:* one dependency guard and its module-level name are gone, and
+  help and the tools that only read retained output no longer load numpy.
+  *Evidence:* those five entry points run with a numpy package that records
+  its import (no import, where there was one); the version read without an
+  import equals the installed one; the Skylos quality gate still passes, so
+  the declared dependency is not reported as unused. *Not claimed:* a
+  start-up saving worth having (about 20 ms of 230 ms here). numpy stays a
+  declared dependency; whether the project still needs to declare it was
+  not examined. The Pillow and defusedxml guards stay: one gives a clear
+  message, the other a working degraded run.
+
 - Value checks (0.17.118, step 6 of john's 2026-11-11 plan): the rule "an
   integer, or a number, that is not a boolean" was written out at 30 places
   in four spellings (`isinstance(x, int) and not isinstance(x, bool)`, its
@@ -1775,6 +1794,19 @@ Notable changes to this project will be documented in this file.
   must now sort its own results. Report order is unchanged.
 
 ### Fixed
+
+- System facts (0.17.121): a run without psutil completed with its CPU core
+  counts, available memory and swap use missing and nothing saying why.
+  psutil is an optional extra, absent from CI and from a plain install. The
+  run now states it once ("psutil could not be imported (optional: pip
+  install psutil); CPU core counts, available memory and swap use were not
+  read and are missing from this run's system facts") among the start-up
+  warnings, so it is on the console, in the log, in the `results.jsonl`
+  header and in `run_summary.md`. *Unchanged:* the run still completes and
+  total RAM is still read from `sysctl` or MLX. *Evidence:* the real command
+  line run to completion against a fake MLX runtime, once with a fake psutil
+  (the four facts recorded, no note) and once with psutil unimportable (the
+  four absent, the note in all three places).
 
 - Run summary (0.17.120): the native command printed for a failed model
   that recorded no settings of its own (a load crash, say) stated
