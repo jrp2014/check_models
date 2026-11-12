@@ -10832,12 +10832,13 @@ _FULL_COMMAND_LINE_REPRO_FLAGS: str = (
 )
 
 
-def _finalise_from_command_line(tmp_path: Path, *argv: str) -> Path:
+def _finalise_from_command_line(tmp_path: Path, *argv: str, settings_recorded: bool = True) -> Path:
     """Run the real finalisation as ``main`` would after these arguments; return the output dir.
 
     Three crashes: one at model load, one in generation whose template opened
     a thinking block and mapped the requested effort, and one whose checkpoint
-    declared its own sampling values.
+    declared its own sampling values. With ``settings_recorded`` false, no
+    model got as far as recording the settings it ran with.
     """
     output_dir = tmp_path / "output"
     full_argv = [*argv, "--compare-with", "none", "--output-dir", str(output_dir)]
@@ -10875,11 +10876,11 @@ def _finalise_from_command_line(tmp_path: Path, *argv: str) -> Path:
         _make_failure_with_details("org/load-crash", failure_phase="model_load"),
         replace(
             _make_failure_with_details("org/gen-crash", failure_phase="generation"),
-            prompt_diagnostics=thinking,
+            prompt_diagnostics=thinking if settings_recorded else None,
         ),
         replace(
             _make_failure_with_details("org/sampled-crash", failure_phase="generation"),
-            prompt_diagnostics=sampled,
+            prompt_diagnostics=sampled if settings_recorded else None,
         ),
     ]
     with (
@@ -10961,11 +10962,78 @@ def test_finalised_reports_restate_the_whole_command_line_in_native_commands(
         "--max-tokens 321 --temperature 1.0 --revision run-revision --trust-remote-code "
         "--seed 73 --top-p 0.95 --top-k 64"
     ) in summary
+    # The load crash recorded no settings of its own. It gets what the other
+    # two shared, and no value for what they did not: the record does not say
+    # which temperature it would have run with.
+    assert (
+        "--model org/load-crash --image repro-image.jpg --prompt 'Describe the image.' "
+        "--max-tokens 321 --revision run-revision --trust-remote-code --seed 73\n"
+    ) in summary
+    assert (
+        "The run did not record these settings for this model, so the command leaves them "
+        "out: `--enable-thinking`, `--temperature`, `--thinking-budget`, "
+        "`--thinking-end-token`, `--top-k`, `--top-p`."
+    ) in " ".join(summary.split())
+    assert summary.count("The run did not record these settings") == 1
 
     metadata = json.loads(safe_io.read_text_no_follow(output_dir / "results.jsonl").splitlines()[0])
     assert metadata["execution_mode"] == "in_process"
     assert metadata["trust_remote_code"] is True
     assert metadata["image"]["source_url"] == "https://example.org/pictures/street.jpg"
+
+
+def test_retained_command_states_no_setting_the_run_recorded_for_no_model(tmp_path: Path) -> None:
+    """With nothing recorded, the summary's commands claim no token cap or temperature."""
+    output_dir = _finalise_from_command_line(tmp_path, *_FULL_COMMAND_LINE, settings_recorded=False)
+
+    summary = safe_io.read_text_no_follow(output_dir / "issues" / "run_summary.md")
+    models = ("org/load-crash", "org/gen-crash", "org/sampled-crash")
+    for model in models:
+        assert (
+            f"--model {model} --image repro-image.jpg --prompt 'Describe the image.' "
+            "--revision run-revision --trust-remote-code\n"
+        ) in summary
+    note = (
+        "The run did not record these settings for this model, so the command leaves "
+        "them out: `--max-tokens`, `--temperature`."
+    )
+    assert " ".join(summary.split()).count(note) == len(models)
+    # The live reports state the run's own settings, which they hold.
+    diagnostics = safe_io.read_text_no_follow(output_dir / "reports" / "diagnostics.md")
+    assert "--model MODEL_ID --image repro-image.jpg --prompt 'Describe the image.' " in diagnostics
+    assert "--max-tokens 321 --temperature 0.25 " in diagnostics
+    assert "did not record these settings" not in diagnostics
+
+
+def test_native_command_states_no_default_for_an_unrecorded_sampling_setting() -> None:
+    """A sampled command states top_p and top_k at their defaults only when recorded."""
+    settings = replace(_run_settings(), temperature=0.7)
+
+    def command(*unrecorded: str) -> str:
+        return check_models.build_native_mlx_vlm_repro_command_spec(
+            model_name="org/model",
+            prompt="Describe.",
+            image_ref="image.jpg",
+            settings=settings,
+            unrecorded_settings=unrecorded,
+        ).shell_command()
+
+    assert "--temperature 0.7" in command()
+    assert "--top-p 1.0 --top-k 0" in command()
+    assert "--top-p" not in command("top_p")
+    assert "--top-k 0" in command("top_p")
+    assert "--temperature" not in command("temperature")
+    # The load-only command is the same whatever was recorded: it claims
+    # nothing about the run's settings.
+    minimal = check_models.build_native_mlx_vlm_repro_command_spec(
+        model_name="org/model",
+        prompt="Describe.",
+        image_ref="image.jpg",
+        settings=settings,
+        minimal_load=True,
+        unrecorded_settings=("max_tokens", "temperature"),
+    ).shell_command()
+    assert "--prompt x --max-tokens 8 --temperature 0.0" in minimal
 
 
 def test_finalised_reports_follow_isolation_trust_and_adapter_options(tmp_path: Path) -> None:

@@ -24541,8 +24541,10 @@ def _public_reproduction_filename(image: RunImageRecord, source_url: str) -> str
     return f"repro-image{suffix or '.img'}"
 
 
-# What a native command states for a setting the retained record does not
-# hold: mlx-vlm's own defaults, and no remote code.
+# Stand-ins for settings the retained record does not hold: mlx-vlm's own
+# defaults, and no remote code. A command states a stand-in only where the
+# record holds the setting for no model at all; see
+# ``_retained_unrecorded_settings`` for a model the record is silent about.
 _UNRECORDED_RUN_SETTINGS: Final[ModelRunSettings] = ModelRunSettings(
     max_tokens=DEFAULT_MAX_TOKENS,
     temperature=DEFAULT_TEMPERATURE,
@@ -24574,6 +24576,30 @@ def _retained_run_settings(source: RunIssueSummarySource) -> ModelRunSettings:
     }
     recorded["trust_remote_code"] = source.trust_remote_code is True
     return replace(_UNRECORDED_RUN_SETTINGS, **recorded)
+
+
+def _retained_unrecorded_settings(
+    source: RunIssueSummarySource, result: JsonlResultRecord
+) -> tuple[str, ...]:
+    """Name the settings a retained record holds for other models but not this one.
+
+    A model that failed before generation has no settings of its own in the
+    record. Where the run's other models shared a value it is the run's;
+    where they did not (checkpoints declared their own sampling values, say),
+    this model's value is unknown, and so are the token cap and temperature
+    when the record shares none.
+    """
+
+    def recorded(record: JsonlResultRecord) -> Mapping[str, object]:
+        kwargs = (record.get("prompt_diagnostics") or {}).get("generate_kwargs")
+        return kwargs if isinstance(kwargs, dict) else {}
+
+    if recorded(result):
+        return ()
+    statable = {spec.name for spec in fields(ModelRunSettings)}
+    shared = {key for key, _ in source.generation_settings}
+    elsewhere = {key for other in source.results for key in recorded(other)}
+    return tuple(sorted(((elsewhere | {"max_tokens", "temperature"}) & statable) - shared))
 
 
 _REPRO_THINKING_KWARG_KEYS: Final[tuple[str, ...]] = (
@@ -24727,6 +24753,7 @@ def _verified_public_reproduction_blocks(
     resolved_revision: str | None,
     reasoning_effort_applied: str | None,
     lead: str,
+    unrecorded_settings: Collection[str] = (),
 ) -> tuple[ReportBlock, ...]:
     """Download-verify-run command for a public image whose digest is known."""
     filename = _public_reproduction_filename(image, source_url)
@@ -24744,9 +24771,22 @@ def _verified_public_reproduction_blocks(
             settings=settings,
             resolved_revision=resolved_revision,
             reasoning_effort_applied=reasoning_effort_applied,
+            unrecorded_settings=unrecorded_settings,
         ).shell_command()
     )
-    return (ReportParagraph(lead), ReportCodeBlock("\n".join(commands), language="bash"))
+    blocks: list[ReportBlock] = [
+        ReportParagraph(lead),
+        ReportCodeBlock("\n".join(commands), language="bash"),
+    ]
+    if unrecorded_settings:
+        flags = ", ".join(f"`--{name.replace('_', '-')}`" for name in sorted(unrecorded_settings))
+        blocks.append(
+            ReportParagraph(
+                "The run did not record these settings for this model, so the command "
+                f"leaves them out: {flags}."
+            )
+        )
+    return tuple(blocks)
 
 
 def _reproduction_input_blocks(
@@ -24760,6 +24800,7 @@ def _reproduction_input_blocks(
     effective_generate_kwargs: Mapping[str, object] | None = None,
     published_preview: RunImageRecord | None = None,
     reasoning_effort_applied: str | None = None,
+    unrecorded_settings: Collection[str] = (),
 ) -> tuple[ReportBlock, ...]:
     """Describe exact inputs and render a command only when it is exact evidence.
 
@@ -24831,6 +24872,7 @@ def _reproduction_input_blocks(
                     settings=settings,
                     resolved_revision=resolved_revision,
                     reasoning_effort_applied=reasoning_effort_applied,
+                    unrecorded_settings=unrecorded_settings,
                     lead=(
                         "Shareable stand-in: the retained gallery preview is a downscaled "
                         "re-encoding of the original, so an observation reproduced on it "
@@ -24864,6 +24906,7 @@ def _reproduction_input_blocks(
             settings=settings,
             resolved_revision=resolved_revision,
             reasoning_effort_applied=reasoning_effort_applied,
+            unrecorded_settings=unrecorded_settings,
             lead="Download and verify the exact public input, then run one native mlx-vlm process.",
         )
     )
@@ -25035,6 +25078,7 @@ def _run_issue_summary_crash_section(
                         (result.get("prompt_diagnostics") or {}).get("generate_kwargs"),
                     ),
                     reasoning_effort_applied=_retained_applied_reasoning_effort(result),
+                    unrecorded_settings=_retained_unrecorded_settings(source, result),
                 ),
                 level=4,
             ),
@@ -26918,6 +26962,7 @@ def _build_native_mlx_vlm_cli_tokens(
     resolved_revision: str | None = None,
     minimal_load: bool = False,
     reasoning_effort_applied: str | None = None,
+    unrecorded_settings: Collection[str] = (),
 ) -> list[str]:
     """Build a native ``python -m mlx_vlm.generate`` command for issue drafts.
 
@@ -26929,6 +26974,9 @@ def _build_native_mlx_vlm_cli_tokens(
     never the run's requested ``settings.reasoning_effort``: a model whose
     template does not read it, or that mapped it, ran without it or with
     another value. The upstream flag exists from mlx-vlm 0.7.12.
+
+    ``unrecorded_settings`` names settings whose values in ``settings`` are
+    stand-ins, not what the model ran with: the command states none of them.
     """
     tokens = [
         "python",
@@ -26941,19 +26989,17 @@ def _build_native_mlx_vlm_cli_tokens(
         image_ref,
         "--prompt",
         "x" if minimal_load else prompt,
-        "--max-tokens",
-        str(
-            8
-            if minimal_load
-            else (settings.max_tokens if settings is not None else DEFAULT_MAX_TOKENS)
-        ),
-        "--temperature",
-        str(
-            settings.temperature
-            if settings is not None and not minimal_load
-            else DEFAULT_TEMPERATURE
-        ),
     ]
+    if minimal_load:
+        tokens.extend(["--max-tokens", "8", "--temperature", str(DEFAULT_TEMPERATURE)])
+    else:
+        for flag, attribute, fallback in (
+            ("--max-tokens", "max_tokens", DEFAULT_MAX_TOKENS),
+            ("--temperature", "temperature", DEFAULT_TEMPERATURE),
+        ):
+            if attribute not in unrecorded_settings:
+                stated = getattr(settings, attribute) if settings is not None else fallback
+                tokens.extend([flag, str(stated)])
     if settings is None:
         _append_native_cli_optional_pair(tokens, "--revision", resolved_revision)
         return tokens
@@ -26972,7 +27018,8 @@ def _build_native_mlx_vlm_cli_tokens(
     sampled = float(settings.temperature) > 0
     for flag, attribute, default in _NATIVE_CLI_NONDEFAULT_ARGS:
         value = getattr(settings, attribute)
-        if value != default or (sampled and attribute in {"top_p", "top_k"}):
+        states_default = sampled and attribute in {"top_p", "top_k"}
+        if value != default or (states_default and attribute not in unrecorded_settings):
             tokens.extend([flag, str(value)])
     for flag, attribute in _NATIVE_CLI_BOOLEAN_FLAGS:
         if bool(getattr(settings, attribute)):
@@ -26999,6 +27046,7 @@ def build_native_mlx_vlm_repro_command_spec(
     resolved_revision: str | None = None,
     minimal_load: bool = False,
     reasoning_effort_applied: str | None = None,
+    unrecorded_settings: Collection[str] = (),
 ) -> ReproCommandSpec:
     """Build a native ``mlx_vlm.generate`` CLI repro command spec."""
     tokens = _build_native_mlx_vlm_cli_tokens(
@@ -27009,6 +27057,7 @@ def build_native_mlx_vlm_repro_command_spec(
         resolved_revision=resolved_revision,
         minimal_load=minimal_load,
         reasoning_effort_applied=reasoning_effort_applied,
+        unrecorded_settings=unrecorded_settings,
     )
     return ReproCommandSpec(
         base_tokens=tuple(tokens[:3]),

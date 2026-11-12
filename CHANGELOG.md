@@ -1776,6 +1776,26 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Run summary (0.17.120): the native command printed for a failed model
+  that recorded no settings of its own (a load crash, say) stated
+  `--temperature 0.0` whenever the run's other models had not all used one
+  temperature, and `--max-tokens 500` when no model recorded any, whatever
+  the run had asked for. The retained record holds only the settings every
+  model shared plus each model's own, so those values were stand-ins. The
+  command now leaves out any setting the record holds for other models but
+  not for this one, and a line under it names them ("The run did not record
+  these settings for this model, so the command leaves them out: ..."). A
+  sampled command likewise no longer states an unrecorded `--top-p` or
+  `--top-k` at its default. *Unchanged:* commands for models that recorded
+  their settings; the load-only command (`--prompt x --max-tokens 8
+  --temperature 0.0`), which claims nothing about the run; and the
+  commands in `diagnostics.md` and the issue drafts, which are written from
+  the run's own settings. *Evidence:* the real finalisation run from a
+  command line asking for temperature 0.25, with one model that sampled at
+  its checkpoint's 1.0 and one load crash: the summary gave the load crash
+  `--temperature 0.0` before and no temperature now; a second run where no
+  model recorded settings; three tests, all failing on the previous code.
+
 - Start-up (0.17.119): an mlx or mlx-vlm import that failed in this process
   was always reported as "not found, please install it", whatever went
   wrong. A module mlx-vlm needs being absent, or mlx-vlm having moved a name
