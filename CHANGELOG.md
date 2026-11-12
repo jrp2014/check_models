@@ -177,6 +177,29 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Quality gate (0.17.123): the Skylos dependency scan targets
+  `pyproject.toml` instead of `.`. Skylos finds manifests by walking the
+  project root whatever the target, so the report is the same; a `.` target
+  also repeated the source and dead-code analysis the quality gate had just
+  run. *Behaviour preserved:* `tools.check_dependency_advisories` reads the
+  same report (its coverage block and dependency findings) and decides the
+  same way; the step's output and exit status do not change. *Benefit:* the
+  step takes about 1 s instead of 35 s (sandbox, 4 cores, Skylos 5.6.0), in
+  fast and full mode, and its report is 16 KB instead of 18 MB. *Evidence:*
+  both commands run the same `scan_dependencies(project_root)` call; on
+  this tree both reports have identical coverage, supply-chain summary and
+  findings, and the checker's verdict is the same; a manifest added in a
+  subdirectory was found by both. A new test runs real Skylos on a
+  temporary project with a second manifest outside the target and compares
+  the two scans. *Not claimed:* advisory findings were not compared, since
+  the sandbox cannot reach OSV (both runs end "no dependencies were
+  checked" here). The other Skylos runs stay separate: merging the
+  dependency scan into the quality gate scan also costs only ~2 s, but
+  Skylos writes one output format per run, so the gate would lose its
+  concise listing; the danger gate scans from the repository root (for
+  `.github` workflows), where a quality/secrets scan stops on `CLAUDE.md`;
+  the suppression audit covers danger rules and runs in the background.
+
 - Dependencies (0.17.121): `check_models.py` no longer imports numpy. Its
   only use was a fallback for numpy's version when the installed metadata
   could not be read, behind a guard for numpy being absent; the script

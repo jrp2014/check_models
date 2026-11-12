@@ -986,10 +986,14 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     )
     assert 'quality_print_skylos_advice\necho "✅ All quality checks passed!"' in quality_script
     # Dependency advisories are gated by their own step (Skylos's ignore list
-    # cannot accept one advisory), which must run before pytest too.
+    # cannot accept one advisory), which must run before pytest too. It
+    # targets pyproject.toml so it skips the source analysis; see
+    # test_skylos_dependency_scan_of_one_manifest_matches_the_whole_tree.
     assert re.search(
-        r"quality_run_skylos \. --sca --json -o \"\$sca_report_path\" --no-upload", quality_script
+        r"quality_run_skylos pyproject\.toml --sca --json -o \"\$sca_report_path\" --no-upload",
+        quality_script,
     )
+    assert "quality_run_skylos . --sca" not in quality_script
     assert '"$QUALITY_PYTHON" -m tools.check_dependency_advisories "$sca_report_path"' in (
         quality_script
     )
@@ -997,6 +1001,61 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
         'echo "=== Pytest ==="'
     )
     assert not re.search(r"quality_run_skylos \. -a\b", quality_script)
+
+
+@pytest.mark.subprocess
+def test_skylos_dependency_scan_of_one_manifest_matches_the_whole_tree(tmp_path: Path) -> None:
+    """A `pyproject.toml --sca` scan reports what a `. --sca` scan does.
+
+    The quality gate's dependency scan targets pyproject.toml so Skylos does
+    not repeat the source and dead-code analysis. That only holds while Skylos
+    finds manifests by walking the project root whatever the target: here a
+    second manifest sits in a subdirectory the target does not name. Version
+    ranges, not pins, keep Skylos from querying OSV.
+    """
+    skylos = Path(sys.executable).parent / "skylos"
+    found = str(skylos) if skylos.is_file() else shutil.which("skylos")
+    if found is None:
+        pytest.skip("skylos is not installed")
+    skylos_path: str = found  # checkers do not carry narrowing into the nested helper
+    # Skylos refuses to write a report through a symlinked parent (macOS /var).
+    project = tmp_path.resolve() / "project"
+    (project / "sub").mkdir(parents=True)
+    (project / "pyproject.toml").write_text(
+        '[project]\nname = "probe"\nversion = "0.1"\ndependencies = ["requests>=2"]\n',
+        encoding="utf-8",
+    )
+    (project / "probe.py").write_text("import requests\n\nprint(requests)\n", encoding="utf-8")
+    (project / "sub" / "requirements.txt").write_text("idna>=3\n", encoding="utf-8")
+
+    (project / ".skylos").mkdir()
+
+    def sca_report(target: str, name: str) -> dict[str, typing.Any]:
+        report_path = project / ".skylos" / f"{name}.json"
+        completed = subprocess.run(  # noqa: S603 - resolved skylos binary on a temp project
+            [skylos_path, target, "--sca", "--json", "-o", str(report_path), "--no-upload"],
+            cwd=project,
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+            env={**os.environ, "SKYLOS_NO_CLIPBOARD": "1"},
+        )
+        assert report_path.is_file(), completed.stderr[-2000:]
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert isinstance(report, dict)
+        return report
+
+    whole_tree = sca_report(".", "whole-tree")
+    one_manifest = sca_report("pyproject.toml", "one-manifest")
+
+    assert one_manifest["analysis_summary"]["sca_coverage"]["supported_manifest_count"] == 2
+    assert (
+        one_manifest["analysis_summary"]["sca_coverage"]
+        == whole_tree["analysis_summary"]["sca_coverage"]
+    )
+    assert one_manifest["dependency_vulnerabilities"] == whole_tree["dependency_vulnerabilities"]
 
 
 def test_skylos_danger_advisory_script_is_separate_and_agent_friendly() -> None:

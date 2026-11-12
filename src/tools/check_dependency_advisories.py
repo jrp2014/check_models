@@ -3,8 +3,8 @@
 Skylos's `[tool.skylos] ignore` list does not apply to dependency (SCA)
 findings, and its gate only counts them, so one advisory with no fixed
 release cannot be accepted without accepting any other. `run_quality_checks.sh`
-therefore runs the dependency scan on its own (`skylos . --sca --json`) and
-this module decides:
+therefore runs the dependency scan on its own (`skylos pyproject.toml --sca
+--json`; Skylos still walks all of src/ for manifests) and this module decides:
 
 - pass only a scan Skylos reports as finished with a recognised successful
   status (see SUCCESSFUL_STATUSES); every other status, including ones this

@@ -129,10 +129,11 @@ quality_run_python_tool vulture
 # added (ai-defects); the audit pass only printed a grade card over the same
 # files, at the cost of a second full analysis (~9 s). Danger stays in its
 # own advisory wrapper below, which post-filters the JSON report.
-# The dependency report (~15 MB, below) must not be in the tree this step
-# scans: its secret scan stops on files over 8 MB (SKY-ANALYSIS-INCOMPLETE).
-# It is removed after its own step; this also clears one an interrupted run
-# left behind.
+# The dependency report (below) must not be in the tree this step scans. A
+# whole-tree --sca report was ~15 MB, over the 8 MB at which the secret scan
+# stops (SKY-ANALYSIS-INCOMPLETE); the scan below writes ~16 KB, but a stray
+# report is still not source. It is removed after its own step; this also
+# clears one an interrupted run left behind.
 sca_report_path=".skylos/skylos-dependency-scan.json"
 rm -f "$sca_report_path"
 echo "=== Skylos Quality Gate ==="
@@ -145,10 +146,17 @@ echo "=== Skylos Dependency Scan ==="
 # Skylos only writes reports inside the project ("could not safely write
 # output file" for a temp path), so the report goes in .skylos/ and is
 # removed as soon as it has been checked.
+# The target is pyproject.toml, not `.`: Skylos looks for dependency
+# manifests by walking the project root (src/, the target's directory)
+# whatever the target, so the report is the same, but a `.` target also
+# repeats the source and dead-code analysis the quality gate has just done
+# (~1 s instead of ~35 s on 4 cores, Skylos 5.6.0). A test checks the walk
+# still finds a manifest outside the target.
 mkdir -p .skylos
 set +e
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . --sca --json -o "$sca_report_path" --no-upload </dev/null >/dev/null
+    quality_run_skylos pyproject.toml --sca --json -o "$sca_report_path" --no-upload \
+    </dev/null >/dev/null
 sca_exit_code=$?
 set -e
 if [ ! -f "$sca_report_path" ]; then
