@@ -736,12 +736,6 @@ _TRACKED_NPM_OVERRIDES: dict[str, _NpmOverrideRecord] = {
         fixed_version="0.18.2",
         advisory="GHSA-238p-pmpm-9mq7",
     ),
-    "re2js": _NpmOverrideRecord(
-        parent="markdownlint",
-        parent_requirement="2.8.6",
-        fixed_version="2.8.7",
-        advisory="GHSA-gg6h-894w-4m9c",
-    ),
 }
 
 

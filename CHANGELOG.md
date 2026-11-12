@@ -1964,8 +1964,10 @@ Notable changes to this project will be documented in this file.
   dependency to address GHSA-gg6h-894w-4m9c — first with 2.8.7, then raised to
   2.9.1, the latest release (john's call, 2026-10-30). A dependency test rejects
   vulnerable resolutions and flags the override for removal when markdownlint
-  changes that requirement. Remove the override once upstream resolves a patched
-  version without it; no advisory suppression is added.
+  changes that requirement. Retired 2026-11-12: markdownlint 0.42.1 (via
+  markdownlint-cli2 0.24.1) itself pins `re2js` 2.9.1, past the 2.8.7 fix, so
+  the override and its retirement record are gone; katex is the only override
+  left. No advisory suppression was ever added.
 - Development tooling (0.17.102): the override-retirement guard now covers
   every npm override, not just re2js. Each `package.json` override must have
   a record naming the parent requirement that necessitated it and the
