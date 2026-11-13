@@ -177,6 +177,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Development tooling: a committed `src/.npmrc` sets `ignore-scripts=true`
+  and `min-release-age=7` for the markdownlint-cli2 install, so every
+  `npm install` in `src/` (the Makefile, `setup_conda_env.sh` and plain
+  `npm install --prefix src` included, not just CI and `update.sh`) skips
+  dependency lifecycle scripts and versions under a week old, matching
+  Dependabot's cooldown. npm 11.10+ honours the age setting (a
+  `markdownlint-cli2@latest` install resolves the newest release older than
+  a week); CI's npm 10 ignores it. Clears Skylos 5.6.0's
+  `install_scripts_disabled` posture check and the npm half of
+  `release_age_cooldown`.
 - Quality gate (0.17.123): the Skylos dependency scan targets
   `pyproject.toml` instead of `.`. Skylos finds manifests by walking the
   project root whatever the target, so the report is the same; a `.` target
