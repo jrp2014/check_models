@@ -177,7 +177,7 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Development tooling: a committed `src/.npmrc` sets `ignore-scripts=true`
+- Development tooling (0.17.124): a committed `src/.npmrc` sets `ignore-scripts=true`
   and `min-release-age=7` for the markdownlint-cli2 install, so every
   `npm install` in `src/` (the Makefile, `setup_conda_env.sh` and plain
   `npm install --prefix src` included, not just CI and `update.sh`) skips
@@ -187,7 +187,7 @@ Notable changes to this project will be documented in this file.
   a week); CI's npm 10 ignores it. Clears Skylos 5.6.0's
   `install_scripts_disabled` posture check and the npm half of
   `release_age_cooldown`.
-- Docs: `src/README.md` (Requirements) now states when the next Python
+- Docs (0.17.124): `src/README.md` (Requirements) now states when the next Python
   counts as ready. Every compiled dependency must publish a wheel for it on
   Apple Silicon; a pure-Python package without one (multiprocess, docopt) is
   not a blocker, and dev-only tools (Skylos and its tree-sitter bindings)
@@ -2012,7 +2012,7 @@ Notable changes to this project will be documented in this file.
   dependency to address GHSA-gg6h-894w-4m9c — first with 2.8.7, then raised to
   2.9.1, the latest release (john's call, 2026-10-30). A dependency test rejects
   vulnerable resolutions and flags the override for removal when markdownlint
-  changes that requirement. Retired 2026-11-12: markdownlint 0.42.1 (via
+  changes that requirement. Retired 2026-11-12 (0.17.124): markdownlint 0.42.1 (via
   markdownlint-cli2 0.24.1) itself pins `re2js` 2.9.1, past the 2.8.7 fix, so
   the override and its retirement record are gone; katex is the only override
   left. No advisory suppression was ever added.
