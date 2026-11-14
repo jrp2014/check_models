@@ -98,6 +98,52 @@ def test_metadata_profile_checks_fields_without_parsing_the_prompt() -> None:
     assert check_models._quality_observations(text="answer", analysis=analysis) == (
         "duplicate_keywords",
     )
+
+
+# Qwen3.6-35B-A3B's 11 November answer: the description paragraph has no label.
+UNLABELLED_DESCRIPTION_ANSWER = (
+    "Title: Two Tabby Cats Sleeping on Pink Sofa\n\n"
+    "Two tabby cats lie sleeping on a bright pink sofa, positioned next to white "
+    "remote controls.\n\n"
+    "Keywords: tabby cats, pink sofa, white remote controls, sleeping animals, "
+    "domestic cats, striped fur, relaxed pose, indoor setting, living room, pet "
+    "furniture"
+)
+
+
+def test_unlabelled_paragraph_after_title_is_not_counted_as_title(tmp_path: Path) -> None:
+    """A title ends at its first blank line; the unlabelled paragraph stays unclaimed."""
+    result = _result(
+        UNLABELLED_DESCRIPTION_ANSWER, prompt=CATALOG_PROMPT, assessment_profile="metadata"
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.title_word_count == 7
+    assert result.quality_analysis.missing_sections == ["description"]
+    jsonl = tmp_path / "results.jsonl"
+    check_models.save_jsonl_report([result], jsonl, prompt=CATALOG_PROMPT, system_info={})
+    record = json.loads(jsonl.read_text(encoding="utf-8").splitlines()[1])
+    assert record["assessment"]["observations"] == ["missing_requested_sections"]
+    assert record["assessment"]["details"]["title_word_count"] == 7
+    preview = check_models._field_aware_preview(UNLABELLED_DESCRIPTION_ANSWER, max_chars=400)
+    assert preview is not None
+    assert preview.startswith(
+        "Title: Two Tabby Cats Sleeping on Pink Sofa | Description: (not detected) |"
+    )
+
+
+def test_title_on_the_line_after_its_label_is_still_read() -> None:
+    """Blank lines before a title's text do not end it; only one after the text does."""
+    analysis = check_models.analyze_generation_text(
+        "Title:\n\nTwo tabby cats sleeping on a pink sofa\n\n"
+        "Description:\nTwo tabby cats are curled up asleep.\n\n"
+        "Keywords:\ncats, sleeping, tabby",
+        30,
+        assessment_profile="metadata",
+    )
+
+    assert analysis.missing_sections == []
+    assert analysis.title_word_count == 8
     missing = check_models.analyze_generation_text(
         "A mill by a river.", 10, assessment_profile="metadata"
     )

@@ -1843,6 +1843,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Catalogue fields (0.17.125): a title now ends at its first blank line.
+  When a model left out the `Description:` label, the unlabelled description
+  paragraph was read as part of the title, so the gallery preview showed it
+  under "Title:" and the record's `title_word_count` counted it (23 for
+  Qwen3.6-35B-A3B's 7-word title in the 11 November run; diagnostics.md and
+  results.html show that count for listed models). Blank lines before the
+  title's text still do not end it. *Behaviour changed:* only the title of an
+  answer with a blank line inside its Title section; the description stays
+  "not detected", as before. Retained records are not rewritten.
+
 - Value checks (0.17.122): 23 more readers of JSON and runtime values
   tested `isinstance(value, int)` or `int | float` without excluding
   booleans, so a `true` was read as 1: one parameter in a `config.json`,

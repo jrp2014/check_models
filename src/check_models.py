@@ -4142,6 +4142,11 @@ def _extract_catalog_sections(text: str) -> dict[str, str]:
         next_start: int = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
         trailing: str = text[match.end() : next_start].strip()
         combined: str = "\n".join(part for part in (section_line, trailing) if part).strip()
+        if label == "title":
+            # A title is one paragraph: an unlabelled paragraph after it (such as
+            # a description whose label was left out) is not part of the title.
+            raw_title = (section_line + text[match.end() : next_start]).strip()
+            combined = re.split(r"\n[ \t]*\n", raw_title, maxsplit=1)[0].strip()
         sections[label] = combined
     return sections
 
