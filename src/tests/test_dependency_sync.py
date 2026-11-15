@@ -3770,6 +3770,13 @@ def test_hub_precheck_layout_rule_matches_the_server_style_filter() -> None:
         "tokenizer_config.json",
         "*.safetensors",
     ]
+    # mlx-vlm's loader reads params.json when config.json is absent.
+    assert (
+        hub_precheck.layout_missing(["params.json", "tokenizer_config.json", "a.safetensors"]) == []
+    )
+    assert hub_precheck.layout_missing(["tokenizer_config.json", "a.safetensors"]) == [
+        "config.json (or params.json)"
+    ]
 
 
 def _candidate(**overrides: object) -> hub_precheck.HubCandidate:
@@ -3812,6 +3819,7 @@ def _fetch_with_siblings(
     card_data: dict[str, object] | None = None,
     bases_of: Mapping[str, tuple[str, ...]] | None = None,
     cached: Mapping[str, tuple[str, ...]] | None = None,
+    config_file: str = "config.json",
 ) -> hub_precheck.HubCandidate:
     """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set).
 
@@ -3832,7 +3840,7 @@ def _fetch_with_siblings(
                 {"siblings": listing, "pipeline_tag": pipeline_tag, "card_data": card_data},
             )()
 
-    texts = {"config.json": '{"model_type": "qwen3_vl"}', **(fetched or {})}
+    texts = {config_file: '{"model_type": "qwen3_vl"}', **(fetched or {})}
     siblings = {**dict.fromkeys(texts, 100), **siblings}
     monkeypatch.setattr(huggingface_hub, "HfApi", _Api)
     monkeypatch.setattr(huggingface_hub, "hf_hub_url", lambda _repo, name: name)
@@ -3927,6 +3935,22 @@ def test_hub_precheck_records_checkpoint_model_code_instead_of_blocking_the_type
     assert any(
         "model_file='modeling.py'" in reason and "runs that file" in reason for reason in reasons
     )
+
+
+def test_hub_precheck_reads_the_config_file_the_loader_reads(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """params.json only when config.json is absent; a malformed config.json is not skipped."""
+    base = {"tokenizer_config.json": 100, "model.safetensors": 1_000}
+    native = _fetch_with_siblings(monkeypatch, base, config_file="params.json")
+    assert (native.config_source, native.model_type) == ("params.json", "qwen3_vl")
+    assert "config from: params.json" in hub_precheck.render([native])
+    assert not any("cache layout" in reason for reason in native.verdict()[1])
+
+    texts = {"config.json": "not json", "params.json": '{"model_type": "x"}'}
+    assert hub_precheck._config_facts(texts, texts.get) == (None, None, "config.json")
+    unread = _candidate(model_type=None, arch_supported=None, config_source="config.json")
+    assert "architecture not checked: no model_type in config.json" in unread.verdict()[1]
 
 
 def test_hub_precheck_lineage_helpers_follow_declared_bases() -> None:

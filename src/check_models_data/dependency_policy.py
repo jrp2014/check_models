@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Final
+from typing import TYPE_CHECKING, Final
+
+if TYPE_CHECKING:
+    from collections.abc import Container
 
 # Floors also guarantee upstream-shipped typing, which the quality gate relies
 # on now that no local stubs are generated at all: mlx >= 0.32.1 wheels bundle
@@ -69,3 +72,21 @@ VALIDATE_ENV_EXTRAS_FALLBACK_SPECS: Final[dict[str, str]] = {
     **PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS,
     **PROJECT_TORCH_EXTRA_COMPAT_SPECS,
 }
+
+# mlx-vlm's load_config reads config.json and, only when that file is absent,
+# params.json (Neywa-Labs/mlx-vlm 633757c8, #2717). It converts neither schema,
+# and a malformed config.json fails rather than falling back. Cached-model
+# discovery, the Hub pre-check and the snapshot metadata readers all choose the
+# file with select_model_config_file, so their facts come from the file the
+# loader reads.
+MODEL_CONFIG_FILE_NAMES: Final[tuple[str, ...]] = ("config.json", "params.json")
+
+
+def select_model_config_file(present: Container[str]) -> str | None:
+    """Return the configuration file mlx-vlm's loader reads, given the files present.
+
+    ``config.json`` when present, else ``params.json``, else None. Presence
+    alone decides: a present but malformed ``config.json`` is still the file
+    read, so callers report it instead of falling back.
+    """
+    return next((name for name in MODEL_CONFIG_FILE_NAMES if name in present), None)

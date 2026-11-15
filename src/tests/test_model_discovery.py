@@ -7,7 +7,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 # HF cache environment is configured by conftest.py (early env setup + autouse fixture).
 import pytest
@@ -233,6 +233,73 @@ def test_config_check_leaves_an_absent_file_to_the_missing_reason() -> None:
     """Without a snapshot on disk the content check stays silent."""
     repo = _fake_cache_repo("org/listed-only", ("config.json", "tokenizer_config.json"))
     assert check_models._cached_config_problem(repo) is None
+
+
+def _cached_repo_with_files(tmp_path: Path, files: dict[str, str]) -> SimpleNamespace:
+    """A cached repo whose main snapshot holds these files plus tokenizer and weights."""
+    snapshot = tmp_path / "models--org--m" / "snapshots" / ("b" * 40)
+    snapshot.mkdir(parents=True)
+    contents = {"tokenizer_config.json": "{}", "model.safetensors": "weights", **files}
+    for name, text in contents.items():
+        safe_io.write_text_no_follow(snapshot / name, text)
+    return SimpleNamespace(
+        repo_id="org/m",
+        repo_type="model",
+        refs={
+            "main": SimpleNamespace(
+                files=tuple(SimpleNamespace(file_path=name) for name in contents),
+                snapshot_path=snapshot,
+            )
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    ("files", "reasons", "config_source"),
+    [
+        ({"params.json": '{"model_type": "mistral3"}'}, (), "params.json"),
+        (
+            {"config.json": '{"model_type": "qwen2_vl"}', "params.json": '{"model_type": "x"}'},
+            (),
+            "config.json",
+        ),
+        (
+            {"config.json": "not json", "params.json": '{"model_type": "mistral3"}'},
+            ("config.json is not a readable JSON object",),
+            None,
+        ),
+        ({"params.json": '{"dim": 4096}'}, ("params.json has no model_type",), "params.json"),
+        ({}, ("missing config.json and params.json",), None),
+    ],
+    ids=["params-only", "both-prefers-config", "malformed-config", "params-no-type", "neither"],
+)
+def test_cached_discovery_reads_the_config_file_the_loader_reads(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    files: dict[str, str],
+    reasons: tuple[str, ...],
+    config_source: str | None,
+) -> None:
+    """mlx-vlm 633757c8: params.json only when config.json is absent, never as a fallback.
+
+    The skip reason, the architecture pre-check and the retained discovery
+    record all come from the one file the loader would read.
+    """
+    monkeypatch.setattr(
+        check_models, "_installed_mlx_vlm_model_types", lambda: frozenset({"mistral3", "qwen2_vl"})
+    )
+    monkeypatch.setattr(check_models, "_mlx_vlm_model_remapping", dict)
+    repo = _cached_repo_with_files(tmp_path, files)
+
+    entry = check_models._cached_repo_model_eligibility(repo)
+
+    assert entry.reasons == reasons
+    assert entry.supported is (not reasons)
+    assert entry.config_source == config_source
+    if not reasons:
+        assert entry.arch_supported is True
+    monkeypatch.setattr(check_models, "get_cached_model_eligibility", lambda: (entry,))
+    assert check_models._cache_discovery_records()[0]["config_source"] == config_source
 
 
 def test_family_readme_fact_points_drafters_at_the_upstream_readme(
@@ -658,17 +725,21 @@ def _capability_for(
     *,
     config: dict[str, object] | None,
     model_index: dict[str, object] | None = None,
+    config_source: str | None = "config.json",
 ) -> check_models.ImageCapability:
-    """Classify a fake repo whose config.json / model_index.json are supplied inline."""
+    """Classify a fake repo whose model config / model_index.json are supplied inline."""
 
     def _read(_repo: object, file_name: str) -> dict[str, object] | None:
-        if file_name == "config.json":
-            return config
-        if file_name == "model_index.json":
-            return model_index
-        return None
+        return model_index if file_name == "model_index.json" else None
 
     monkeypatch.setattr(check_models, "_read_cached_repo_json", _read)
+    monkeypatch.setattr(
+        check_models,
+        "_read_cached_repo_model_config",
+        lambda _repo: check_models.SnapshotModelConfig(
+            config_source, cast("dict[str, check_models.JsonLike] | None", config)
+        ),
+    )
     return check_models._classify_image_capability(object())
 
 
@@ -914,6 +985,8 @@ class TestImageCapabilityClassifier:
 
         assert cap.verdict == "unknown"
         assert cap.evidence == ("no readable config.json",)
+        neither = _capability_for(monkeypatch, config=None, config_source=None)
+        assert neither.evidence == ("no config.json or params.json",)
 
 
 class TestCapabilityAwareSelection:
@@ -1730,6 +1803,31 @@ class TestModelBurdenFacts:
         burden = check_models._collect_model_burden("org/m")
         assert burden is not None
         assert burden.weight_bytes == 4
+
+    def test_params_json_supplies_the_facts_only_when_config_json_is_absent(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Burden facts and their rendered labels name the file the loader reads."""
+        snapshot = self._snapshot(tmp_path)
+        safe_io.write_text_no_follow(
+            snapshot / "params.json", json.dumps({"max_position_embeddings": 32_768})
+        )
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("org/m")
+        assert burden is not None
+        assert (burden.context_length, burden.config_source) == (32_768, "params.json")
+        result = check_models.PerformanceResult(
+            model_name="org/m", generation=None, success=True, model_burden=burden
+        )
+        rows = dict(check_models._model_burden_rows(result))
+        assert rows["Declared context length"] == "32,768 (params.json max_position_embeddings)"
+
+        # A malformed config.json is still the file read: no fallback to params.json.
+        safe_io.write_text_no_follow(snapshot / "config.json", "not json")
+        burden = check_models._collect_model_burden("org/m")
+        assert burden is not None
+        assert (burden.context_length, burden.config_source) == (None, None)
 
     def test_invalid_utf8_config_degrades_to_no_config_facts(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path

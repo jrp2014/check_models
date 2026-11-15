@@ -2118,6 +2118,16 @@ def test_checkpoint_file_facts_record_what_each_file_declares(tmp_path: Path) ->
     assert check_models._chat_template_sources(None) == ()
 
 
+def test_declared_eos_ids_name_params_json_when_the_loader_reads_it(tmp_path: Path) -> None:
+    """Without config.json, mlx-vlm reads params.json, and the EOS label says so."""
+    snapshot = tmp_path / "snapshot"
+    snapshot.mkdir()
+    check_models._write_text_file(snapshot / "params.json", json.dumps({"eos_token_id": 2}))
+    assert check_models._declared_eos_token_ids(snapshot, None) == {"params.json": 2}
+    check_models._write_text_file(snapshot / "config.json", json.dumps({"eos_token_id": 7}))
+    assert check_models._declared_eos_token_ids(snapshot, None) == {"config.json": 7}
+
+
 def test_chat_template_variables_come_from_the_parsed_template() -> None:
     """jinja2.meta names what a template reads, so unread options are a fact, not a guess."""
     template = (

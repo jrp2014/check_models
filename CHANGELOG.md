@@ -177,6 +177,25 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Model config discovery (0.17.126): cached-model eligibility, the Hub
+  pre-check (`tools.hub_precheck`) and the snapshot metadata readers (model
+  burden facts, declared EOS ids, architecture pre-check, image-capability
+  classification) now read the model config the way mlx-vlm's `load_config`
+  does since 633757c8 (#2717): `config.json`, or `params.json` only when
+  `config.json` is absent. A malformed `config.json` is still a skip
+  ("config.json is not a readable JSON object"), never a fallback; neither
+  file is now "missing config.json and params.json" (was "missing
+  config.json"). One rule, `select_model_config_file` in
+  `check_models_data.dependency_policy`, serves both the script and the
+  tool. Which file supplied the facts is recorded: `config_source` in each
+  record's `model_burden` and in the cache-discovery entries of the
+  `results.jsonl` header, the file name in the burden rows of
+  `diagnostics.md` (e.g. "32,768 (config.json
+  text_config.max_position_embeddings)") and in the EOS-ids labels, and a
+  "config from" fact on each Hub pre-check line. *Behaviour preserved* for
+  every checkpoint with a `config.json`: the same file is read and the same
+  facts result; only the labels gain the file name. The 14 November sweep
+  skipped no model, so this changes no selection there.
 - Development tooling (0.17.124): a committed `src/.npmrc` sets `ignore-scripts=true`
   and `min-release-age=7` for the markdownlint-cli2 install, so every
   `npm install` in `src/` (the Makefile, `setup_conda_env.sh` and plain

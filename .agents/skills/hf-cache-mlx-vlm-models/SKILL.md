@@ -46,8 +46,11 @@ checks. It can therefore attempt a model that default discovery would skip.
 ## Cache layout and shared files
 
 The layout check requires a model repository with a cached `main` revision,
-`config.json`, `tokenizer_config.json`, and either a safetensors index or
-safetensors weights. Indexed weights must also be complete and readable.
+a model config, `tokenizer_config.json`, and either a safetensors index or
+safetensors weights. The model config is `config.json`, or `params.json` only
+when `config.json` is absent, the rule mlx-vlm's `load_config` applies
+(mlx-vlm's server listing still requires `config.json`). A malformed
+`config.json` is a skip, never a fallback to `params.json`. Indexed weights must also be complete and readable.
 This is a file-presence check, not a generation test.
 
 Snapshots normally contain links. Depending on the installed Hub version,
@@ -121,7 +124,7 @@ checkpoint configuration, loader compatibility, and environmental limits:
 | No `preprocessor_config.json` / `processor_config.json` | the processor fell back to defaults silently (a video patch size of 2 doubled the patches and crashed prefill) | "Snapshot notes" in diagnostics |
 | Weight keys flattened or renamed | load rejected hundreds of weights | a native `load()` |
 | Text-only chat template on a vision model | list-content messages fail at prefill, or the image is dropped | `tools.hub_precheck` template shape |
-| `config.json` unparseable or without `model_type` | nothing can load it | discovery layout skip |
+| `config.json` (or, without it, `params.json`) unparseable or without `model_type` | nothing can load it | discovery layout skip |
 | `model_type` without an installed loader package | load crash (`Model type … not supported`) | architecture pre-check |
 | Weights larger than unified memory | cannot be held | `tools.hub_precheck` memory verdict |
 | Missing or empty weight shards | incomplete download | discovery layout skip |

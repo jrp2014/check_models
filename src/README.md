@@ -1496,8 +1496,12 @@ Model selection logic:
 3. `--exclude` only: run supported cached repos minus excluded.
 4. `--models` + `--exclude`: intersect explicit list then subtract exclusions.
 
-The cache filter requires repo type `model`, a cached `main` revision,
-`config.json`, `tokenizer_config.json`, and safetensors weights. When
+The cache filter requires repo type `model`, a cached `main` revision, a
+model config, `tokenizer_config.json`, and safetensors weights. The model
+config is `config.json`, or `params.json` only when `config.json` is absent,
+as mlx-vlm's loader reads it (a malformed `config.json` is skipped, not
+replaced by `params.json`); the metadata the run records comes from the same
+file. When
 `--models` is omitted, local cached repos skipped by that filter are highlighted
 with the reason before the run list. The script also warns about exclusions that
 don't match any local cached repo. Use `--dry-run` or `get_cached_model_ids()` to

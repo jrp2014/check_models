@@ -152,9 +152,11 @@ from rich.text import Text
 
 from check_models_data import safe_io
 from check_models_data.dependency_policy import (
+    MODEL_CONFIG_FILE_NAMES,
     PROJECT_MIN_TRANSFORMERS_VERSION,
     PROJECT_RUNTIME_STACK_MINIMUMS,
     UPSTREAM_MLX_VLM_MINIMUMS,
+    select_model_config_file,
 )
 
 # Optional dependency: psutil for system info; degrade gracefully if missing.
@@ -1308,6 +1310,8 @@ class CacheDiscoveryEntryRecord(TypedDict):
     thinking_template: NotRequired[bool | None]
     model_type: str | None
     arch_supported: bool | None
+    # "config.json" or "params.json": the file model_type and the capability came from.
+    config_source: NotRequired[str | None]
 
 
 @dataclass(frozen=True)
@@ -2007,7 +2011,8 @@ class PromptDiagnostics:
     # applies (e.g. max_new_tokens, repetition_penalty, reasoning_budget).
     unapplied_generation_settings: dict[str, JsonLike] = dataclass_field(default_factory=dict)
     # EOS ids as each checkpoint file declares them ("config.json",
-    # "config.json text_config", "generation_config.json"), when present.
+    # "config.json text_config", "generation_config.json"; "params.json" in
+    # place of config.json when the loader reads it), when present.
     declared_eos_token_ids: dict[str, JsonLike] = dataclass_field(default_factory=dict)
     # Snapshot files that carry a chat template, in the processor's precedence
     # (the first is the one it uses).
@@ -2227,6 +2232,8 @@ def _model_burden_rows(
     if burden is None:
         return ()
     rows: list[tuple[str, str | float | int | None]] = []
+    # Config-derived facts name the file they came from (config.json or params.json).
+    config_file = f"{burden.config_source} " if burden.config_source else ""
     weight_gb = burden.weight_bytes / 1e9 if burden.weight_bytes else None
     if weight_gb is not None:
         rows.append(("Checkpoint weights (GB)", f"{weight_gb:.2f}"))
@@ -2234,7 +2241,10 @@ def _model_burden_rows(
         count_text = f"{burden.parameter_count / 1e9:.2f}B"
         if burden.active_parameter_count is not None:
             count_text += f" total, {burden.active_parameter_count / 1e9:.2f}B active"
-        rows.append(("Parameter count", f"{count_text} ({burden.parameter_count_source})"))
+        count_source = burden.parameter_count_source
+        if count_source != "name-estimate":
+            count_source = f"{config_file}{count_source}"
+        rows.append(("Parameter count", f"{count_text} ({count_source})"))
     elif burden.active_parameter_count is not None:
         # An "A3B"-style name states the active size only; the total is unknown.
         rows.append(
@@ -2254,12 +2264,15 @@ def _model_burden_rows(
             parts.append(f"group {burden.quantization_group_size}")
         if burden.quantization_mode is not None:
             parts.append(burden.quantization_mode)
-        rows.append(("Quantization", ", ".join(parts)))
+        quantization_text = ", ".join(parts)
+        if burden.config_source:
+            quantization_text += f" ({burden.config_source})"
+        rows.append(("Quantization", quantization_text))
     if burden.context_length is not None:
         rows.append(
             (
                 "Declared context length",
-                f"{burden.context_length:,} ({burden.context_length_source})",
+                f"{burden.context_length:,} ({config_file}{burden.context_length_source})",
             )
         )
     runtime = result.runtime_diagnostics
@@ -7798,6 +7811,31 @@ def _read_snapshot_json(snapshot_path: Path, file_name: str) -> dict[str, JsonLi
     return payload if isinstance(payload, dict) else None
 
 
+class SnapshotModelConfig(NamedTuple):
+    """The configuration file mlx-vlm's loader would read from a snapshot, and its object."""
+
+    # "config.json" or "params.json"; None when the snapshot has neither.
+    source: str | None
+    # None when no file is present, or the selected one is not a readable JSON object.
+    config: dict[str, JsonLike] | None
+
+
+def _read_snapshot_model_config(snapshot_path: Path | None) -> SnapshotModelConfig:
+    """Read the snapshot's model configuration the way mlx-vlm's loader chooses it.
+
+    ``params.json`` is read only when ``config.json`` is absent; a present but
+    unreadable ``config.json`` yields its name with no object, never a fallback.
+    """
+    if snapshot_path is None:
+        return SnapshotModelConfig(None, None)
+    source = select_model_config_file(
+        {name for name in MODEL_CONFIG_FILE_NAMES if (snapshot_path / name).is_file()}
+    )
+    if source is None:
+        return SnapshotModelConfig(None, None)
+    return SnapshotModelConfig(source, _read_snapshot_json(snapshot_path, source))
+
+
 def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
     """Scan a snapshot's chat template(s) for thinking markers (Nativ-style).
 
@@ -7864,6 +7902,9 @@ class ModelBurdenFacts:
     quantization_mode: str | None = None
     context_length: int | None = None
     context_length_source: str | None = None
+    # The file the config-derived facts above came from: "config.json", or
+    # "params.json" when config.json is absent (as mlx-vlm's loader reads).
+    config_source: str | None = None
 
 
 def _snapshot_weight_bytes(snapshot_path: Path) -> int | None:
@@ -7923,7 +7964,8 @@ def _collect_model_burden(
     snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
     if snapshot_path is None or not snapshot_path.is_dir():
         return None
-    config: dict[str, JsonLike] = _read_snapshot_json(snapshot_path, "config.json") or {}
+    model_config = _read_snapshot_model_config(snapshot_path)
+    config: dict[str, JsonLike] = model_config.config or {}
 
     parameter_count: int | None = None
     parameter_count_source: str | None = None
@@ -7977,6 +8019,7 @@ def _collect_model_burden(
         quantization_mode=quantization_mode,
         context_length=context_length,
         context_length_source=context_length_source,
+        config_source=model_config.source if model_config.config is not None else None,
     )
 
 
@@ -13516,15 +13559,13 @@ def _declared_eos_token_ids(
     if snapshot_path is None:
         return {}
     declared: dict[str, JsonLike] = {}
-    config = _read_snapshot_json(snapshot_path, "config.json")
-    if isinstance(config, dict):
+    source, config = _read_snapshot_model_config(snapshot_path)
+    if source is not None and config is not None:
         if config.get("eos_token_id") is not None:
-            declared["config.json"] = _prompt_diag_json_value(config["eos_token_id"])
+            declared[source] = _prompt_diag_json_value(config["eos_token_id"])
         text_config = config.get("text_config")
         if isinstance(text_config, dict) and text_config.get("eos_token_id") is not None:
-            declared["config.json text_config"] = _prompt_diag_json_value(
-                text_config["eos_token_id"]
-            )
+            declared[f"{source} text_config"] = _prompt_diag_json_value(text_config["eos_token_id"])
     if generation_config is not None and generation_config.get("eos_token_id") is not None:
         declared["generation_config.json"] = _prompt_diag_json_value(
             generation_config["eos_token_id"]
@@ -13959,7 +14000,7 @@ class CachedModelEligibility:
     repo_id: str
     supported: bool
     reasons: tuple[str, ...] = ()
-    # Architecture pre-check (upstream --check-arch tier): config.json
+    # Architecture pre-check (upstream --check-arch tier): the model config's
     # model_type versus installed mlx_vlm/models packages. ``None`` means
     # indeterminate — never a claim that generation works.
     model_type: str | None = None
@@ -13976,10 +14017,14 @@ class CachedModelEligibility:
     # found). A neutral discovery fact — self-opening thinkers declare markers
     # without pre-opening a block, which render-time checks cannot see.
     thinking_template: bool | None = None
-    # config.json ``model_file``: mlx-vlm imports this file from the checkpoint
-    # instead of its own packages (get_model_and_args), so the package check
-    # does not apply and ``arch_supported`` stays None.
+    # The model config's ``model_file``: mlx-vlm imports this file from the
+    # checkpoint instead of its own packages (get_model_and_args), so the
+    # package check does not apply and ``arch_supported`` stays None.
     model_file: str | None = None
+    # The file the model_type, capability and model_file facts came from:
+    # "config.json", or "params.json" when config.json is absent (as mlx-vlm's
+    # loader reads); None when neither is a readable JSON object.
+    config_source: str | None = None
 
     @property
     def selected(self) -> bool:
@@ -18539,6 +18584,11 @@ def _read_cached_repo_json(repo: object, file_name: str) -> dict[str, JsonLike] 
     return _read_snapshot_json(snapshot, file_name)
 
 
+def _read_cached_repo_model_config(repo: object) -> SnapshotModelConfig:
+    """Read a cached repo's model configuration as mlx-vlm's loader chooses the file."""
+    return _read_snapshot_model_config(_hf_cache_main_snapshot_path(repo))
+
+
 # Positive image-input evidence: keys mlx-vlm VLM configs carry (surveyed across
 # every cached VLM family: vision_config plus image/vision token ids).
 _IMAGE_INPUT_CONFIG_KEYS: Final[frozenset[str]] = frozenset(
@@ -18788,8 +18838,8 @@ def _embedding_layout_signal(repo: object) -> ImageCapability | None:
 def _classify_image_capability(repo: object) -> ImageCapability:
     """Classify a cached repo's fit for the single-image description benchmark.
 
-    Reads only bounded metadata already in the snapshot (config.json and, when
-    present, model_index.json) and derives a tri-state verdict from explicit
+    Reads only bounded metadata already in the snapshot (the model config the
+    loader would read, and model_index.json when present) and derives a tri-state verdict from explicit
     keys, model type, architectures, and task stamps. It never infers policy
     from repo names and never rejects an unfamiliar layout solely because its
     capability cannot be inferred (that is ``unknown``, which still runs).
@@ -18803,9 +18853,10 @@ def _classify_image_capability(repo: object) -> ImageCapability:
             "image_or_video_generation",
             (f"model_index.json _class_name={class_name}",),
         )
-    config = _read_cached_repo_json(repo, "config.json")
+    source, config = _read_cached_repo_model_config(repo)
     if config is None:
-        return ImageCapability("unknown", "unknown", ("no readable config.json",))
+        missing = f"no readable {source}" if source else "no config.json or params.json"
+        return ImageCapability("unknown", "unknown", (missing,))
 
     layout_signal = _embedding_layout_signal(repo)
     if layout_signal is not None:
@@ -18868,7 +18919,7 @@ def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | N
     ``None`` when indeterminate (no config, unreadable config, or no installed
     mlx-vlm package to compare against).
     """
-    config = _read_cached_repo_json(repo, "config.json")
+    config = _read_cached_repo_model_config(repo).config
     if config is None:
         return None, None, None
     model_type, resolved, supported = arch_precheck_for_model_type(
@@ -18880,7 +18931,7 @@ def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | N
 
 
 def _declared_model_file(config: Mapping[str, object]) -> str | None:
-    """The checkpoint-shipped model code config.json names, if any."""
+    """The checkpoint-shipped model code the model config names, if any."""
     value = config.get("model_file")
     return value if isinstance(value, str) and value else None
 
@@ -18905,24 +18956,23 @@ def arch_precheck_for_model_type(
 
 
 def _cached_config_problem(repo: object) -> str | None:
-    """Say why a present ``config.json`` cannot be loaded, or None when it can.
+    """Say why the model config the loader would read cannot be loaded, or None.
 
-    Upstream ``load()`` reads ``config.json`` and dispatches on its
-    ``model_type``, so a file that is not a JSON object, or that has no
-    ``model_type``, is a guaranteed load failure rather than an unfamiliar
-    layout; mlx-vlm's server does not list such folders either. Only a file
-    actually on disk is judged: an absent one is the separate
-    "missing config.json" reason.
+    Upstream ``load()`` reads ``config.json`` (``params.json`` only when
+    ``config.json`` is absent) and dispatches on its ``model_type``, so a file
+    that is not a JSON object, or that has no ``model_type``, is a guaranteed
+    load failure rather than an unfamiliar layout; a malformed ``config.json``
+    fails without falling back to ``params.json``. Only a file actually on
+    disk is judged: an absent one is the separate "missing" reason.
     """
-    snapshot = _hf_cache_main_snapshot_path(repo)
-    if snapshot is None or not (snapshot / "config.json").is_file():
+    source, config = _read_cached_repo_model_config(repo)
+    if source is None:
         return None
-    config = _read_snapshot_json(snapshot, "config.json")
     if config is None:
-        return "config.json is not a readable JSON object"
+        return f"{source} is not a readable JSON object"
     model_type = config.get("model_type")
     if not isinstance(model_type, str) or not model_type.strip():
-        return "config.json has no model_type"
+        return f"{source} has no model_type"
     return None
 
 
@@ -18939,8 +18989,8 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
     if main_files is None:
         reasons.append("missing main revision in cache")
     else:
-        if "config.json" not in main_files:
-            reasons.append("missing config.json")
+        if select_model_config_file(main_files) is None:
+            reasons.append("missing config.json and params.json")
         elif (config_problem := _cached_config_problem(repo)) is not None:
             reasons.append(config_problem)
         if "tokenizer_config.json" not in main_files:
@@ -18966,6 +19016,7 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
                     )
 
     model_type, resolved_model_type, arch_supported = _model_arch_precheck(repo)
+    model_config = _read_cached_repo_model_config(repo)
     return CachedModelEligibility(
         repo_id=repo_id,
         supported=not reasons,
@@ -18975,7 +19026,8 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
         arch_supported=arch_supported,
         capability=_classify_image_capability(repo),
         thinking_template=_template_declares_thinking(_hf_cache_main_snapshot_path(repo)),
-        model_file=_declared_model_file(_read_cached_repo_json(repo, "config.json") or {}),
+        model_file=_declared_model_file(model_config.config or {}),
+        config_source=model_config.source if model_config.config is not None else None,
     )
 
 
@@ -19033,6 +19085,7 @@ def _cache_discovery_records() -> list[CacheDiscoveryEntryRecord]:
             "model_type": entry.model_type,
             "arch_supported": entry.arch_supported,
             "thinking_template": entry.thinking_template,
+            "config_source": entry.config_source,
         }
         for entry in get_cached_model_eligibility()
     ]
@@ -19055,7 +19108,8 @@ def _arch_precheck_summary(model_id: str) -> str | None:
     for entry in get_cached_model_eligibility():
         if entry.repo_id == model_id and entry.model_file is not None:
             return (
-                f"not checked: config.json model_file={entry.model_file!r} "
+                f"not checked: {entry.config_source or 'config.json'} "
+                f"model_file={entry.model_file!r} "
                 "(mlx-vlm imports and runs that checkpoint file instead of its own packages)"
             )
     model_type, resolved, supported = _arch_precheck_for_model(model_id)

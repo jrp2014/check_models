@@ -282,7 +282,8 @@ Agent workflows for native repros, HF cache filter alignment, issue-ready
 Markdown, and upstream fixes live under `.agents/skills/` (`native-mlx-vlm-repro`,
 `hf-cache-mlx-vlm-models`, `upstream-mlx-vlm-issues`,
 `upstream-mlx-vlm-contributing`). Default model discovery
-matches the mlx-vlm server cache filter (`config.json`, `tokenizer_config.json`,
+matches the mlx-vlm server cache filter (`config.json`, or `params.json` when
+`config.json` is absent as mlx-vlm's loader allows, `tokenizer_config.json`,
 safetensors on `main`); use `python -m check_models --dry-run` or
 `get_cached_model_ids()` rather than ad-hoc cache scanners.
 

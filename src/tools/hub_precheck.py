@@ -3,8 +3,10 @@
 Before spending tens of gigabytes on a checkpoint, judge it from a few small
 hub reads the way ``check_models`` will judge it once cached:
 
-1. **Layout**: the server-style file rule (``config.json``,
-   ``tokenizer_config.json``, safetensors weights).
+1. **Layout**: the cache-discovery file rule (a model config,
+   ``tokenizer_config.json``, safetensors weights). The model config is
+   ``config.json``, or ``params.json`` only when ``config.json`` is absent,
+   as mlx-vlm's loader reads it.
 2. **Architecture**: the ``model_type`` resolves (via ``MODEL_REMAPPING``) to
    an installed ``mlx_vlm/models/`` package whose ``__init__`` binds ``Model``
    and its config class (read statically, never imported).
@@ -23,7 +25,7 @@ hub reads the way ``check_models`` will judge it once cached:
    something already cached (a re-quantisation or fine-tune), worth reading
    the card before downloading. It depends on publishers declaring bases.
 
-Only ``config.json``, the chat template, the safetensors index and the
+Only the model config, the chat template, the safetensors index and the
 model-card metadata of the candidate and its declared bases are fetched,
 over HTTP(S); the local Hugging Face cache is only read, for the cached
 models' own declared bases. Verdicts are hints, never proof.
@@ -49,7 +51,9 @@ from urllib.request import Request, urlopen
 
 import yaml
 
-_LAYOUT_REQUIRED: Final[tuple[str, ...]] = ("config.json", "tokenizer_config.json")
+from check_models_data.dependency_policy import select_model_config_file
+
+_LAYOUT_REQUIRED: Final[tuple[str, ...]] = ("tokenizer_config.json",)
 _FETCH_TIMEOUT_S: Final[int] = 30
 # Hops of declared base_model followed from a candidate: an MLX conversion of
 # a fine-tune of a base model is three.
@@ -116,7 +120,8 @@ def selected_weight_files(files: Iterable[str], index_text: str | None) -> tuple
 def layout_missing(files: Iterable[str]) -> list[str]:
     """Return what the server-style cache-layout rule would find missing."""
     names = set(files)
-    missing = [name for name in _LAYOUT_REQUIRED if name not in names]
+    missing = [] if select_model_config_file(names) else ["config.json (or params.json)"]
+    missing += [name for name in _LAYOUT_REQUIRED if name not in names]
     if "model.safetensors.index.json" not in names and not any(
         name.endswith(".safetensors") for name in names
     ):
@@ -146,8 +151,11 @@ class HubCandidate:
     template_source: str | None = None
     # The hub's task label (e.g. "image-text-to-text"); recorded, not gated on.
     pipeline_tag: str | None = None
-    # config.json names checkpoint-shipped model code (mlx-vlm loads it as "custom").
+    # The model config names checkpoint-shipped model code (mlx-vlm loads it as "custom").
     model_file: str | None = None
+    # The model config read: "config.json", or "params.json" when config.json
+    # is absent (as mlx-vlm's loader reads); None when the repo lists neither.
+    config_source: str | None = None
     # The declared base_model chain, nearest first (empty when none is declared).
     base_models: tuple[str, ...] = ()
     # (cached repo, the shared id): cached models that are, or declare, one of
@@ -173,13 +181,18 @@ class HubCandidate:
             )
         elif self.model_file is not None:
             warnings.append(
-                f"config.json declares model_file={self.model_file!r}: mlx-vlm imports and "
+                f"{self.config_source or 'config.json'} declares "
+                f"model_file={self.model_file!r}: mlx-vlm imports and "
                 "runs that file from the checkpoint instead of its own model packages"
             )
         elif self.arch_supported is None:
             warnings.append(
                 "architecture not checked"
-                + (": no model_type in config.json" if self.model_type is None else "")
+                + (
+                    f": no model_type in {self.config_source or 'config.json or params.json'}"
+                    if self.model_type is None
+                    else ""
+                )
             )
         if self.weights_gb is not None and self.memory_gb and self.weights_gb > self.memory_gb:
             blocked.append(
@@ -413,20 +426,28 @@ def _template_from_tokenizer_config(text: str | None) -> str | None:
 type TextFetcher = Callable[[str], str | None]
 
 
-def _config_facts(fetch: TextFetcher) -> tuple[object, str | None]:
-    """config.json's raw model_type and its declared ``model_file``, when readable."""
-    config_text = fetch("config.json")
+def _config_facts(
+    files: Iterable[str], fetch: TextFetcher
+) -> tuple[object, str | None, str | None]:
+    """The model config's raw model_type, declared ``model_file`` and file name.
+
+    The file is the one mlx-vlm's loader reads (``params.json`` only when
+    ``config.json`` is absent); an unreadable ``config.json`` gives no facts
+    rather than a fallback. The name is None when the repo lists neither file.
+    """
+    source = select_model_config_file(set(files))
+    config_text = fetch(source) if source is not None else None
     if config_text is None:
-        return None, None
+        return None, None, source
     try:
         config = json.loads(config_text)
     except json.JSONDecodeError:
-        return None, None
+        return None, None, source
     if not isinstance(config, dict):
-        return None, None
+        return None, None, source
     declared_file = config.get("model_file")
     model_file = declared_file if isinstance(declared_file, str) and declared_file else None
-    return config.get("model_type") or config.get("speculators_model_type"), model_file
+    return config.get("model_type") or config.get("speculators_model_type"), model_file, source
 
 
 def _first_template(files: Iterable[str], fetch: TextFetcher) -> tuple[str | None, str | None]:
@@ -462,7 +483,7 @@ def fetch_candidate(
     bases_of: BasesLookup | None = None,
     cached_bases: CachedBases | None = None,
 ) -> HubCandidate:
-    """Read the file list, config.json, chat template and lineage of a hub repo."""
+    """Read the file list, model config, chat template and lineage of a hub repo."""
     from huggingface_hub import HfApi, hf_hub_url  # noqa: PLC0415 - network path only
     from huggingface_hub.utils import build_hf_headers  # noqa: PLC0415 - network path only
 
@@ -484,7 +505,7 @@ def fetch_candidate(
 
     weight_sizes = _selected_weight_sizes(files, size_by_name, fetch)
     weights_known = bool(weight_sizes) and all(weight_sizes)
-    model_type_raw, model_file = _config_facts(fetch)
+    model_type_raw, model_file, config_source = _config_facts(files, fetch)
     model_type, resolved, supported = check(model_type_raw)
     # mlx-vlm imports a declared model_file from the checkpoint instead of its
     # own packages (get_model_and_args), so the package check does not apply.
@@ -508,6 +529,7 @@ def fetch_candidate(
         template_source=template_source,
         pipeline_tag=getattr(info, "pipeline_tag", None),
         model_file=model_file,
+        config_source=config_source,
         weights_gb=_gigabytes(sum(size or 0 for size in weight_sizes)) if weights_known else None,
         memory_gb=_gigabytes(memory_bytes),
         working_set_gb=_gigabytes(working_set_bytes),
@@ -528,6 +550,7 @@ def render(candidates: Sequence[HubCandidate]) -> str:
         facts = [
             f"{label}: {value}"
             for label, value in (
+                ("config from", candidate.config_source),
                 ("template from", candidate.template_source),
                 ("pipeline_tag", candidate.pipeline_tag),
                 ("base", " → ".join(candidate.base_models)),
