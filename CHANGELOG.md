@@ -6,7 +6,7 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
-- Processor provenance (0.17.127): each record's prompt diagnostics now
+- Processor provenance (0.17.128): each record's prompt diagnostics now
   carry `image_processor_class` (the processor's `image_processor`) and
   `image_processor_settings`: the public resize, crop and patch attributes
   the loaded image processor holds (`do_resize`, `size`, `min_pixels`,
@@ -192,7 +192,7 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Report wording (0.17.128): results that completed with only answer-format
+- Report wording (0.17.129): results that completed with only answer-format
   observations or hint reuse are no longer called "prompt-compliance
   observations". Reusing supplied, correct hints is allowed, so the run
   summary now says "answer-format or hint-reuse observations only (labels or
@@ -201,7 +201,8 @@ Notable changes to this project will be documented in this file.
   and Hint-Reuse Notes (not maintainer issues)", describing hint reuse as
   not in itself a fault. Counts, grouping, observation codes and the
   keyword and hint-text overlap columns are unchanged.
-- Model config discovery (0.17.126): cached-model eligibility, the Hub
+- Model config discovery (0.17.127; committed as 0.17.126, which another
+  change also used): cached-model eligibility, the Hub
   pre-check (`tools.hub_precheck`) and the snapshot metadata readers (model
   burden facts, declared EOS ids, architecture pre-check, image-capability
   classification) now read the model config the way mlx-vlm's `load_config`
