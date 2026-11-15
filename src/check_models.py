@@ -11218,15 +11218,16 @@ def _diagnostics_evidence_blocks(
     compliance: ReportBlock = (
         ReportTable(("Model", "Mechanical checks", "Observations"), compliance_rows)
         if compliance_rows
-        else ReportParagraph("No compliance-only observations.")
+        else ReportParagraph("No answer-format or hint-reuse observations.")
     )
     blocks.append(
         _report_section(
-            "Model Compliance Notes (not maintainer issues)",
+            "Model Answer-Format and Hint-Reuse Notes (not maintainer issues)",
             ReportParagraph(
-                "Prompt-compliance observations (missing fields, constraint counts, hint "
-                "copying, instruction echo, cap hits) inform model selection; complete "
-                "evidence is in the model gallery."
+                "Answer-format observations (missing fields, constraint counts, instruction "
+                "echo, cap hits) and hint reuse (text or keywords repeated from the prompt's "
+                "hints, which is allowed and not in itself a fault) inform model selection; "
+                "complete evidence is in the model gallery."
             ),
             compliance,
         )
@@ -26444,7 +26445,7 @@ def _run_issue_summary_artifacts_section(
 
 
 def _completion_breakdown(results: Sequence[JsonlResultRecord]) -> tuple[int, int, int]:
-    """Completed results: no observations, prompt-compliance only, and native-repro candidates."""
+    """Completed results: no observations, answer-format or hint reuse only, and repro candidates."""
     completed = [
         result["assessment"]
         for result in results
@@ -26462,8 +26463,9 @@ def _completion_breakdown_sentence(results: Sequence[JsonlResultRecord]) -> str 
         return None
     return (
         f"**Completed models:** {clean} with no mechanical observations, "
-        f"{compliance_only} with prompt-compliance observations only (labels, form or "
-        f"copied hint text), and {review} with observations mlx-vlm can produce (such as "
+        f"{compliance_only} with answer-format or hint-reuse observations only (labels or "
+        "form, or text reused from the prompt's hints, which is allowed), and "
+        f"{review} with observations mlx-vlm can produce (such as "
         "repetition, missing final answers or visible control tokens); only those "
         f"{review} are candidates for native reproduction."
     )
@@ -26484,7 +26486,7 @@ def _run_issue_summary_clean_completions_section(
     if compliance_only_count:
         clean_sentence = (
             f"{clean_phrase}; "
-            f"{compliance_only_count} more completed with prompt-compliance "
+            f"{compliance_only_count} more completed with answer-format or hint-reuse "
             "observations only (not maintainer issues)."
         )
     if include_gallery_markdown:

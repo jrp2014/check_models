@@ -638,7 +638,7 @@ def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) 
     assert "org/a-minimal" not in observations
     compliance = _extract_markdown_subsection(
         content,
-        "## Model Compliance Notes (not maintainer issues)",
+        "## Model Answer-Format and Hint-Reuse Notes (not maintainer issues)",
         end_headings=("## Context for completions without detected concerns",),
     )
     assert "org/a-minimal" in compliance
@@ -10058,6 +10058,7 @@ def test_run_summary_breakdown_says_why_only_some_need_native_reproduction() -> 
         _issue_summary_result(
             "org/labels", usability="unusable", observations=["missing_requested_sections"]
         ),
+        _issue_summary_result("org/hints", usability="usable", observations=["prompt_hint_echoed"]),
         _issue_summary_result(
             "org/loop",
             usability="unusable",
@@ -10069,7 +10070,12 @@ def test_run_summary_breakdown_says_why_only_some_need_native_reproduction() -> 
         cast("list[check_models.JsonlResultRecord]", results)
     )
     assert sentence is not None
-    assert "1 with no mechanical observations, 1 with prompt-compliance" in sentence
+    # Reusing supplied hints is allowed: it is named as reuse, not as non-compliance.
+    assert (
+        "1 with no mechanical observations, 2 with answer-format or hint-reuse observations "
+        "only (labels or form, or text reused from the prompt's hints, which is allowed)"
+    ) in sentence
+    assert "compliance" not in sentence
     assert "only those 1 are candidates for native reproduction" in sentence
 
 

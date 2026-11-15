@@ -192,6 +192,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Report wording (0.17.128): results that completed with only answer-format
+  observations or hint reuse are no longer called "prompt-compliance
+  observations". Reusing supplied, correct hints is allowed, so the run
+  summary now says "answer-format or hint-reuse observations only (labels or
+  form, or text reused from the prompt's hints, which is allowed)", and the
+  `diagnostics.md` / `results.html` section is renamed "Model Answer-Format
+  and Hint-Reuse Notes (not maintainer issues)", describing hint reuse as
+  not in itself a fault. Counts, grouping, observation codes and the
+  keyword and hint-text overlap columns are unchanged.
 - Model config discovery (0.17.126): cached-model eligibility, the Hub
   pre-check (`tools.hub_precheck`) and the snapshot metadata readers (model
   burden facts, declared EOS ids, architecture pre-check, image-capability
