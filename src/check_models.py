@@ -1968,6 +1968,16 @@ class ReasoningEffortResolution:
     template_variables: tuple[str, ...] = ()
 
 
+class ImageProcessorSetting(NamedTuple):
+    """One image-processor attribute as loaded, and the source of its value."""
+
+    value: JsonLike
+    # "preprocessor_config.json", "processor_config.json image_processor",
+    # "processor default" (the checkpoint file does not declare it), or
+    # "source not checked" / "<file> unreadable" when the file could not be read.
+    source: str
+
+
 @dataclass(frozen=True)
 class PromptDiagnostics:
     """Bounded prompt/rendering context for maintainer repro artifacts."""
@@ -1975,6 +1985,15 @@ class PromptDiagnostics:
     model_type: str | None = None
     processor_class: str | None = None
     tokenizer_class: str | None = None
+    # The processor's image processor (``processor.image_processor``), when it has one.
+    image_processor_class: str | None = None
+    # Public resize/crop/patch attributes the loaded image processor holds,
+    # each with where it came from: the snapshot file that declares it, or
+    # "processor default" when that file does not. Attributes the processor
+    # lacks are left out (unknown); nothing here is derived or recomputed.
+    image_processor_settings: dict[str, ImageProcessorSetting] = dataclass_field(
+        default_factory=dict
+    )
     rendered_prompt_hash_sha256: str | None = None
     rendered_prompt_preview: str | None = None
     # Complete rendered chat-template prompt as sent upstream (the preview is
@@ -10598,6 +10617,7 @@ def _diagnostics_result_facts(
         ("Requested model revision", requested_revision),
         ("Processor class", processor),
         ("Tokenizer class", tokenizer),
+        *_image_processor_fact_rows(prompt_diagnostics),
         *_runtime_termination_facts(runtime),
         (
             "Checkpoint-declared sampling (generation_config.json)",
@@ -10742,6 +10762,29 @@ def _oom_capacity_rows(
             ("Upstream memory estimate", f"model {match.group(0).strip()} (mlx-vlm warning)")
         )
     return tuple(rows)
+
+
+def _image_processor_fact_rows(
+    diagnostics: PromptDiagnostics | None,
+) -> tuple[tuple[str, str | None], ...]:
+    """The image-processor class and settings rows (None values are left out)."""
+    if diagnostics is None:
+        return ()
+    return (
+        ("Image processor class", diagnostics.image_processor_class),
+        ("Image processor settings", _image_processor_settings_fact(diagnostics)),
+    )
+
+
+def _image_processor_settings_fact(diagnostics: PromptDiagnostics | None) -> str | None:
+    """Image-processor attributes as "key=value (source)", grouped by source; None when none."""
+    if diagnostics is None or not diagnostics.image_processor_settings:
+        return None
+    by_source: dict[str, list[str]] = {}
+    for key, setting in diagnostics.image_processor_settings.items():
+        value_text = json.dumps(setting.value, ensure_ascii=False, sort_keys=True)
+        by_source.setdefault(setting.source, []).append(f"{key}={value_text}")
+    return "; ".join(f"{', '.join(items)} ({source})" for source, items in by_source.items())
 
 
 def _checkpoint_fact_rows(
@@ -13668,6 +13711,75 @@ def _active_chat_template(processor: object) -> _ActiveChatTemplate:
     )
 
 
+# Public image-processor attributes that decide resizing, cropping and patching.
+# Recorded as the loaded processor holds them; patch counts are never derived.
+_IMAGE_PROCESSOR_SETTING_KEYS: Final[tuple[str, ...]] = (
+    "do_resize",
+    "size",
+    "min_pixels",
+    "max_pixels",
+    "do_center_crop",
+    "crop_size",
+    "patch_size",
+    "merge_size",
+    "temporal_patch_size",
+)
+_IMAGE_PROCESSOR_DEFAULT_SOURCE: Final[str] = "processor default"
+
+
+def _declared_image_processor_config(
+    snapshot_path: Path | None,
+) -> tuple[str, Mapping[str, JsonLike] | None]:
+    """The snapshot's image-processor settings as transformers selects them, with the file.
+
+    transformers 5 reads a nested ``image_processor`` from processor_config.json
+    first, else preprocessor_config.json (ImageProcessingMixin.get_image_processor_dict).
+    Returns ``(label, mapping)``; the mapping is None when the settings could
+    not be read, so no key can be called a default, and empty when neither
+    file declares any.
+    """
+    if snapshot_path is None:
+        return "source not checked", None
+    processor_config = _read_snapshot_json(snapshot_path, "processor_config.json")
+    nested = processor_config.get("image_processor") if processor_config is not None else None
+    if isinstance(nested, dict):
+        return "processor_config.json image_processor", nested
+    if not (snapshot_path / "preprocessor_config.json").is_file():
+        return _IMAGE_PROCESSOR_DEFAULT_SOURCE, {}
+    declared = _read_snapshot_json(snapshot_path, "preprocessor_config.json")
+    if declared is None:
+        return "preprocessor_config.json unreadable", None
+    return "preprocessor_config.json", declared
+
+
+def _image_processor_setting_value(value: object) -> JsonLike:
+    """A JSON form of one attribute; transformers' SizeDict keeps only its set fields."""
+    if is_dataclass(value) and not isinstance(value, type):
+        return {
+            item.name: _prompt_diag_json_value(item_value)
+            for item in fields(value)
+            if (item_value := getattr(value, item.name)) is not None
+        }
+    return _prompt_diag_json_value(value)
+
+
+def _image_processor_settings(
+    image_processor: object | None, snapshot_path: Path | None
+) -> dict[str, ImageProcessorSetting]:
+    """Source-labelled resize/crop/patch attributes of a loaded image processor."""
+    if image_processor is None:
+        return {}
+    label, declared = _declared_image_processor_config(snapshot_path)
+    settings: dict[str, ImageProcessorSetting] = {}
+    for key in _IMAGE_PROCESSOR_SETTING_KEYS:
+        value = getattr(image_processor, key, None)
+        if value is None:
+            continue
+        source = label if declared is None or key in declared else _IMAGE_PROCESSOR_DEFAULT_SOURCE
+        settings[key] = ImageProcessorSetting(_image_processor_setting_value(value), source)
+    return settings
+
+
 def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is an explicit keyword  # skylos: ignore[SKY-C303]
     *,
     template: _ChatTemplateFacts,
@@ -13691,10 +13803,13 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
     model_type = str(model_type_raw) if model_type_raw is not None else None
     eos_token = getattr(tokenizer, "eos_token", None)
     template_variables = template.variables
+    image_processor = getattr(processor, "image_processor", None)
     return PromptDiagnostics(
         model_type=model_type,
         processor_class=_qualified_class_name(processor),
         tokenizer_class=_qualified_class_name(tokenizer),
+        image_processor_class=_qualified_class_name(image_processor),
+        image_processor_settings=_image_processor_settings(image_processor, snapshot_path),
         rendered_prompt_hash_sha256=_sha256_text(formatted_prompt),
         rendered_prompt_preview=_build_prompt_preview(
             formatted_prompt,
@@ -13773,6 +13888,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "model_type",
         "processor_class",
         "tokenizer_class",
+        "image_processor_class",
         "rendered_prompt_hash_sha256",
         "rendered_prompt_preview",
         "rendered_prompt",
@@ -13819,6 +13935,11 @@ def _checkpoint_facts_to_json(diagnostics: PromptDiagnostics) -> dict[str, JsonL
     for key in ("unapplied_generation_settings", "declared_eos_token_ids"):
         if mapping := getattr(diagnostics, key):
             facts[key] = dict(mapping)
+    if diagnostics.image_processor_settings:
+        facts["image_processor_settings"] = {
+            key: {"value": setting.value, "source": setting.source}
+            for key, setting in diagnostics.image_processor_settings.items()
+        }
     for key in ("chat_template_sources", "unread_chat_template_kwargs"):
         if values := getattr(diagnostics, key):
             facts[key] = list(values)

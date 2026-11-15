@@ -6,6 +6,21 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Processor provenance (0.17.127): each record's prompt diagnostics now
+  carry `image_processor_class` (the processor's `image_processor`) and
+  `image_processor_settings`: the public resize, crop and patch attributes
+  the loaded image processor holds (`do_resize`, `size`, `min_pixels`,
+  `max_pixels`, `do_center_crop`, `crop_size`, `patch_size`, `merge_size`,
+  `temporal_patch_size`), each with its source. The source is the snapshot
+  file that declares the key, read in transformers' order (a nested
+  `image_processor` in `processor_config.json`, else
+  `preprocessor_config.json`), or "processor default" when that file does
+  not declare it; "source not checked" or "preprocessor_config.json
+  unreadable" when the file could not be read. Attributes a processor lacks
+  are left out (unknown), and nothing is derived: no patch counts, no
+  reconstructed preprocessing. `diagnostics.md` shows both as "Image
+  processor class" and "Image processor settings" rows, so a changed
+  visual-token count after a processor update can be read against them.
 - CLI (0.17.107): `--reasoning-effort` now reaches only chat templates
   that read `reasoning_effort` or `reasoning_strength`, under the names each
   reads; a template reading neither gets nothing, with an INFO line per

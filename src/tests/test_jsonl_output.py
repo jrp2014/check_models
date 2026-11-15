@@ -1412,6 +1412,131 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     }
 
 
+def _prompt_diagnostics_for(
+    processor: object, snapshot: Path | None
+) -> check_models.PromptDiagnostics:
+    """Build prompt diagnostics the way a run does, around this processor."""
+    template = check_models._ChatTemplateFacts(
+        kwargs={},
+        variables=None,
+        declared_reasoning_efforts=None,
+        reasoning_effort_allowlist_enforced=False,
+        reasoning_effort=None,
+    )
+    return check_models._build_prompt_diagnostics(
+        template=template,
+        processor=cast("check_models.ProcessorMixin", processor),
+        config={"model_type": "llava"},
+        formatted_prompt="<image> Describe this.",
+        generate_kwargs={},
+        processor_passthrough_kwargs={},
+        snapshot_path=snapshot,
+        generation_config=None,
+        declared_sampling={},
+        sampling_sources={},
+    )
+
+
+def test_image_processor_class_and_settings_are_recorded_with_their_source(
+    tmp_path: Path,
+) -> None:
+    """A real transformers image processor: declared settings vs processor defaults.
+
+    The checkpoint declares only ``size``; ``crop_size`` and the flags come from
+    the processor class. Nothing is derived (no patch counts).
+    """
+    transformers = pytest.importorskip("transformers")
+    snapshot = tmp_path / "snapshot"
+    snapshot.mkdir()
+    declared = {"size": {"shortest_edge": 336}}
+    safe_io.write_text_no_follow(snapshot / "preprocessor_config.json", json.dumps(declared))
+    # Built from the declared settings, as from_pretrained would, without a hub-style load.
+    image_processor = transformers.CLIPImageProcessor(**declared)
+    processor = SimpleNamespace(image_processor=image_processor)
+
+    diagnostics = _prompt_diagnostics_for(processor, snapshot)
+
+    assert diagnostics.image_processor_class is not None
+    assert "CLIPImageProcessor" in diagnostics.image_processor_class
+    settings = diagnostics.image_processor_settings
+    assert settings["size"].value == {"shortest_edge": 336}
+    assert settings["size"].source == "preprocessor_config.json"
+    assert settings["crop_size"].value == {"height": 224, "width": 224}
+    assert settings["crop_size"].source == "processor default"
+    assert "patch_size" not in settings  # CLIP's image processor has none: left unknown
+
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="org/m", generation=None, success=True, prompt_diagnostics=diagnostics
+    )
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+    recorded = _require_present(rows[0].get("prompt_diagnostics"), field_name="prompt_diagnostics")
+    assert recorded["image_processor_class"] == diagnostics.image_processor_class
+    recorded_settings = recorded["image_processor_settings"]
+    assert isinstance(recorded_settings, dict)
+    assert recorded_settings["size"] == {
+        "value": {"shortest_edge": 336},
+        "source": "preprocessor_config.json",
+    }
+    fact = check_models._image_processor_settings_fact(diagnostics)
+    assert fact is not None
+    assert 'size={"shortest_edge": 336} (preprocessor_config.json)' in fact
+    assert 'crop_size={"height": 224, "width": 224}' in fact
+    assert "(processor default)" in fact
+
+
+@pytest.mark.parametrize(
+    ("files", "source"),
+    [
+        (
+            {
+                "processor_config.json": '{"image_processor": {"patch_size": 14}}',
+                "preprocessor_config.json": '{"merge_size": 2}',
+            },
+            {
+                "patch_size": "processor_config.json image_processor",
+                "merge_size": "processor default",
+            },
+        ),
+        (
+            {"preprocessor_config.json": "not json"},
+            {
+                "patch_size": "preprocessor_config.json unreadable",
+                "merge_size": "preprocessor_config.json unreadable",
+            },
+        ),
+        ({}, {"patch_size": "processor default", "merge_size": "processor default"}),
+        (None, {"patch_size": "source not checked", "merge_size": "source not checked"}),
+    ],
+    ids=["nested-wins", "unreadable", "no-file", "no-snapshot"],
+)
+def test_image_processor_setting_sources_follow_the_transformers_file_order(
+    tmp_path: Path, files: dict[str, str] | None, source: dict[str, str]
+) -> None:
+    """processor_config.json's nested image_processor first, else preprocessor_config.json."""
+    snapshot: Path | None = None
+    if files is not None:
+        snapshot = tmp_path / "snapshot"
+        snapshot.mkdir()
+        for name, text in files.items():
+            safe_io.write_text_no_follow(snapshot / name, text)
+    image_processor = SimpleNamespace(patch_size=14, merge_size=2, crop_size=None)
+
+    settings = check_models._image_processor_settings(image_processor, snapshot)
+
+    assert {key: setting.source for key, setting in settings.items()} == source
+    assert "crop_size" not in settings  # None on the processor: unknown, not recorded
+
+
+def test_a_processor_without_an_image_processor_records_none(tmp_path: Path) -> None:
+    """No image_processor attribute: no class and no settings, rather than guesses."""
+    diagnostics = _prompt_diagnostics_for(SimpleNamespace(), tmp_path)
+    assert diagnostics.image_processor_class is None
+    assert diagnostics.image_processor_settings == {}
+    assert "image_processor_settings" not in check_models._prompt_diagnostics_to_json(diagnostics)
+
+
 def test_jsonl_does_not_back_project_legacy_machine_facts(tmp_path: Path) -> None:
     """Machine rows should expose the assessment without legacy report aliases."""
     output_file = tmp_path / "results.jsonl"
