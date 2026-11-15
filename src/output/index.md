@@ -1,24 +1,24 @@
 # Check Models Output Index
 
-Run: started 2026-11-11 18:43:43 GMT; check_models 0.17.119 @ 95efedab3
+Run: started 2026-11-15 00:17:44 GMT; check_models 0.17.124 @ 0aaa2c8e9
 
 Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 
 This run records model responses to one shared image and prompt (evaluation
-lane: blind). Mechanical checks are not factual-accuracy judgments; inspect
+lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
 the image, prompt and final answers before choosing a model. Results do not
 establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 3m 44s
-- Evaluation lane: blind
-- Prompt hints: no description or keyword hints
+- Run duration: 10m 35s
+- Evaluation lane: assisted
+- Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- Input image: JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
+- Input image: JPEG, 9,984 x 5,616 pixels (56.1 MP), 28.7 MB
 - Models attempted: 41 (completed 41, crashed 0, indeterminate 0)
-- Mechanical checks: no concerns detected 34, concerns detected 1, major concerns 6 (generation 1, answer format 5), not assessed 0
-- Observations, most important first: Response repeats the same text (1), Unrecognised model control tokens remain visible (2), Required labelled fields not detected (5), Response appears cut off at the token limit (2), Conversation-role control tokens remain visible (1); 1 more kind in diagnostics
+- Mechanical checks: no concerns detected 33, concerns detected 5, major concerns 3 (generation 0, answer format 3), not assessed 0
+- Observations, most important first: Unrecognised model control tokens remain visible (1), Required labelled fields not detected (3), Repeated keyword entries (1), Output repeats the prompt's own hint text (4)
 
 ## Start here
 
