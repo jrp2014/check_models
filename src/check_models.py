@@ -829,7 +829,7 @@ def _import_mlx_vlm(*, probe_first: bool) -> None:
         strict: bool = True,
         *,
         trust_remote_code: bool = True,
-        **kwargs: object,
+        **kwargs: Unpack[LoadExtraKwargs],
     ) -> tuple[nn.Module, ProcessorMixin]:
         loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
             path_or_hf_repo=path_or_hf_repo,

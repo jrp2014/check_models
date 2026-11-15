@@ -1843,6 +1843,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Typing (0.17.126): the mlx-vlm `load()` wrapper types its extra keyword
+  arguments with the existing `LoadExtraKwargs` TypedDict instead of
+  `**kwargs: object`. mlx-vlm main added a `sharding_group:
+  mx.distributed.Group | None` parameter to `load()`, so mypy rejected the
+  untyped forwarding there. *Behaviour preserved:* the same two keywords
+  (`force_download`, `quantize_activations`) reach `load()`.
 - Catalogue fields (0.17.125): a title now ends at its first blank line.
   When a model left out the `Description:` label, the unlabelled description
   paragraph was read as part of the title, so the gallery preview showed it
