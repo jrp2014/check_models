@@ -125,7 +125,7 @@ clean_directory() {
 				remove_direct_child_dir "$dir" "$pattern"
 				echo "  ✓ Removed: $pattern/"
 			fi
-			((cleaned++))
+			cleaned=$((cleaned + 1))
 		fi
 	done
 	
@@ -137,7 +137,7 @@ clean_directory() {
 			rm -rf "$egginfo"
 			echo "  ✓ Removed: $(basename "$egginfo")"
 		fi
-		((cleaned++))
+		cleaned=$((cleaned + 1))
 	done < <(find "$dir" -maxdepth 1 -type d -name '*.egg-info' -print0 2>/dev/null)
 	
 	# Cache directories (including linter caches)
@@ -147,16 +147,16 @@ clean_directory() {
 			count=$(find "$dir" -type d -name "$cache" 2>/dev/null | wc -l | tr -d ' ')
 			if [[ $count -gt 0 ]]; then
 				echo "  [DRY RUN] Would remove: $count $cache directories"
-				((cleaned++))
+				cleaned=$((cleaned + 1))
 			fi
 		else
 			while IFS= read -r -d '' cachedir; do
 				rm -rf "$cachedir"
-				((count++))
+				count=$((count + 1))
 			done < <(find "$dir" -type d -name "$cache" -print0 2>/dev/null)
 			if [[ $count -gt 0 ]]; then
 				echo "  ✓ Removed: $count $cache directories"
-				((cleaned++))
+				cleaned=$((cleaned + 1))
 			fi
 		fi
 	done
@@ -167,16 +167,16 @@ clean_directory() {
 		pyc_count=$(find "$dir" -type f \( -name '*.pyc' -o -name '*.pyo' \) 2>/dev/null | wc -l | tr -d ' ')
 		if [[ $pyc_count -gt 0 ]]; then
 			echo "  [DRY RUN] Would remove: $pyc_count bytecode files"
-			((cleaned++))
+			cleaned=$((cleaned + 1))
 		fi
 	else
 		while IFS= read -r -d '' pycfile; do
 			rm -f "$pycfile"
-			((pyc_count++))
+			pyc_count=$((pyc_count + 1))
 		done < <(find "$dir" -type f \( -name '*.pyc' -o -name '*.pyo' \) -print0 2>/dev/null)
 		if [[ $pyc_count -gt 0 ]]; then
 			echo "  ✓ Removed: $pyc_count bytecode files"
-			((cleaned++))
+			cleaned=$((cleaned + 1))
 		fi
 	fi
 	
@@ -186,16 +186,16 @@ clean_directory() {
 		ds_count=$(find "$dir" -type f -name '.DS_Store' 2>/dev/null | wc -l | tr -d ' ')
 		if [[ $ds_count -gt 0 ]]; then
 			echo "  [DRY RUN] Would remove: $ds_count .DS_Store files"
-			((cleaned++))
+			cleaned=$((cleaned + 1))
 		fi
 	else
 		while IFS= read -r -d '' dsfile; do
 			rm -f "$dsfile"
-			((ds_count++))
+			ds_count=$((ds_count + 1))
 		done < <(find "$dir" -type f -name '.DS_Store' -print0 2>/dev/null)
 		if [[ $ds_count -gt 0 ]]; then
 			echo "  ✓ Removed: $ds_count .DS_Store files"
-			((cleaned++))
+			cleaned=$((cleaned + 1))
 		fi
 	fi
 	
@@ -232,7 +232,7 @@ if [[ -d "$OUTPUT_DIR" ]]; then
 			rm -rf "$testfile"
 			echo "  ✓ Removed: $(basename "$testfile")"
 		fi
-		((test_cleaned++))
+		test_cleaned=$((test_cleaned + 1))
 	done < <(find "$OUTPUT_DIR" -mindepth 1 -maxdepth 1 -name 'test_*' -print0 2>/dev/null)
 	if [[ $test_cleaned -eq 0 ]]; then
 		echo "  (no test output files found)"
@@ -254,7 +254,7 @@ for cache in ".pytest_cache" ".mypy_cache" ".ruff_cache"; do
 			rm -rf "${SCRIPTS_DIR:?}/$cache"
 			echo "  ✓ Removed: $cache/"
 		fi
-		((root_cleaned++))
+		root_cleaned=$((root_cleaned + 1))
 	fi
 done
 # Clean .DS_Store at root level
@@ -265,7 +265,7 @@ if [[ -f "$SCRIPTS_DIR/.DS_Store" ]]; then
 		rm -f "$SCRIPTS_DIR/.DS_Store"
 		echo "  ✓ Removed: .DS_Store"
 	fi
-	((root_cleaned++))
+	root_cleaned=$((root_cleaned + 1))
 fi
 if [[ $root_cleaned -eq 0 ]]; then
 	echo "  (no artifacts found)"

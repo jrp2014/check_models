@@ -445,25 +445,137 @@ def test_conda_setup_verifier_imports_declared_non_dev_dependencies() -> None:
     assert imported_modules <= declared_imports
 
 
-def test_conda_setup_verifies_mlx_backend_pair() -> None:
-    """Fresh setup should fail fast on mismatched or missing MLX Metal artifacts."""
+def _setup_script_function(name: str) -> str:
+    """Extract one top-level shell function from setup_conda_env.sh."""
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+    match = re.search(
+        rf"^{re.escape(name)}\(\) \{{\n.*?^\}}\n", setup_script, re.DOTALL | re.MULTILINE
+    )
+    assert match is not None, name
+    return match.group(0)
 
-    assert "metadata.version('mlx-metal')" in setup_script
-    assert "mlx/mlx-metal version mismatch" in setup_script
-    assert "mlx.metallib" in setup_script
-    assert "MLX Metal library missing" in setup_script
-    assert "MLX editable install detected" in setup_script
+
+def _run_setup_verification(
+    tmp_path: Path,
+    *,
+    mlx: str = "0.32.4",
+    mlx_metal: str | None = "0.32.4",
+    metallib: bool = True,
+    editable: bool = False,
+    cli: str = "hf",
+) -> subprocess.CompletedProcess[str]:
+    """Run setup_conda_env.sh's verify_installation against a fake macOS install.
+
+    A site directory holds stand-in ``mlx`` (with or without its metallib),
+    ``mlx_vlm``, ``huggingface_hub`` and ``PIL`` packages and the mlx
+    distribution metadata, and is the only package directory the check sees;
+    ``platform.system()`` reports Darwin. ``cli`` is the Hugging Face
+    command put on PATH ("" for none).
+    """
+    site = tmp_path / "site"
+    for package in ("mlx", "mlx_vlm", "huggingface_hub"):
+        (site / package).mkdir(parents=True)
+        safe_io.write_text_no_follow(site / package / "__init__.py", "")
+    safe_io.write_text_no_follow(site / "mlx" / "core.py", "")
+    if metallib:
+        (site / "mlx" / "lib").mkdir()
+        safe_io.write_text_no_follow(site / "mlx" / "lib" / "mlx.metallib", "")
+    distributions = {"mlx": mlx} | ({"mlx-metal": mlx_metal} if mlx_metal else {})
+    for name, version in distributions.items():
+        dist_info = site / f"{name.replace('-', '_')}-{version}.dist-info"
+        dist_info.mkdir()
+        safe_io.write_text_no_follow(
+            dist_info / "METADATA", f"Metadata-Version: 2.1\nName: {name}\nVersion: {version}\n"
+        )
+        if name == "mlx" and editable:
+            safe_io.write_text_no_follow(
+                dist_info / "direct_url.json",
+                '{"url": "file:///src/mlx", "dir_info": {"editable": true}}',
+            )
+    safe_io.write_text_no_follow(
+        site / "sitecustomize.py", "import platform\nplatform.system = lambda: 'Darwin'\n"
+    )
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    (site / "PIL").mkdir()
+    for module in ("__init__.py", "Image.py"):
+        safe_io.write_text_no_follow(site / "PIL" / module, "")
+    # -S keeps the real environment's site-packages (and its mlx metadata) out;
+    # the snippet runs with only the stand-ins and the standard library.
+    launcher = (
+        f"import sys; sys.path.insert(0, {str(site)!r}); import sitecustomize; "
+        "exec(compile(sys.argv[1], '<setup>', 'exec'))"
+    )
+    safe_io.write_text_no_follow(
+        fake_bin / "python",
+        "#!/bin/bash\n"
+        f'[[ "$1" == "-c" ]] && exec "{sys.executable}" -S -c "{launcher}" "$2"\n'
+        f'exec "{sys.executable}" "$@"\n',
+        mode=0o755,
+    )
+    if cli:
+        safe_io.write_text_no_follow(fake_bin / cli, "#!/bin/bash\n", mode=0o755)
+    functions = "".join(
+        _setup_script_function(name)
+        for name in ("log_info", "log_success", "log_warn", "log_error", "verify_installation")
+    )
+    return _run_bash_script(
+        f"set -e\n{functions}verify_installation\n",
+        env={"PATH": f"{fake_bin}:/usr/bin:/bin", "HOME": str(tmp_path)},
+    )
 
 
-def test_conda_setup_uses_current_huggingface_cli_installation() -> None:
-    """Avoid installing removed huggingface-hub extras on any bootstrap path."""
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("install", "expected"),
+    [
+        ({}, "✓ MLX-Metal version: 0.32.4"),
+        ({"mlx_metal": "0.32.3"}, "mlx/mlx-metal version mismatch: mlx=0.32.4, mlx-metal=0.32.3"),
+        ({"metallib": False}, "MLX Metal library missing"),
+        ({"mlx_metal": None}, "mlx-metal is required for the PyPI mlx backend on macOS"),
+        (
+            {"mlx_metal": None, "editable": True},
+            "✓ MLX editable install detected; local backend comes from the mlx package",
+        ),
+    ],
+    ids=["matched-pair", "mismatch", "no-metallib", "pypi-without-metal", "editable-mlx"],
+)
+def test_conda_setup_verifies_the_mlx_backend_pair(
+    tmp_path: Path, install: dict[str, typing.Any], expected: str
+) -> None:
+    """Setup verification passes a matched or editable backend and stops on a broken one."""
+    result = _run_setup_verification(tmp_path, **install)
+
+    should_pass = not install or install.get("editable", False)
+    assert expected in result.stdout + result.stderr
+    assert (result.returncode == 0) == should_pass, result.stdout + result.stderr
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("cli", "expected"),
+    [
+        ("hf", "Hugging Face CLI command 'hf' is available"),
+        ("huggingface-cli", "Legacy Hugging Face CLI command 'huggingface-cli' is available"),
+        ("", "Hugging Face CLI command not found"),
+    ],
+)
+def test_conda_setup_reports_the_hugging_face_cli_it_finds(
+    tmp_path: Path, cli: str, expected: str
+) -> None:
+    """``hf`` is the current command; the legacy name is still recognised."""
+    result = _run_setup_verification(tmp_path, cli=cli)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert expected in result.stdout
+
+
+def test_conda_setup_does_not_install_the_removed_huggingface_cli_extra() -> None:
+    """huggingface-hub no longer has a ``cli`` extra; no install path may ask for it."""
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
-
-    assert '"huggingface_hub[cli]"' not in setup_script
-    assert "command -v hf" in setup_script
-
     makefile = (PKG_ROOT / "Makefile").read_text(encoding="utf-8")
+
+    assert "huggingface_hub[cli]" not in setup_script
     assert "huggingface_hub[cli]" not in makefile
 
 
@@ -585,26 +697,124 @@ def test_common_quality_python_tools_do_not_fall_back_to_path_by_default(tmp_pat
     assert result.returncode == 0, result.stderr or result.stdout
 
 
-def test_conda_setup_uses_conda_executable_without_sourcing_conda_sh() -> None:
-    """Setup should use conda directly and avoid dynamic conda.sh sourcing."""
-    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+@pytest.mark.subprocess
+@pytest.mark.parametrize("env_exists", [True, False], ids=["env-found", "env-missing"])
+def test_conda_setup_targets_the_env_by_path_without_activating(
+    tmp_path: Path, *, env_exists: bool
+) -> None:
+    """The env is found with ``conda env list`` and used by its prefix; nothing is sourced."""
+    prefix = tmp_path / "envs" / "mlx-vlm"
+    (prefix / "bin").mkdir(parents=True)
+    safe_io.write_text_no_follow(prefix / "bin" / "python", "#!/bin/bash\n", mode=0o755)
+    conda_log = tmp_path / "conda.log"
+    listing = f"mlx-vlm                  {prefix}" if env_exists else "base  /opt/conda"
+    conda = tmp_path / "conda"
+    safe_io.write_text_no_follow(
+        conda,
+        f'#!/bin/bash\necho "$*" >> "{conda_log}"\n'
+        f'[[ "$*" == "env list" ]] && echo "{listing}"\nexit 0\n',
+        mode=0o755,
+    )
+    functions = "".join(
+        _setup_script_function(name)
+        for name in (
+            "log_info",
+            "log_error",
+            "conda_cmd",
+            "conda_env_prefix",
+            "activate_environment_path",
+        )
+    )
+    result = _run_bash_script(
+        f'{functions}CONDA_BIN="{conda}"\nENV_NAME=mlx-vlm\nactivate_environment_path\n'
+        'echo "PREFIX=$CONDA_PREFIX"\necho "ENV=$CONDA_DEFAULT_ENV"\n'
+        'echo "PYTHON=$(command -v python)"\n',
+        env={"PATH": "/usr/bin:/bin"},
+    )
 
-    assert "source_conda_sh" not in setup_script
-    assert "conda info --base" not in setup_script
-    assert 'conda activate "$ENV_NAME"' not in setup_script
-    assert "conda_cmd()" in setup_script
-    assert "activate_environment_path()" in setup_script
+    assert conda_log.read_text(encoding="utf-8").splitlines() == ["env list"]
+    if env_exists:
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert f"PREFIX={prefix}" in result.stdout
+        assert "ENV=mlx-vlm" in result.stdout
+        assert f"PYTHON={prefix}/bin/python" in result.stdout
+    else:
+        assert result.returncode == 1
+        assert "Unable to resolve Python for conda environment 'mlx-vlm'" in result.stdout
 
 
-def test_clean_builds_uses_static_help_and_guarded_direct_child_removal() -> None:
-    """Cleanup tooling should avoid self-read help and unguarded direct-child rm calls."""
-    clean_script = (PKG_ROOT / "tools" / "clean_builds.sh").read_text(encoding="utf-8")
+def _clean_builds_layout(tmp_path: Path) -> tuple[Path, Path, Path]:
+    """A checkout layout with build litter; returns the script, the mlx checkout, an outside dir."""
+    tools_dir = tmp_path / "work" / "check_models" / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    shutil.copy2(PKG_ROOT / "tools" / "clean_builds.sh", tools_dir / "clean_builds.sh")
+    mlx = tmp_path / "work" / "mlx"
+    for directory in (".git", "build/temp", "dist", ".eggs", "mlx.egg-info", "python/__pycache__"):
+        (mlx / directory).mkdir(parents=True)
+    for file_name in ("build/temp/x.o", "python/__pycache__/a.pyc", "python/b.pyc", "keep.cpp"):
+        safe_io.write_text_no_follow(mlx / file_name, "x")
+    output = tmp_path / "work" / "check_models" / "src" / "output"
+    (output / "test_run").mkdir(parents=True)
+    safe_io.write_text_no_follow(output / "results.jsonl", "{}\n")
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    safe_io.write_text_no_follow(outside / "precious.txt", "keep")
+    vlm = tmp_path / "work" / "mlx-vlm"
+    (vlm / ".git").mkdir(parents=True)
+    (vlm / "build").symlink_to(outside, target_is_directory=True)
+    return tools_dir / "clean_builds.sh", mlx, outside
 
-    assert 'head -n 17 "$0"' not in clean_script
-    assert "show_help()" in clean_script
-    assert "remove_direct_child_dir()" in clean_script
-    assert 'rm -rf "${dir:?}/$pattern"' not in clean_script
-    assert "sudo rm -rf" not in clean_script
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize("dry_run", [True, False], ids=["dry-run", "clean"])
+def test_clean_builds_removes_only_build_litter_and_never_follows_a_link(
+    tmp_path: Path, *, dry_run: bool
+) -> None:
+    """Every checkout is cleaned to the end; sources, outputs and link targets stay."""
+    script, mlx, outside = _clean_builds_layout(tmp_path)
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    sudo_log = tmp_path / "sudo.log"
+    safe_io.write_text_no_follow(
+        fake_bin / "sudo", f'#!/bin/bash\necho "$*" >> "{sudo_log}"\n', mode=0o755
+    )
+    before = sorted(str(path.relative_to(tmp_path)) for path in tmp_path.rglob("*"))
+
+    result = _run_bash_script(
+        f'bash "{script}"' + (" --dry-run" if dry_run else ""),
+        env={"PATH": f"{fake_bin}:/usr/bin:/bin"},
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert ("DRY RUN COMPLETE" in result.stdout) == dry_run
+    assert not sudo_log.exists()
+    assert (outside / "precious.txt").read_text(encoding="utf-8") == "keep"
+    remaining = sorted(str(path.relative_to(tmp_path)) for path in tmp_path.rglob("*"))
+    if dry_run:
+        assert remaining == before
+        assert "  [DRY RUN] Would remove: build/" in result.stdout
+        return
+    assert sorted(path.name for path in mlx.iterdir()) == [".git", "keep.cpp", "python"]
+    assert list((mlx / "python").iterdir()) == []
+    assert not (tmp_path / "work" / "mlx-vlm" / "build").exists()
+    output = tmp_path / "work" / "check_models" / "src" / "output"
+    assert [path.name for path in output.iterdir()] == ["results.jsonl"]
+
+
+def test_clean_builds_prints_static_help_and_rejects_unknown_options(tmp_path: Path) -> None:
+    """Help is the script's own text whatever it is called; an unknown option fails."""
+    script, _mlx, _outside = _clean_builds_layout(tmp_path)
+    renamed = script.with_name("renamed.sh")
+    shutil.copy2(script, renamed)
+
+    help_result = _run_bash_script(f'bash "{renamed}" --help')
+    bad_result = _run_bash_script(f'bash "{renamed}" --bogus')
+
+    assert help_result.returncode == 0
+    assert help_result.stdout.startswith("Clean build artifacts and caches")
+    assert "bash tools/clean_builds.sh --dry-run" in help_result.stdout
+    assert bad_result.returncode == 1
+    assert "Unknown option: --bogus" in bad_result.stdout
 
 
 def test_packaged_quality_config_is_the_only_default_source() -> None:
@@ -913,80 +1123,189 @@ def test_python_sources_write_variation_selectors_as_escapes() -> None:
     assert offenders == [], offenders
 
 
-def test_quality_script_runs_skylos_quality_gate() -> None:
-    """Local quality checks should include the calibrated Skylos quality gate."""
+_SKYLOS_ADVICE_LINE = "check_models.py:3  SKY-P401  advice only"
+
+
+def _run_quality_gate(
+    tmp_path: Path, *args: str, env: Mapping[str, str] | None = None
+) -> tuple[int, list[str]]:
+    """Run the copied run_quality_checks.sh with every tool it calls faked.
+
+    The repository layout holds the gate script, common_quality.sh, two
+    workflow files and a git-untracked Python file. The conda env's python,
+    ty, pyrefly, vulture and skylos, and PATH's shellcheck and
+    markdownlint-cli2, append ``CALL <tool> <arguments>`` to the transcript
+    the gate's own output goes to; each also appends ``ENV <tool> <values>``
+    for the environment it saw. The danger wrapper is a stub that logs
+    ``CALL danger-wrapper``. The fake Skylos writes a report for ``-o`` and
+    prints one advice-only finding for the gated scan.
+    """
+    repo = tmp_path / "repo"
+    tools_dir = repo / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    for name in ("run_quality_checks.sh", "common_quality.sh"):
+        shutil.copy2(PKG_ROOT / "tools" / name, tools_dir / name)
+    transcript = tmp_path / "transcript.log"
+    safe_io.write_text_no_follow(
+        tools_dir / "run_skylos_danger_advisory.sh",
+        f'#!/bin/bash\necho "CALL danger-wrapper $*" >> "{transcript}"\n',
+        mode=0o755,
+    )
+    (repo / ".github" / "workflows").mkdir(parents=True)
+    for workflow in ("quality.yml", "release.yaml"):
+        safe_io.write_text_no_follow(repo / ".github" / "workflows" / workflow, "on: push\n")
+    safe_io.write_text_no_follow(repo / ".pre-commit-config.yaml", "repos: []\n")
+    safe_io.write_text_no_follow(repo / "src" / "check_models.py", "")
+    subprocess.run(  # noqa: S603 - fixed git command on a test-created directory
+        ["git", "init", "-q", str(repo)],  # noqa: S607 - git from PATH, as the gate uses it
+        check=True,
+    )
+
+    def fake(path: Path, name: str, extra: str = "") -> None:
+        safe_io.write_text_no_follow(
+            path,
+            "#!/bin/bash\n"
+            f'echo "CALL {name} $*" >> "{transcript}"\n'
+            f'echo "ENV {name} GIT_DIR=${{GIT_DIR-unset}} '
+            "SKYLOS_GREP_BUDGET=${SKYLOS_GREP_BUDGET-unset} "
+            "SKYLOS_NO_CLIPBOARD=${SKYLOS_NO_CLIPBOARD-unset} "
+            f'NO_COLOR=${{NO_COLOR-unset}}" >> "{transcript}"\n' + extra,
+            mode=0o755,
+        )
+
+    env_bin = tmp_path / "envs" / "mlx-vlm" / "bin"
+    env_bin.mkdir(parents=True)
+    for name in ("python", "ty", "pyrefly", "vulture"):
+        fake(env_bin / name, name)
+    fake(
+        env_bin / "skylos",
+        "skylos",
+        "for ((i = 1; i <= $#; i++)); do\n"
+        '    if [[ "${!i}" == "-o" ]]; then next=$((i + 1)); echo "{}" > "${!next}"; fi\n'
+        "done\n"
+        f'[[ " $* " == *" --format concise "* ]] && echo "{_SKYLOS_ADVICE_LINE}"\n'
+        "exit 0\n",
+    )
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    for name in ("shellcheck", "markdownlint-cli2"):
+        fake(fake_bin / name, name)
+    base_env = {
+        "PATH": f"{fake_bin}:/usr/bin:/bin",
+        "HOME": str(tmp_path),
+        "TMPDIR": str(tmp_path),
+        "CONDA_ENV": "mlx-vlm",
+        "CONDA_PREFIX": str(env_bin.parent),
+    }
+    with transcript.open("a", encoding="utf-8") as output:
+        result = subprocess.run(  # noqa: S603 - fixed bash runs a copied repo script with fake tools
+            ["/bin/bash", str(tools_dir / "run_quality_checks.sh"), *args],
+            stdout=output,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False,
+            stdin=subprocess.DEVNULL,
+            cwd=tmp_path,
+            env=base_env | dict(env or {}),
+        )
+    return result.returncode, safe_io.read_text_no_follow(transcript).splitlines()
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize("mode", ["--full", "--fast"])
+def test_quality_gate_runs_skylos_once_gated_before_pytest(tmp_path: Path, mode: str) -> None:
+    """One gated Skylos scan, the dependency scan and the danger wrapper all precede pytest."""
+    status, lines = _run_quality_gate(tmp_path, mode)
+
+    assert status == 0, "\n".join(lines)
+    skylos_calls = [line for line in lines if line.startswith("CALL skylos ")]
+    assert skylos_calls == [
+        "CALL skylos . --quality --secrets --ai-defects --gate --no-upload --format concise",
+        (
+            "CALL skylos pyproject.toml --sca --json -o .skylos/skylos-dependency-scan.json "
+            "--no-upload"
+        ),
+    ]
+    for env_line in (line for line in lines if line.startswith("ENV skylos ")):
+        assert "SKYLOS_GREP_BUDGET=300 SKYLOS_NO_CLIPBOARD=1 NO_COLOR=1" in env_line
+    advisories = _first_line(
+        lines,
+        "CALL python -m tools.check_dependency_advisories .skylos/skylos-dependency-scan.json",
+    )
+    danger = [line for line in lines if line.startswith("CALL danger-wrapper ")]
+    assert danger == (
+        ["CALL danger-wrapper --full --gate"]
+        if mode == "--full"
+        else ["CALL danger-wrapper --full"]
+    )
+    pytest_call = _first_line(lines, "CALL python -m pytest")
+    assert _first_line(lines, "CALL skylos . --quality") < advisories < pytest_call
+    assert lines.index(danger[0]) < pytest_call
+    # The dependency report is checked, then removed from the tree.
+    assert not (tmp_path / "repo" / "src" / ".skylos" / "skylos-dependency-scan.json").exists()
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("mode", "final"),
+    [("--full", "✅ All quality checks passed!"), ("--fast", "✅ Fast quality checks passed!")],
+)
+def test_quality_gate_lints_markdown_once_and_repeats_skylos_advice_at_the_end(
+    tmp_path: Path, mode: str, final: str
+) -> None:
+    """Markdown is linted once, worktrees excluded, after pytest; advice precedes the pass line."""
+    status, lines = _run_quality_gate(tmp_path, mode)
+
+    assert status == 0, "\n".join(lines)
+    markdownlint = [line for line in lines if line.startswith("CALL markdownlint-cli2 ")]
+    assert len(markdownlint) == 1
+    assert "!**/.worktrees/**" in markdownlint[0]
+    assert lines.index(markdownlint[0]) > _first_line(lines, "CALL python -m pytest")
+    assert lines[-1] == final
+    advice = lines.index(
+        "\u26a0\ufe0f  Skylos advice (passes the gate, not blocking; fix it or add a reasoned ignore):"
+    )
+    assert lines[advice + 1] == f"    {_SKYLOS_ADVICE_LINE}"
+    assert advice > lines.index(markdownlint[0])
+
+
+@pytest.mark.subprocess
+def test_quality_gate_validates_every_workflow_file_by_glob(tmp_path: Path) -> None:
+    """Both workflow files, whatever their extension, reach the syntax check."""
+    status, lines = _run_quality_gate(tmp_path, "--full")
+
+    assert status == 0, "\n".join(lines)
+    syntax_call = next(line for line in lines if "check_file_syntax.py" in line)
+    assert syntax_call.endswith(
+        "/.github/workflows/quality.yml "
+        f"{tmp_path}/repo/.github/workflows/release.yaml {tmp_path}/repo/.pre-commit-config.yaml"
+    )
+
+
+@pytest.mark.subprocess
+def test_quality_gate_ignores_a_hook_exported_git_dir(tmp_path: Path) -> None:
+    """Git exports GIT_DIR into hooks; no tool the gate runs from src/ may see it."""
+    status, lines = _run_quality_gate(tmp_path, "--full", env={"GIT_DIR": str(tmp_path / "bogus")})
+
+    assert status == 0, "\n".join(lines)
+    env_lines = [line for line in lines if line.startswith("ENV ")]
+    assert env_lines
+    assert not [line for line in env_lines if "GIT_DIR=unset" not in line]
+    # With the variable dropped, Pyrefly's target list comes from the real repository.
+    assert next(line for line in lines if line.startswith("CALL pyrefly ")).endswith(
+        f"{tmp_path}/repo/src/check_models.py"
+    )
+
+
+def test_setup_script_installs_the_declared_skylos_spec() -> None:
+    """The conda setup script installs the Skylos spec pyproject declares, unpinned."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
     dev_deps = pyproject["project"]["optional-dependencies"]["dev"]
-    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
 
     skylos_specs = [dep for dep in dev_deps if dep.startswith("skylos")]
     assert len(skylos_specs) == 1
-    # The setup script must install the same spec pyproject declares,
-    # whatever that spec is (deliberately not pinned).
     assert f'"{skylos_specs[0]}"' in setup_script
-    assert (
-        'quality_require_python_tool skylos "Install dev dependencies with: pip install -e .[dev]"'
-        in quality_script
-    )
-    assert 'echo "=== Skylos Quality Gate ==="' in quality_script
-    # The ungated `-a` audit pass is gone: it rescanned the same tree for a
-    # grade card; its one extra check (ai-defects) rides on the gated pass.
-    assert 'echo "=== Skylos Audit Gate ==="' not in quality_script
-    assert "SKYLOS_JOBS" not in quality_script
-    # Every Skylos call goes through the wrapper, which raises the grep
-    # verification cap (Skylos default 120 s) so the slower CI runner does not turn a
-    # clean tree into SKY-ANALYSIS-INCOMPLETE (exit 2).
-    common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
-    assert 'SKYLOS_GREP_BUDGET="${SKYLOS_GREP_BUDGET:-300}"' in common_quality
-    # The danger scan is deliberately blocking in full mode, and only via the
-    # wrapper script (never a bare `skylos --danger` that would bypass the
-    # worktree post-filter and non-interactive guards).
-    assert 'bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate' in quality_script
-    # Fast mode keeps an advisory (non-blocking) danger scan since the ungated
-    # `-a` audit pass, which used to provide it, is gone.
-    assert 'bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full\n' in quality_script
-    assert "skylos . --danger" not in quality_script
-    # One markdownlint step (with the worktree exclusion) serves both modes:
-    # one definition plus one call in fast mode and one in full mode.
-    assert quality_script.count('"!**/.worktrees/**"') == 1
-    assert quality_script.count("run_markdownlint_step") == 3
-    # Skylos runs before pytest, never concurrently: its grep verification
-    # aborts when files appear or vanish under it.
-    assert quality_script.index('echo "=== Skylos Quality Gate ==="') < quality_script.index(
-        'echo "=== Pytest ==="'
-    )
-    # The gated scan and its advice capture live in common_quality.sh; see
-    # test_skylos_quality_gate_wrapper_repeats_advice_and_keeps_failures.
-    assert re.search(
-        r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
-        r"quality_run_skylos \. --quality --secrets --ai-defects --gate --no-upload "
-        r"--format concise",
-        common_quality,
-    )
-    assert 'echo "=== Skylos Quality Gate ==="\nquality_run_skylos_quality_gate\n' in quality_script
-    # Advice is repeated just before both final "passed" lines.
-    assert quality_script.count("quality_print_skylos_advice") == 2
-    assert (
-        'quality_print_skylos_advice\n    echo "✅ Fast quality checks passed!"' in quality_script
-    )
-    assert 'quality_print_skylos_advice\necho "✅ All quality checks passed!"' in quality_script
-    # Dependency advisories are gated by their own step (Skylos's ignore list
-    # cannot accept one advisory), which must run before pytest too. It
-    # targets pyproject.toml so it skips the source analysis; see
-    # test_skylos_dependency_scan_of_one_manifest_matches_the_whole_tree.
-    assert re.search(
-        r"quality_run_skylos pyproject\.toml --sca --json -o \"\$sca_report_path\" --no-upload",
-        quality_script,
-    )
-    assert "quality_run_skylos . --sca" not in quality_script
-    assert '"$QUALITY_PYTHON" -m tools.check_dependency_advisories "$sca_report_path"' in (
-        quality_script
-    )
-    assert quality_script.index('echo "=== Skylos Dependency Scan ==="') < quality_script.index(
-        'echo "=== Pytest ==="'
-    )
-    assert not re.search(r"quality_run_skylos \. -a\b", quality_script)
 
 
 @pytest.mark.subprocess
@@ -1044,22 +1363,12 @@ def test_skylos_dependency_scan_of_one_manifest_matches_the_whole_tree(tmp_path:
     assert one_manifest["dependency_vulnerabilities"] == whole_tree["dependency_vulnerabilities"]
 
 
-def test_skylos_danger_advisory_script_is_separate_and_agent_friendly() -> None:
-    """Advisory Skylos danger scans should stay separate from the blocking quality gate."""
-    script = SKYLOS_DANGER_ADVISORY_SCRIPT.read_text(encoding="utf-8")
+def _run_danger_wrapper(tmp_path: Path, *args: str) -> tuple[int, list[str]]:
+    """Run the real danger wrapper with Skylos faked; return its status and Skylos calls.
 
-    assert "--danger --json" in script
-    assert "skylos cicd annotate" in script
-    assert "--severity medium" in script
-    assert "cicd gate" in script
-    assert "--advisory" in script
-    assert "--llm" in script
-    assert ".skylos/skylos-danger-advisory.llm.txt" in script
-
-
-@pytest.mark.subprocess
-def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> None:
-    """The real wrapper must pass its worktree exclusion to the scanner process."""
+    Each call is logged as ``skylos <arguments>``; a call with ``-o`` gets an
+    empty danger report at that path.
+    """
     repo_root = tmp_path / "repo"
     tools_dir = repo_root / "src" / "tools"
     tools_dir.mkdir(parents=True)
@@ -1102,7 +1411,7 @@ def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> No
     )
 
     result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-copied script
-        ["/bin/bash", str(script), "--full", "--gate"],
+        ["/bin/bash", str(script), *args],
         capture_output=True,
         text=True,
         check=False,
@@ -1115,21 +1424,94 @@ def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> No
         },
     )
 
+    calls = call_log.read_text(encoding="utf-8").splitlines() if call_log.exists() else []
     assert result.returncode == 0, result.stderr or result.stdout
-    scan_call = next(
-        line for line in call_log.read_text().splitlines() if "--danger --json" in line
-    )
+    return result.returncode, calls
+
+
+@pytest.mark.subprocess
+def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> None:
+    """The real wrapper must pass its worktree exclusion to the scanner process."""
+    _status, calls = _run_danger_wrapper(tmp_path, "--full", "--gate")
+
+    scan_call = next(line for line in calls if "--danger --json" in line)
     assert "--exclude .worktrees" in scan_call
 
 
-def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
-    """The Skylos verify helper should keep agent checks repo-scoped and deterministic."""
-    script = SKYLOS_VERIFY_SCRIPT.read_text(encoding="utf-8")
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("args", "gate_call", "llm"),
+    [
+        (("--full",), "skylos cicd gate --input {report} --advisory", False),
+        (("--full", "--gate"), "skylos cicd gate --input {report}", False),
+        (("--full", "--llm"), "skylos cicd gate --input {report} --advisory", True),
+    ],
+    ids=["advisory", "gate", "llm"],
+)
+def test_skylos_danger_wrapper_annotates_then_gates_in_each_mode(
+    tmp_path: Path, args: tuple[str, ...], gate_call: str, *, llm: bool
+) -> None:
+    """Scan, annotate at medium severity, gate (advisory unless --gate), then the LLM report."""
+    _status, calls = _run_danger_wrapper(tmp_path, *args)
 
-    assert "Usage: bash tools/run_skylos_verify.sh" in script
-    assert 'cd "$(quality_repo_root)"' in script
-    assert "quality_require_python_tool skylos" in script
-    assert 'quality_run_skylos verify . --project-context "$@"' in script
+    scan = next(line for line in calls if " --danger --json " in line)
+    report = scan.split(" -o ", 1)[1].split()[0]
+    annotate = calls.index(f"skylos cicd annotate --input {report} --severity medium")
+    gate = calls.index(gate_call.format(report=report))
+    assert calls.index(scan) < annotate < gate
+    llm_calls = [line for line in calls if " --llm " in line]
+    if llm:
+        assert llm_calls == [
+            (
+                "skylos . --danger --llm -o .skylos/skylos-danger-advisory.llm.txt "
+                "--no-upload --exclude .worktrees"
+            )
+        ]
+        assert calls.index(llm_calls[0]) > gate
+    else:
+        assert llm_calls == []
+
+
+@pytest.mark.subprocess
+def test_skylos_verify_script_runs_from_the_repo_root_with_project_context(
+    tmp_path: Path,
+) -> None:
+    """Arguments pass through to ``skylos verify . --project-context`` run at the repo root."""
+    tools_dir = tmp_path / "repo" / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    for name in (SKYLOS_VERIFY_SCRIPT.name, "common_quality.sh"):
+        shutil.copy2(PKG_ROOT / "tools" / name, tools_dir / name)
+    env_bin = tmp_path / "envs" / "mlx-vlm" / "bin"
+    env_bin.mkdir(parents=True)
+    call_log = tmp_path / "calls.log"
+    safe_io.write_text_no_follow(env_bin / "python", "#!/bin/bash\n", mode=0o755)
+    safe_io.write_text_no_follow(
+        env_bin / "skylos",
+        f'#!/bin/bash\necho "$PWD :: $* :: ${{SKYLOS_NO_CLIPBOARD-unset}}" >> "{call_log}"\n',
+        mode=0o755,
+    )
+    env = {
+        "PATH": "/usr/bin:/bin",
+        "HOME": str(tmp_path),
+        "CONDA_ENV": "mlx-vlm",
+        "CONDA_PREFIX": str(env_bin.parent),
+    }
+    script = tools_dir / SKYLOS_VERIFY_SCRIPT.name
+
+    result = _run_bash_script(
+        f'bash "{script}" --file src/check_models.py --range 10:20', env=env, cwd=tmp_path
+    )
+    no_args = _run_bash_script(f'bash "{script}"', env=env, cwd=tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert call_log.read_text(encoding="utf-8").splitlines() == [
+        (
+            f"{tmp_path / 'repo'} :: verify . --project-context --file src/check_models.py "
+            "--range 10:20 :: 1"
+        )
+    ]
+    assert no_args.returncode == 2
+    assert "Usage: bash tools/run_skylos_verify.sh" in no_args.stderr
 
 
 def test_defusedxml_probe_is_a_real_import_without_suppression() -> None:
@@ -1799,18 +2181,6 @@ def test_probe_python_next_rejects_a_non_https_torch_index(tmp_path: Path) -> No
     assert result.returncode == 1
     assert "PROBE_TORCH_INDEX must be a plain https:// URL" in result.stderr
     assert calls == []
-
-
-def test_quality_script_drops_hook_exported_git_dir_before_entering_src() -> None:
-    """Git exports GIT_DIR into hooks; left set, git treats src/ as the work tree.
-
-    Every ``git diff`` a tool ran from ``src/`` then reported the whole
-    repository as deleted (a Skylos SKY-L021 storm from linked worktrees).
-    """
-    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
-
-    assert "\nunset GIT_DIR\n" in quality_script
-    assert quality_script.index("unset GIT_DIR") < quality_script.index('cd "$(quality_src_root)"')
 
 
 def test_stale_pip_backups_are_removed_and_everything_else_is_left(tmp_path: Path) -> None:
@@ -3070,14 +3440,6 @@ def test_make_format_covers_every_gate_formatted_directory() -> None:
         f"make format misses {expected_dirs - fmt_paths}; the gate's `ruff format .` "
         "would still reformat them"
     )
-
-
-def test_quality_script_globs_workflow_yaml_files() -> None:
-    """Workflow YAML validation must enumerate by glob, not by hardcoded list."""
-    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
-
-    assert 'find "$(quality_repo_root)/.github/workflows"' in quality_script
-    assert ".github/workflows/quality.yml" not in quality_script
 
 
 def test_danger_report_filter_drops_only_worktree_findings(tmp_path: Path) -> None:

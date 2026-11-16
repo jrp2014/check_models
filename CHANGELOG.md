@@ -192,6 +192,25 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Script tests (0.17.134): nine more tests that asserted shell-script source
+  text now run the scripts. A harness runs the whole `run_quality_checks.sh`
+  with every tool faked: one gated Skylos scan with the grep budget and no
+  clipboard, the dependency scan of `pyproject.toml` (its report removed
+  afterwards) and the danger wrapper (blocking in full mode only) before
+  pytest; one markdownlint run excluding worktrees; the Skylos advice before
+  the final pass line; every workflow file found by glob; and no tool seeing
+  a hook's `GIT_DIR`. The danger wrapper runs in its advisory, gate and LLM
+  modes, the verify wrapper from the repository root, the setup script's
+  backend check against a stand-in macOS install (matched, mismatched, no
+  metallib, PyPI without mlx-metal, editable mlx) and its Hugging Face CLI
+  report, its env lookup by prefix with a faked conda, and `clean_builds.sh`
+  over a checkout with build litter and a `build` symlink. The conda-setup
+  check that the removed `huggingface_hub[cli]` extra stays gone, and the
+  Skylos spec the setup script installs, stay as declaration checks.
+  Nine deliberate breaks of the quality scripts were each caught.
+  Remaining source checks on `check_models.py` (named markdownlint rule
+  sets, no fixture literals in policy code, the defusedxml binding) are
+  checks of the source itself and stay.
 - Updater tests (0.17.133): eight tests that asserted `update.sh` source text
   are replaced by tests that run it. A new harness runs the whole copied
   script with conda, Homebrew, npm and the target interpreter faked, and
@@ -1931,6 +1950,13 @@ Notable changes to this project will be documented in this file.
   must now sort its own results. Report order is unchanged.
 
 ### Fixed
+
+- `clean_builds.sh` (0.17.134): under bash 4.1 or later (Homebrew bash, Linux)
+  the cleanup stopped with status 1 after removing its first artifact:
+  `((cleaned++))` evaluates to 0 the first time, and `set -e` treats that as
+  a failure. Counters now use `x=$((x + 1))`. macOS's `/bin/bash` 3.2 does
+  not stop there, which is why `make clean-mlx` worked on the Mac. Found by
+  the new behavioural test.
 
 - Typing (0.17.126): the mlx-vlm `load()` wrapper types its extra keyword
   arguments with the existing `LoadExtraKwargs` TypedDict instead of
