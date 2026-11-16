@@ -1410,11 +1410,16 @@ def test_skylos_dependency_scan_of_one_manifest_matches_the_whole_tree(tmp_path:
     assert one_manifest["dependency_vulnerabilities"] == whole_tree["dependency_vulnerabilities"]
 
 
-def _run_danger_wrapper(tmp_path: Path, *args: str) -> tuple[int, list[str]]:
+def _run_danger_wrapper(
+    tmp_path: Path, *args: str, github_env: Mapping[str, str] | None = None
+) -> tuple[int, list[str]]:
     """Run the real danger wrapper with Skylos faked; return its status and Skylos calls.
 
     Each call is logged as ``skylos <arguments>``; a call with ``-o`` gets an
-    empty danger report at that path.
+    empty danger report at that path. The wrapper reacts to GitHub Actions
+    variables (a step summary, a PR base), so the caller's ``GITHUB_*`` are
+    dropped and only ``github_env`` is set: the result is the same locally and
+    in CI.
     """
     repo_root = tmp_path / "repo"
     tools_dir = repo_root / "src" / "tools"
@@ -1464,7 +1469,8 @@ def _run_danger_wrapper(tmp_path: Path, *args: str) -> tuple[int, list[str]]:
         check=False,
         cwd=repo_root,
         env={
-            **os.environ,
+            **{k: v for k, v in os.environ.items() if not k.startswith("GITHUB_")},
+            **(github_env or {}),
             "TEST_REPO_ROOT": str(repo_root),
             "TEST_PYTHON": sys.executable,
             "TEST_CALL_LOG": str(call_log),
@@ -1488,19 +1494,33 @@ def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> No
 
 @pytest.mark.subprocess
 @pytest.mark.parametrize(
-    ("args", "gate_call", "llm"),
+    ("args", "github_env", "gate_call", "llm"),
     [
-        (("--full",), "skylos cicd gate --input {report} --advisory", False),
-        (("--full", "--gate"), "skylos cicd gate --input {report}", False),
-        (("--full", "--llm"), "skylos cicd gate --input {report} --advisory", True),
+        (("--full",), {}, "skylos cicd gate --input {report} --advisory", False),
+        (("--full", "--gate"), {}, "skylos cicd gate --input {report}", False),
+        (("--full", "--llm"), {}, "skylos cicd gate --input {report} --advisory", True),
+        (
+            ("--full", "--gate"),
+            {"GITHUB_STEP_SUMMARY": "summary.md"},
+            "skylos cicd gate --input {report} --summary",
+            False,
+        ),
     ],
-    ids=["advisory", "gate", "llm"],
+    ids=["advisory", "gate", "llm", "gate-in-actions"],
 )
 def test_skylos_danger_wrapper_annotates_then_gates_in_each_mode(
-    tmp_path: Path, args: tuple[str, ...], gate_call: str, *, llm: bool
+    tmp_path: Path,
+    args: tuple[str, ...],
+    github_env: dict[str, str],
+    gate_call: str,
+    *,
+    llm: bool,
 ) -> None:
-    """Scan, annotate at medium severity, gate (advisory unless --gate), then the LLM report."""
-    _status, calls = _run_danger_wrapper(tmp_path, *args)
+    """Scan, annotate at medium severity, gate (advisory unless --gate), then the LLM report.
+
+    Under GitHub Actions (a step summary file) the gate also writes the summary.
+    """
+    _status, calls = _run_danger_wrapper(tmp_path, *args, github_env=github_env)
 
     scan = next(line for line in calls if " --danger --json " in line)
     report = scan.split(" -o ", 1)[1].split()[0]

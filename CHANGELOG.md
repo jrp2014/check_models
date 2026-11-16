@@ -192,6 +192,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Script tests (0.17.137): the danger-wrapper test passed locally and failed
+  on every CI static-quality job. Under GitHub Actions `GITHUB_STEP_SUMMARY`
+  is set, so the wrapper adds `--summary` to its gate call, and the test's
+  harness passed the runner's environment through. The harness now drops
+  `GITHUB_*` variables and sets only those a case names, and a new case
+  checks the `--summary` call under Actions. Both pass with and without the
+  Actions variables present.
 - Script tests (0.17.136): every repository script the dependency tests run
   is bounded by a 120 s timeout (`_SCRIPT_TIMEOUT_S`), so a script that
   loops fails its test instead of hanging the suite. The `clean_builds.sh`
