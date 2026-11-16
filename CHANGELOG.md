@@ -192,6 +192,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Updater tests (0.17.133): eight tests that asserted `update.sh` source text
+  are replaced by tests that run it. A new harness runs the whole copied
+  script with conda, Homebrew, npm and the target interpreter faked, and
+  records what it prints and runs in one transcript. It checks that the plan
+  and state snapshot come before the first change, that every pip call goes
+  through the target interpreter, the order PyPI MLX, project reinstall,
+  `pip check`, `validate_env`, import check, that no install disables build
+  isolation or caps setuptools, the `UPDATE_SYSTEM_PACKAGES` and
+  `UPDATE_NODE_TOOLING` switches, the repair hint for an unimportable
+  `mlx_vlm`, and the `HISTORY_BACKUP_DIR` snapshot. The local-build harness
+  gains a dirty checkout, a changed Metal compiler (with and without
+  `MLX_REBUILD_ON_TOOLCHAIN_CHANGE`), the compiler record after a good and a
+  failed build, and the deployment target pip sees. The macOS build
+  requirement check runs against a faked toolchain for a pass and for each
+  shortfall. Eleven deliberate breaks of `update.sh` were each caught. The
+  README check for the switches stays as a documentation test.
 - Settings reads (0.17.132): start-up, validation, prompt preparation, the
   model loop and finalisation read parsed options as `args.name`; the 50
   `getattr(args, "name", default)` reads are gone, so each default is stated

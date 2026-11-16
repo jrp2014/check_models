@@ -46,7 +46,7 @@ from tools import (
 )
 
 if typing.TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
+    from collections.abc import Iterable, Mapping, Sequence
     from urllib.request import Request
 
 _TEST_FILE = Path(__file__).resolve()
@@ -671,8 +671,9 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
 def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
     """Keep markdownlint-cli2 aligned between npm metadata and update tooling.
 
-    Policy: the spec is a caret range (never an exact pin), and update.sh moves
-    to the latest release by default. The lockfile is deliberately untracked,
+    Policy: the spec is a caret range (never an exact pin); that update.sh moves
+    to the latest release by default is run in
+    ``test_update_script_system_and_node_tooling_switches``. The lockfile is deliberately untracked,
     so it is only cross-checked when a local `npm install` has produced one.
     """
     package_json = json.loads((PKG_ROOT / "package.json").read_text(encoding="utf-8"))
@@ -696,21 +697,6 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
         # resolved (an override that no longer applies is stale and should go).
         for name, pinned in (package_json.get("overrides") or {}).items():
             assert package_lock["packages"][f"node_modules/{name}"]["version"] == pinned, name
-
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    assert 'npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT"' in (
-        update_script
-    )
-    assert (
-        "npm install --ignore-scripts --no-audit --no-fund "
-        '--prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest'
-    ) in update_script
-    assert "--save-exact" not in update_script
-    # Latest is the default; the lockfile install is only the offline opt-out.
-    assert '"${UPDATE_NODE_TOOLING:-1}" == "1"' in update_script
-    assert update_script.index("markdownlint-cli2@latest") < update_script.index(
-        "package-lock.json..."
-    )
 
 
 class _NpmOverrideRecord(typing.NamedTuple):
@@ -1568,13 +1554,6 @@ def test_update_script_flags_conflict_copies_only_with_evidence(tmp_path: Path) 
     assert _conflict_probe("find_malformed_git_refs", repo) == [".git/refs/heads/main 2"]
 
 
-def test_update_script_leaves_setuptools_to_pip_above_mlxs_build_floor() -> None:
-    """No upper cap: builds are isolated, and the old <82 cap only made the env look stale."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    assert "<82" not in update_script
-    assert "--no-build-isolation" not in update_script
-
-
 _PROBE_FAKE_MLX_VERSION = "0.32.4.dev20261002+abc1234"
 
 
@@ -1822,31 +1801,6 @@ def test_probe_python_next_rejects_a_non_https_torch_index(tmp_path: Path) -> No
     assert calls == []
 
 
-def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
-    """Stage 2 records git status --porcelain; Stage 3 consults it before skipping."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-
-    assert 'if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then' in update_script
-    assert "REPO_DIRTY[idx]=1" in update_script
-    decision_call = (
-        'mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" '
-        '"${REPO_DIRTY[idx]}" "$editable_verified" "$toolchain_matches"'
-    )
-    # The stamp lives under .git so it never dirties the checkout it describes,
-    # and it is written only after a successful mlx install.
-    assert '"$1/.git/check_models_build_toolchain"' in update_script
-    # A changed compiler only warns unless the rebuild is asked for: upstream
-    # main may not compile under a new Xcode, and a failed build would swap
-    # the working local build for a PyPI wheel.
-    assert 'if [[ "${MLX_REBUILD_ON_TOOLCHAIN_CHANGE:-0}" == "1" ]]; then' in update_script
-    assert "MLX_REBUILD_ON_TOOLCHAIN_CHANGE" in (PKG_ROOT / "README.md").read_text(encoding="utf-8")
-    assert update_script.index("installed successfully") < update_script.index(
-        'metal_compiler_version > "$(mlx_build_toolchain_stamp'
-    )
-    assert decision_call in update_script
-    assert update_script.index("REPO_DIRTY[idx]=1") < update_script.index(decision_call)
-
-
 def test_quality_script_drops_hook_exported_git_dir_before_entering_src() -> None:
     """Git exports GIT_DIR into hooks; left set, git treats src/ as the work tree.
 
@@ -1857,59 +1811,6 @@ def test_quality_script_drops_hook_exported_git_dir_before_entering_src() -> Non
 
     assert "\nunset GIT_DIR\n" in quality_script
     assert quality_script.index("unset GIT_DIR") < quality_script.index('cd "$(quality_src_root)"')
-
-
-def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
-    """Local MLX builds should follow upstream's editable dev install guidance."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in update_script
-    assert "macOS SDK" in update_script
-    assert "Apple Clang" in update_script
-    assert "Native arm64 shell detected" in update_script
-    assert "MLX_LOCAL_BUILD_SMOKE" in update_script
-    assert "backup_run_history" in update_script
-    assert "HISTORY_BACKUP_DIR" in update_script
-    assert "HISTORY_BACKUP_DIR" in (PKG_ROOT / "README.md").read_text(encoding="utf-8")
-    assert "mlx.metallib" in update_script
-    assert "MLX runtime backend provenance" in update_script
-
-
-def test_update_script_import_repair_hint_uses_distribution_names() -> None:
-    """Postflight repair output should use pip package names, not import module names."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-
-    assert "IMPORT_TO_PIP_PACKAGE" in update_script
-    assert "printf '%s\\n' \"mlx-vlm\"" in update_script
-    assert "REPAIR_PKGS" in update_script
-    assert 'REPAIR_PKGS+=("$(IMPORT_TO_PIP_PACKAGE "$pkg")")' in update_script
-    assert "Fix with: pip install ${REPAIR_PKGS[*]}" in update_script
-    assert "Fix with: pip install ${MISSING_PKGS[*]}" not in update_script
-
-
-def test_update_script_updates_system_packages_and_node_tooling_by_default() -> None:
-    """The updater refreshes system packages and moves markdownlint-cli2 to latest by default."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
-
-    assert "UPDATE_SYSTEM_PACKAGES" in update_script
-    assert "UPDATE_NODE_TOOLING" in update_script
-    assert 'if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then' in update_script
-    assert 'if [[ "${UPDATE_NODE_TOOLING:-1}" == "1" ]]; then' in update_script
-    assert "Skipping conda base/environment package updates (UPDATE_SYSTEM_PACKAGES=0)" in (
-        update_script
-    )
-    assert "Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)" in update_script
-    assert "Installing repo-local markdownlint tooling from package-lock.json" in update_script
-    # Both switches are documented in the README environment table.
-    assert "`UPDATE_SYSTEM_PACKAGES`" in readme
-    assert "`UPDATE_NODE_TOOLING`" in readme
-
-    package_latest = "markdownlint-cli2@latest"
-    assert package_latest in update_script
-    # Latest comes first (the default branch); the lockfile install is the opt-out.
-    assert update_script.index(package_latest) < update_script.index(
-        "Installing repo-local markdownlint tooling from package-lock.json"
-    )
 
 
 def test_stale_pip_backups_are_removed_and_everything_else_is_left(tmp_path: Path) -> None:
@@ -2151,57 +2052,6 @@ def test_quarantine_broken_pip_metadata_refuses_symlink(tmp_path: Path) -> None:
 
     assert metadata_link.is_symlink()
     assert target.is_dir()
-
-
-def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
-    """update.sh should let pyproject.toml reconcile deps after MLX updates."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    policy_source = (PKG_ROOT / "check_models_data" / "dependency_policy.py").read_text(
-        encoding="utf-8",
-    )
-    main_flow = update_script[update_script.index("# Clean build artifacts if requested") :]
-
-    assert "UPDATE_PIP_CONSTRAINT" not in update_script
-    assert "UPDATE_PIP_CONSTRAINT_SPECS" not in policy_source
-    # One shared invocation injects the private local-mlx pin (empty-safe on
-    # bash 3.2); both public wrappers delegate to it.
-    assert (
-        'pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"}'
-        in update_script
-    )
-    assert update_script.count("run_eager_pip_install") >= 3  # def + two wrappers
-    # Detection is a separate, non-mutating gate so set -e reaches the updater.
-    assert "if local_mlx_repos_present; then" in update_script
-    assert 'pip_install_tool "setuptools>=80"' in update_script
-
-    local_update_pos = main_flow.index("update_local_mlx_repos")
-    pypi_update_pos = main_flow.index("update_mlx_from_pypi_or_preserve_local")
-    assert "pip_install mlx mlx-metal mlx-vlm" in _update_script_function(
-        "update_mlx_from_pypi_or_preserve_local"
-    )
-    reconcile_pos = main_flow.index("reconcile_project_environment_from_pyproject")
-    local_smoke_pos = main_flow.index("run_local_mlx_backend_smoke")
-    critical_check_pos = main_flow.index("[update.sh] Verifying critical packages")
-
-    assert local_update_pos < reconcile_pos
-    assert pypi_update_pos < reconcile_pos
-    assert reconcile_pos < local_smoke_pos
-    assert reconcile_pos < critical_check_pos
-    assert "python -m pip check" in update_script
-    assert "python -m tools.validate_env" in update_script
-
-
-def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:
-    """Local mlx builds should let upstream MLX choose the deployment target."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-
-    mlx_build_start = update_script.index("# MLX build controls are passed to pip via CMAKE_ARGS.")
-    mlx_build_end = update_script.index("local install_failed=0", mlx_build_start)
-    mlx_build = update_script[mlx_build_start:mlx_build_end]
-
-    assert "MACOSX_DEPLOYMENT_TARGET" not in mlx_build
-    assert "MLX_METAL_JIT" in mlx_build
-    assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in mlx_build
 
 
 def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
@@ -3063,6 +2913,88 @@ def test_locale_dependent_text_io_detector_recognises_each_form() -> None:
     assert [source for source in cleared if describe(source) is not None] == []
 
 
+def test_update_switches_are_documented_in_the_readme() -> None:
+    """Every environment switch the updater tests exercise is in the README."""
+    readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
+    for switch in (
+        "UPDATE_SYSTEM_PACKAGES",
+        "UPDATE_NODE_TOOLING",
+        "MLX_REBUILD_ON_TOOLCHAIN_CHANGE",
+        "HISTORY_BACKUP_DIR",
+    ):
+        assert f"`{switch}`" in readme or switch in readme, switch
+
+
+_GOOD_MAC_TOOLCHAIN: dict[str, str] = {
+    "cmake": "cmake version 3.31.6",
+    "sw_vers": "15.5",
+    "xcode-select": "/Applications/Xcode.app/Contents/Developer",
+    "xcodebuild": "Xcode 16.4",
+    "sdk": "15.5",
+    "clang": "Apple clang version 17.0.0 (clang-1700.0.13.5)",
+    "uname": "arm64",
+}
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("override", "expected"),
+    [
+        ({}, "✓ Native arm64 shell detected"),
+        ({"sdk": "13.3"}, "macOS SDK 13.3 found, but MLX requires >= 14.0"),
+        (
+            {"clang": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)"},
+            "Apple Clang 14.0.3 found, but MLX requires >= 15.0",
+        ),
+        ({"uname": "x86_64"}, "local MLX Metal builds must run from a native arm64 shell"),
+        ({"cmake": "cmake version 3.24.2"}, "CMake 3.24.2 found, but MLX requires >= 3.25"),
+    ],
+    ids=["meets-every-requirement", "old-sdk", "old-clang", "rosetta-shell", "old-cmake"],
+)
+def test_mlx_build_requirements_check_reports_each_shortfall(
+    tmp_path: Path, override: dict[str, str], expected: str
+) -> None:
+    """The local-build preflight passes a current toolchain and names what falls short."""
+    values = _GOOD_MAC_TOOLCHAIN | override
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    simple = {
+        "cmake": values["cmake"],
+        "sw_vers": values["sw_vers"],
+        "xcode-select": values["xcode-select"],
+        "xcodebuild": values["xcodebuild"],
+        "uname": values["uname"],
+    }
+    for name, output in simple.items():
+        safe_io.write_text_no_follow(fake_bin / name, f"#!/bin/bash\necho '{output}'\n", mode=0o755)
+    safe_io.write_text_no_follow(
+        fake_bin / "xcrun",
+        "#!/bin/bash\n"
+        'case "$*" in\n'
+        f"    \"-sdk macosx --show-sdk-version\") echo '{values['sdk']}' ;;\n"
+        f"    \"clang --version\") echo '{values['clang']}' ;;\n"
+        '    "-f metal") echo /xcode/metal ;;\n'
+        '    "-f metallib") echo /xcode/metallib ;;\n'
+        '    *) echo "fake 1" ;;\n'
+        "esac\n",
+        mode=0o755,
+    )
+    driver = (
+        "OSTYPE=darwin24\n"
+        f"{_update_script_function('version_major_minor_at_least')}"
+        f"{_update_script_function('check_mlx_build_requirements')}"
+        "check_mlx_build_requirements\n"
+    )
+    result = _run_bash_script(driver, env={"PATH": f"{fake_bin}:/usr/bin:/bin"})
+
+    assert expected in result.stdout, result.stdout
+    assert (result.returncode == 0) == (not override), result.stdout
+    if not override:
+        assert "✓ macOS SDK 15.5 (>= 14.0 required for MLX source builds)" in result.stdout
+        assert "✓ Apple Clang 17.0.0 (C++20 compiler requirement)" in result.stdout
+        assert "   metallib: /xcode/metallib" in result.stdout
+
+
 def test_update_smoke_defaults_are_documented() -> None:
     """The smoke model and expected output are documented once, in the README table."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
@@ -3487,9 +3419,6 @@ echo "PINFILE: $LOCAL_MLX_CONSTRAINT_FILE"
     )
     assert pin_file
     assert not Path(pin_file).exists(), "EXIT trap must remove the pin file"
-    # And the script must never export global pip state for the pin.
-    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    assert "export PIP_CONSTRAINT" not in script
 
 
 def test_pip_show_helpers_survive_set_e_pipefail_with_chatty_pip(tmp_path: Path) -> None:
@@ -4282,6 +4211,9 @@ def _run_local_mlx_stage(
     pulled: bool = True,
     editable_survives: bool = True,
     caller_cmake_args: str | None = None,
+    dirty_repo: str = "",
+    toolchain_matches: bool = True,
+    extra_env: Mapping[str, str] | None = None,
 ) -> tuple[dict[str, list[str]], list[str]]:
     """Run update.sh's real Stage 1-3b function against fake ``git`` and ``pip``.
 
@@ -4289,8 +4221,13 @@ def _run_local_mlx_stage(
     shipped text; only the helpers that inspect a real environment (editable
     origin, compiled revision, Metal toolchain) are replaced.
     ``editable_survives=False`` models an environment where the local install
-    is gone: the editable-origin check and ``pip show`` both fail. Returns the
-    final state the driver prints, keyed by name, and the fake pip's calls as
+    is gone: the editable-origin check and ``pip show`` both fail.
+    ``dirty_repo`` names a checkout whose ``git status --porcelain`` is not
+    empty, and ``toolchain_matches=False`` makes the recorded Metal compiler
+    differ from the current one. Returns the final state the driver prints,
+    keyed by name (``stamp`` is the recorded compiler, empty when none was
+    written; ``deployment_target`` is MACOSX_DEPLOYMENT_TARGET as each pip
+    call saw it), and the fake pip's calls as
     ``<checkout> CMAKE_ARGS=<value> :: <arguments>``.
     """
     script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
@@ -4316,6 +4253,7 @@ def _run_local_mlx_stage(
         fake_bin / "pip",
         "#!/bin/bash\n"
         f'echo "$(basename "$PWD") CMAKE_ARGS=${{CMAKE_ARGS:-unset}} :: $*" >> "{pip_log}"\n'
+        f'echo "${{MACOSX_DEPLOYMENT_TARGET:-unset}}" >> "{tmp_path / "deployment-target.log"}"\n'
         f'[[ "$1" == "show" ]] && exit {0 if editable_survives else 1}\n'
         '[[ "$*" == *" -e "* && "$(basename "$PWD")" == "$FAKE_FAILING_REPO" ]] && exit 1\n'
         "exit 0\n",
@@ -4328,6 +4266,7 @@ def _run_local_mlx_stage(
         '    "pull --ff-only") [[ "$FAKE_PULLED" == "1" ]] && touch "$PWD/.git/pulled" ;;\n'
         '    "rev-parse HEAD") [[ -f "$PWD/.git/pulled" ]] && echo bbbbbbbbbbbb || echo aaaaaaaaaaaa ;;\n'
         '    "rev-parse --short=9 HEAD") echo bbbbbbbbb ;;\n'
+        '    "status --porcelain") [[ "$(basename "$PWD")" == "$FAKE_DIRTY_REPO" ]] && echo " M x.cpp" ;;\n'
         "esac\n"
         "exit 0\n",
         mode=0o755,
@@ -4340,7 +4279,7 @@ LOCAL_MLX_READY=0
 get_installed_distribution_version() {{ echo "{_LOCAL_MLX_VERSION}"; }}
 verify_expected_editable_install() {{ return {0 if editable_survives else 1}; }}
 installed_build_matches_checkout() {{ return 0; }}
-mlx_build_toolchain_matches() {{ echo 1; }}
+mlx_build_toolchain_matches() {{ echo {1 if toolchain_matches else 0}; }}
 metal_compiler_version() {{ echo "fake-metal 1"; }}
 mlx_build_toolchain_stamp() {{ echo "{tmp_path}/toolchain-stamp"; }}
 log_editable_install_provenance() {{ :; }}
@@ -4351,13 +4290,16 @@ echo "ready=$LOCAL_MLX_READY"
 echo "cmake_after=${{CMAKE_ARGS:-unset}}"
 echo "pin=$(cat "${{LOCAL_MLX_CONSTRAINT_FILE:-/dev/null}}" 2>/dev/null)"
 printf 'verified=%s\\n' ${{VERIFIED_LOCAL_INSTALLS[@]+"${{VERIFIED_LOCAL_INSTALLS[@]}}"}}
+echo "stamp=$(cat "{tmp_path}/toolchain-stamp" 2>/dev/null)"
 """
     env = {
         "PATH": f"{fake_bin}:/usr/bin:/bin",
         "TMPDIR": str(tmp_path),
         "FAKE_FAILING_REPO": failing_repo,
         "FAKE_PULLED": "1" if pulled else "0",
+        "FAKE_DIRTY_REPO": dirty_repo,
         "MLX_METAL_JIT": "on",
+        **(extra_env or {}),
     }
     if caller_cmake_args is not None:
         env["CMAKE_ARGS"] = caller_cmake_args
@@ -4367,9 +4309,12 @@ printf 'verified=%s\\n' ${{VERIFIED_LOCAL_INSTALLS[@]+"${{VERIFIED_LOCAL_INSTALL
     state: dict[str, list[str]] = {"output": [result.stdout]}
     for line in result.stdout.splitlines():
         key, separator, value = line.partition("=")
-        if separator and key in {"status", "ready", "cmake_after", "pin", "verified"}:
+        if separator and key in {"status", "ready", "cmake_after", "pin", "verified", "stamp"}:
             state.setdefault(key, []).append(value)
     pip_calls = safe_io.read_text_no_follow(pip_log).splitlines() if pip_log.exists() else []
+    target_log = tmp_path / "deployment-target.log"
+    if target_log.exists():
+        state["deployment_target"] = safe_io.read_text_no_follow(target_log).splitlines()
     return state, pip_calls
 
 
@@ -4459,6 +4404,60 @@ def test_update_local_stage_stops_on_a_failed_mlx_vlm_install_with_mlx_pinned(
     assert state["pin"] == [f"mlx=={_LOCAL_MLX_VERSION}"]
     assert state.get("verified", [""]) == [""]
     assert pip_calls[-1].startswith("mlx-vlm CMAKE_ARGS=unset :: install -U")
+
+
+@pytest.mark.subprocess
+def test_update_local_stage_rebuilds_an_unchanged_checkout_with_local_changes(
+    tmp_path: Path,
+) -> None:
+    """Nothing pulled, both verified, but mlx has uncommitted changes: mlx is rebuilt."""
+    state, pip_calls = _run_local_mlx_stage(tmp_path, pulled=False, dirty_repo="mlx")
+
+    assert "mlx has uncommitted or untracked changes — rebuild forced" in state["output"][0]
+    rebuilt = [call.split(" ", 1)[0] for call in pip_calls if " -e " in call]
+    assert rebuilt[:1] == ["mlx"]
+    assert state["status"] == ["0"]
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize("forced", [False, True], ids=["warns-only", "rebuild-requested"])
+def test_update_local_stage_on_a_changed_metal_compiler(tmp_path: Path, *, forced: bool) -> None:
+    """A new compiler only warns; MLX_REBUILD_ON_TOOLCHAIN_CHANGE=1 rebuilds mlx."""
+    state, pip_calls = _run_local_mlx_stage(
+        tmp_path,
+        pulled=False,
+        toolchain_matches=False,
+        extra_env={"MLX_REBUILD_ON_TOOLCHAIN_CHANGE": "1"} if forced else None,
+    )
+
+    rebuilt = [call.split(" ", 1)[0] for call in pip_calls if " -e " in call]
+    assert state["status"] == ["0"]
+    if forced:
+        assert "rebuild forced (MLX_REBUILD_ON_TOOLCHAIN_CHANGE=1)" in state["output"][0]
+        assert rebuilt[0] == "mlx"
+    else:
+        assert "Kernels built by the old toolchain stay in use" in state["output"][0]
+        assert rebuilt == []
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize("failing_repo", ["", "mlx"], ids=["build-succeeds", "build-fails"])
+def test_update_local_stage_records_the_compiler_only_after_a_successful_mlx_build(
+    tmp_path: Path, failing_repo: str
+) -> None:
+    """The toolchain record describes the installed build, so a failed build writes none."""
+    state, _pip_calls = _run_local_mlx_stage(tmp_path, failing_repo=failing_repo)
+
+    assert state["stamp"] == ([""] if failing_repo else ["fake-metal 1"])
+
+
+@pytest.mark.subprocess
+def test_update_local_stage_leaves_the_deployment_target_to_upstream_mlx(tmp_path: Path) -> None:
+    """No pip call in the stage sees a MACOSX_DEPLOYMENT_TARGET the updater chose."""
+    state, pip_calls = _run_local_mlx_stage(tmp_path)
+
+    assert [call for call in pip_calls if " -e " in call]
+    assert set(state["deployment_target"]) == {"unset"}
 
 
 # ---------------------------------------------------------------------------
@@ -4562,6 +4561,207 @@ def _copy_update_script_layout(tmp_path: Path) -> Path:
     return tools_dir / "update.sh"
 
 
+_WHOLE_UPDATE_CHANGING_CALLS = (
+    "CALL brew update",
+    "CALL brew upgrade",
+    "CALL conda update",
+    "CALL npm install",
+    "CALL python -m pip install",
+    "CALL python -m pip uninstall",
+)
+
+
+def _run_whole_update(
+    tmp_path: Path,
+    *,
+    env: Mapping[str, str] | None = None,
+    failing_imports: Iterable[str] = (),
+    conda: bool = False,
+) -> tuple[int, list[str]]:
+    """Run the whole copied update.sh with every external tool faked.
+
+    The fakes append ``CALL <tool> <arguments>`` to the same file the script's
+    output goes to, so the returned transcript keeps the order of what the
+    script printed and what it ran. The target interpreter is a venv's python
+    (or, with ``conda``, the active ``mlx-vlm`` env's); it succeeds except for
+    ``python -c "import <name>"`` with a name in ``failing_imports``. Bare
+    ``pip``/``python3`` on PATH are fakes too, so a call that bypasses the
+    target interpreter shows up as ``CALL bare-...``. No local checkouts exist,
+    so MLX comes from PyPI.
+    """
+    transcript = tmp_path / "transcript.log"
+    script = _copy_update_script_layout(tmp_path)
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    for name in ("brew", "conda", "npm"):
+        safe_io.write_text_no_follow(
+            fake_bin / name, f'#!/bin/bash\necho "CALL {name} $*" >> "{transcript}"\n', mode=0o755
+        )
+    for name in ("pip", "pip3", "python3"):
+        safe_io.write_text_no_follow(
+            fake_bin / name,
+            f'#!/bin/bash\necho "CALL bare-{name} $*" >> "{transcript}"\n',
+            mode=0o755,
+        )
+    prefix = tmp_path / "envs" / ("mlx-vlm" if conda else "venv")
+    (prefix / "bin").mkdir(parents=True)
+    failing = " ".join(failing_imports)
+    safe_io.write_text_no_follow(
+        prefix / "bin" / "python",
+        "#!/bin/bash\n"
+        f'echo "CALL python $*" >> "{transcript}"\n'
+        'if [[ "$1" == "-c" && " $FAKE_FAILING_IMPORTS " == *" ${2#import } "* ]]; then\n'
+        "    echo \"ModuleNotFoundError: No module named '${2#import }'\" >&2\n"
+        "    exit 1\n"
+        "fi\n",
+        mode=0o755,
+    )
+    base_env = {
+        "PATH": f"{fake_bin}:/usr/bin:/bin",
+        "HOME": str(tmp_path),
+        "TMPDIR": str(tmp_path),
+        "FAKE_FAILING_IMPORTS": failing,
+    }
+    if conda:
+        base_env |= {"CONDA_DEFAULT_ENV": "mlx-vlm", "CONDA_PREFIX": str(prefix)}
+    else:
+        base_env["VIRTUAL_ENV"] = str(prefix)
+    with transcript.open("a", encoding="utf-8") as output:
+        result = subprocess.run(  # noqa: S603 - fixed bash runs a copied repo script with fake tools
+            ["/bin/bash", str(script)],
+            stdout=output,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False,
+            stdin=subprocess.DEVNULL,
+            env=base_env | dict(env or {}),
+        )
+    return result.returncode, safe_io.read_text_no_follow(transcript).splitlines()
+
+
+def _first_line(lines: Sequence[str], prefix: str) -> int:
+    """Index of the first transcript line starting with ``prefix``."""
+    return next(index for index, line in enumerate(lines) if line.startswith(prefix))
+
+
+@pytest.mark.subprocess
+def test_update_script_plans_and_snapshots_before_the_first_change(tmp_path: Path) -> None:
+    """The plan prints and the state snapshot is read before anything is changed."""
+    status, lines = _run_whole_update(tmp_path)
+
+    assert status == 0, "\n".join(lines)
+    first_change = min(
+        index
+        for index, line in enumerate(lines)
+        if line.startswith(_WHOLE_UPDATE_CHANGING_CALLS) or "update_helpers.py clean-pip" in line
+    )
+    assert _first_line(lines, "[update.sh] Planned changes, in order:") < first_change
+    assert _first_line(lines, "CALL brew list --versions --formula") < first_change
+    # Every Python and pip call went to the target interpreter.
+    assert not [line for line in lines if line.startswith("CALL bare-")]
+
+
+@pytest.mark.subprocess
+def test_update_script_reconciles_the_project_after_the_mlx_update(tmp_path: Path) -> None:
+    """PyPI MLX first, then the project reinstall, its checks, and the import check."""
+    status, lines = _run_whole_update(tmp_path)
+
+    assert status == 0, "\n".join(lines)
+    order = [
+        "CALL python -m pip install -U --upgrade-strategy eager mlx mlx-metal mlx-vlm",
+        "CALL python -m pip install -U --upgrade-strategy eager -e ",
+        "CALL python -m pip check",
+        "CALL python -m tools.validate_env",
+        "CALL python -c import mlx",
+        "CALL python -c import mlx_vlm",
+    ]
+    positions = [_first_line(lines, prefix) for prefix in order]
+    assert positions == sorted(positions)
+    reinstall = lines[positions[1]]
+    assert reinstall.endswith("/src/.[dev,extras,torch]")
+
+
+@pytest.mark.subprocess
+def test_update_script_pip_installs_leave_builds_isolated_and_setuptools_uncapped(
+    tmp_path: Path,
+) -> None:
+    """Builds stay in pip's isolated environment, and setuptools keeps only mlx's floor."""
+    status, lines = _run_whole_update(tmp_path)
+
+    assert status == 0, "\n".join(lines)
+    installs = [line for line in lines if line.startswith("CALL python -m pip install")]
+    assert installs
+    assert not [line for line in installs if "--no-build-isolation" in line]
+    setuptools_specs = [
+        word for line in installs for word in line.split() if word.startswith("setuptools")
+    ]
+    assert setuptools_specs == ["setuptools>=80"]
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("settings", "expect_system", "expect_npm"),
+    [
+        ({}, True, "--save-dev markdownlint-cli2@latest"),
+        ({"UPDATE_SYSTEM_PACKAGES": "0"}, False, "--save-dev markdownlint-cli2@latest"),
+        ({"UPDATE_NODE_TOOLING": "0"}, True, ""),
+    ],
+    ids=["defaults", "no-system-packages", "lockfile-node-tooling"],
+)
+def test_update_script_system_and_node_tooling_switches(
+    tmp_path: Path, settings: dict[str, str], *, expect_system: bool, expect_npm: str
+) -> None:
+    """By default conda, Homebrew and markdownlint-cli2@latest update; each switch opts out."""
+    status, lines = _run_whole_update(tmp_path, env=settings, conda=True)
+
+    assert status == 0, "\n".join(lines)
+    system_calls = [
+        line for line in lines if line.startswith(("CALL brew update", "CALL brew upgrade"))
+    ] + [line for line in lines if line.startswith("CALL conda ") and " update" in line]
+    if expect_system:
+        assert any(line.startswith("CALL brew upgrade") for line in system_calls)
+        assert any(line.startswith("CALL conda ") for line in system_calls)
+    else:
+        assert system_calls == []
+        assert "[update.sh] Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)" in lines
+    npm_installs = [line for line in lines if line.startswith("CALL npm install")]
+    assert len(npm_installs) == 1
+    assert npm_installs[0].endswith("/src" + (" " + expect_npm if expect_npm else ""))
+    assert "--save-exact" not in npm_installs[0]
+
+
+@pytest.mark.subprocess
+def test_update_script_names_the_pip_distribution_for_an_unimportable_package(
+    tmp_path: Path,
+) -> None:
+    """A failed ``import mlx_vlm`` stops the run and suggests ``pip install mlx-vlm``."""
+    status, lines = _run_whole_update(tmp_path, failing_imports=["mlx_vlm"])
+
+    assert status == 1
+    assert "   Fix with: pip install mlx-vlm" in lines
+    assert "     ModuleNotFoundError: No module named 'mlx_vlm'" in lines
+
+
+@pytest.mark.subprocess
+def test_update_script_snapshots_the_sweep_history_where_asked(tmp_path: Path) -> None:
+    """A non-empty history is copied to HISTORY_BACKUP_DIR before anything changes."""
+    history = tmp_path / "work" / "check_models" / "src" / "output" / "results.history.jsonl"
+    history.parent.mkdir(parents=True)
+    safe_io.write_text_no_follow(history, '{"run": 1}\n')
+    backups = tmp_path / "history-backups"
+
+    status, lines = _run_whole_update(tmp_path, env={"HISTORY_BACKUP_DIR": str(backups)})
+
+    assert status == 0, "\n".join(lines)
+    snapshots = list(backups.glob("results.history.*.jsonl"))
+    assert [safe_io.read_text_no_follow(path) for path in snapshots] == ['{"run": 1}\n']
+    snapshot_line = _first_line(lines, "[update.sh] Sweep history snapshot: ")
+    first_change = min(
+        index for index, line in enumerate(lines) if line.startswith(_WHOLE_UPDATE_CHANGING_CALLS)
+    )
+    assert snapshot_line < first_change
+
+
 def test_update_script_mismatched_env_stops_before_any_change(tmp_path: Path) -> None:
     """The whole script, not just the resolver: no tool runs when the target is wrong."""
     log = tmp_path / "calls.log"
@@ -4637,22 +4837,6 @@ def test_update_script_failure_reports_the_steps_already_completed() -> None:
     )
     assert "Failed during (may be partly applied): Homebrew update and upgrade" in result.stdout
     assert "never reached" not in result.stdout
-
-
-def test_update_script_main_flow_runs_preflight_before_the_first_change() -> None:
-    """Target resolution, repo checks and the plan precede every changing step."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    main_flow = update_script[update_script.index("# ── Preflight") :]
-    first_change = main_flow.index("run_step ")
-    for preflight in (
-        "resolve_update_target ||",
-        "preflight_local_mlx_repos",
-        "report_update_plan",
-    ):
-        assert main_flow.index(preflight) < first_change, preflight
-    assert main_flow.index("trap report_update_outcome EXIT") < first_change
-    assert 'pip() { "$UPDATE_PYTHON" -m pip "$@"; }' in main_flow
-    assert main_flow.index("snapshot_update_state >") < first_change
 
 
 def _git_commit(repo: Path, message: str) -> str:
