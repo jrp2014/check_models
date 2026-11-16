@@ -80,6 +80,10 @@ set -euo pipefail
 # Determine project root (assuming check_models/src/tools/update.sh)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# The local checkouts the updater builds, in dependency order (mlx first),
+# and the directory that holds them beside this check_models checkout.
+LOCAL_MLX_REPOS=(mlx mlx-vlm)
+CHECKOUT_PARENT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 # Same override convention as common_quality.sh and the Makefiles.
 CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
@@ -310,7 +314,7 @@ backup_run_history() {
 		echo "[update.sh] No sweep history to back up ($history absent or empty)"
 		return 0
 	fi
-	local backup_dir="${HISTORY_BACKUP_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)/backups}"
+	local backup_dir="${HISTORY_BACKUP_DIR:-$CHECKOUT_PARENT/backups}"
 	mkdir -p "$backup_dir"
 	# Snapshot names sort by timestamp, so the last glob match is the newest.
 	local latest="" candidate
@@ -730,13 +734,13 @@ run_local_mlx_backend_smoke() {
 # metadata for only these requested tools before pip attempts an uninstall.
 update_packaging_tools() {
 	python "$SCRIPT_DIR/quarantine_broken_pip_metadata.py" \
-		pip wheel setuptools build pyrefly
+		pip wheel setuptools build
 
 	# Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
-	echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
+	echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build)..."
 	# setuptools keeps only mlx's build floor (>=80): every source build runs in
 	# pip's isolated build environment, which takes the latest setuptools anyway.
-	pip_install_tool pip wheel "setuptools>=80" build pyrefly
+	pip_install_tool pip wheel "setuptools>=80" build
 }
 
 # Resolve project extras once; the install itself runs after MLX updates so
@@ -773,15 +777,10 @@ reconcile_project_environment_from_pyproject() {
 
 # Function to clean build artifacts from local MLX repositories
 clean_local_mlx_builds() {
-	local SCRIPT_DIR
-	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-	local PARENT_DIR
-	PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-	local MLX_REPOS=("mlx" "mlx-vlm")
-	
+	local PARENT_DIR="$CHECKOUT_PARENT"
 	echo "[update.sh] Cleaning build artifacts from local MLX repositories..."
 	
-	for repo in "${MLX_REPOS[@]}"; do
+	for repo in "${LOCAL_MLX_REPOS[@]}"; do
 		local REPO_PATH="$PARENT_DIR/$repo"
 		if [[ -d "$REPO_PATH/.git" ]]; then
 			echo "[update.sh] Cleaning $repo build artifacts..."
@@ -1023,24 +1022,18 @@ mlx_build_toolchain_matches() {
 
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
-	# Determine the parent directory (assuming check_models/src/tools/update.sh)
-	local SCRIPT_DIR
-	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-	local PARENT_DIR
-	PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	local PARENT_DIR="$CHECKOUT_PARENT"
 	local ORIGINAL_DIR
 	ORIGINAL_DIR="$(pwd)"
 	
 	echo "[update.sh] Checking for local MLX development repositories..."
 	
-	# Define repositories in dependency order: mlx first (base), then mlx-vlm
-	local MLX_REPOS=("mlx" "mlx-vlm")
 	local -a REPO_NAMES=()
 	local -a REPO_PATHS=()
 	local -a REPO_UNCHANGED=()
 	local -a REPO_DIRTY=()
 	
-	for repo in "${MLX_REPOS[@]}"; do
+	for repo in "${LOCAL_MLX_REPOS[@]}"; do
 		local REPO_PATH="$PARENT_DIR/$repo"
 		if [[ -d "$REPO_PATH/.git" ]]; then
 			REPO_NAMES+=("$repo")
@@ -1340,8 +1333,8 @@ verify_local_installs_survived_reconcile() {
 # - Build requirements (CMake, Xcode, SDK, Metal toolchain) when mlx is local.
 preflight_local_mlx_repos() {
 	local parent_dir repo repo_path
-	parent_dir="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-	for repo in mlx mlx-vlm; do
+	parent_dir="$CHECKOUT_PARENT"
+	for repo in "${LOCAL_MLX_REPOS[@]}"; do
 		repo_path="$parent_dir/$repo"
 		[[ -d "$repo_path/.git" ]] || continue
 
@@ -1415,7 +1408,7 @@ report_update_plan() {
 	fi
 	local mlx_source="PyPI (unless a local dev build is detected)"
 	if local_mlx_repos_present; then
-		mlx_source="pull and rebuild the local checkouts in $(cd "$SCRIPT_DIR/../../.." && pwd)"
+		mlx_source="pull and rebuild the local checkouts in $CHECKOUT_PARENT"
 	fi
 	[[ "${SKIP_MLX:-0}" == "1" ]] && mlx_source="$mlx_source; PyPI MLX updates skipped (SKIP_MLX=1)"
 	echo ""
@@ -1425,7 +1418,7 @@ report_update_plan() {
 	echo "   2. Stale pip '~' backups removed (CLEAN_PIP_INVALID_DISTS=0 skips)"
 	echo "   3. System packages: $system_packages"
 	echo "   4. Node tooling: $node_tooling"
-	echo "   5. Packaging tools: pip, wheel, setuptools, build, pyrefly"
+	echo "   5. Packaging tools: pip, wheel, setuptools, build"
 	echo "   6. MLX: $mlx_source"
 	echo "   7. Project reinstall: $INSTALL_GROUPS, then pip check and validate_env"
 	echo ""
@@ -1442,10 +1435,10 @@ report_update_plan() {
 # be read: only a read source's lines are compared. Prints the snapshot.
 snapshot_update_state() {
 	local repo_parent repo listing revision git_read=1
-	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	repo_parent="$CHECKOUT_PARENT"
 	# A missing checkout is read as absent; one whose HEAD cannot be read
 	# leaves git unmarked rather than looking removed.
-	for repo in mlx mlx-vlm; do
+	for repo in "${LOCAL_MLX_REPOS[@]}"; do
 		[[ -d "$repo_parent/$repo/.git" ]] || continue
 		if revision="$(git -C "$repo_parent/$repo" rev-parse HEAD 2>/dev/null)"; then
 			printf 'git\t%s\t%s\n' "$repo" "$revision"
@@ -1552,7 +1545,7 @@ diff_update_state() {
 #   $1 before snapshot; $2 after snapshot
 report_update_changes() {
 	local repo_parent changes source name old new count rows="" unread_after="" unread_before=""
-	repo_parent="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	repo_parent="$CHECKOUT_PARENT"
 	changes="$(diff_update_state "$1" "$2")"
 	echo ""
 	if [[ -z "$changes" ]]; then
@@ -1648,9 +1641,9 @@ report_update_outcome() {
 # PyPI branch with a half-local environment.
 local_mlx_repos_present() {
 	local parent_dir
-	parent_dir="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	parent_dir="$CHECKOUT_PARENT"
 	local repo
-	for repo in mlx mlx-vlm; do
+	for repo in "${LOCAL_MLX_REPOS[@]}"; do
 		[[ -d "$parent_dir/$repo/.git" ]] && return 0
 	done
 	return 1
@@ -1747,7 +1740,7 @@ else
 	echo "   (Install Node.js/npm for markdown linting: brew install node)"
 fi
 
-run_step "packaging tools (pip, wheel, setuptools, build, pyrefly)" update_packaging_tools
+run_step "packaging tools (pip, wheel, setuptools, build)" update_packaging_tools
 
 # Clean build artifacts if requested
 if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then

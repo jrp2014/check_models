@@ -1374,6 +1374,22 @@ def _update_script_function(name: str) -> str:
     return match.group(0)
 
 
+def _update_script_checkout_constants() -> str:
+    """Return update.sh's shipped checkout constants as shell text.
+
+    ``CHECKOUT_PARENT`` is derived from ``SCRIPT_DIR``, so a driver sets that
+    first. Functions extracted with ``_update_script_function`` read both.
+    """
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    lines = [
+        line
+        for line in update_script.splitlines()
+        if line.startswith(("LOCAL_MLX_REPOS=", "CHECKOUT_PARENT="))
+    ]
+    assert len(lines) == 2, lines
+    return "\n".join(lines) + "\n"
+
+
 def _run_bash_script(
     script: str,
     *args: str,
@@ -2039,18 +2055,33 @@ def test_conda_plan_package_names(plan: object, expected: str | None) -> None:
     assert update_helpers.conda_plan_package_names("") is None
 
 
-def test_update_script_quarantines_broken_packaging_metadata_before_upgrade() -> None:
-    """The packaging-tool upgrade should preflight only its own metadata."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    helper_name = "quarantine_broken_pip_metadata.py"
-    install_command = 'pip_install_tool pip wheel "setuptools>=80" build pyrefly'
+@pytest.mark.subprocess
+def test_update_packaging_tools_quarantines_the_same_tools_it_then_upgrades() -> None:
+    """The metadata preflight runs first, on exactly the tools the upgrade names.
 
-    assert helper_name in update_script
-    helper_position = update_script.index(helper_name)
-    install_position = update_script.index(install_command)
-    preflight = update_script[helper_position:install_position]
-    assert "pip wheel setuptools build pyrefly" in " ".join(preflight.split())
-    assert helper_position < install_position
+    pyrefly is not among them: it is a dev requirement, so the eager project
+    reinstall (``-U --upgrade-strategy eager``) installs and upgrades it.
+    """
+    driver = (
+        "set -euo pipefail\n"
+        "SCRIPT_DIR=/unused\n"
+        'python() { echo "quarantine ${*:2}"; }\n'
+        'pip_install_tool() { echo "upgrade $*"; }\n'
+        f"{_update_script_function('update_packaging_tools')}update_packaging_tools\n"
+    )
+    result = _run_bash_script(driver)
+    assert result.returncode == 0, result.stderr
+    calls = [line for line in result.stdout.splitlines() if not line.startswith("[update.sh]")]
+    assert len(calls) == 2, calls
+    quarantined = calls[0].removeprefix("quarantine ").split()
+    upgraded = [Requirement(spec).name for spec in calls[1].removeprefix("upgrade ").split()]
+    assert calls[0].startswith("quarantine ")
+    assert calls[1].startswith("upgrade ")
+    assert quarantined == upgraded == ["pip", "wheel", "setuptools", "build"]
+
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    dev = {Requirement(spec).name for spec in pyproject["project"]["optional-dependencies"]["dev"]}
+    assert "pyrefly" in dev
 
 
 def test_quarantine_broken_pip_metadata_moves_only_malformed_targets(
@@ -4330,7 +4361,8 @@ printf 'verified=%s\\n' ${{VERIFIED_LOCAL_INSTALLS[@]+"${{VERIFIED_LOCAL_INSTALL
     }
     if caller_cmake_args is not None:
         env["CMAKE_ARGS"] = caller_cmake_args
-    result = _run_bash_script(helpers + driver, env=env, cwd=tools_dir)
+    preamble = f"SCRIPT_DIR={tools_dir}\n{_update_script_checkout_constants()}"
+    result = _run_bash_script(preamble + helpers + driver, env=env, cwd=tools_dir)
     assert result.returncode == 0, result.stderr + result.stdout
     state: dict[str, list[str]] = {"output": [result.stdout]}
     for line in result.stdout.splitlines():
@@ -4646,7 +4678,7 @@ def _run_update_change_report(tmp_path: Path, before: str, after: str) -> str:
         _update_script_function(name) for name in ("diff_update_state", "report_update_changes")
     )
     driver = (
-        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\n{functions}"
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\n{_update_script_checkout_constants()}{functions}"
         f"report_update_changes {tmp_path / 'before.tsv'} {tmp_path / 'after.tsv'}\n"
     )
     result = _run_bash_script(driver)
@@ -4751,7 +4783,7 @@ def test_update_state_snapshot_reads_each_source(tmp_path: Path) -> None:
         mode=0o755,
     )
     driver = (
-        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\nPROJECT_ROOT={project_root}\n"
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\n{_update_script_checkout_constants()}PROJECT_ROOT={project_root}\n"
         f"UPDATE_PYTHON={sys.executable}\nUPDATE_ENV_TYPE=conda\nCONDA_ENV=mlx-vlm\n"
         f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
     )
@@ -4786,7 +4818,7 @@ def test_update_state_snapshot_leaves_an_unreadable_checkout_unmarked(tmp_path: 
     script = _copy_update_script_layout(tmp_path)
     (tmp_path / "work" / "mlx" / ".git").mkdir(parents=True)
     driver = (
-        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\nPROJECT_ROOT={script.parent.parent}\n"
+        f"set -euo pipefail\nSCRIPT_DIR={script.parent}\n{_update_script_checkout_constants()}PROJECT_ROOT={script.parent.parent}\n"
         f"UPDATE_PYTHON={sys.executable}\nUPDATE_SYSTEM_PACKAGES=0\n"
         f"{_update_script_function('snapshot_update_state')}snapshot_update_state\n"
     )
@@ -4818,7 +4850,7 @@ def test_update_outcome_reports_changes_on_success_and_after_a_stop(tmp_path: Pa
         safe_io.write_text_no_follow(before, "pip\tnumpy\t2.3.0\npip\t\t\n")
         driver = (
             "set -euo pipefail\n"
-            f"SCRIPT_DIR={tmp_path}\n"
+            f"SCRIPT_DIR={tmp_path}\n{_update_script_checkout_constants()}"
             "cleanup_local_mlx_constraint() { :; }\n"
             "snapshot_update_state() { printf 'pip\\tnumpy\\t2.3.1\\npip\\t\\t\\n'; }\n"
             f'COMPLETED_STEPS=()\nCURRENT_STEP=""\nUPDATE_STATE_BEFORE={before}\n'

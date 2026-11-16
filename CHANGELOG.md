@@ -192,6 +192,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Updater (0.17.131): `update.sh` names its local checkouts once.
+  `LOCAL_MLX_REPOS` (mlx, then mlx-vlm) and `CHECKOUT_PARENT` replace five
+  spelled-out repo lists and eight `$(cd "$SCRIPT_DIR/../../.." && pwd)`
+  expressions, and the two functions that recomputed `SCRIPT_DIR` from
+  `BASH_SOURCE` use the script's own. The packaging-tools step no longer
+  installs pyrefly: it is a `.[dev]` requirement, and the project reinstall
+  (`-U --upgrade-strategy eager`) installs and upgrades it. The source-text
+  test of that step is replaced by one that runs it and checks the
+  quarantined and upgraded tools are the same list. The updater test
+  harnesses take the two constants from the shipped script, and moving the
+  parent or reordering the repos fails them.
 - Report blocks (0.17.130): both block renderers end in
   `_raise_unsupported_report_block`, whose parameter is `Never`, so a
   `ReportBlock` member a renderer forgets is now a type error rather than a
