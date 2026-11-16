@@ -53,6 +53,10 @@ _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
 PKG_ROOT = _TEST_FILE.parents[1]
 REPO_ROOT = PKG_ROOT.parent
+# Every repository script a test runs is bounded: a loop that never ends
+# fails the test instead of hanging the suite. The slowest, the whole quality
+# gate with fake tools, takes a few seconds.
+_SCRIPT_TIMEOUT_S = 120
 
 
 def _write_pip_dist_info(
@@ -765,12 +769,54 @@ def _clean_builds_layout(tmp_path: Path) -> tuple[Path, Path, Path]:
     return tools_dir / "clean_builds.sh", mlx, outside
 
 
+def _bash_major(path: str) -> int | None:
+    """Major version of the bash at ``path``, or None when it does not run."""
+    try:
+        completed = subprocess.run(  # noqa: S603 - a bash binary found by the caller, fixed argument
+            [path, "-c", 'printf %s "${BASH_VERSINFO[0]}"'],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=_SCRIPT_TIMEOUT_S,
+        )
+    except OSError:
+        return None
+    return int(completed.stdout) if completed.stdout.isdigit() else None
+
+
+def _bash_interpreter(kind: str) -> str:
+    """``system``: /bin/bash (3.2 on macOS). ``modern``: a bash 4 or later, else skip.
+
+    Bash 4.1 made ``set -e`` stop on an arithmetic command that evaluates to 0
+    (``((count++))`` the first time), which macOS's /bin/bash 3.2 ignores, so
+    a script needs both to be tested on a Mac.
+    """
+    if kind == "system":
+        return "/bin/bash"
+    candidates = [
+        shutil.which("bash"),
+        "/opt/homebrew/bin/bash",
+        "/usr/local/bin/bash",
+        "/bin/bash",
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file() and (_bash_major(candidate) or 0) >= 4:
+            return candidate
+    pytest.skip("no bash 4 or later installed")
+
+
 @pytest.mark.subprocess
+@pytest.mark.parametrize("bash", ["system", "modern"])
 @pytest.mark.parametrize("dry_run", [True, False], ids=["dry-run", "clean"])
 def test_clean_builds_removes_only_build_litter_and_never_follows_a_link(
-    tmp_path: Path, *, dry_run: bool
+    tmp_path: Path, bash: str, *, dry_run: bool
 ) -> None:
-    """Every checkout is cleaned to the end; sources, outputs and link targets stay."""
+    """Every checkout is cleaned to the end; sources, outputs and link targets stay.
+
+    Run under both macOS's bash 3.2 and a bash 4 or later: under bash 4.1+ the
+    old ``((cleaned++))`` counters stopped the run after its first removal.
+    """
+    interpreter = _bash_interpreter(bash)
     script, mlx, outside = _clean_builds_layout(tmp_path)
     fake_bin = tmp_path / "fake-bin"
     fake_bin.mkdir()
@@ -781,7 +827,7 @@ def test_clean_builds_removes_only_build_litter_and_never_follows_a_link(
     before = sorted(str(path.relative_to(tmp_path)) for path in tmp_path.rglob("*"))
 
     result = _run_bash_script(
-        f'bash "{script}"' + (" --dry-run" if dry_run else ""),
+        f'"{interpreter}" "{script}"' + (" --dry-run" if dry_run else ""),
         env={"PATH": f"{fake_bin}:/usr/bin:/bin"},
     )
 
@@ -1207,6 +1253,7 @@ def _run_quality_gate(
             stdin=subprocess.DEVNULL,
             cwd=tmp_path,
             env=base_env | dict(env or {}),
+            timeout=_SCRIPT_TIMEOUT_S,
         )
     return result.returncode, safe_io.read_text_no_follow(transcript).splitlines()
 
@@ -1422,6 +1469,7 @@ def _run_danger_wrapper(tmp_path: Path, *args: str) -> tuple[int, list[str]]:
             "TEST_PYTHON": sys.executable,
             "TEST_CALL_LOG": str(call_log),
         },
+        timeout=_SCRIPT_TIMEOUT_S,
     )
 
     calls = call_log.read_text(encoding="utf-8").splitlines() if call_log.exists() else []
@@ -1778,6 +1826,7 @@ def _run_bash_script(
         check=check,
         env=env,
         cwd=cwd,
+        timeout=_SCRIPT_TIMEOUT_S,
     )
 
 
@@ -4997,6 +5046,7 @@ def _run_whole_update(
             check=False,
             stdin=subprocess.DEVNULL,
             env=base_env | dict(env or {}),
+            timeout=_SCRIPT_TIMEOUT_S,
         )
     return result.returncode, safe_io.read_text_no_follow(transcript).splitlines()
 

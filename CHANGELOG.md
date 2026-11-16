@@ -192,6 +192,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Script tests (0.17.136): every repository script the dependency tests run
+  is bounded by a 120 s timeout (`_SCRIPT_TIMEOUT_S`), so a script that
+  loops fails its test instead of hanging the suite. The `clean_builds.sh`
+  test runs under `/bin/bash` and under a bash 4 or later when one is
+  installed (Homebrew's, on a Mac); the bash 4.1+ counter failure fixed in
+  0.17.134 is invisible to macOS's bash 3.2. Both variants fail on the old
+  script. From john's review of 0.17.130-0.17.134.
 - Updater (0.17.135): when the markdownlint-cli2 step rewrites
   `src/package.json` (a new release moves the caret range), `update.sh` now
   says so and prints the commit command. Left uncommitted, the change made
