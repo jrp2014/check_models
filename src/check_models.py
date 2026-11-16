@@ -110,6 +110,7 @@ from typing import (
     Final,
     Literal,
     NamedTuple,
+    Never,
     NoReturn,
     NotRequired,
     Protocol,
@@ -1616,6 +1617,9 @@ class LoadExtraKwargs(TypedDict, total=False):
     quantize_activations: bool
 
 
+# Protocol members with parameters spell their bodies ``del <params>`` and
+# ``raise NotImplementedError`` rather than ``...``: vulture runs at
+# min_confidence 100, where it reports unused arguments.
 class SupportsTextDecoder(Protocol):
     """Minimal tokenizer/processor decode interface used by preflight checks."""
 
@@ -2694,6 +2698,16 @@ class UnsupportedReportBlockError(TypeError):
         super().__init__(f"Unsupported report block: {block_name}")
 
 
+def _raise_unsupported_report_block(block: Never) -> NoReturn:
+    """Reject a block no renderer branch handled.
+
+    The ``Never`` parameter makes a ``ReportBlock`` member that a renderer
+    forgets a type error at the call site; the raise covers anything that
+    reaches it at run time regardless.
+    """
+    raise UnsupportedReportBlockError(block)
+
+
 class MissingGalleryAssessmentError(RuntimeError):
     """Raised when gallery rendering lacks the cached current-run assessments."""
 
@@ -2857,7 +2871,7 @@ def _render_report_markdown_block(block: ReportBlock) -> list[str]:
     elif isinstance(block, ReportModelOutput):
         rendered = _render_report_model_output_markdown(block)
     else:
-        raise UnsupportedReportBlockError(block)
+        _raise_unsupported_report_block(block)
     return rendered
 
 
@@ -2972,7 +2986,7 @@ def _render_report_html_block(block: ReportBlock) -> list[str]:
     elif isinstance(block, ReportModelOutput):
         rendered = _render_report_model_output_html(block)
     else:
-        raise UnsupportedReportBlockError(block)
+        _raise_unsupported_report_block(block)
     return rendered
 
 
@@ -21173,13 +21187,6 @@ def _output_index_link(index_filename: Path, artifact_path: Path, label: str) ->
     return f"[{escape_markdown_cell(label)}]({target})"
 
 
-# Derived from the canonical Literals / observation registry (F1).
-_RUN_ISSUE_EXECUTION_VALUES: Final[frozenset[str]] = _EXECUTION_STATUS_VALUES
-_RUN_ISSUE_USABILITY_VALUES: Final[frozenset[str]] = _MODEL_USABILITY_VALUES
-_RUN_ISSUE_MAINTAINER_VALUES: Final[frozenset[str]] = _MAINTAINER_STATUS_VALUES
-_RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = _OBSERVATION_CODE_VALUES
-
-
 # =============================================================================
 # SECTION: RUN COMPARISON (current sweep vs a retained baseline)
 # =============================================================================
@@ -24344,9 +24351,9 @@ def _validate_run_issue_model_provenance(
 
 
 _RUN_ISSUE_ASSESSMENT_VOCABULARIES: Final[tuple[tuple[str, frozenset[str]], ...]] = (
-    ("execution", _RUN_ISSUE_EXECUTION_VALUES),
-    ("usability", _RUN_ISSUE_USABILITY_VALUES),
-    ("maintainer_status", _RUN_ISSUE_MAINTAINER_VALUES),
+    ("execution", _EXECUTION_STATUS_VALUES),
+    ("usability", _MODEL_USABILITY_VALUES),
+    ("maintainer_status", _MAINTAINER_STATUS_VALUES),
 )
 
 
@@ -24474,7 +24481,7 @@ def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResult
         vocabulary_violation
         or not isinstance(observations, list)
         or any(
-            not isinstance(item, str) or item not in _RUN_ISSUE_OBSERVATION_VALUES
+            not isinstance(item, str) or item not in _OBSERVATION_CODE_VALUES
             for item in observations
         )
     ):

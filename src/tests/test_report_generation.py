@@ -1334,12 +1334,24 @@ def test_github_blob_ref_never_pins_to_producer_head(
     assert check_models._github_blob_ref() == "a" * 40
 
 
+@pytest.mark.parametrize(
+    "render",
+    [check_models.render_report_markdown, check_models.render_report_html],
+)
+def test_report_renderers_reject_a_block_outside_the_union(
+    render: Callable[[Sequence[check_models.ReportBlock]], list[str]],
+) -> None:
+    """A value that is no ReportBlock member still fails loudly at run time."""
+    stray = cast("check_models.ReportBlock", object())
+    with pytest.raises(check_models.UnsupportedReportBlockError, match="object"):
+        render((stray,))
+
+
 def test_observation_display_registry_covers_literal_codes() -> None:
     """Observation display metadata must stay aligned with ObservationCode."""
     codes = check_models._literal_values(check_models.ObservationCode)
     assert set(check_models._OBSERVATION_DISPLAY_BY_CODE) == codes
-    assert codes == check_models._RUN_ISSUE_OBSERVATION_VALUES
-    assert check_models._RUN_ISSUE_EXECUTION_VALUES == check_models._EXECUTION_STATUS_VALUES
+    assert codes == check_models._OBSERVATION_CODE_VALUES
     assert "empty_output" in check_models._UNUSABLE_OBSERVATIONS
     assert "thinking_trace_present" not in check_models._UNUSABLE_OBSERVATIONS
     assert (

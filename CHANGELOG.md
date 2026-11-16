@@ -192,6 +192,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Report blocks (0.17.130): both block renderers end in
+  `_raise_unsupported_report_block`, whose parameter is `Never`, so a
+  `ReportBlock` member a renderer forgets is now a type error rather than a
+  run-time `UnsupportedReportBlockError` (which still guards anything that
+  reaches it). A test covers that run-time path for both renderers. The four
+  `_RUN_ISSUE_*_VALUES` aliases are gone; their users name the canonical
+  vocabularies. A comment records why Protocol stubs with parameters use
+  `del` and `raise NotImplementedError`: vulture's min_confidence 100 reports
+  unused arguments. `__all__` stays: the README's library section points to
+  it, and at min_confidence 100 vulture does not report unused functions, so
+  it hides nothing from the gate.
 - Report wording (0.17.129): results that completed with only answer-format
   observations or hint reuse are no longer called "prompt-compliance
   observations". Reusing supplied, correct hints is allowed, so the run
