@@ -192,6 +192,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Development tooling (0.17.138): `src/.npmrc` now sets `min-release-age=1`
+  (was 7), so `update.sh` and `npm install` in `src/` pick up a new
+  markdownlint-cli2 release after one day rather than a week (0.24.1 was
+  held back for six days). `ignore-scripts=true` is unchanged, and Skylos
+  5.6.0's `release_age_cooldown` check accepts any positive age, so its npm
+  half still passes.
 - Script tests (0.17.137): the danger-wrapper test passed locally and failed
   on every CI static-quality job. Under GitHub Actions `GITHUB_STEP_SUMMARY`
   is set, so the wrapper adds `--summary` to its gate call, and the test's
