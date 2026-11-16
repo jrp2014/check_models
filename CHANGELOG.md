@@ -192,6 +192,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Updater (0.17.135): when the markdownlint-cli2 step rewrites
+  `src/package.json` (a new release moves the caret range), `update.sh` now
+  says so and prints the commit command. Left uncommitted, the change made
+  the pre-push hook fail: it stashes uncommitted changes, then compares the
+  old committed range with the new `package-lock.json`. A test runs the step
+  with an npm that does and does not rewrite the file.
 - Script tests (0.17.134): nine more tests that asserted shell-script source
   text now run the scripts. A harness runs the whole `run_quality_checks.sh`
   with every tool faked: one gated Skylos scan with the grep budget and no

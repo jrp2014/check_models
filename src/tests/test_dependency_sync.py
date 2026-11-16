@@ -5093,6 +5093,39 @@ def test_update_script_system_and_node_tooling_switches(
 
 
 @pytest.mark.subprocess
+@pytest.mark.parametrize("bumped", [True, False], ids=["new-release", "already-latest"])
+def test_update_node_tooling_says_to_commit_a_rewritten_package_json(
+    tmp_path: Path, *, bumped: bool
+) -> None:
+    """A new markdownlint-cli2 release rewrites package.json; the step says to commit it."""
+    project = tmp_path / "src"
+    project.mkdir()
+    old = '{\n  "devDependencies": {\n    "markdownlint-cli2": "^0.24.0"\n  }\n}\n'
+    safe_io.write_text_no_follow(project / "package.json", old)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    rewrite = (
+        f"sed -i.bak 's/\\^0.24.0/^0.24.1/' \"{project / 'package.json'}\"\n" if bumped else ""
+    )
+    safe_io.write_text_no_follow(fake_bin / "npm", f"#!/bin/bash\n{rewrite}exit 0\n", mode=0o755)
+    driver = (
+        f"set -euo pipefail\nPROJECT_ROOT={project}\n"
+        f"{_update_script_function('update_node_tooling')}update_node_tooling\n"
+    )
+
+    result = _run_bash_script(driver, env={"PATH": f"{fake_bin}:/usr/bin:/bin"})
+
+    assert result.returncode == 0, result.stderr
+    reminder = "src/package.json changed (markdownlint-cli2 ^0.24.1). Commit it:"
+    assert (reminder in result.stdout) == bumped, result.stdout
+    if bumped:
+        assert (
+            '   git add src/package.json && git commit -m "chore(deps): markdownlint-cli2 ^0.24.1"'
+            in result.stdout
+        )
+
+
+@pytest.mark.subprocess
 def test_update_script_names_the_pip_distribution_for_an_unimportable_package(
     tmp_path: Path,
 ) -> None:
