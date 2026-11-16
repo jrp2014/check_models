@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-11-15 00:17:44 GMT
+FULL ENVIRONMENT DUMP - 2026-11-16 14:19:14 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -22,7 +22,7 @@ certifi==2026.10.23
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
-check_models==0.17.124
+check_models==0.17.129
 click==8.5.1
 cmake==4.4.4
 coverage==7.17.3
@@ -36,17 +36,17 @@ docopt==0.6.2
 editor==2.0.1
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.163.0
+fastapi==0.163.1
 filelock==4.2.10
 frozenlist==1.8.0
 fsspec==2026.9.0
 h11==0.16.0
 hf-xet==1.8.0
 httpcore==1.0.9
-httpcore2==2.16.0
+httpcore2==2.16.2
 httpx==0.28.1
 httpx-sse==0.4.3
-httpx2==2.16.0
+httpx2==2.16.2
 huggingface_hub==2.4.0
 identify==2.6.20
 idna==3.20
@@ -88,7 +88,7 @@ mypy_extensions==1.2.0
 networkx==3.7
 nodeenv==1.12.0
 num2words==0.5.14
-numpy==2.5.4
+numpy==2.5.5
 opencv-python==5.0.0.93
 opentelemetry-api==1.45.2
 packageurl-python==0.17.6
@@ -125,11 +125,11 @@ python-dateutil==4.0.0
 python-discovery==1.9.5
 python-dotenv==1.2.4
 python-hcl2==8.2.0
-python-multipart==0.0.33
+python-multipart==0.0.34
 PyYAML==6.0.3
 readchar==4.2.2
 referencing==0.37.0
-regex==2026.11.9
+regex==2026.11.15
 requests==2.34.2
 rich==15.0.0
 rpds-py==2026.9.1
@@ -194,5 +194,5 @@ yarl==1.25.1
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-11-15 00:17:44 GMT
+Environment dump completed at 2026-11-16 14:19:14 GMT
 ================================================================================
