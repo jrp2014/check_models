@@ -278,6 +278,9 @@ The file is organized in this order — search for these exact landmark headers 
 - Prefer explicit symbol imports when practical (e.g., `from check_models import foo`), especially in tests; avoid broad module imports when only a few symbols are used.
 - `Final` for constants: `TIMEOUT: Final[float] = 5.0`
 - `pathlib.Path` for all paths; convert to `str` only at library call boundaries
+- Read parsed options as `args.name`, never `getattr(args, "name", default)`:
+  the parser is the one place a default is stated. Tests that call run-setup
+  functions build their namespace from `_build_cli_parser().parse_args([])`.
 - File I/O goes through the bounded, non-link-following helpers, never raw
   `Path.read_text`/`write_text` or `open()`. There is one implementation, in
   the packaged `check_models_data/safe_io.py`, whose docstring is the

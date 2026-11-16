@@ -6949,12 +6949,9 @@ def _prompt_builder_exposes_metadata(
     metadata: MetadataDict | None,
 ) -> bool:
     """Return whether the generated prompt actually includes metadata context."""
-    if getattr(args, "prompt", None):
+    if args.prompt:
         return False
-    if (
-        _resolve_eval_mode(str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)), metadata)
-        != "assisted"
-    ):
+    if _resolve_eval_mode(str(args.eval_mode), metadata) != "assisted":
         return False
     provenance = _build_metadata_provenance(metadata)
     return provenance.has_authoritative_context or provenance.has_draft
@@ -12742,7 +12739,7 @@ def _harness_generation_argument_names() -> frozenset[str]:
 def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
     """Validate direct-generation flags shared with the MLX-VLM server request API."""
     for name in ("presence_context_size", "frequency_context_size"):
-        size = getattr(args, name, DEFAULT_PENALTY_CONTEXT_SIZE)
+        size = getattr(args, name)
         if size is not None and size <= 0:
             msg = f"{name} must be > 0 if specified, got {size}"
             raise ValueError(msg)
@@ -12750,10 +12747,10 @@ def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
 
 def _validate_thinking_params(args: argparse.Namespace) -> None:
     """Validate opt-in thinking-mode arguments."""
-    enable_thinking = bool(getattr(args, "enable_thinking", False))
-    thinking_budget = getattr(args, "thinking_budget", None)
-    thinking_start_token = getattr(args, "thinking_start_token", None)
-    thinking_end_token = getattr(args, "thinking_end_token", DEFAULT_THINKING_END_MARKER)
+    enable_thinking = bool(args.enable_thinking)
+    thinking_budget = args.thinking_budget
+    thinking_start_token = args.thinking_start_token
+    thinking_end_token = args.thinking_end_token
     thinking_requested = (
         enable_thinking or thinking_budget is not None or thinking_start_token is not None
     )
@@ -12772,13 +12769,13 @@ def _validate_thinking_params(args: argparse.Namespace) -> None:
 
     # Omitted (None) leaves the template default; "none" or "off" is a value the
     # template receives. An empty value would be neither, so it is refused.
-    reasoning_effort = getattr(args, "reasoning_effort", None)
+    reasoning_effort = args.reasoning_effort
     if reasoning_effort is not None and not reasoning_effort.strip():
         msg = "reasoning_effort must be non-empty if specified (omit it for the template default)"
         raise ValueError(msg)
 
-    fallback = getattr(args, "reasoning_effort_fallback", DEFAULT_REASONING_EFFORT_FALLBACK)
-    if getattr(args, "reasoning_effort", None) is None and fallback not in {
+    fallback = args.reasoning_effort_fallback
+    if args.reasoning_effort is None and fallback not in {
         None,
         DEFAULT_REASONING_EFFORT_FALLBACK,
     }:
@@ -12813,20 +12810,20 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
         max_kv_size=args.max_kv_size,
         kv_bits=args.kv_bits,
         kv_quant_scheme=args.kv_quant_scheme,
-        kv_key_bits=getattr(args, "kv_key_bits", None),
-        kv_value_bits=getattr(args, "kv_value_bits", None),
-        kv_key_scheme=getattr(args, "kv_key_scheme", None),
-        kv_value_scheme=getattr(args, "kv_value_scheme", None),
+        kv_key_bits=args.kv_key_bits,
+        kv_value_bits=args.kv_value_bits,
+        kv_key_scheme=args.kv_key_scheme,
+        kv_value_scheme=args.kv_value_scheme,
     )
 
-    args.resize_shape = _normalize_resize_shape(getattr(args, "resize_shape", None))
-    args.eos_tokens = _decode_cli_eos_tokens(getattr(args, "eos_tokens", None))
+    args.resize_shape = _normalize_resize_shape(args.resize_shape)
+    args.eos_tokens = _decode_cli_eos_tokens(args.eos_tokens)
     args.processor_kwargs = _validate_processor_kwargs(
-        getattr(args, "processor_kwargs", None),
+        args.processor_kwargs,
     )
     _validate_server_shared_request_params(args)
     _validate_thinking_params(args)
-    _validate_unique_model_ids(getattr(args, "models", None))
+    _validate_unique_model_ids(args.models)
 
 
 def _validate_unique_model_ids(models: Sequence[str] | None) -> None:
@@ -17258,7 +17255,7 @@ def _isolated_worker_spec(
     if isinstance(params.image_path, Path):
         # ``str | Path`` cannot be told apart after JSON; tag the Path case.
         payload["image_path"] = {_SPEC_PATH_TAG: str(params.image_path)}
-    quality_config = getattr(args, "quality_config", None)
+    quality_config = args.quality_config
     return {
         "params": payload,
         "quality_config": None if quality_config is None else str(quality_config),
@@ -18177,7 +18174,7 @@ def _reject_url_image_argument(image: Path) -> None:
 
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
-    if getattr(args, "image", None) is not None:
+    if args.image is not None:
         _reject_url_image_argument(args.image)
         return _validate_selected_image(args.image.resolve())
 
@@ -18257,7 +18254,7 @@ def _apply_eval_mode_defaults(
     metadata: Mapping[str, str | None] | None,
 ) -> None:
     """Apply metadata-aware eval-mode and token-cap defaults to parsed CLI args."""
-    requested_eval_mode = str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE))
+    requested_eval_mode = str(args.eval_mode)
     if requested_eval_mode == "assisted" and not _metadata_has_descriptive_reference(metadata):
         msg = (
             "The assisted evaluation lane requires descriptive metadata "
@@ -18272,21 +18269,21 @@ def _apply_eval_mode_defaults(
             else "no descriptive image metadata found"
         )
         logger.info("Auto eval mode selected '%s' (%s).", resolved_eval_mode, reason)
-    if getattr(args, "prompt", None):
+    if args.prompt:
         logger.info(
             "--prompt overrides the '%s' lane prompt; the lane still governs the "
             "default token cap and report labeling.",
             resolved_eval_mode,
         )
     args.eval_mode = resolved_eval_mode
-    args.assessment_profile = getattr(args, "assessment_profile", None) or (
-        "general" if getattr(args, "prompt", None) or resolved_eval_mode == "triage" else "metadata"
+    args.assessment_profile = args.assessment_profile or (
+        "general" if args.prompt or resolved_eval_mode == "triage" else "metadata"
     )
 
     # None marks "not set on the CLI": an explicit --max-tokens always wins, even
     # when it equals a lane default (the old value-comparison sentinel silently
     # replaced an explicit 500 with the triage cap).
-    if getattr(args, "max_tokens", None) is not None:
+    if args.max_tokens is not None:
         return
     args.max_tokens = TRIAGE_MAX_TOKENS if resolved_eval_mode == "triage" else DEFAULT_MAX_TOKENS
 
@@ -18430,7 +18427,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     print_cli_section("Prompt Configuration")
     max_display_len = 200
 
-    eval_mode = _resolve_eval_mode(str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)), metadata)
+    eval_mode = _resolve_eval_mode(str(args.eval_mode), metadata)
 
     prompt: str
     if args.prompt:
@@ -18457,7 +18454,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         # in both, descriptive hints only when assisted.
         prompt = _build_cataloguing_prompt(metadata, include_metadata_hints=include_metadata_hints)
         logger.debug("Using generated %s-lane prompt.", eval_mode)
-        if not getattr(args, "dry_run", False):  # dry-run prints the whole prompt below
+        if not args.dry_run:  # dry-run prints the whole prompt below
             logger.info(
                 "Final prompt: %s",
                 _build_prompt_preview(prompt, max_chars=max_display_len),
@@ -18468,10 +18465,10 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         "Lane: %s | Prompt: %s | Assessment: %s | Max tokens: %s",
         eval_mode,
         prompt_source,
-        getattr(args, "assessment_profile", None) or "unresolved",
-        getattr(args, "max_tokens", None),
+        args.assessment_profile or "unresolved",
+        args.max_tokens,
     )
-    logger.info("Assessment: %s", _assessment_scope(getattr(args, "assessment_profile", None)))
+    logger.info("Assessment: %s", _assessment_scope(args.assessment_profile))
     return prompt
 
 
@@ -19549,9 +19546,9 @@ def _process_image_params_from_args(
         timeout=args.timeout if timeout is None else timeout,
         verbose=args.verbose if verbose is None else verbose,
         lazy=args.lazy_load,
-        auto_thinking_budget=getattr(args, "auto_thinking_budget", True),
-        system_telemetry=_resolve_system_telemetry_mode(getattr(args, "system_telemetry", None)),
-        assessment_profile=getattr(args, "assessment_profile", None) or "general",
+        auto_thinking_budget=args.auto_thinking_budget,
+        system_telemetry=_resolve_system_telemetry_mode(args.system_telemetry),
+        assessment_profile=args.assessment_profile or "general",
         explicit_sampling=frozenset(explicit),
         **run_settings,
     )
@@ -19583,11 +19580,7 @@ def _run_one_model(
         timeout=timeout,
         verbose=verbose,
     )
-    result = (
-        _run_model_isolated(args, params)
-        if getattr(args, "isolate", False)
-        else process_image_with_model(params)
-    )
+    result = _run_model_isolated(args, params) if args.isolate else process_image_with_model(params)
     return replace(result, assessment_profile=params.assessment_profile)
 
 
@@ -19621,9 +19614,7 @@ def process_models(
         # Explicit selection overrides the capability filter and the layout
         # check, but both stay visible so the run's behaviour is no surprise.
         _warn_explicit_non_image_models(model_identifiers)
-        _warn_explicit_incomplete_cache(
-            model_identifiers, requested_revision=getattr(args, "revision", None)
-        )
+        _warn_explicit_incomplete_cache(model_identifiers, requested_revision=args.revision)
     else:
         # Case 2: No explicit models - scan cache and apply exclusions
         logger.info("Scanning cache for models to process...")
@@ -19716,7 +19707,7 @@ def _assess_and_log_model_outcome(
     # is a self-contained timeline rather than a replay of the reports.
     logger.debug(
         "%s",
-        _reproduction_log_line(result, requested_revision=getattr(args, "revision", None)),
+        _reproduction_log_line(result, requested_revision=args.revision),
     )
     return result
 
@@ -28670,9 +28661,7 @@ def finalize_execution(
 
         recommended_working_set_bytes = _get_recommended_working_set_bytes()
         runtime_fingerprint = collect_runtime_fingerprint()
-        requested_revision = (
-            str(args.revision) if getattr(args, "revision", None) is not None else None
-        )
+        requested_revision = str(args.revision) if args.revision is not None else None
         model_provenance = {
             result.model_name: _collect_model_provenance(
                 result.model_name,
@@ -28684,7 +28673,7 @@ def finalize_execution(
             results=[
                 replace(
                     result,
-                    assessment_profile=getattr(args, "assessment_profile", None) or "general",
+                    assessment_profile=args.assessment_profile or "general",
                 )
                 for result in results
             ],
@@ -28692,7 +28681,7 @@ def finalize_execution(
             image_path=image_path,
             metadata=metadata,
             metadata_exposed_to_prompt=metadata_exposed_to_prompt,
-            eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
+            eval_mode=str(args.eval_mode),
             system_info=system_info,
             recommended_working_set_bytes=recommended_working_set_bytes,
             preflight_issues=run_facts.preflight_issues,
@@ -28772,7 +28761,7 @@ def finalize_execution(
                     current_image_record["sha256"] if current_image_record is not None else None
                 ),
                 generation_settings=_common_generation_settings(results),
-                execution_mode="isolated" if getattr(args, "isolate", False) else "in_process",
+                execution_mode="isolated" if args.isolate else "in_process",
                 eval_mode=eval_mode,
                 system_info=system_info,
                 mlx_environment=_mlx_environment(),
@@ -28799,7 +28788,7 @@ def finalize_execution(
             history_appended=history_record is not None,
             environment_logged=run_facts.environment_logged,
             model_revision=requested_revision,
-            trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
+            trust_remote_code=bool(args.trust_remote_code),
             runtime_fingerprint=runtime_fingerprint,
         )
         report_outcomes = _generate_reports_and_log_outputs(report_inputs)
@@ -28826,7 +28815,7 @@ def finalize_execution(
         ),
         extra={"style_hint": LogStyles.METRIC_LABEL},
     )
-    if getattr(args, "verbose", False):
+    if args.verbose:
         # Already printed at the top of this run from the same snapshot.
         logger.info(
             "Library versions and run-start system facts: see the top of this log "
@@ -28861,10 +28850,10 @@ def _explicit_cli_dests(argv: Sequence[str]) -> frozenset[str]:
 
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
-    _LinkStyleState.value = getattr(args, "link_style", "github")
+    _LinkStyleState.value = args.link_style
     # Before the clock starts: loading the runtime is not part of a run's
     # duration. A dry run invokes no models, so it is not probed.
-    load_mlx_runtime(probe_first=not getattr(args, "dry_run", False))
+    load_mlx_runtime(probe_first=not args.dry_run)
 
     # Wall clock, not a perf counter: the reported run duration must match
     # what a person experienced, including any time the machine was asleep.
@@ -28886,7 +28875,7 @@ def main(args: argparse.Namespace) -> None:
         prompt = prepare_prompt(args, metadata)
 
         # Handle dry-run mode: show what would be run and exit
-        if getattr(args, "dry_run", False):
+        if args.dry_run:
             _handle_dry_run(args, prompt, run_facts)
             return
 
@@ -28896,7 +28885,7 @@ def main(args: argparse.Namespace) -> None:
         results = process_models(args, image_path, prompt=prompt)
 
         # Phase 5: Differential reruns for crashes and mechanical observations
-        if getattr(args, "rerun_triage", False):
+        if args.rerun_triage:
             candidates = _select_rerun_candidates(results)
             if candidates:
                 updated = _run_differential_reruns(candidates, args, image_path)
@@ -28968,9 +28957,7 @@ def _handle_dry_run(
         model_identifiers = args.models
         logger.info("📦 Models specified explicitly:")
         selection_context = "explicit list"
-        _warn_explicit_incomplete_cache(
-            model_identifiers, requested_revision=getattr(args, "revision", None)
-        )
+        _warn_explicit_incomplete_cache(model_identifiers, requested_revision=args.revision)
     else:
         model_identifiers = _supported_cached_model_ids_with_skipped_logging(
             get_cached_model_eligibility()
@@ -29046,7 +29033,7 @@ def main_cli() -> None:
     args.explicit_cli = sorted(_explicit_cli_dests(sys.argv[1:]))
 
     # If neither --folder nor --image is specified, assume default folder
-    if getattr(args, "folder", None) is None and getattr(args, "image", None) is None:
+    if args.folder is None and args.image is None:
         args.folder = DEFAULT_FOLDER
         logger.info(
             "No --folder or --image specified. Assuming default folder: %s",
@@ -29064,13 +29051,13 @@ def main_cli() -> None:
             )
 
     # Print all command-line arguments if verbose is set
-    if getattr(args, "verbose", False):
+    if args.verbose:
         print_cli_section("Command Line Parameters")
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info("  %s: %s", arg_name, arg_value)
 
     # Load quality configuration
-    load_quality_config(getattr(args, "quality_config", None))
+    load_quality_config(args.quality_config)
 
     main(args)
 

@@ -192,6 +192,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Settings reads (0.17.132): start-up, validation, prompt preparation, the
+  model loop and finalisation read parsed options as `args.name`; the 50
+  `getattr(args, "name", default)` reads are gone, so each default is stated
+  once, in the parser (every one matched it). `explicit_cli` keeps its
+  `getattr`: `main_cli` sets it, and `main` called directly has none. Tests
+  that called these functions with a hand-built namespace now start from the
+  parser's defaults.
 - Updater (0.17.131): `update.sh` names its local checkouts once.
   `LOCAL_MLX_REPOS` (mlx, then mlx-vlm) and `CHECKOUT_PARENT` replace five
   spelled-out repo lists and eight `$(cd "$SCRIPT_DIR/../../.." && pwd)`

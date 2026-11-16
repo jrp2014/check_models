@@ -2188,6 +2188,9 @@ class TestRerunEvidence:
             reasoning_effort_fallback="lower",
             assessment_profile="metadata",
         )
+        # The values above over the parser's defaults for every other option.
+        parsed_defaults = vars(check_models._build_cli_parser().parse_args([]))
+        args = argparse.Namespace(**(parsed_defaults | vars(args)))
 
         def capture(params: check_models.ProcessImageParams) -> PerformanceResult:
             captured.append(params)

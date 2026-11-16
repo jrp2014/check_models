@@ -218,7 +218,11 @@ class TestCliArgumentNormalization:
 
     @staticmethod
     def _build_args(**overrides: object) -> argparse.Namespace:
+        # Start from the parser's own defaults, as a real command line does;
+        # validation reads every option directly, so none may be missing.
+        parsed = vars(check_models._build_cli_parser().parse_args([]))
         base: dict[str, object] = {
+            **parsed,
             "temperature": 0.0,
             "max_tokens": 10,
             "top_p": 1.0,

@@ -44,6 +44,16 @@ def mod() -> types.ModuleType:
     return importlib.import_module("check_models")
 
 
+def _cli_args(**values: object) -> argparse.Namespace:
+    """Return a parsed command line's namespace with ``values`` set on it.
+
+    Run-setup functions read their options directly, as ``main`` hands them a
+    fully parsed namespace, so a test namespace starts from the parser.
+    """
+    parser = importlib.import_module("check_models")._build_cli_parser()
+    return argparse.Namespace(**(vars(parser.parse_args([])) | values))
+
+
 # ── validate_model_identifier ──────────────────────────────────────────────
 
 
@@ -541,7 +551,7 @@ class TestValidateAndWarnModelSelection:
         models: list[str] | None,
         verbose: bool = False,
     ) -> argparse.Namespace:
-        return argparse.Namespace(exclude=exclude, models=models, verbose=verbose)
+        return _cli_args(exclude=exclude, models=models, verbose=verbose)
 
     def test_warns_when_excluded_model_is_not_cached(
         self,
@@ -703,7 +713,7 @@ class TestPreparePrompt:
         *,
         eval_mode: str = "auto",
     ) -> argparse.Namespace:
-        return argparse.Namespace(prompt=prompt, eval_mode=eval_mode)
+        return _cli_args(prompt=prompt, eval_mode=eval_mode)
 
     def test_user_provided_prompt(self, mod: types.ModuleType) -> None:
         """User-provided prompt should be returned verbatim."""
@@ -802,7 +812,7 @@ class TestPreparePrompt:
         mod: types.ModuleType,
     ) -> None:
         """Assisted prompts should label factual context separately from draft text."""
-        args = argparse.Namespace(prompt=None, eval_mode="assisted")
+        args = _cli_args(prompt=None, eval_mode="assisted")
         prompt = mod.prepare_prompt(
             args,
             {
@@ -828,7 +838,7 @@ class TestPreparePrompt:
     ) -> None:
         """The full localized EXIF datetime should appear once in assisted context."""
         prompt = mod.prepare_prompt(
-            argparse.Namespace(prompt=None, eval_mode="assisted"),
+            _cli_args(prompt=None, eval_mode="assisted"),
             {
                 "date": "2026-07-25 18:33:16 UTC+01:00",
                 "time": "18:33:16",
@@ -844,7 +854,7 @@ class TestPreparePrompt:
     ) -> None:
         """Arbitrary metadata keywords remain fallible draft text."""
         prompt = mod.prepare_prompt(
-            argparse.Namespace(prompt=None, eval_mode="assisted"),
+            _cli_args(prompt=None, eval_mode="assisted"),
             {"keywords": "Example Harbour, Sample Village, boats"},
         )
 
