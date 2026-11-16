@@ -1224,7 +1224,9 @@ class TestProcessImageWithModelMock:
             patch.object(check_models, "_reproduction_log_line", return_value="REPRO"),
         ):
             check_models._assess_and_log_model_outcome(
-                result, args=cast("Any", types.SimpleNamespace(max_tokens=10)), prompt="p"
+                result,
+                args=check_models._build_cli_parser().parse_args(["--max-tokens", "10"]),
+                prompt="p",
             )
         line = next(
             record.getMessage()
