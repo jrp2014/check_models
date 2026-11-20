@@ -128,16 +128,54 @@ quality_run_python_tool vulture
 # One gated scan carries every check the former ungated `-a` audit pass
 # added (ai-defects); the audit pass only printed a grade card over the same
 # files, at the cost of a second full analysis (~9 s). Danger stays in its
-# own advisory wrapper below, which post-filters the JSON report.
-# The dependency report (below) must not be in the tree this step scans. A
+# own wrapper, which post-filters the JSON report.
+#
+# The danger scan runs alongside the quality scan. Each Skylos run keeps about
+# one core busy (it analyses check_models.py in one worker), so on 4 cores the
+# pair took ~125 s side by side against ~220 s one after the other (Skylos
+# 5.7.0, same findings and reports either way). Neither writes into the tree the other scans while it runs: the
+# quality scan writes only Skylos's own src/.skylos/cache, the danger scan
+# writes its report to the repository root's .skylos/ when it finishes. The
+# danger output is held in a file and printed whole after the quality output,
+# and either failure fails the gate. The suppression audit stays before them:
+# it writes temporary copies of suppressed files beside the originals.
+# The dependency report (below) must not be in the tree either scan reads. A
 # whole-tree --sca report was ~15 MB, over the 8 MB at which the secret scan
 # stops (SKY-ANALYSIS-INCOMPLETE); the scan below writes ~16 KB, but a stray
-# report is still not source. It is removed after its own step; this also
-# clears one an interrupted run left behind.
+# report is still not source. It is written only after both scans finish and
+# removed after its own step; this also clears one an interrupted run left
+# behind.
 sca_report_path=".skylos/skylos-dependency-scan.json"
 rm -f "$sca_report_path"
+if [ "$QUALITY_MODE" = "full" ]; then
+    danger_heading="Skylos Danger Gate"
+    danger_args=(--full --gate)
+else
+    # Fast mode keeps the danger scan the former ungated `-a` audit pass
+    # provided, advisory only (findings are printed, never blocking here).
+    danger_heading="Skylos Danger Advisory (fast, non-blocking)"
+    danger_args=(--full)
+fi
+danger_log="$(mktemp "${TMPDIR:-/tmp}/skylos-danger.XXXXXX")"
+bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" "${danger_args[@]}" </dev/null >"$danger_log" 2>&1 &
+danger_pid=$!
+# An interrupted or failed run must not leave the danger scan running.
+trap 'kill "$danger_pid" 2>/dev/null || true; rm -f "$danger_log"' EXIT
 echo "=== Skylos Quality Gate ==="
-quality_run_skylos_quality_gate
+quality_gate_status=0
+quality_run_skylos_quality_gate || quality_gate_status=$?
+danger_status=0
+wait "$danger_pid" || danger_status=$?
+trap - EXIT
+echo "=== $danger_heading ==="
+cat "$danger_log"
+rm -f "$danger_log"
+if [ "$quality_gate_status" -ne 0 ]; then
+    exit "$quality_gate_status"
+fi
+if [ "$danger_status" -ne 0 ]; then
+    exit "$danger_status"
+fi
 
 # The dependency scan runs on its own because Skylos's ignore list does not
 # reach dependency advisories: tools.check_dependency_advisories fails on any
@@ -168,16 +206,6 @@ sca_check_status=0
 rm -f "$sca_report_path"
 if [ "$sca_check_status" -ne 0 ]; then
     exit "$sca_check_status"
-fi
-
-if [ "$QUALITY_MODE" = "full" ]; then
-    echo "=== Skylos Danger Gate ==="
-    bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate
-else
-    # Fast mode keeps the danger scan the former ungated `-a` audit pass
-    # provided, advisory only (findings are printed, never blocking here).
-    echo "=== Skylos Danger Advisory (fast, non-blocking) ==="
-    bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full
 fi
 
 if [ "$QUALITY_MODE" = "fast" ]; then

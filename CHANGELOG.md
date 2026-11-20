@@ -192,6 +192,32 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Quality gate (0.17.143): the Skylos danger scan runs alongside the Skylos
+  quality scan instead of after the dependency scan; the dependency scan now
+  follows both. *Behaviour preserved:* the same three Skylos commands run
+  with the same arguments, in fast and full mode; the danger output is held
+  in a file and printed whole, under its usual heading, after the quality
+  output; either scan failing fails the gate before the dependency scan and
+  pytest (a failing quality scan now also shows the danger result instead of
+  stopping before it). *Benefit:* each Skylos run keeps only about one core
+  busy, because it analyses `check_models.py` in a single worker, so the pair
+  takes ~125 s instead of ~220 s (sandbox, 4 cores, Skylos 5.7.0, two runs
+  each). *Evidence:* on this tree the side-by-side runs gave byte-identical
+  quality and danger output and the same danger report (findings and
+  suppressions) as the runs one after the other. Neither scan writes into
+  the other's tree while running, and the dependency report is written only
+  after both finish. The suppression audit stays before them because it
+  writes temporary copies of suppressed files beside the originals. New
+  tests run the real gate script with faked tools: one fails unless the two
+  scans overlap, and one checks that either failure stops the gate.
+- Skylos 5.7.0 (john's upgrade from 5.6.0) adds 14-18 s to the quality scan
+  here (106 s to 120-124 s). Its new `_executable_script_sibling` check
+  parses and walks all of `check_models.py` (a `#!` script) once for each
+  standard-library import, about 40 times; caching that answer gave the same
+  output in 109-110 s. Upstream issue drafted, not filed
+  (project files `upstream-skylos/executable-script-sibling-reparse.md`).
+  The danger scan and the suppression audit's Skylos scan take the same
+  time on 5.6.0 and 5.7.0. No change here; the floor stays 5.5.0.
 - CLI (0.17.142): `--enable-thinking` is three-state like mlx-vlm 960752d6's
   flag (john's request). Omitted sends nothing, so the model's template
   default applies; `--enable-thinking` sends `enable_thinking=True` and the

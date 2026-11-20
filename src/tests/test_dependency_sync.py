@@ -1173,7 +1173,11 @@ _SKYLOS_ADVICE_LINE = "check_models.py:3  SKY-P401  advice only"
 
 
 def _run_quality_gate(
-    tmp_path: Path, *args: str, env: Mapping[str, str] | None = None
+    tmp_path: Path,
+    *args: str,
+    env: Mapping[str, str] | None = None,
+    danger_body: str = "",
+    quality_scan_body: str = "",
 ) -> tuple[int, list[str]]:
     """Run the copied run_quality_checks.sh with every tool it calls faked.
 
@@ -1183,8 +1187,9 @@ def _run_quality_gate(
     markdownlint-cli2, append ``CALL <tool> <arguments>`` to the transcript
     the gate's own output goes to; each also appends ``ENV <tool> <values>``
     for the environment it saw. The danger wrapper is a stub that logs
-    ``CALL danger-wrapper``. The fake Skylos writes a report for ``-o`` and
-    prints one advice-only finding for the gated scan.
+    ``CALL danger-wrapper``, runs ``danger_body`` and logs ``DONE
+    danger-wrapper``. The fake Skylos writes a report for ``-o``; for the gated
+    scan it runs ``quality_scan_body`` and prints one advice-only finding.
     """
     repo = tmp_path / "repo"
     tools_dir = repo / "src" / "tools"
@@ -1194,7 +1199,9 @@ def _run_quality_gate(
     transcript = tmp_path / "transcript.log"
     safe_io.write_text_no_follow(
         tools_dir / "run_skylos_danger_advisory.sh",
-        f'#!/bin/bash\necho "CALL danger-wrapper $*" >> "{transcript}"\n',
+        f'#!/bin/bash\necho "CALL danger-wrapper $*" >> "{transcript}"\n'
+        f"{danger_body}\n"
+        f'echo "DONE danger-wrapper" >> "{transcript}"\n',
         mode=0o755,
     )
     (repo / ".github" / "workflows").mkdir(parents=True)
@@ -1229,7 +1236,10 @@ def _run_quality_gate(
         "for ((i = 1; i <= $#; i++)); do\n"
         '    if [[ "${!i}" == "-o" ]]; then next=$((i + 1)); echo "{}" > "${!next}"; fi\n'
         "done\n"
-        f'[[ " $* " == *" --format concise "* ]] && echo "{_SKYLOS_ADVICE_LINE}"\n'
+        'if [[ " $* " == *" --format concise "* ]]; then\n'
+        f"{quality_scan_body}\n"
+        f'    echo "{_SKYLOS_ADVICE_LINE}"\n'
+        "fi\n"
         "exit 0\n",
     )
     fake_bin = tmp_path / "fake-bin"
@@ -1290,6 +1300,74 @@ def test_quality_gate_runs_skylos_once_gated_before_pytest(tmp_path: Path, mode:
     assert lines.index(danger[0]) < pytest_call
     # The dependency report is checked, then removed from the tree.
     assert not (tmp_path / "repo" / "src" / ".skylos" / "skylos-dependency-scan.json").exists()
+
+
+def _wait_for(path: Path) -> str:
+    """Bash that waits up to 10 s for ``path`` to exist."""
+    return f'for _ in $(seq 200); do [ -e "{path}" ] && break; sleep 0.05; done'
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize(
+    ("mode", "heading"),
+    [
+        ("--full", "=== Skylos Danger Gate ==="),
+        ("--fast", "=== Skylos Danger Advisory (fast, non-blocking) ==="),
+    ],
+)
+def test_quality_gate_runs_the_danger_scan_alongside_the_quality_scan(
+    tmp_path: Path, mode: str, heading: str
+) -> None:
+    """Both scans run at once; danger output follows the quality output; the SCA waits for both.
+
+    The fake quality scan fails unless the danger wrapper has started while it
+    is still running, and the danger wrapper waits for the quality scan to
+    finish, so a gate that ran them one after the other would fail here.
+    """
+    danger_started = tmp_path / "danger-started"
+    quality_done = tmp_path / "quality-done"
+    status, lines = _run_quality_gate(
+        tmp_path,
+        mode,
+        danger_body=(
+            f'touch "{danger_started}"\n{_wait_for(quality_done)}\necho "danger wrapper output"'
+        ),
+        quality_scan_body=(
+            f"{_wait_for(danger_started)}\n"
+            f'[ -e "{danger_started}" ] || {{ echo "danger scan did not overlap"; exit 3; }}\n'
+            f'touch "{quality_done}"'
+        ),
+    )
+
+    assert status == 0, "\n".join(lines)
+    quality_heading = lines.index("=== Skylos Quality Gate ===")
+    advice_line = lines.index(_SKYLOS_ADVICE_LINE)
+    danger_heading = lines.index(heading)
+    danger_output = lines.index("danger wrapper output")
+    sca_call = _first_line(lines, "CALL skylos pyproject.toml --sca")
+    assert quality_heading < advice_line < danger_heading < danger_output < sca_call
+    assert lines.index("DONE danger-wrapper") < sca_call
+
+
+@pytest.mark.subprocess
+@pytest.mark.parametrize("failing", ["danger", "quality"])
+def test_quality_gate_fails_when_either_concurrent_skylos_scan_fails(
+    tmp_path: Path, failing: str
+) -> None:
+    """Either scan's failure fails the gate before the SCA and pytest; danger output is shown."""
+    status, lines = _run_quality_gate(
+        tmp_path,
+        "--full",
+        danger_body=('echo "danger wrapper output"' + ("\nexit 1" if failing == "danger" else "")),
+        quality_scan_body=('echo "quality finding"; exit 1' if failing == "quality" else ""),
+    )
+
+    assert status == 1, "\n".join(lines)
+    assert lines.index("=== Skylos Danger Gate ===") < lines.index("danger wrapper output")
+    assert not [line for line in lines if line.startswith("CALL skylos pyproject.toml")]
+    assert not [line for line in lines if line.startswith("CALL python -m pytest")]
+    if failing == "quality":
+        assert "quality finding" in lines
 
 
 @pytest.mark.subprocess
