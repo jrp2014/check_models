@@ -1992,6 +1992,13 @@ Notable changes to this project will be documented in this file.
   difference as documented, and a new test checks that omission forwards no
   `enable_thinking`. Supporting `--no-enable-thinking` would be separate
   three-state work.
+- `--enable-thinking` help and README (0.17.141): a new "Thinking mode"
+  section says what omitting the flag means. The harness sends nothing, so
+  before mlx-vlm 960752d6 thinking was off (mlx-vlm sent `False` itself) and
+  from 960752d6 each template's default applies, which is thinking on for
+  Qwen3-style hybrids. That affects token caps, truncation and prompt digests,
+  so the choice and the mlx-vlm build belong to each sweep. The README also
+  notes that the harness cannot force thinking off yet.
 - `clean_builds.sh` (0.17.134): under bash 4.1 or later (Homebrew bash, Linux)
   the cleanup stopped with status 1 after removing its first artifact:
   `((cleaned++))` evaluates to 0 the first time, and `set -e` treats that as

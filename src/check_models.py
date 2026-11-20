@@ -12872,8 +12872,9 @@ def _auto_thinking_budget_kwargs(
     is passed AND the rendered prompt already contains the thinking start
     token, so this affects only models whose chat template itself opens a
     thinking block (final marker unmatched, not merely mentioned or closed).
-    Chat-template kwargs are untouched: hybrid models keep their default
-    non-thinking behaviour, and any explicit thinking flag, ``--thinking-mode``
+    Chat-template kwargs are untouched: hybrid models keep their template
+    default (thinking on for some from mlx-vlm 960752d6, which no longer sends
+    False for an omitted value), and any explicit thinking flag, ``--thinking-mode``
     or a reasoning effort this template received hands full control back to
     the user. A model whose template was given no effort (it reads neither
     variable, or the fallback passed nothing) keeps the automatic budget, so
@@ -29216,7 +29217,13 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     prompt_group.add_argument(
         "--enable-thinking",
         action="store_true",
-        help="Enable thinking mode in the upstream chat template and generation flow.",
+        help=(
+            "Pass enable_thinking=True to the chat template and generate call. "
+            "Without it the harness sends no enable_thinking at all, so each "
+            "template's own default applies. With mlx-vlm 960752d6 or later that "
+            "default can be thinking on (Qwen3-style hybrid templates); older mlx-vlm "
+            "sent False itself. Decide per sweep; see README 'Thinking mode'."
+        ),
     )
     prompt_group.add_argument(
         "--thinking-mode",

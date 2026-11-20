@@ -1371,7 +1371,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
 | `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |
-| `--enable-thinking` | flag | `False` | Enable thinking mode in the upstream chat template and generation flow. |
+| `--enable-thinking` | flag | `False` (nothing sent) | Pass `enable_thinking=True` to the chat template and generate call. Omitted, nothing is sent and each template's own default applies, which depends on the mlx-vlm version. See [Thinking mode](#thinking-mode). |
 | `--thinking-budget` | int | (none) | Maximum number of thinking tokens before forcing the end token. |
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
@@ -1412,6 +1412,28 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--isolate` | flag | `False` | Run each model in a fresh child interpreter. A native crash (segfault, abort, interpreter-finalization fault) in one model is then recorded as that model's phase-tagged failure — with the signal name and the phase the child reached — instead of ending the sweep. The parent bounds each child by the model timeout plus 120 s start-up/cleanup grace and records an expiry as a phase-tagged timeout, and `--rerun-triage` reruns go through the same boundary. Costs a few seconds of import time per model and frees GPU memory between models; results round-trip through JSON so outputs and reports are identical to in-process runs. Each child starts with cold per-process caches, so treat throughput from isolated and in-process sweeps as separate populations — the JSONL metadata records `execution_mode`, and `--compare-with` says so when the two differ. Like any sweep, keep the machine otherwise idle: concurrent CPU-heavy work (a test suite, type checkers) measurably slows prefill. |
 | `--rerun-triage` | flag | `False` | Add secondary attempts for crashed models and completed models with recorded mechanical observations. Overrides prompt (brief caption), assessment (general), token cap (100), temperature (0), timeout (60 s), and verbose output (off); other settings, including `--isolate`, are retained. First-pass results are never overwritten. See [triage versus reruns](#triage-lane-versus-triage-reruns). |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
+
+### Thinking mode
+
+`--enable-thinking` sends `enable_thinking=True`. Without it the harness
+sends no `enable_thinking`, so each chat template decides, and what it
+decides depends on the installed mlx-vlm:
+
+- Before mlx-vlm 960752d6 (including the 0.8.0 release), mlx-vlm itself
+  sent `enable_thinking=False` to any processor that accepted it, so a sweep
+  without the flag ran with thinking off.
+- From 960752d6, an omitted value keeps the template default. Hybrid
+  templates such as Qwen3's then think unless told otherwise.
+
+Choose per sweep, and keep the choice and the mlx-vlm build fixed when
+comparing sweeps. Where a template now thinks by default, the thinking
+tokens count against `--max-tokens`, the answer can be cut off, and the
+rendered prompt (and its digest) differs from a sweep on older mlx-vlm. The
+automatic thinking budget helps only when the template opens the thinking
+block in the prompt; a model that opens it itself is not capped. The harness
+cannot yet force thinking off: mlx-vlm's `--no-enable-thinking` has no
+counterpart here. Each model's prompt diagnostics record the generate
+kwargs sent, and its rendered prompt shows what the template did.
 
 ### Reasoning effort
 
