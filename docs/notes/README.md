@@ -7,6 +7,7 @@ once fully resolved.
 ## Active Documents
 
 - **[GPS_DATA_FORMAT_EXPLANATION.md](GPS_DATA_FORMAT_EXPLANATION.md)** — GPS/EXIF data format reference
+- **[CODEX_SKILL_OVERRIDES.md](CODEX_SKILL_OVERRIDES.md)** — repository-scoped Codex skill settings in `.codex/config.toml`
 
 The thinking-budget evidence file behind [Blaizzy/mlx-vlm#1819](https://github.com/Blaizzy/mlx-vlm/issues/1819)
 moved to `archive/` when that issue closed as completed on 2026-08-19.
