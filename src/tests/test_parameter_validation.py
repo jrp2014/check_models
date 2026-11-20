@@ -666,6 +666,10 @@ class TestUpstreamCliParity:
 
     # Flag -> reason the default deliberately differs from upstream generate.
     DELIBERATE_DEFAULT_DIVERGENCES: ClassVar[dict[str, str]] = {
+        # mlx-vlm 960752d6: omitted = None = the template default. Our False
+        # is never forwarded, so omission sends no override either (see
+        # test_omitted_enable_thinking_forwards_no_override).
+        "--enable-thinking": "store_true False is not forwarded; upstream None, same effect",
         "--max-tokens": "lane-resolved default (500/200/1000) vs upstream free-form 2048",
         "--prompt": "harness builds a metadata-cataloguing prompt when unset",
         "--revision": "None distinguishes requested vs resolved revisions in reports",
@@ -933,6 +937,22 @@ class TestAutoThinkingBudget:
         assert kwargs(None) == {"reasoning_effort": "low", "reasoning_strength": "low"}
         assert kwargs(("messages",)) == {}
         assert check_models._build_chat_template_kwargs(params) == {}
+
+    def test_omitted_enable_thinking_forwards_no_override(self) -> None:
+        """Without --enable-thinking neither the template nor generate gets the key.
+
+        The parser's False stands for omission, matching upstream's None
+        (mlx-vlm 960752d6): the model's own default applies. No False override.
+        """
+        args = check_models._build_cli_parser().parse_args([])
+        assert args.enable_thinking is False
+        params = _thinking_params(auto_thinking_budget=False)
+
+        assert "enable_thinking" not in check_models._build_chat_template_kwargs(params)
+        assert "enable_thinking" not in check_models._build_generate_kwargs(params)
+        enabled = _thinking_params(enable_thinking=True)
+        assert check_models._build_chat_template_kwargs(enabled)["enable_thinking"] is True
+        assert check_models._build_generate_kwargs(enabled)["enable_thinking"] is True
 
     def test_reasoning_effort_none_is_a_value_not_an_omission(self) -> None:
         """A value of none reaches the template and repro; only an omitted flag sends nothing."""

@@ -1983,6 +1983,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Upstream CLI parity test (0.17.140): mlx-vlm 960752d6 made
+  `--enable-thinking` three-state (omitted = `None`, the model's template
+  default; `--no-enable-thinking` = `False`), so the parity test reported
+  our store-true `False` as drift. The harness never forwards that `False`
+  (omission sends no override to the template or generate call), so the two
+  defaults mean the same thing; the test now lists the representation
+  difference as documented, and a new test checks that omission forwards no
+  `enable_thinking`. Supporting `--no-enable-thinking` would be separate
+  three-state work.
 - `clean_builds.sh` (0.17.134): under bash 4.1 or later (Homebrew bash, Linux)
   the cleanup stopped with status 1 after removing its first artifact:
   `((cleaned++))` evaluates to 0 the first time, and `set -e` treats that as
