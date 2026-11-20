@@ -868,6 +868,36 @@ def test_native_repro_command_parses_with_upstream_cli() -> None:
         assert getattr(parsed, flag) is True, flag
 
 
+def test_native_repro_states_enable_thinking_in_three_states() -> None:
+    """Omitted states nothing; True and False restate mlx-vlm's --[no-]enable-thinking."""
+
+    def tokens(*, value: bool | None) -> list[str]:
+        return check_models._build_native_mlx_vlm_cli_tokens(
+            model_name="org/model",
+            prompt="p",
+            image_ref="i.jpg",
+            settings=replace(_run_settings(), enable_thinking=value),
+        )
+
+    assert not {"--enable-thinking", "--no-enable-thinking"} & set(tokens(value=None))
+    assert "--enable-thinking" in tokens(value=True)
+    assert "--no-enable-thinking" not in tokens(value=True)
+    disabled = tokens(value=False)
+    assert "--no-enable-thinking" in disabled
+    assert "--enable-thinking" not in disabled
+
+    dispatch = pytest.importorskip("mlx_vlm.generate.dispatch")
+    with (
+        patch.object(sys, "argv", ["mlx_vlm.generate", *disabled[3:]]),
+        patch("sys.stderr", io.StringIO()),
+    ):
+        try:
+            parsed = dispatch.parse_arguments()
+        except SystemExit:
+            pytest.skip("installed mlx-vlm predates --no-enable-thinking (960752d6)")
+    assert parsed.enable_thinking is False
+
+
 def test_native_repro_states_default_top_p_and_top_k_only_when_sampled() -> None:
     """mlx-vlm 73d366e fills omitted --top-p/--top-k from generation_config.json."""
 
@@ -6655,7 +6685,7 @@ def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
 
     assert merged is not None
     assert merged is not settings  # the run's settings are never changed
-    assert settings.enable_thinking is False
+    assert settings.enable_thinking is None
     assert merged.enable_thinking is True
     assert merged.thinking_budget == 800
 

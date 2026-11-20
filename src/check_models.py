@@ -3341,7 +3341,8 @@ class ModelRunSettings:
     eos_tokens: tuple[str, ...] | None = None
     skip_special_tokens: bool = False
     processor_kwargs: dict[str, JsonLike] | None = None
-    enable_thinking: bool = False
+    # None: nothing sent, the template's default applies (as mlx-vlm 960752d6).
+    enable_thinking: bool | None = None
     thinking_budget: int | None = None
     thinking_mode: str | None = None
     thinking_start_token: str | None = None
@@ -12747,7 +12748,7 @@ def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
 
 def _validate_thinking_params(args: argparse.Namespace) -> None:
     """Validate opt-in thinking-mode arguments."""
-    enable_thinking = bool(args.enable_thinking)
+    enable_thinking = args.enable_thinking is True
     thinking_budget = args.thinking_budget
     thinking_start_token = args.thinking_start_token
     thinking_end_token = args.thinking_end_token
@@ -12873,8 +12874,8 @@ def _auto_thinking_budget_kwargs(
     token, so this affects only models whose chat template itself opens a
     thinking block (final marker unmatched, not merely mentioned or closed).
     Chat-template kwargs are untouched: hybrid models keep their template
-    default (thinking on for some from mlx-vlm 960752d6, which no longer sends
-    False for an omitted value), and any explicit thinking flag, ``--thinking-mode``
+    default (thinking on for some from mlx-vlm 960752d6), and any explicit
+    thinking flag (``--enable-thinking`` or ``--no-enable-thinking``), ``--thinking-mode``
     or a reasoning effort this template received hands full control back to
     the user. A model whose template was given no effort (it reads neither
     variable, or the fallback passed nothing) keeps the automatic budget, so
@@ -12883,7 +12884,7 @@ def _auto_thinking_budget_kwargs(
     empty = cast("GenerateKwargs", {})
     if (
         not params.auto_thinking_budget
-        or params.enable_thinking
+        or params.enable_thinking is not None
         or params.thinking_mode is not None
         or reasoning_effort_passed
     ):
@@ -12979,7 +12980,9 @@ def _build_generate_kwargs(params: ProcessImageParams) -> GenerateKwargs:
     generate_kwargs.update(cast("GenerateKwargs", per_tensor_kv_kwargs))
     if params.skip_special_tokens:
         generate_kwargs["skip_special_tokens"] = True
-    if params.enable_thinking:
+    if params.enable_thinking is False:
+        generate_kwargs["enable_thinking"] = False
+    elif params.enable_thinking:
         generate_kwargs["enable_thinking"] = True
         generate_kwargs["thinking_end_token"] = params.thinking_end_token
         if params.thinking_budget is not None:
@@ -13244,6 +13247,11 @@ def _build_chat_template_kwargs(
     whenever set (templates that support it), independent of enable_thinking.
     A resolved reasoning effort is passed under the template variables its
     resolution names, also independent of enable_thinking.
+
+    ``enable_thinking`` is three-state like mlx-vlm 960752d6's
+    ``--[no-]enable-thinking``: None sends nothing (the template default),
+    False and True are sent. mlx-vlm 960752d6 also passes templates that read
+    ``thinking_mode`` "disabled" or "enabled" for them.
     """
     template_kwargs: ChatTemplateKwargs = {}
     if params.thinking_mode is not None:
@@ -13254,7 +13262,10 @@ def _build_chat_template_kwargs(
                 template_kwargs["reasoning_effort"] = reasoning_effort.applied
             elif name == "reasoning_strength":
                 template_kwargs["reasoning_strength"] = reasoning_effort.applied
-    if not params.enable_thinking:
+    if params.enable_thinking is None:
+        return template_kwargs
+    if params.enable_thinking is False:
+        template_kwargs["enable_thinking"] = False
         return template_kwargs
 
     template_kwargs["enable_thinking"] = True
@@ -27101,7 +27112,6 @@ _NATIVE_CLI_NONDEFAULT_ARGS: Final[tuple[tuple[str, str, object], ...]] = (
 )
 _NATIVE_CLI_BOOLEAN_FLAGS: Final[tuple[tuple[str, str], ...]] = (
     ("--skip-special-tokens", "skip_special_tokens"),
-    ("--enable-thinking", "enable_thinking"),
 )
 _NATIVE_CLI_LOAD_BOOLEAN_FLAGS: Final[tuple[tuple[str, str], ...]] = (
     ("--force-download", "force_download"),
@@ -27205,6 +27215,9 @@ def _build_native_mlx_vlm_cli_tokens(
     for flag, attribute in _NATIVE_CLI_BOOLEAN_FLAGS:
         if bool(getattr(settings, attribute)):
             tokens.append(flag)
+    # Three-state: None states nothing. --no-enable-thinking needs mlx-vlm 960752d6.
+    if settings.enable_thinking is not None:
+        tokens.append("--enable-thinking" if settings.enable_thinking else "--no-enable-thinking")
     processor_kwargs = settings.processor_kwargs
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
@@ -29216,13 +29229,14 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     )
     prompt_group.add_argument(
         "--enable-thinking",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=None,
         help=(
-            "Pass enable_thinking=True to the chat template and generate call. "
-            "Without it the harness sends no enable_thinking at all, so each "
-            "template's own default applies. With mlx-vlm 960752d6 or later that "
-            "default can be thinking on (Qwen3-style hybrid templates); older mlx-vlm "
-            "sent False itself. Decide per sweep; see README 'Thinking mode'."
+            "Enable or disable thinking in the chat template, as mlx-vlm's own flag. "
+            "When omitted, use the model's template default, which for some hybrid "
+            "templates (Qwen3-style) is thinking on. Templates that use thinking_mode "
+            "receive 'enabled' or 'disabled' (mlx-vlm 960752d6 or later). "
+            "See README 'Thinking mode'."
         ),
     )
     prompt_group.add_argument(

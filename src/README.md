@@ -1371,7 +1371,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
 | `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |
-| `--enable-thinking` | flag | `False` (nothing sent) | Pass `enable_thinking=True` to the chat template and generate call. Omitted, nothing is sent and each template's own default applies, which depends on the mlx-vlm version. See [Thinking mode](#thinking-mode). |
+| `--enable-thinking` / `--no-enable-thinking` | flag | (template default) | Enable or disable thinking in the chat template, as mlx-vlm's own flag. When omitted, use the model's template default. Templates that use `thinking_mode` receive `enabled` or `disabled`. See [Thinking mode](#thinking-mode). |
 | `--thinking-budget` | int | (none) | Maximum number of thinking tokens before forcing the end token. |
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
@@ -1415,25 +1415,32 @@ python -m check_models --image photo.jpg --eval-mode assisted
 
 ### Thinking mode
 
-`--enable-thinking` sends `enable_thinking=True`. Without it the harness
-sends no `enable_thinking`, so each chat template decides, and what it
-decides depends on the installed mlx-vlm:
+`--enable-thinking` follows mlx-vlm's own flag (from mlx-vlm 960752d6) and
+has three states:
 
-- Before mlx-vlm 960752d6 (including the 0.8.0 release), mlx-vlm itself
-  sent `enable_thinking=False` to any processor that accepted it, so a sweep
-  without the flag ran with thinking off.
-- From 960752d6, an omitted value keeps the template default. Hybrid
-  templates such as Qwen3's then think unless told otherwise.
+| Flag | Chat template and generate call receive |
+| ---- | --------------------------------------- |
+| (omitted) | Nothing: the model's template default applies |
+| `--enable-thinking` | `enable_thinking=True` |
+| `--no-enable-thinking` | `enable_thinking=False` |
+
+mlx-vlm 960752d6 and later also pass templates that read `thinking_mode`
+`enabled` or `disabled` to match. Older mlx-vlm passes `enabled` only, and
+itself sent `enable_thinking=False` when the flag was omitted, so an
+omitted flag meant thinking off there.
 
 Choose per sweep, and keep the choice and the mlx-vlm build fixed when
-comparing sweeps. Where a template now thinks by default, the thinking
-tokens count against `--max-tokens`, the answer can be cut off, and the
-rendered prompt (and its digest) differs from a sweep on older mlx-vlm. The
-automatic thinking budget helps only when the template opens the thinking
-block in the prompt; a model that opens it itself is not capped. The harness
-cannot yet force thinking off: mlx-vlm's `--no-enable-thinking` has no
-counterpart here. Each model's prompt diagnostics record the generate
-kwargs sent, and its rendered prompt shows what the template did.
+comparing sweeps. Omitted, hybrid templates such as Qwen3's think by
+default: the thinking tokens count against `--max-tokens`, the answer can
+be cut off, and the rendered prompt (and its digest) differs from a sweep
+with `--no-enable-thinking`. The automatic thinking budget applies only when
+the flag is omitted, and only when the template opens the thinking block in
+the prompt; a model that opens it itself is not capped. `--thinking-budget`
+and the thinking-token flags need `--enable-thinking`. Native repro commands
+restate `--enable-thinking` or `--no-enable-thinking` when the run used one
+(the latter needs mlx-vlm 960752d6 or later). Each model's prompt
+diagnostics record the generate kwargs sent, and its rendered prompt shows
+what the template did.
 
 ### Reasoning effort
 

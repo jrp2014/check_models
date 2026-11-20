@@ -192,6 +192,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- CLI (0.17.142): `--enable-thinking` is three-state like mlx-vlm 960752d6's
+  flag (john's request). Omitted sends nothing, so the model's template
+  default applies; `--enable-thinking` sends `enable_thinking=True` and the
+  new `--no-enable-thinking` sends `False`, to both the chat template and
+  the generate call. `--no-enable-thinking` also turns off the automatic
+  thinking budget, as `--enable-thinking` already did. Native repro commands
+  restate whichever flag the run used (`--no-enable-thinking` needs mlx-vlm
+  960752d6 or later). The README "Thinking mode" section covers what each
+  state means for token caps, truncation and prompt digests.
+
 - Test fixtures (0.17.139): when no Hugging Face cache exists (CI),
   `src/tests/conftest.py` now creates its session cache with
   `tempfile.mkdtemp` and removes it at exit, instead of reusing a fixed
@@ -1990,15 +2000,15 @@ Notable changes to this project will be documented in this file.
   (omission sends no override to the template or generate call), so the two
   defaults mean the same thing; the test now lists the representation
   difference as documented, and a new test checks that omission forwards no
-  `enable_thinking`. Supporting `--no-enable-thinking` would be separate
-  three-state work.
+  `enable_thinking`. 0.17.142 then made the flag three-state; the parity
+  test needs no divergence entry since.
 - `--enable-thinking` help and README (0.17.141): a new "Thinking mode"
   section says what omitting the flag means. The harness sends nothing, so
   before mlx-vlm 960752d6 thinking was off (mlx-vlm sent `False` itself) and
   from 960752d6 each template's default applies, which is thinking on for
   Qwen3-style hybrids. That affects token caps, truncation and prompt digests,
-  so the choice and the mlx-vlm build belong to each sweep. The README also
-  notes that the harness cannot force thinking off yet.
+  so the choice and the mlx-vlm build belong to each sweep. (0.17.142 added
+  `--no-enable-thinking` to force thinking off.)
 - `clean_builds.sh` (0.17.134): under bash 4.1 or later (Homebrew bash, Linux)
   the cleanup stopped with status 1 after removing its first artifact:
   `((cleaned++))` evaluates to 0 the first time, and `set -e` treats that as
