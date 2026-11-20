@@ -275,12 +275,13 @@ grep -v '^#' tools/image_set.tsv | while IFS=$'\t' read -r slug sha256 url _test
   [ -f "$image" ] || curl -fsSL -o "$image" "$url" || continue
   echo "$sha256  $image" | shasum -a 256 -c --quiet - || continue
   python -m check_models --image "$image" --image-source-url "$url" \
-    --output-dir "output/image_set/$slug" < /dev/null
+    --output-dir "output/test_image_set/$slug" < /dev/null
 done
 ```
 
-Each directory then has its own gallery, run summary and `results.jsonl`, and
-`--compare-with auto` compares it with that directory's last committed run.
+Each directory under gitignored `output/test_image_set/` then has its own
+gallery, run summary and `results.jsonl` (pass a tracked `--output-dir` if you
+intend to commit an image-set baseline and use `--compare-with auto`).
 
 ### Understanding the Output
 
@@ -294,10 +295,12 @@ The tool generates a deliberately small artifact set in `output/` by default:
 - **Gallery Markdown** (`reports/model_gallery.md`): Model-comparison artifact with
   a bounded, orientation-corrected reference-image preview, image metadata, the
   full prompt, a usable-first facts-only chooser, a Resource Highlights section
-  (fastest model, average throughput, lowest peak memory), an Output-at-a-Glance
-  table previewing every model's actual output, and complete readable output per
-  model (an exact-raw copy appears only when it differs from the readable view).
-  End-to-end time precedes decode-only throughput.
+  (quickest completion and lowest peak memory among completions without detected
+  concerns), an Output-at-a-Glance table previewing every model's actual output,
+  and complete readable output per model (an exact-raw copy appears when raw
+  output differs from the readable view).
+  End-to-end time precedes decode-only throughput. See also
+  [Choosing a Captioning & Keywording Model](../docs/CHOOSING_A_MODEL.md).
 - **JSONL** (`results.jsonl`): The sole schema `3.0` machine contract. The
   metadata header carries the complete run-level context — prompt plus its
   SHA-256 digest, execution mode and outcome counts, artifact paths,
@@ -642,7 +645,7 @@ own sizing, so the model may still see a different resolution.
 
 Vision-language models maintain a **key-value (KV) cache** during text generation to avoid recomputing attention for previous tokens. For long sequences or large models, this cache can consume significant memory. MLX-VLM supports KV cache quantization to reduce memory usage with minimal impact on output quality.
 
-### Parameters
+##### Parameters
 
 - `--max-kv-size <int>`: Maximum number of tokens to store in KV cache. Limits memory for very long sequences. Default: `None` (unlimited).
 - `--kv-bits <number>`: Quantize KV cache instead of using full precision (typically 16-bit). Uniform quantization supports `2`, `3`, `4`, `5`, `6`, or `8`; fractional values such as `3.5` use upstream TurboQuant automatically. Default: `None` (no quantization).
@@ -654,11 +657,11 @@ Vision-language models maintain a **key-value (KV) cache** during text generatio
 - `--kv-group-size <int>`: Group size for quantization (larger = more compression, less accuracy). Default: `64`.
 - `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `5000`.
 
-### How It Works
+##### How It Works
 
 From the MLX and MLX-VLM sources: uniform KV quantization uses MLX affine bit widths (`2`, `3`, `4`, `5`, `6`, or `8`) with `kv_group_size` token groups, while TurboQuant supports integer and `.5` bit widths and automatically handles fractional values such as `3.5` as lower-bit keys plus higher-bit values. Both reduce memory while maintaining most of the model's generation quality.
 
-### Example Usage
+##### Example Usage
 
 ```bash
 # Moderate 8-bit quantization for 2× memory savings
@@ -680,7 +683,7 @@ python -m check_models --image photo.jpg --kv-bits 8 --quantized-kv-start 512
 python -m check_models --image photo.jpg --max-kv-size 4096 --kv-bits 8
 ```
 
-### When to Use
+##### When to Use
 
 **Use KV quantization if:**
 
@@ -695,7 +698,7 @@ python -m check_models --image photo.jpg --max-kv-size 4096 --kv-bits 8
 - ❌ Sequences are short (<500 tokens)
 - ❌ You need maximum quality for critical tasks
 
-### Trade-offs
+##### Trade-offs
 
 - **4-bit**: 75% memory reduction, slight quality degradation (noticeable in complex reasoning)
 - **8-bit**: 50% memory reduction, minimal quality impact (recommended starting point)
@@ -848,15 +851,9 @@ pre-commit install
 ```
 
 `pre-commit` ships with the dev extras; the checked-in
-`.pre-commit-config.yaml` installs both the `pre-commit` (staged hygiene) and
-`pre-push` (fast static gate) hooks, and `make dev` / `tools/setup_conda_env.sh`
-run this for you.
-
-  This installs both commit-stage and pre-push hooks from the checked-in
-  `.pre-commit-config.yaml`. The commit hook runs staged-file hygiene only; the
-  push hook runs fast static checks plus the non-slow/non-e2e pytest subset.
-  If you switch between workflows, rerun your preferred installer because both
-  write to `.git/hooks/`.
+`.pre-commit-config.yaml` installs both the `pre-commit` (staged-file hygiene)
+and `pre-push` (fast static checks plus non-slow/non-e2e pytest) hooks, and
+`make dev` / `tools/setup_conda_env.sh` run this for you.
 
 Run the push-stage gate manually with:
 
@@ -870,8 +867,7 @@ staging files. Run directly, it refuses (and changes nothing) while a file it
 would check or re-stage also has unstaged edits, since its fixers re-stage
 whole files; pre-commit stashes those edits for you.
 
-
-### Manual Installation
+### Manual Dependency Install
 
 If you prefer to install dependencies manually (ensure these match `pyproject.toml`):
 
@@ -1793,26 +1789,33 @@ TensorFlow.
 ```text
 check_models/
 ├── src/
-│   ├── check_models.py      # Main script
-│   ├── Makefile             # Package-local automation targets
-│   ├── pyproject.toml       # Project configuration and dependencies
-│   ├── tools/               # Helper scripts
-│   ├── tests/               # PyTest test suite
-│   └── output/              # Versioned benchmark snapshots
-│       ├── index.md          # Tiny current-run artifact index
+│   ├── check_models.py            # Single-file CLI monolith
+│   ├── check_models_data/         # Packaged thresholds, dependency policy, safe I/O
+│   │   ├── dependency_policy.py
+│   │   ├── quality_config.yaml
+│   │   └── safe_io.py
+│   ├── Makefile                   # Package-local automation targets
+│   ├── pyproject.toml             # Project configuration and dependencies
+│   ├── tools/                     # Helper scripts and quality wrappers
+│   ├── tests/                     # PyTest test suite
+│   └── output/                    # Versioned benchmark snapshots
+│       ├── index.md               # Current-run artifact index
+│       ├── accuracy_notes.yaml    # Person-written accuracy notes (optional input)
+│       ├── native_repro_notes.yaml # Recorded native mlx-vlm checks (optional input)
 │       ├── reports/
+│       │   ├── assets/            # Digest-named downscaled reference previews
 │       │   ├── results.html
 │       │   ├── model_gallery.md
 │       │   └── diagnostics.md
-│       ├── results.jsonl
-│       ├── results.history.jsonl
+│       ├── results.jsonl          # Schema-3 machine contract
+│       ├── results.history.jsonl  # Append-only local history (gitignored)
 │       ├── check_models.log
 │       ├── environment.log
 │       └── issues/
-│           ├── run_summary.md # Conditional paste-ready whole-run issue
-│           └── issue_*.md     # Conditional hard-crash drafts
-├── docs/                    # Documentation
-└── Makefile                 # Root orchestration
+│           ├── run_summary.md     # Primary sweep summary and paste-ready issue body
+│           └── issue_*.md         # Conditional hard-crash drafts
+├── docs/                          # Guides and conventions
+└── Makefile                       # Root orchestration
 ```
 
 **Output behaviour**: By default, production outputs are written to `src/output/`
@@ -1873,25 +1876,7 @@ make -C src help
 
 ### Git Hooks and Pre-Commit
 
-Recommended workflow:
-
-
-Alternative workflow:
-
-- `pre-commit` framework:
-
-  ```bash
-  pre-commit install
-  pre-commit run --hook-stage pre-push --all-files
-  ```
-
-Both workflows call the same shared scripts:
-
-- commit stage: staged-file hygiene only
-- push stage: fast static checks, Vulture, plus `pytest -m "not slow and not e2e"`
-
-The push-stage gate also validates the checked-in GitHub workflow YAML and
-keeps the CI/static tooling path aligned with the checked-in scripts.
+See [Pre-commit (Optional)](#pre-commit-optional) above and [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md#git-hooks) for the checked-in `pre-commit` / `pre-push` hook setup.
 
 ### Markdown Linting (Optional)
 

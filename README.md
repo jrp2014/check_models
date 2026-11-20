@@ -52,7 +52,7 @@ Tracked in git (browsable on GitHub):
 - `reports/model_gallery.md` — complete per-model evidence gallery, with an
   Output-at-a-Glance table of every model's actual output
 - `reports/diagnostics.md` — maintainer triage tables and per-model evidence
-- `issues/run_summary.md` — paste-ready whole-run issue summary (when findings exist)
+- `issues/run_summary.md` — primary sweep summary (outcome table, baseline comparison, and paste-ready issue body)
 - `issues/issue_*.md` — per-crash issue drafts (hard actionable crashes only)
 - `results.jsonl` — the sole schema-3 machine contract: a run-level metadata
   header (provenance, counts, artifact manifest, baseline comparison) followed
@@ -75,6 +75,7 @@ Local only (gitignored, regenerated each run):
 
 ## Documentation (full details)
 
+- **[Choosing a Model](docs/CHOOSING_A_MODEL.md)**: How to read the reports and pick a VLM for photograph captioning and keywording.
 - **[User Guide & CLI Reference](src/README.md)**: Full parameter reference, advanced usage, and troubleshooting.
 - **[Contributor Guide](docs/CONTRIBUTING.md)**: Setup, workflow, and quality standards.
 
