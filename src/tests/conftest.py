@@ -14,9 +14,11 @@ Performance optimizations:
 
 from __future__ import annotations
 
+import atexit
 import importlib.util
 import logging
 import os
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -39,10 +41,12 @@ _DEFAULT_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
 os.environ.setdefault("CHECK_MODELS_SKIP_IMPORT_PROBE", "1")
 
 if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
-    # CI environment - create temp cache to prevent CacheNotFound
-    _temp_hf_cache = Path(tempfile.gettempdir()) / "pytest_hf_cache"
-    _temp_hf_cache.mkdir(parents=True, exist_ok=True)
-    (_temp_hf_cache / "hub").mkdir(parents=True, exist_ok=True)
+    # CI environment - create temp cache to prevent CacheNotFound. A private
+    # mkdtemp directory, not a fixed name under the shared temp dir that another
+    # user could create first. xdist workers inherit the variables set here.
+    _temp_hf_cache = Path(tempfile.mkdtemp(prefix="pytest_hf_cache_"))
+    atexit.register(shutil.rmtree, _temp_hf_cache, ignore_errors=True)
+    (_temp_hf_cache / "hub").mkdir()
     os.environ["HF_HUB_CACHE"] = str(_temp_hf_cache / "hub")
     os.environ["HF_HOME"] = str(_temp_hf_cache)
 

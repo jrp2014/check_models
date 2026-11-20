@@ -192,6 +192,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Test fixtures (0.17.139): when no Hugging Face cache exists (CI),
+  `src/tests/conftest.py` now creates its session cache with
+  `tempfile.mkdtemp` and removes it at exit, instead of reusing a fixed
+  `pytest_hf_cache` directory under the shared temp dir that another user
+  could create first. Skylos 5.7.0's new SKY-D348 rule flagged it; 5.6.0 did
+  not report it on the same commit. The Skylos floor stays at 5.5.0.
 - Development tooling (0.17.138): `src/.npmrc` now sets `min-release-age=1`
   (was 7), so `update.sh` and `npm install` in `src/` pick up a new
   markdownlint-cli2 release after one day rather than a week (0.24.1 was
