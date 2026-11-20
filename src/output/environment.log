@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-11-16 14:19:14 GMT
+FULL ENVIRONMENT DUMP - 2026-11-20 18:38:55 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -8,23 +8,23 @@ Total packages: 186
 aiohappyeyeballs==2.7.1
 aiohttp==3.14.5
 aiosignal==1.4.0
-annotated-doc==0.0.6
+annotated-doc==0.0.7
 annotated-types==0.8.0
 anyio==4.16.0
 ast_serialize==0.13.1
 attrs==26.1.0
-blessed==1.52.0
+blessed==1.53.0
 boolean.py==5.0
 build==1.6.1
 ca9==0.9.0
-CacheControl==0.14.4
+CacheControl==0.15.0
 certifi==2026.10.23
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
-check_models==0.17.129
+check_models==0.17.138
 click==8.5.1
-cmake==4.4.4
+cmake==4.4.5
 coverage==7.17.3
 cryptography==50.0.2
 cyclonedx-python-lib==11.12.0
@@ -36,8 +36,8 @@ docopt==0.6.2
 editor==2.0.1
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.163.1
-filelock==4.2.10
+fastapi==0.165.0
+filelock==4.2.12
 frozenlist==1.8.0
 fsspec==2026.9.0
 h11==0.16.0
@@ -56,13 +56,13 @@ jaraco.classes==3.4.0
 jaraco.context==6.1.2
 jaraco.functools==4.6.0
 Jinja2==3.1.6
-jinxed==2.1.0
+jinxed==2.1.1
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 keyring==25.7.0
 lark==1.3.1
 libcst==1.9.0
-librt==0.16.0
+librt==0.17.0
 license-expression==30.4.4
 linkify-it-py==2.2.0
 llguidance==1.9.1
@@ -73,9 +73,9 @@ mcp-types==2.3.0
 mdit-py-plugins==0.7.0
 mdurl==0.1.2
 miniaudio==1.73
-ml_dtypes==0.6.0
-mlx==0.32.5.dev20261107+fc344c986
-mlx-audio==0.6.5
+ml_dtypes==0.7.0
+mlx==0.32.5.dev20261120+bd2d1fb43
+mlx-audio==0.6.7
 mlx-lm==0.32.2
 mlx-vlm==0.8.0
 more-itertools==11.2.1
@@ -89,7 +89,7 @@ networkx==3.7
 nodeenv==1.12.0
 num2words==0.5.14
 numpy==2.5.5
-opencv-python==5.0.0.93
+opencv-python==5.1.0.95
 opentelemetry-api==1.45.2
 packageurl-python==0.17.6
 packaging==26.3
@@ -100,7 +100,7 @@ pip==26.3
 pip-requirements-parser==32.0.1
 pip_api==0.0.35
 pip_audit==2.10.1
-platformdirs==4.14.5
+platformdirs==4.14.8
 pluggy==1.7.0
 pre_commit==4.7.0
 propcache==0.5.4
@@ -109,31 +109,31 @@ psutil==7.2.2
 py-serializable==2.2.0
 pyarrow==26.0.1
 pycparser==3.12
-pydantic==2.14.3
+pydantic==2.14.4
 pydantic-settings==2.16.3
-pydantic_core==2.50.4
+pydantic_core==2.50.5
 Pygments==2.21.0
 PyJWT==2.15.1
 pyparsing==3.3.3
 pyperclip==1.11.0
 pyproject_hooks==1.3.3
-pyrefly==1.4.1
+pyrefly==1.5.0
 pytest==9.2.0
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==4.0.0
-python-discovery==1.9.5
+python-discovery==1.9.6
 python-dotenv==1.2.4
 python-hcl2==8.2.0
 python-multipart==0.0.34
 PyYAML==6.0.3
 readchar==4.2.2
 referencing==0.37.0
-regex==2026.11.15
+regex==2026.11.19
 requests==2.34.2
 rich==15.0.0
 rpds-py==2026.9.1
-ruff==0.17.5
+ruff==0.17.6
 runs==1.3.0
 safetensors==0.8.0
 scipy==1.18.1
@@ -141,7 +141,7 @@ sentencepiece==0.2.3
 setuptools==84.2.1
 shellingham==1.5.4
 six==1.17.0
-skylos==5.6.0
+skylos==5.7.0
 sortedcontainers==2.4.0
 sounddevice==0.5.6
 sse-starlette==3.7.0
@@ -168,8 +168,8 @@ tree-sitter-rust==0.24.2
 tree-sitter-swift==0.7.4
 tree-sitter-typescript==0.23.2
 truststore==0.10.5
-ty==0.0.104
-typer==0.29.1
+ty==0.0.107
+typer==0.29.2
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20261111
 types-PyYAML==6.0.12.20261113
@@ -183,7 +183,7 @@ tzdata==2026.6
 uc-micro-py==2.0.0
 urllib3==2.8.0
 uvicorn==0.54.0
-virtualenv==21.15.6
+virtualenv==21.15.9
 vulture==2.16
 wcwidth==0.9.4
 websockets==17.4
@@ -194,5 +194,5 @@ yarl==1.25.1
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-11-16 14:19:14 GMT
+Environment dump completed at 2026-11-20 18:38:55 GMT
 ================================================================================
