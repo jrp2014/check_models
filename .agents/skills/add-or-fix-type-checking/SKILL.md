@@ -62,9 +62,13 @@ This repo uses **three type checkers** in order of priority:
 
 # Secondary — ty (resolves conda interpreter)
 make ty
+
+# Strictest — pyrefly (note: warnings also fail the quality gate)
+pyrefly check -c src/pyproject.toml --python-interpreter-path "$(which python)" \
+  --min-severity warn --output-format full-text src/check_models.py
 ```
 
-Pyrefly also runs in the full `make quality` acceptance pipeline. That full
+All three also run in the full `make quality` acceptance pipeline. That full
 pipeline is not a prerequisite to understanding one diagnostic.
 
 You can also run mypy on a specific file:
@@ -96,10 +100,9 @@ if x is None:
     raise ValueError("x must not be None")
 x.method()  # checkers know x is X here
 
-# Narrow str | UploadFile
-if isinstance(field, str):
-    raise TypeError("Expected file upload, got string")
-await field.read()  # checkers know field is UploadFile here
+# Narrow int | float | str | bool | None (use _is_int/_is_number for JSON/runtime values)
+if isinstance(value, str):
+    raise TypeError("Expected numeric metric, got string")
 ```
 
 #### b. Use local variables to help checkers track narrowing across closures
@@ -163,32 +166,26 @@ def __getitem__(self, item: int | str) -> ValueType | EncodingType:
 This eliminates `cast()` calls at usage sites by giving the checker
 precise return types for each call pattern.
 
-#### g. Make container classes generic to propagate value types
+#### g. Make container classes or helpers generic with Python 3.13+ PEP 695 syntax
 
-When a class holds values whose type changes after transformation, make the
-class generic so methods can return narrowed types:
+When a container or helper preserves a caller's type across a transformation,
+use PEP 695 type parameter syntax (`class Box[V]` / `def decode[T](...)`)
+rather than legacy `TypeVar` or `typing_extensions` (which is not a dependency):
 
 ```python
-from typing import Generic
-from typing_extensions import TypeVar
-
-_V = TypeVar("_V", default=Any)
-
-class MyDict(UserDict, Generic[_V]):
-    @overload
-    def __getitem__(self, item: str) -> _V: ...
-    # ...
+def decode_record[T](cls: type[T], raw: Mapping[str, object]) -> T:
+    ...
 ```
 
 #### h. Use `cast()` as a last resort before `# type: ignore`
 
 Use when you've structurally validated the type but the checker can't see it:
-pattern-matched AST nodes, known-typed dict values, or validated API
-responses.
+narrowed JSON objects, validated `Literal` strings, or known-typed protocol
+implementations. Prefer `TypeIs` / `TypeGuard` helpers where reusable.
 
 ```python
 # After structural validation confirms the type:
-stmt = cast(cst.Assign, node.body[0])
+record = cast("dict[str, JsonLike]", item)
 ```
 
 Do not use `cast()` when `@overload` or generics can solve it at the source.
@@ -260,6 +257,8 @@ remaining validation or environment limits; do not call it a full quality pass.
   ```bash
   (cd src && mypy --config-file pyproject.toml check_models.py)
   make ty
+  pyrefly check -c src/pyproject.toml --python-interpreter-path "$(which python)" \
+    --min-severity warn --output-format full-text src/check_models.py
   ```
 
 - Re-run Ruff cleanup and the full pipeline to confirm no regressions:

@@ -117,21 +117,22 @@ Use this shape when authoring or rewriting paste-ready Markdown. Fill from
 existing artifacts rather than paraphrasing away exact errors.
 
 ````markdown
-### Summary
+## Summary
 
 <One sentence describing the failure.>
 
-### Environment
+## Environment
 
 - MLX-VLM:
 - mlx:
+- transformers:
 - Python:
 - OS / macOS:
 - Hardware / MLX device:
 - Install method: <PyPI | editable path | branch>
 - check_models (optional context): <version/revision if relevant>
 
-### Model
+## Model
 
 - Model:
 - Resolved revision:
@@ -139,7 +140,7 @@ existing artifacts rather than paraphrasing away exact errors.
 - Trust remote code: <yes/no>
 - Family README: <path, and the checkpoint it recommends, if any | none>
 
-### Reproduction
+## Reproduction
 
 ```bash
 python -m mlx_vlm.generate \
@@ -156,21 +157,21 @@ Optional Python (when CLI cannot express the failing kwargs):
 # load → apply_chat_template → generate; one model per process
 ```
 
-### Expected behavior
+## Expected behavior
 
 <What should have happened.>
 
-### Actual behavior
+## Actual behavior
 
 <What happened instead.>
 
-### Logs / traceback
+## Logs / traceback
 
 ```text
 <root exception and trimmed upstream frames>
 ```
 
-### Inputs
+## Inputs
 
 <Shareable media description; dimensions; note if synthetic repro works.>
 ````

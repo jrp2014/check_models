@@ -144,6 +144,20 @@ what needs isolation. The harness calls `stream_generate` directly but mirrors
 wrapper behaviour including `processor.clean_output`. Distinguish raw streamed
 text from the final cleaned answer when reporting an output discrepancy.
 
+When investigating stop-token bugs or leaked control tokens (to establish
+whether the model itself emitted a declared EOS or whether `mlx-vlm` stopped
+early), inspect the tail token IDs alongside the active stopping criteria in
+the same probe:
+
+```python
+# Append inside the chunk loop: tail.append((chunk.token, chunk.text))
+# where tail = collections.deque(maxlen=10)
+tokenizer = getattr(processor, "tokenizer", processor)
+stop_ids = getattr(getattr(tokenizer, "stopping_criteria", None), "eos_token_ids", None)
+print("eos_token_ids:", stop_ids)
+print("tail tokens:", list(tail))
+```
+
 ## Reproducibility rules
 
 - Include exact command, model ID/path, resolved revision, media type/size,

@@ -13,7 +13,7 @@ Adapted from Skylos's own `skylos` and `skylos-security` skills
 ([`.claude/skills`](https://github.com/duriantaco/skylos/tree/main/.claude/skills),
 read at `7a597ad`). Those target work on the Skylos repository itself; this
 keeps only what a project that runs Skylos as a gate needs. Commands below
-were checked against Skylos 4.43.2.
+were checked against Skylos 5.7.0 (project floor `>=5.5.0`).
 
 ## Where Skylos runs here
 
@@ -101,10 +101,10 @@ new defects. Run the gate on the old and new versions against the same
 commit to confirm, then triage each new rule as above. Also re-test the
 version-pinned workarounds: delete each suppression or filter that names an
 older Skylos version, rerun its narrow command, and drop it if the finding no
-longer appears (current one: the `.worktrees/` danger filter for 4.33.x;
-the SKY-S101 one for 4.33.2 went with the 4.50.1 floor). A workaround for an
-editable install only reproduces with that package installed editable, as on
-john's Mac: CI installs wheels and never sees it.
+longer appears (for example, version-scoped `SKY-D228` comments or the
+`.worktrees/` danger filter). A workaround for an editable install only
+reproduces with that package installed editable locally: CI installs wheels
+and never sees it.
 
 ## 4. Drafting a Skylos bug report
 

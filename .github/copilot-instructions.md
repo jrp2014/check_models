@@ -353,6 +353,7 @@ the `.agents/skills/` copy.
 | `hf-cache-mlx-vlm-models` | List or reason about HF cache models under default discovery: the mlx-vlm server-style layout filter plus the image-capability classification and architecture pre-check | `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md` |
 | `benchmarking-mlx-vlm` | Credible perf measurement: median-of-N with warmup, `mx.eval` before timers, peak-memory protocol, A/B across MLX versions | `.agents/skills/benchmarking-mlx-vlm/SKILL.md` |
 | `upstream-mlx-vlm-contributing` | Turn a confirmed finding into an upstream mlx-vlm fix from the editable checkout: where processor/model/test code goes, focused upstream tests, upstream pre-commit hooks, PR expectations | `.agents/skills/upstream-mlx-vlm-contributing/SKILL.md` |
+| `weekly-sweep-update` | Draft factual weekly diagnostic sweep updates from retained artifacts without overstating comparability or unverified fixes | `.agents/skills/weekly-sweep-update/SKILL.md` |
 | `hf-cli` | Installed Hub CLI commands and authorization boundaries; maintained entrypoint with an on-demand generated command reference (refresh via `hf skills preview`, not `hf skills add --force`) | `.agents/skills/hf-cli/SKILL.md` |
 
 Upstream mlx-vlm ships its own skill bundle under `skills/skills/` (added by
