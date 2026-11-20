@@ -3224,6 +3224,9 @@ def _gallery_model_evidence_blocks(result: PerformanceResult) -> tuple[ReportBlo
                 )
             )
         else:
+            answer, reasoning = _final_answer_text(result)
+            if reasoning and answer:
+                blocks.append(_report_section("Final answer", ReportCodeBlock(answer), level=4))
             blocks.append(ReportModelOutput(output))
     else:
         traceback_block: ReportBlock = (
@@ -7112,13 +7115,34 @@ def _html_class_attr(classes: Sequence[str]) -> str:
 
 
 def _html_status_attrs(row: GalleryRow) -> str:
-    """Return presentation-only filter attributes from one chooser row."""
+    """Return presentation-only filter and comparison attributes from one chooser row."""
+    peak_gb = "" if row.peak_memory_gb is None else f"{row.peak_memory_gb:.4f}"
+    total_s = "" if row.total_time_s is None else f"{row.total_time_s:.4f}"
     return "".join(
         (
             _html_attr("data-model", row.model.casefold()),
+            _html_attr("data-model-label", row.model),
+            _html_attr("data-article-id", _gallery_model_anchor(row.model)),
             _html_attr("data-execution", row.execution),
             _html_attr("data-usability", row.usability),
             _html_attr("data-maintainer-status", row.maintainer_status),
+            _html_attr("data-peak-gb", peak_gb),
+            _html_attr("data-total-s", total_s),
+            _html_attr("data-has-reasoning", "yes" if row.reasoning_chars > 0 else "no"),
+            _html_attr(
+                "data-keywords",
+                _format_keywords_cell(row.keyword_count, row.keywords_from_hints),
+            ),
+            _html_attr(
+                "data-hint-text",
+                _format_hint_text_cell(row.description_hint_percent, row.description_hint_scope),
+            ),
+            _html_attr("data-observations", _gallery_observation_labels(row.observations)),
+            _html_attr("data-total-display", _gallery_total_time_cell(row)),
+            _html_attr("data-peak-display", _gallery_metric("peak_memory", row.peak_memory_gb)),
+            _html_attr("data-final-title", row.final_title),
+            _html_attr("data-final-description", row.final_description),
+            _html_attr("data-final-keywords", row.final_keywords),
             _html_class_attr((row.execution, row.usability)),
         )
     )
@@ -8465,10 +8489,26 @@ def _chooser_first_token_seconds(runtime: RuntimeDiagnostics | None) -> float | 
     return runtime.first_token_latency_s
 
 
+def _gallery_row_parsed_fields(
+    result: PerformanceResult,
+    answer: str,
+) -> tuple[str, str, str]:
+    """Return parsed (title, description, keywords) strings for metadata-profile completions."""
+    if result.assessment_profile != "metadata" or not answer:
+        return ("", "", "")
+    catalog = _parse_catalog_answer(answer)
+    return (
+        catalog.sections.get("title", "").strip(),
+        catalog.sections.get("description", "").strip(),
+        ", ".join(catalog.keywords),
+    )
+
+
 def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> GalleryRow:
     """Build one chooser row from cached assessment and captured facts only."""
     generation = result.generation
     output = _generation_text_value(generation)
+    answer = ""
     reasoning = ""
     field_preview: str | None = None
     if assessment.execution == "completed":
@@ -8495,6 +8535,12 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
     reasoning_preview = _truncate_text_preview(
         _collapse_preview_line_whitespace(reasoning), max_chars=MAX_OUTPUT_PREVIEW_CHARS
     )
+    analysis = result.quality_analysis
+    final_title, final_description, final_keywords = (
+        _gallery_row_parsed_fields(result, answer)
+        if assessment.execution == "completed"
+        else ("", "", "")
+    )
     return GalleryRow(
         model=result.model_name,
         execution=assessment.execution,
@@ -8512,6 +8558,15 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
         output_preview=output_preview,
         reasoning_chars=len(reasoning),
         reasoning_preview=reasoning_preview,
+        keyword_count=analysis.keyword_count if analysis is not None else None,
+        keywords_from_hints=analysis.keywords_from_hints if analysis is not None else None,
+        description_hint_percent=(
+            analysis.description_hint_percent if analysis is not None else None
+        ),
+        description_hint_scope=(analysis.description_hint_scope if analysis is not None else None),
+        final_title=final_title,
+        final_description=final_description,
+        final_keywords=final_keywords,
     )
 
 
@@ -9031,7 +9086,24 @@ def _gallery_chooser_explanation() -> str:
     )
 
 
-type ChooserCellKind = Literal["model", "label", "text", "preview"]
+type ChooserCellKind = Literal["model", "label", "text", "preview", "compare"]
+
+
+def _format_keywords_cell(count: int | None, from_hints: int | None) -> str:
+    """Format objective keyword count and how many are new versus copied from hints."""
+    if count is None:
+        return "-"
+    if from_hints is not None:
+        novel = max(0, count - from_hints)
+        return f"{count} ({novel} new / {from_hints} hint)"
+    return str(count)
+
+
+def _format_hint_text_cell(percent: int | None, scope: str | None) -> str:
+    """Format objective four-word-run overlap percent against the prompt's description hint."""
+    if percent is None:
+        return "-"
+    return f"{percent}% of answer" if scope == "answer" else f"{percent}%"
 
 
 @dataclass(frozen=True, slots=True)
@@ -9089,9 +9161,42 @@ _CHOOSER_METRICS: Final[tuple[ChooserColumn, ...]] = (
         lambda row: row.generation_tokens,
     ),
 )
+_CHOOSER_COMPARE: Final = ChooserColumn("Compare", lambda _row: "", lambda _row: None, "compare")
+_CHOOSER_KEYWORDS: Final = ChooserColumn(
+    "Keywords",
+    lambda row: _format_keywords_cell(row.keyword_count, row.keywords_from_hints),
+    lambda row: row.keyword_count,
+)
+_CHOOSER_HINT_TEXT: Final = ChooserColumn(
+    "Hint text",
+    lambda row: _format_hint_text_cell(row.description_hint_percent, row.description_hint_scope),
+    lambda row: row.description_hint_percent,
+)
 _CHOOSER_PREVIEW: Final = ChooserColumn(
     "Output preview", lambda row: row.output_preview, lambda row: row.output_preview, "preview"
 )
+
+
+def _active_chooser_columns(
+    base: tuple[ChooserColumn, ...],
+    rows: Sequence[GalleryRow],
+    *,
+    include_compare: bool = False,
+) -> tuple[ChooserColumn, ...]:
+    """Insert objective keyword/hint columns only when captured facts exist for the run."""
+    extras: list[ChooserColumn] = []
+    if any(row.keyword_count is not None for row in rows):
+        extras.append(_CHOOSER_KEYWORDS)
+    if any(row.description_hint_percent is not None for row in rows):
+        extras.append(_CHOOSER_HINT_TEXT)
+    columns: list[ChooserColumn] = [_CHOOSER_COMPARE] if include_compare else []
+    for column in base:
+        if column is _CHOOSER_OBSERVATIONS and extras:
+            columns.extend(extras)
+        columns.append(column)
+    return tuple(columns)
+
+
 # Markdown keeps the chooser compact: execution and maintainer lanes live in
 # the diagnostics report, and previews in the output-glance table below it.
 MARKDOWN_CHOOSER_COLUMNS: Final[tuple[ChooserColumn, ...]] = (
@@ -9204,7 +9309,10 @@ def _render_gallery_chooser(data: GalleryChooserData) -> list[str]:
         "",
         _gallery_chooser_explanation(),
         "",
-        *_render_markdown_chooser_table(MARKDOWN_CHOOSER_COLUMNS, data.ordered),
+        *_render_markdown_chooser_table(
+            _active_chooser_columns(MARKDOWN_CHOOSER_COLUMNS, data.ordered),
+            data.ordered,
+        ),
         "",
         "## Resource Highlights",
         "",
@@ -9354,6 +9462,13 @@ class GalleryRow:
     output_preview: str
     reasoning_chars: int = 0
     reasoning_preview: str = ""
+    keyword_count: int | None = None
+    keywords_from_hints: int | None = None
+    description_hint_percent: int | None = None
+    description_hint_scope: str | None = None
+    final_title: str = ""
+    final_description: str = ""
+    final_keywords: str = ""
 
 
 def _execution_status(result: PerformanceResult) -> ExecutionStatus:
@@ -11374,7 +11489,7 @@ def _html_model_link(model_name: str) -> str:
 
 
 def _html_filter_controls() -> str:
-    """Return dependency-free filters over exact cached assessment strings."""
+    """Return dependency-free filters, side-by-side comparison, and note-copy helpers."""
     return """
 <div class="filter-controls">
 <strong>Filter current-run chooser:</strong>
@@ -11389,30 +11504,122 @@ def _html_filter_controls() -> str:
 <option value="unusable">major concerns</option><option value="not_evaluated">not assessed</option>
 </select></label>
 <label>Maintainer status <select id="maintainer-status-filter">
-<option value="all">all</option><option value="actionable_failure">actionable_failure</option>
-<option value="observation_needs_reproduction">observation_needs_reproduction</option>
+<option value="all">all</option><option value="actionable_failure">actionable failure</option>
+<option value="observation_needs_reproduction">observation needs reproduction</option>
 <option value="none">none</option>
+</select></label>
+<label>Max peak GB <select id="peak-memory-filter">
+<option value="all">all</option><option value="8">&lt;= 8 GB</option>
+<option value="16">&lt;= 16 GB</option><option value="24">&lt;= 24 GB</option>
+<option value="36">&lt;= 36 GB</option><option value="64">&lt;= 64 GB</option>
+</select></label>
+<label>Max total s <select id="total-time-filter">
+<option value="all">all</option><option value="5">&lt;= 5s</option>
+<option value="15">&lt;= 15s</option><option value="30">&lt;= 30s</option>
+<option value="60">&lt;= 60s</option>
+</select></label>
+<label>Reasoning <select id="reasoning-filter">
+<option value="all">all</option><option value="yes">with reasoning</option>
+<option value="no">no reasoning</option>
 </select></label>
 <span id="filter-info" role="status" aria-live="polite">Showing all rows</span>
 </div>
+<div id="compare-panel" class="compare-panel hidden" aria-live="polite"></div>
 <script>
 function applyAssessmentFilters() {
     const query = document.getElementById('model-search').value.toLowerCase();
     const execution = document.getElementById('execution-filter').value;
     const usability = document.getElementById('usability-filter').value;
     const maintainer = document.getElementById('maintainer-status-filter').value;
+    const maxPeakRaw = document.getElementById('peak-memory-filter').value;
+    const maxTimeRaw = document.getElementById('total-time-filter').value;
+    const reasoning = document.getElementById('reasoning-filter').value;
+    const maxPeak = maxPeakRaw === 'all' ? null : Number(maxPeakRaw);
+    const maxTime = maxTimeRaw === 'all' ? null : Number(maxTimeRaw);
     const rows = document.querySelectorAll('#chooser-table tr[data-model]');
     let visible = 0;
     rows.forEach(row => {
+        const peakVal = row.dataset.peakGb ? Number(row.dataset.peakGb) : null;
+        const timeVal = row.dataset.totalS ? Number(row.dataset.totalS) : null;
         const show = row.dataset.model.includes(query)
             && (execution === 'all' || row.dataset.execution === execution)
             && (usability === 'all' || row.dataset.usability === usability)
-            && (maintainer === 'all' || row.dataset.maintainerStatus === maintainer);
+            && (maintainer === 'all' || row.dataset.maintainerStatus === maintainer)
+            && (maxPeak === null || (peakVal !== null && peakVal <= maxPeak))
+            && (maxTime === null || (timeVal !== null && timeVal <= maxTime))
+            && (reasoning === 'all' || row.dataset.hasReasoning === reasoning);
         row.classList.toggle('hidden', !show);
         if (show) visible += 1;
     });
     document.getElementById('filter-info').textContent =
         `Showing ${visible} of ${rows.length} rows`;
+}
+function renderComparePanel() {
+    const panel = document.getElementById('compare-panel');
+    if (!panel) return;
+    const checked = Array.from(document.querySelectorAll('#chooser-table .compare-toggle:checked'))
+        .map(box => box.closest('tr'))
+        .filter(Boolean);
+    panel.replaceChildren();
+    if (checked.length === 0) {
+        panel.classList.add('hidden');
+        return;
+    }
+    panel.classList.remove('hidden');
+    const heading = document.createElement('div');
+    heading.className = 'compare-header';
+    const title = document.createElement('strong');
+    title.textContent = `Side-by-side comparison (${checked.length} selected; check up to 4 models)`;
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.textContent = 'Clear selection';
+    clearBtn.addEventListener('click', () => {
+        document.querySelectorAll('#chooser-table .compare-toggle:checked').forEach(box => {
+            box.checked = false;
+        });
+        renderComparePanel();
+    });
+    heading.append(title, clearBtn);
+    const grid = document.createElement('div');
+    grid.className = 'compare-grid';
+    checked.forEach(row => {
+        const card = document.createElement('div');
+        card.className = 'compare-card';
+        const h4 = document.createElement('h4');
+        h4.textContent = row.dataset.modelLabel || row.dataset.model || '';
+        const meta = document.createElement('p');
+        meta.className = 'compare-meta';
+        meta.textContent = [
+            `Total: ${row.dataset.totalDisplay || '-'}`,
+            `Peak GB: ${row.dataset.peakDisplay || '-'}`,
+            row.dataset.keywords && row.dataset.keywords !== '-' ? `Keywords: ${row.dataset.keywords}` : '',
+            row.dataset.hintText && row.dataset.hintText !== '-' ? `Hint text: ${row.dataset.hintText}` : '',
+            `Observations: ${row.dataset.observations || 'none'}`,
+        ].filter(Boolean).join(' | ');
+        card.append(h4, meta);
+        const fields = [
+            ['Title', row.dataset.finalTitle],
+            ['Description', row.dataset.finalDescription],
+            ['Keywords', row.dataset.finalKeywords],
+        ];
+        if (fields.some(([, val]) => val)) {
+            fields.forEach(([label, val]) => {
+                const p = document.createElement('p');
+                const b = document.createElement('strong');
+                b.textContent = `${label}: `;
+                p.append(b, document.createTextNode(val || '(not detected)'));
+                card.append(p);
+            });
+        } else {
+            const pre = document.createElement('pre');
+            const article = row.dataset.articleId ? document.getElementById(row.dataset.articleId) : null;
+            const evidence = article ? article.querySelector('.model-output-readable') : null;
+            pre.textContent = (evidence && evidence.textContent) || '(no final answer)';
+            card.append(pre);
+        }
+        grid.append(card);
+    });
+    panel.append(heading, grid);
 }
 function sortChooserColumn(button) {
     const table = document.querySelector('#chooser-table table');
@@ -11444,6 +11651,32 @@ function sortChooserColumn(button) {
 }
 document.querySelectorAll('.filter-controls input, .filter-controls select')
     .forEach(control => control.addEventListener('input', applyAssessmentFilters));
+document.addEventListener('change', event => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement) || !target.classList.contains('compare-toggle')) return;
+    const checked = document.querySelectorAll('#chooser-table .compare-toggle:checked');
+    if (checked.length > 4) {
+        target.checked = false;
+        return;
+    }
+    renderComparePanel();
+});
+document.addEventListener('click', event => {
+    const target = event.target;
+    if (!(target instanceof HTMLButtonElement) || !target.classList.contains('copy-note-cmd')) return;
+    const cmd = target.dataset.command || '';
+    if (!cmd) return;
+    const done = () => {
+        const prev = target.textContent;
+        target.textContent = 'Copied!';
+        setTimeout(() => { target.textContent = prev; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(done, () => { window.prompt('Copy command:', cmd); });
+    } else {
+        window.prompt('Copy command:', cmd);
+    }
+});
 applyAssessmentFilters();
 </script>
 """
@@ -11511,9 +11744,12 @@ def _html_embedded_image(image_path: Path | None) -> str:
 def _html_chooser_cell(column: ChooserColumn, row: GalleryRow) -> str:
     """Apply the HTML boundary treatment to one shared chooser cell.
 
-    Model links and the preview disclosure arrive as built markup; every
-    other cell is escaped by ``_html_table``.
+    Model links, compare checkboxes and the preview disclosure arrive as built
+    markup; every other cell is escaped by ``_html_table``.
     """
+    if column.kind == "compare":
+        label = html.escape(f"Compare {row.model}", quote=True)
+        return f'<input type="checkbox" class="compare-toggle" aria-label="{label}">'
     if column.kind == "model":
         return _html_model_link(row.model)
     if column.kind == "preview":
@@ -11535,7 +11771,9 @@ def _html_chooser_table(
         rows=[tuple(_html_chooser_cell(column, row) for column in columns) for row in rows],
         row_attrs=[_html_status_attrs(row) for row in rows] if sortable else (),
         raw_columns=frozenset(
-            index for index, column in enumerate(columns) if column.kind in {"model", "preview"}
+            index
+            for index, column in enumerate(columns)
+            if column.kind in {"model", "preview", "compare"}
         ),
         sort_values=(
             [tuple(column.sort_value(row) for column in columns) for row in rows]
@@ -11557,7 +11795,11 @@ def _html_gallery_chooser(report_context: ReportRenderContext) -> str:
         '<div id="chooser-table">',
         _html_chooser_table(
             caption="Current-run model chooser",
-            columns=HTML_CHOOSER_COLUMNS,
+            columns=_active_chooser_columns(
+                HTML_CHOOSER_COLUMNS,
+                data.ordered,
+                include_compare=True,
+            ),
             rows=data.ordered,
             sortable=True,
         ),
@@ -11605,9 +11847,25 @@ def _html_gallery_model(
         for label, value in _gallery_model_facts(result, row, assessment, model_provenance)
         if value is not None
     )
+    note_cmd = shlex_join(
+        (
+            "python",
+            "-m",
+            "tools.add_accuracy_note",
+            result.model_name,
+            "--reviewer",
+            "YOUR_NAME",
+            "--note",
+            "YOUR_NOTE",
+        )
+    )
     parts = [
         f'<article id="{html.escape(_gallery_model_anchor(result.model_name), quote=True)}">',
         f"<h3>{html.escape(result.model_name, quote=True)}</h3>",
+        (
+            f'<button type="button" class="copy-note-cmd"{_html_attr("data-command", note_cmd)}>'
+            "Copy add_accuracy_note command</button>"
+        ),
         *render_report_html(_gallery_accuracy_note_blocks(accuracy_note)),
         f"<details><summary>Complete evidence: {html.escape(result.model_name, quote=True)}</summary>",
         _html_table(
@@ -11713,7 +11971,6 @@ def _html_runtime_facts(
         (
             '<section id="runtime">',
             "<h2>Runtime</h2>",
-            "<p><b>Runtime</b></p>",
             "".join(render_report_html((ReportKeyValues(tuple(rows)),))),
             "</section>",
         )
@@ -11780,6 +12037,13 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
 .indeterminate { background: #fff8dc; }
 .filter-controls { background: #f5f5f5; border: 1px solid #ddd; margin: 1rem 0; padding: 0.75rem; }
 .filter-controls label { display: inline-block; margin: 0.25rem 0.75rem 0.25rem 0; }
+.compare-panel { background: #fafafa; border: 1px solid #bbb; margin: 1rem 0; padding: 0.75rem; }
+.compare-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
+.compare-card { background: #fff; border: 1px solid #ddd; padding: 0.65rem; }
+.compare-card h4 { margin: 0 0 0.35rem; font-size: 0.95rem; word-break: break-word; }
+.compare-meta { color: #444; font-size: 0.85rem; margin: 0 0 0.5rem; }
+.copy-note-cmd { font-size: 0.85rem; margin: 0.25rem 0 0.5rem; padding: 0.25rem 0.5rem; cursor: pointer; }
 .hidden { display: none; }
 .embedded-image { border: 1px solid #ccc; max-width: min(100%, 600px); }
 </style>

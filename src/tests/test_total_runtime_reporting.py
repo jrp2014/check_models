@@ -107,7 +107,8 @@ def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
         total_runtime_seconds=56.78,
     )
     content = html_file.read_text(encoding="utf-8")
-    assert "<p><b>Runtime</b></p>" in content
+    assert "<h2>Runtime</h2>" in content
+    assert "<p><b>Runtime</b></p>" not in content
     assert "Validation overhead:" in content
     assert "Upstream model prefill / first-token time:" in content
     assert "Generation total:" in content

@@ -1,5 +1,8 @@
 """Tests for HTML formatting utilities."""
 
+from pathlib import Path
+from types import SimpleNamespace
+
 import check_models
 
 
@@ -125,3 +128,62 @@ def test_field_aware_preview_bounds_a_single_run_on_keyword() -> None:
     preview = check_models._field_aware_preview(answer, max_chars=280)
     assert preview is not None
     assert len(preview) < 400
+
+
+def test_html_report_workbench_filters_compare_and_note_copy(tmp_path: Path) -> None:
+    """HTML chooser exposes hardware/reasoning filters, comparison panel, and note copy button."""
+    prompt = (
+        "Create British-English catalogue metadata from the image and supplied context.\n\n"
+        "Context: Descriptive hints:\n"
+        "- Description hint: A small dog sits indoors looking at the camera.\n"
+        "- Keyword hints: dog, indoors, alert, harness\n\n"
+        "Return exactly these three sections and nothing else:\n"
+        "Title:\nDescription:\nKeywords:"
+    )
+    answer = (
+        "<think>Checking the image details.</think>\n"
+        "Title: Small dog sitting indoors\n"
+        "Description: A small dog sits indoors looking at the camera in soft light.\n"
+        "Keywords: dog, indoors, living room, portrait"
+    )
+    result = check_models.PerformanceResult(
+        model_name="org/thinking-model",
+        generation=SimpleNamespace(
+            text=answer,
+            prompt_tokens=200,
+            generation_tokens=60,
+            total_tokens=260,
+            prompt_tps=400.0,
+            generation_tps=50.0,
+            peak_memory=6.5,
+        ),
+        model_load_time=0.5,
+        generation_time=1.2,
+        total_time=1.7,
+        success=True,
+        assessment_profile="metadata",
+    )
+    out = tmp_path / "workbench.html"
+    check_models.generate_html_report(
+        results=[result],
+        filename=out,
+        versions={"mlx": "0.32.3", "mlx-vlm": "0.8.0"},
+        prompt=prompt,
+        total_runtime_seconds=1.7,
+    )
+    content = out.read_text(encoding="utf-8")
+    assert 'id="peak-memory-filter"' in content
+    assert 'id="total-time-filter"' in content
+    assert 'id="reasoning-filter"' in content
+    assert 'id="compare-panel"' in content
+    assert 'class="compare-toggle"' in content
+    assert ">actionable failure</option>" in content
+    assert ">observation needs reproduction</option>" in content
+    assert "4 (2 new / 2 hint)" in content
+    assert "<th>" not in content or "Hint text" in content
+    assert 'data-has-reasoning="yes"' in content
+    assert 'data-peak-gb="6.5000"' in content
+    assert "Copy add_accuracy_note command" in content
+    assert "tools.add_accuracy_note" in content
+    assert "<h4>Final answer</h4>" in content
+    assert "<p><b>Runtime</b></p>" not in content

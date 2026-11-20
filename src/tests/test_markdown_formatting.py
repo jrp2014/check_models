@@ -667,3 +667,52 @@ def test_report_text_escaping_keeps_bare_urls_as_autolinks() -> None:
         (check_models.ReportKeyValues((("Retained preview", url),)),)
     )
     assert lines[0] == f"- *Retained preview:* <{url}>"
+
+
+def test_gallery_chooser_includes_objective_keyword_and_hint_columns_when_present() -> None:
+    """Chooser adds Keywords and Hint text columns only when captured facts exist."""
+    plain = check_models.GalleryRow(
+        model="org/plain",
+        execution="completed",
+        usability="usable",
+        maintainer_status="none",
+        observations=(),
+        total_time_s=2.0,
+        generation_tps=50.0,
+        first_token_latency_s=0.5,
+        peak_memory_gb=4.0,
+        prompt_tokens=100,
+        generation_tokens=40,
+        output_preview="Plain caption",
+    )
+    plain_md = "\n".join(
+        check_models._render_gallery_chooser(check_models._gallery_chooser_data([plain]))
+    )
+    assert "| Keywords" not in plain_md
+    assert "| Hint text" not in plain_md
+
+    assisted = check_models.GalleryRow(
+        model="org/assisted",
+        execution="completed",
+        usability="usable",
+        maintainer_status="none",
+        observations=(),
+        total_time_s=2.0,
+        generation_tps=50.0,
+        first_token_latency_s=0.5,
+        peak_memory_gb=4.0,
+        prompt_tokens=100,
+        generation_tokens=40,
+        output_preview="Title: Dog",
+        keyword_count=18,
+        keywords_from_hints=12,
+        description_hint_percent=25,
+        description_hint_scope="description",
+    )
+    assisted_md = "\n".join(
+        check_models._render_gallery_chooser(check_models._gallery_chooser_data([assisted]))
+    )
+    assert "Keywords" in assisted_md
+    assert "Hint text" in assisted_md
+    assert "18 (6 new / 12 hint)" in assisted_md
+    assert "25%" in assisted_md
