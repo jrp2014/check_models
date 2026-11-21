@@ -2025,6 +2025,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/update.sh` (0.17.146) no longer rewrites the tracked
+  `src/package.json` for routine markdownlint-cli2 releases. It runs
+  `npm update markdownlint-cli2`, which installs the newest release the
+  committed caret range allows and writes only the untracked lockfile, then
+  compares that with `npm view markdownlint-cli2@latest`. Only a latest
+  release outside the range (a 0.x minor such as 0.25.0, or a major) is
+  installed with `--save-dev`, and the step still says to commit the moved
+  range. Previously every patch release (^0.24.1 to ^0.24.2) left a local
+  diff that had to be committed or stashed before `git pull`.
 - `tools.analyze_output_quality` (0.17.145) estimates tokens with
   `prompt_word_to_token_ratio` from `quality_config.yaml`, like the harness,
   instead of a hardcoded 1.3. With the bundled config the result is

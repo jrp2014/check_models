@@ -356,21 +356,32 @@ backup_run_history() {
 # package.json, never an exact pin or an npm override): a stale pin is how a
 # transitive smol-toml advisory reached the gate. UPDATE_NODE_TOOLING=0 is the
 # offline escape hatch, installing whatever the untracked lockfile holds.
-# A new release rewrites the caret range in the tracked package.json. Left
+# `npm update` takes the newest release the committed range allows and writes
+# only the untracked lockfile, so routine releases leave tracked files clean.
+# Only a latest release outside the range (a 0.x minor such as 0.25.0, or a
+# major) is installed with --save-dev, which rewrites the tracked range. Left
 # uncommitted, the pre-push hook (which stashes uncommitted changes) compares
 # the old committed range with the new lockfile and fails, so say so here.
 update_node_tooling() {
 	if [[ "${UPDATE_NODE_TOOLING:-1}" == "1" ]]; then
 		echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
-		local package_json="$PROJECT_ROOT/package.json" before="" after="" spec=""
-		before="$(cat "$package_json" 2>/dev/null || true)"
-		npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
-		after="$(cat "$package_json" 2>/dev/null || true)"
-		if [[ "$after" != "$before" ]]; then
-			spec="$(printf '%s\n' "$after" | sed -n 's/.*"markdownlint-cli2": *"\([^"]*\)".*/\1/p')"
-			echo "⚠️  src/package.json changed (markdownlint-cli2 ${spec:-updated}). Commit it:"
-			echo "   git add src/package.json && git commit -m \"chore(deps): markdownlint-cli2 ${spec:-update}\""
-			echo "   Until then the pre-push check fails: it compares the committed range with package-lock.json."
+		local npm_flags=(--ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT")
+		local package_json="$PROJECT_ROOT/package.json" before="" after="" spec="" latest="" installed=""
+		npm update "${npm_flags[@]}" markdownlint-cli2
+		latest="$(npm view markdownlint-cli2@latest version 2>/dev/null || true)"
+		installed="$(sed -n 's/^  "version": *"\([^"]*\)".*/\1/p' \
+			"$PROJECT_ROOT/node_modules/markdownlint-cli2/package.json" 2>/dev/null || true)"
+		if [[ -n "$latest" && "$latest" != "$installed" ]]; then
+			echo "[update.sh] markdownlint-cli2 $latest is outside the committed range; moving it..."
+			before="$(cat "$package_json" 2>/dev/null || true)"
+			npm install "${npm_flags[@]}" --save-dev markdownlint-cli2@latest
+			after="$(cat "$package_json" 2>/dev/null || true)"
+			if [[ "$after" != "$before" ]]; then
+				spec="$(printf '%s\n' "$after" | sed -n 's/.*"markdownlint-cli2": *"\([^"]*\)".*/\1/p')"
+				echo "⚠️  src/package.json changed (markdownlint-cli2 ${spec:-updated}). Commit it:"
+				echo "   git add src/package.json && git commit -m \"chore(deps): markdownlint-cli2 ${spec:-update}\""
+				echo "   Until then the pre-push check fails: it compares the committed range with package-lock.json."
+			fi
 		fi
 	else
 		echo "[update.sh] Installing repo-local markdownlint tooling from package-lock.json..."

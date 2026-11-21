@@ -5212,16 +5212,16 @@ def test_update_script_pip_installs_leave_builds_isolated_and_setuptools_uncappe
 @pytest.mark.parametrize(
     ("settings", "expect_system", "expect_npm"),
     [
-        ({}, True, "--save-dev markdownlint-cli2@latest"),
-        ({"UPDATE_SYSTEM_PACKAGES": "0"}, False, "--save-dev markdownlint-cli2@latest"),
-        ({"UPDATE_NODE_TOOLING": "0"}, True, ""),
+        ({}, True, "update"),
+        ({"UPDATE_SYSTEM_PACKAGES": "0"}, False, "update"),
+        ({"UPDATE_NODE_TOOLING": "0"}, True, "install"),
     ],
     ids=["defaults", "no-system-packages", "lockfile-node-tooling"],
 )
 def test_update_script_system_and_node_tooling_switches(
     tmp_path: Path, settings: dict[str, str], *, expect_system: bool, expect_npm: str
 ) -> None:
-    """By default conda, Homebrew and markdownlint-cli2@latest update; each switch opts out."""
+    """By default conda, Homebrew and markdownlint-cli2 update; each switch opts out."""
     status, lines = _run_whole_update(tmp_path, env=settings, conda=True)
 
     assert status == 0, "\n".join(lines)
@@ -5234,28 +5234,45 @@ def test_update_script_system_and_node_tooling_switches(
     else:
         assert system_calls == []
         assert "[update.sh] Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)" in lines
-    npm_installs = [line for line in lines if line.startswith("CALL npm install")]
-    assert len(npm_installs) == 1
-    assert npm_installs[0].endswith("/src" + (" " + expect_npm if expect_npm else ""))
-    assert "--save-exact" not in npm_installs[0]
+    npm_changes = [
+        line for line in lines if line.startswith(("CALL npm install", "CALL npm update"))
+    ]
+    assert len(npm_changes) == 1
+    expected_tail = "/src markdownlint-cli2" if expect_npm == "update" else "/src"
+    assert npm_changes[0].startswith(f"CALL npm {expect_npm} ")
+    assert npm_changes[0].endswith(expected_tail)
+    assert "--save" not in npm_changes[0]
 
 
 @pytest.mark.subprocess
-@pytest.mark.parametrize("bumped", [True, False], ids=["new-release", "already-latest"])
-def test_update_node_tooling_says_to_commit_a_rewritten_package_json(
-    tmp_path: Path, *, bumped: bool
+@pytest.mark.parametrize("outside_range", [True, False], ids=["outside-range", "within-range"])
+def test_update_node_tooling_rewrites_package_json_only_outside_the_range(
+    tmp_path: Path, *, outside_range: bool
 ) -> None:
-    """A new markdownlint-cli2 release rewrites package.json; the step says to commit it."""
+    """A release the caret range allows leaves package.json alone; only one outside it moves it."""
     project = tmp_path / "src"
-    project.mkdir()
-    old = '{\n  "devDependencies": {\n    "markdownlint-cli2": "^0.24.0"\n  }\n}\n'
+    (project / "node_modules" / "markdownlint-cli2").mkdir(parents=True)
+    old = '{\n  "devDependencies": {\n    "markdownlint-cli2": "^0.24.1"\n  }\n}\n'
     safe_io.write_text_no_follow(project / "package.json", old)
+    # What `npm update` left installed: the newest 0.24.x.
+    safe_io.write_text_no_follow(
+        project / "node_modules" / "markdownlint-cli2" / "package.json",
+        '{\n  "name": "markdownlint-cli2",\n  "version": "0.24.2"\n}\n',
+    )
+    latest = "0.25.0" if outside_range else "0.24.2"
+    transcript = tmp_path / "npm.log"
     fake_bin = tmp_path / "bin"
     fake_bin.mkdir()
-    rewrite = (
-        f"sed -i.bak 's/\\^0.24.0/^0.24.1/' \"{project / 'package.json'}\"\n" if bumped else ""
+    safe_io.write_text_no_follow(
+        fake_bin / "npm",
+        "#!/bin/bash\n"
+        f'echo "$1" >> "{transcript}"\n'
+        f'if [[ "$1" == view ]]; then echo {latest}; fi\n'
+        'if [[ "$1" == install ]]; then '
+        f"sed -i.bak 's/\\^0.24.1/^0.25.0/' \"{project / 'package.json'}\"; fi\n"
+        "exit 0\n",
+        mode=0o755,
     )
-    safe_io.write_text_no_follow(fake_bin / "npm", f"#!/bin/bash\n{rewrite}exit 0\n", mode=0o755)
     driver = (
         f"set -euo pipefail\nPROJECT_ROOT={project}\n"
         f"{_update_script_function('update_node_tooling')}update_node_tooling\n"
@@ -5264,11 +5281,15 @@ def test_update_node_tooling_says_to_commit_a_rewritten_package_json(
     result = _run_bash_script(driver, env={"PATH": f"{fake_bin}:/usr/bin:/bin"})
 
     assert result.returncode == 0, result.stderr
-    reminder = "src/package.json changed (markdownlint-cli2 ^0.24.1). Commit it:"
-    assert (reminder in result.stdout) == bumped, result.stdout
-    if bumped:
+    calls = safe_io.read_text_no_follow(transcript).split()
+    assert calls == (["update", "view", "install"] if outside_range else ["update", "view"])
+    unchanged = safe_io.read_text_no_follow(project / "package.json") == old
+    assert unchanged != outside_range
+    reminder = "src/package.json changed (markdownlint-cli2 ^0.25.0). Commit it:"
+    assert (reminder in result.stdout) == outside_range, result.stdout
+    if outside_range:
         assert (
-            '   git add src/package.json && git commit -m "chore(deps): markdownlint-cli2 ^0.24.1"'
+            '   git add src/package.json && git commit -m "chore(deps): markdownlint-cli2 ^0.25.0"'
             in result.stdout
         )
 
