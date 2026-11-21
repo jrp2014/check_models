@@ -64,7 +64,7 @@ import time
 import tomllib
 import traceback
 import types
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from collections.abc import (
     Callable,
     Collection,
@@ -1061,6 +1061,13 @@ class TextDeliveryRecord(TypedDict):
     final_chunk_chars: int
 
 
+class TailTokenRecord(TypedDict):
+    """One of the final generated tokens as streamed (id and released text)."""
+
+    id: int
+    text: str
+
+
 class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     """Performance metrics emitted for successful generations."""
 
@@ -1070,6 +1077,7 @@ class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     peak_memory_delta_gb: float
     first_token_peak_memory_gb: float
     text_delivery: TextDeliveryRecord
+    tail_tokens: list[TailTokenRecord]
     post_cleanup_active_memory_gb: float
     post_cleanup_cache_memory_gb: float
 
@@ -2021,6 +2029,9 @@ class PromptDiagnostics:
     # harness applied it because the template opened a thinking block,
     # "explicit" when the user passed thinking flags, None when no budget.
     thinking_budget_source: Literal["auto", "explicit"] | None = None
+    # Factual explanation of why the automatic thinking budget did or did not
+    # engage for this model's rendered prompt and run flags.
+    auto_thinking_budget_status: str | None = None
     template_thinking_markers: bool | None = None
     # Sampling defaults the checkpoint itself declares in generation_config.json
     # (do_sample, temperature, top_p, ...): a structured stand-in for "what the
@@ -2192,6 +2203,9 @@ class RuntimeDiagnostics:
     first_token_peak_memory_gb: float | None = None
     stop_reason: str | None = None
     text_delivery: TextDelivery | None = None
+    # Final generated (token_id, chunk_text) pairs captured from the stream for
+    # EOS/stop-token and control-token debugging.
+    tail_tokens: tuple[tuple[int, str], ...] = ()
     # Allocator residue sampled after the per-model cleanup sequence.
     post_cleanup_active_memory_gb: float | None = None
     post_cleanup_cache_memory_gb: float | None = None
@@ -8614,6 +8628,7 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         "Final answer emitted twice",
         "answer emitted twice",
         unusable=True,
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "missing_final_answer",
@@ -10679,12 +10694,48 @@ _OBSERVATION_DETAIL_LABELS: Final[dict[str, str]] = {
 }
 
 
+def _auto_thinking_budget_fact(
+    prompt_diagnostics: PromptDiagnostics | None,
+    generation_kwargs: Mapping[str, object],
+) -> str | None:
+    """Return why the auto thinking budget did or did not engage, when relevant."""
+    if prompt_diagnostics is None or prompt_diagnostics.auto_thinking_budget_status is None:
+        return None
+    relevant = (
+        prompt_diagnostics.thinking_budget_source == "auto"
+        or prompt_diagnostics.template_thinking_markers is True
+        or generation_kwargs.get("thinking_budget") is not None
+    )
+    return prompt_diagnostics.auto_thinking_budget_status if relevant else None
+
+
+def _per_model_repro_flags_fact(
+    result: PerformanceResult,
+    *,
+    resolved_revision: str | None,
+    settings: ModelRunSettings | None,
+) -> str:
+    """All native arguments except the shared image, prompt and display flag."""
+    diagnostics = result.prompt_diagnostics
+    effective = _effective_repro_settings(
+        settings, diagnostics.generate_kwargs if diagnostics else None
+    )
+    flags = _native_cli_settings_tokens(
+        settings=effective,
+        resolved_revision=resolved_revision,
+        reasoning_effort_applied=_applied_reasoning_effort(diagnostics),
+        unrecorded_settings=("max_tokens", "temperature") if effective is None else (),
+    )
+    return shlex_join(["--model", result.model_name, *flags])
+
+
 def _diagnostics_result_facts(
     result: PerformanceResult,
     assessment: ResultAssessment,
     *,
     requested_revision: str | None,
     model_provenance: ModelProvenanceRecord | None,
+    settings: ModelRunSettings | None = None,
 ) -> tuple[tuple[str, str], ...]:
     """Return exact per-model runtime and provenance fields for maintainers."""
     prompt_diagnostics = result.prompt_diagnostics
@@ -10773,6 +10824,13 @@ def _diagnostics_result_facts(
         ("Configured thinking start token", generation_kwargs.get("thinking_start_token")),
         ("Configured thinking end token", generation_kwargs.get("thinking_end_token")),
         ("Configured thinking budget", generation_kwargs.get("thinking_budget")),
+        ("Auto thinking budget", _auto_thinking_budget_fact(prompt_diagnostics, generation_kwargs)),
+        (
+            "Model reproduction flags",
+            _per_model_repro_flags_fact(
+                result, resolved_revision=resolved_revision, settings=settings
+            ),
+        ),
     )
     rows.extend(
         (label, _diagnostics_fact(value)) for label, value in optional_facts if value is not None
@@ -10951,6 +11009,13 @@ def _checkpoint_fact_rows(
     )
 
 
+def _tail_tokens_fact(tail_tokens: Sequence[tuple[int, str]]) -> str | None:
+    """Format the final streamed (token_id, text) pairs for stop/EOS debugging."""
+    if not tail_tokens:
+        return None
+    return ", ".join(f"{token_id}: {text!r}" for token_id, text in tail_tokens)
+
+
 def _runtime_termination_facts(
     runtime: RuntimeDiagnostics | None,
 ) -> tuple[tuple[str, object], ...]:
@@ -10965,6 +11030,7 @@ def _runtime_termination_facts(
         ),
         ("Peak memory at first token (GB)", runtime.first_token_peak_memory_gb),
         ("Text delivery", _notable_text_delivery_fact(runtime.text_delivery)),
+        ("Tail generated tokens (id: text)", _tail_tokens_fact(runtime.tail_tokens)),
     )
 
 
@@ -11027,6 +11093,7 @@ def _diagnostics_model_blocks(
     model_provenance: ModelProvenanceRecord | None,
     system_info: Mapping[str, str] | None = None,
     image_profile: ImageInputProfile | None = None,
+    settings: ModelRunSettings | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Build one model's complete maintainer evidence in priority order."""
     blocks: list[ReportBlock] = []
@@ -11060,6 +11127,7 @@ def _diagnostics_model_blocks(
                     assessment,
                     requested_revision=requested_revision,
                     model_provenance=model_provenance,
+                    settings=settings,
                 )
             ),
             level=4,
@@ -11196,6 +11264,7 @@ def _diagnostics_partition_blocks(
     requested_revision: str | None,
     system_info: Mapping[str, str] | None = None,
     image_profile: ImageInputProfile | None = None,
+    settings: ModelRunSettings | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Build one expanded or collapsed cached-assessment partition."""
     blocks: list[ReportBlock] = []
@@ -11213,6 +11282,7 @@ def _diagnostics_partition_blocks(
             model_provenance=provenance.get(result.model_name),
             system_info=system_info,
             image_profile=image_profile,
+            settings=settings,
         )
         if presentation == "expanded":
             entry: ReportBlock = ReportSection(result.model_name, evidence, level=3)
@@ -11262,6 +11332,7 @@ def _diagnostics_evidence_blocks(
     *,
     requested_revision: str | None,
     image_path: Path | None = None,
+    settings: ModelRunSettings | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Build the shared skim-first diagnostics hierarchy from cached assessments."""
     assessments = report_context.assessment_by_model
@@ -11304,6 +11375,7 @@ def _diagnostics_evidence_blocks(
                 requested_revision=requested_revision,
                 system_info=report_context.system_info,
                 image_profile=image_profile,
+                settings=settings,
             ),
         ),
         _report_section(
@@ -11316,6 +11388,7 @@ def _diagnostics_evidence_blocks(
                 requested_revision=requested_revision,
                 system_info=report_context.system_info,
                 image_profile=image_profile,
+                settings=settings,
             ),
         ),
         _report_section(
@@ -11328,6 +11401,7 @@ def _diagnostics_evidence_blocks(
                 requested_revision=requested_revision,
                 system_info=report_context.system_info,
                 image_profile=image_profile,
+                settings=settings,
             ),
         ),
     ]
@@ -11446,6 +11520,7 @@ def generate_diagnostics_report(
             partitions,
             requested_revision=settings.revision if settings is not None else None,
             image_path=image_path,
+            settings=settings,
         ),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
@@ -11927,6 +12002,7 @@ def _html_maintainer_diagnostics(
     *,
     requested_revision: str | None,
     image_path: Path | None,
+    settings: ModelRunSettings | None = None,
 ) -> str:
     """Render the same cached diagnostic block hierarchy used by Markdown."""
     parts = [
@@ -11938,6 +12014,7 @@ def _html_maintainer_diagnostics(
                 partitions,
                 requested_revision=requested_revision,
                 image_path=image_path,
+                settings=settings,
             )
         ),
         "</section>",
@@ -12078,6 +12155,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
                 partitions,
                 requested_revision=settings.revision if settings is not None else None,
                 image_path=image_path,
+                settings=settings,
             ),
             _html_provenance(
                 report_context=report_context,
@@ -13125,6 +13203,44 @@ def _prompt_opens_thinking_block(
     return formatted_prompt.rstrip().endswith(pair.start)
 
 
+def _auto_thinking_budget_decision(
+    params: ProcessImageParams,
+    formatted_prompt: str,
+    *,
+    reasoning_effort_passed: bool = False,
+) -> tuple[GenerateKwargs, str]:
+    """Return auto thinking-budget kwargs plus the factual reason it did or did not engage."""
+    empty = cast("GenerateKwargs", {})
+    budget = params.max_tokens - AUTO_THINKING_ANSWER_RESERVE_TOKENS
+    skip_reason: str | None = None
+    if not params.auto_thinking_budget:
+        skip_reason = "not applied: disabled (--no-auto-thinking-budget)"
+    elif params.enable_thinking is not None:
+        skip_reason = "not applied: explicit --enable-thinking/--no-enable-thinking"
+    elif params.thinking_mode is not None:
+        skip_reason = "not applied: explicit --thinking-mode"
+    elif reasoning_effort_passed:
+        skip_reason = "not applied: explicit reasoning effort applied"
+    elif budget < AUTO_THINKING_BUDGET_MIN_TOKENS:
+        skip_reason = f"not applied: max_tokens ({params.max_tokens}) leaves below minimum budget"
+    if skip_reason is not None:
+        return empty, skip_reason
+    for pair in THINKING_TRACE_DELIMITERS:
+        if not pair.auto_budget_eligible:
+            continue
+        if _prompt_opens_thinking_block(formatted_prompt, pair):
+            return (
+                {
+                    "enable_thinking": True,
+                    "thinking_budget": budget,
+                    "thinking_start_token": pair.start,
+                    "thinking_end_token": pair.end,
+                },
+                f"applied ({budget} tokens; prompt pre-opened {pair.start})",
+            )
+    return empty, "not applied: rendered prompt did not pre-open a thinking block"
+
+
 def _auto_thinking_budget_kwargs(
     params: ProcessImageParams,
     formatted_prompt: str,
@@ -13145,28 +13261,10 @@ def _auto_thinking_budget_kwargs(
     variable, or the fallback passed nothing) keeps the automatic budget, so
     --reasoning-effort leaves such models exactly as a run without it.
     """
-    empty = cast("GenerateKwargs", {})
-    if (
-        not params.auto_thinking_budget
-        or params.enable_thinking is not None
-        or params.thinking_mode is not None
-        or reasoning_effort_passed
-    ):
-        return empty
-    budget = params.max_tokens - AUTO_THINKING_ANSWER_RESERVE_TOKENS
-    if budget < AUTO_THINKING_BUDGET_MIN_TOKENS:
-        return empty
-    for pair in THINKING_TRACE_DELIMITERS:
-        if not pair.auto_budget_eligible:
-            continue
-        if _prompt_opens_thinking_block(formatted_prompt, pair):
-            return {
-                "enable_thinking": True,
-                "thinking_budget": budget,
-                "thinking_start_token": pair.start,
-                "thinking_end_token": pair.end,
-            }
-    return empty
+    auto_kwargs, _status = _auto_thinking_budget_decision(
+        params, formatted_prompt, reasoning_effort_passed=reasoning_effort_passed
+    )
+    return auto_kwargs
 
 
 def _apply_auto_thinking_budget(
@@ -13175,16 +13273,16 @@ def _apply_auto_thinking_budget(
     generate_kwargs: GenerateKwargs,
     *,
     reasoning_effort_passed: bool = False,
-) -> bool:
+) -> tuple[bool, str]:
     """Inject the automatic thinking budget when the template opens thinking.
 
-    Returns True when a budget was applied automatically.
+    Returns ``(applied, status_reason)``.
     """
-    auto_kwargs = _auto_thinking_budget_kwargs(
+    auto_kwargs, status = _auto_thinking_budget_decision(
         params, formatted_prompt, reasoning_effort_passed=reasoning_effort_passed
     )
     if not auto_kwargs:
-        return False
+        return False, status
     generate_kwargs.update(auto_kwargs)
     logger.info(
         "Auto thinking budget: %s tokens for %s (template opens a thinking block; "
@@ -13192,7 +13290,7 @@ def _apply_auto_thinking_budget(
         auto_kwargs.get("thinking_budget"),
         params.model_identifier,
     )
-    return True
+    return True, status
 
 
 def _build_generate_kwargs(params: ProcessImageParams) -> GenerateKwargs:
@@ -14077,6 +14175,7 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
     generate_kwargs: GenerateKwargs,
     processor_passthrough_kwargs: Mapping[str, object],
     thinking_budget_source: Literal["auto", "explicit"] | None = None,
+    auto_thinking_budget_status: str | None = None,
     snapshot_notes: tuple[str, ...] = (),
     prepared_input_token_count: int | None = None,
     image_token_count: int | None = None,
@@ -14116,6 +14215,7 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         thinking_budget_source=thinking_budget_source,
+        auto_thinking_budget_status=auto_thinking_budget_status,
         template_thinking_markers=_template_declares_thinking(snapshot_path),
         declared_sampling=dict(declared_sampling),
         sampling_sources=dict(sampling_sources),
@@ -14188,6 +14288,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "eos_token_id",
         "eos_token",
         "thinking_budget_source",
+        "auto_thinking_budget_status",
         "template_thinking_markers",
     ):
         if key == "rendered_prompt_preview" and diagnostics.rendered_prompt:
@@ -15493,9 +15594,7 @@ def _build_runtime_diagnostics(
     *,
     stop_reason: str | None,
     first_token_latency_s: float | None = None,
-    time_to_first_token_s: float | None = None,
-    first_token_peak_memory_gb: float | None = None,
-    text_delivery: TextDelivery | None = None,
+    observations: StreamObservations | None = None,
     model_load_active_memory_gb: float | None = None,
     model_weight_buffer_gb: float | None = None,
     post_cleanup_active_memory_gb: float | None = None,
@@ -15511,10 +15610,15 @@ def _build_runtime_diagnostics(
         decode_time_s=phase_timer.duration("decode"),
         cleanup_time_s=phase_timer.duration("cleanup"),
         first_token_latency_s=first_token_latency_s,
-        time_to_first_token_s=time_to_first_token_s,
-        first_token_peak_memory_gb=first_token_peak_memory_gb,
+        time_to_first_token_s=(
+            observations.time_to_first_token_s if observations is not None else None
+        ),
+        first_token_peak_memory_gb=(
+            observations.first_token_peak_memory_gb if observations is not None else None
+        ),
         stop_reason=stop_reason,
-        text_delivery=text_delivery,
+        text_delivery=observations.text_delivery if observations is not None else None,
+        tail_tokens=observations.tail_token_tuples if observations is not None else (),
         post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
         post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
@@ -15851,7 +15955,7 @@ def _prepare_generation(
             ", ".join(f"{key} {effective.get(key)}" for key in taken),
         )
     effort = prepared_prompt.template.reasoning_effort
-    auto_budget_applied = _apply_auto_thinking_budget(
+    auto_budget_applied, auto_thinking_budget_status = _apply_auto_thinking_budget(
         params,
         formatted_prompt,
         generate_kwargs,
@@ -15882,6 +15986,7 @@ def _prepare_generation(
         generate_kwargs=generate_kwargs,
         processor_passthrough_kwargs=processor_passthrough_kwargs,
         thinking_budget_source=thinking_budget_source,
+        auto_thinking_budget_status=auto_thinking_budget_status,
         snapshot_notes=prepared_prompt.snapshot_notes,
         prepared_input_token_count=prepared_input_token_count,
         image_token_count=image_token_count,
@@ -15938,6 +16043,14 @@ def _stream_tail_repeats(tail: str, chunk: object, chunk_count: int) -> bool:
     return _detect_streaming_repetition(tail)
 
 
+_RUNTIME_TAIL_TOKEN_LIMIT: Final[int] = 10
+
+
+def _new_tail_token_buffer() -> deque[tuple[int, str]]:
+    """Bounded FIFO of the final streamed (token_id, text) pairs."""
+    return deque(maxlen=_RUNTIME_TAIL_TOKEN_LIMIT)
+
+
 @dataclass
 class StreamObservations:
     """Facts only the streaming loop can see; returned beside the generation result.
@@ -15949,7 +16062,9 @@ class StreamObservations:
     so ``time_to_first_token_s`` is the time to first token as a caller
     experiences it (input preparation, prefill and the first decode step).
     ``token_ids`` are the retained (non-draft) generated ids, from which
-    special tokens are detected by id rather than by regex on the text.
+    special tokens are detected by id rather than by regex on the text, and
+    ``tail_tokens`` keeps the last few ``(token_id, text)`` pairs for EOS and
+    control-token debugging.
     The text-delivery counts say how the detokenizer released that text:
     retained chunks, those that released none, the longest consecutive
     stretch of them, and the characters in the last retained chunk (upstream's
@@ -15961,6 +16076,8 @@ class StreamObservations:
     first_token_at: float | None = None
     first_token_peak_memory_gb: float | None = None
     token_ids: list[int] = dataclass_field(default_factory=list)
+    last_token_position: int = 0
+    tail_tokens: deque[tuple[int, str]] = dataclass_field(default_factory=_new_tail_token_buffer)
     special_tokens: tuple[str, ...] = ()
     text_chunks: int = 0
     empty_text_chunks: int = 0
@@ -15978,6 +16095,11 @@ class StreamObservations:
         self.empty_text_chunks += 1
         self._empty_text_run += 1
         self.longest_empty_text_run = max(self.longest_empty_text_run, self._empty_text_run)
+
+    @property
+    def tail_token_tuples(self) -> tuple[tuple[int, str], ...]:
+        """Immutable snapshot of the final streamed ``(token_id, text)`` pairs."""
+        return tuple(self.tail_tokens)
 
     @property
     def text_delivery(self) -> TextDelivery | None:
@@ -16041,12 +16163,20 @@ def _observe_first_token(observations: StreamObservations | None, chunk: object)
 
 
 def _observe_token(observations: StreamObservations | None, chunk: object) -> None:
-    """Append a retained chunk's token id, when the chunk carries one."""
+    """Append a retained chunk's token id and tail text, when the chunk carries one."""
     if observations is None:
         return
     token = getattr(chunk, "token", None)
-    if _is_int(token):
-        observations.token_ids.append(token)
+    if not _is_int(token):
+        return
+    observations.token_ids.append(token)
+    position = getattr(chunk, "generation_tokens", None)
+    # Flush and diffusion block events can reuse the last token. Without a
+    # new, known position we cannot identify a newly generated token.
+    if _is_int(position) and position > observations.last_token_position:
+        observations.last_token_position = position
+        chunk_text = getattr(chunk, "text", "")
+        observations.tail_tokens.append((token, chunk_text if isinstance(chunk_text, str) else ""))
 
 
 def _upstream_stop_token_ids(tokenizer: object) -> frozenset[int]:
@@ -16571,23 +16701,35 @@ def _compose_stream_capture_for_file_log(
 _PROGRESS_BAR_LINE_RE: Final[re.Pattern[str]] = re.compile(
     r"^(?P<label>[^|]*?):\s+(?P<percent>\d{1,3})%\|"
 )
+# HF Hub Xet cache-hit bars that transferred zero bytes.
+_ZERO_BYTE_HUB_PROGRESS_RE: Final[re.Pattern[str]] = re.compile(
+    r"^(?:Downloading bytes|Download complete|Reconstructing(?:\s*\([^)]*\))?|"
+    r"Reconstruction complete):.*\|\s*0\.00B(?:\s*/\s*0\.00B)?\s*$"
+)
+_ZERO_BYTE_TQDM_RE: Final[re.Pattern[str]] = re.compile(r"\|\s*0\.00B/0\.00B\b")
 
 
 def _drop_finished_progress_bars(text: str) -> str:
-    """Drop progress bars that only say a step finished.
+    """Drop progress bars that only say a step finished or hit the local cache.
 
     A tee'd tqdm bar leaves every state it drew. One that reached 100% (a
-    cache hit's "Fetching 10 files", a completed prefill) adds nothing the
-    timings lack, so it is dropped; a bar's last state is kept when it
-    stopped short (a stall or a timeout) or moved bytes (a real download).
+    cache hit's "Fetching 10 files", a completed prefill) or an HF Hub Xet
+    cache-hit bar transferring 0.00B adds nothing the timings lack, so it is
+    dropped; a bar's last state is kept when it stopped short (a stall or a
+    timeout) or moved non-zero bytes (a real download).
     """
     lines = text.replace("\r", "\n").splitlines()
     last_state: dict[str, tuple[int, bool]] = {}
     bar_indexes: set[int] = set()
     for index, line in enumerate(lines):
-        if match := _PROGRESS_BAR_LINE_RE.match(_strip_ansi(line).strip()):
+        cleaned = _strip_ansi(line).strip()
+        if _ZERO_BYTE_HUB_PROGRESS_RE.match(cleaned):
             bar_indexes.add(index)
-            telling = match["percent"] != "100" or line.rstrip().endswith("B/s]")
+            continue
+        if match := _PROGRESS_BAR_LINE_RE.match(cleaned):
+            bar_indexes.add(index)
+            moved_bytes = line.rstrip().endswith("B/s]") and not _ZERO_BYTE_TQDM_RE.search(cleaned)
+            telling = match["percent"] != "100" or moved_bytes
             last_state[match["label"]] = (index, telling)
     kept_bars = {index for index, telling in last_state.values() if telling}
     return "\n".join(
@@ -16656,7 +16798,7 @@ def _build_success_process_result(
         upstream_boundary=upstream_boundary,
         captured_upstream_output=_compose_stream_capture_for_file_log(
             stdout_text=stdout_text,
-            stderr_text=stderr_text,
+            stderr_text=_drop_finished_progress_bars(stderr_text),
         ),
         generation_time=generation_time,
         model_load_time=model_load_time,
@@ -16666,9 +16808,7 @@ def _build_success_process_result(
         runtime_diagnostics=_build_runtime_diagnostics(
             phase_timer,
             first_token_latency_s=first_token_latency_s,
-            time_to_first_token_s=observations.time_to_first_token_s,
-            first_token_peak_memory_gb=observations.first_token_peak_memory_gb,
-            text_delivery=observations.text_delivery,
+            observations=observations,
             model_load_active_memory_gb=run.model_load_active_memory_gb,
             model_weight_buffer_gb=run.model_weight_buffer_gb,
             stop_reason=stop_reason,
@@ -21020,6 +21160,10 @@ def _build_jsonl_metrics_record(
             "longest_empty_text_run": delivery.longest_empty_text_run,
             "final_chunk_chars": delivery.final_chunk_chars,
         }
+    if runtime is not None and runtime.tail_tokens:
+        metrics["tail_tokens"] = [
+            {"id": token_id, "text": text} for token_id, text in runtime.tail_tokens
+        ]
     working_set_pct = _peak_memory_working_set_pct(
         facts.get("peak_memory_gb"),
         recommended_working_set_bytes,
@@ -27433,7 +27577,7 @@ def _build_native_mlx_vlm_cli_tokens(
     ``unrecorded_settings`` names settings whose values in ``settings`` are
     stand-ins, not what the model ran with: the command states none of them.
     """
-    tokens = [
+    return [
         "python",
         "-m",
         "mlx_vlm.generate",
@@ -27444,7 +27588,26 @@ def _build_native_mlx_vlm_cli_tokens(
         image_ref,
         "--prompt",
         "x" if minimal_load else prompt,
+        *_native_cli_settings_tokens(
+            settings=settings,
+            resolved_revision=resolved_revision,
+            minimal_load=minimal_load,
+            reasoning_effort_applied=reasoning_effort_applied,
+            unrecorded_settings=unrecorded_settings,
+        ),
     ]
+
+
+def _native_cli_settings_tokens(
+    *,
+    settings: ModelRunSettings | None,
+    resolved_revision: str | None,
+    minimal_load: bool = False,
+    reasoning_effort_applied: str | None = None,
+    unrecorded_settings: Collection[str] = (),
+) -> list[str]:
+    """Canonical native load and decoding flags for both full commands and model-specific flags."""
+    tokens: list[str] = []
     if minimal_load:
         tokens.extend(["--max-tokens", "8", "--temperature", str(DEFAULT_TEMPERATURE)])
     else:
@@ -27581,6 +27744,13 @@ def _diagnostics_shared_context_blocks(
     )
     if thinking_caveat is not None:
         reproduction_blocks = (*reproduction_blocks, thinking_caveat)
+    if highlighted_results:
+        reproduction_blocks += (
+            ReportParagraph(
+                "To use a model's reproduction flags, keep the shared command's --verbose, --image "
+                "and --prompt arguments and replace all its other arguments with those flags."
+            ),
+        )
     return (
         _report_section(
             "Shared Reproduction and Provenance",

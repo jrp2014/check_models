@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Generation diagnostics now show why the automatic thinking budget did or
+  did not engage, the last ten observed generated token positions (excluding
+  flush and block notifications), and per-model native reproduction flags.
+  Sampled reproductions explicitly preserve default-valued top-k and top-p.
+  Duplicated final answers are routed for native checking; successful stream
+  captures omit finished zero-byte cache progress.
 - Processor provenance (0.17.128): each record's prompt diagnostics now
   carry `image_processor_class` (the processor's `image_processor`) and
   `image_processor_settings`: the public resize, crop and patch attributes

@@ -3295,3 +3295,96 @@ def test_phase_progress_notes_mark_each_slow_stretch_once(caplog: pytest.LogCapt
         "Rendering the prompt...",
         "Preparing image inputs and prefilling...",
     ]
+
+
+def test_drop_finished_progress_bars_strips_zero_byte_hub_cache_hits() -> None:
+    """HF Hub Xet 0.00B cache-hit lines and finished tqdm bars are dropped; real downloads stay."""
+    raw = (
+        "Downloading bytes:        |  0.00B\n"
+        "Reconstructing (incomplete total...): |        |  0.00B /  0.00B\n"
+        "Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 2800.00it/s]\n"
+        "Download complete:        |  0.00B\n"
+        "Reconstruction complete:  |        |  0.00B /  0.00B\n"
+        "Prefill: 100%|██████████| 512/512 [00:00<00:00, 4000.00tok/s]\n"
+        "model.safetensors: 100%|██████████| 2.00G/2.00G [00:04<00:00, 500MB/s]\n"
+        "Prefill stalled:  42%|████      | 215/512 [00:05<00:07, 43.0tok/s]\n"
+        "Upstream warning: fallback enabled"
+    )
+    cleaned = check_models._drop_finished_progress_bars(raw)
+    assert "Downloading bytes:" not in cleaned
+    assert "Reconstructing (" not in cleaned
+    assert "Download complete:" not in cleaned
+    assert "Reconstruction complete:" not in cleaned
+    assert "Fetching 10 files:" not in cleaned
+    assert "Prefill: 100%" not in cleaned
+    assert "500MB/s]" in cleaned
+    assert "Prefill stalled:  42%" in cleaned
+    assert "Upstream warning: fallback enabled" in cleaned
+
+
+def test_stream_tail_tokens_are_bounded_and_round_trip_isolate_json() -> None:
+    """Only the final 10 streamed (token_id, text) pairs are retained and survive --isolate JSON."""
+    obs = check_models.StreamObservations()
+    for idx in range(15):
+        chunk = types.SimpleNamespace(token=100 + idx, generation_tokens=idx + 1, text=f"t{idx}")
+        check_models._observe_token(obs, chunk)
+    # Length-stop flush and diffusion block notifications reuse the last position.
+    for text in ("", "buffered"):
+        check_models._observe_token(
+            obs, types.SimpleNamespace(token=114, generation_tokens=15, text=text)
+        )
+    expected = tuple((100 + idx, f"t{idx}") for idx in range(5, 15))
+    assert obs.tail_token_tuples == expected
+    # A repeated ID at a new position and an EOS seen only on the final chunk both count.
+    for position, token, text in ((16, 114, "again"), (17, 99, "")):
+        check_models._observe_token(
+            obs, types.SimpleNamespace(token=token, generation_tokens=position, text=text)
+        )
+    assert obs.tail_token_tuples[-3:] == ((114, "t14"), (114, "again"), (99, ""))
+
+    runtime = check_models.RuntimeDiagnostics(stop_reason="completed", tail_tokens=expected)
+    result = check_models.PerformanceResult(
+        model_name="org/m",
+        generation=None,
+        success=True,
+        runtime_diagnostics=runtime,
+    )
+    encoded = json.loads(json.dumps(check_models._performance_result_to_json(result)))
+    rebuilt = check_models._dataclass_from_json(check_models.PerformanceResult, encoded)
+    assert rebuilt.runtime_diagnostics is not None
+    assert rebuilt.runtime_diagnostics.tail_tokens == expected
+
+
+def test_auto_thinking_budget_decision_reports_factual_reasons(tmp_path: Path) -> None:
+    """Decision helper states why the auto thinking budget engaged or stayed off."""
+    image = tmp_path / "img.jpg"
+    image.write_bytes(b"x")
+    args = check_models._build_cli_parser().parse_args(
+        ["--image", str(image), "--max-tokens", "1000"]
+    )
+    base = check_models._process_image_params_from_args(
+        args, model_identifier="org/m", image_path=image, prompt="describe"
+    )
+    applied_kwargs, applied_reason = check_models._auto_thinking_budget_decision(
+        base, "assistant: <think>"
+    )
+    assert applied_kwargs.get("thinking_budget") == 800
+    assert applied_reason == "applied (800 tokens; prompt pre-opened <think>)"
+
+    unopened_kwargs, unopened_reason = check_models._auto_thinking_budget_decision(
+        base, "assistant: <think></think>"
+    )
+    assert unopened_kwargs == {}
+    assert "did not pre-open" in unopened_reason
+
+    disabled_kwargs, disabled_reason = check_models._auto_thinking_budget_decision(
+        dataclasses.replace(base, auto_thinking_budget=False), "assistant: <think>"
+    )
+    assert disabled_kwargs == {}
+    assert "--no-auto-thinking-budget" in disabled_reason
+
+    effort_kwargs, effort_reason = check_models._auto_thinking_budget_decision(
+        base, "assistant: <think>", reasoning_effort_passed=True
+    )
+    assert effort_kwargs == {}
+    assert "reasoning effort" in effort_reason

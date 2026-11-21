@@ -898,6 +898,65 @@ def test_native_repro_states_enable_thinking_in_three_states() -> None:
     assert parsed.enable_thinking is False
 
 
+def test_diagnostics_facts_surface_tail_tokens_auto_budget_and_repro_flags() -> None:
+    """Highlighted diagnostics facts include tail tokens, auto-budget status, and per-model flags."""
+    result = PerformanceResult(
+        model_name="org/thinker",
+        generation=_MockGeneration(text="hello", prompt_tokens=10, generation_tokens=4),
+        success=True,
+        runtime_diagnostics=check_models.RuntimeDiagnostics(
+            stop_reason="length",
+            tail_tokens=((10, "hi"), (151645, "<|im_end|>")),
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            template_thinking_markers=True,
+            thinking_budget_source="auto",
+            auto_thinking_budget_status="applied (800 tokens; prompt pre-opened <think>)",
+            generate_kwargs={
+                "temperature": 0.7,
+                "enable_thinking": True,
+                "thinking_budget": 800,
+            },
+            reasoning_effort=check_models.ReasoningEffortResolution(
+                requested="low",
+                fallback="higher",
+                status="applied",
+                applied="low",
+                template_variables=("reasoning_effort",),
+            ),
+        ),
+    )
+    assessment = check_models._completed_assessment(("unexpected_special_token",))
+    provenance: check_models.ModelProvenanceRecord = {
+        "model": "org/thinker",
+        "requested_revision": None,
+        "resolved_revision": "abcdef123456",
+        "snapshot_path": None,
+        "revision_source": "refs/main",
+    }
+    args = check_models._build_cli_parser().parse_args(["--max-tokens", "1000"])
+    facts = dict(
+        check_models._diagnostics_result_facts(
+            result,
+            assessment,
+            requested_revision=None,
+            model_provenance=provenance,
+            settings=check_models._model_run_settings_from_args(args),
+        )
+    )
+    assert facts["Tail generated tokens (id: text)"] == "10: 'hi', 151645: '<|im_end|>'"
+    assert facts["Auto thinking budget"] == "applied (800 tokens; prompt pre-opened <think>)"
+    flags = facts["Model reproduction flags"]
+    assert "--model org/thinker" in flags
+    assert "--revision abcdef123456" in flags
+    assert "--temperature 0.7" in flags
+    assert "--top-k 0" in flags
+    assert "--top-p 1.0" in flags
+    assert "--enable-thinking" in flags
+    assert "--thinking-budget 800" in flags
+    assert "--reasoning-effort low" in flags
+
+
 def test_native_repro_states_default_top_p_and_top_k_only_when_sampled() -> None:
     """mlx-vlm 73d366e fills omitted --top-p/--top-k from generation_config.json."""
 

@@ -2480,3 +2480,45 @@ def test_provenance_separates_the_compiled_build_from_the_checkout() -> None:
     )
     # The revision a run is labelled with is the build that ran, not the checkout.
     assert check_models._component_source_revision({"mlx": lagging}, "mlx") == "229f5b430"
+
+
+def test_jsonl_retains_tail_tokens_and_auto_thinking_budget_status(tmp_path: Path) -> None:
+    """JSONL retains tail generated tokens and the auto thinking-budget status."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="org/thinker",
+        generation=SimpleNamespace(
+            text="Title: Dog",
+            prompt_tokens=100,
+            generation_tokens=5,
+            total_tokens=105,
+            prompt_tps=200.0,
+            generation_tps=50.0,
+            peak_memory=2.5,
+            finish_reason="stop",
+        ),
+        success=True,
+        runtime_diagnostics=check_models.RuntimeDiagnostics(
+            stop_reason="completed",
+            tail_tokens=((42, "Dog"), (151645, "<|im_end|>")),
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            template_thinking_markers=True,
+            auto_thinking_budget_status=(
+                "not applied: rendered prompt did not pre-open a thinking block"
+            ),
+        ),
+    )
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+    metrics = _require_present(rows[0].get("metrics"), field_name="metrics")
+    assert metrics["tail_tokens"] == [
+        {"id": 42, "text": "Dog"},
+        {"id": 151645, "text": "<|im_end|>"},
+    ]
+    diagnostics = _require_present(
+        rows[0].get("prompt_diagnostics"), field_name="prompt_diagnostics"
+    )
+    assert diagnostics["auto_thinking_budget_status"] == (
+        "not applied: rendered prompt did not pre-open a thinking block"
+    )

@@ -1446,7 +1446,12 @@ def test_duplicated_answer_becomes_an_unusable_observation_with_its_separator() 
     )
     assert "final_answer_duplicated" in observations
     assert "unexpected_special_token" in observations
-    assert check_models._completed_assessment(observations).usability == "unusable"
+    assessment = check_models._completed_assessment(observations)
+    assert assessment.usability == "unusable"
+    assert assessment.maintainer_status == "observation_needs_reproduction"
+    # Even without leaked control tokens, duplicated final answer alone is an integration signal.
+    dup_only = check_models._completed_assessment(("final_answer_duplicated",))
+    assert dup_only.maintainer_status == "observation_needs_reproduction"
     label = check_models._human_observation_labels(
         ("final_answer_duplicated",), details={"duplicated_answer_separator": "</think>"}
     )
