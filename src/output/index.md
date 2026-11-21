@@ -1,24 +1,24 @@
 # Check Models Output Index
 
-Run: started 2026-11-20 18:38:55 GMT; check_models 0.17.142 @ 3ed61570c
+Run: started 2026-11-21 23:42:25 GMT; check_models 0.17.146 @ 6f3a5278e
 
 Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 
 This run records model responses to one shared image and prompt (evaluation
-lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
+lane: blind). Mechanical checks are not factual-accuracy judgments; inspect
 the image, prompt and final answers before choosing a model. Results do not
 establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 13m 30s
-- Evaluation lane: assisted
-- Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
+- Run duration: 5m 37s
+- Evaluation lane: blind
+- Prompt hints: no description or keyword hints
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- Input image: JPEG, 9,984 x 6,656 pixels (66.5 MP), 49.0 MB
+- Input image: JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
 - Models attempted: 41 (completed 41, crashed 0, indeterminate 0)
-- Mechanical checks: no concerns detected 31, concerns detected 3, major concerns 7 (generation 1, answer format 6), not assessed 0
-- Observations, most important first: Final answer emitted twice (1), Unrecognised model control tokens remain visible (1), Required labelled fields not detected (6), Response appears cut off at the token limit (2), Internal reasoning block appears incomplete (1); 2 more kinds in diagnostics
+- Mechanical checks: no concerns detected 35, concerns detected 2, major concerns 4 (generation 1, answer format 3), not assessed 0
+- Observations, most important first: Response repeats the same text (1), Unrecognised model control tokens remain visible (1), Required labelled fields not detected (3), Response appears cut off at the token limit (1), Repeated keyword entries (3)
 
 ## Start here
 

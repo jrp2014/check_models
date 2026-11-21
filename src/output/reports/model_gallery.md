@@ -1,15 +1,15 @@
 # Model Output Gallery
 
-Generated on: 2026-11-20 18:52:25 GMT
+Generated on: 2026-11-21 23:48:03 GMT
 
-- *Evaluation lane:* assisted
-- *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
+- *Evaluation lane:* blind
+- *Prompt hints:* no description or keyword hints
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 49.0 MB
-- *Human accuracy notes:* 0 of 41 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed; 1 note for other images or models
+- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
+- *Human accuracy notes:* 1 of 41 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed
 
 This run records model responses to one shared image and prompt (evaluation
-lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
+lane: blind). Mechanical checks are not factual-accuracy judgments; inspect
 the image, prompt and final answers before choosing a model. Results do not
 establish fitness for other tasks.
 
@@ -19,7 +19,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-886122b0e90058b0.jpg)
+![Reference image](assets/source-image-c4aeb8d18432656f.jpg)
 
 ## Current-run Chooser
 
@@ -27,56 +27,56 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                    |
-|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------|
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 86.08s  | 35.6 tok/s | 61.47           | 17      | 16,576     | 768     | none                                                                            |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 82.30s  | 29.3 tok/s | 46.61           | 21      | 16,576     | 928     | none                                                                            |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 11.73s  | 121 tok/s  | 2.15            | 19      | 1,606      | 846     | none                                                                            |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 18.30s  | 75.8 tok/s | 6.46            | 8.7     | 6,427      | 761     | none                                                                            |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 6.41s   | 55.6 tok/s | 2.38            | 10      | 2,087      | 112     | none                                                                            |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected`          | 3.33s   | 207 tok/s  | 1.28            | 4.0     | 2,087      | 79      | none                                                                            |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected`          | 5.49s   | 307 tok/s  | 2.39            | 3.6     | 905        | 392     | none                                                                            |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 15.42s  | 83.7 tok/s | 1.60            | 25      | 905        | 806     | none                                                                            |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 6.96s   | 64.5 tok/s | 2.80            | 13      | 2,902      | 137     | none                                                                            |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 3.82s   | 189 tok/s  | 1.58            | 7.7     | 2,901      | 126     | none                                                                            |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 24.46s  | 76.9 tok/s | 9.81            | 73      | 2,381      | 116     | none                                                                            |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 7.00s   | 69.6 tok/s | 3.20            | 8.1     | 1,498      | 131     | none                                                                            |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 10.09s  | 28.3 tok/s | 4.02            | 13      | 3,100      | 105     | none                                                                            |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 5.34s   | 212 tok/s  | 2.74            | 3.7     | 4,060      | 127     | none                                                                            |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 4.30s   | 55.8 tok/s | 1.03            | 9.3     | 1,103      | 96      | none                                                                            |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 24.54s  | 72.3 tok/s | 19.51           | 26      | 12,764     | 108     | none                                                                            |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 35.35s  | 92.8 tok/s | 31.02           | 23      | 16,521     | 117     | none                                                                            |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 36.25s  | 69.4 tok/s | 32.62           | 11      | 16,521     | 104     | none                                                                            |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 40.67s  | 113 tok/s  | 28.67           | 25      | 16,534     | 933     | none                                                                            |
-| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected`          | 48.41s  | 114 tok/s  | 36.47           | 25      | 16,534     | 927     | none                                                                            |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 84.83s  | 30.6 tok/s | 52.96           | 21      | 16,576     | 879     | none                                                                            |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.94s   | 103 tok/s  | 1.61            | 6.5     | 2,069      | 119     | none                                                                            |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 7.51s   | 54.9 tok/s | 3.43            | 28      | 567        | 86      | none                                                                            |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 5.37s   | 63.4 tok/s | 1.27            | 7.6     | 571        | 100     | none                                                                            |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 5.05s   | 127 tok/s  | 0.99            | 16      | 571        | 92      | none                                                                            |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 4.25s   | 126 tok/s  | 1.01            | 6.0     | 567        | 105     | none                                                                            |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected`          | 3.26s   | 186 tok/s  | 1.17            | 4.7     | 1,361      | 93      | none                                                                            |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 4.94s   | 130 tok/s  | 2.21            | 5.4     | 4,184      | 140     | none                                                                            |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 7.60s   | 35.9 tok/s | 2.06            | 18      | 1,248      | 113     | none                                                                            |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 11.19s  | 164 tok/s  | 3.00            | 23      | 3,603      | 837     | none                                                                            |
-| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 74.90s  | 30.7 tok/s | 26.08           | 87      | 3,602      | 928     | none                                                                            |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`             | 2.43s   | 520 tok/s  | 0.91            | 1.9     | 2,095      | 126     | duplicate keywords                                                              |
-| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `concerns detected`             | 6.70s   | 60.6 tok/s | 2.20            | 9.7     | 1,361      | 91      | prompt hint repeated                                                            |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `concerns detected`             | 2.68s   | 454 tok/s  | 1.06            | 2.1     | 2,090      | 105     | duplicate keywords                                                              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 4.16s   | 386 tok/s  | 2.04            | 1.8     | 308        | 34      | labelled fields not detected; prompt hint repeated                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `major concerns: generation`    | 12.90s  | 98.5 tok/s | 0.92            | 7.0     | 361        | 1,000   | labelled fields not detected; cut off at token limit; incomplete thinking block |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: answer format` | 53.28s  | 23.9 tok/s | 7.84            | 25      | 4,387      | 1,000   | labelled fields not detected; cut off at token limit                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `major concerns: answer format` | 3.77s   | 124 tok/s  | 1.41            | 5.6     | 1,400      | 97      | labelled fields not detected; prompt hint repeated                              |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 3.39s   | 107 tok/s  | 1.41            | 6.7     | 2,173      | 25      | control tokens visible; labelled fields not detected                            |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 2.39s   | 378 tok/s  | 0.92            | 1.8     | 304        | 82      | labelled fields not detected                                                    |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `major concerns: answer format` | 6.85s   | 101 tok/s  | 1.64            | 7.4     | 1,846      | 304     | answer emitted twice; prompt hint repeated                                      |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Keywords | Observations                                              |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|---------------------|-----------------|---------|------------|---------|----------|-----------------------------------------------------------|
+| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 2.62s   | 61.5 tok/s          | 0.57            | 9.7     | 734        | 56      | 10       | none                                                      |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 1.29s   | 570 tok/s           | 0.80            | 1.3     | 350        | 47      | 6        | none                                                      |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 31.34s  | 31.8 tok/s          | 0.90            | 17      | 461        | 865     | 16       | none                                                      |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.15s   | 102 tok/s           | 1.55            | 6.5     | 2,909      | 82      | 10       | none                                                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 5.29s   | 66.1 tok/s          | 1.87            | 28      | 386        | 66      | 14       | none                                                      |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 3.53s   | 63.1 tok/s          | 0.27            | 7.5     | 390        | 88      | 18       | none                                                      |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 3.44s   | 127 tok/s           | 0.34            | 16      | 390        | 75      | 15       | none                                                      |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 2.43s   | 124 tok/s           | 0.18            | 5.9     | 386        | 67      | 14       | none                                                      |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 11.71s  | 81.9 tok/s          | 0.46            | 8.0     | 495        | 819     | 12       | none                                                      |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected`          | 1.39s   | 178 tok/s           | 0.29            | 4.7     | 734        | 57      | 10       | none                                                      |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.25s   | 55.6 tok/s          | 2.31            | 10      | 3,435      | 90      | 18       | none                                                      |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected`          | 1.47s   | 217 tok/s           | 0.24            | 3.6     | 344        | 73      | 10       | none                                                      |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected`          | 2.08s   | 313 tok/s           | 0.14            | 3.5     | 330        | 268     | 15       | none                                                      |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 8.73s   | 87.4 tok/s          | 0.58            | 24      | 330        | 431     | 18       | none                                                      |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 3.30s   | 67.5 tok/s          | 0.73            | 8.9     | 1,070      | 81      | 10       | none                                                      |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 1.65s   | 209 tok/s           | 0.24            | 3.7     | 1,069      | 102     | 12       | none                                                      |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 20.11s  | 91.1 tok/s          | 6.77            | 69      | 549        | 82      | 18       | none                                                      |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 3.00s   | 71.1 tok/s          | 0.51            | 8.2     | 873        | 95      | 10       | none                                                      |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 4.57s   | 30.3 tok/s          | 0.81            | 12      | 860        | 70      | 10       | none                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `no concerns detected`          | 39.24s  | 24.9 tok/s          | 0.90            | 25      | 545        | 884     | 14       | none                                                      |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 1.65s   | 267 tok/s           | 0.18            | 3.3     | 418        | 78      | 12       | none                                                      |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 2.85s   | 58.1 tok/s          | 0.29            | 9.1     | 883        | 94      | 19       | none                                                      |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 3.73s   | 93.6 tok/s          | 0.38            | 23      | 409        | 81      | 18       | none                                                      |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 3.01s   | 133 tok/s           | 0.34            | 19      | 409        | 83      | 10       | none                                                      |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 1.87s   | 103 tok/s           | 0.25            | 6.8     | 409        | 60      | 10       | none                                                      |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 10.24s  | 123 tok/s           | 0.34            | 21      | 419        | 898     | 18       | none                                                      |
+| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected`          | 8.39s   | 121 tok/s           | 0.37            | 21      | 419        | 653     | 19       | none                                                      |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 23.52s  | 30.9 tok/s          | 0.72            | 17      | 461        | 640     | 14       | none                                                      |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected`          | 1.51s   | 117 tok/s           | 0.45            | 5.6     | 1,204      | 31      | 4        | none                                                      |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 1.73s   | 149 tok/s           | 0.17            | 5.2     | 420        | 88      | 10       | none                                                      |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 4.89s   | 35.9 tok/s          | 0.67            | 16      | 538        | 87      | 18       | none                                                      |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 7.01s   | 162 tok/s           | 0.35            | 21      | 421        | 706     | 17       | none                                                      |
+| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 55.31s  | 30.3 tok/s          | 11.70           | 81      | 420        | 797     | 15       | none                                                      |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected`          | 3.61s   | 97.4 tok/s          | 0.25            | 6.7     | 419        | 198     | 11       | none                                                      |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 15.17s  | 43.2 tok/s          | 1.67            | 11      | 461        | 517     | 14       | none                                                      |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`             | 6.00s   | 145 tok/s           | 0.52            | 19      | 545        | 540     | 16       | duplicate keywords                                        |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `concerns detected`             | 5.01s   | 102 tok/s           | 0.19            | 7.0     | 173        | 367     | 18       | duplicate keywords                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 1.18s   | 395 tok/s           | 0.32            | 2.1     | 120        | 32      | -        | labelled fields not detected                              |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.73s   | 379 tok/s           | 0.38            | 2.3     | 3,438      | 1,000   | 144      | repeated text; cut off at token limit; duplicate keywords |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 2.69s   | insufficient sample | 1.41            | 7.0     | 3,512      | 14      | -        | control tokens visible; labelled fields not detected      |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 1.02s   | 353 tok/s           | 0.10            | 1.5     | 116        | 97      | -        | labelled fields not detected                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/granite-4.0-3b-vision-4bit` at 3.26s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.29s
 
-Lowest peak memory among completions without detected concerns: `mlx-community/MiniCPM-V-4.7-1B-4bit` at 3.6 GB
+Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.3 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
@@ -84,15 +84,12 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                           | Mechanical checks               | Observations                                                                    |
-|-------------------------------------------------------------------------------------------------|---------------------------------|---------------------------------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                      | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                    | `major concerns: generation`    | labelled fields not detected; cut off at token limit; incomplete thinking block |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit) | `major concerns: answer format` | labelled fields not detected; cut off at token limit                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)    | `major concerns: answer format` | labelled fields not detected; prompt hint repeated                              |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)         | `major concerns: answer format` | control tokens visible; labelled fields not detected                            |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                    | `major concerns: answer format` | labelled fields not detected                                                    |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                         | `major concerns: answer format` | answer emitted twice; prompt hint repeated                                      |
+| Model                                                                                   | Mechanical checks               | Observations                                              |
+|-----------------------------------------------------------------------------------------|---------------------------------|-----------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)              | `major concerns: answer format` | labelled fields not detected                              |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)          | `major concerns: generation`    | repeated text; cut off at token limit; duplicate keywords |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit) | `major concerns: answer format` | control tokens visible; labelled fields not detected      |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)            | `major concerns: answer format` | labelled fields not detected                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -101,56 +98,56 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: Small dog in harness gazes at camera indoors \| Description: Captured on 14 November 2026 at 17:41, a small brown-and-black dog with large erect ears and a pa... \| Keywords (18): small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close up, indoors, living room, ...[2,446 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: Small Dog in Harness Watches Over Relaxed Senior Man \| Description: A small brown-and-black dog with large erect ears, wearing a blue harness, gazes attenti... \| Keywords (17): alert, big ears, brown and black, canine, casual, chihuahua mix, close up, companion animal, dog harness, ...[3,263 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Attentive Companion Dog with Senior Man \| Description: A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness,... \| Keywords (21): dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, ...[2,650 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Alert Mixed-Breed Dog in Living Room \| Description: An alert small mixed-breed dog in a harness looks toward the camera, with an older person relaxing i... \| Keywords (11): mixed-breed dog, harness, living room, alert, big ears, brown and black, canine, casual, indoors, senior man, ...[2,713 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Alert Chihuahua Mix in Cozy Living Room \| Description: A small, alert chihuahua mix dog in a harness gazes at the camera in a warmly lit living room, with a... \| Keywords (20): Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, ...                                                                               |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Alert mixed-breed dog in harness indoors \| Description: A small brown and black dog wearing a harness looks attentively toward the camera while a seni... \| Keywords (13): dog, harness, mixed-breed, alert, indoors, senior man, tablet, living room, close-up, companion, canine, brown, ...                                                                               |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected` | Title: Alert Chihuahua Mix with Harness \| Description: A small mixed-breed dog wearing a harness looks attentively toward the camera in a warm indoor living room,... \| Keywords (17): Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, ...[1,007 characters of reasoning omitted; complete output in the evidence block]  |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected` | Title: Small Black and Tan Dog with Large Ears in Harness \| Description: A small mixed-breed dog with prominent upright ears and a black-and-tan coat, wearing a patter... \| Keywords (18): dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, person, tablet, relaxing, ...[2,978 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **"Alert Mixed-Breed Dog in Harness with Senior Man Indoors"** \| Description: A small mixed-breed dog with brown and black fur, wearing a harness, sits attentively i... \| Keywords (16): dog, mixed-breed, brown and black, harness, indoor photography, living room, senior man, tablet, ...                                                                               |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: A Warm Indoor Moment with a Harnessed Canine Mix \| Description: A small mixed-breed dog with expressive brown-and-black fur and prominent ears gazes attentively at th... \| Keywords (13): harnessed dog, attentive canine, mixed-breed, big ears, brown-black fur, indoor domestic scene, ...                                                                               |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected` | Title: Small dog in harness watches camera as senior man relaxes indoors \| Description: A small mixed-breed dog with big ears and a brown-and-black coat, wearing a... \| Keywords (17): dog harness, domestic life, indoors, senior man, sitting, tablet, alert, big ears, brown and black coat, ...                                                                                |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Alert Chihuahua Mix in Harness, Senior Man Relaxing Indoors \| Description: A small mixed-breed dog with big ears and brown-black fur, wearing a harness, loo... \| Keywords (20): Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, ...                                                                               |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected` | Title: Alert Chihuahua Mix in Living Room with Senior Man \| Description: A small brown and black chihuahua mix with a harness looks directly at the camera in a... \| Keywords (15): chihuahua mix, brown and black dog, living room, senior man, tablet, alert dog, domestic life, indoor scene, ...                                                                                |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: A Canine Companion in a Comfortable Setting \| Description: A small mixed-breed dog, adorned with a harness, sits attentively in a cozy indoor space, its brown and b... \| Keywords (18): Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, ...                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Attentive Mixed-Breed Dog in Harness \| Description: A small, alert mixed-breed dog with large ears wearing a harness sits attentively in a living room, wit... \| Keywords (10): mixed-breed, harness, alert, large ears, senior man, tablet, living room, attentive, relaxed, companion animal                                                                               |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Close-up of alert dog with big ears \| Description: A small, alert dog with large, upright ears and brown-and-black fur looks directly at the camera while wearin... \| Keywords (18): dog, close-up, alert, big ears, brown and black, small dog, dog harness, indoor, man, tablet, casual, ...                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Close-up of a small dog with big ears \| Description: A small, alert dog with large brown and black ears and a speckled face looks towards the camera whi... \| Keywords (20): dog, small dog, mixed breed, big ears, brown and black, alert, companion animal, domestic life, indoors, man, ...                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Alert dog with big ears looks at camera \| Description: A small brown and black dog with large ears and a harness sits attentively indoors, looking dire... \| Keywords (18): dog, harness, alert, big ears, brown and black, indoors, companion, living room, senior man, tablet, close up, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Small black and tan dog in harness held by man \| Description: Captured indoors on November 14, 2026, a small dog with black and tan fur and merle marki... \| Keywords (18): dog, harness, mini pinscher, black and tan, merle, big ears, alert, man, tablet, indoor, living room, holding, ...[2,945 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Small black and tan dog with large ears looks at camera \| Description: Captured in warm, indoor lighting, a small mixed-breed dog with prominent uprigh... \| Keywords (20): dog, pet, animal, chihuahua, terrier, mixed breed, brown, black, big ears, close up, alert, harness, domestic, ...[3,151 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Small dog in harness gazes at camera indoors \| Description: A small mixed-breed dog with large erect ears and a brown, black and tan coat wears a light-strap... \| Keywords (16): small dog, large ears, dog harness, close up, mixed breed, brown and black coat, attentive, living room, ...[2,991 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Small Dog's Attentive Gaze in Living Room \| Description: A small mixed-breed dog with a distinctive brown and black coat and large ears sits attentively o... \| Keywords (11): Small dog, Mixed breed, Brown and black coat, Large ears, Attentive gaze, Living room, Older man, Relaxing, ...                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Alert chihuahua-mix dog wearing a harness indoors \| Description: A small brown and black-- dog with large ears wears a harness and looks at the camera w... \| Keywords (16): dog, chihuahua mix, harness, alert, ears, indoors, senior, man, sitting, tablet, domestic, companion, canine, ...                                                                               |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Small Dog with Large Ears Wearing a Harness \| Description: A small brown and black mixed-breed dog with large ears looks attentively toward the camera... \| Keywords (18): Dog, harness, big ears, canine, brown and black, chihuahua mix, domestic life, indoors, man, relaxing, tablet, ...                                                                                |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Small mixed-breed dog with large ears wearing a harness \| Description: A small brown and black dog wearing a harness looks attentively at the camera in a br... \| Keywords (16): dog, harness, chihuahua mix, domestic life, indoors, senior man, companion, pet, alert, big ears, canine, ...                                                                               |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Attentive small dog in harness watches camera indoors. \| Description: A small, brown and black mixed-breed dog in a harness looks attentively towards the camera... \| Keywords (14): mixed-breed dog, canine companion, dog harness, indoors, alert, big ears, brown and black, close up, ...                                                                                |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Senior Man and His Alert Dog" \| Description: A small mixed-breed dog with big ears and a brown and black coat looks attentively toward the camera, while... \| Keywords (12): senior man, dog harness, domestic life, Indoors, chihuahua mix, attentive, comfortable, companion, close up, ...                                                                               |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Small mixed-breed dog with alert expression in living room, senior man using... \| Description: A small mixed-breed dog wearing a harness looks attentively toward th... \| Keywords (18): Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, ...                                                                               |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Small Dog in Harness with Relaxed Older Person \| Description: A small, mixed-breed dog with large ears wears a harness and looks attentively at the camera, w... \| Keywords (20): Small dog, dog harness, chihuahua mix, big ears, brown and black fur, living room, older person, tablet, ...                                                                               |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Attentive Small Dog in Harness \| Description: A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly a... \| Keywords (14): dog, harness, small, mixed-breed, big-ears, brown-black, attentive, living-room, tablet, older-man, relaxed, ...[2,713 characters of reasoning omitted; complete output in the evidence block] |
-| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected` | Title: Close-up of a small dog with big ears wearing a harness \| Description: A close-up shot features a small mixed-breed dog with large ears and a speckled brown... \| Keywords (17): dog, canine, harness, big ears, close up, mixed breed, brown and black, indoor, living room, senior man, ...[3,103 characters of reasoning omitted; complete output in the evidence block]  |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`    | Title: "Chihuahua in a Living Room" \| Description: A small mixed-breed dog with large ears and a brown and black coat is sitting attentively in a living room,... \| Keywords (19): Chihuahua, living room, dog, harness, attentive, casual, indoor, relaxed, comfortable, companion animal, dog, ...                                                                                |
-| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `concerns detected`    | Title: "Chihuahua Mix in Harness" \| Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in... \| Keywords (13): Chihuahua mix, dog harness, indoor, senior man, relaxed, digital device, living room, attentive, mixed breed, ...                                                                               |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `concerns detected`    | Title: Small Dog in Harness, Man Relaxing, Digital Device in Background \| Description: A small mixed-breed dog wearing a harness sits attentively in a living roo... \| Keywords (20): Dog harness, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, ...                                                                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.                                                                                                                                                                                                                |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `major concerns`       | &lt;think&gt;<br>User is asking to create British-English catalogue metadata from an image and some context. I need to follow the instructions carefully.<br><br>First, I'll start with the title. It should be concrete, 5-10 words. Looking at the image, there's a small dog with big ears, weari...                                                                               |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: Alert Small Dog With Big Ears Wearing Harness Indoors \| Description: A small brown-and-black mixed-breed dog with large erect ears and a blue patterned harness sits on blue jeans, looking attentively toward the camera in a warmly lit \| Keywords: (not detected)                                                                                                         |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `major concerns`       | Title: (not detected) \| Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background... \| Keywords (20): Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, ...                                                                                |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a small dog with a harness looking at the camera while a person sits on a couch.                                                                                                                                                                                                                                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "A Dog's Watchful Eyes in a Living Room" \| Description: A dog wearing a harness looks attentively toward the camera, while an older person relaxes in the background using a tablet. The dog is wearing a mix of breeds, and the older person is sitting comfort... \| Keywords: (not detected)                                                                               |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `major concerns`       | Title: Alert Dog in Living Room \| Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the backgroun... \| Keywords (18): Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, ...[476 characters of reasoning omitted; complete output in the evidence block]   |
+| Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                            |
+|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected` | Title: "Cats at Rest on a Pink Sofa" \| Description: Two cats are sleeping on a pink sofa, with remote controls nearby. \| Keywords (10): cats, sleeping, pink sofa, remote controls, domestic, comfort, tranquility, home, leisure, relaxation.                                                                                                                                          |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Cats on a Pink Couch \| Description: Two tabby cats are lying on a bright pink couch, appearing relaxed and comfortable. \| Keywords (6): cats, pink couch, relaxation, tabby, comfortable, cozy                                                                                                                                                                                   |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: Two tabby cats lying on pink fabric beside remotes \| Description: Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker ma... \| Keywords (16): tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, ...[2,838 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Two Cats Relaxing Together \| Description: Two tabby cats are curled up and sleeping side by side on a pink blanket, with a remote control placed nearby on the sofa. The sce... \| Keywords (10): cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, home, indoor, comfortable                                                                                   |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Two tabby cats sleeping on a pink blanket \| Description: Two striped tabby cats lie resting on a pink fabric surface next to two remote controls. \| Keywords (14): cats, tabby, sleeping, pink, blanket, sofa, indoor, remote controls, lounging, resting, striped, fur, fabric, ...                                                                                             |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Two Tabby Cats on a Pink Sofa \| Description: Two tabby cats lie on a pink fabric sofa, with one resting horizontally and the other positioned verticall... \| Keywords (18): cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, pink fabric, remote controls, furniture, ...                                                                                   |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Two tabby cats sleeping on a pink surface \| Description: Two tabby cats lie on a pink fabric surface next to two remote controls. The cats are positioned... \| Keywords (15): tabby, cat, sleeping, pink, fabric, remote, electronics, domestic, animal, lying, indoor, bright, two, cats, ...                                                                                   |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Two cats rest upon bright pink fabric \| Description: Two cats lie on a vividly coloured pink surface under soft lighting. They are accompanied by a remote... \| Keywords (14): cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, lounged, indoors, tortoiseshell, domestic, ...                                                                                   |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Two Tabby Cats on Pink Couch with Remotes \| Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other... \| Keywords (12): tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, ...[2,997 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Feline Serenity on a Red Couch" \| Description: Two striped cats lounging on a red blanket, one with a remote control nearby. \| Keywords (10): cats, striped, red, blanket, lounging, remote control, comfort, rest, domestic, leisure                                                                                                                                           |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Cats Sleeping on Sofa with Remote Controls \| Description: Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft,... \| Keywords (18): cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy, domestic, resting, comfort, ...                                                                                    |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Two cats sleeping on a pink couch. \| Description: Two tabby cats are lying on a pink couch with remote controls nearby. The lighting is bright, highlighting th... \| Keywords (10): cats, pink couch, tabby, sleeping, remote controls, bright lighting, fur patterns, relaxation, indoor, ...                                                                                   |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected` | Title: Two tabby cats sleep on pink couch \| Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with stripe... \| Keywords (15): tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy[705 characters of reasoning omitted; complete output in the evidence block]       |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Sofa \| Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The... \| Keywords (18): tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, ...[1,400 characters of reasoning omitted; complete output in the evidence block]      |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: Two Cats Relaxing on Pink Cushioned Surface \| Description: Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The... \| Keywords (10): cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, natural lighting, striped fur, ...                                                                                   |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Two resting tabby cats on a pink sofa \| Description: Two adult tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft, na... \| Keywords (12): tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-setting, domestic-pets, ...                                                                                   |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink sofa \| Description: Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and... \| Keywords (18): cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relaxation, soft lighting, ...                                                                                    |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Two Calico Cats Sleeping on Pink Bedding \| Description: Two calico cats are sleeping side by side on pink bedding. They are positioned with their heads facin... \| Keywords (10): calico cats, sleeping, pink bedding, white remotes, black and brown fur, white cats, striped cats, cozy, ...                                                                                   |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected` | Title: Two Cats Sleeping on Pink Blanket with Remote Controls \| Description: Two cats are sleeping on a pink blanket. A white remote control is visible behind them. Th... \| Keywords (10): cats, pink blanket, remote controls, sleeping, white remote, comfortable, soft surface, feline, rest, ...                                                                                   |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `no concerns detected` | Title: Two cats resting on pink blanket sofa \| Description: Two cats lie on a bright pink blanket on a red sofa, one with its head resting down and eyes closed, the... \| Keywords (14): cats, pink blanket, red sofa, remote controls, tabby markings, resting, sleeping, fabric, couch, indoor, ...                                                                                   |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: "Cats Resting on a Pink Couch" \| Description: "Two cats are comfortably sprawled out on a vibrant pink couch, basking in the soft light of the day. Their relaxed postu... \| Keywords (12): cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, basking, cozy, serene, scene.                                                                                   |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Two Cats Sleeping on Pink Sofa \| Description: Two cats are sleeping on a pink sofa with remote controls beside them. \| Keywords (19): cats, sleeping, pink sofa, remote controls, relaxed, comfortable, indoor, domestic, fur, striped, resting, ...                                                                                                                             |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Two tabby cats sleeping on sofa \| Description: Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats. \| Keywords (18): tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoor, animal, pet, living room, ...                                                                                       |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink surface \| Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with its eyes closed, while... \| Keywords (10): cats, remote controls, pink fabric, lying down, curled up, eyes closed, striped pattern, light, indoor setting, ...                                                                                   |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Two Cats Sleeping on Pink Sofa \| Description: Two tabby cats rest peacefully on a bright pink sofa. Remote controls lie beside them. Natural daylight illuminates the scene. \| Keywords (10): cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feline                                                                                                           |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa next to remotes \| Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote co... \| Keywords (18): cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, ...[3,062 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa with remotes. \| Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote co... \| Keywords (19): tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, ...[1,952 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Two tabby cats resting beside remote controls on pink sofa \| Description: Two striped tabby cats lie asleep on a vivid pink sofa, one wearing a green collar tag,... \| Keywords (14): tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, ...[2,135 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | Title: Two Cats on a Couch \| Description: Two cats are sleeping on a pink couch. \| Keywords (4): cats, couch, sleeping, pink                                                                                                                                                                                                                                                            |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Two Cats Resting on a Pink Couch with Remotes \| Description: Two tabby cats are lying on a pink couch, with a remote control placed between them. The cats appear to be... \| Keywords (10): cats, resting, pink couch, remote control, tabby, sleeping, indoor, bright lighting, tail, visible                                                                                   |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Two Cats Resting on a Pink Blanket \| Description: Two tabby cats are lying on a pink blanket, one stretched out and the other curled up. A remote contr... \| Keywords (18): cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch, paws, stripes, sleeping, pet, ...                                                                                   |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Two tabby cats sleeping on pink cushion \| Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby. \| Keywords (17): cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, ...[2,396 characters of reasoning omitted; complete output in the evidence block]      |
+| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa \| Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a... \| Keywords (15): cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting[2,856 characters of reasoning omitted; complete output in the evidence block]     |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected` | Title: Two Cats Sleeping on Pink Blanket \| Description: Two tabby cats are lying asleep on a vibrant pink blanket, accompanied by two white remote controls. One cat is s... \| Keywords (11): cats, sleeping, pink blanket, remote controls, tabby, rest, indoor, fur, relaxation, domestic, &lt;/think&gt;[430 characters of reasoning omitted; complete output in the evidence block] |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Fabric \| Description: Two tabby cats lie stretched out on a bright pink fabric surface with their eyes closed. Two white remote control... \| Keywords (14): tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, ...[1,713 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Two cats sleeping on a red sofa \| Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on... \| Keywords (16): cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, ...[1,607 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `concerns detected`    | Title: Two tabby cats resting on pink fabric with remotes \| Description: Two tabby cats are lying on a pink fabric surface, near white remote controls. They ap... \| Keywords (18): cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, ...[1,186 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, their fur patterns contrasting against the soft fabric.                                                                                                                                                                                                                                 |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Two cats sleeping on a pink couch \| Description: Two striped cats are sleeping on a pink couch, with one cat lying on its side and the other on its back, next to a r... \| Keywords (144): cats, sleeping, pink couch, remote control, striped, British English, British, British-English, ...                                                                                   |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The two cats are sleeping on a pink couch.                                                                                                                                                                                                                                                                                                            |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "A Study in Stripes" \| Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting... \| Keywords: (not detected)                                                                                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
 - `mlx-vlm`: `0.8.0`
-- `mlx`: `0.32.5.dev20261120+bd2d1fb43`
-- `transformers`: `5.23.0`
+- `mlx`: `0.32.5.dev20261121+8803ac3ca`
+- `transformers`: `5.24.0`
 - `tokenizers`: `0.23.3`
 - `huggingface-hub`: `2.4.0`
 - *Python Version:* 3.14.7
@@ -163,53 +160,19 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 - *Recommended Working Set:* 115 GB
 - *Fused Attention:* Available
 
-## Image Metadata
-
-- *Description:* A small mixed-breed dog wearing a harness looks attentively
-  toward the camera while an older person relaxes in the background using a
-  digital device in a living room.
-- *Keywords:* Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors,
-  Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and
-  black, canine, casual, chihuahua mix, close up, comfortable, companion,
-  companion animal, couch, cozy, curious, cute, dog, domestic animal, ears up,
-  family pet, friendship, furry, harness, home, indoor, jeans, lap dog,
-  lifestyle, living room, looking, looking at camera, loyalty, merle, owner,
-  pet, portrait, puppy, senior, small dog, sofa, terrier, terrier mix, warm
-  lighting, watching
-- *Date:* 2026-11-14 17:41:49 UTC+01:00
-- *Time:* 17:41:49
-
 ## Prompt
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Create British-English catalogue metadata from the image and supplied
-> context.
->
-> Treat any capture date/time and GPS as authoritative facts, but do not claim
-> they are visible. Descriptive hints may be incomplete or wrong: retain
-> details supported by the image, correct conflicts, and add important visible
-> details. Prefer image evidence when a hint conflicts, and omit uncertain
-> details.
->
-> Context: Authoritative context:
-> &#45; Capture date/time: 2026-11-14 17:41:49 UTC+01:00
->
-> &#8203;Descriptive hints:
-> &#45; Description hint: A small mixed-breed dog wearing a harness looks
-> attentively toward the camera while an older person relaxes in the
-> background using a digital device in a living room.
-> &#45; Keyword hints: Adobe Stock, Any Vision, Dog harness, Domestic life,
-> Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown
-> and black, canine, casual, chihuahua mix, close up, comfortable, companion,
-> companion animal
+> Create British-English catalogue metadata using only clearly visible facts.
+> Omit uncertain details and unsupported identity, location, event, brand,
+> species, period, or intent.
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
-> &#45; a 1-2-sentence factual description combining relevant context with the
-> main visible subject, setting, action, lighting, and distinctive details;
-> &#45; 10-18 unique, comma-separated keywords covering relevant context and
-> visible details.
+> &#45; a 1-2-sentence factual description of the main subject, setting, action,
+> lighting, and distinctive details;
+> &#45; 10-18 unique, comma-separated keywords.
 >
 > &#8203;Return exactly these three sections and nothing else:
 > &#8203;Title:
@@ -221,12 +184,12 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 Complete generated or crash evidence for every attempted model.
 
-<a id="model-technobaptist-ternary-bonsai-2-27b-mlx-2bit"></a>
+<a id="model-ibm-granite-granite-vision-41-4b"></a>
 
-### TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit
+### ibm-granite/granite-vision-4.1-4b
 
 <details>
-<summary>Complete evidence: TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit</summary>
+<summary>Complete evidence: ibm-granite/granite-vision-4.1-4b</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -234,109 +197,105 @@ Complete generated or crash evidence for every attempted model.
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type
-  prism_hadamard_qwen35)
-- *Model load time:* 1.78s
-- *Generation time:* 83.06s
-- *Total time:* 86.08s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 60.5
-- *Cleanup time:* 0.152
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 768
-- *Total tokens:* 17,344
-- *Prompt throughput (raw):* 274 tok/s
-- *Generation throughput (raw):* 35.6 tok/s
-- *Peak memory (GB):* 17
-- *Active memory (GB):* 8.6
-- *Cache memory (GB):* 3.3
-- *Model-load active memory (GB):* 8.6
-- *Post-cleanup active memory (GB):* 0.00113
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.99s
+- *Generation time:* 1.49s
+- *Total time:* 2.62s
+- *Prompt preparation time:* 0.0356
+- *First-token latency:* 0.55
+- *Cleanup time:* 0.0897
+- *Prompt tokens:* 734
+- *Generation tokens:* 56
+- *Total tokens:* 790
+- *Prompt throughput (raw):* 1,335 tok/s
+- *Generation throughput (raw):* 61.5 tok/s
+- *Peak memory (GB):* 9.7
+- *Active memory (GB):* 8.0
+- *Cache memory (GB):* 0.13
+- *Model-load active memory (GB):* 8
+- *Post-cleanup active memory (GB):* 0.00135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1612
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Rendered prompt characters:* 696
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 498775b03b55d038f716fea2568bf6ae6b8e0b5e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--TechnoBaptist--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/498775b03b55d038f716fea2568bf6ae6b8e0b5e
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
+- *Resolved model revision:* 12e928afb004ac65a44effbf50ca3a70375fa0bd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--ibm-granite--granite-vision-4.1-4b/snapshots/12e928afb004ac65a44effbf50ca3a70375fa0bd
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Cats at Rest on a Pink Sofa"
+Description: Two cats are sleeping on a pink sofa, with remote controls nearby.
+Keywords: cats, sleeping, pink sofa, remote controls, domestic, comfort, tranquility, home, leisure, relaxation.
+</pre>
+
+</details>
+
+---
+
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+
+<details>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.30s
+- *Generation time:* 0.89s
+- *Total time:* 1.29s
+- *Prompt preparation time:* 0.0139
+- *First-token latency:* 0.797
+- *Cleanup time:* 0.066
+- *Prompt tokens:* 350
+- *Generation tokens:* 47
+- *Total tokens:* 397
+- *Prompt throughput (raw):* 439 tok/s
+- *Generation throughput (raw):* 570 tok/s
+- *Peak memory (GB):* 1.3
+- *Active memory (GB):* 0.90
+- *Cache memory (GB):* 0.02
+- *Model-load active memory (GB):* 0.897
+- *Post-cleanup active memory (GB):* 0.000133
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 523
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-The user wants British-English catalogue metadata. I need to look carefully at the image and the context.
-
-Capture date/time: 2026-11-14 17:41:49 UTC+01:01:00 — authoritative, but I should not claim it's visible. I'll incorporate it into the description as context (time of day, date) without saying it's visible.
-
-Let me look at the image. A small dog, looks like a Chihuahua mix or similar small breed, with large erect ears, brown and black/tan and grey coat, wearing a harness (blue patterned harness with grey trim). The dog looks attentively at the camera. In the background, blurred, an older person (man) is sitting, using a digital device (tablet/phone) — there's a screen visible with a blue light. The setting is indoors, a living room, with a beige/cream wall. There's a yellow object on the left (maybe a toy or part of furniture). The dog is in focus, shallow depth of field.
-
-Now the description hint says "older person relaxes in the background using a digital device in a living room." That matches.
-
-Keywords: need 10-18 unique comma-separated. From hints: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal. I should pick relevant ones and add visible details. I'll write them in British English style but keywords are usually just terms.
-
-Let me draft title: 5-10 words. "Small dog in harness gazes at camera indoors" — count: Small(1) dog(2) in(3) harness(4) gazes(5) at(6) camera(7) indoors(8). Good, 8 words. Or "Alert small dog in harness looks at camera" 8 words.
-
-Description: 1-2 sentences factual, combining context (date/time) with main subject, setting, action, lighting, distinctive details. E.g., "Captured on 14 November 2026 at 17:41, a small brown-and-black dog with large erect ears and a patterned harness looks attentively at the camera in a softly lit living room. An older man sits blurred in the background using a tablet." That's two sentences. Good.
-
-Keywords: I'll list 10-18. Let's pick: small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close up, indoors, living room, senior man, relaxing, tablet, domestic life, companion animal, casual, comfortable, companion, canine. That's 18. Good.
-
-Make sure British English: "living room" fine. Use "14 November 2026".
-
-Now produce exactly three sections.
-&lt;/think&gt;
-
 Title:
-Small dog in harness gazes at camera indoors
+Cats on a Pink Couch
 
 Description:
-Captured on 14 November 2026 at 17:41, a small brown-and-black dog with large erect ears and a patterned harness looks attentively at the camera in a softly lit living room. An older man sits blurred in the background using a tablet.
+Two tabby cats are lying on a bright pink couch, appearing relaxed and comfortable.
 
 Keywords:
-small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close up, indoors, living room, senior man, relaxing, tablet, domestic life, companion animal, casual, comfortable, companion, canine
+cats, pink couch, relaxation, tabby, comfortable, cozy
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The user wants British-English catalogue metadata. I need to look carefully at the image and the context.
-
-Capture date/time: 2026-11-14 17:41:49 UTC+01:01:00 — authoritative, but I should not claim it's visible. I'll incorporate it into the description as context (time of day, date) without saying it's visible.
-
-Let me look at the image. A small dog, looks like a Chihuahua mix or similar small breed, with large erect ears, brown and black/tan and grey coat, wearing a harness (blue patterned harness with grey trim). The dog looks attentively at the camera. In the background, blurred, an older person (man) is sitting, using a digital device (tablet/phone) — there's a screen visible with a blue light. The setting is indoors, a living room, with a beige/cream wall. There's a yellow object on the left (maybe a toy or part of furniture). The dog is in focus, shallow depth of field.
-
-Now the description hint says "older person relaxes in the background using a digital device in a living room." That matches.
-
-Keywords: need 10-18 unique comma-separated. From hints: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal. I should pick relevant ones and add visible details. I'll write them in British English style but keywords are usually just terms.
-
-Let me draft title: 5-10 words. "Small dog in harness gazes at camera indoors" — count: Small(1) dog(2) in(3) harness(4) gazes(5) at(6) camera(7) indoors(8). Good, 8 words. Or "Alert small dog in harness looks at camera" 8 words.
-
-Description: 1-2 sentences factual, combining context (date/time) with main subject, setting, action, lighting, distinctive details. E.g., "Captured on 14 November 2026 at 17:41, a small brown-and-black dog with large erect ears and a patterned harness looks attentively at the camera in a softly lit living room. An older man sits blurred in the background using a tablet." That's two sentences. Good.
-
-Keywords: I'll list 10-18. Let's pick: small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close up, indoors, living room, senior man, relaxing, tablet, domestic life, companion animal, casual, comfortable, companion, canine. That's 18. Good.
-
-Make sure British English: "living room" fine. Use "14 November 2026".
-
-Now produce exactly three sections.
-</think>
-
-Title:
-Small dog in harness gazes at camera indoors
-
-Description:
-Captured on 14 November 2026 at 17:41, a small brown-and-black dog with large erect ears and a patterned harness looks attentively at the camera in a softly lit living room. An older man sits blurred in the background using a tablet.
-
-Keywords:
-small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close up, indoors, living room, senior man, relaxing, tablet, domestic life, companion animal, casual, comfortable, companion, canine
-```
-
-</details>
 
 </details>
 
@@ -356,26 +315,26 @@ small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close u
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.72s
-- *Generation time:* 78.24s
-- *Total time:* 82.30s
-- *Prompt preparation time:* 1.18
-- *First-token latency:* 45.6
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 928
-- *Total tokens:* 17,504
-- *Prompt throughput (raw):* 364 tok/s
-- *Generation throughput (raw):* 29.3 tok/s
-- *Peak memory (GB):* 21
+- *Model load time:* 3.11s
+- *Generation time:* 28.08s
+- *Total time:* 31.34s
+- *Prompt preparation time:* 0.00955
+- *First-token latency:* 0.894
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 461
+- *Generation tokens:* 865
+- *Total tokens:* 1,326
+- *Prompt throughput (raw):* 516 tok/s
+- *Generation throughput (raw):* 31.8 tok/s
+- *Peak memory (GB):* 17
 - *Active memory (GB):* 16
-- *Cache memory (GB):* 1.9
+- *Cache memory (GB):* 0.30
 - *Model-load active memory (GB):* 16.1
 - *Post-cleanup active memory (GB):* 0.00185
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1612
+- *Rendered prompt characters:* 789
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
@@ -387,1669 +346,80 @@ small dog, chihuahua mix, dog harness, big ears, brown and black, alert, close u
   "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
-*Readable output:*
-
-<pre class="model-output-readable">
-The user wants British-English catalogue metadata. I need to look carefully at the image.
-
-Image evidence: A small dog with large erect ears, brown and black/tan coat, wearing a harness (blue/grey with light piping). The dog looks attentively at the camera. In the background, an older man with grey hair is sitting, wearing a grey t-shirt and blue jeans, holding a tablet device (screen glowing). There's a yellow object in his other hand. The setting is indoors, warm lighting, shallow depth of field.
-
-The hint says "chihuahua mix" — the dog has big ears and a small head, plausible. I'll keep "small mixed-breed dog" or "chihuahua mix" cautiously. The hint mentions "chihuahua mix" as a keyword. The dog's features (large ears, small size) are consistent. I'll include it but maybe phrase as "small dog" to be safe, but the keyword hint includes chihuahua mix; I can include it as a keyword since it's plausible. Actually instructions: retain details supported by image, correct conflicts. The big ears and small size support a chihuahua mix. I'll include "chihuahua mix" in keywords.
-
-Capture date/time authoritative: 2026-11-14 17:41:49 UTC+01:00. I should not claim it's visible, but I can mention it in description? The instruction says "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So I can include the date in the description as a fact. Hmm, but typically catalogue descriptions don't include capture date. The instruction says combine relevant context with main visible subject. I think I can mention the date. But it's a bit odd for a stock photo description. The instruction says "do not claim they are visible" — meaning I can state it as a fact without saying "the photo was taken at...". Actually I think it's fine to include. Let me include a brief mention. Actually, re-reading: "a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details". The relevant context is the capture date/time. I'll weave it in subtly, e.g., "Captured in November 2026..." Hmm but that might be claiming visibility? No, stating the capture date is a fact, not claiming it's visible in the image. I'll include it.
-
-Let me draft.
-
-Title (5-10 words): "Small Dog in Harness Watches Over Relaxed Senior Man" — count: Small(1) Dog(2) in(3) Harness(4) Watches(5) Over(6) Relaxed(7) Senior(8) Man(9). 9 words. Good.
-
-Description: 1-2 sentences. "A small brown-and-black dog with large erect ears, wearing a blue harness, gazes attentively at the camera while a senior man in a grey T-shirt and jeans relaxes behind him using a tablet. The warmly lit indoor scene was captured on 14 November 2026." That's 2 sentences. Good.
-
-Keywords: 10-18 unique, comma-separated. From hints and image: dog harness, domestic life, indoors, man, relaxing, senior man, sitting, tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal. I'll select and adapt to British English. Let me list: alert, big ears, brown and black, canine, casual, chihuahua mix, close up, companion animal, dog harness, domestic life, indoors, jeans, relaxing, senior man, sitting, tablet, warm lighting
-&lt;/think&gt;
-Title: Small Dog in Harness Watches Over Relaxed Senior Man
-Description: A small brown-and-black dog with large erect ears, wearing a blue harness, gazes attentively at the camera while a senior man in a grey T-shirt and jeans relaxes behind him using a tablet. The warmly lit indoor scene was captured on 14 November 2026.
-Keywords: alert, big ears, brown and black, canine, casual, chihuahua mix, close up, companion animal, dog harness, domestic life, indoors, jeans, relaxing, senior man, sitting, tablet, warm lighting
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
+#### Final answer
 
 ```text
-The user wants British-English catalogue metadata. I need to look carefully at the image.
-
-Image evidence: A small dog with large erect ears, brown and black/tan coat, wearing a harness (blue/grey with light piping). The dog looks attentively at the camera. In the background, an older man with grey hair is sitting, wearing a grey t-shirt and blue jeans, holding a tablet device (screen glowing). There's a yellow object in his other hand. The setting is indoors, warm lighting, shallow depth of field.
-
-The hint says "chihuahua mix" — the dog has big ears and a small head, plausible. I'll keep "small mixed-breed dog" or "chihuahua mix" cautiously. The hint mentions "chihuahua mix" as a keyword. The dog's features (large ears, small size) are consistent. I'll include it but maybe phrase as "small dog" to be safe, but the keyword hint includes chihuahua mix; I can include it as a keyword since it's plausible. Actually instructions: retain details supported by image, correct conflicts. The big ears and small size support a chihuahua mix. I'll include "chihuahua mix" in keywords.
-
-Capture date/time authoritative: 2026-11-14 17:41:49 UTC+01:00. I should not claim it's visible, but I can mention it in description? The instruction says "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So I can include the date in the description as a fact. Hmm, but typically catalogue descriptions don't include capture date. The instruction says combine relevant context with main visible subject. I think I can mention the date. But it's a bit odd for a stock photo description. The instruction says "do not claim they are visible" — meaning I can state it as a fact without saying "the photo was taken at...". Actually I think it's fine to include. Let me include a brief mention. Actually, re-reading: "a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details". The relevant context is the capture date/time. I'll weave it in subtly, e.g., "Captured in November 2026..." Hmm but that might be claiming visibility? No, stating the capture date is a fact, not claiming it's visible in the image. I'll include it.
-
-Let me draft.
-
-Title (5-10 words): "Small Dog in Harness Watches Over Relaxed Senior Man" — count: Small(1) Dog(2) in(3) Harness(4) Watches(5) Over(6) Relaxed(7) Senior(8) Man(9). 9 words. Good.
-
-Description: 1-2 sentences. "A small brown-and-black dog with large erect ears, wearing a blue harness, gazes attentively at the camera while a senior man in a grey T-shirt and jeans relaxes behind him using a tablet. The warmly lit indoor scene was captured on 14 November 2026." That's 2 sentences. Good.
-
-Keywords: 10-18 unique, comma-separated. From hints and image: dog harness, domestic life, indoors, man, relaxing, senior man, sitting, tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal. I'll select and adapt to British English. Let me list: alert, big ears, brown and black, canine, casual, chihuahua mix, close up, companion animal, dog harness, domestic life, indoors, jeans, relaxing, senior man, sitting, tablet, warm lighting
-</think>
-Title: Small Dog in Harness Watches Over Relaxed Senior Man
-Description: A small brown-and-black dog with large erect ears, wearing a blue harness, gazes attentively at the camera while a senior man in a grey T-shirt and jeans relaxes behind him using a tablet. The warmly lit indoor scene was captured on 14 November 2026.
-Keywords: alert, big ears, brown and black, canine, casual, chihuahua mix, close up, companion animal, dog harness, domestic life, indoors, jeans, relaxing, senior man, sitting, tablet, warm lighting
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.70s
-- *Generation time:* 9.16s
-- *Total time:* 11.73s
-- *Prompt preparation time:* 0.727
-- *First-token latency:* 1.49
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 1,606
-- *Generation tokens:* 846
-- *Total tokens:* 2,452
-- *Prompt throughput (raw):* 1,079 tok/s
-- *Generation throughput (raw):* 121 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.17
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.00207
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1485
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get this done. I need to create some metadata for this image, and it's my job to be thorough.
-
-First, I need to figure out a good title. Hmm... I'm thinking something short and sweet. "A small dog with big ears..." No, too long. "Dog and Senior Man..." Maybe. "Attentive Dog with Senior Man"... That's okay, but it could be better. "Companion Dog Looking at Camera"... That's a good start. Okay, let's go with: "Attentive Companion Dog with Senior Man." Perfect!
-
-Next, the description. I need to be factual and descriptive. Let's see... The image is a close-up of a small, mixed-breed dog, probably a Chihuahua mix. It's wearing a harness and looking intently at the camera. The dog's big, expressive eyes are the key feature. In the background, there's a senior man relaxing on a sofa with a tablet. The lighting is warm and soft. Okay, let's put that together: "A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness, attentively watching the camera. In the background, a senior man relaxes on a sofa with a tablet, creating a warm, domestic scene." Yep, that's good. It covers the main elements, the setting, and the lighting.
-
-Finally, the keywords. I need to be comprehensive, but not redundant. I've got to include things like "dog," "small dog," "chihuahua mix," "companion," "pet," "animal," "senior man," "older man," "elderly," "sitting," "tablet," "digital device," "indoor," "domestic life," "close up," "big ears," "brown and black," "canine," "focus," "companion animal," and "life." Okay, let me refine this a bit. I need to make sure I'm hitting all the key points without repeating myself. I'll try to use a mix of specific and general terms. Okay, here's what I've got: "dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, digital device, indoor, domestic life, close up, big ears, brown and black, canine, focus, companion animal, life." Perfect!
-
-Okay, now I just need to put it all together in the correct format.
-
-**Title:** Attentive Companion Dog with Senior Man
-
-**Description:** A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness, attentively watching the camera. In the background, a senior man relaxes on a sofa with a tablet, creating a warm, domestic scene.
-
-**Keywords:** dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, digital device, indoor, domestic life, close up, big ears, brown and black, canine, focus, companion animal, life.
-
-That should be it. I'm satisfied with the results.
-&lt;/think&gt;
-
-Title: Attentive Companion Dog with Senior Man
-
-Description: A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness, attentively watching the camera. In the background, a senior man relaxes on a sofa with a tablet, creating a warm, domestic scene.
-
-Keywords: dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, digital device, indoor, domestic life, close up, big ears, brown and black, canine, focus, companion animal, life
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get this done. I need to create some metadata for this image, and it's my job to be thorough.
-
-First, I need to figure out a good title. Hmm... I'm thinking something short and sweet. "A small dog with big ears..." No, too long. "Dog and Senior Man..." Maybe. "Attentive Dog with Senior Man"... That's okay, but it could be better. "Companion Dog Looking at Camera"... That's a good start. Okay, let's go with: "Attentive Companion Dog with Senior Man." Perfect!
-
-Next, the description. I need to be factual and descriptive. Let's see... The image is a close-up of a small, mixed-breed dog, probably a Chihuahua mix. It's wearing a harness and looking intently at the camera. The dog's big, expressive eyes are the key feature. In the background, there's a senior man relaxing on a sofa with a tablet. The lighting is warm and soft. Okay, let's put that together: "A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness, attentively watching the camera. In the background, a senior man relaxes on a sofa with a tablet, creating a warm, domestic scene." Yep, that's good. It covers the main elements, the setting, and the lighting.
-
-Finally, the keywords. I need to be comprehensive, but not redundant. I've got to include things like "dog," "small dog," "chihuahua mix," "companion," "pet," "animal," "senior man," "older man," "elderly," "sitting," "tablet," "digital device," "indoor," "domestic life," "close up," "big ears," "brown and black," "canine," "focus," "companion animal," and "life." Okay, let me refine this a bit. I need to make sure I'm hitting all the key points without repeating myself. I'll try to use a mix of specific and general terms. Okay, here's what I've got: "dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, digital device, indoor, domestic life, close up, big ears, brown and black, canine, focus, companion animal, life." Perfect!
-
-Okay, now I just need to put it all together in the correct format.
-
-**Title:** Attentive Companion Dog with Senior Man
-
-**Description:** A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness, attentively watching the camera. In the background, a senior man relaxes on a sofa with a tablet, creating a warm, domestic scene.
-
-**Keywords:** dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, digital device, indoor, domestic life, close up, big ears, brown and black, canine, focus, companion animal, life.
-
-That should be it. I'm satisfied with the results.
-</think>
-
-Title: Attentive Companion Dog with Senior Man
-
-Description: A close-up, intimate portrait of a small, mixed-breed dog with big, expressive eyes, wearing a harness, attentively watching the camera. In the background, a senior man relaxes on a sofa with a tablet, creating a warm, domestic scene.
-
-Keywords: dog, small dog, chihuahua mix, companion, pet, animal, senior man, older man, elderly, sitting, tablet, digital device, indoor, domestic life, close up, big ears, brown and black, canine, focus, companion animal, life
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-flash-4bit"></a>
-
-### mlx-community/GLM-4.6V-Flash-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.08s
-- *Generation time:* 16.50s
-- *Total time:* 18.30s
-- *Prompt preparation time:* 0.604
-- *First-token latency:* 5.92
-- *Cleanup time:* 0.0974
-- *Prompt tokens:* 6,427
-- *Generation tokens:* 761
-- *Total tokens:* 7,188
-- *Prompt throughput (raw):* 1,085 tok/s
-- *Generation throughput (raw):* 75.8 tok/s
-- *Peak memory (GB):* 8.7
-- *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.50
-- *Model-load active memory (GB):* 7.08
-- *Post-cleanup active memory (GB):* 0.00269
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1352
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image: small mixed-breed dog, harness, living room. Maybe "Alert Mixed-Breed Dog in Living Room" but need to keep it concise. Let's think: "Alert Small Mixed-Breed Dog in Living Room" – that's 10 words, maybe too long. The hint says 5-10, so maybe "Alert Mixed-Breed Dog in Living Room" – that's 7 words, good.
-
-Next, the description. Need to combine context (capture date/time, but we don't need to mention time, just date maybe? Wait, the context says capture date/time is 2026-11-14 17:41:49 UTC+01:00. But the description shouldn't mention the time unless it's relevant, but the main thing is the dog, the setting, the action.
-
-The descriptive hint says: "A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room."
-
-So we need to combine that with the context (date, but maybe not necessary unless the date is important, but the main description should focus on the scene). Wait, the description needs to be 1-2 sentences. Let's draft:
-
-"An alert small mixed-breed dog in a harness looks toward the camera, with an older person relaxing in the background of a living room."
-
-That covers the main subject (alert small mixed-breed dog in harness), action (looks toward camera), background (older person relaxing, living room). Good.
-
-Now keywords. Need 10-18 unique, comma-separated keywords. Let's list from hints and image:
-
-- Mixed-breed dog
-- Harness
-- Living room
-- Alert
-- Big ears
-- Brown and black
-- Canine
-- Casual
-- Chihuahua mix (maybe, but the dog looks like a kelpie mix, but the hint says chihuahua mix, but image shows a small mixed breed, maybe not chihuahua mix. So better to avoid that if uncertain. The image shows a small dog with brown and black fur, big ears, wearing a harness. So keywords should include:
-
-- Dog
-- Small dog
-- Mixed breed
-- Harness
-- Living room
-- Alert
-- Big ears
-- Brown and black
-- Canine
-- Casual
-- Indoors
-- Senior man (background person is older, maybe senior man)
-- Tablet (background person is using a digital device, likely tablet)
-
-Let's pick the most relevant and unique ones, 10-18. Let's list:
-
-- Mixed-breed dog
-- Harness
-- Living room
-- Alert
-- Big ears
-- Brown and black
-- Canine
-- Casual
-- Indoors
-- Senior man
-- Tablet
-
-That's 14 keywords, which is within 10-18. Let's check if they are unique and cover relevant context. Yes, they include the dog's breed (mixed-breed), the harness, the setting (living room, indoors), the dog's state (alert), physical features (big ears, brown and black), and background elements (senior man, tablet). Perfect.&lt;/think&gt;
-Title: Alert Mixed-Breed Dog in Living Room
-Description: An alert small mixed-breed dog in a harness looks toward the camera, with an older person relaxing in the background of a living room.
-Keywords: mixed-breed dog, harness, living room, alert, big ears, brown and black, canine, casual, indoors, senior man, tablet
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image: small mixed-breed dog, harness, living room. Maybe "Alert Mixed-Breed Dog in Living Room" but need to keep it concise. Let's think: "Alert Small Mixed-Breed Dog in Living Room" – that's 10 words, maybe too long. The hint says 5-10, so maybe "Alert Mixed-Breed Dog in Living Room" – that's 7 words, good.
-
-Next, the description. Need to combine context (capture date/time, but we don't need to mention time, just date maybe? Wait, the context says capture date/time is 2026-11-14 17:41:49 UTC+01:00. But the description shouldn't mention the time unless it's relevant, but the main thing is the dog, the setting, the action.
-
-The descriptive hint says: "A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room."
-
-So we need to combine that with the context (date, but maybe not necessary unless the date is important, but the main description should focus on the scene). Wait, the description needs to be 1-2 sentences. Let's draft:
-
-"An alert small mixed-breed dog in a harness looks toward the camera, with an older person relaxing in the background of a living room."
-
-That covers the main subject (alert small mixed-breed dog in harness), action (looks toward camera), background (older person relaxing, living room). Good.
-
-Now keywords. Need 10-18 unique, comma-separated keywords. Let's list from hints and image:
-
-- Mixed-breed dog
-- Harness
-- Living room
-- Alert
-- Big ears
-- Brown and black
-- Canine
-- Casual
-- Chihuahua mix (maybe, but the dog looks like a kelpie mix, but the hint says chihuahua mix, but image shows a small mixed breed, maybe not chihuahua mix. So better to avoid that if uncertain. The image shows a small dog with brown and black fur, big ears, wearing a harness. So keywords should include:
-
-- Dog
-- Small dog
-- Mixed breed
-- Harness
-- Living room
-- Alert
-- Big ears
-- Brown and black
-- Canine
-- Casual
-- Indoors
-- Senior man (background person is older, maybe senior man)
-- Tablet (background person is using a digital device, likely tablet)
-
-Let's pick the most relevant and unique ones, 10-18. Let's list:
-
-- Mixed-breed dog
-- Harness
-- Living room
-- Alert
-- Big ears
-- Brown and black
-- Canine
-- Casual
-- Indoors
-- Senior man
-- Tablet
-
-That's 14 keywords, which is within 10-18. Let's check if they are unique and cover relevant context. Yes, they include the dog's breed (mixed-breed), the harness, the setting (living room, indoors), the dog's state (alert), physical features (big ears, brown and black), and background elements (senior man, tablet). Perfect.</think>
-Title: Alert Mixed-Breed Dog in Living Room  
-Description: An alert small mixed-breed dog in a harness looks toward the camera, with an older person relaxing in the background of a living room.  
-Keywords: mixed-breed dog, harness, living room, alert, big ears, brown and black, canine, casual, indoors, senior man, tablet
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-internvl3-14b-4bit"></a>
-
-### mlx-community/InternVL3-14B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/InternVL3-14B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.21s
-- *Generation time:* 4.40s
-- *Total time:* 6.41s
-- *Prompt preparation time:* 0.675
-- *First-token latency:* 1.73
-- *Cleanup time:* 0.113
-- *Prompt tokens:* 2,087
-- *Generation tokens:* 112
-- *Total tokens:* 2,199
-- *Prompt throughput (raw):* 1,209 tok/s
-- *Generation throughput (raw):* 55.6 tok/s
-- *Peak memory (GB):* 10
-- *Active memory (GB):* 8.9
-- *Cache memory (GB):* 0.51
-- *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.003
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1300
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 26328eaab82cdc642fa3b73d8fa0b73db398710d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-14B-4bit/snapshots/26328eaab82cdc642fa3b73d8fa0b73db398710d
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Alert Chihuahua Mix in Cozy Living Room
-
-Description:
-A small, alert chihuahua mix dog in a harness gazes at the camera in a warmly lit living room, with an older person relaxing in the background using a digital tablet.
-
-Keywords:
-Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
-
-### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.85s
-- *Generation time:* 1.67s
-- *Total time:* 3.33s
-- *Prompt preparation time:* 0.711
-- *First-token latency:* 0.6
-- *Cleanup time:* 0.0889
-- *Prompt tokens:* 2,087
-- *Generation tokens:* 79
-- *Total tokens:* 2,166
-- *Prompt throughput (raw):* 3,478 tok/s
-- *Generation throughput (raw):* 207 tok/s
-- *Peak memory (GB):* 4.0
-- *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 2.82
-- *Post-cleanup active memory (GB):* 0.00357
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1346
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* b6311011d95c8894a57289bba8b916e6fbae9a61
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/b6311011d95c8894a57289bba8b916e6fbae9a61
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Alert mixed-breed dog in harness indoors
-Description: A small brown and black dog wearing a harness looks attentively toward the camera while a senior man relaxes in the background using a digital device in a living room.
-Keywords: dog, harness, mixed-breed, alert, indoors, senior man, tablet, living room, close-up, companion, canine, brown, black
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-47-1b-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.7-1B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.7-1B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
-- *Model load time:* 0.98s
-- *Generation time:* 3.67s
-- *Total time:* 5.49s
-- *Prompt preparation time:* 0.725
-- *First-token latency:* 1.69
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 905
-- *Generation tokens:* 392
-- *Total tokens:* 1,297
-- *Prompt throughput (raw):* 535 tok/s
-- *Generation throughput (raw):* 307 tok/s
-- *Peak memory (GB):* 3.6
-- *Active memory (GB):* 2.7
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 2.67
-- *Post-cleanup active memory (GB):* 0.00408
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1346
-- *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 13caa569f70e4b68b0ad7dd9574f15a241b34a7d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.7-1B-4bit/snapshots/13caa569f70e4b68b0ad7dd9574f15a241b34a7d
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Okay, let me tackle this. First, the title needs to be 5-10 words. The image has a small mixed-breed dog with a harness, looking at the camera. So, maybe "Alert Chihuahua Mix with Harness." That’s 7 words, so it fits.
-
-Next, the description. The context is 2026-11-14 17:41:49 UTC+01:00. The setting is indoors, living room. The dog is wearing a harness, attentive, near an older person relaxing with a tablet. Lighting is warm, cozy. Distinctive details: big ears, brown/black coat, canine, close-up.
-
-Now keywords. Need 10-18 unique, comma-separated. Let’s list: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable. Wait, check count. Let’s make sure it’s 10-18. Let’s list: Adobe, Any, Vision, Dog, harness, Domestic, life, Indoors, Man, Relaxing, Senior, Sitting, Tablet, alert, big, ears, brown, black, canine, companion, comfortable. That’s 18 keywords. Looks good.
-&lt;/think&gt;
-
-Title: Alert Chihuahua Mix with Harness
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera in a warm indoor living room, with an older person relaxing using a tablet, featuring big ears, brown/black coat, and canine details.
-Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Okay, let me tackle this. First, the title needs to be 5-10 words. The image has a small mixed-breed dog with a harness, looking at the camera. So, maybe "Alert Chihuahua Mix with Harness." That’s 7 words, so it fits.
-
-Next, the description. The context is 2026-11-14 17:41:49 UTC+01:00. The setting is indoors, living room. The dog is wearing a harness, attentive, near an older person relaxing with a tablet. Lighting is warm, cozy. Distinctive details: big ears, brown/black coat, canine, close-up.
-
-Now keywords. Need 10-18 unique, comma-separated. Let’s list: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable. Wait, check count. Let’s make sure it’s 10-18. Let’s list: Adobe, Any, Vision, Dog, harness, Domestic, life, Indoors, Man, Relaxing, Senior, Sitting, Tablet, alert, big, ears, brown, black, canine, companion, comfortable. That’s 18 keywords. Looks good.
-</think>
-
-Title: Alert Chihuahua Mix with Harness  
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera in a warm indoor living room, with an older person relaxing using a tablet, featuring big ears, brown/black coat, and canine details.  
-Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-47-35b-a3b-4bit"></a>
-
-### mlx-community/MiniCPM-V-4.7-35B-A3B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.7-35B-A3B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
-- *Model load time:* 3.28s
-- *Generation time:* 11.23s
-- *Total time:* 15.42s
-- *Prompt preparation time:* 0.737
-- *First-token latency:* 0.907
-- *Cleanup time:* 0.151
-- *Prompt tokens:* 905
-- *Generation tokens:* 806
-- *Total tokens:* 1,711
-- *Prompt throughput (raw):* 998 tok/s
-- *Generation throughput (raw):* 83.7 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 24
-- *Cache memory (GB):* 0.13
-- *Model-load active memory (GB):* 23.5
-- *Post-cleanup active memory (GB):* 0.00459
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1346
-- *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0e3b706c1599ad95294122c67c77ce662de18794
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.7-35B-A3B-4bit/snapshots/0e3b706c1599ad95294122c67c77ce662de18794
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-I need to create British-English catalogue metadata based on the image and the provided context. First, I'll analyze the image details and the context given.
-
-The image shows a small dog with large ears, black and tan coloring, wearing a harness. In the background, there's a person (likely a man) sitting and using a tablet. The setting appears to be a living room, indoors, with soft lighting. The capture date is 2026-11-14 17:41:49 UTC+01:00.
-
-Now, I'll structure the required sections:
-
-Title: Needs to be 5-10 words, concrete. Something like "Small Dog with Big Ears in Harness Indoors" or "Attentive Chihuahua Mix Dog with Harness".
-
-Description: 1-2 sentences, factual, combining context with visible subject, setting, action, lighting, distinctive details. Mention the dog, the person in the background, the indoor setting, and the lighting.
-
-Keywords: 10-18 unique, comma-separated. Include visible details like dog, harness, ears, indoors, person, tablet, etc., and context like domestic life, relaxing.
-
-Let me draft each section carefully.
-
-Title: "Small Black and Tan Dog with Large Ears in Harness"
-
-Description: "A small mixed-breed dog with large upright ears and a black-and-tan coat, wearing a patterned harness, looks attentively at the camera while an older person relaxes in the background using a tablet in a softly lit living room."
-
-Keywords: dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, person, tablet, relaxing, senior man, domestic life, close up, companion animal, attentive, casual, comfortable, canine
-
-I need to ensure the keywords are unique and cover the context. Let me check the count and relevance.
-
-Also, make sure the description uses British English where appropriate, but the keywords can be standard. The context mentions "British-English catalogue metadata", so the title and description should reflect that, though the keywords are usually standard terms.
-
-Wait, the capture date is given, but I shouldn't claim it's visible. So I don't need to include the date in the description unless it's part of the context, but the instruction says to treat it as authoritative fact but not claim it's visible. So I can mention the time of day if it's implied by lighting, but the lighting seems soft, maybe indoor lighting.
-
-Let me refine the description to include the lighting and setting clearly.
-
-Final check:
-
-Title: 5-10 words. "Small Dog with Large Ears Wearing a Harness Indoors" (7 words)
-
-Description: "A small black and tan mixed-breed dog with prominent upright ears, wearing a patterned harness, gazes attentively towards the viewer while an older man relaxes in the background using a digital tablet in a warmly lit indoor living space."
-
-Keywords: dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, man, tablet, relaxing, senior, domestic life, close-up, companion, attentive, casual, comfortable, canine
-
-That looks good. Now, I'll format it exactly as required.
-&lt;/think&gt;
-
-Title: Small Black and Tan Dog with Large Ears in Harness
-
-Description: A small mixed-breed dog with prominent upright ears and a black-and-tan coat, wearing a patterned harness, looks attentively at the camera while an older person relaxes in the background using a tablet in a softly lit living room.
-
-Keywords: dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, person, tablet, relaxing, senior man, domestic life, close up, companion animal, attentive, casual, comfortable, canine
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-I need to create British-English catalogue metadata based on the image and the provided context. First, I'll analyze the image details and the context given.
-
-The image shows a small dog with large ears, black and tan coloring, wearing a harness. In the background, there's a person (likely a man) sitting and using a tablet. The setting appears to be a living room, indoors, with soft lighting. The capture date is 2026-11-14 17:41:49 UTC+01:00.
-
-Now, I'll structure the required sections:
-
-Title: Needs to be 5-10 words, concrete. Something like "Small Dog with Big Ears in Harness Indoors" or "Attentive Chihuahua Mix Dog with Harness".
-
-Description: 1-2 sentences, factual, combining context with visible subject, setting, action, lighting, distinctive details. Mention the dog, the person in the background, the indoor setting, and the lighting.
-
-Keywords: 10-18 unique, comma-separated. Include visible details like dog, harness, ears, indoors, person, tablet, etc., and context like domestic life, relaxing.
-
-Let me draft each section carefully.
-
-Title: "Small Black and Tan Dog with Large Ears in Harness"
-
-Description: "A small mixed-breed dog with large upright ears and a black-and-tan coat, wearing a patterned harness, looks attentively at the camera while an older person relaxes in the background using a tablet in a softly lit living room."
-
-Keywords: dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, person, tablet, relaxing, senior man, domestic life, close up, companion animal, attentive, casual, comfortable, canine
-
-I need to ensure the keywords are unique and cover the context. Let me check the count and relevance.
-
-Also, make sure the description uses British English where appropriate, but the keywords can be standard. The context mentions "British-English catalogue metadata", so the title and description should reflect that, though the keywords are usually standard terms.
-
-Wait, the capture date is given, but I shouldn't claim it's visible. So I don't need to include the date in the description unless it's part of the context, but the instruction says to treat it as authoritative fact but not claim it's visible. So I can mention the time of day if it's implied by lighting, but the lighting seems soft, maybe indoor lighting.
-
-Let me refine the description to include the lighting and setting clearly.
-
-Final check:
-
-Title: 5-10 words. "Small Dog with Large Ears Wearing a Harness Indoors" (7 words)
-
-Description: "A small black and tan mixed-breed dog with prominent upright ears, wearing a patterned harness, gazes attentively towards the viewer while an older man relaxes in the background using a digital tablet in a warmly lit indoor living space."
-
-Keywords: dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, man, tablet, relaxing, senior, domestic life, close-up, companion, attentive, casual, comfortable, canine
-
-That looks good. Now, I'll format it exactly as required.
-</think>
-
-Title: Small Black and Tan Dog with Large Ears in Harness
-
-Description: A small mixed-breed dog with prominent upright ears and a black-and-tan coat, wearing a patterned harness, looks attentively at the camera while an older person relaxes in the background using a tablet in a softly lit living room.
-
-Keywords: dog, harness, big ears, black and tan, chihuahua mix, indoors, living room, person, tablet, relaxing, senior man, domestic life, close up, companion animal, attentive, casual, comfortable, canine
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
-
-### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
-
-<details>
-<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.31s
-- *Generation time:* 4.93s
-- *Total time:* 6.96s
-- *Prompt preparation time:* 0.598
-- *First-token latency:* 2.23
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 2,902
-- *Generation tokens:* 137
-- *Total tokens:* 3,039
-- *Prompt throughput (raw):* 1,302 tok/s
-- *Generation throughput (raw):* 64.5 tok/s
-- *Peak memory (GB):* 13
-- *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.56
-- *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00516
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3733
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 7c992876448fc5426841a85c6eb951b056fe38d2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-mxfp4/snapshots/7c992876448fc5426841a85c6eb951b056fe38d2
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
 Title:
-**"Alert Mixed-Breed Dog in Harness with Senior Man Indoors"**
+Two tabby cats lying on pink fabric beside remotes
 
 Description:
-A small mixed-breed dog with brown and black fur, wearing a harness, sits attentively in a well-lit living room, while an older person relaxes in the background using a tablet. The warm indoor lighting enhances the dog’s expressive eyes and perky ears, capturing a moment of quiet companionship.
+Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the scene is lit by even indoor light.
 
 Keywords:
-dog, mixed-breed, brown and black, harness, indoor photography, living room, senior man, tablet, companion animal, warm lighting, alert expression, close-up portrait, domestic life, casual setting, big ears, chihuahua mix
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
-
-### mlx-community/Ministral-3-3B-Instruct-2512-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Ministral-3-3B-Instruct-2512-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.87s
-- *Generation time:* 2.25s
-- *Total time:* 3.82s
-- *Prompt preparation time:* 0.597
-- *First-token latency:* 1.01
-- *Cleanup time:* 0.0916
-- *Prompt tokens:* 2,901
-- *Generation tokens:* 126
-- *Total tokens:* 3,027
-- *Prompt throughput (raw):* 2,866 tok/s
-- *Generation throughput (raw):* 189 tok/s
-- *Peak memory (GB):* 7.7
-- *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.38
-- *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00543
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3732
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* a962dcb09eee4169c890e544c9eb938f1113fdee
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-3B-Instruct-2512-4bit/snapshots/a962dcb09eee4169c890e544c9eb938f1113fdee
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-A Warm Indoor Moment with a Harnessed Canine Mix
-
-Description:
-A small mixed-breed dog with expressive brown-and-black fur and prominent ears gazes attentively at the camera while comfortably perched on a person’s lap indoors. The soft ambient lighting suggests a cozy domestic setting, with an older individual casually using a tablet in the background.
-
-Keywords:
-harnessed dog, attentive canine, mixed-breed, big ears, brown-black fur, indoor domestic scene, companion animal, close-up shot, relaxed senior man, digital device, warm lighting, chihuahua mix, cozy atmosphere
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-mistral-small-4-119b-2603-4bit"></a>
-
-### mlx-community/Mistral-Small-4-119B-2603-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Mistral-Small-4-119B-2603-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 12.15s
-- *Generation time:* 11.32s
-- *Total time:* 24.46s
-- *Prompt preparation time:* 0.675
-- *First-token latency:* 7.89
-- *Cleanup time:* 0.298
-- *Prompt tokens:* 2,381
-- *Generation tokens:* 116
-- *Total tokens:* 2,497
-- *Prompt throughput (raw):* 302 tok/s
-- *Generation throughput (raw):* 76.9 tok/s
-- *Peak memory (GB):* 73
-- *Active memory (GB):* 68
-- *Cache memory (GB):* 1.6
-- *Model-load active memory (GB):* 67.8
-- *Post-cleanup active memory (GB):* 0.00569
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1356
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 87b1249207734f029ec9dcefab80eabedfa6b812
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Mistral-Small-4-119B-2603-4bit/snapshots/87b1249207734f029ec9dcefab80eabedfa6b812
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Small dog in harness watches camera as senior man relaxes indoors
-
-Description:
-A small mixed-breed dog with big ears and a brown-and-black coat, wearing a harness, looks attentively toward the camera in a softly lit living room. An older man sits relaxed in the background using a digital device.
-
-Keywords:
-dog harness, domestic life, indoors, senior man, sitting, tablet, alert, big ears, brown and black coat, canine, casual, chihuahua mix, close-up, companion animal, relaxed atmosphere, living room, attentive dog
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
-
-### mlx-community/Molmo2-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.02s
-- *Generation time:* 5.09s
-- *Total time:* 7.00s
-- *Prompt preparation time:* 0.782
-- *First-token latency:* 2.49
-- *Cleanup time:* 0.096
-- *Prompt tokens:* 1,498
-- *Generation tokens:* 131
-- *Total tokens:* 1,629
-- *Prompt throughput (raw):* 602 tok/s
-- *Generation throughput (raw):* 69.6 tok/s
-- *Peak memory (GB):* 8.1
-- *Active memory (GB):* 6.5
-- *Cache memory (GB):* 0.31
-- *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.006
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1333
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Alert Chihuahua Mix in Harness, Senior Man Relaxing Indoors
-
-Description: A small mixed-breed dog with big ears and brown-black fur, wearing a harness, looks attentively toward the camera. An older person in blue jeans relaxes in the background, using a digital device on a couch in a living room with a white wall.
-
-Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmopoint-8b-4bit"></a>
-
-### mlx-community/MolmoPoint-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/MolmoPoint-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.35s
-- *Generation time:* 7.74s
-- *Total time:* 10.09s
-- *Prompt preparation time:* 0.885
-- *First-token latency:* 3.15
-- *Cleanup time:* 0.101
-- *Prompt tokens:* 3,100
-- *Generation tokens:* 105
-- *Total tokens:* 3,205
-- *Prompt throughput (raw):* 984 tok/s
-- *Generation throughput (raw):* 28.3 tok/s
-- *Peak memory (GB):* 13
-- *Active memory (GB):* 8.6
-- *Cache memory (GB):* 3.9
-- *Model-load active memory (GB):* 7.23
-- *Post-cleanup active memory (GB):* 0.00662
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1333
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 9bab196f867ceedecdb1eab071395bfedcd62538
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MolmoPoint-8B-4bit/snapshots/9bab196f867ceedecdb1eab071395bfedcd62538
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Alert Chihuahua Mix in Living Room with Senior Man
-
-Description: A small brown and black chihuahua mix with a harness looks directly at the camera in a cozy living room. An older man in blue jeans sits nearby, relaxed and using a tablet.
-
-Keywords: chihuahua mix, brown and black dog, living room, senior man, tablet, alert dog, domestic life, indoor scene, canine companion, man relaxing, casual, comfortable, close up, dog harness, companion animal
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
-
-### mlx-community/North-Micro-Vision-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/North-Micro-Vision-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.05s
-- *Generation time:* 3.34s
-- *Total time:* 5.34s
-- *Prompt preparation time:* 0.838
-- *First-token latency:* 1.94
-- *Cleanup time:* 0.0977
-- *Prompt tokens:* 4,060
-- *Generation tokens:* 127
-- *Total tokens:* 4,187
-- *Prompt throughput (raw):* 2,095 tok/s
-- *Generation throughput (raw):* 212 tok/s
-- *Peak memory (GB):* 3.7
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.65
-- *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00756
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1426
-- *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
-- *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 87466363e6c5f57adf91c18c3a62c3c74765f8df
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--North-Micro-Vision-Instruct-4bit/snapshots/87466363e6c5f57adf91c18c3a62c3c74765f8df
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
-- *EOS token:* <\|END_OF_TURN_TOKEN\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: A Canine Companion in a Comfortable Setting
-
-Description: A small mixed-breed dog, adorned with a harness, sits attentively in a cozy indoor space, its brown and black fur complemented by a white stripe on its face. The dog gazes directly at the camera, while in the background, an older person is seen relaxing on a couch, engrossed in their digital device.
-
-Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.88s
-- *Generation time:* 2.75s
-- *Total time:* 4.30s
-- *Prompt preparation time:* 0.561
-- *First-token latency:* 0.501
-- *Cleanup time:* 0.0937
-- *Prompt tokens:* 1,103
-- *Generation tokens:* 96
-- *Total tokens:* 1,199
-- *Prompt throughput (raw):* 2,200 tok/s
-- *Generation throughput (raw):* 55.8 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 8.3
-- *Cache memory (GB):* 0.52
-- *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00762
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1316
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Attentive Mixed-Breed Dog in Harness
-
-Description: A small, alert mixed-breed dog with large ears wearing a harness sits attentively in a living room, with a senior man relaxing in the background using a tablet.
-
-Keywords: mixed-breed, harness, alert, large ears, senior man, tablet, living room, attentive, relaxed, companion animal
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.31s
-- *Generation time:* 21.01s
-- *Total time:* 24.54s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 18.6
-- *Cleanup time:* 0.142
-- *Prompt tokens:* 12,764
-- *Generation tokens:* 108
-- *Total tokens:* 12,872
-- *Prompt throughput (raw):* 685 tok/s
-- *Generation throughput (raw):* 72.3 tok/s
-- *Peak memory (GB):* 26
-- *Active memory (GB):* 22
-- *Cache memory (GB):* 1.8
-- *Model-load active memory (GB):* 21.8
-- *Post-cleanup active memory (GB):* 0.00793
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1367
-- *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 93b3cbddd65ed4babff8f22fba491cdba7a21778
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-Omni-30B-A3B-Instruct-4bit/snapshots/93b3cbddd65ed4babff8f22fba491cdba7a21778
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Close-up of alert dog with big ears
-
-Description:
-A small, alert dog with large, upright ears and brown-and-black fur looks directly at the camera while wearing a blue harness. An older man in casual clothing relaxes in the background, using a tablet in a softly lit indoor setting.
-
-Keywords:
-dog, close-up, alert, big ears, brown and black, small dog, dog harness, indoor, man, tablet, casual, companion animal, domestic life, relaxed, senior man, sitting, companion, canine
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.90s
-- *Generation time:* 32.28s
-- *Total time:* 35.35s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 30.1
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 16,521
-- *Generation tokens:* 117
-- *Total tokens:* 16,638
-- *Prompt throughput (raw):* 549 tok/s
-- *Generation throughput (raw):* 92.8 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 2.3
-- *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00824
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1367
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Close-up of a small dog with big ears
-Description: A small, alert dog with large brown and black ears and a speckled face looks towards the camera while resting on a person's lap. The scene is set indoors in a warmly lit room, with a person in the background using a tablet.
-Keywords: dog, small dog, mixed breed, big ears, brown and black, alert, companion animal, domestic life, indoors, man, senior man, sitting, tablet, digital device, casual, comfortable, close up, canine, dog harness, companion
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-8b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-VL-8B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-8B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.99s
-- *Generation time:* 34.12s
-- *Total time:* 36.25s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 31.7
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 16,521
-- *Generation tokens:* 104
-- *Total tokens:* 16,625
-- *Prompt throughput (raw):* 521 tok/s
-- *Generation throughput (raw):* 69.4 tok/s
-- *Peak memory (GB):* 11
-- *Active memory (GB):* 5.8
-- *Cache memory (GB):* 3.4
-- *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00856
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1367
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* defcdea7cc7a4b0858fea563cbbce171d328e457
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-8B-Instruct-4bit/snapshots/defcdea7cc7a4b0858fea563cbbce171d328e457
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Alert dog with big ears looks at camera
-
-Description: A small brown and black dog with large ears and a harness sits attentively indoors, looking directly at the camera. The scene is warmly lit, with a blurred background showing a person relaxing with a tablet.
-
-Keywords: dog, harness, alert, big ears, brown and black, indoors, companion, living room, senior man, tablet, close up, domestic life, sitting, relaxed, canine, comfortable, companion animal, chihuahua mix
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
-
-### mlx-community/Qwen3.5-35B-A3B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.5-35B-A3B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.54s
-- *Generation time:* 36.91s
-- *Total time:* 40.67s
-- *Prompt preparation time:* 1.07
-- *First-token latency:* 27.7
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 16,534
-- *Generation tokens:* 933
-- *Total tokens:* 17,467
-- *Prompt throughput (raw):* 596 tok/s
-- *Generation throughput (raw):* 113 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 20
-- *Cache memory (GB):* 0.92
-- *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00906
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1375
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 1e20fd8d42056f870933bf98ca6211024744f7ec
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-35B-A3B-4bit/snapshots/1e20fd8d42056f870933bf98ca6211024744f7ec
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The user wants catalogue metadata based on an image and provided context.
-
-**1. Analyze the Image:**
-*   **Subject:** A small dog, likely a Miniature Pinscher or similar terrier mix. It has large, alert ears, black and tan fur with some merle/dapple markings on the head (white/greyish speckles). It is wearing a blue patterned harness.
-*   **Action:** The dog is looking directly at the camera, held by a person.
-*   **Background/Context:** A man is holding the dog. He is wearing a grey t-shirt and blue jeans. He is holding a tablet or large smartphone. The background is a blurred living room setting with a sofa.
-*   **Lighting:** Indoor, warm, artificial lighting.
-*   **Date/Time:** 2026-11-14 17:41:49 UTC+01:00 (Evening/Afternoon).
-
-**2. Evaluate Descriptive Hints:**
-*   "A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room." -&gt; Accurate.
-*   "Keyword hints": Adobe Stock (ignore, this is internal), Any Vision (ignore), Dog harness (keep), Domestic life (keep), Indoors (keep), Man (keep), Relaxing (keep), Senior Man (maybe, face is blurry but implies older adult), Sitting (keep), Tablet (keep), alert (keep), big ears (keep), brown and black (keep), canine (keep), casual (keep), chihuahua mix (likely min pin mix), close up (keep), comfortable (keep), companion (keep), companion animal (keep).
-
-**3. Draft Title (5-10 words):**
-*   *Draft 1:* Small black and tan dog in harness held by man. (9 words) - Good.
-*   *Draft 2:* Close up of alert small dog with big ears. (9 words) - Good.
-*   *Draft 3:* Small mixed breed dog with merle markings in harness. (9 words) - Good.
-*   *Selection:* Small black and tan dog in harness held by man.
-
-**4. Draft Description (1-2 sentences):**
-*   *Requirements:* Factual, combine context (date/time implies evening indoor), visible subject, setting, action, lighting.
-*   *Draft:* Captured on November 14, 2026, this indoor shot features a small black and tan dog with distinctive merle markings and large ears looking alertly at the camera. The animal is being held by an older man wearing a grey t-shirt and blue jeans, who is using a tablet in the background.
-*   *Refinement:* Keep it tighter. "Indoors on November 14, 2026, a small black and tan dog with merle markings and large ears looks attentively at the camera while being held by a man using a tablet."
-
-**5. Draft Keywords (10-18 unique):**
-*   *Selection:* dog, harness, miniature pinscher, black and tan, merle, big ears, alert, man, tablet, indoor, living room, holding, casual, evening, companion, canine, domestic, senior man.
-
-**6. Final Review against Constraints:**
-*   Title: 5-10 words? Yes.
-*   Description: 1-2 sentences? Yes. Factual? Yes.
-*   Keywords: 10-18? Yes. Unique? Yes.
-*   Format: Exactly three sections.
-
-Let's refine the title to be more evocative but factual. "Small black and tan
-&lt;/think&gt;
-
-Title: Small black and tan dog in harness held by man
-
-Description: Captured indoors on November 14, 2026, a small dog with black and tan fur and merle markings looks alertly at the camera while being held by a man using a tablet in the background. The animal wears a blue patterned harness, and the scene is set in a softly lit living room.
-
-Keywords: dog, harness, mini pinscher, black and tan, merle, big ears, alert, man, tablet, indoor, living room, holding, casual, evening, companion, canine, domestic, senior man
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The user wants catalogue metadata based on an image and provided context.
-
-**1. Analyze the Image:**
-*   **Subject:** A small dog, likely a Miniature Pinscher or similar terrier mix. It has large, alert ears, black and tan fur with some merle/dapple markings on the head (white/greyish speckles). It is wearing a blue patterned harness.
-*   **Action:** The dog is looking directly at the camera, held by a person.
-*   **Background/Context:** A man is holding the dog. He is wearing a grey t-shirt and blue jeans. He is holding a tablet or large smartphone. The background is a blurred living room setting with a sofa.
-*   **Lighting:** Indoor, warm, artificial lighting.
-*   **Date/Time:** 2026-11-14 17:41:49 UTC+01:00 (Evening/Afternoon).
-
-**2. Evaluate Descriptive Hints:**
-*   "A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room." -> Accurate.
-*   "Keyword hints": Adobe Stock (ignore, this is internal), Any Vision (ignore), Dog harness (keep), Domestic life (keep), Indoors (keep), Man (keep), Relaxing (keep), Senior Man (maybe, face is blurry but implies older adult), Sitting (keep), Tablet (keep), alert (keep), big ears (keep), brown and black (keep), canine (keep), casual (keep), chihuahua mix (likely min pin mix), close up (keep), comfortable (keep), companion (keep), companion animal (keep).
-
-**3. Draft Title (5-10 words):**
-*   *Draft 1:* Small black and tan dog in harness held by man. (9 words) - Good.
-*   *Draft 2:* Close up of alert small dog with big ears. (9 words) - Good.
-*   *Draft 3:* Small mixed breed dog with merle markings in harness. (9 words) - Good.
-*   *Selection:* Small black and tan dog in harness held by man.
-
-**4. Draft Description (1-2 sentences):**
-*   *Requirements:* Factual, combine context (date/time implies evening indoor), visible subject, setting, action, lighting.
-*   *Draft:* Captured on November 14, 2026, this indoor shot features a small black and tan dog with distinctive merle markings and large ears looking alertly at the camera. The animal is being held by an older man wearing a grey t-shirt and blue jeans, who is using a tablet in the background.
-*   *Refinement:* Keep it tighter. "Indoors on November 14, 2026, a small black and tan dog with merle markings and large ears looks attentively at the camera while being held by a man using a tablet."
-
-**5. Draft Keywords (10-18 unique):**
-*   *Selection:* dog, harness, miniature pinscher, black and tan, merle, big ears, alert, man, tablet, indoor, living room, holding, casual, evening, companion, canine, domestic, senior man.
-
-**6. Final Review against Constraints:**
-*   Title: 5-10 words? Yes.
-*   Description: 1-2 sentences? Yes. Factual? Yes.
-*   Keywords: 10-18? Yes. Unique? Yes.
-*   Format: Exactly three sections.
-
-Let's refine the title to be more evocative but factual. "Small black and tan
-</think>
-
-Title: Small black and tan dog in harness held by man
-
-Description: Captured indoors on November 14, 2026, a small dog with black and tan fur and merle markings looks alertly at the camera while being held by a man using a tablet in the background. The animal wears a blue patterned harness, and the scene is set in a softly lit living room.
-
-Keywords: dog, harness, mini pinscher, black and tan, merle, big ears, alert, man, tablet, indoor, living room, holding, casual, evening, companion, canine, domestic, senior man
+tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws
 ```
 
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen36-35b-a3b-4bit"></a>
-
-### mlx-community/Qwen3.6-35B-A3B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.6-35B-A3B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.54s
-- *Generation time:* 44.63s
-- *Total time:* 48.41s
-- *Prompt preparation time:* 1.09
-- *First-token latency:* 35.5
-- *Cleanup time:* 0.138
-- *Prompt tokens:* 16,534
-- *Generation tokens:* 927
-- *Total tokens:* 17,461
-- *Prompt throughput (raw):* 465 tok/s
-- *Generation throughput (raw):* 114 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 20
-- *Cache memory (GB):* 0.92
-- *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00957
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1375
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 38740b847e4cb78f352aba30aa41c76e08e6eb46
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-35B-A3B-4bit/snapshots/38740b847e4cb78f352aba30aa41c76e08e6eb46
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
 *Readable output:*
 
 <pre class="model-output-readable">
-The user wants metadata for an image of a dog.
+The user wants British-English catalogue metadata based strictly on visible facts. I need to look carefully at the image.
 
-**1. Analyze the Image:**
-*   **Subject:** A small dog, likely a Chihuahua or Terrier mix. It has large, upright ears (one is very prominent), black and tan fur (tricolor with some white on the muzzle/nose), and dark eyes. It's wearing a blue harness.
-*   **Action:** The dog is looking directly at the camera, appearing alert or attentive.
-*   **Background:** A person (appears to be an older man based on the hint, though blurry) is sitting behind the dog. He is holding a smartphone or tablet. He is wearing blue jeans. The background is a blurred living room setting.
-*   **Lighting:** Warm, indoor lighting. Looks like evening or late afternoon (matches the timestamp 17:41).
-*   **Details:** The dog's ears are very large relative to its head. The harness is visible around the neck/shoulders.
+Visible facts: Two tabby cats lying on a bright pink/magenta fabric surface (looks like a sofa or cushion). There are two white remote controls visible — one near the left cat's head, one between the two cats. The cats are stretched out, appearing to sleep or rest. The left cat is smaller, stretched diagonally with paws extended. The right cat is larger, curled slightly with head down. The background top shows a darker red/maroon fabric (sofa back). Lighting appears even, indoor.
 
-**2. Process Context &amp; Hints:**
-*   **Authoritative Context:** Date is 2026-11-14. Time is 17:41:49 UTC+01:00.
-*   **Hint Analysis:**
-    *   "A small mixed-breed dog wearing a harness looks attentively toward the camera..." -&gt; Matches image perfectly.
-    *   "...while an older person relaxes in the background using a digital device..." -&gt; Matches image (blurry figure with phone/tablet).
-    *   "...in a living room." -&gt; Matches blurry background furniture.
-    *   Keywords: "Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal" -&gt; Most of these are valid. "Tablet" is likely a phone given the size and hold, but "digital device" covers both. "Big ears" is very accurate. "Chihuahua mix" is a good descriptor.
+I must avoid unsupported identity, location, event, brand, species (well, "cat" is visible, that's fine — species is cat, that's clearly visible), period, intent. I should not say "sleeping" if uncertain? They appear to be resting with eyes closed. The left cat's eyes look closed; the right cat's eyes look closed. I can say "resting" or "lying". I'll say "lying" to be safe, maybe "appearing to rest".
 
-**3. Draft Title:**
-*   Needs to be 5-10 words.
-*   "Small black and tan dog with large ears looks at camera" (9 words) - Good.
-*   "Alert small mixed-breed dog wearing a blue harness" (8 words) - Good.
-*   "Close-up of a small dog with large ears" (8 words) - Good.
-*   Let's go with: "Small black and tan dog with large ears looks at camera"
+Title: 5-10 words concrete. "Two tabby cats resting on pink sofa with remotes" — count words: Two(1) tabby(2) cats(3) resting(4) on(5) pink(6) sofa(7) with(8) remotes(9). 9 words. Good. But "sofa" — is it clearly a sofa? The top maroon part suggests a sofa back. The pink is a cover. I can say "pink fabric" to be safe. Title: "Two tabby cats lying on pink fabric beside remotes" — Two(1) tabby(2) cats(3) lying(4) on(5) pink(6) fabric(7) beside(8) remotes(9). 9 words. Good.
 
-**4. Draft Description:**
-*   Needs 1-2 sentences.
-*   Must combine context (date/time not explicitly stated as visible but implied setting) + subject + setting + lighting.
-*   "A small, alert mixed-breed dog with large, upright ears and black and tan fur wears a blue harness while gazing directly at the camera. In the softly lit background, a person sits in jeans, blurred while using a digital device in a cozy indoor setting."
-*   Refining based on constraints: "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." -&gt; I don't need to put the date in the text unless it fits naturally, but the prompt says "combining relevant context". The context is the time of day (evening).
-*   "Captured in the warm light of late afternoon, this close-up features a small, alert mixed-breed dog with distinctive large ears and black and tan markings wearing a blue harness. The dog looks directly forward while a person in jeans relaxes in the blurred background, holding a mobile device."
+Description: 1-2 sentences factual. Mention main subject (two tabby cats), setting (bright pink fabric surface with maroon backdrop), action (lying stretched out), lighting (even indoor), distinctive details (two white remote controls, striped coats, one smaller one larger).
 
-**5. Draft Keywords:**
-*   Needs 1
+Keywords: 10-18 unique comma-separated. British English spelling. Include: tabby cat, cats, pink fabric, remote control, sofa, resting, striped coat, indoor, animal, pet, lying down, magenta, cushion, sleep. Need 10-18. Let me list: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, sleep, whiskers. That's 16. Good. Ensure British spelling — "feline" fine, no American spellings. "remote control" fine.
+
+Check no uncertain details. Whiskers visible on right cat — yes. Sleep — eyes appear closed, but I'll keep "resting" and "sleep" maybe risky. I'll include "sleeping" as keyword? The instruction says omit uncertain. Eyes look closed, but to be safe I'll use "resting" not "sleeping". I'll drop "sleep". Replace with "paws". Paws visible. Good.
+
+Final keywords: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws. 16.
+
+Now produce exactly three sections.
 &lt;/think&gt;
+Title:
+Two tabby cats lying on pink fabric beside remotes
 
-Title: Small black and tan dog with large ears looks at camera
-Description: Captured in warm, indoor lighting, a small mixed-breed dog with prominent upright ears and black and tan markings wears a blue harness while looking attentively at the camera. In the blurred background, a person sits wearing jeans and holding a digital device, suggesting a relaxed domestic scene.
-Keywords: dog, pet, animal, chihuahua, terrier, mixed breed, brown, black, big ears, close up, alert, harness, domestic, indoors, man, companion, comfortable, looking, sitting, digital device
+Description:
+Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the scene is lit by even indoor light.
+
+Keywords:
+tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-The user wants metadata for an image of a dog.
+The user wants British-English catalogue metadata based strictly on visible facts. I need to look carefully at the image.
 
-**1. Analyze the Image:**
-*   **Subject:** A small dog, likely a Chihuahua or Terrier mix. It has large, upright ears (one is very prominent), black and tan fur (tricolor with some white on the muzzle/nose), and dark eyes. It's wearing a blue harness.
-*   **Action:** The dog is looking directly at the camera, appearing alert or attentive.
-*   **Background:** A person (appears to be an older man based on the hint, though blurry) is sitting behind the dog. He is holding a smartphone or tablet. He is wearing blue jeans. The background is a blurred living room setting.
-*   **Lighting:** Warm, indoor lighting. Looks like evening or late afternoon (matches the timestamp 17:41).
-*   **Details:** The dog's ears are very large relative to its head. The harness is visible around the neck/shoulders.
+Visible facts: Two tabby cats lying on a bright pink/magenta fabric surface (looks like a sofa or cushion). There are two white remote controls visible — one near the left cat's head, one between the two cats. The cats are stretched out, appearing to sleep or rest. The left cat is smaller, stretched diagonally with paws extended. The right cat is larger, curled slightly with head down. The background top shows a darker red/maroon fabric (sofa back). Lighting appears even, indoor.
 
-**2. Process Context & Hints:**
-*   **Authoritative Context:** Date is 2026-11-14. Time is 17:41:49 UTC+01:00.
-*   **Hint Analysis:**
-    *   "A small mixed-breed dog wearing a harness looks attentively toward the camera..." -> Matches image perfectly.
-    *   "...while an older person relaxes in the background using a digital device..." -> Matches image (blurry figure with phone/tablet).
-    *   "...in a living room." -> Matches blurry background furniture.
-    *   Keywords: "Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal" -> Most of these are valid. "Tablet" is likely a phone given the size and hold, but "digital device" covers both. "Big ears" is very accurate. "Chihuahua mix" is a good descriptor.
+I must avoid unsupported identity, location, event, brand, species (well, "cat" is visible, that's fine — species is cat, that's clearly visible), period, intent. I should not say "sleeping" if uncertain? They appear to be resting with eyes closed. The left cat's eyes look closed; the right cat's eyes look closed. I can say "resting" or "lying". I'll say "lying" to be safe, maybe "appearing to rest".
 
-**3. Draft Title:**
-*   Needs to be 5-10 words.
-*   "Small black and tan dog with large ears looks at camera" (9 words) - Good.
-*   "Alert small mixed-breed dog wearing a blue harness" (8 words) - Good.
-*   "Close-up of a small dog with large ears" (8 words) - Good.
-*   Let's go with: "Small black and tan dog with large ears looks at camera"
+Title: 5-10 words concrete. "Two tabby cats resting on pink sofa with remotes" — count words: Two(1) tabby(2) cats(3) resting(4) on(5) pink(6) sofa(7) with(8) remotes(9). 9 words. Good. But "sofa" — is it clearly a sofa? The top maroon part suggests a sofa back. The pink is a cover. I can say "pink fabric" to be safe. Title: "Two tabby cats lying on pink fabric beside remotes" — Two(1) tabby(2) cats(3) lying(4) on(5) pink(6) fabric(7) beside(8) remotes(9). 9 words. Good.
 
-**4. Draft Description:**
-*   Needs 1-2 sentences.
-*   Must combine context (date/time not explicitly stated as visible but implied setting) + subject + setting + lighting.
-*   "A small, alert mixed-breed dog with large, upright ears and black and tan fur wears a blue harness while gazing directly at the camera. In the softly lit background, a person sits in jeans, blurred while using a digital device in a cozy indoor setting."
-*   Refining based on constraints: "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." -> I don't need to put the date in the text unless it fits naturally, but the prompt says "combining relevant context". The context is the time of day (evening).
-*   "Captured in the warm light of late afternoon, this close-up features a small, alert mixed-breed dog with distinctive large ears and black and tan markings wearing a blue harness. The dog looks directly forward while a person in jeans relaxes in the blurred background, holding a mobile device."
+Description: 1-2 sentences factual. Mention main subject (two tabby cats), setting (bright pink fabric surface with maroon backdrop), action (lying stretched out), lighting (even indoor), distinctive details (two white remote controls, striped coats, one smaller one larger).
 
-**5. Draft Keywords:**
-*   Needs 1
+Keywords: 10-18 unique comma-separated. British English spelling. Include: tabby cat, cats, pink fabric, remote control, sofa, resting, striped coat, indoor, animal, pet, lying down, magenta, cushion, sleep. Need 10-18. Let me list: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, sleep, whiskers. That's 16. Good. Ensure British spelling — "feline" fine, no American spellings. "remote control" fine.
+
+Check no uncertain details. Whiskers visible on right cat — yes. Sleep — eyes appear closed, but I'll keep "resting" and "sleep" maybe risky. I'll include "sleeping" as keyword? The instruction says omit uncertain. Eyes look closed, but to be safe I'll use "resting" not "sleeping". I'll drop "sleep". Replace with "paws". Paws visible. Good.
+
+Final keywords: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws. 16.
+
+Now produce exactly three sections.
 </think>
-
-Title: Small black and tan dog with large ears looks at camera
-Description: Captured in warm, indoor lighting, a small mixed-breed dog with prominent upright ears and black and tan markings wears a blue harness while looking attentively at the camera. In the blurred background, a person sits wearing jeans and holding a digital device, suggesting a relaxed domestic scene.
-Keywords: dog, pet, animal, chihuahua, terrier, mixed breed, brown, black, big ears, close up, alert, harness, domestic, indoors, man, companion, comfortable, looking, sitting, digital device
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen38-27b-nvfp4"></a>
-
-### mlx-community/Qwen3.8-27B-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.8-27B-nvfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.93s
-- *Generation time:* 81.73s
-- *Total time:* 84.83s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 52
-- *Cleanup time:* 0.14
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 879
-- *Total tokens:* 17,455
-- *Prompt throughput (raw):* 318 tok/s
-- *Generation throughput (raw):* 30.6 tok/s
-- *Peak memory (GB):* 21
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 1.9
-- *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0101
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1612
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* f9cb6495054684578f19bf751882716f87542a96
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-nvfp4/snapshots/f9cb6495054684578f19bf751882716f87542a96
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The user wants British-English catalogue metadata. Let me examine the image carefully.
-
-The image shows a small dog in sharp focus in the foreground. It has large erect ears, brown and black/tan fur, a grizzle pattern on the head, and dark eyes looking directly at the camera. It appears to be wearing some kind of harness or clothing with a light blue/grey strap. The dog's breed looks like a mixed breed, possibly chihuahua or similar terrier mix, but I should be cautious. The description hint says "chihuahua mix" and "mixed-breed dog." The ears are large and erect.
-
-In the background, blurred, there is a person. The hint says "older person" / "Senior Man." The person appears to be wearing a grey checked shirt, holding a tablet (a digital device with a lit screen). The person is holding something yellow in their hand on the left. The setting is indoors, a living room, with what looks like a brown leather sofa or chair in the background.
-
-Lighting is warm, indoor, soft.
-
-Capture date: 2026-11-14 17:41:49 UTC+01:00. I should not claim it's visible but can use it as context. Actually the instructions say treat capture date as authoritative but don't claim visible. The description should combine relevant context with main visible subject. The date is evening-ish (17:41). I could mention it's an indoor evening scene, but I shouldn't over-claim. I'll keep the description focused on visible elements.
-
-Let me draft the title: 5-10 words, concrete. "Small dog in harness looks at camera indoors" — that's 9 words. Or "Close-up of small dog with large erect ears indoors". Let me count: Close-up(1) of(2) small(3) dog(4) with(5) large(6) erect(7) ears(8) indoors(9). Good. Or include the man. "Small dog in harness before man using tablet" — 9 words. Hmm. The main subject is the dog. Let me make a concrete title: "Small dog in harness gazes at camera indoors" = 9 words. Good.
-
-Description: 1-2 sentences. "A small mixed-breed dog with large erect ears and a brown, black and tan coat wears a harness and looks attentively at the camera in a warm-lit living room. Behind it, an older man in a grey checked shirt sits out of focus holding a tablet and a yellow object." That captures it. Use British spelling: "recognised" not needed. "grey" is British. Good.
-
-Keywords: 10-18 unique, comma-separated. From hints and image: dog harness, domestic life, indoors, man, relaxing, senior man, sitting, tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal. I should select and add image-supported details. Let me create a list: small dog, large ears, dog harness, close up, mixed breed, brown and black coat, attentive, living room, indoors, senior man, tablet, grey shirt, blurred background, warm lighting, companion animal, domestic life. Count: 16. Good. Ensure unique.
-
-Let me ensure British English: "close up" or "close-up"? Keywords can be either. I'll use "close up". "grey" fine.
-
-Now finalize.
-&lt;/think&gt;
-
 Title:
-Small dog in harness gazes at camera indoors
+Two tabby cats lying on pink fabric beside remotes
 
 Description:
-A small mixed-breed dog with large erect ears and a brown, black and tan coat wears a light-strapped harness and looks attentively at the camera in a warm-lit living room. Behind it, an older man in a grey checked shirt sits out of focus, holding a lit tablet and a yellow object.
+Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the scene is lit by even indoor light.
 
 Keywords:
-small dog, large ears, dog harness, close up, mixed breed, brown and black coat, attentive, living room, indoors, senior man, tablet, grey shirt, blurred background, warm lighting, companion animal, domestic life
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The user wants British-English catalogue metadata. Let me examine the image carefully.
-
-The image shows a small dog in sharp focus in the foreground. It has large erect ears, brown and black/tan fur, a grizzle pattern on the head, and dark eyes looking directly at the camera. It appears to be wearing some kind of harness or clothing with a light blue/grey strap. The dog's breed looks like a mixed breed, possibly chihuahua or similar terrier mix, but I should be cautious. The description hint says "chihuahua mix" and "mixed-breed dog." The ears are large and erect.
-
-In the background, blurred, there is a person. The hint says "older person" / "Senior Man." The person appears to be wearing a grey checked shirt, holding a tablet (a digital device with a lit screen). The person is holding something yellow in their hand on the left. The setting is indoors, a living room, with what looks like a brown leather sofa or chair in the background.
-
-Lighting is warm, indoor, soft.
-
-Capture date: 2026-11-14 17:41:49 UTC+01:00. I should not claim it's visible but can use it as context. Actually the instructions say treat capture date as authoritative but don't claim visible. The description should combine relevant context with main visible subject. The date is evening-ish (17:41). I could mention it's an indoor evening scene, but I shouldn't over-claim. I'll keep the description focused on visible elements.
-
-Let me draft the title: 5-10 words, concrete. "Small dog in harness looks at camera indoors" — that's 9 words. Or "Close-up of small dog with large erect ears indoors". Let me count: Close-up(1) of(2) small(3) dog(4) with(5) large(6) erect(7) ears(8) indoors(9). Good. Or include the man. "Small dog in harness before man using tablet" — 9 words. Hmm. The main subject is the dog. Let me make a concrete title: "Small dog in harness gazes at camera indoors" = 9 words. Good.
-
-Description: 1-2 sentences. "A small mixed-breed dog with large erect ears and a brown, black and tan coat wears a harness and looks attentively at the camera in a warm-lit living room. Behind it, an older man in a grey checked shirt sits out of focus holding a tablet and a yellow object." That captures it. Use British spelling: "recognised" not needed. "grey" is British. Good.
-
-Keywords: 10-18 unique, comma-separated. From hints and image: dog harness, domestic life, indoors, man, relaxing, senior man, sitting, tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal. I should select and add image-supported details. Let me create a list: small dog, large ears, dog harness, close up, mixed breed, brown and black coat, attentive, living room, indoors, senior man, tablet, grey shirt, blurred background, warm lighting, companion animal, domestic life. Count: 16. Good. Ensure unique.
-
-Let me ensure British English: "close up" or "close-up"? Keywords can be either. I'll use "close up". "grey" fine.
-
-Now finalize.
-</think>
-
-Title:
-Small dog in harness gazes at camera indoors
-
-Description:
-A small mixed-breed dog with large erect ears and a brown, black and tan coat wears a light-strapped harness and looks attentively at the camera in a warm-lit living room. Behind it, an older man in a grey checked shirt sits out of focus, holding a lit tablet and a yellow object.
-
-Keywords:
-small dog, large ears, dog harness, close up, mixed breed, brown and black coat, attentive, living room, indoors, senior man, tablet, grey shirt, blurred background, warm lighting, companion animal, domestic life
+tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws
 ```
 
 </details>
@@ -2072,26 +442,26 @@ small dog, large ears, dog harness, close up, mixed breed, brown and black coat,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.10s
-- *Generation time:* 2.76s
-- *Total time:* 4.94s
-- *Prompt preparation time:* 0.964
-- *First-token latency:* 0.75
+- *Model load time:* 1.09s
+- *Generation time:* 2.36s
+- *Total time:* 4.15s
+- *Prompt preparation time:* 0.587
+- *First-token latency:* 1.05
 - *Cleanup time:* 0.103
-- *Prompt tokens:* 2,069
-- *Generation tokens:* 119
-- *Total tokens:* 2,188
-- *Prompt throughput (raw):* 2,760 tok/s
-- *Generation throughput (raw):* 103 tok/s
+- *Prompt tokens:* 2,909
+- *Generation tokens:* 82
+- *Total tokens:* 2,991
+- *Prompt throughput (raw):* 2,759 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.34
+- *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 5.46
 - *Post-cleanup active memory (GB):* 0.0107
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4233
+- *Rendered prompt characters:* 3410
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -2105,11 +475,9 @@ small dog, large ears, dog harness, close up, mixed breed, brown and black coat,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Small Dog's Attentive Gaze in Living Room
-
-Description: A small mixed-breed dog with a distinctive brown and black coat and large ears sits attentively on a couch, looking directly at the camera, while an older man relaxes in the background, engrossed in a digital device. The scene captures a moment of companionship and calm in a cozy indoor setting.
-
-Keywords: Small dog, Mixed breed, Brown and black coat, Large ears, Attentive gaze, Living room, Older man, Relaxing, Digital device, Companion animal, Indoor setting
+Title: Two Cats Relaxing Together
+Description: Two tabby cats are curled up and sleeping side by side on a pink blanket, with a remote control placed nearby on the sofa. The scene is well-lit, capturing the peaceful atmosphere of a cozy living room.
+Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, home, indoor, comfortable
 </pre>
 
 </details>
@@ -2130,17 +498,17 @@ Keywords: Small dog, Mixed breed, Brown and black coat, Large ears, Attentive ga
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.25s
-- *Generation time:* 3.44s
-- *Total time:* 7.51s
-- *Prompt preparation time:* 0.666
-- *First-token latency:* 1.03
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 567
-- *Generation tokens:* 86
-- *Total tokens:* 653
-- *Prompt throughput (raw):* 550 tok/s
-- *Generation throughput (raw):* 54.9 tok/s
+- *Model load time:* 3.18s
+- *Generation time:* 1.88s
+- *Total time:* 5.29s
+- *Prompt preparation time:* 0.031
+- *First-token latency:* 0.633
+- *Cleanup time:* 0.169
+- *Prompt tokens:* 386
+- *Generation tokens:* 66
+- *Total tokens:* 452
+- *Prompt throughput (raw):* 610 tok/s
+- *Generation throughput (raw):* 66.1 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -2149,7 +517,7 @@ Keywords: Small dog, Mixed breed, Brown and black coat, Large ears, Attentive ga
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1321
+- *Rendered prompt characters:* 498
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2163,21 +531,10 @@ Keywords: Small dog, Mixed breed, Brown and black coat, Large ears, Attentive ga
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Alert chihuahua-mix dog wearing a harness indoors
-Description: A small brown and black-- dog with large ears wears a harness and looks at the camera while an older man sits on a sofa using a tablet.
-Keywords: dog, chihuahua mix, harness, alert, ears, indoors, senior, man, sitting, tablet, domestic, companion, canine, brown, black, relaxing
+Title: Two tabby cats sleeping on a pink blanket
+Description: Two striped tabby cats lie resting on a pink fabric surface next to two remote controls.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote controls, lounging, resting, striped, fur, fabric, domestic
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title: Alert chihuahua-mix dog wearing a harness indoors
-Description: A small brown and black-- dog with large ears wears a harness and looks at the camera while an older man sits on a sofa using a tablet. 
-Keywords: dog, chihuahua mix, harness, alert, ears, indoors, senior, man, sitting, tablet, domestic, companion, canine, brown, black, relaxing
-```
-
-</details>
 
 </details>
 
@@ -2197,26 +554,26 @@ Keywords: dog, chihuahua mix, harness, alert, ears, indoors, senior, man, sittin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.72s
-- *Generation time:* 2.85s
-- *Total time:* 5.37s
-- *Prompt preparation time:* 0.662
-- *First-token latency:* 0.656
-- *Cleanup time:* 0.113
-- *Prompt tokens:* 571
-- *Generation tokens:* 100
-- *Total tokens:* 671
-- *Prompt throughput (raw):* 870 tok/s
-- *Generation throughput (raw):* 63.4 tok/s
-- *Peak memory (GB):* 7.6
+- *Model load time:* 1.69s
+- *Generation time:* 1.67s
+- *Total time:* 3.53s
+- *Prompt preparation time:* 0.03
+- *First-token latency:* 0.259
+- *Cleanup time:* 0.111
+- *Prompt tokens:* 390
+- *Generation tokens:* 88
+- *Total tokens:* 478
+- *Prompt throughput (raw):* 1,506 tok/s
+- *Generation throughput (raw):* 63.1 tok/s
+- *Peak memory (GB):* 7.5
 - *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.30
+- *Cache memory (GB):* 0.25
 - *Model-load active memory (GB):* 6.75
 - *Post-cleanup active memory (GB):* 0.0112
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 526
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2230,14 +587,11 @@ Keywords: dog, chihuahua mix, harness, alert, ears, indoors, senior, man, sittin
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Small Dog with Large Ears Wearing a Harness
+Title: Two Tabby Cats on a Pink Sofa
 
-Description:
-A small brown and black mixed-breed dog with large ears looks attentively toward the camera while a man relaxes in the background. The scene captures a quiet domestic moment in a softly lit living room.
+Description: Two tabby cats lie on a pink fabric sofa, with one resting horizontally and the other positioned vertically. Two remote controls are also visible near the cats.
 
-Keywords:
-Dog, harness, big ears, canine, brown and black, chihuahua mix, domestic life, indoors, man, relaxing, tablet, alert, companion, pet, close up, home, portrait, sitting
+Keywords: cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, pink fabric, remote controls, furniture, tabby cat, resting, indoor, grey and brown, stripes, paws, tail
 </pre>
 
 </details>
@@ -2258,26 +612,26 @@ Dog, harness, big ears, canine, brown and black, chihuahua mix, domestic life, i
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.54s
-- *Generation time:* 1.72s
-- *Total time:* 5.05s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 0.385
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 571
-- *Generation tokens:* 92
-- *Total tokens:* 663
-- *Prompt throughput (raw):* 1,483 tok/s
+- *Model load time:* 2.34s
+- *Generation time:* 0.94s
+- *Total time:* 3.44s
+- *Prompt preparation time:* 0.0101
+- *First-token latency:* 0.336
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 390
+- *Generation tokens:* 75
+- *Total tokens:* 465
+- *Prompt throughput (raw):* 1,161 tok/s
 - *Generation throughput (raw):* 127 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
-- *Cache memory (GB):* 0.22
+- *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.4
 - *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1349
+- *Rendered prompt characters:* 526
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2291,9 +645,11 @@ Dog, harness, big ears, canine, brown and black, chihuahua mix, domestic life, i
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Small mixed-breed dog with large ears wearing a harness
-Description: A small brown and black dog wearing a harness looks attentively at the camera in a brightly lit living room. In the blurred background, a man relaxes while using a digital tablet.
-Keywords: dog, harness, chihuahua mix, domestic life, indoors, senior man, companion, pet, alert, big ears, canine, casual, close up, sitting, relaxing, companion animal
+Title: Two tabby cats sleeping on a pink surface
+
+Description: Two tabby cats lie on a pink fabric surface next to two remote controls. The cats are positioned with their bodies facing different directions under bright lighting.
+
+Keywords: tabby, cat, sleeping, pink, fabric, remote, electronics, domestic, animal, lying, indoor, bright, two, cats, striped
 </pre>
 
 </details>
@@ -2314,26 +670,26 @@ Keywords: dog, harness, chihuahua mix, domestic life, indoors, senior man, compa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.63s
-- *Generation time:* 1.85s
-- *Total time:* 4.25s
-- *Prompt preparation time:* 0.635
-- *First-token latency:* 0.403
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 567
-- *Generation tokens:* 105
-- *Total tokens:* 672
-- *Prompt throughput (raw):* 1,406 tok/s
-- *Generation throughput (raw):* 126 tok/s
-- *Peak memory (GB):* 6.0
+- *Model load time:* 1.57s
+- *Generation time:* 0.72s
+- *Total time:* 2.43s
+- *Prompt preparation time:* 0.00963
+- *First-token latency:* 0.166
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 386
+- *Generation tokens:* 67
+- *Total tokens:* 453
+- *Prompt throughput (raw):* 2,321 tok/s
+- *Generation throughput (raw):* 124 tok/s
+- *Peak memory (GB):* 5.9
 - *Active memory (GB):* 5.2
-- *Cache memory (GB):* 0.08
+- *Cache memory (GB):* 0.07
 - *Model-load active memory (GB):* 5.16
 - *Post-cleanup active memory (GB):* 0.0123
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1321
+- *Rendered prompt characters:* 498
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2347,10 +703,185 @@ Keywords: dog, harness, chihuahua mix, domestic life, indoors, senior man, compa
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Attentive small dog in harness watches camera indoors.
-Description: A small, brown and black mixed-breed dog in a harness looks attentively towards the camera while an older man relaxes nearby in a living room setting. The indoor scene is softly lit, capturing a moment of quiet companionable companionship.
-Keywords: mixed-breed dog, canine companion, dog harness, indoors, alert, big ears, brown and black, close up, companion animal, domestic life, relaxing, casual, living room, young animal
+Title: Two cats rest upon bright pink fabric
+Description: Two cats lie on a vividly coloured pink surface under soft lighting. They are accompanied by a remote control device.
+Keywords: cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, lounged, indoors, tortoiseshell, domestic, creature, fluffy
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-4bit"></a>
+
+### mlx-community/GLM-4.6V-Flash-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.07s
+- *Generation time:* 10.47s
+- *Total time:* 11.71s
+- *Prompt preparation time:* 0.0271
+- *First-token latency:* 0.46
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 495
+- *Generation tokens:* 819
+- *Total tokens:* 1,314
+- *Prompt throughput (raw):* 1,077 tok/s
+- *Generation throughput (raw):* 81.9 tok/s
+- *Peak memory (GB):* 8.0
+- *Active memory (GB):* 7.1
+- *Cache memory (GB):* 0.11
+- *Model-load active memory (GB):* 7.08
+- *Post-cleanup active memory (GB):* 0.00269
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 529
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
+- *EOS token:* <\|endoftext\|>
+
+#### Final answer
+
+```text
+Title: Two Tabby Cats on Pink Couch with Remotes
+Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it.
+Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two tabby cats on a pink couch with remote controls. So title could be "Two Tabby Cats on Pink Couch with Remotes".
+
+Next, the description: 1-2 sentences, factual. Need to include main subject (two tabby cats), setting (pink couch), action (lying down, sleeping), distinctive details (remote controls, cat colors, positions). Let's draft: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it."
+
+Then keywords: unique, comma-separated. Need to pick from visible facts: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, pink fabric, two cats, remote control, couch, pet, animal, domestic cat, tabby pattern, pink upholstery, remote controls on couch, two tabby cats resting on pink couch with remote controls.
+
+Now, pick the most relevant and unique ones, keeping it within 10-18. Let's list possible keywords:
+
+- tabby cats
+- pink couch
+- remote controls
+- lying down
+- sleeping
+- brown tabby
+- striped fur
+- pink fabric
+- two cats
+- remote control
+- couch
+- pet
+- animal
+- domestic cat
+- tabby pattern
+- pink upholstery
+
+Now, select the most concise and unique ones. Let's aim for around 12-15. Let's pick:
+
+tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+
+Wait, but need to ensure they are unique and clearly visible. Let's check the image again: two tabby cats (one lighter, one darker brown tabby), pink couch (upholstery), remote controls (two, one light blue, one white with buttons), lying down/sleeping, striped fur, two cats, remote control, couch, pet, domestic cat.
+
+Now, title: "Two Tabby Cats on Pink Couch with Remotes" – that's 10 words, good.
+
+Description: Need to be 1-2 sentences. Let's make it concise: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." That's two sentences, factual.
+
+Keywords: Let's pick the most relevant and unique ones, ensuring they are comma-separated and within 10-18. Let's list:
+
+tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+
+That's 15 keywords, which is within 10-18. They are all clearly visible and unique.
+
+Now, check if all sections are correct:
+
+Title: "Two Tabby Cats on Pink Couch with Remotes" – 10 words, concrete.
+
+Description: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." – 1-2 sentences, factual.
+
+Keywords: "tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat" – 15 unique, comma-separated keywords.
+
+All sections are correct. Now, return exactly these three sections and nothing else.&lt;/think&gt;
+Title: Two Tabby Cats on Pink Couch with Remotes
+Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it.
+Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two tabby cats on a pink couch with remote controls. So title could be "Two Tabby Cats on Pink Couch with Remotes".
+
+Next, the description: 1-2 sentences, factual. Need to include main subject (two tabby cats), setting (pink couch), action (lying down, sleeping), distinctive details (remote controls, cat colors, positions). Let's draft: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it."
+
+Then keywords: unique, comma-separated. Need to pick from visible facts: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, pink fabric, two cats, remote control, couch, pet, animal, domestic cat, tabby pattern, pink upholstery, remote controls on couch, two tabby cats resting on pink couch with remote controls.
+
+Now, pick the most relevant and unique ones, keeping it within 10-18. Let's list possible keywords:
+
+- tabby cats
+- pink couch
+- remote controls
+- lying down
+- sleeping
+- brown tabby
+- striped fur
+- pink fabric
+- two cats
+- remote control
+- couch
+- pet
+- animal
+- domestic cat
+- tabby pattern
+- pink upholstery
+
+Now, select the most concise and unique ones. Let's aim for around 12-15. Let's pick:
+
+tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+
+Wait, but need to ensure they are unique and clearly visible. Let's check the image again: two tabby cats (one lighter, one darker brown tabby), pink couch (upholstery), remote controls (two, one light blue, one white with buttons), lying down/sleeping, striped fur, two cats, remote control, couch, pet, domestic cat.
+
+Now, title: "Two Tabby Cats on Pink Couch with Remotes" – that's 10 words, good.
+
+Description: Need to be 1-2 sentences. Let's make it concise: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." That's two sentences, factual.
+
+Keywords: Let's pick the most relevant and unique ones, ensuring they are comma-separated and within 10-18. Let's list:
+
+tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+
+That's 15 keywords, which is within 10-18. They are all clearly visible and unique.
+
+Now, check if all sections are correct:
+
+Title: "Two Tabby Cats on Pink Couch with Remotes" – 10 words, concrete.
+
+Description: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." – 1-2 sentences, factual.
+
+Keywords: "tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat" – 15 unique, comma-separated keywords.
+
+All sections are correct. Now, return exactly these three sections and nothing else.</think>
+Title: Two Tabby Cats on Pink Couch with Remotes
+Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it.
+Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+```
+
+</details>
 
 </details>
 
@@ -2370,26 +901,26 @@ Keywords: mixed-breed dog, canine companion, dog harness, indoors, alert, big ea
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.61s
-- *Generation time:* 1.68s
-- *Total time:* 3.26s
-- *Prompt preparation time:* 0.856
-- *First-token latency:* 0.365
-- *Cleanup time:* 0.0945
-- *Prompt tokens:* 1,361
-- *Generation tokens:* 93
-- *Total tokens:* 1,454
-- *Prompt throughput (raw):* 3,727 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Model load time:* 0.62s
+- *Generation time:* 0.61s
+- *Total time:* 1.39s
+- *Prompt preparation time:* 0.0317
+- *First-token latency:* 0.244
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 734
+- *Generation tokens:* 57
+- *Total tokens:* 791
+- *Prompt throughput (raw):* 3,012 tok/s
+- *Generation throughput (raw):* 178 tok/s
 - *Peak memory (GB):* 4.7
 - *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.22
+- *Cache memory (GB):* 0.13
 - *Model-load active memory (GB):* 3.03
 - *Post-cleanup active memory (GB):* 0.0125
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1519
+- *Rendered prompt characters:* 696
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -2403,9 +934,1542 @@ Keywords: mixed-breed dog, canine companion, dog harness, indoors, alert, big ea
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Senior Man and His Alert Dog"
-Description: A small mixed-breed dog with big ears and a brown and black coat looks attentively toward the camera, while a senior man relaxes in the background using a digital device in a living room.
-Keywords: senior man, dog harness, domestic life, Indoors, chihuahua mix, attentive, comfortable, companion, close up, relaxed, tablet, brown and black dog
+Title: "Feline Serenity on a Red Couch"
+Description: Two striped cats lounging on a red blanket, one with a remote control nearby.
+Keywords: cats, striped, red, blanket, lounging, remote control, comfort, rest, domestic, leisure
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-internvl3-14b-4bit"></a>
+
+### mlx-community/InternVL3-14B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/InternVL3-14B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
+- *Model load time:* 1.17s
+- *Generation time:* 3.93s
+- *Total time:* 5.25s
+- *Prompt preparation time:* 0.0292
+- *First-token latency:* 2.22
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 3,435
+- *Generation tokens:* 90
+- *Total tokens:* 3,525
+- *Prompt throughput (raw):* 1,550 tok/s
+- *Generation throughput (raw):* 55.6 tok/s
+- *Peak memory (GB):* 10
+- *Active memory (GB):* 8.9
+- *Cache memory (GB):* 0.79
+- *Model-load active memory (GB):* 8.94
+- *Post-cleanup active memory (GB):* 0.003
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 477
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 26328eaab82cdc642fa3b73d8fa0b73db398710d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-14B-4bit/snapshots/26328eaab82cdc642fa3b73d8fa0b73db398710d
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Cats Sleeping on Sofa with Remote Controls
+
+Description:
+Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft, highlighting the relaxed posture of the cats and the vibrant pink fabric of the sofa.
+
+Keywords:
+cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy, domestic, resting, comfort, household, feline, nap, indoors, tranquility
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
+
+### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.77s
+- *Generation time:* 0.58s
+- *Total time:* 1.47s
+- *Prompt preparation time:* 0.0177
+- *First-token latency:* 0.233
+- *Cleanup time:* 0.0854
+- *Prompt tokens:* 344
+- *Generation tokens:* 73
+- *Total tokens:* 417
+- *Prompt throughput (raw):* 1,478 tok/s
+- *Generation throughput (raw):* 217 tok/s
+- *Peak memory (GB):* 3.6
+- *Active memory (GB):* 2.8
+- *Cache memory (GB):* 0.02
+- *Model-load active memory (GB):* 2.82
+- *Post-cleanup active memory (GB):* 0.00357
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 523
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* b6311011d95c8894a57289bba8b916e6fbae9a61
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/b6311011d95c8894a57289bba8b916e6fbae9a61
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two cats sleeping on a pink couch.
+Description: Two tabby cats are lying on a pink couch with remote controls nearby. The lighting is bright, highlighting the cats' fur patterns and the vibrant color of the couch.
+Keywords: cats, pink couch, tabby, sleeping, remote controls, bright lighting, fur patterns, relaxation, indoor, domestic
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-47-1b-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.7-1B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.7-1B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
+- *Model load time:* 0.94s
+- *Generation time:* 1.00s
+- *Total time:* 2.08s
+- *Prompt preparation time:* 0.0248
+- *First-token latency:* 0.106
+- *Cleanup time:* 0.0958
+- *Prompt tokens:* 330
+- *Generation tokens:* 268
+- *Total tokens:* 598
+- *Prompt throughput (raw):* 3,121 tok/s
+- *Generation throughput (raw):* 313 tok/s
+- *Peak memory (GB):* 3.5
+- *Active memory (GB):* 2.7
+- *Cache memory (GB):* 0.05
+- *Model-load active memory (GB):* 2.67
+- *Post-cleanup active memory (GB):* 0.00408
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 523
+- *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 13caa569f70e4b68b0ad7dd9574f15a241b34a7d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.7-1B-4bit/snapshots/13caa569f70e4b68b0ad7dd9574f15a241b34a7d
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title: Two tabby cats sleep on pink couch  
+Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with striped fur.  
+Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Okay, let me tackle this. First, the title needs to be 5-10 words. Let’s think: "Two cats sleep on pink couch." That’s 5 words. Next, description. The main subjects are two tabby cats, lying on a pink fabric couch. One is on the left with a remote, the other on the right with a remote. Lighting is indoor, soft. Distinctive details: striped fur, green ear tag on left cat. Keywords should be unique. Let’s list: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. Check count: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. That’s 12 keywords. Make sure it’s clear and based on visible facts.
+&lt;/think&gt;
+
+Title: Two tabby cats sleep on pink couch
+Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with striped fur.
+Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Okay, let me tackle this. First, the title needs to be 5-10 words. Let’s think: "Two cats sleep on pink couch." That’s 5 words. Next, description. The main subjects are two tabby cats, lying on a pink fabric couch. One is on the left with a remote, the other on the right with a remote. Lighting is indoor, soft. Distinctive details: striped fur, green ear tag on left cat. Keywords should be unique. Let’s list: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. Check count: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. That’s 12 keywords. Make sure it’s clear and based on visible facts.
+</think>
+
+Title: Two tabby cats sleep on pink couch  
+Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with striped fur.  
+Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-47-35b-a3b-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.7-35B-A3B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.7-35B-A3B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
+- *Model load time:* 3.02s
+- *Generation time:* 5.51s
+- *Total time:* 8.73s
+- *Prompt preparation time:* 0.0154
+- *First-token latency:* 0.557
+- *Cleanup time:* 0.16
+- *Prompt tokens:* 330
+- *Generation tokens:* 431
+- *Total tokens:* 761
+- *Prompt throughput (raw):* 592 tok/s
+- *Generation throughput (raw):* 87.4 tok/s
+- *Peak memory (GB):* 24
+- *Active memory (GB):* 24
+- *Cache memory (GB):* 0.11
+- *Model-load active memory (GB):* 23.5
+- *Post-cleanup active memory (GB):* 0.00459
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 523
+- *Processor:* mlx_vlm.models.minicpmv4_7.processing_minicpmv4_7.MiniCPMV4_7Processor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0e3b706c1599ad95294122c67c77ce662de18794
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.7-35B-A3B-4bit/snapshots/0e3b706c1599ad95294122c67c77ce662de18794
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title: Two Tabby Cats Resting on Pink Sofa
+
+Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The cats appear to be sleeping or resting, with their striped fur patterns clearly visible against the pink background.
+
+Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+I need to create British-English catalogue metadata based on the image. Let me start by analyzing the image carefully.
+
+First, the main subjects are two tabby cats. They are lying on a pink surface, which looks like a couch or sofa. There are two remote controls visible near the cats. The cats are resting or sleeping. The lighting seems to be natural or indoor, but I should focus on clearly visible facts.
+
+For the title, I need a concrete 5-10-word title. Something like "Two Tabby Cats Resting on Pink Sofa" would work.
+
+Now for the description: The main subject is two tabby cats lying on a bright pink fabric surface, likely a sofa. Each cat is near a white remote control. The cats appear to be sleeping or resting. The lighting is even, highlighting the cats' fur patterns and the pink fabric.
+
+Keywords: I need 10-18 unique keywords. Let's list them: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink.
+
+Wait, I need to make sure they are unique and relevant. Let's check: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink. Some might be redundant, but I'll keep them as distinct terms.
+
+Now, structuring the response exactly as required.
+&lt;/think&gt;
+
+Title: Two Tabby Cats Resting on Pink Sofa
+
+Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The cats appear to be sleeping or resting, with their striped fur patterns clearly visible against the pink background.
+
+Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+I need to create British-English catalogue metadata based on the image. Let me start by analyzing the image carefully.
+
+First, the main subjects are two tabby cats. They are lying on a pink surface, which looks like a couch or sofa. There are two remote controls visible near the cats. The cats are resting or sleeping. The lighting seems to be natural or indoor, but I should focus on clearly visible facts.
+
+For the title, I need a concrete 5-10-word title. Something like "Two Tabby Cats Resting on Pink Sofa" would work.
+
+Now for the description: The main subject is two tabby cats lying on a bright pink fabric surface, likely a sofa. Each cat is near a white remote control. The cats appear to be sleeping or resting. The lighting is even, highlighting the cats' fur patterns and the pink fabric.
+
+Keywords: I need 10-18 unique keywords. Let's list them: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink.
+
+Wait, I need to make sure they are unique and relevant. Let's check: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink. Some might be redundant, but I'll keep them as distinct terms.
+
+Now, structuring the response exactly as required.
+</think>
+
+Title: Two Tabby Cats Resting on Pink Sofa
+
+Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The cats appear to be sleeping or resting, with their striped fur patterns clearly visible against the pink background.
+
+Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.24s
+- *Generation time:* 1.93s
+- *Total time:* 3.30s
+- *Prompt preparation time:* 0.0165
+- *First-token latency:* 0.72
+- *Cleanup time:* 0.0987
+- *Prompt tokens:* 1,070
+- *Generation tokens:* 81
+- *Total tokens:* 1,151
+- *Prompt throughput (raw):* 1,485 tok/s
+- *Generation throughput (raw):* 67.5 tok/s
+- *Peak memory (GB):* 8.9
+- *Active memory (GB):* 8.0
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 8.01
+- *Post-cleanup active memory (GB):* 0.00516
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 2910
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7c992876448fc5426841a85c6eb951b056fe38d2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-mxfp4/snapshots/7c992876448fc5426841a85c6eb951b056fe38d2
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Two Cats Relaxing on Pink Cushioned Surface
+
+Description:
+Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The lighting is natural, and the cats appear calm and at ease.
+
+Keywords:
+cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, natural lighting, striped fur, resting, cushioned fabric, domestic scene
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
+
+### mlx-community/Ministral-3-3B-Instruct-2512-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Ministral-3-3B-Instruct-2512-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 0.78s
+- *Generation time:* 0.74s
+- *Total time:* 1.65s
+- *Prompt preparation time:* 0.0171
+- *First-token latency:* 0.214
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 1,069
+- *Generation tokens:* 102
+- *Total tokens:* 1,171
+- *Prompt throughput (raw):* 4,992 tok/s
+- *Generation throughput (raw):* 209 tok/s
+- *Peak memory (GB):* 3.7
+- *Active memory (GB):* 2.8
+- *Cache memory (GB):* 0.16
+- *Model-load active memory (GB):* 2.75
+- *Post-cleanup active memory (GB):* 0.00543
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 2909
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* a962dcb09eee4169c890e544c9eb938f1113fdee
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-3B-Instruct-2512-4bit/snapshots/a962dcb09eee4169c890e544c9eb938f1113fdee
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Two resting tabby cats on a pink sofa
+
+Description:
+Two adult tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft, natural lighting highlights their striped fur patterns and relaxed postures.
+
+Keywords:
+tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-setting, domestic-pets, household-items, resting-scene, pet-photography, domestic-interior, soft-lighting
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-mistral-small-4-119b-2603-4bit"></a>
+
+### mlx-community/Mistral-Small-4-119B-2603-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Mistral-Small-4-119B-2603-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 12.11s
+- *Generation time:* 7.68s
+- *Total time:* 20.11s
+- *Prompt preparation time:* 0.0299
+- *First-token latency:* 5.44
+- *Cleanup time:* 0.285
+- *Prompt tokens:* 549
+- *Generation tokens:* 82
+- *Total tokens:* 631
+- *Prompt throughput (raw):* 101 tok/s
+- *Generation throughput (raw):* 91.1 tok/s
+- *Peak memory (GB):* 69
+- *Active memory (GB):* 68
+- *Cache memory (GB):* 0.46
+- *Model-load active memory (GB):* 67.8
+- *Post-cleanup active memory (GB):* 0.00569
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 533
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 87b1249207734f029ec9dcefab80eabedfa6b812
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Mistral-Small-4-119B-2603-4bit/snapshots/87b1249207734f029ec9dcefab80eabedfa6b812
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Two cats resting on a pink sofa
+
+Description:
+Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and the sofa's colour.
+
+Keywords:
+cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relaxation, soft lighting, living room, animal, comfort, leisure, home decor, sofa cushion, pet accessories
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
+
+### mlx-community/Molmo2-8B-4bit
+
+#### Human accuracy note
+
+Reviewed by john on 2026-10-25 for this exact image, model revision and
+output. This is a person's judgement, not one of the mechanical checks.
+
+Describes the pictured tabby cats as calico cats and gives incorrect
+positional details.
+
+<details>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 1.02s
+- *Generation time:* 1.85s
+- *Total time:* 3.00s
+- *Prompt preparation time:* 0.0194
+- *First-token latency:* 0.451
+- *Cleanup time:* 0.0934
+- *Prompt tokens:* 873
+- *Generation tokens:* 95
+- *Total tokens:* 968
+- *Prompt throughput (raw):* 1,936 tok/s
+- *Generation throughput (raw):* 71.1 tok/s
+- *Peak memory (GB):* 8.2
+- *Active memory (GB):* 6.5
+- *Cache memory (GB):* 0.17
+- *Model-load active memory (GB):* 6.45
+- *Post-cleanup active memory (GB):* 0.006
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 510
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Calico Cats Sleeping on Pink Bedding
+
+Description: Two calico cats are sleeping side by side on pink bedding. They are positioned with their heads facing each other and their tails touching. The cats have white, black, and brown fur. Two white remote controls are visible behind the cats.
+
+Keywords: calico cats, sleeping, pink bedding, white remotes, black and brown fur, white cats, striped cats, cozy, relaxed, feline
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmopoint-8b-4bit"></a>
+
+### mlx-community/MolmoPoint-8B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MolmoPoint-8B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
+- *Model load time:* 1.30s
+- *Generation time:* 3.14s
+- *Total time:* 4.57s
+- *Prompt preparation time:* 0.0219
+- *First-token latency:* 0.737
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 860
+- *Generation tokens:* 70
+- *Total tokens:* 930
+- *Prompt throughput (raw):* 1,167 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
+- *Peak memory (GB):* 12
+- *Active memory (GB):* 8.5
+- *Cache memory (GB):* 3.1
+- *Model-load active memory (GB):* 7.23
+- *Post-cleanup active memory (GB):* 0.00662
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 510
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 9bab196f867ceedecdb1eab071395bfedcd62538
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MolmoPoint-8B-4bit/snapshots/9bab196f867ceedecdb1eab071395bfedcd62538
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Cats Sleeping on Pink Blanket with Remote Controls
+
+Description: Two cats are sleeping on a pink blanket. A white remote control is visible behind them. The cats are resting comfortably on the soft surface.
+
+Keywords: cats, pink blanket, remote controls, sleeping, white remote, comfortable, soft surface, feline, rest, relaxation
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
+
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Model load time:* 2.67s
+- *Generation time:* 36.40s
+- *Total time:* 39.24s
+- *Prompt preparation time:* 0.0294
+- *First-token latency:* 0.891
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 545
+- *Generation tokens:* 884
+- *Total tokens:* 1,429
+- *Prompt throughput (raw):* 612 tok/s
+- *Generation throughput (raw):* 24.9 tok/s
+- *Peak memory (GB):* 25
+- *Active memory (GB):* 24
+- *Cache memory (GB):* 0.12
+- *Model-load active memory (GB):* 23.9
+- *Post-cleanup active memory (GB):* 0.00703
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 710
+- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 865ee8de65799cc4ee406587e4b607063708f358
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/865ee8de65799cc4ee406587e4b607063708f358
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two cats resting on pink blanket sofa
+Description: Two cats lie on a bright pink blanket on a red sofa, one with its head resting down and eyes closed, the other with its head lowered. Two white remote controls lie on the fabric beside the cats.
+Keywords: cats, pink blanket, red sofa, remote controls, tabby markings, resting, sleeping, fabric, couch, indoor, white remotes, fur, paws, collar
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
+
+### mlx-community/North-Micro-Vision-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/North-Micro-Vision-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
+- *Model load time:* 1.05s
+- *Generation time:* 0.48s
+- *Total time:* 1.65s
+- *Prompt preparation time:* 0.016
+- *First-token latency:* 0.157
+- *Cleanup time:* 0.092
+- *Prompt tokens:* 418
+- *Generation tokens:* 78
+- *Total tokens:* 496
+- *Prompt throughput (raw):* 2,662 tok/s
+- *Generation throughput (raw):* 267 tok/s
+- *Peak memory (GB):* 3.3
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.11
+- *Model-load active memory (GB):* 2.18
+- *Post-cleanup active memory (GB):* 0.00756
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 603
+- *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
+- *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 87466363e6c5f57adf91c18c3a62c3c74765f8df
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--North-Micro-Vision-Instruct-4bit/snapshots/87466363e6c5f57adf91c18c3a62c3c74765f8df
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+- *EOS token:* <\|END_OF_TURN_TOKEN\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Cats Resting on a Pink Couch"
+
+Description: "Two cats are comfortably sprawled out on a vibrant pink couch, basking in the soft light of the day. Their relaxed postures and the cozy setting create a serene and tranquil scene."
+
+Keywords: cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, basking, cozy, serene, scene.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.83s
+- *Generation time:* 1.91s
+- *Total time:* 2.85s
+- *Prompt preparation time:* 0.0183
+- *First-token latency:* 0.227
+- *Cleanup time:* 0.0925
+- *Prompt tokens:* 883
+- *Generation tokens:* 94
+- *Total tokens:* 977
+- *Prompt throughput (raw):* 3,890 tok/s
+- *Generation throughput (raw):* 58.1 tok/s
+- *Peak memory (GB):* 9.1
+- *Active memory (GB):* 8.3
+- *Cache memory (GB):* 0.42
+- *Model-load active memory (GB):* 8.3
+- *Post-cleanup active memory (GB):* 0.00762
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 493
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Cats Sleeping on Pink Sofa
+
+Description: Two cats are sleeping on a pink sofa with remote controls beside them.
+
+Keywords: cats, sleeping, pink sofa, remote controls, relaxed, comfortable, indoor, domestic, fur, striped, resting, tranquil, domesticated, pet, animal, relaxation, cozy, home, companionship
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
+- *Model load time:* 2.29s
+- *Generation time:* 1.24s
+- *Total time:* 3.73s
+- *Prompt preparation time:* 0.0245
+- *First-token latency:* 0.366
+- *Cleanup time:* 0.152
+- *Prompt tokens:* 409
+- *Generation tokens:* 81
+- *Total tokens:* 490
+- *Prompt throughput (raw):* 1,116 tok/s
+- *Generation throughput (raw):* 93.6 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 22
+- *Cache memory (GB):* 0.07
+- *Model-load active memory (GB):* 21.8
+- *Post-cleanup active memory (GB):* 0.00793
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 544
+- *Processor:* mlx_vlm.models.qwen3_omni_moe.processing_qwen3_omni_moe.Qwen3OmniMoeProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 93b3cbddd65ed4babff8f22fba491cdba7a21778
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-Omni-30B-A3B-Instruct-4bit/snapshots/93b3cbddd65ed4babff8f22fba491cdba7a21778
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Two tabby cats sleeping on sofa
+
+Description:
+Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats.
+
+Keywords:
+tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoor, animal, pet, living room, comfort, relaxation, animal companions, domestic animals, household, feline, rest
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
+- *Model load time:* 1.88s
+- *Generation time:* 0.97s
+- *Total time:* 3.01s
+- *Prompt preparation time:* 0.0211
+- *First-token latency:* 0.33
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 409
+- *Generation tokens:* 83
+- *Total tokens:* 492
+- *Prompt throughput (raw):* 1,239 tok/s
+- *Generation throughput (raw):* 133 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 0.07
+- *Model-load active memory (GB):* 18.3
+- *Post-cleanup active memory (GB):* 0.00824
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 544
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two cats resting on a pink surface
+
+Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with its eyes closed, while the other lies on its side. Two remote controls are visible on the surface near the cats.
+
+Keywords: cats, remote controls, pink fabric, lying down, curled up, eyes closed, striped pattern, light, indoor setting, domestic animals
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-8b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-VL-8B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-8B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.89s
+- *Generation time:* 0.84s
+- *Total time:* 1.87s
+- *Prompt preparation time:* 0.0104
+- *First-token latency:* 0.204
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 409
+- *Generation tokens:* 60
+- *Total tokens:* 469
+- *Prompt throughput (raw):* 2,001 tok/s
+- *Generation throughput (raw):* 103 tok/s
+- *Peak memory (GB):* 6.8
+- *Active memory (GB):* 5.8
+- *Cache memory (GB):* 0.11
+- *Model-load active memory (GB):* 5.77
+- *Post-cleanup active memory (GB):* 0.00855
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 544
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* defcdea7cc7a4b0858fea563cbbce171d328e457
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-8B-Instruct-4bit/snapshots/defcdea7cc7a4b0858fea563cbbce171d328e457
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Cats Sleeping on Pink Sofa
+
+Description: Two tabby cats rest peacefully on a bright pink sofa. Remote controls lie beside them. Natural daylight illuminates the scene.
+
+Keywords: cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feline
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
+
+### mlx-community/Qwen3.5-35B-A3B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.5-35B-A3B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
+- *Model load time:* 2.41s
+- *Generation time:* 7.66s
+- *Total time:* 10.24s
+- *Prompt preparation time:* 0.0247
+- *First-token latency:* 0.334
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 419
+- *Generation tokens:* 898
+- *Total tokens:* 1,317
+- *Prompt throughput (raw):* 1,254 tok/s
+- *Generation throughput (raw):* 123 tok/s
+- *Peak memory (GB):* 21
+- *Active memory (GB):* 20
+- *Cache memory (GB):* 0.12
+- *Model-load active memory (GB):* 20.4
+- *Post-cleanup active memory (GB):* 0.00906
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 552
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 1e20fd8d42056f870933bf98ca6211024744f7ec
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-35B-A3B-4bit/snapshots/1e20fd8d42056f870933bf98ca6211024744f7ec
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title: Two tabby cats sleeping on pink sofa next to remotes
+
+Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+
+Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The user wants catalogue metadata for the provided image.
+
+**1. Analyze the Image:**
+*   **Subjects:** Two tabby cats.
+    *   Cat 1 (Left): Lying on its back/side, stretched out. Looks like a young cat or kitten based on size, but it's hard to be certain. It has a green collar.
+    *   Cat 2 (Right): Lying on its side/stomach, facing the other cat but slightly angled away. Larger than the one on the left. Also tabby.
+*   **Setting:** A bright pink sofa or couch with fabric folds.
+*   **Objects:** Two remote controls. One is white/grey with blue buttons (left), one is white with colorful buttons (center/right).
+*   **Lighting:** Bright, likely natural daylight or strong indoor lighting. Shadows are soft but distinct.
+*   **Action:** Sleeping or resting peacefully.
+
+**2. Draft Title (5-10 words):**
+*   *Draft 1:* Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
+*   *Draft 2:* Sleeping tabby cats resting on bright pink couch cushions. (9 words) - Good.
+*   *Draft 3:* Two striped cats lying on pink sofa next to remotes. (10 words) - Good.
+*   *Selection:* Two tabby cats sleeping on pink sofa next to remotes.
+
+**3. Draft Description (1-2 sentences):**
+*   *Focus:* Main subject, setting, action, lighting, details.
+*   *Draft 1:* Two tabby cats are lying asleep on a bright pink sofa. There are two remote controls near them, one near the head of the cat on the left and another between the cats. The lighting is bright and casts soft shadows.
+*   *Refining for constraints:* Needs to be factual and concise.
+*   *Final Version:* Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+
+**4. Draft Keywords (10-18 unique, comma-separated):**
+*   *Brainstorming:* cats, tabby, pets, sleeping, sofa, couch, pink, remote, television, controls, feline, animals, resting, fabric, stripes, collar, green, furniture, domestic.
+*   *Selection:* cats, tabby, sleeping, sofa, couch, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, pets, stretching. (18 items)
+*   *Refining:* cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion.
+
+**5. Final Review:**
+*   Title: Two tabby cats sleeping on pink sofa next to remotes. (9 words) -&gt; Check.
+*   Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left. (2 sentences) -&gt; Check.
+*   Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion. (18 keywords) -&gt; Check.
+
+**6. Formatting:**
+Ensure "Title:", "Description:", "Keywords:" headers are present and no extra text is added.
+
+*Self-Correction during drafting:* The prompt asks for "British-English catalogue metadata". "Couch" and "Sofa" are fine
+&lt;/think&gt;
+
+Title: Two tabby cats sleeping on pink sofa next to remotes
+
+Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+
+Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The user wants catalogue metadata for the provided image.
+
+**1. Analyze the Image:**
+*   **Subjects:** Two tabby cats.
+    *   Cat 1 (Left): Lying on its back/side, stretched out. Looks like a young cat or kitten based on size, but it's hard to be certain. It has a green collar.
+    *   Cat 2 (Right): Lying on its side/stomach, facing the other cat but slightly angled away. Larger than the one on the left. Also tabby.
+*   **Setting:** A bright pink sofa or couch with fabric folds.
+*   **Objects:** Two remote controls. One is white/grey with blue buttons (left), one is white with colorful buttons (center/right).
+*   **Lighting:** Bright, likely natural daylight or strong indoor lighting. Shadows are soft but distinct.
+*   **Action:** Sleeping or resting peacefully.
+
+**2. Draft Title (5-10 words):**
+*   *Draft 1:* Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
+*   *Draft 2:* Sleeping tabby cats resting on bright pink couch cushions. (9 words) - Good.
+*   *Draft 3:* Two striped cats lying on pink sofa next to remotes. (10 words) - Good.
+*   *Selection:* Two tabby cats sleeping on pink sofa next to remotes.
+
+**3. Draft Description (1-2 sentences):**
+*   *Focus:* Main subject, setting, action, lighting, details.
+*   *Draft 1:* Two tabby cats are lying asleep on a bright pink sofa. There are two remote controls near them, one near the head of the cat on the left and another between the cats. The lighting is bright and casts soft shadows.
+*   *Refining for constraints:* Needs to be factual and concise.
+*   *Final Version:* Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+
+**4. Draft Keywords (10-18 unique, comma-separated):**
+*   *Brainstorming:* cats, tabby, pets, sleeping, sofa, couch, pink, remote, television, controls, feline, animals, resting, fabric, stripes, collar, green, furniture, domestic.
+*   *Selection:* cats, tabby, sleeping, sofa, couch, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, pets, stretching. (18 items)
+*   *Refining:* cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion.
+
+**5. Final Review:**
+*   Title: Two tabby cats sleeping on pink sofa next to remotes. (9 words) -> Check.
+*   Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left. (2 sentences) -> Check.
+*   Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion. (18 keywords) -> Check.
+
+**6. Formatting:**
+Ensure "Title:", "Description:", "Keywords:" headers are present and no extra text is added.
+
+*Self-Correction during drafting:* The prompt asks for "British-English catalogue metadata". "Couch" and "Sofa" are fine
+</think>
+
+Title: Two tabby cats sleeping on pink sofa next to remotes
+
+Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+
+Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen36-35b-a3b-4bit"></a>
+
+### mlx-community/Qwen3.6-35B-A3B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.6-35B-A3B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
+- *Model load time:* 2.43s
+- *Generation time:* 5.78s
+- *Total time:* 8.39s
+- *Prompt preparation time:* 0.0242
+- *First-token latency:* 0.357
+- *Cleanup time:* 0.131
+- *Prompt tokens:* 419
+- *Generation tokens:* 653
+- *Total tokens:* 1,072
+- *Prompt throughput (raw):* 1,175 tok/s
+- *Generation throughput (raw):* 121 tok/s
+- *Peak memory (GB):* 21
+- *Active memory (GB):* 20
+- *Cache memory (GB):* 0.12
+- *Model-load active memory (GB):* 20.4
+- *Post-cleanup active memory (GB):* 0.00957
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 552
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 38740b847e4cb78f352aba30aa41c76e08e6eb46
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-35B-A3B-4bit/snapshots/38740b847e4cb78f352aba30aa41c76e08e6eb46
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title: Two tabby cats sleeping on pink sofa with remotes.
+Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, grey, buttons, fabric, pattern, kittens
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The user wants metadata for an image of two cats on a sofa.
+I need to extract specific details:
+- **Subject:** Two tabby cats. One is small/kitten, one is adult/larger.
+- **Setting:** A bright pink sofa/couch.
+- **Objects:** Two remote controls (grey/silver).
+- **Action:** Sleeping/resting.
+- **Lighting:** Natural, soft, indoor lighting.
+- **Distinctive details:** The kittens' striped fur, the pink fabric, the position of the remotes.
+
+**Drafting Title:**
+Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
+
+**Drafting Description:**
+Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+
+**Drafting Keywords:**
+tabby cats, pink sofa, sleeping kittens, remote controls, furniture, striped fur, paws, cushions, pets, animals, resting, domestic, grey remote, texture, fabric, stripes, back, front paws, rear paws.
+
+Let's refine keywords to be unique and distinct.
+1. tabby cats
+2. pink sofa
+3. sleeping kittens
+4. remote controls
+5. furniture
+6. striped fur
+7. paws
+8. cushions
+9. pets
+10. animals
+11. resting
+12. domestic
+13. grey remote
+14. texture
+15. fabric
+16. stripes
+17. back
+18. front paws
+
+Wait, "back" and "front paws" might be redundant with "paws". Let's stick to visible objects and clear descriptors.
+- tabby
+- cats
+- pink
+- sofa
+- remote
+- controls
+- sleeping
+- fur
+- stripes
+- paws
+- cushions
+- furniture
+- pets
+- animals
+- grey
+- buttons
+- fabric
+- pattern
+
+Let's count: 18 words. Perfect.
+
+Final check of the prompt requirements:
+- British-English catalogue metadata. (No specific British spelling issues really, just standard English).
+- Only clearly visible facts. (Yes).
+- Omit uncertain details. (Yes, didn't guess breeds or specific room names).
+- 5-10 word title. (Yes).
+- 1-2 sentence description. (Yes).
+- 10-18 unique keywords. (Yes).
+
+Let's assemble.
+&lt;/think&gt;
+
+Title: Two tabby cats sleeping on pink sofa with remotes.
+Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, grey, buttons, fabric, pattern, kittens
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The user wants metadata for an image of two cats on a sofa.
+I need to extract specific details:
+- **Subject:** Two tabby cats. One is small/kitten, one is adult/larger.
+- **Setting:** A bright pink sofa/couch.
+- **Objects:** Two remote controls (grey/silver).
+- **Action:** Sleeping/resting.
+- **Lighting:** Natural, soft, indoor lighting.
+- **Distinctive details:** The kittens' striped fur, the pink fabric, the position of the remotes.
+
+**Drafting Title:**
+Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
+
+**Drafting Description:**
+Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+
+**Drafting Keywords:**
+tabby cats, pink sofa, sleeping kittens, remote controls, furniture, striped fur, paws, cushions, pets, animals, resting, domestic, grey remote, texture, fabric, stripes, back, front paws, rear paws.
+
+Let's refine keywords to be unique and distinct.
+1. tabby cats
+2. pink sofa
+3. sleeping kittens
+4. remote controls
+5. furniture
+6. striped fur
+7. paws
+8. cushions
+9. pets
+10. animals
+11. resting
+12. domestic
+13. grey remote
+14. texture
+15. fabric
+16. stripes
+17. back
+18. front paws
+
+Wait, "back" and "front paws" might be redundant with "paws". Let's stick to visible objects and clear descriptors.
+- tabby
+- cats
+- pink
+- sofa
+- remote
+- controls
+- sleeping
+- fur
+- stripes
+- paws
+- cushions
+- furniture
+- pets
+- animals
+- grey
+- buttons
+- fabric
+- pattern
+
+Let's count: 18 words. Perfect.
+
+Final check of the prompt requirements:
+- British-English catalogue metadata. (No specific British spelling issues really, just standard English).
+- Only clearly visible facts. (Yes).
+- Omit uncertain details. (Yes, didn't guess breeds or specific room names).
+- 5-10 word title. (Yes).
+- 1-2 sentence description. (Yes).
+- 10-18 unique keywords. (Yes).
+
+Let's assemble.
+</think>
+
+Title: Two tabby cats sleeping on pink sofa with remotes.
+Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, grey, buttons, fabric, pattern, kittens
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen38-27b-nvfp4"></a>
+
+### mlx-community/Qwen3.8-27B-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.8-27B-nvfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.89s
+- *Generation time:* 21.45s
+- *Total time:* 23.52s
+- *Prompt preparation time:* 0.0107
+- *First-token latency:* 0.711
+- *Cleanup time:* 0.143
+- *Prompt tokens:* 461
+- *Generation tokens:* 640
+- *Total tokens:* 1,101
+- *Prompt throughput (raw):* 648 tok/s
+- *Generation throughput (raw):* 30.9 tok/s
+- *Peak memory (GB):* 17
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 0.29
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.0101
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 789
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* f9cb6495054684578f19bf751882716f87542a96
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-nvfp4/snapshots/f9cb6495054684578f19bf751882716f87542a96
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title:
+Two tabby cats resting beside remote controls on pink sofa
+
+Description:
+Two striped tabby cats lie asleep on a vivid pink sofa, one wearing a green collar tag, with two white remote controls placed nearby under even indoor lighting.
+
+Keywords:
+tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, green collar tag, indoor lighting, resting felines, domestic animals, lounging, two cats, cushioned seating
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The user wants British-English catalogue metadata based strictly on visible facts. I need to examine the image carefully.
+
+Visible facts: Two tabby cats lying on a pink/magenta fabric surface (looks like a couch or sofa with cushions visible at top). Both cats appear asleep/lying down. Two white remote controls are visible—one near the top left by the smaller cat, one between the cats. The cats are tabby patterned, brownish-grey with stripes. One cat has a green collar tag visible. Lighting appears even/indoor.
+
+I must avoid uncertain identity, location, event, brand, species (well, "cat" is visible, that's fine), period, intent. I'll stick to "tabby cats" as that's a visible coat pattern, acceptable.
+
+Title: 5-10 words concrete. "Two tabby cats sleeping beside remote controls on pink couch" — count: Two(1) tabby(2) cats(3) sleeping(4) beside(5) remote(6) controls(7) on(8) pink(9) couch(10). Good, 10 words.
+
+Description: 1-2 sentences factual. Mention main subject, setting, action, lighting, distinctive details.
+
+Keywords: 10-18 unique comma-separated.
+
+Let me draft keywords: tabby cats, pink fabric, remote controls, sleeping, striped coat, magenta sofa, indoor lighting, feline, collar tag, resting, domestic animals, two cats, white remotes, lounging. Count them.
+
+Let me ensure British English: "couch" vs "sofa" — both fine; I'll use "sofa" perhaps. Actually pink fabric surface with cushions at top suggests sofa. I'll say "pink sofa".
+
+Final title with sofa: "Two tabby cats resting beside remote controls on pink sofa" = Two1 tabby2 cats3 resting4 beside5 remote6 controls7 on8 pink9 sofa10. Good.
+
+Description: "Two striped tabby cats lie asleep on a vivid pink sofa, one with a green collar tag, with two white remote controls placed nearby under even indoor lighting." That's one sentence, factual.
+
+Keywords list, ensure unique and 10-18: tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, green collar tag, indoor lighting, resting felines, domestic animals, lounging, two cats, cushioned seating. Count: 14. Good.
+
+Return exactly three sections.
+&lt;/think&gt;
+
+Title:
+Two tabby cats resting beside remote controls on pink sofa
+
+Description:
+Two striped tabby cats lie asleep on a vivid pink sofa, one wearing a green collar tag, with two white remote controls placed nearby under even indoor lighting.
+
+Keywords:
+tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, green collar tag, indoor lighting, resting felines, domestic animals, lounging, two cats, cushioned seating
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The user wants British-English catalogue metadata based strictly on visible facts. I need to examine the image carefully.
+
+Visible facts: Two tabby cats lying on a pink/magenta fabric surface (looks like a couch or sofa with cushions visible at top). Both cats appear asleep/lying down. Two white remote controls are visible—one near the top left by the smaller cat, one between the cats. The cats are tabby patterned, brownish-grey with stripes. One cat has a green collar tag visible. Lighting appears even/indoor.
+
+I must avoid uncertain identity, location, event, brand, species (well, "cat" is visible, that's fine), period, intent. I'll stick to "tabby cats" as that's a visible coat pattern, acceptable.
+
+Title: 5-10 words concrete. "Two tabby cats sleeping beside remote controls on pink couch" — count: Two(1) tabby(2) cats(3) sleeping(4) beside(5) remote(6) controls(7) on(8) pink(9) couch(10). Good, 10 words.
+
+Description: 1-2 sentences factual. Mention main subject, setting, action, lighting, distinctive details.
+
+Keywords: 10-18 unique comma-separated.
+
+Let me draft keywords: tabby cats, pink fabric, remote controls, sleeping, striped coat, magenta sofa, indoor lighting, feline, collar tag, resting, domestic animals, two cats, white remotes, lounging. Count them.
+
+Let me ensure British English: "couch" vs "sofa" — both fine; I'll use "sofa" perhaps. Actually pink fabric surface with cushions at top suggests sofa. I'll say "pink sofa".
+
+Final title with sofa: "Two tabby cats resting beside remote controls on pink sofa" = Two1 tabby2 cats3 resting4 beside5 remote6 controls7 on8 pink9 sofa10. Good.
+
+Description: "Two striped tabby cats lie asleep on a vivid pink sofa, one with a green collar tag, with two white remote controls placed nearby under even indoor lighting." That's one sentence, factual.
+
+Keywords list, ensure unique and 10-18: tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, green collar tag, indoor lighting, resting felines, domestic animals, lounging, two cats, cushioned seating. Count: 14. Good.
+
+Return exactly three sections.
+</think>
+
+Title:
+Two tabby cats resting beside remote controls on pink sofa
+
+Description:
+Two striped tabby cats lie asleep on a vivid pink sofa, one wearing a green collar tag, with two white remote controls placed nearby under even indoor lighting.
+
+Keywords:
+tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, green collar tag, indoor lighting, resting felines, domestic animals, lounging, two cats, cushioned seating
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.61s
+- *Generation time:* 0.72s
+- *Total time:* 1.51s
+- *Prompt preparation time:* 0.0681
+- *First-token latency:* 0.383
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 1,204
+- *Generation tokens:* 31
+- *Total tokens:* 1,235
+- *Prompt throughput (raw):* 3,141 tok/s
+- *Generation throughput (raw):* 117 tok/s
+- *Peak memory (GB):* 5.6
+- *Active memory (GB):* 4.5
+- *Cache memory (GB):* 0.30
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0102
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 504
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Two Cats on a Couch
+Description: Two cats are sleeping on a pink couch.
+Keywords: cats, couch, sleeping, pink
 </pre>
 
 </details>
@@ -2426,26 +2490,26 @@ Keywords: senior man, dog harness, domestic life, Indoors, chihuahua mix, attent
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.80s
-- *Generation time:* 3.29s
-- *Total time:* 4.94s
-- *Prompt preparation time:* 0.741
-- *First-token latency:* 1.51
-- *Cleanup time:* 0.0982
-- *Prompt tokens:* 4,184
-- *Generation tokens:* 140
-- *Total tokens:* 4,324
-- *Prompt throughput (raw):* 2,762 tok/s
-- *Generation throughput (raw):* 130 tok/s
-- *Peak memory (GB):* 5.4
+- *Model load time:* 0.83s
+- *Generation time:* 0.77s
+- *Total time:* 1.73s
+- *Prompt preparation time:* 0.0127
+- *First-token latency:* 0.136
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 420
+- *Generation tokens:* 88
+- *Total tokens:* 508
+- *Prompt throughput (raw):* 3,095 tok/s
+- *Generation throughput (raw):* 149 tok/s
+- *Peak memory (GB):* 5.2
 - *Active memory (GB):* 3.9
-- *Cache memory (GB):* 0.72
+- *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 3.93
 - *Post-cleanup active memory (GB):* 0.0138
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1425
+- *Rendered prompt characters:* 602
 - *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2458,11 +2522,9 @@ Keywords: senior man, dog harness, domestic life, Indoors, chihuahua mix, attent
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Small mixed-breed dog with alert expression in living room, senior man using tablet in background
-
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older man relaxes in the background using a tablet in a cozy living room setting. The dog has big ears, a brown and black coat, and a calm, curious expression. The lighting is warm and indoor, creating a comfortable atmosphere.
-
-Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal
+Title: Two Cats Resting on a Pink Couch with Remotes
+Description: Two tabby cats are lying on a pink couch, with a remote control placed between them. The cats appear to be sleeping or resting, with one cat's tail visible. The lighting is bright, and the setting is indoors.
+Keywords: cats, resting, pink couch, remote control, tabby, sleeping, indoor, bright lighting, tail, visible
 </pre>
 
 </details>
@@ -2483,26 +2545,26 @@ Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sittin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.70s
-- *Generation time:* 5.21s
-- *Total time:* 7.60s
-- *Prompt preparation time:* 0.558
-- *First-token latency:* 1.52
-- *Cleanup time:* 0.115
-- *Prompt tokens:* 1,248
-- *Generation tokens:* 113
-- *Total tokens:* 1,361
-- *Prompt throughput (raw):* 821 tok/s
+- *Model load time:* 1.64s
+- *Generation time:* 3.11s
+- *Total time:* 4.89s
+- *Prompt preparation time:* 0.0114
+- *First-token latency:* 0.666
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 538
+- *Generation tokens:* 87
+- *Total tokens:* 625
+- *Prompt throughput (raw):* 808 tok/s
 - *Generation throughput (raw):* 35.9 tok/s
-- *Peak memory (GB):* 18
+- *Peak memory (GB):* 16
 - *Active memory (GB):* 15
-- *Cache memory (GB):* 0.28
+- *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 15.1
 - *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1295
+- *Rendered prompt characters:* 472
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2516,13 +2578,13 @@ Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sittin
 
 <pre class="model-output-readable">
 Title:
-Small Dog in Harness with Relaxed Older Person
+Two Cats Resting on a Pink Blanket
 
 Description:
-A small, mixed-breed dog with large ears wears a harness and looks attentively at the camera, while an older person sits in the background using a tablet in a living room.
+Two tabby cats are lying on a pink blanket, one stretched out and the other curled up. A remote control is visible near the cats.
 
 Keywords:
-Small dog, dog harness, chihuahua mix, big ears, brown and black fur, living room, older person, tablet, indoors, relaxed, casual, companion animal, domestic life, close-up, alert, sitting, comfortable, digital device, Adobe Stock, Any Vision
+cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch, paws, stripes, sleeping, pet, animal, lounge, cushion, relaxed posture, domestic
 </pre>
 
 </details>
@@ -2544,26 +2606,26 @@ Small dog, dog harness, chihuahua mix, big ears, brown and black fur, living roo
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.21s
-- *Generation time:* 8.12s
-- *Total time:* 11.19s
-- *Prompt preparation time:* 0.699
-- *First-token latency:* 2.26
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 3,603
-- *Generation tokens:* 837
-- *Total tokens:* 4,440
-- *Prompt throughput (raw):* 1,591 tok/s
-- *Generation throughput (raw):* 164 tok/s
-- *Peak memory (GB):* 23
+- *Model load time:* 2.12s
+- *Generation time:* 4.72s
+- *Total time:* 7.01s
+- *Prompt preparation time:* 0.0241
+- *First-token latency:* 0.342
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 421
+- *Generation tokens:* 706
+- *Total tokens:* 1,127
+- *Prompt throughput (raw):* 1,232 tok/s
+- *Generation throughput (raw):* 162 tok/s
+- *Peak memory (GB):* 21
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.15
+- *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 19.7
-- *Post-cleanup active memory (GB):* 0.015
+- *Post-cleanup active memory (GB):* 0.0144
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
+- *Rendered prompt characters:* 547
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2576,85 +2638,101 @@ Small dog, dog harness, chihuahua mix, big ears, brown and black fur, living roo
   "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
 - *EOS token:* <\|im_end\|>
 
+#### Final answer
+
+```text
+Title: Two tabby cats sleeping on pink cushion  
+Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby.  
+Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding
+```
+
 *Readable output:*
 
 <pre class="model-output-readable">
-We need to produce British-English catalogue metadata. Title 5-10 words, concrete. Description 1-2 sentences factual, combine context with main visible subject, setting, action, lighting, distinctive details. Keywords 10-18 unique, comma-separated, covering relevant context and visible details.
+We need to produce British-English catalogue metadata using only clearly visible facts. Omit uncertain details. Provide title (5-10 words), description (1-2 sentences factual), keywords (10-18 unique, comma-separated). Must be exactly three sections, no extra text.
 
-We must not claim capture date/time visible, but we have authoritative context: 2026-11-14 17:41:49 UTC+01:00. So we can mention date/time? Probably not, as not visible. But we can incorporate context like "indoor living room setting" etc.
+We need to infer what is visible: two cats sleeping on a pink surface (likely a couch or cushion). There are two remote controls (white). The cats are tabby. The setting: a pink fabric (cushion) on a red background (maybe a sofa). Lighting appears natural indoor. Distinctive details: remote controls, pink fabric, tabby cats.
 
-Title: maybe "Attentive Small Dog in Harness". That's 5 words? "Attentive Small Dog in Harness" = 5 words. Good.
+Title 5-10 words: "Two tabby cats sleeping on pink cushion". That's 6 words. Good.
 
-Description: 1-2 sentences. Something like: "A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly at the camera while an older man relaxes in the background using a tablet in a warmly lit living room." That's one sentence. Ensure British English spelling (e.g., "colour" not needed). Use British punctuation.
+Description: 1-2 sentences, factual. "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence. Could be two sentences but okay.
 
-Keywords: need 10-18 unique, comma-separated. Let's list: "dog, harness, small dog, mixed breed, big ears, brown black, attentive, living room, tablet, older man, relaxed, indoor, close up, canine companion, casual, chihuahua mix, domestic life". Count them: let's count: dog(1), harness(2), small dog(3) maybe treat as phrase? It's okay. We need unique keywords, not phrases? Probably each word separated by commas. We can include multi-word keywords but they count as one token? Safer to use single words or short phrases separated by commas. Let's produce 14 keywords: dog, harness, small, mixed-breed, big-ears, brown-black, attentive, living-room, tablet, older-man, relaxed, indoor, close-up, canine-companion. That's 14. Ensure uniqueness.
+Keywords: need 10-18 unique, comma-separated. Let's list: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding. Need 10-18, ensure uniqueness. Count: cat(1), tabby(2), pink(3), cushion(4), remote(5), white(6), sleeping(7), domestic(8), animal(9), furniture(10), indoor(11), relaxed(12), paws(13), ears(14), whiskers(15), sofa(16), bedding(17). That's 17, within 10-18. Ensure comma-separated.
 
-Check count: 1 dog, 2 harness, 3 small, 4 mixed-breed, 5 big-ears, 6 brown-black, 7 attentive, 8 living-room, 9 tablet, 10 older-man, 11 relaxed, 12 indoor, 13 close-up, 14 canine-companion. That's 14, within 10-18.
+Check no uncertain details: we assume "cushion" is visible, yes pink fabric. Remote controls are white. Cats are tabby. All visible.
 
-Now ensure British English: "harness" same, "living-room" hyphen, "close-up" hyphen, "older-man" hyphen. Good.
-
-Now produce final answer with exactly three sections:
+Now format:
 
 Title:
 Description:
 Keywords:
 
-Make sure no extra text. Let's craft.
+Make sure each line starts with "Title:", "Description:", "Keywords:".
 
-Title: "Attentive Small Dog in Harness" (5 words). Good.
+Let's craft.
 
-Description: "A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly at the camera while an older man relaxes in the background using a tablet in a warmly lit living room." That's one sentence, maybe two sentences? It's okay 1-2 sentences.
+Title: "Two tabby cats sleeping on pink cushion" (6 words). Good.
 
-Keywords: as list.
+Description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence, factual.
 
-Check for British spelling: "patterned" ok, "relaxes" British? "relaxes" same. "warmly lit" fine.
+Keywords: "cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding"
 
-Now produce final.
+Check count: 17 items. Good.
+
+Now ensure British English: "lying" maybe "lying" is fine. "cushion" British. "remote controls" maybe "remote controls" okay. Use British spelling: "remote controls" fine. "pink" same. "cushion" same.
+
+Check description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's okay.
+
+Now output exactly three sections, nothing else.
 &lt;/think&gt;
-Title: Attentive Small Dog in Harness
-Description: A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly at the camera while an older man relaxes in the background using a tablet in a warmly lit living room.
-Keywords: dog, harness, small, mixed-breed, big-ears, brown-black, attentive, living-room, tablet, older-man, relaxed, indoor, close-up, canine-companion
+Title: Two tabby cats sleeping on pink cushion
+Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby.
+Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-We need to produce British-English catalogue metadata. Title 5-10 words, concrete. Description 1-2 sentences factual, combine context with main visible subject, setting, action, lighting, distinctive details. Keywords 10-18 unique, comma-separated, covering relevant context and visible details.
+We need to produce British-English catalogue metadata using only clearly visible facts. Omit uncertain details. Provide title (5-10 words), description (1-2 sentences factual), keywords (10-18 unique, comma-separated). Must be exactly three sections, no extra text.
 
-We must not claim capture date/time visible, but we have authoritative context: 2026-11-14 17:41:49 UTC+01:00. So we can mention date/time? Probably not, as not visible. But we can incorporate context like "indoor living room setting" etc.
+We need to infer what is visible: two cats sleeping on a pink surface (likely a couch or cushion). There are two remote controls (white). The cats are tabby. The setting: a pink fabric (cushion) on a red background (maybe a sofa). Lighting appears natural indoor. Distinctive details: remote controls, pink fabric, tabby cats.
 
-Title: maybe "Attentive Small Dog in Harness". That's 5 words? "Attentive Small Dog in Harness" = 5 words. Good.
+Title 5-10 words: "Two tabby cats sleeping on pink cushion". That's 6 words. Good.
 
-Description: 1-2 sentences. Something like: "A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly at the camera while an older man relaxes in the background using a tablet in a warmly lit living room." That's one sentence. Ensure British English spelling (e.g., "colour" not needed). Use British punctuation.
+Description: 1-2 sentences, factual. "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence. Could be two sentences but okay.
 
-Keywords: need 10-18 unique, comma-separated. Let's list: "dog, harness, small dog, mixed breed, big ears, brown black, attentive, living room, tablet, older man, relaxed, indoor, close up, canine companion, casual, chihuahua mix, domestic life". Count them: let's count: dog(1), harness(2), small dog(3) maybe treat as phrase? It's okay. We need unique keywords, not phrases? Probably each word separated by commas. We can include multi-word keywords but they count as one token? Safer to use single words or short phrases separated by commas. Let's produce 14 keywords: dog, harness, small, mixed-breed, big-ears, brown-black, attentive, living-room, tablet, older-man, relaxed, indoor, close-up, canine-companion. That's 14. Ensure uniqueness.
+Keywords: need 10-18 unique, comma-separated. Let's list: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding. Need 10-18, ensure uniqueness. Count: cat(1), tabby(2), pink(3), cushion(4), remote(5), white(6), sleeping(7), domestic(8), animal(9), furniture(10), indoor(11), relaxed(12), paws(13), ears(14), whiskers(15), sofa(16), bedding(17). That's 17, within 10-18. Ensure comma-separated.
 
-Check count: 1 dog, 2 harness, 3 small, 4 mixed-breed, 5 big-ears, 6 brown-black, 7 attentive, 8 living-room, 9 tablet, 10 older-man, 11 relaxed, 12 indoor, 13 close-up, 14 canine-companion. That's 14, within 10-18.
+Check no uncertain details: we assume "cushion" is visible, yes pink fabric. Remote controls are white. Cats are tabby. All visible.
 
-Now ensure British English: "harness" same, "living-room" hyphen, "close-up" hyphen, "older-man" hyphen. Good.
-
-Now produce final answer with exactly three sections:
+Now format:
 
 Title:
 Description:
 Keywords:
 
-Make sure no extra text. Let's craft.
+Make sure each line starts with "Title:", "Description:", "Keywords:".
 
-Title: "Attentive Small Dog in Harness" (5 words). Good.
+Let's craft.
 
-Description: "A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly at the camera while an older man relaxes in the background using a tablet in a warmly lit living room." That's one sentence, maybe two sentences? It's okay 1-2 sentences.
+Title: "Two tabby cats sleeping on pink cushion" (6 words). Good.
 
-Keywords: as list.
+Description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence, factual.
 
-Check for British spelling: "patterned" ok, "relaxes" British? "relaxes" same. "warmly lit" fine.
+Keywords: "cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding"
 
-Now produce final.
+Check count: 17 items. Good.
+
+Now ensure British English: "lying" maybe "lying" is fine. "cushion" British. "remote controls" maybe "remote controls" okay. Use British spelling: "remote controls" fine. "pink" same. "cushion" same.
+
+Check description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's okay.
+
+Now output exactly three sections, nothing else.
 </think>
-Title: Attentive Small Dog in Harness  
-Description: A small mixed‑breed dog with big ears and a brown‑black coat, wearing a patterned harness, looks directly at the camera while an older man relaxes in the background using a tablet in a warmly lit living room.  
-Keywords: dog, harness, small, mixed-breed, big-ears, brown-black, attentive, living-room, tablet, older-man, relaxed, indoor, close-up, canine-companion
+Title: Two tabby cats sleeping on pink cushion  
+Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby.  
+Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding
 ```
 
 </details>
@@ -2678,145 +2756,151 @@ Keywords: dog, harness, small, mixed-breed, big-ears, brown-black, attentive, li
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type nemotron_h_omni via
   nemotron_h_nano_omni)
-- *Model load time:* 17.41s
-- *Generation time:* 56.32s
-- *Total time:* 74.90s
-- *Prompt preparation time:* 0.839
-- *First-token latency:* 24.2
-- *Cleanup time:* 0.285
-- *Prompt tokens:* 3,602
-- *Generation tokens:* 928
-- *Total tokens:* 4,530
-- *Prompt throughput (raw):* 149 tok/s
-- *Generation throughput (raw):* 30.7 tok/s
-- *Peak memory (GB):* 87
+- *Model load time:* 16.97s
+- *Generation time:* 38.03s
+- *Total time:* 55.31s
+- *Prompt preparation time:* 0.0276
+- *First-token latency:* 10.5
+- *Cleanup time:* 0.245
+- *Prompt tokens:* 420
+- *Generation tokens:* 797
+- *Total tokens:* 1,217
+- *Prompt throughput (raw):* 39.9 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
+- *Peak memory (GB):* 81
 - *Active memory (GB):* 78
-- *Cache memory (GB):* 0.30
+- *Cache memory (GB):* 0.21
 - *Model-load active memory (GB):* 78.4
-- *Post-cleanup active memory (GB):* 0.0152
+- *Post-cleanup active memory (GB):* 0.0146
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1369
+- *Rendered prompt characters:* 546
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 3acb09951cff50cda7be0200ebbad2c15a3e63ba
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nvidia--NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4/snapshots/3acb09951cff50cda7be0200ebbad2c15a3e63ba
+- *Resolved model revision:* ae1368329b1fc76b71534c5d04b87b35d9cc6e15
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nvidia--NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4/snapshots/ae1368329b1fc76b71534c5d04b87b35d9cc6e15
 - *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
   "prefill_step_size": 2048, "seed": 0, "temperature": 1.0, "thinking_budget":
   800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
   "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
 - *EOS token:* <\|im_end\|>
 
+#### Final answer
+
+```text
+Title: Two tabby cats sleeping on pink sofa
+
+Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
+
+Keywords: cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting
+```
+
 *Readable output:*
 
 <pre class="model-output-readable">
-The user wants me to create British-English catalogue metadata based on an image and some context.
+The user wants British-English catalogue metadata based on the image.
 
-**1. Analyze the Input:**
-*   **Image:** A close-up of a small dog (looks like a Chihuahua mix or similar small breed) with big ears, brown and black/white speckled fur. It's wearing a blue harness. The dog is looking at the camera. In the background, there's a blurry older man sitting, holding a tablet or digital device. He's wearing jeans and a grey shirt. The setting is indoors, likely a living room.
-*   **Context:**
-    *   Capture date/time: 2026-11-14 17:41:49 UTC+01:00 (Authoritative fact).
-    *   Description hint: Small mixed-breed dog, harness, attentive to camera, older person relaxing in background using digital device, living room.
-    *   Keyword hints: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal.
+1.  **Analyze the image:**
+    *   **Subjects:** Two cats lying on a pink surface (likely a sofa or bed).
+    *   **Action:** Both appear to be sleeping or resting. One is curled slightly, the other is stretched out.
+    *   **Setting:** A pink fabric surface, possibly a sofa cover or blanket. There are two remote controls visible behind them.
+    *   **Lighting:** Even, indoor lighting. No harsh shadows.
+    *   **Distinctive details:** Tabby cats, pink fabric, remote controls (white/grey).
+    *   **Constraints:** British-English, only clearly visible facts, omit uncertain details (breed, exact location, specific intent, specific brand of remote, etc.).
+    *   **Format:**
+        *   Title: 5-10 words.
+        *   Description: 1-2 sentences covering subject, setting, action, lighting, distinctive details.
+        *   Keywords: 10-18 unique, comma-separated.
 
-**2. Draft the Title:**
-*   Needs to be 5-10 words.
-*   Concrete and descriptive.
-*   Draft ideas: Small dog with big ears looking at camera; Chihuahua mix wearing harness indoors; Senior man with tablet and alert dog.
-*   Selection: Small dog with big ears wearing a harness indoors. (8 words) - Simple and accurate. Or maybe: Close-up of a chihuahua mix wearing a harness. (9 words). Let's go with something capturing both subjects slightly or just the main one. "Small dog with big ears looking at the camera" is good. Let's try: "Close-up of a small dog with big ears". (8 words).
+2.  **Drafting Title:**
+    *   *Draft 1:* Two tabby cats sleeping on pink sofa. (6 words) - Good.
+    *   *Draft 2:* Cats resting on pink fabric with remotes. (7 words) - Good.
+    *   *Selection:* Two tabby cats sleeping on pink sofa.
 
-**3. Draft the Description:**
-*   1-2 sentences.
-*   Factual.
-*   Combine context (date/time is authoritative but not visible, so I shouldn't claim it's visible, but I can mention the scene).
-*   Setting: Indoors, living room.
-*   Lighting: Indoor lighting, warm.
-*   Main subject: Small dog, big ears, brown/black/white speckled coat, blue harness, looking at camera.
-*   Background: Older man, sitting, relaxed, holding a tablet/digital device, wearing blue jeans.
-*   Draft: A close-up shot captures a small mixed-breed dog with large ears and a speckled coat wearing a blue harness, looking directly at the camera. In the softly lit living room background, an older man sits comfortably wearing jeans while using a digital tablet.
-*   Check constraints: 1-2 sentences. Looks good.
+3.  **Drafting Description:**
+    *   *Draft:* Two tabby cats are asleep on a bright pink fabric surface. White remote controls lie behind them against a red cushion.
+    *   *Check:* Subject (two cats), Setting (pink fabric, red cushion), Action (asleep), Lighting (implied even indoor), Distinctive details (remote controls).
+    *   *Refinement for British English:* "Asleep" is fine. "Fabric surface" is safe.
+    *   *Final:* Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
 
-**4. Draft the Keywords:**
-*   10-18 unique, comma-separated.
-*   Cover context and visible details.
-*   British-English spelling (though most keywords are neutral).
-*   List: dog, canine, harness, big ears, close up, mixed breed, brown and black, indoor, living room, senior man, tablet, relaxing, domestic life, companion animal, alert, jeans, speckled coat.
-*   Count: 17 keywords. Perfect.
+4.  **Drafting Keywords:**
+    *   Need 10-18 unique words.
+    *   cat, cats, tabby, sleeping, asleep, pink, sofa, cushion, remote, control, television, fabric, indoor, domestic, pet, fur, stripes, resting.
+    *   *Selection:* cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting
 
-**5. Final Review:**
-*   Title: 5-10 words? "Close-up of a small dog with big ears" is 8 words.
-*   Description: 1-2 sentences? Yes.
-*   Keywords: 10-18? Yes.
-*   Format: Exactly three sections.
-*   Language: British-English (no specific US spellings like 'color' used).
+5.  **Final Review against constraints:**
+    *   British-English? Yes (no specific US spellings used like 'color', though none appeared).
+    *   Only clearly visible facts? Yes.
+    *   Omit uncertain details? Yes (no breed specification beyond visual tabby, no brand).
+    *   Title length: 7 words. (Pass)
+    *   Description length: 2 sentences. (Pass)
+    *   Keywords count: 15 words. (Pass)
+    *   Format: Exactly three sections.
 
-Let's refine the title to be a bit more catalogue-like.
-&lt;/think&gt;Title:
-Close-up of a small dog with big ears wearing a harness
+6.  **Constructing Output:**
+    Title: Two tabby cats sleeping on pink sofa
+    Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
+    Keywords: cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting&lt;/think&gt;Title: Two tabby cats sleeping on pink sofa
 
-Description:
-A close-up shot features a small mixed-breed dog with large ears and a speckled brown and black coat wearing a blue harness, looking attentively at the camera. In the background of a warmly lit living room, an older man sits comfortably in blue jeans while using a digital tablet.
+Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
 
-Keywords:
-dog, canine, harness, big ears, close up, mixed breed, brown and black, indoor, living room, senior man, tablet, relaxing, domestic life, companion animal, alert, jeans, speckled coat
+Keywords: cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-The user wants me to create British-English catalogue metadata based on an image and some context.
+The user wants British-English catalogue metadata based on the image.
 
-**1. Analyze the Input:**
-*   **Image:** A close-up of a small dog (looks like a Chihuahua mix or similar small breed) with big ears, brown and black/white speckled fur. It's wearing a blue harness. The dog is looking at the camera. In the background, there's a blurry older man sitting, holding a tablet or digital device. He's wearing jeans and a grey shirt. The setting is indoors, likely a living room.
-*   **Context:**
-    *   Capture date/time: 2026-11-14 17:41:49 UTC+01:00 (Authoritative fact).
-    *   Description hint: Small mixed-breed dog, harness, attentive to camera, older person relaxing in background using digital device, living room.
-    *   Keyword hints: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal.
+1.  **Analyze the image:**
+    *   **Subjects:** Two cats lying on a pink surface (likely a sofa or bed).
+    *   **Action:** Both appear to be sleeping or resting. One is curled slightly, the other is stretched out.
+    *   **Setting:** A pink fabric surface, possibly a sofa cover or blanket. There are two remote controls visible behind them.
+    *   **Lighting:** Even, indoor lighting. No harsh shadows.
+    *   **Distinctive details:** Tabby cats, pink fabric, remote controls (white/grey).
+    *   **Constraints:** British-English, only clearly visible facts, omit uncertain details (breed, exact location, specific intent, specific brand of remote, etc.).
+    *   **Format:**
+        *   Title: 5-10 words.
+        *   Description: 1-2 sentences covering subject, setting, action, lighting, distinctive details.
+        *   Keywords: 10-18 unique, comma-separated.
 
-**2. Draft the Title:**
-*   Needs to be 5-10 words.
-*   Concrete and descriptive.
-*   Draft ideas: Small dog with big ears looking at camera; Chihuahua mix wearing harness indoors; Senior man with tablet and alert dog.
-*   Selection: Small dog with big ears wearing a harness indoors. (8 words) - Simple and accurate. Or maybe: Close-up of a chihuahua mix wearing a harness. (9 words). Let's go with something capturing both subjects slightly or just the main one. "Small dog with big ears looking at the camera" is good. Let's try: "Close-up of a small dog with big ears". (8 words).
+2.  **Drafting Title:**
+    *   *Draft 1:* Two tabby cats sleeping on pink sofa. (6 words) - Good.
+    *   *Draft 2:* Cats resting on pink fabric with remotes. (7 words) - Good.
+    *   *Selection:* Two tabby cats sleeping on pink sofa.
 
-**3. Draft the Description:**
-*   1-2 sentences.
-*   Factual.
-*   Combine context (date/time is authoritative but not visible, so I shouldn't claim it's visible, but I can mention the scene).
-*   Setting: Indoors, living room.
-*   Lighting: Indoor lighting, warm.
-*   Main subject: Small dog, big ears, brown/black/white speckled coat, blue harness, looking at camera.
-*   Background: Older man, sitting, relaxed, holding a tablet/digital device, wearing blue jeans.
-*   Draft: A close-up shot captures a small mixed-breed dog with large ears and a speckled coat wearing a blue harness, looking directly at the camera. In the softly lit living room background, an older man sits comfortably wearing jeans while using a digital tablet.
-*   Check constraints: 1-2 sentences. Looks good.
+3.  **Drafting Description:**
+    *   *Draft:* Two tabby cats are asleep on a bright pink fabric surface. White remote controls lie behind them against a red cushion.
+    *   *Check:* Subject (two cats), Setting (pink fabric, red cushion), Action (asleep), Lighting (implied even indoor), Distinctive details (remote controls).
+    *   *Refinement for British English:* "Asleep" is fine. "Fabric surface" is safe.
+    *   *Final:* Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
 
-**4. Draft the Keywords:**
-*   10-18 unique, comma-separated.
-*   Cover context and visible details.
-*   British-English spelling (though most keywords are neutral).
-*   List: dog, canine, harness, big ears, close up, mixed breed, brown and black, indoor, living room, senior man, tablet, relaxing, domestic life, companion animal, alert, jeans, speckled coat.
-*   Count: 17 keywords. Perfect.
+4.  **Drafting Keywords:**
+    *   Need 10-18 unique words.
+    *   cat, cats, tabby, sleeping, asleep, pink, sofa, cushion, remote, control, television, fabric, indoor, domestic, pet, fur, stripes, resting.
+    *   *Selection:* cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting
 
-**5. Final Review:**
-*   Title: 5-10 words? "Close-up of a small dog with big ears" is 8 words.
-*   Description: 1-2 sentences? Yes.
-*   Keywords: 10-18? Yes.
-*   Format: Exactly three sections.
-*   Language: British-English (no specific US spellings like 'color' used).
+5.  **Final Review against constraints:**
+    *   British-English? Yes (no specific US spellings used like 'color', though none appeared).
+    *   Only clearly visible facts? Yes.
+    *   Omit uncertain details? Yes (no breed specification beyond visual tabby, no brand).
+    *   Title length: 7 words. (Pass)
+    *   Description length: 2 sentences. (Pass)
+    *   Keywords count: 15 words. (Pass)
+    *   Format: Exactly three sections.
 
-Let's refine the title to be a bit more catalogue-like.
-</think>Title:
-Close-up of a small dog with big ears wearing a harness
+6.  **Constructing Output:**
+    Title: Two tabby cats sleeping on pink sofa
+    Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
+    Keywords: cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting</think>Title: Two tabby cats sleeping on pink sofa
 
-Description:
-A close-up shot features a small mixed-breed dog with large ears and a speckled brown and black coat wearing a blue harness, looking attentively at the camera. In the background of a warmly lit living room, an older man sits comfortably in blue jeans while using a digital tablet.
+Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a red cushion.
 
-Keywords:
-dog, canine, harness, big ears, close up, mixed breed, brown and black, indoor, living room, senior man, tablet, relaxing, domestic life, companion animal, alert, jeans, speckled coat
+Keywords: cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting
 ```
 
 </details>
@@ -2825,175 +2909,475 @@ dog, canine, harness, big ears, close up, mixed breed, brown and black, indoor, 
 
 ---
 
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+<a id="model-sahilchachra-lensvlm-9b-mxfp4"></a>
 
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+### sahilchachra/LensVLM-9B-MXFP4
 
 <details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+<summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* concerns detected
+- *Mechanical checks:* no concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: dog, comfortable
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.27s
-- *Generation time:* 1.15s
-- *Total time:* 2.43s
-- *Prompt preparation time:* 0.537
-- *First-token latency:* 0.377
-- *Cleanup time:* 0.0688
-- *Prompt tokens:* 2,095
-- *Generation tokens:* 126
-- *Total tokens:* 2,221
-- *Prompt throughput (raw):* 5,564 tok/s
-- *Generation throughput (raw):* 520 tok/s
-- *Peak memory (GB):* 1.9
-- *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.000134
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.17s
+- *Generation time:* 2.29s
+- *Total time:* 3.61s
+- *Prompt preparation time:* 0.0095
+- *First-token latency:* 0.247
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 419
+- *Generation tokens:* 198
+- *Total tokens:* 617
+- *Prompt throughput (raw):* 1,696 tok/s
+- *Generation throughput (raw):* 97.4 tok/s
+- *Peak memory (GB):* 6.7
+- *Active memory (GB):* 5.7
+- *Cache memory (GB):* 0.12
+- *Model-load active memory (GB):* 5.69
+- *Post-cleanup active memory (GB):* 0.0151
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1346
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 552
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *Resolved model revision:* 23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--sahilchachra--LensVLM-9B-MXFP4/snapshots/23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
-*Readable output:*
+#### Final answer
 
-<pre class="model-output-readable">
+```text
 Title:
-"Chihuahua in a Living Room"
+Two Cats Sleeping on Pink Blanket
 
 Description:
-A small mixed-breed dog with large ears and a brown and black coat is sitting attentively in a living room, looking directly at the camera. The dog is wearing a blue harness and appears to be in a relaxed, casual setting with an older person using a tablet in the background.
+Two tabby cats are lying asleep on a vibrant pink blanket, accompanied by two white remote controls. One cat is stretched out on the left, while the other rests on the right, both appearing relaxed. The scene is brightly lit, highlighting the contrast between the cats' fur and the bold colour of the blanket.
 
 Keywords:
-Chihuahua, living room, dog, harness, attentive, casual, indoor, relaxed, comfortable, companion animal, dog, alert, big ears, brown and black, domestic life, senior man, tablet, close up, comfortable
-</pre>
-
-</details>
-
----
-
-<a id="model-ibm-granite-granite-vision-41-4b"></a>
-
-### ibm-granite/granite-vision-4.1-4b
-
-<details>
-<summary>Complete evidence: ibm-granite/granite-vision-4.1-4b</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 1.96s
-- *Generation time:* 3.70s
-- *Total time:* 6.70s
-- *Prompt preparation time:* 0.912
-- *First-token latency:* 1.37
-- *Cleanup time:* 0.105
-- *Prompt tokens:* 1,361
-- *Generation tokens:* 91
-- *Total tokens:* 1,452
-- *Prompt throughput (raw):* 996 tok/s
-- *Generation throughput (raw):* 60.6 tok/s
-- *Peak memory (GB):* 9.7
-- *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.21
-- *Model-load active memory (GB):* 8
-- *Post-cleanup active memory (GB):* 0.00135
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1519
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 37d591f06319e8f1638b5adcf58bdf50e0f84f7a
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--ibm-granite--granite-vision-4.1-4b/snapshots/37d591f06319e8f1638b5adcf58bdf50e0f84f7a
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+cats, sleeping, pink blanket, remote controls, tabby, rest, indoor, fur, relaxation, domestic
+</think>
+Title:
+Two Cats Sleeping on Pink Blanket
+```
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Chihuahua Mix in Harness"
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
-Keywords: Chihuahua mix, dog harness, indoor, senior man, relaxed, digital device, living room, attentive, mixed breed, small dog, close-up, comfortable, companion animal.
+The image shows two tabby cats sleeping on a bright pink blanket, with remote controls nearby. I need to create a British-English catalogue entry focusing only on clearly visible facts like the title, description, and keywords. The title should be concise, and the description must cover the main subject, setting, and distinctive details without speculation. Keywords will list the notable elements present in the scene.
+&lt;/think&gt;
+Title:
+Two Cats Sleeping on Pink Blanket
+
+Description:
+Two tabby cats are lying asleep on a vibrant pink blanket, accompanied by two white remote controls. One cat is stretched out on the left, while the other rests on the right, both appearing relaxed. The scene is brightly lit, highlighting the contrast between the cats' fur and the bold colour of the blanket.
+
+Keywords:
+cats, sleeping, pink blanket, remote controls, tabby, rest, indoor, fur, relaxation, domestic
+&lt;/think&gt;
+Title:
+Two Cats Sleeping on Pink Blanket
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image shows two tabby cats sleeping on a bright pink blanket, with remote controls nearby. I need to create a British-English catalogue entry focusing only on clearly visible facts like the title, description, and keywords. The title should be concise, and the description must cover the main subject, setting, and distinctive details without speculation. Keywords will list the notable elements present in the scene.
+</think>
+Title:
+Two Cats Sleeping on Pink Blanket
+
+Description:
+Two tabby cats are lying asleep on a vibrant pink blanket, accompanied by two white remote controls. One cat is stretched out on the left, while the other rests on the right, both appearing relaxed. The scene is brightly lit, highlighting the contrast between the cats' fur and the bold colour of the blanket.
+
+Keywords:
+cats, sleeping, pink blanket, remote controls, tabby, rest, indoor, fur, relaxation, domestic
+</think>
+Title:
+Two Cats Sleeping on Pink Blanket
+```
+
+</details>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-internvl35-1b-4bit"></a>
+<a id="model-technobaptist-ternary-bonsai-2-27b-mlx-2bit"></a>
 
-### mlx-community/InternVL3_5-1B-4bit
+### TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit
 
 <details>
-<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
+<summary>Complete evidence: TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* concerns detected
+- *Mechanical checks:* no concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: comfortable
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.60s
-- *Generation time:* 1.29s
-- *Total time:* 2.68s
-- *Prompt preparation time:* 0.675
-- *First-token latency:* 0.406
-- *Cleanup time:* 0.0928
-- *Prompt tokens:* 2,090
-- *Generation tokens:* 105
-- *Total tokens:* 2,195
-- *Prompt throughput (raw):* 5,147 tok/s
-- *Generation throughput (raw):* 454 tok/s
-- *Peak memory (GB):* 2.1
-- *Active memory (GB):* 1.1
-- *Cache memory (GB):* 0.29
-- *Model-load active memory (GB):* 1.08
-- *Post-cleanup active memory (GB):* 0.00331
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type
+  prism_hadamard_qwen35)
+- *Model load time:* 1.37s
+- *Generation time:* 13.64s
+- *Total time:* 15.17s
+- *Prompt preparation time:* 0.0267
+- *First-token latency:* 1.64
+- *Cleanup time:* 0.114
+- *Prompt tokens:* 461
+- *Generation tokens:* 517
+- *Total tokens:* 978
+- *Prompt throughput (raw):* 282 tok/s
+- *Generation throughput (raw):* 43.2 tok/s
+- *Peak memory (GB):* 11
+- *Active memory (GB):* 8.6
+- *Cache memory (GB):* 0.62
+- *Model-load active memory (GB):* 8.6
+- *Post-cleanup active memory (GB):* 0.00113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1338
-- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
+- *Rendered prompt characters:* 789
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *Resolved model revision:* 498775b03b55d038f716fea2568bf6ae6b8e0b5e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--TechnoBaptist--Ternary-Bonsai-2-27B-mlx-2bit/snapshots/498775b03b55d038f716fea2568bf6ae6b8e0b5e
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.0, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title: Two Tabby Cats Resting on Pink Fabric
+
+Description: Two tabby cats lie stretched out on a bright pink fabric surface with their eyes closed. Two white remote controls rest beside them under even indoor lighting.
+
+Keywords: tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, indoor lighting, closed eyes, lying down, pet, feline, cushion
+```
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Small Dog in Harness, Man Relaxing, Digital Device in Background
+The user wants British-English catalogue metadata based only on clearly visible facts. I need to look carefully at the image.
 
-Description: A small mixed-breed dog wearing a harness sits attentively in a living room, with an older person relaxing in the background using a tablet.
+Visible facts: two tabby cats lying on a pink/magenta fabric surface (looks like a sofa or cushion). There are two white remote controls nearby. The cats are stretched out, appearing to sleep or rest. Lighting is even, indoor. No brand, no location, no event, no period, no intent.
 
-Keywords: Dog harness, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, comfortable, companion, Adobe Stock, Any Vision, close up, comfortable, domestic life.
+I must avoid unsupported identity, location, event, brand, species (well, cat is visible, that's fine—species is cat, that's clearly visible), period, intent.
+
+Title: 5-10 words, concrete. "Two Tabby Cats Sleeping on Pink Sofa" — that's 7 words. But "sofa" — is it a sofa? The pink surface looks like a cushion/sofa. The top shows a darker pink/maroon fabric that could be a sofa back. I'll say "pink cushion" or "pink fabric". To be safe, "Two Tabby Cats Resting on Pink Fabric" — 7 words. Concrete.
+
+Description: 1-2 sentences factual, main subject, setting, action, lighting, distinctive details. "Two tabby cats lie stretched out on a bright pink fabric surface, eyes closed. Two white remote controls rest beside them under even indoor lighting." That's factual.
+
+Keywords: 10-18 unique comma-separated. tabby cat, two cats, pink fabric, remote control, sleeping, resting, sofa, cushion, striped fur, white remote, indoor, closed eyes, lying down, pet, feline, fur pattern. Need 10-18. Let me list: tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, indoor lighting, closed eyes, lying down, pet, feline, cushion. That's 14. Good.
+
+Make sure British English: "favourite" not needed. Use "colour" if needed. Fine.
+
+Return exactly three sections.
+&lt;/think&gt;
+
+Title: Two Tabby Cats Resting on Pink Fabric
+
+Description: Two tabby cats lie stretched out on a bright pink fabric surface with their eyes closed. Two white remote controls rest beside them under even indoor lighting.
+
+Keywords: tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, indoor lighting, closed eyes, lying down, pet, feline, cushion
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The user wants British-English catalogue metadata based only on clearly visible facts. I need to look carefully at the image.
+
+Visible facts: two tabby cats lying on a pink/magenta fabric surface (looks like a sofa or cushion). There are two white remote controls nearby. The cats are stretched out, appearing to sleep or rest. Lighting is even, indoor. No brand, no location, no event, no period, no intent.
+
+I must avoid unsupported identity, location, event, brand, species (well, cat is visible, that's fine—species is cat, that's clearly visible), period, intent.
+
+Title: 5-10 words, concrete. "Two Tabby Cats Sleeping on Pink Sofa" — that's 7 words. But "sofa" — is it a sofa? The pink surface looks like a cushion/sofa. The top shows a darker pink/maroon fabric that could be a sofa back. I'll say "pink cushion" or "pink fabric". To be safe, "Two Tabby Cats Resting on Pink Fabric" — 7 words. Concrete.
+
+Description: 1-2 sentences factual, main subject, setting, action, lighting, distinctive details. "Two tabby cats lie stretched out on a bright pink fabric surface, eyes closed. Two white remote controls rest beside them under even indoor lighting." That's factual.
+
+Keywords: 10-18 unique comma-separated. tabby cat, two cats, pink fabric, remote control, sleeping, resting, sofa, cushion, striped fur, white remote, indoor, closed eyes, lying down, pet, feline, fur pattern. Need 10-18. Let me list: tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, indoor lighting, closed eyes, lying down, pet, feline, cushion. That's 14. Good.
+
+Make sure British English: "favourite" not needed. Use "colour" if needed. Fine.
+
+Return exactly three sections.
+</think>
+
+Title: Two Tabby Cats Resting on Pink Fabric
+
+Description: Two tabby cats lie stretched out on a bright pink fabric surface with their eyes closed. Two white remote controls rest beside them under even indoor lighting.
+
+Keywords: tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, indoor lighting, closed eyes, lying down, pet, feline, cushion
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: sofa
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.60s
+- *Generation time:* 4.25s
+- *Total time:* 6.00s
+- *Prompt preparation time:* 0.0206
+- *First-token latency:* 0.512
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 545
+- *Generation tokens:* 540
+- *Total tokens:* 1,085
+- *Prompt throughput (raw):* 1,063 tok/s
+- *Generation throughput (raw):* 145 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.00207
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 662
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
+
+#### Final answer
+
+```text
+Title: Two cats sleeping on a red sofa
+
+Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
+
+Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get this done. I need to create some metadata for an image, and it's got to be spot-on.
+
+First, the image itself. I see two cats, definitely on a red sofa, and they're *sleeping*. One's a calico or tortoiseshell, and the other is a tiger-striped or tuxedo. The lighting is soft, probably natural. The image quality looks good.
+
+Okay, the title. It needs to be short and sweet, and in British English. I think "Two cats sleeping on a red sofa" is perfect. Concise and accurate.
+
+Now, the description. I'll cover the main subject (two cats), the setting (red sofa), the action (sleeping), and the lighting (soft, natural). I'll also mention the distinct details, like the different colors and patterns of the cats. I'll make sure to be objective and stick to what I *see*.
+
+Finally, the keywords. I need to be thorough here. I'll include terms like "cat," "cats," "kittens," "sleeping," "sofa," "red," and some breed-related terms. I'll also add words like "pet" and "domestic" to be as specific as possible. I'll make sure the keywords are distinct and relevant to the image.
+
+Let's get this right.
+
+**Title:** Two cats sleeping on a red sofa
+
+**Description:** A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
+
+**Keywords:** cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
+
+That should cover it. It's all about clear, factual observations. Nothing speculative, just what's right in front of me.
+&lt;/think&gt;
+
+Title: Two cats sleeping on a red sofa
+
+Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
+
+Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get this done. I need to create some metadata for an image, and it's got to be spot-on.
+
+First, the image itself. I see two cats, definitely on a red sofa, and they're *sleeping*. One's a calico or tortoiseshell, and the other is a tiger-striped or tuxedo. The lighting is soft, probably natural. The image quality looks good.
+
+Okay, the title. It needs to be short and sweet, and in British English. I think "Two cats sleeping on a red sofa" is perfect. Concise and accurate.
+
+Now, the description. I'll cover the main subject (two cats), the setting (red sofa), the action (sleeping), and the lighting (soft, natural). I'll also mention the distinct details, like the different colors and patterns of the cats. I'll make sure to be objective and stick to what I *see*.
+
+Finally, the keywords. I need to be thorough here. I'll include terms like "cat," "cats," "kittens," "sleeping," "sofa," "red," and some breed-related terms. I'll also add words like "pet" and "domestic" to be as specific as possible. I'll make sure the keywords are distinct and relevant to the image.
+
+Let's get this right.
+
+**Title:** Two cats sleeping on a red sofa
+
+**Description:** A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
+
+**Keywords:** cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
+
+That should cover it. It's all about clear, factual observations. Nothing speculative, just what's right in front of me.
+</think>
+
+Title: Two cats sleeping on a red sofa
+
+Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
+
+Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-o-45-4bit"></a>
+
+### mlx-community/MiniCPM-o-4_5-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-o-4_5-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: lounging
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
+- *Model load time:* 1.08s
+- *Generation time:* 3.78s
+- *Total time:* 5.01s
+- *Prompt preparation time:* 0.0136
+- *First-token latency:* 0.133
+- *Cleanup time:* 0.12
+- *Prompt tokens:* 173
+- *Generation tokens:* 367
+- *Total tokens:* 540
+- *Prompt throughput (raw):* 1,301 tok/s
+- *Generation throughput (raw):* 102 tok/s
+- *Peak memory (GB):* 7.0
+- *Active memory (GB):* 6.1
+- *Cache memory (GB):* 0.13
+- *Model-load active memory (GB):* 6.15
+- *Post-cleanup active memory (GB):* 0.0049
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 508
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 592c09d85e7bffbc8f8e45a417aa8e9a96119814
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-o-4_5-4bit/snapshots/592c09d85e7bffbc8f8e45a417aa8e9a96119814
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.6, "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title:
+Two tabby cats resting on pink fabric with remotes
+
+Description:
+Two tabby cats are lying on a pink fabric surface, near white remote controls. They appear relaxed, possibly sleeping, under even indoor lighting.
+
+Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+User wants me to create British-English catalogue metadata based on the provided image. I need to extract concrete, visible facts without adding uncertain details.
+
+First, I'll analyze the image:
+
+- There are two tabby cats lying on a pink surface, likely a couch or blanket.
+- Both cats are near remote controls, which are white and placed near them.
+- The cats are relaxed, possibly sleeping or resting.
+- The setting appears to be indoors, on a red/pink fabric.
+- Lighting seems natural or even, no harsh shadows.
+- Distinctive details: tabby patterns, remote controls, pink/red fabric.
+
+Now, crafting the title: It should be 5-10 words. Maybe "Two Tabby Cats Resting on Pink Fabric".
+
+Description: Must be 1-2 sentences. Focus on main subject (cats), setting (pink/red surface), action (resting), lighting (even), and details (remotes, tabby patterns).
+
+Keywords: Need 10-18 unique, comma-separated. Possible: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes.
+
+I should make sure all are from visible facts only, no assumptions about location, brand, etc.
+&lt;/think&gt;
+
+Title:
+Two tabby cats resting on pink fabric with remotes
+
+Description:
+Two tabby cats are lying on a pink fabric surface, near white remote controls. They appear relaxed, possibly sleeping, under even indoor lighting.
+
+Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+User wants me to create British-English catalogue metadata based on the provided image. I need to extract concrete, visible facts without adding uncertain details.
+
+First, I'll analyze the image:
+
+- There are two tabby cats lying on a pink surface, likely a couch or blanket.
+- Both cats are near remote controls, which are white and placed near them.
+- The cats are relaxed, possibly sleeping or resting.
+- The setting appears to be indoors, on a red/pink fabric.
+- Lighting seems natural or even, no harsh shadows.
+- Distinctive details: tabby patterns, remote controls, pink/red fabric.
+
+Now, crafting the title: It should be 5-10 words. Maybe "Two Tabby Cats Resting on Pink Fabric".
+
+Description: Must be 1-2 sentences. Focus on main subject (cats), setting (pink/red surface), action (resting), lighting (even), and details (remotes, tabby patterns).
+
+Keywords: Need 10-18 unique, comma-separated. Possible: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes.
+
+I should make sure all are from visible facts only, no assumptions about location, brand, etc.
+</think>
+
+Title:
+Two tabby cats resting on pink fabric with remotes
+
+Description:
+Two tabby cats are lying on a pink fabric surface, near white remote controls. They appear relaxed, possibly sleeping, under even indoor lighting.
+
+Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes
+```
+
+</details>
 
 </details>
 
@@ -3012,29 +3396,29 @@ Keywords: Dog harness, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, aler
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* Required labelled fields not detected: title, description,
-  keywords; Repeats the prompt's hint text: description
+  keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.70s
-- *Generation time:* 2.13s
-- *Total time:* 4.16s
-- *Prompt preparation time:* 1.23
-- *First-token latency:* 0.864
-- *Cleanup time:* 0.0868
-- *Prompt tokens:* 308
-- *Generation tokens:* 34
-- *Total tokens:* 342
-- *Prompt throughput (raw):* 356 tok/s
-- *Generation throughput (raw):* 386 tok/s
-- *Peak memory (GB):* 1.8
+- *Model load time:* 0.65s
+- *Generation time:* 0.41s
+- *Total time:* 1.18s
+- *Prompt preparation time:* 0.0281
+- *First-token latency:* 0.292
+- *Cleanup time:* 0.0861
+- *Prompt tokens:* 120
+- *Generation tokens:* 32
+- *Total tokens:* 152
+- *Prompt throughput (raw):* 411 tok/s
+- *Generation throughput (raw):* 395 tok/s
+- *Peak memory (GB):* 2.1
 - *Active memory (GB):* 1.2
-- *Cache memory (GB):* 0.03
+- *Cache memory (GB):* 0.02
 - *Model-load active memory (GB):* 1.25
 - *Post-cleanup active memory (GB):* 0.00238
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1390
+- *Rendered prompt characters:* 567
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -3048,245 +3432,69 @@ Keywords: Dog harness, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, aler
 *Readable output:*
 
 <pre class="model-output-readable">
-A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
+A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, their fur patterns contrasting against the soft fabric.
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-minicpm-o-45-4bit"></a>
+<a id="model-mlx-community-internvl35-1b-4bit"></a>
 
-### mlx-community/MiniCPM-o-4_5-4bit
+### mlx-community/InternVL3_5-1B-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/MiniCPM-o-4_5-4bit</summary>
+<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation needs reproduction
-- *Observations:* Required labelled fields not detected: title, description,
-  keywords; Response appears cut off at the token limit; Internal reasoning
-  block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.14s
-- *Generation time:* 11.08s
-- *Total time:* 12.90s
-- *Prompt preparation time:* 0.558
-- *First-token latency:* 0.4
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 361
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Duplicate keywords: british english, british english
+  examples of metadata, british english examples of details, british english
+  examples of context, british english examples of information, british
+  english examples of data, british english examples of content, british
+  english examples of examples
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl)
+- *Model load time:* 0.58s
+- *Generation time:* 3.02s
+- *Total time:* 3.73s
+- *Prompt preparation time:* 0.0293
+- *First-token latency:* 0.343
+- *Cleanup time:* 0.0888
+- *Prompt tokens:* 3,438
 - *Generation tokens:* 1,000
-- *Total tokens:* 1,361
-- *Prompt throughput (raw):* 902 tok/s
-- *Generation throughput (raw):* 98.5 tok/s
-- *Peak memory (GB):* 7.0
-- *Active memory (GB):* 6.1
-- *Cache memory (GB):* 0.23
-- *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.0049
+- *Total tokens:* 4,438
+- *Prompt throughput (raw):* 10,009 tok/s
+- *Generation throughput (raw):* 379 tok/s
+- *Peak memory (GB):* 2.3
+- *Active memory (GB):* 1.1
+- *Cache memory (GB):* 0.56
+- *Model-load active memory (GB):* 1.08
+- *Post-cleanup active memory (GB):* 0.00331
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1331
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
+- *Rendered prompt characters:* 515
+- *Processor:* mlx_vlm.models.internvl.processing_internvl.InternVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 592c09d85e7bffbc8f8e45a417aa8e9a96119814
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-o-4_5-4bit/snapshots/592c09d85e7bffbc8f8e45a417aa8e9a96119814
+- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_k": 20, "top_p": 0.95}
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;
-User is asking to create British-English catalogue metadata from an image and some context. I need to follow the instructions carefully.
+Title: Two cats sleeping on a pink couch
 
-First, I'll start with the title. It should be concrete, 5-10 words. Looking at the image, there's a small dog with big ears, wearing a harness, looking at the camera. The background has a person with a tablet. So maybe something like "Alert Chihuahua Mix Dog in Living Room".
+Description: Two striped cats are sleeping on a pink couch, with one cat lying on its side and the other on its back, next to a remote control.
 
-Next, the description. It must be factual, combining context and visible details. The context says capture date/time is 2026-11-14 17:41:49 UTC+01:00. The image shows a small mixed-breed dog (possibly chihuahua mix) with brown and black coloring, big ears, wearing a harness, looking attentively at the camera. Background has an older person (maybe senior man) sitting, using a digital device (tablet), indoors, likely living room. Lighting seems natural or indoor, not sure, but visible. Distinctive details: harness, big ears, attentive gaze, person with tablet.
-
-So description could be: A small brown and black chihuahua mix dog with large ears and a harness sits indoors, attentively looking at the camera as a senior man relaxes in the background using a tablet.
-
-Now keywords. Need 10-18 unique, comma-separated. From context and image: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable, companion animal, living room, digital device, attentive, close up.
-
-Check if I have enough. Let's count: 1. Dog harness, 2. Domestic life, 3. Indoors, 4. Man, 5. Relaxing, 6. Senior Man, 7. Sitting, 8. Tablet, 9. alert, 10. big ears, 11. brown and black, 12. canine, 13. casual, 14. companion, 15. comfortable, 16. companion animal, 17. living room, 18. digital device. That's 18, which is okay.
-
-Wait, the descriptive hint mentions "Adobe Stock, Any Vision" as keyword hints, but should I include them? The user said "omit uncertain details" and "retain details supported by the image". Since those might be stock platforms, but the image might not indicate that, I should probably not include them unless visible. Looking at the image, there's no text like Adobe Stock or Any Vision visible, so I should omit those.
-
-So final list: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable, companion animal, living room, digital device. Wait, that's 16. Maybe add "close up" as per hint? The hint says "close up", and the image is a close-up of the dog. So add "close up".
-
-So 17. close up. That's okay.
-
-Alternatively, maybe "chihuahua mix" is better than "mixed-breed" since the hint mentions it. The image shows a small dog with large ears, which is characteristic of chihuahua mix. So I'll use that.
-
-So revised keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable, companion animal, living room, digital device, close up.
-
-That's 19, but maybe "chihuahua mix" is better. Let me check the hint again: "chihuahua mix" is a keyword hint. So include that instead of mixed-breed.
-
-So 1. Dog harness, 2. Domestic life, 3. Indoors, 4. Man, 5. Relaxing, 6. Senior Man, 7. Sitting, 8. Tablet, 9. alert, 10. big ears, 11. brown and black, 12. canine, 13. casual, 14. companion, 15. comfortable, 16. companion animal, 17. living room, 18. digital device, 19. chihuahua mix. Too many? But 10-18 is required, so 17 or 18 is okay.
-
-Alternatively, maybe "pet" or something, but the hints don't mention it. Better stick to given or visible.
-
-Another point: the person
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-User is asking to create British-English catalogue metadata from an image and some context. I need to follow the instructions carefully.
-
-First, I'll start with the title. It should be concrete, 5-10 words. Looking at the image, there's a small dog with big ears, wearing a harness, looking at the camera. The background has a person with a tablet. So maybe something like "Alert Chihuahua Mix Dog in Living Room".
-
-Next, the description. It must be factual, combining context and visible details. The context says capture date/time is 2026-11-14 17:41:49 UTC+01:00. The image shows a small mixed-breed dog (possibly chihuahua mix) with brown and black coloring, big ears, wearing a harness, looking attentively at the camera. Background has an older person (maybe senior man) sitting, using a digital device (tablet), indoors, likely living room. Lighting seems natural or indoor, not sure, but visible. Distinctive details: harness, big ears, attentive gaze, person with tablet.
-
-So description could be: A small brown and black chihuahua mix dog with large ears and a harness sits indoors, attentively looking at the camera as a senior man relaxes in the background using a tablet.
-
-Now keywords. Need 10-18 unique, comma-separated. From context and image: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable, companion animal, living room, digital device, attentive, close up.
-
-Check if I have enough. Let's count: 1. Dog harness, 2. Domestic life, 3. Indoors, 4. Man, 5. Relaxing, 6. Senior Man, 7. Sitting, 8. Tablet, 9. alert, 10. big ears, 11. brown and black, 12. canine, 13. casual, 14. companion, 15. comfortable, 16. companion animal, 17. living room, 18. digital device. That's 18, which is okay.
-
-Wait, the descriptive hint mentions "Adobe Stock, Any Vision" as keyword hints, but should I include them? The user said "omit uncertain details" and "retain details supported by the image". Since those might be stock platforms, but the image might not indicate that, I should probably not include them unless visible. Looking at the image, there's no text like Adobe Stock or Any Vision visible, so I should omit those.
-
-So final list: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable, companion animal, living room, digital device. Wait, that's 16. Maybe add "close up" as per hint? The hint says "close up", and the image is a close-up of the dog. So add "close up".
-
-So 17. close up. That's okay.
-
-Alternatively, maybe "chihuahua mix" is better than "mixed-breed" since the hint mentions it. The image shows a small dog with large ears, which is characteristic of chihuahua mix. So I'll use that.
-
-So revised keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, companion, comfortable, companion animal, living room, digital device, close up.
-
-That's 19, but maybe "chihuahua mix" is better. Let me check the hint again: "chihuahua mix" is a keyword hint. So include that instead of mixed-breed.
-
-So 1. Dog harness, 2. Domestic life, 3. Indoors, 4. Man, 5. Relaxing, 6. Senior Man, 7. Sitting, 8. Tablet, 9. alert, 10. big ears, 11. brown and black, 12. canine, 13. casual, 14. companion, 15. comfortable, 16. companion animal, 17. living room, 18. digital device, 19. chihuahua mix. Too many? But 10-18 is required, so 17 or 18 is okay.
-
-Alternatively, maybe "pet" or something, but the hints don't mention it. Better stick to given or visible.
-
-Another point: the person
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: keywords; Response
-  appears cut off at the token limit
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.75s
-- *Generation time:* 49.64s
-- *Total time:* 53.28s
-- *Prompt preparation time:* 0.743
-- *First-token latency:* 7.16
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 4,387
-- *Generation tokens:* 1,000
-- *Total tokens:* 5,387
-- *Prompt throughput (raw):* 613 tok/s
-- *Generation throughput (raw):* 23.9 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 24
-- *Cache memory (GB):* 0.23
-- *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00703
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1533
-- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 865ee8de65799cc4ee406587e4b607063708f358
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/865ee8de65799cc4ee406587e4b607063708f358
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Alert Small Dog With Big Ears Wearing Harness Indoors
-
-Description:
-A small brown-and-black mixed-breed dog with large erect ears and a blue patterned harness sits on blue jeans, looking attentively toward the camera in a warmly lit
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: title; Repeats the
-  prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.66s
-- *Generation time:* 2.19s
-- *Total time:* 3.77s
-- *Prompt preparation time:* 0.812
-- *First-token latency:* 0.637
-- *Cleanup time:* 0.0932
-- *Prompt tokens:* 1,400
-- *Generation tokens:* 97
-- *Total tokens:* 1,497
-- *Prompt throughput (raw):* 2,199 tok/s
-- *Generation throughput (raw):* 124 tok/s
-- *Peak memory (GB):* 5.6
-- *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0102
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1327
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title:
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
-Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion, companion animal
+Keywords: cats, sleeping, pink couch, remote control, striped, British English, British, British-English, British-English catalogue, British-English metadata, British-English details, British-English context, British-English information, British-English data, British-English content, British-English examples, British-English examples of metadata, British-English examples of keywords, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata, British-English examples of details, British-English examples of context, British-English examples of information, British-English examples of data, British-English examples of content, British-English examples of examples, British-English examples of metadata
 </pre>
 
 </details>
@@ -3308,26 +3516,26 @@ Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Rel
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 0.88s
-- *Generation time:* 1.65s
-- *Total time:* 3.39s
-- *Prompt preparation time:* 0.696
-- *First-token latency:* 0.748
-- *Cleanup time:* 0.149
-- *Prompt tokens:* 2,173
-- *Generation tokens:* 25
-- *Total tokens:* 2,198
-- *Prompt throughput (raw):* 2,903 tok/s
-- *Generation throughput (raw):* 107 tok/s
-- *Peak memory (GB):* 6.7
+- *Model load time:* 0.89s
+- *Generation time:* 1.57s
+- *Total time:* 2.69s
+- *Prompt preparation time:* 0.0439
+- *First-token latency:* 1.38
+- *Cleanup time:* 0.179
+- *Prompt tokens:* 3,512
+- *Generation tokens:* 14
+- *Total tokens:* 3,526
+- *Prompt throughput (raw):* 2,554 tok/s
+- *Generation throughput (raw):* 92.0 tok/s
+- *Peak memory (GB):* 7.0
 - *Active memory (GB):* 5.7
-- *Cache memory (GB):* 0.35
+- *Cache memory (GB):* 0.55
 - *Model-load active memory (GB):* 5.69
 - *Post-cleanup active memory (GB):* 0.0129
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1554
+- *Rendered prompt characters:* 731
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -3341,14 +3549,14 @@ Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Rel
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a small dog with a harness looking at the camera while a person sits on a couch.
+&lt;|channel|&gt; analysis&lt;|message|&gt; The two cats are sleeping on a pink couch.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The image shows a small dog with a harness looking at the camera while a person sits on a couch.
+<|channel|> analysis<|message|> The two cats are sleeping on a pink couch.
 ```
 
 </details>
@@ -3372,26 +3580,26 @@ Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Rel
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.50s
-- *Generation time:* 1.14s
-- *Total time:* 2.39s
-- *Prompt preparation time:* 0.656
-- *First-token latency:* 0.277
-- *Cleanup time:* 0.0973
-- *Prompt tokens:* 304
-- *Generation tokens:* 82
-- *Total tokens:* 386
-- *Prompt throughput (raw):* 1,097 tok/s
-- *Generation throughput (raw):* 378 tok/s
-- *Peak memory (GB):* 1.8
+- *Model load time:* 0.51s
+- *Generation time:* 0.38s
+- *Total time:* 1.02s
+- *Prompt preparation time:* 0.0144
+- *First-token latency:* 0.0883
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 116
+- *Generation tokens:* 97
+- *Total tokens:* 213
+- *Prompt throughput (raw):* 1,314 tok/s
+- *Generation throughput (raw):* 353 tok/s
+- *Peak memory (GB):* 1.5
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.28
+- *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 0.612
 - *Post-cleanup active memory (GB):* 0.0135
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1381
+- *Rendered prompt characters:* 558
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -3405,90 +3613,9 @@ Keywords: Adobe Stock, Any Vision, Dog harness, Domestic life, Indoors, Man, Rel
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "A Dog's Watchful Eyes in a Living Room"
-Description: A dog wearing a harness looks attentively toward the camera, while an older person relaxes in the background using a tablet. The dog is wearing a mix of breeds, and the older person is sitting comfortably in a living room setting. The image captures a moment of quiet companionship between the dog and the older person.
+Title: "A Study in Stripes"
+Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
 </pre>
-
-</details>
-
----
-
-<a id="model-sahilchachra-lensvlm-9b-mxfp4"></a>
-
-### sahilchachra/LensVLM-9B-MXFP4
-
-<details>
-<summary>Complete evidence: sahilchachra/LensVLM-9B-MXFP4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Final answer emitted twice, around &lt;/think&gt;; Repeats
-  the prompt's hint text: description
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.23s
-- *Generation time:* 4.66s
-- *Total time:* 6.85s
-- *Prompt preparation time:* 0.825
-- *First-token latency:* 0.982
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 1,846
-- *Generation tokens:* 304
-- *Total tokens:* 2,150
-- *Prompt throughput (raw):* 1,879 tok/s
-- *Generation throughput (raw):* 101 tok/s
-- *Peak memory (GB):* 7.4
-- *Active memory (GB):* 5.7
-- *Cache memory (GB):* 0.21
-- *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.0157
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1375
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen3_5.tokenization_qwen3_5.Qwen3_5Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--sahilchachra--LensVLM-9B-MXFP4/snapshots/23ae80ae9a7d0b8ce975f5a409ba6f017699af6c
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.0, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image features a small mixed-breed dog with large ears and a harness, looking directly at the camera. In the background, an older person is relaxed, using a digital device like a tablet in a living room setting. The capture date is noted as 2026-11-14 17:41:49 UTC+01:00, which provides the specific timestamp for this domestic scene. I need to create a title, a factual description, and a list of keywords based on these visible details and the provided context.
-&lt;/think&gt;
-Title: Alert Dog in Living Room
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
-Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion
-&lt;/think&gt;
-Title: Alert Dog in Living Room
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
-Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image features a small mixed-breed dog with large ears and a harness, looking directly at the camera. In the background, an older person is relaxed, using a digital device like a tablet in a living room setting. The capture date is noted as 2026-11-14 17:41:49 UTC+01:00, which provides the specific timestamp for this domestic scene. I need to create a title, a factual description, and a list of keywords based on these visible details and the provided context.
-</think>
-Title: Alert Dog in Living Room
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
-Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion
-</think>
-Title: Alert Dog in Living Room
-Description: A small mixed-breed dog wearing a harness looks attentively toward the camera while an older person relaxes in the background using a digital device in a living room.
-Keywords: Dog harness, Domestic life, Indoors, Man, Relaxing, Senior Man, Sitting, Tablet, alert, big ears, brown and black, canine, casual, chihuahua mix, close up, comfortable, companion
-```
-
-</details>
 
 </details>
 
