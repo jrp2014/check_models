@@ -2025,6 +2025,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools.analyze_output_quality` (0.17.145) estimates tokens with
+  `prompt_word_to_token_ratio` from `quality_config.yaml`, like the harness,
+  instead of a hardcoded 1.3. With the bundled config the result is
+  unchanged.
 - HTML comparison workbench (0.17.144), from a review of 2591aaa: the
   filter script now follows `#chooser-table`, so its first run counts the
   rows instead of reporting "Showing 0 of 0 rows" on every page load; the

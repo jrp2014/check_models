@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+import check_models
+from tools import analyze_output_quality
 from tools.analyze_output_quality import main
 
 if TYPE_CHECKING:
@@ -247,3 +249,26 @@ def test_json_mode_uses_canonical_assessment(
     assert payload["assessment"]["usability"] == (
         "unusable" if exit_code else "usable_with_caveats" if observation else "usable"
     )
+
+
+def test_token_estimate_uses_the_loaded_quality_config(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The word-to-token ratio comes from quality_config.yaml, as in the harness."""
+    config = tmp_path / "quality_config.yaml"
+    config.write_text("thresholds:\n  prompt_word_to_token_ratio: 2.0\n", encoding="utf-8")
+    monkeypatch.setattr(check_models, "QUALITY", check_models.QUALITY)  # restored afterwards
+    monkeypatch.setattr(
+        analyze_output_quality,
+        "load_quality_config",
+        lambda: check_models.load_quality_config(config),
+    )
+    text = "A small dog sits on a wooden floor."
+    monkeypatch.setattr(sys, "argv", ["analyze_output_quality.py", "--text", text, "--json"])
+
+    assert main() == 0
+    summary = json.loads(capsys.readouterr().out)["summary"]
+    assert summary["word_count"] == 8
+    assert summary["estimated_tokens"] == 16

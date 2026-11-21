@@ -17,6 +17,7 @@ from typing import cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import check_models
 from check_models import (
     AssessmentProfile,
     GenerationQualityAnalysis,
@@ -107,8 +108,12 @@ def _resolve_prompt_text(args: argparse.Namespace) -> str | None:
 
 
 def _estimate_tokens(text: str) -> int:
-    """Approximate token count from word count for CLI analysis."""
-    estimated_tokens = int(len(text.split()) * 1.3)
+    """Approximate token count from word count for CLI analysis.
+
+    The ratio is read at call time: ``load_quality_config`` rebinds
+    ``check_models.QUALITY`` rather than updating it in place.
+    """
+    estimated_tokens = int(len(text.split()) * check_models.QUALITY.prompt_word_to_token_ratio)
     if estimated_tokens == 0 and text:
         return 1
     return estimated_tokens
