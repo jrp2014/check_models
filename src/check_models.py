@@ -7157,6 +7157,7 @@ def _html_status_attrs(row: GalleryRow) -> str:
             _html_attr("data-final-title", row.final_title),
             _html_attr("data-final-description", row.final_description),
             _html_attr("data-final-keywords", row.final_keywords),
+            _html_attr("data-final-answer", row.final_answer),
             _html_class_attr((row.execution, row.usability)),
         )
     )
@@ -7174,19 +7175,23 @@ def _html_table(
 ) -> str:
     """Render a compact escaped table, allowing explicitly built internal-link cells."""
     parts = ["<table>", f"<caption>{html.escape(caption, quote=True)}</caption>", "<thead><tr>"]
-    if sortable:
-        parts.extend(
-            (
-                '<th scope="col"><button type="button" class="sort-button" '
-                f'data-sort-column="{column_index}" onclick="sortChooserColumn(this)">'
-                f"{html.escape(header, quote=True)}</button></th>"
-            )
-            for column_index, header in enumerate(headers)
+    # A column whose rows have no sort value (the Compare checkboxes) has
+    # nothing to sort, so it gets a plain header rather than a dead button.
+    sortable_columns = (
+        {index for values in sort_values for index, value in enumerate(values) if value is not None}
+        if sortable
+        else set()
+    )
+    parts.extend(
+        (
+            '<th scope="col"><button type="button" class="sort-button" '
+            f'data-sort-column="{column_index}" onclick="sortChooserColumn(this)">'
+            f"{html.escape(header, quote=True)}</button></th>"
         )
-    else:
-        parts.extend(
-            f'<th scope="col">{html.escape(header, quote=True)}</th>' for header in headers
-        )
+        if column_index in sortable_columns
+        else f'<th scope="col">{html.escape(header, quote=True)}</th>'
+        for column_index, header in enumerate(headers)
+    )
     parts.extend(["</tr></thead>", "<tbody>"])
     for row_index, row in enumerate(rows):
         attrs = row_attrs[row_index] if row_index < len(row_attrs) else ""
@@ -8581,6 +8586,7 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
         final_title=final_title,
         final_description=final_description,
         final_keywords=final_keywords,
+        final_answer=answer if reasoning else "",
     )
 
 
@@ -8800,6 +8806,11 @@ def _usability_rank(usability: str) -> int:
         if usability in _USABILITY_ORDER
         else len(_USABILITY_ORDER)
     )
+
+
+def _model_sort_key(model: str) -> tuple[str, str]:
+    """Case-insensitive model order shared by every report, exact name breaking ties."""
+    return model.casefold(), model
 
 
 def _usability_severity(usability: ModelUsability) -> int:
@@ -9041,7 +9052,9 @@ def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     reasoning lengths differ so much across models that a tok/s ranking or
     a cross-model average carries little decision value.
     """
-    ordered = tuple(sorted(rows, key=lambda row: (_usability_rank(row.usability), row.model)))
+    ordered = tuple(
+        sorted(rows, key=lambda row: (_usability_rank(row.usability), *_model_sort_key(row.model)))
+    )
     avoided = tuple(row for row in ordered if row.usability in {"unusable", "not_evaluated"})
     usable = [row for row in ordered if row.usability == "usable" and not row.observations]
     timed = [row for row in usable if row.total_time_s is not None]
@@ -9484,6 +9497,8 @@ class GalleryRow:
     final_title: str = ""
     final_description: str = ""
     final_keywords: str = ""
+    # The answer after a removed thinking trace; empty when nothing was removed.
+    final_answer: str = ""
 
 
 def _execution_status(result: PerformanceResult) -> ExecutionStatus:
@@ -9949,6 +9964,9 @@ class ReportRenderContext:
     model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
     # Person-written notes from the output root, or ``None`` when it has none.
     accuracy_notes: AccuracyNotes | None = None
+    # The run's output root, so copied note commands target it; ``None`` for
+    # a standalone report, whose commands then use the tool's default root.
+    output_root: Path | None = None
 
     @property
     def eval_mode(self) -> EvaluationLane | None:
@@ -11576,7 +11594,7 @@ def _html_model_link(model_name: str) -> str:
 
 
 def _html_filter_controls() -> str:
-    """Return dependency-free filters, side-by-side comparison, and note-copy helpers."""
+    """Return the chooser's filter controls and its (initially hidden) comparison panel."""
     return """
 <div class="filter-controls">
 <strong>Filter current-run chooser:</strong>
@@ -11612,6 +11630,16 @@ def _html_filter_controls() -> str:
 <span id="filter-info" role="status" aria-live="polite">Showing all rows</span>
 </div>
 <div id="compare-panel" class="compare-panel hidden" aria-live="polite"></div>
+"""
+
+
+def _html_workbench_script() -> str:
+    """Return the dependency-free filter, comparison, sort and note-copy script.
+
+    It runs as the page is parsed, so it must follow ``#chooser-table``:
+    its first ``applyAssessmentFilters()`` counts the rows already there.
+    """
+    return """
 <script>
 function applyAssessmentFilters() {
     const query = document.getElementById('model-search').value.toLowerCase();
@@ -11698,10 +11726,13 @@ function renderComparePanel() {
                 card.append(p);
             });
         } else {
+            // A thinking model's readable output starts with its trace, so the
+            // row carries the answer after the trace whenever one was removed.
             const pre = document.createElement('pre');
             const article = row.dataset.articleId ? document.getElementById(row.dataset.articleId) : null;
             const evidence = article ? article.querySelector('.model-output-readable') : null;
-            pre.textContent = (evidence && evidence.textContent) || '(no final answer)';
+            pre.textContent = row.dataset.finalAnswer
+                || (evidence && evidence.textContent) || '(no final answer)';
             card.append(pre);
         }
         grid.append(card);
@@ -11891,6 +11922,7 @@ def _html_gallery_chooser(report_context: ReportRenderContext) -> str:
             sortable=True,
         ),
         "</div>",
+        _html_workbench_script(),
         "<h3>Resource Highlights</h3>",
     ]
     # The chooser table is sortable by every column, so the former
@@ -11921,12 +11953,48 @@ def _html_gallery_chooser(report_context: ReportRenderContext) -> str:
     return "\n".join(parts)
 
 
+def _accuracy_note_command(model: str, output_root: Path | None) -> str:
+    """The ``tools.add_accuracy_note`` command, run from ``src/``, for one model's output.
+
+    It names ``--output-dir`` unless the run used the tool's default root.
+    The root is shown relative to ``src/`` or with ``~`` for the home
+    directory (the tool expands both), otherwise as the absolute path.
+    """
+    output_dir_args: tuple[str, ...] = ()
+    if output_root is not None:
+        root = output_root.expanduser().resolve()
+        script_dir = _SCRIPT_DIR.resolve()
+        if root != script_dir / "output":
+            if root.is_relative_to(script_dir):
+                shown = root.relative_to(script_dir).as_posix()
+            elif root.is_relative_to(home := Path.home().resolve()):
+                shown = f"~/{root.relative_to(home).as_posix()}"
+            else:
+                shown = str(root)
+            output_dir_args = ("--output-dir", shown)
+    return shlex_join(
+        (
+            "python",
+            "-m",
+            "tools.add_accuracy_note",
+            model,
+            "--reviewer",
+            "YOUR_NAME",
+            "--note",
+            "YOUR_NOTE",
+            *output_dir_args,
+        )
+    )
+
+
 def _html_gallery_model(
     result: PerformanceResult,
     row: GalleryRow,
     assessment: ResultAssessment,
     model_provenance: ModelProvenanceRecord | None,
     accuracy_note: AccuracyNoteMatch | None,
+    *,
+    output_root: Path | None = None,
 ) -> str:
     """Render one complete, escaped model-evidence entry from shared gallery facts."""
     facts = tuple(
@@ -11934,18 +12002,7 @@ def _html_gallery_model(
         for label, value in _gallery_model_facts(result, row, assessment, model_provenance)
         if value is not None
     )
-    note_cmd = shlex_join(
-        (
-            "python",
-            "-m",
-            "tools.add_accuracy_note",
-            result.model_name,
-            "--reviewer",
-            "YOUR_NAME",
-            "--note",
-            "YOUR_NOTE",
-        )
-    )
+    note_cmd = _accuracy_note_command(result.model_name, output_root)
     parts = [
         f'<article id="{html.escape(_gallery_model_anchor(result.model_name), quote=True)}">',
         f"<h3>{html.escape(result.model_name, quote=True)}</h3>",
@@ -11992,7 +12049,10 @@ def _gallery_evidence_entries(
     ]
     return sorted(
         entries,
-        key=lambda entry: (_usability_rank(entry[1].usability), entry[0].model_name),
+        key=lambda entry: (
+            _usability_rank(entry[1].usability),
+            *_model_sort_key(entry[0].model_name),
+        ),
     )
 
 
@@ -12002,7 +12062,10 @@ def _html_complete_gallery(report_context: ReportRenderContext) -> str:
         '<section id="complete-model-evidence">',
         "<h2>Complete Per-model Evidence</h2>",
         "<p>Complete generated or crash evidence for every attempted model.</p>",
-        *(_html_gallery_model(*entry) for entry in _gallery_evidence_entries(report_context)),
+        *(
+            _html_gallery_model(*entry, output_root=report_context.output_root)
+            for entry in _gallery_evidence_entries(report_context)
+        ),
         "</section>",
     ]
     return "\n".join(parts)
@@ -26502,7 +26565,7 @@ def _run_issue_summary_quality_section(
                 result["assessment"]["usability"], result["assessment"]["observations"]
             )
             == "generation",
-            result["model"].lower(),
+            *_model_sort_key(result["model"]),
         ),
     )
     # A custom --prompt (general profile) has no Keywords field to count.
@@ -29251,6 +29314,7 @@ def finalize_execution(
         current_image_record = _run_image_record(image_path, report_context.image_profile)
         report_context = replace(
             report_context,
+            output_root=output_paths.index.parent,
             accuracy_notes=_load_accuracy_notes(
                 output_paths.index.parent / ACCURACY_NOTES_FILENAME,
                 image_sha256=(

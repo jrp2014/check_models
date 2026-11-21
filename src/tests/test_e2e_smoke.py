@@ -15,9 +15,12 @@ Skip these in CI by default (they require MLX hardware and model downloads).
 
 from __future__ import annotations
 
+import html
 import json
+import shlex
 import sys
-from typing import TYPE_CHECKING, NamedTuple
+from pathlib import Path
+from typing import NamedTuple
 from unittest.mock import patch
 
 # conftest.py sets up the HF cache environment before this module is collected.
@@ -28,9 +31,6 @@ from PIL import Image
 
 import check_models
 from check_models_data import safe_io
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 # Fixture model - small, fast, reliable MLX conversion
 # Smallest usable model in the standing suite; nanoLLaVA-1.5 was retired
@@ -295,6 +295,14 @@ class TestE2ESmoke:
         assert record["model"] == str(model_dir)
         assert record["assessment"]["execution"] == "completed"
         assert record["generated_text"] == "a a a a"
+
+        # A run in its own output root hands out note commands that target it.
+        report = safe_io.read_text_no_follow(
+            check_models.ReportOutputPaths.from_root(e2e_output_dir).html
+        )
+        command = shlex.split(html.unescape(report.split('data-command="', 1)[1].split('"', 1)[0]))
+        output_dir = Path(command[command.index("--output-dir") + 1]).expanduser()
+        assert output_dir.resolve() == e2e_output_dir.resolve()
 
     @pytest.mark.skipif(
         not _check_model_cached(FIXTURE_MODEL),

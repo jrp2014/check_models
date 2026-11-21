@@ -187,3 +187,81 @@ def test_html_report_workbench_filters_compare_and_note_copy(tmp_path: Path) -> 
     assert "tools.add_accuracy_note" in content
     assert "<h4>Final answer</h4>" in content
     assert "<p><b>Runtime</b></p>" not in content
+
+
+def _general_result(name: str, text: str) -> check_models.PerformanceResult:
+    return check_models.PerformanceResult(
+        model_name=name,
+        generation=SimpleNamespace(
+            text=text,
+            prompt_tokens=100,
+            generation_tokens=20,
+            total_tokens=120,
+            prompt_tps=400.0,
+            generation_tps=50.0,
+            peak_memory=4.0,
+        ),
+        model_load_time=0.5,
+        generation_time=1.0,
+        total_time=1.5,
+        success=True,
+    )
+
+
+def _render_workbench(tmp_path: Path, results: list[check_models.PerformanceResult]) -> str:
+    out = tmp_path / "workbench.html"
+    check_models.generate_html_report(
+        results=results,
+        filename=out,
+        versions={"mlx": "0.32.3", "mlx-vlm": "0.8.0"},
+        prompt="Describe the image.",
+        total_runtime_seconds=3.0,
+    )
+    return out.read_text(encoding="utf-8")
+
+
+def test_html_workbench_script_follows_the_chooser_table_it_initialises(tmp_path: Path) -> None:
+    """The filter script runs at parse time, so it must come after the rows it counts.
+
+    Regression: the script sat above ``#chooser-table``, so its initial
+    ``applyAssessmentFilters()`` found no rows and the status line read
+    "Showing 0 of 0 rows" on every page load.
+    """
+    content = _render_workbench(
+        tmp_path, [_general_result("org/a", "A dog."), _general_result("org/b", "A cat.")]
+    )
+    chooser_start = content.index('<div id="chooser-table">')
+    chooser_end = content.index("</table>", chooser_start)
+    assert content.count("<script>") == 1
+    assert content.index('id="filter-info"') < chooser_start
+    assert content.index("<script>") > chooser_end
+
+
+def test_html_chooser_offers_sorting_only_for_columns_with_sort_values(tmp_path: Path) -> None:
+    """The Compare checkbox column has nothing to sort, so it gets no sort button."""
+    content = _render_workbench(tmp_path, [_general_result("org/a", "A dog.")])
+    chooser = content[content.index('<div id="chooser-table">') :]
+    assert chooser.startswith('<div id="chooser-table">\n<table>')
+    assert '<th scope="col">Compare</th>' in chooser
+    assert 'data-sort-column="0"' not in chooser
+    # Column indices still address the rendered cells, so Model stays column 1.
+    assert 'data-sort-column="1" onclick="sortChooserColumn(this)">Model</button>' in chooser
+
+
+def test_html_compare_fallback_carries_the_final_answer_without_reasoning(
+    tmp_path: Path,
+) -> None:
+    """Without parsed fields, the compare card shows the final answer, not the thinking trace."""
+    content = _render_workbench(
+        tmp_path,
+        [
+            _general_result("org/thinker", "<think>Scratch work here.</think>\nA small dog."),
+            _general_result("org/plain", "A small cat."),
+        ],
+    )
+    thinker_row = content.split('data-model="org/thinker"', 1)[1].split(">", 1)[0]
+    plain_row = content.split('data-model="org/plain"', 1)[1].split(">", 1)[0]
+    assert 'data-final-answer="A small dog."' in thinker_row
+    assert "Scratch work" not in thinker_row
+    # Without a removed trace the readable output already is the answer.
+    assert 'data-final-answer=""' in plain_row

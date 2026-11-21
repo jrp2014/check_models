@@ -2025,6 +2025,19 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- HTML comparison workbench (0.17.144), from a review of 2591aaa: the
+  filter script now follows `#chooser-table`, so its first run counts the
+  rows instead of reporting "Showing 0 of 0 rows" on every page load; the
+  Compare checkbox column has a plain header instead of a sort button that
+  did nothing; without parsed Title/Description/Keywords, a thinking model's
+  compare card shows the answer after its removed trace (new
+  `data-final-answer` row attribute) instead of the trace itself; and the
+  copied `tools.add_accuracy_note` command names `--output-dir` when the run
+  used another output root (relative to `src/`, `~`-relative, or absolute).
+  `model_gallery.md`, `results.html` and `run_summary.md` now share one
+  case-insensitive model order within each status group (`aya-vision` no
+  longer follows `Qwen` in the gallery). The retained `src/output` reports
+  pick these up at the next sweep.
 - Native-check history now separates known revision, build or experiment
   mismatches from checks that cannot be compared because facts are missing.
   Optional `--upstream-issue` links stay attached to the corresponding checks.

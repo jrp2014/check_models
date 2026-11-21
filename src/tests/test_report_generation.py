@@ -12,6 +12,7 @@ import io
 import json
 import logging
 import re
+import shlex
 import subprocess
 import sys
 from argparse import Namespace
@@ -10468,6 +10469,62 @@ def test_accuracy_note_shows_only_while_image_revision_and_output_match(
     assert "<b>tabby</b>" not in html_report
 
 
+def _copied_note_command(html_report: str, model: str) -> list[str]:
+    """The add_accuracy_note command a reader copies from one model's HTML entry."""
+    article = html_report.split(f"<h3>{model}</h3>", 1)[1]
+    command = article.split('class="copy-note-cmd" data-command="', 1)[1].split('"', 1)[0]
+    return shlex.split(html.unescape(command))
+
+
+def test_copied_accuracy_note_command_records_into_the_runs_output_root(
+    tmp_path: Path, test_image: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The HTML copy button's command writes the note where that run's results live.
+
+    Regression: the command never named ``--output-dir``, so for a run in a
+    custom output root it read and wrote ``src/output`` instead.
+    """
+    monkeypatch.setenv("HOME", str(tmp_path))
+    results, context, output_root = _accuracy_notes_run(tmp_path, test_image)
+    _, html_report = _render_gallery_and_html(
+        tmp_path, results, replace(context, output_root=output_root), test_image
+    )
+    command = _copied_note_command(html_report, "org/reviewed")
+    assert command[:4] == ["python", "-m", "tools.add_accuracy_note", "org/reviewed"]
+    # The home directory is shown as ~, which the tool expands.
+    assert command[command.index("--output-dir") + 1] == "~/output"
+    argv = [{"YOUR_NAME": "john", "YOUR_NOTE": "Accurate."}.get(arg, arg) for arg in command[3:]]
+    assert add_accuracy_note(argv) == 0
+    notes = yaml.safe_load((output_root / check_models.ACCURACY_NOTES_FILENAME).read_text())
+    assert [(note["model"], note["note"]) for note in notes["notes"]] == [
+        ("org/reviewed", "Accurate.")
+    ]
+
+    # The default output root (and a report built without one) needs no flag.
+    for root in (check_models._SCRIPT_DIR / "output", None):
+        _, html_report = _render_gallery_and_html(
+            tmp_path, results, replace(context, output_root=root), test_image
+        )
+        assert "--output-dir" not in _copied_note_command(html_report, "org/reviewed")
+
+
+def test_gallery_and_html_order_models_like_the_run_summary(
+    tmp_path: Path, test_image: Path
+) -> None:
+    """Within one usability group, models sort case-insensitively in every report."""
+    names = ("TechnoBaptist/model", "aya/model", "Qwen/model")
+    results = [_make_success(name) for name in names]
+    context = _build_report_render_context(
+        results=results, prompt="Describe the image.", system_info={}
+    )
+    expected = ["aya/model", "Qwen/model", "TechnoBaptist/model"]
+    assert [row.model for row in context.gallery_chooser.ordered] == expected
+    gallery, html_report = _render_gallery_and_html(tmp_path, results, context, test_image)
+    for report, marker in ((gallery, "### "), (html_report, "<h3>")):
+        positions = [report.index(f"{marker}{name}") for name in expected]
+        assert positions == sorted(positions)
+
+
 def test_accuracy_notes_absent_or_unreadable(tmp_path: Path, test_image: Path) -> None:
     """No file adds nothing; a malformed file is reported and shows no output as reviewed."""
     results, context, output_root = _accuracy_notes_run(tmp_path, test_image)
@@ -10606,6 +10663,8 @@ def test_native_repro_upstream_issue_link_validation_and_surfacing(tmp_path: Pat
         active_summary, "org/loop"
     )
     assert "| Upstream issue" in active_summary
+    # The column's URL is an autolink, never a bare URL (markdownlint MD034).
+    assert f"| <{issue_url}> |" in active_summary
 
     # When mlx-vlm changes, the cell stays out of date while preserving the issue link and details.
     metadata, *rows = safe_io.read_text_no_follow(output_paths.jsonl).splitlines()
