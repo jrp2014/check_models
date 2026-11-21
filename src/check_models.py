@@ -9721,21 +9721,31 @@ class AccuracyNoteMatch:
     stale: tuple[tuple[AccuracyNote, str], ...] = ()
 
 
+def _validate_note_entry_url(where: str, key: str, value: str) -> None:
+    """Reject URLs that are not absolute http(s) links."""
+    parsed = urlparse(value)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        msg = f"{where}: {key} must be an http:// or https:// URL"
+        raise ValueError(msg)
+
+
 def _parse_note_entry(
     index: int,
     entry: object,
     keys: tuple[str, ...],
     *,
     date_key: str,
+    optional_url_keys: tuple[str, ...] = (),
     sha256_keys: tuple[str, ...] = (),
     choices: Mapping[str, tuple[str, ...]] | None = None,
 ) -> dict[str, str]:
-    """Validate one notes-file entry; every field is required and none is guessed."""
+    """Validate one notes-file entry; required fields are mandatory and none is guessed."""
     where = f"note {index}"
     if not isinstance(entry, dict):
         msg = f"{where} is not a mapping"
         raise ValueError(msg)  # noqa: TRY004 - one error type for every malformed-file reason
-    unknown = sorted(str(key) for key in entry if key not in keys)
+    allowed_keys = (*keys, *optional_url_keys)
+    unknown = sorted(str(key) for key in entry if key not in allowed_keys)
     missing = [key for key in keys if key not in entry]
     if unknown or missing:
         problems = [f"unknown keys: {', '.join(unknown)}"] if unknown else []
@@ -9743,7 +9753,7 @@ def _parse_note_entry(
         msg = f"{where} has {'; '.join(problems)}"
         raise ValueError(msg)
     values: dict[str, str] = {}
-    for key in keys:
+    for key in entry:
         value = entry[key]
         # YAML reads an unquoted 2026-10-25 as a date.
         if key == date_key and isinstance(value, date):
@@ -9756,6 +9766,8 @@ def _parse_note_entry(
         if _SHA256_HEX_RE.fullmatch(values[key]) is None:
             msg = f"{where}: {key} must be 64 lowercase hex digits"
             raise ValueError(msg)
+    for key in values.keys() & optional_url_keys:
+        _validate_note_entry_url(where, key, values[key])
     for key, allowed in (choices or {}).items():
         if values[key] not in allowed:
             msg = f"{where}: {key} must be one of {', '.join(allowed)}"
@@ -26139,6 +26151,7 @@ class NativeReproNote:
     checker: str
     checked: str
     evidence: str
+    upstream_issue: str | None = None
 
 
 @dataclass(frozen=True)
@@ -26160,7 +26173,12 @@ def _parse_native_repro_notes(document: object) -> tuple[NativeReproNote, ...]:
     return tuple(
         NativeReproNote(
             **_parse_note_entry(
-                index, entry, _NATIVE_REPRO_NOTE_KEYS, date_key="checked", choices=choices
+                index,
+                entry,
+                _NATIVE_REPRO_NOTE_KEYS,
+                date_key="checked",
+                optional_url_keys=("upstream_issue",),
+                choices=choices,
             )
         )
         for index, entry in enumerate(_note_entries(document), 1)
@@ -26273,10 +26291,10 @@ def _native_repro_gloss(code: str) -> str:
     return _OBSERVATION_SELECTOR_GLOSSES.get(cast("ObservationCode", code), code)
 
 
-def _native_repro_note_applies(
+def _native_repro_nonmatch(
     note: NativeReproNote, result: JsonlResultRecord, notes: NativeReproNotes
-) -> bool:
-    """Whether a note was checked on this run's revision, builds and inputs.
+) -> str | None:
+    """Why a note cannot establish this result, or None for an exact match.
 
     The experiment inputs are part of the key: a confirmation on one image,
     prompt, rendered prompt or sampling setup says nothing about another
@@ -26286,52 +26304,68 @@ def _native_repro_note_applies(
     provenance = result.get("model_provenance")
     revision = provenance.get("resolved_revision") if provenance is not None else None
     experiment = _native_repro_experiment(notes.run_inputs, result)
-    return (
-        notes.stack is not None
-        and experiment is not None
-        and note.stack == notes.stack
-        and note.experiment == experiment
-        and note.model_revision == revision
+    pairs = (
+        (revision, note.model_revision),
+        (notes.stack, note.stack),
+        (experiment, note.experiment),
     )
+    if any(current is not None and current != prior for current, prior in pairs):
+        return "out of date"
+    if any(current is None for current, _prior in pairs):
+        return "not comparable: inputs not recorded"
+    return None
+
+
+def _unique_issue_links(notes: Sequence[NativeReproNote]) -> tuple[str, ...]:
+    """Return unique recorded upstream issue URLs in first-seen order."""
+    seen: list[str] = []
+    for note in notes:
+        if note.upstream_issue and note.upstream_issue not in seen:
+            seen.append(note.upstream_issue)
+    return tuple(seen)
 
 
 def _native_repro_cell(result: JsonlResultRecord, notes: NativeReproNotes | None) -> str:
     """Per-observation native status: confirmed, not reproduced, or not yet checked."""
-    maintainer_status = result["assessment"]["maintainer_status"]
-    if maintainer_status == "none":
+    if result["assessment"]["maintainer_status"] == "none":
         return "-"
     codes = _native_repro_codes(result)
-    by_code: dict[str, str] = {}
-    unmatched = False
+    by_code: dict[str, NativeReproNote] = {}
+    unmatched: dict[str, list[NativeReproNote]] = defaultdict(list)
     if notes is not None:
         for note in notes.notes:
             if note.model != result["model"] or note.observation not in codes:
                 continue
-            if _native_repro_note_applies(note, result, notes):
+            if (reason := _native_repro_nonmatch(note, result, notes)) is None:
                 # A later applicable note for the same observation supersedes
                 # an earlier one.
-                by_code[note.observation] = _NATIVE_REPRO_STATUS_LABELS[note.status]
+                by_code[note.observation] = note
             else:
-                unmatched = True
+                unmatched[reason].append(note)
     groups: dict[str, list[str]] = {}
     for code in codes:
-        label = by_code.get(code, _NATIVE_REPRO_UNCHECKED)
+        applied_note = by_code.get(code)
+        label = (
+            _NATIVE_REPRO_STATUS_LABELS[applied_note.status]
+            if applied_note is not None
+            else _NATIVE_REPRO_UNCHECKED
+        )
         groups.setdefault(label, []).append(_native_repro_gloss(code))
     if len(groups) == 1:
         cell = next(iter(groups))
     else:
         cell = "; ".join(f"{label} ({', '.join(glosses)})" for label, glosses in groups.items())
-    if unmatched and _NATIVE_REPRO_UNCHECKED in groups:
-        # Out of date only when this run's experiment is known to differ;
-        # unrecorded inputs cannot be compared either way.
-        recorded = notes is not None and (
-            _native_repro_experiment(notes.run_inputs, result) is not None
-        )
-        cell += (
-            " (earlier check out of date)"
-            if recorded
-            else " (earlier check not comparable: inputs not recorded)"
-        )
+    applicable_issues = _unique_issue_links(tuple(by_code.values()))
+    if applicable_issues:
+        cell += f" (upstream issue: {', '.join(applicable_issues)})"
+    if _NATIVE_REPRO_UNCHECKED in groups:
+        for reason, earlier in unmatched.items():
+            unchecked = [note for note in earlier if note.observation not in by_code]
+            if not unchecked:
+                continue
+            prior_issues = _unique_issue_links(unchecked)
+            links = f"; upstream issue: {', '.join(prior_issues)}" if prior_issues else ""
+            cell += f" (earlier check {reason}{links})"
     return cell or _NATIVE_REPRO_UNCHECKED
 
 
@@ -26377,6 +26411,33 @@ def _run_issue_summary_accuracy_section(
     return ReportSection("Human accuracy notes", tuple(blocks))
 
 
+def _native_repro_section_table(
+    notes: Sequence[NativeReproNote], *, include_stack: bool = False
+) -> ReportTable:
+    """Build a native-repro table, adding the Upstream issue column when any note links one."""
+    has_issue = any(note.upstream_issue for note in notes)
+    headers: list[str] = ["Model", "Observation", "Prior status" if include_stack else "Native"]
+    if include_stack:
+        headers.append("Prior stack")
+    headers.extend(("Checked", "Evidence"))
+    if has_issue:
+        headers.append("Upstream issue")
+    rows: list[tuple[str, ...]] = []
+    for note in notes:
+        row: list[str] = [
+            note.model,
+            _native_repro_gloss(note.observation),
+            _NATIVE_REPRO_STATUS_LABELS[note.status],
+        ]
+        if include_stack:
+            row.append(note.stack)
+        row.extend((f"{note.checker}, {note.checked}", note.evidence))
+        if has_issue:
+            row.append(note.upstream_issue or "-")
+        rows.append(tuple(row))
+    return ReportTable(tuple(headers), tuple(rows))
+
+
 def _native_repro_section(
     results: Sequence[JsonlResultRecord], notes: NativeReproNotes | None
 ) -> ReportSection | None:
@@ -26394,31 +26455,34 @@ def _native_repro_section(
             ),
         )
     by_model = {result["model"]: result for result in results}
-    rows = tuple(
-        (
-            note.model,
-            _native_repro_gloss(note.observation),
-            _NATIVE_REPRO_STATUS_LABELS[note.status],
-            f"{note.checker}, {note.checked}",
-            note.evidence,
-        )
-        for note in notes.notes
-        if (result := by_model.get(note.model)) is not None
-        and note.observation in _native_repro_codes(result)
-        and _native_repro_note_applies(note, result, notes)
-    )
+    applicable: list[NativeReproNote] = []
+    earlier: dict[str, list[NativeReproNote]] = defaultdict(list)
+    for note in notes.notes:
+        result = by_model.get(note.model)
+        if result is None or note.observation not in _native_repro_codes(result):
+            continue
+        if (reason := _native_repro_nonmatch(note, result, notes)) is None:
+            applicable.append(note)
+        else:
+            earlier[reason].append(note)
     intro = (
         f"Recorded in {NATIVE_REPRO_NOTES_FILENAME} for this run's model revisions, "
         f"builds ({notes.stack or 'builds not recorded'}) and experiment inputs (image, "
         "prompt, generation settings, and each model's rendered prompt and effective "
-        "generation arguments). A check made on another revision, build or experiment, "
-        "or for a model whose inputs were not recorded, does not apply and is not listed."
+        "generation arguments). Earlier checks shown separately do not establish this result."
     )
     blocks: list[ReportBlock] = [ReportParagraph(intro)]
-    if rows:
-        blocks.append(ReportTable(("Model", "Observation", "Native", "Checked", "Evidence"), rows))
+    if applicable:
+        blocks.append(_native_repro_section_table(applicable))
     else:
         blocks.append(ReportParagraph("No recorded check applies to this run."))
+    for reason, prior_notes in earlier.items():
+        blocks.append(
+            ReportDetails(
+                f"Earlier native checks ({reason})",
+                (_native_repro_section_table(prior_notes, include_stack=True),),
+            )
+        )
     return ReportSection("Native reproduction checks", tuple(blocks))
 
 

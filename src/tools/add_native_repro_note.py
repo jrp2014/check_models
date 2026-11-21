@@ -66,6 +66,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Check date (YYYY-MM-DD); defaults to today.",
     )
     parser.add_argument(
+        "--upstream-issue",
+        default=None,
+        help="Optional upstream issue or PR URL (http:// or https://) tracking this check.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=_DEFAULT_OUTPUT_DIR,
@@ -95,7 +100,7 @@ def _note_entry(args: argparse.Namespace) -> dict[str, str]:
             f"retained run (it has: {', '.join(codes) or 'none'})"
         )
         raise ValueError(msg)
-    return {
+    entry = {
         "model": args.model,
         "model_revision": revision,
         "observation": args.observation,
@@ -106,6 +111,9 @@ def _note_entry(args: argparse.Namespace) -> dict[str, str]:
         "checked": args.checked.isoformat(),
         "evidence": args.evidence,
     }
+    if args.upstream_issue is not None:
+        entry["upstream_issue"] = args.upstream_issue
+    return entry
 
 
 def main(argv: list[str] | None = None) -> int:

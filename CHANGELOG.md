@@ -2025,6 +2025,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Native-check history now separates known revision, build or experiment
+  mismatches from checks that cannot be compared because facts are missing.
+  Optional `--upstream-issue` links stay attached to the corresponding checks.
 - Upstream CLI parity test (0.17.140): mlx-vlm 960752d6 made
   `--enable-thinking` three-state (omitted = `None`, the model's template
   default; `--no-enable-thinking` = `False`), so the parity test reported

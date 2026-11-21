@@ -10557,6 +10557,70 @@ def test_native_repro_status_follows_model_revision_and_builds(tmp_path: Path) -
         "| not yet checked (earlier check out of date) |"
     )
     assert "No recorded check applies to this run." in summary
+    assert "Earlier native checks" in summary
+    assert "does not apply and is not listed" not in summary
+    assert "mlx 0.32.1; mlx-vlm 0.6.8; transformers 5.14.1" in summary
+
+
+def test_native_repro_upstream_issue_link_validation_and_surfacing(tmp_path: Path) -> None:
+    """Optional upstream_issue URL is validated and shown for both active and out-of-date checks."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_root = output_paths.index.parent
+    loop = _with_model_inputs(
+        _issue_summary_result(
+            "org/loop",
+            usability="unusable",
+            maintainer_status="observation_needs_reproduction",
+            observations=["repeated_output"],
+        )
+    )
+    _write_issue_summary_fixture(output_paths, results=(loop,))
+    issue_url = "https://github.com/Blaizzy/mlx-vlm/issues/999"
+
+    # Non-http(s) URLs are rejected.
+    assert (
+        add_native_repro_note(
+            [
+                *("org/loop", "repeated_output", "confirmed", "--checker", "john"),
+                *("--output-dir", str(output_root), "--evidence", "looped natively"),
+                *("--upstream-issue", "javascript:alert(1)"),
+            ]
+        )
+        == 1
+    )
+    assert (
+        add_native_repro_note(
+            [
+                *("org/loop", "repeated_output", "confirmed", "--checker", "john"),
+                *("--output-dir", str(output_root), "--evidence", "looped natively"),
+                *("--upstream-issue", issue_url),
+            ]
+        )
+        == 0
+    )
+
+    summary_path = check_models.regenerate_run_issue_summary(output_root)
+    assert summary_path is not None
+    active_summary = safe_io.read_text_no_follow(summary_path)
+    assert f"| confirmed (upstream issue: <{issue_url}>) |" in _native_repro_table_row(
+        active_summary, "org/loop"
+    )
+    assert "| Upstream issue" in active_summary
+
+    # When mlx-vlm changes, the cell stays out of date while preserving the issue link and details.
+    metadata, *rows = safe_io.read_text_no_follow(output_paths.jsonl).splitlines()
+    header = json.loads(metadata)
+    header["library_versions"]["mlx-vlm"] = "0.6.9"
+    safe_io.write_text_no_follow(output_paths.jsonl, "\n".join((json.dumps(header), *rows)) + "\n")
+    summary_path = check_models.regenerate_run_issue_summary(output_root)
+    assert summary_path is not None
+    stale_summary = safe_io.read_text_no_follow(summary_path)
+    assert (
+        f"| not yet checked (earlier check out of date; upstream issue: <{issue_url}>) |"
+        in _native_repro_table_row(stale_summary, "org/loop")
+    )
+    assert "Earlier native checks" in stale_summary
+    assert issue_url in stale_summary
 
 
 def test_native_repro_status_follows_experiment_inputs(tmp_path: Path) -> None:
@@ -10692,6 +10756,9 @@ def test_native_repro_status_follows_each_models_own_inputs(tmp_path: Path) -> N
     assert summary_for(loop()).endswith(
         "| not yet checked (earlier check not comparable: inputs not recorded) |"
     )
+    summary = safe_io.read_text_no_follow(output_root / "issues" / "run_summary.md")
+    assert "Earlier native checks" in summary
+    assert "out of date" not in summary.partition("Earlier native checks")[2]
 
 
 def test_unreadable_native_repro_notes_leave_every_observation_unchecked(tmp_path: Path) -> None:
