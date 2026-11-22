@@ -59,7 +59,9 @@ _FETCH_TIMEOUT_S: Final[int] = 30
 # a fine-tune of a base model is three.
 _LINEAGE_MAX_DEPTH: Final[int] = 3
 
-type TemplateShape = Literal["iterates-content", "string-only", "absent", "unknown"]
+# "unreadable": no template was found, but a template file the hub lists could
+# not be read (a gated repo answers 401), so "absent" is not established.
+type TemplateShape = Literal["iterates-content", "string-only", "absent", "unknown", "unreadable"]
 
 # A template that walks content parts, or branches on whether content is a
 # string, can render list-content messages.
@@ -164,6 +166,9 @@ class HubCandidate:
     already_cached: bool = False
     # Bases whose own card could not be read, so the chain may stop early.
     lineage_unreadable: tuple[str, ...] = ()
+    # Files the hub lists but would not serve (a gated repo without accepted
+    # terms answers 401), so facts drawn from them were not checked.
+    unreadable_files: tuple[str, ...] = ()
 
     def verdict(self) -> tuple[str, list[str]]:
         """Return ("OK" | "WARN" | "BLOCKED", reasons)."""
@@ -171,6 +176,11 @@ class HubCandidate:
             return "BLOCKED", [f"hub read failed: {self.error}"]
         blocked: list[str] = []
         warnings: list[str] = []
+        if self.unreadable_files:
+            warnings.append(
+                f"could not read {', '.join(self.unreadable_files)} although the hub lists "
+                "them; a gated repo needs its terms accepted on the hub and `hf auth login`"
+            )
         missing = layout_missing(self.files)
         if missing:
             blocked.append(f"cache layout would skip it: missing {', '.join(missing)}")
@@ -185,6 +195,8 @@ class HubCandidate:
                 f"model_file={self.model_file!r}: mlx-vlm imports and "
                 "runs that file from the checkpoint instead of its own model packages"
             )
+        elif self.arch_supported is None and self.config_source in self.unreadable_files:
+            warnings.append(f"architecture not checked: {self.config_source} could not be read")
         elif self.arch_supported is None:
             warnings.append(
                 "architecture not checked"
@@ -219,18 +231,24 @@ class HubCandidate:
                 f"text-only chat template{source} (concatenates message content as a string); "
                 "list-content messages fail at prefill"
             )
-        elif self.template == "absent":
-            warnings.append(
-                "no chat template found in chat_template.jinja/.json, processor_config.json "
-                "or tokenizer_config.json; the processor may supply one"
-            )
-        elif self.template == "unknown":
-            warnings.append(
-                f"chat template shape{source} not recognised; check it handles content parts"
-            )
+        elif (note := self._template_note(source)) is not None:
+            warnings.append(note)
         if blocked:
             return "BLOCKED", blocked + warnings
         return ("WARN", warnings) if warnings else ("OK", [])
+
+    def _template_note(self, source: str) -> str | None:
+        """The warning for a template not found, not read or not recognised."""
+        if self.template == "absent":
+            return (
+                "no chat template found in chat_template.jinja/.json, processor_config.json "
+                "or tokenizer_config.json; the processor may supply one"
+            )
+        if self.template == "unreadable":
+            return "chat template not checked: a template file could not be read"
+        if self.template == "unknown":
+            return f"chat template shape{source} not recognised; check it handles content parts"
+        return None
 
 
 ArchCheck = Callable[[object], tuple[str | None, str | None, bool | None]]
@@ -499,9 +517,14 @@ def fetch_candidate(
     size_by_name = {sibling.rfilename: sibling.size for sibling in info.siblings or ()}
     memory_bytes, working_set_bytes = (memory_check or _default_memory_check)()
     headers = build_hf_headers()
+    unreadable: list[str] = []
 
     def fetch(file_name: str) -> str | None:
-        return _fetch_text(hf_hub_url(repo_id, file_name), headers)
+        # Only files the hub listed are fetched, so a None here is a failed read.
+        text = _fetch_text(hf_hub_url(repo_id, file_name), headers)
+        if text is None and file_name not in unreadable:
+            unreadable.append(file_name)
+        return text
 
     weight_sizes = _selected_weight_sizes(files, size_by_name, fetch)
     weights_known = bool(weight_sizes) and all(weight_sizes)
@@ -510,7 +533,10 @@ def fetch_candidate(
     # mlx-vlm imports a declared model_file from the checkpoint instead of its
     # own packages (get_model_and_args), so the package check does not apply.
     template, template_source = _first_template(files, fetch)
-    chain, unreadable = lineage(
+    shape = template_shape(template)
+    if shape == "absent" and any(name in unreadable for name in _TEMPLATE_SOURCES):
+        shape = "unreadable"
+    chain, unreadable_bases = lineage(
         declared_bases(getattr(info, "card_data", None)), bases_of or _hub_declared_bases
     )
     cached = (cached_bases or _cached_declared_bases)()
@@ -518,14 +544,15 @@ def fetch_candidate(
         base_models=chain,
         cached_relatives=cached_relatives(repo_id, chain, cached),
         already_cached=repo_id.lower() in {cached_id.lower() for cached_id in cached},
-        lineage_unreadable=unreadable,
+        lineage_unreadable=unreadable_bases,
+        unreadable_files=tuple(unreadable),
         repo_id=repo_id,
         files=files,
         size_gb=round(sum(sizes) / 1e9, 1) if sizes else None,
         model_type=model_type,
         resolved_model_type=resolved,
         arch_supported=None if model_file is not None else supported,
-        template=template_shape(template),
+        template=shape,
         template_source=template_source,
         pipeline_tag=getattr(info, "pipeline_tag", None),
         model_file=model_file,

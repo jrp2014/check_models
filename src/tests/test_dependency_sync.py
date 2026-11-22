@@ -4289,10 +4289,12 @@ def _fetch_with_siblings(
     bases_of: Mapping[str, tuple[str, ...]] | None = None,
     cached: Mapping[str, tuple[str, ...]] | None = None,
     config_file: str = "config.json",
+    unserved: tuple[str, ...] = (),
 ) -> hub_precheck.HubCandidate:
     """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set).
 
     Lineage lookups are injected too, so no test reads the hub or the real cache.
+    ``unserved`` files stay listed but every read of them fails (a gated repo).
     """
 
     class _Sibling:
@@ -4314,10 +4316,15 @@ def _fetch_with_siblings(
     monkeypatch.setattr(huggingface_hub, "HfApi", _Api)
     monkeypatch.setattr(huggingface_hub, "hf_hub_url", lambda _repo, name: name)
     monkeypatch.setattr(huggingface_hub.utils, "build_hf_headers", dict)
-    monkeypatch.setattr(hub_precheck, "_fetch_text", lambda url, _headers: texts.get(url))
+    monkeypatch.setattr(
+        hub_precheck,
+        "_fetch_text",
+        lambda url, _headers: None if url in unserved else texts.get(url),
+    )
     return hub_precheck.fetch_candidate(
         "org/repo",
-        arch_check=lambda raw: (str(raw), str(raw), True),
+        # Like arch_precheck_for_model_type: no model_type, nothing checked.
+        arch_check=lambda raw: (None, None, None) if raw is None else (str(raw), str(raw), True),
         memory_check=lambda: (16_000_000_000, 12_000_000_000),
         bases_of=lambda repo: (bases_of or {}).get(repo, ()),
         cached_bases=lambda: cached or {},
@@ -6150,3 +6157,22 @@ def test_bootstrap_reports_optional_omissions_on_success(tmp_path: Path) -> None
     assert "Bootstrap complete, with an optional step skipped:" in result.stdout
     assert "npm not found" in result.stdout
     assert calls.count("-m pre_commit install") == 1
+
+
+def test_hub_precheck_reports_gated_files_as_unread_not_absent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: a gated repo's 401 on config/template read as "no model_type/no template"."""
+    listed = {"tokenizer_config.json": 100, "model.safetensors": 1_000}
+    gated = _fetch_with_siblings(
+        monkeypatch, listed, unserved=("config.json", "tokenizer_config.json")
+    )
+    assert gated.unreadable_files == ("config.json", "tokenizer_config.json")
+    assert (gated.model_type, gated.template) == (None, "unreadable")
+    status, reasons = gated.verdict()
+    assert status == "WARN"
+    assert any("could not read config.json, tokenizer_config.json" in r for r in reasons)
+    assert "architecture not checked: config.json could not be read" in reasons
+    assert "chat template not checked: a template file could not be read" in reasons
+    assert not any("no model_type" in r or "no chat template found" in r for r in reasons)
+    assert "template=unreadable" in hub_precheck.render([gated])

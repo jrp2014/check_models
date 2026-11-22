@@ -2025,6 +2025,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/hub_precheck.py` (0.17.147) no longer reports a gated repo's
+  unreadable files as missing. A listed file the hub will not serve (a 401
+  until the repo's terms are accepted, as for `sensenova/SenseNova-Loop-9B`)
+  was read as "no model_type" and "no chat template found". Such files are
+  now recorded in `unreadable_files` and named in a warning that points to
+  accepting the terms and `hf auth login`; the verdict says "architecture
+  not checked: config.json could not be read" and the template column shows
+  `unreadable` instead of `absent`.
 - `tools/update.sh` (0.17.146) no longer rewrites the tracked
   `src/package.json` for routine markdownlint-cli2 releases. It runs
   `npm update markdownlint-cli2`, which installs the newest release the
