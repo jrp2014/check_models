@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-11-21 23:42:25 GMT
+FULL ENVIRONMENT DUMP - 2026-11-27 13:11:59 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -21,13 +21,13 @@ CacheControl==0.15.0
 certifi==2026.11.20
 cffi==2.1.1
 cfgv==3.5.0
-charset-normalizer==3.5.2
-check_models==0.17.146
+charset-normalizer==3.5.3
+check_models==0.17.147
 click==8.5.1
 cmake==4.4.5
-coverage==7.17.4
+coverage==7.17.5
 cryptography==50.0.2
-cyclonedx-python-lib==11.12.0
+cyclonedx-python-lib==11.13.0
 datasets==5.2.0
 defusedxml==0.7.1
 dill==0.4.1
@@ -37,17 +37,17 @@ editor==2.0.1
 einops==0.8.2
 execnet==2.1.2
 fastapi==0.165.0
-filelock==4.2.12
+filelock==4.3.1
 frozenlist==1.8.0
 fsspec==2026.9.0
 h11==0.16.0
 hf-xet==1.8.0
 httpcore==1.0.9
 httpcore2==2.16.2
-httpx==0.28.1
+httpx==0.29.0
 httpx-sse==0.4.3
 httpx2==2.16.2
-huggingface_hub==2.4.0
+huggingface_hub==2.5.0
 identify==2.6.20
 idna==3.20
 iniconfig==2.3.1
@@ -74,10 +74,10 @@ mdit-py-plugins==0.7.0
 mdurl==0.1.2
 miniaudio==1.73
 ml_dtypes==0.7.0
-mlx==0.32.5.dev20261121+8803ac3ca
-mlx-audio==0.6.7
+mlx==0.33.0.dev20261127+266a9bd01
+mlx-audio==0.6.8
 mlx-lm==0.32.2
-mlx-vlm==0.8.0
+mlx-vlm==0.8.1
 more-itertools==11.2.1
 mpmath==1.3.0
 msgpack==1.2.4
@@ -92,7 +92,7 @@ numpy==2.5.5
 opencv-python==5.1.0.95
 opentelemetry-api==1.45.2
 packageurl-python==0.17.6
-packaging==26.3
+packaging==26.4
 pandas==3.1.1
 pathspec==1.1.1
 pillow==13.0.0
@@ -122,14 +122,14 @@ pytest==9.2.0
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==4.0.0
-python-discovery==1.9.6
+python-discovery==1.9.7
 python-dotenv==1.2.4
 python-hcl2==8.2.0
 python-multipart==0.0.34
 PyYAML==6.0.4
 readchar==4.2.2
 referencing==0.37.0
-regex==2026.11.19
+regex==2026.11.25
 requests==2.34.2
 rich==15.0.0
 rpds-py==2026.9.1
@@ -141,10 +141,10 @@ sentencepiece==0.2.3
 setuptools==84.2.1
 shellingham==1.5.4
 six==1.17.0
-skylos==5.7.0
+skylos==5.8.0
 sortedcontainers==2.4.0
 sounddevice==0.5.6
-sse-starlette==3.7.0
+sse-starlette==3.7.1
 starlette==1.10.0
 sympy==1.14.0
 textual==8.2.8
@@ -156,7 +156,7 @@ torch==2.15.0
 torchaudio==2.11.1
 torchvision==0.29.2
 tqdm==4.70.1
-transformers==5.24.0
+transformers==5.24.1
 tree-sitter==0.26.1
 tree-sitter-cpp==0.23.4
 tree-sitter-dart-orchard==0.5.0
@@ -168,14 +168,14 @@ tree-sitter-rust==0.24.2
 tree-sitter-swift==0.7.4
 tree-sitter-typescript==0.23.2
 truststore==0.10.5
-ty==0.0.107
-typer==0.29.2
+ty==0.0.112
+typer==0.29.3
 types-defusedxml==0.7.0.20260504
-types-psutil==7.2.2.20261111
-types-PyYAML==6.0.12.20261113
+types-psutil==7.2.2.20261122
+types-PyYAML==6.0.12.20261122
 types-simplejson==4.3.0.20261112
 types-toml==0.10.8.20260518
-types-tqdm==4.70.0.20261106
+types-tqdm==4.70.0.20261122
 types-urllib3==1.26.25.14
 typing-inspection==0.4.5
 typing_extensions==4.16.0
@@ -183,7 +183,7 @@ tzdata==2026.6
 uc-micro-py==2.0.0
 urllib3==2.8.0
 uvicorn==0.54.0
-virtualenv==21.15.12
+virtualenv==21.15.13
 vulture==2.16
 wcwidth==0.9.5
 websockets==17.4
@@ -194,5 +194,5 @@ yarl==1.25.1
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-11-21 23:42:25 GMT
+Environment dump completed at 2026-11-27 13:11:59 GMT
 ================================================================================

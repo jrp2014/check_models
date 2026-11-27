@@ -1,12 +1,12 @@
 # Model Output Gallery
 
-Generated on: 2026-11-21 23:48:03 GMT
+Generated on: 2026-11-27 13:18:03 GMT
 
 - *Evaluation lane:* blind
 - *Prompt hints:* no description or keyword hints
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
-- *Human accuracy notes:* 1 of 41 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed
+- *Human accuracy notes:* 0 of 42 outputs reviewed by a person for this exact image, model revision and output (accuracy_notes.yaml); the others are unreviewed; 1 earlier note out of date
 
 This run records model responses to one shared image and prompt (evaluation
 lane: blind). Mechanical checks are not factual-accuracy judgments; inspect
@@ -27,54 +27,55 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Keywords | Observations                                              |
-|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|---------------------|-----------------|---------|------------|---------|----------|-----------------------------------------------------------|
-| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 2.62s   | 61.5 tok/s          | 0.57            | 9.7     | 734        | 56      | 10       | none                                                      |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 1.29s   | 570 tok/s           | 0.80            | 1.3     | 350        | 47      | 6        | none                                                      |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 31.34s  | 31.8 tok/s          | 0.90            | 17      | 461        | 865     | 16       | none                                                      |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.15s   | 102 tok/s           | 1.55            | 6.5     | 2,909      | 82      | 10       | none                                                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected`          | 5.29s   | 66.1 tok/s          | 1.87            | 28      | 386        | 66      | 14       | none                                                      |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 3.53s   | 63.1 tok/s          | 0.27            | 7.5     | 390        | 88      | 18       | none                                                      |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected`          | 3.44s   | 127 tok/s           | 0.34            | 16      | 390        | 75      | 15       | none                                                      |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 2.43s   | 124 tok/s           | 0.18            | 5.9     | 386        | 67      | 14       | none                                                      |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 11.71s  | 81.9 tok/s          | 0.46            | 8.0     | 495        | 819     | 12       | none                                                      |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected`          | 1.39s   | 178 tok/s           | 0.29            | 4.7     | 734        | 57      | 10       | none                                                      |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.25s   | 55.6 tok/s          | 2.31            | 10      | 3,435      | 90      | 18       | none                                                      |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected`          | 1.47s   | 217 tok/s           | 0.24            | 3.6     | 344        | 73      | 10       | none                                                      |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected`          | 2.08s   | 313 tok/s           | 0.14            | 3.5     | 330        | 268     | 15       | none                                                      |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 8.73s   | 87.4 tok/s          | 0.58            | 24      | 330        | 431     | 18       | none                                                      |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 3.30s   | 67.5 tok/s          | 0.73            | 8.9     | 1,070      | 81      | 10       | none                                                      |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 1.65s   | 209 tok/s           | 0.24            | 3.7     | 1,069      | 102     | 12       | none                                                      |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 20.11s  | 91.1 tok/s          | 6.77            | 69      | 549        | 82      | 18       | none                                                      |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 3.00s   | 71.1 tok/s          | 0.51            | 8.2     | 873        | 95      | 10       | none                                                      |
-| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 4.57s   | 30.3 tok/s          | 0.81            | 12      | 860        | 70      | 10       | none                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `no concerns detected`          | 39.24s  | 24.9 tok/s          | 0.90            | 25      | 545        | 884     | 14       | none                                                      |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 1.65s   | 267 tok/s           | 0.18            | 3.3     | 418        | 78      | 12       | none                                                      |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 2.85s   | 58.1 tok/s          | 0.29            | 9.1     | 883        | 94      | 19       | none                                                      |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 3.73s   | 93.6 tok/s          | 0.38            | 23      | 409        | 81      | 18       | none                                                      |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 3.01s   | 133 tok/s           | 0.34            | 19      | 409        | 83      | 10       | none                                                      |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 1.87s   | 103 tok/s           | 0.25            | 6.8     | 409        | 60      | 10       | none                                                      |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 10.24s  | 123 tok/s           | 0.34            | 21      | 419        | 898     | 18       | none                                                      |
-| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected`          | 8.39s   | 121 tok/s           | 0.37            | 21      | 419        | 653     | 19       | none                                                      |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 23.52s  | 30.9 tok/s          | 0.72            | 17      | 461        | 640     | 14       | none                                                      |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected`          | 1.51s   | 117 tok/s           | 0.45            | 5.6     | 1,204      | 31      | 4        | none                                                      |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 1.73s   | 149 tok/s           | 0.17            | 5.2     | 420        | 88      | 10       | none                                                      |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 4.89s   | 35.9 tok/s          | 0.67            | 16      | 538        | 87      | 18       | none                                                      |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 7.01s   | 162 tok/s           | 0.35            | 21      | 421        | 706     | 17       | none                                                      |
-| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 55.31s  | 30.3 tok/s          | 11.70           | 81      | 420        | 797     | 15       | none                                                      |
-| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected`          | 3.61s   | 97.4 tok/s          | 0.25            | 6.7     | 419        | 198     | 11       | none                                                      |
-| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 15.17s  | 43.2 tok/s          | 1.67            | 11      | 461        | 517     | 14       | none                                                      |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`             | 6.00s   | 145 tok/s           | 0.52            | 19      | 545        | 540     | 16       | duplicate keywords                                        |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `concerns detected`             | 5.01s   | 102 tok/s           | 0.19            | 7.0     | 173        | 367     | 18       | duplicate keywords                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 1.18s   | 395 tok/s           | 0.32            | 2.1     | 120        | 32      | -        | labelled fields not detected                              |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.73s   | 379 tok/s           | 0.38            | 2.3     | 3,438      | 1,000   | 144      | repeated text; cut off at token limit; duplicate keywords |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 2.69s   | insufficient sample | 1.41            | 7.0     | 3,512      | 14      | -        | control tokens visible; labelled fields not detected      |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 1.02s   | 353 tok/s           | 0.10            | 1.5     | 116        | 97      | -        | labelled fields not detected                              |
+| Model                                                                                                                               | Mechanical checks               | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Keywords | Observations                                                                                                                         |
+|-------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------|---------------------|-----------------|---------|------------|---------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
+| [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected`          | 3.15s   | 63.7 tok/s          | 1.14            | 9.7     | 734        | 56      | 10       | none                                                                                                                                 |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected`          | 0.64s   | 569 tok/s           | 0.07            | 1.3     | 350        | 47      | 6        | none                                                                                                                                 |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected`          | 21.25s  | 32.4 tok/s          | 2.01            | 17      | 461        | 551     | 15       | none                                                                                                                                 |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected`          | 4.01s   | 102 tok/s           | 1.43            | 6.6     | 2,909      | 82      | 10       | none                                                                                                                                 |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected`          | 6.96s   | 116 tok/s           | 0.91            | 19      | 545        | 495     | 12       | none                                                                                                                                 |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected`          | 3.77s   | 63.3 tok/s          | 0.56            | 7.5     | 390        | 84      | 17       | none                                                                                                                                 |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected`          | 2.74s   | 124 tok/s           | 0.38            | 6.0     | 386        | 72      | 14       | none                                                                                                                                 |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected`          | 8.12s   | 82.6 tok/s          | 0.87            | 8.0     | 495        | 499     | 11       | none                                                                                                                                 |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected`          | 1.48s   | 186 tok/s           | 0.27            | 4.7     | 734        | 68      | 10       | none                                                                                                                                 |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected`          | 5.38s   | 55.4 tok/s          | 2.44            | 10      | 3,435      | 87      | 17       | none                                                                                                                                 |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected`          | 1.89s   | 220 tok/s           | 0.64            | 3.6     | 344        | 77      | 10       | none                                                                                                                                 |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected`          | 5.09s   | 105 tok/s           | 0.33            | 7.0     | 173        | 368     | 16       | none                                                                                                                                 |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected`          | 3.08s   | 325 tok/s           | 0.87            | 3.5     | 330        | 368     | 16       | none                                                                                                                                 |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected`          | 8.77s   | 87.7 tok/s          | 0.41            | 24      | 330        | 477     | 16       | none                                                                                                                                 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected`          | 3.30s   | 69.9 tok/s          | 0.75            | 8.9     | 1,070      | 81      | 10       | none                                                                                                                                 |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected`          | 1.61s   | 212 tok/s           | 0.22            | 3.7     | 1,069      | 103     | 13       | none                                                                                                                                 |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected`          | 13.96s  | 93.1 tok/s          | 4.34            | 69      | 549        | 82      | 17       | none                                                                                                                                 |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected`          | 4.39s   | 73.6 tok/s          | 1.55            | 7.9     | 873        | 124     | 11       | none                                                                                                                                 |
+| [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected`          | 5.19s   | 31.4 tok/s          | 1.52            | 12      | 860        | 70      | 10       | none                                                                                                                                 |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected`          | 1.59s   | 266 tok/s           | 0.18            | 3.3     | 418        | 57      | 10       | none                                                                                                                                 |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected`          | 3.13s   | 59.0 tok/s          | 0.44            | 9.1     | 883        | 94      | 19       | none                                                                                                                                 |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected`          | 3.87s   | 95.3 tok/s          | 0.37            | 23      | 409        | 87      | 18       | none                                                                                                                                 |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected`          | 3.12s   | 135 tok/s           | 0.34            | 19      | 409        | 97      | 18       | none                                                                                                                                 |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected`          | 1.81s   | 106 tok/s           | 0.23            | 6.8     | 409        | 60      | 10       | none                                                                                                                                 |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected`          | 8.90s   | 129 tok/s           | 0.35            | 21      | 419        | 768     | 18       | none                                                                                                                                 |
+| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected`          | 9.97s   | 130 tok/s           | 0.35            | 21      | 419        | 909     | 17       | none                                                                                                                                 |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected`          | 22.51s  | 32.6 tok/s          | 0.76            | 17      | 461        | 640     | 14       | none                                                                                                                                 |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected`          | 1.76s   | 125 tok/s           | 0.67            | 5.6     | 1,204      | 31      | 4        | none                                                                                                                                 |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected`          | 1.66s   | 153 tok/s           | 0.15            | 5.3     | 420        | 88      | 10       | none                                                                                                                                 |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected`          | 5.00s   | 36.5 tok/s          | 0.81            | 16      | 538        | 87      | 19       | none                                                                                                                                 |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected`          | 8.19s   | 166 tok/s           | 0.57            | 21      | 421        | 879     | 18       | none                                                                                                                                 |
+| [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected`          | 57.73s  | 31.0 tok/s          | 16.58           | 81      | 420        | 797     | 15       | none                                                                                                                                 |
+| [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected`          | 3.59s   | 103 tok/s           | 0.27            | 6.7     | 419        | 198     | 11       | none                                                                                                                                 |
+| [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected`          | 15.97s  | 42.7 tok/s          | 2.48            | 11      | 461        | 517     | 14       | none                                                                                                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`             | 6.20s   | 47.9 tok/s          | 2.77            | 28      | 386        | 70      | 15       | duplicate keywords                                                                                                                   |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `concerns detected`             | 3.50s   | 126 tok/s           | 0.34            | 16      | 390        | 77      | 17       | duplicate keywords                                                                                                                   |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns: answer format` | 1.45s   | 398 tok/s           | 0.57            | 1.8     | 120        | 32      | -        | labelled fields not detected                                                                                                         |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns: generation`    | 3.82s   | 380 tok/s           | 0.47            | 2.3     | 3,438      | 1,000   | 144      | repeated text; cut off at token limit; duplicate keywords                                                                            |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns: answer format` | 2.41s   | insufficient sample | 1.20            | 7.0     | 3,512      | 14      | -        | control tokens visible; labelled fields not detected                                                                                 |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns: generation`    | 44.14s  | 25.0 tok/s          | 1.19            | 25      | 545        | 1,000   | 42       | repeated text; control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns: answer format` | 1.09s   | 400 tok/s           | 0.23            | 1.3     | 116        | 97      | -        | labelled fields not detected                                                                                                         |
+| [`thinkingmachines/Inkling-2-Mini`](#model-thinkingmachines-inkling-2-mini)                                                         | `major concerns: answer format` | 29.74s  | 37.0 tok/s          | 0.44            | 22      | 318        | 1,000   | -        | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.29s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 0.64s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.3 GB
 
@@ -84,12 +85,14 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                   | Mechanical checks               | Observations                                              |
-|-----------------------------------------------------------------------------------------|---------------------------------|-----------------------------------------------------------|
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)              | `major concerns: answer format` | labelled fields not detected                              |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)          | `major concerns: generation`    | repeated text; cut off at token limit; duplicate keywords |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit) | `major concerns: answer format` | control tokens visible; labelled fields not detected      |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)            | `major concerns: answer format` | labelled fields not detected                              |
+| Model                                                                                           | Mechanical checks               | Observations                                                                                                                         |
+|-------------------------------------------------------------------------------------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                      | `major concerns: answer format` | labelled fields not detected                                                                                                         |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                  | `major concerns: generation`    | repeated text; cut off at token limit; duplicate keywords                                                                            |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)         | `major concerns: answer format` | control tokens visible; labelled fields not detected                                                                                 |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit) | `major concerns: generation`    | repeated text; control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; duplicate keywords |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                    | `major concerns: answer format` | labelled fields not detected                                                                                                         |
+| [`thinkingmachines/Inkling-2-Mini`](#model-thinkingmachines-inkling-2-mini)                     | `major concerns: answer format` | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -102,54 +105,55 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 |-------------------------------------------------------------------------------------------------------------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`ibm-granite/granite-vision-4.1-4b`](#model-ibm-granite-granite-vision-41-4b)                                                      | `no concerns detected` | Title: "Cats at Rest on a Pink Sofa" \| Description: Two cats are sleeping on a pink sofa, with remote controls nearby. \| Keywords (10): cats, sleeping, pink sofa, remote controls, domestic, comfort, tranquility, home, leisure, relaxation.                                                                                                                                          |
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Cats on a Pink Couch \| Description: Two tabby cats are lying on a bright pink couch, appearing relaxed and comfortable. \| Keywords (6): cats, pink couch, relaxation, tabby, comfortable, cozy                                                                                                                                                                                   |
-| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: Two tabby cats lying on pink fabric beside remotes \| Description: Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker ma... \| Keywords (16): tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, ...[2,838 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/AREX-2-4bit`](#model-mlx-community-arex-2-4bit)                                                                     | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Fabric \| Description: Two tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind t... \| Keywords (15): tabby cat, sleeping, pink fabric, sofa, remote control, striped coat, resting, indoor, cushion, magenta, ...[1,840 characters of reasoning omitted; complete output in the evidence block]     |
 | [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Two Cats Relaxing Together \| Description: Two tabby cats are curled up and sleeping side by side on a pink blanket, with a remote control placed nearby on the sofa. The sce... \| Keywords (10): cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, home, indoor, comfortable                                                                                   |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Two tabby cats sleeping on a pink blanket \| Description: Two striped tabby cats lie resting on a pink fabric surface next to two remote controls. \| Keywords (14): cats, tabby, sleeping, pink, blanket, sofa, indoor, remote controls, lounging, resting, striped, fur, fabric, ...                                                                                             |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Two Tabby Cats on a Pink Sofa \| Description: Two tabby cats lie on a pink fabric sofa, with one resting horizontally and the other positioned verticall... \| Keywords (18): cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, pink fabric, remote controls, furniture, ...                                                                                   |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Two tabby cats sleeping on a pink surface \| Description: Two tabby cats lie on a pink fabric surface next to two remote controls. The cats are positioned... \| Keywords (15): tabby, cat, sleeping, pink, fabric, remote, electronics, domestic, animal, lying, indoor, bright, two, cats, ...                                                                                   |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Two cats rest upon bright pink fabric \| Description: Two cats lie on a vividly coloured pink surface under soft lighting. They are accompanied by a remote... \| Keywords (14): cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, lounged, indoors, tortoiseshell, domestic, ...                                                                                   |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Two Tabby Cats on Pink Couch with Remotes \| Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other... \| Keywords (12): tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, ...[2,997 characters of reasoning omitted; complete output in the evidence block]     |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Feline Serenity on a Red Couch" \| Description: Two striped cats lounging on a red blanket, one with a remote control nearby. \| Keywords (10): cats, striped, red, blanket, lounging, remote control, comfort, rest, domestic, leisure                                                                                                                                           |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Cats Sleeping on Sofa with Remote Controls \| Description: Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft,... \| Keywords (18): cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy, domestic, resting, comfort, ...                                                                                    |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Two cats sleeping on a pink couch. \| Description: Two tabby cats are lying on a pink couch with remote controls nearby. The lighting is bright, highlighting th... \| Keywords (10): cats, pink couch, tabby, sleeping, remote controls, bright lighting, fur patterns, relaxation, indoor, ...                                                                                   |
-| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected` | Title: Two tabby cats sleep on pink couch \| Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with stripe... \| Keywords (15): tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy[705 characters of reasoning omitted; complete output in the evidence block]       |
-| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Sofa \| Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The... \| Keywords (18): tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, ...[1,400 characters of reasoning omitted; complete output in the evidence block]      |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Two cats sleeping on a red sofa. \| Description: Two cats, one light-colored and one dark, are sleeping on a red sofa indoors. The scene is lit softly, with one c... \| Keywords (12): cats, two cats, sleeping, on a sofa, red sofa, indoor, pet, feline, light cat, dark cat, white paws, ...[1,537 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Two Tabby Cats on a Pink Sofa \| Description: Two striped tabby cats lie on a pink sofa, with one resting its head on a remote control. The cats are positioned i... \| Keywords (17): cats, tabby, pets, sofa, remote control, sleeping, lounging, feline, furniture, grey, brown, stripes, ...                                                                                   |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Two cats rest upon a pink surface \| Description: Two cats lie on a bright pink surface. One cat on the left displays horizontal banding, while the cat on... \| Keywords (14): cats, two, pink, surface, reclining, stripes, feline, animal, indoors, domestic, tortoiseshell, tabby, nap, ...                                                                                    |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Two Tabby Cats on Pink Couch with Remotes \| Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the... \| Keywords (11): tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, ...[1,741 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Feline Serenity on a Vibrant Red Sofa" \| Description: Two striped cats lounging on a red sofa, one with a remote control nearby, under soft lighting. \| Keywords (10): cats, striped, red sofa, remote control, lounging, soft lighting, comfort, domestic, tranquility, ...                                                                                                    |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Cats Sleeping on Sofa with Remote Controls \| Description: Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft,... \| Keywords (17): cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, domestic, pets, cozy, resting, comfort, ...                                                                                    |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Two cats sleeping on a pink couch. \| Description: Two tabby cats are lying on a pink couch, one with a remote nearby. The scene is well-lit, highlighting the cats' fur pat... \| Keywords (10): cats, pink couch, tabby, sleeping, remotes, fur patterns, well-lit, cozy, domestic, relaxation                                                                                   |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Two tabby cats resting on pink fabric with remote controls \| Description: Two tabby cats lie relaxed on a pink surface, accompanied by two remote controls... \| Keywords (16): cats, tabby, pink, couch, remotes, resting, indoor, fur, striped, relaxed, fabric, lounging, animals, pets, ...[1,251 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/MiniCPM-V-4.7-1B-4bit`](#model-mlx-community-minicpm-v-47-1b-4bit)                                                  | `no concerns detected` | Title: Two Tabby Cats Rest on Pink Couch \| Description: Two tabby cats lie relaxed on a pink fabric couch, one with a remote and green ear tag, both in a calm... \| Keywords (16): tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, ...[1,101 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/MiniCPM-V-4.7-35B-A3B-4bit`](#model-mlx-community-minicpm-v-47-35b-a3b-4bit)                                        | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Sofa \| Description: Two tabby cats with striped fur are lying on a pink sofa cushion, each near a white remote control.... \| Keywords (16): tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, ...[1,625 characters of reasoning omitted; complete output in the evidence block]      |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: Two Cats Relaxing on Pink Cushioned Surface \| Description: Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The... \| Keywords (10): cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, natural lighting, striped fur, ...                                                                                   |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Two resting tabby cats on a pink sofa \| Description: Two adult tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft, na... \| Keywords (12): tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-setting, domestic-pets, ...                                                                                   |
-| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink sofa \| Description: Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and... \| Keywords (18): cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relaxation, soft lighting, ...                                                                                    |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Two Calico Cats Sleeping on Pink Bedding \| Description: Two calico cats are sleeping side by side on pink bedding. They are positioned with their heads facin... \| Keywords (10): calico cats, sleeping, pink bedding, white remotes, black and brown fur, white cats, striped cats, cozy, ...                                                                                   |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Two Kitten Friends on a Pink Couch \| Description: Two striped kittens lie relaxed on a bright pink cushion, each with a remote control beside them. The lar... \| Keywords (13): kitten, domestic-cat, pink-cushion, remote-control, indoor-setting, stretching, curled, striped-fur, cozy, ...                                                                                   |
+| [`mlx-community/Mistral-Small-4-119B-2603-4bit`](#model-mlx-community-mistral-small-4-119b-2603-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink sofa \| Description: Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed p... \| Keywords (17): cats, sofa, pink, remote control, resting, indoor, pet, cushion, soft lighting, domestic scene, relaxed poses, ...                                                                                   |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Two Calico Cats Sleeping on Pink Bedding \| Description: Two calico cats with black, orange, and white fur are sleeping side by side on pink bedding. The... \| Keywords (11): calico cats, sleeping, pink bedding, black fur, orange fur, white fur, side by side, heads facing each other, ...                                                                                   |
 | [`mlx-community/MolmoPoint-8B-4bit`](#model-mlx-community-molmopoint-8b-4bit)                                                       | `no concerns detected` | Title: Two Cats Sleeping on Pink Blanket with Remote Controls \| Description: Two cats are sleeping on a pink blanket. A white remote control is visible behind them. Th... \| Keywords (10): cats, pink blanket, remote controls, sleeping, white remote, comfortable, soft surface, feline, rest, ...                                                                                   |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `no concerns detected` | Title: Two cats resting on pink blanket sofa \| Description: Two cats lie on a bright pink blanket on a red sofa, one with its head resting down and eyes closed, the... \| Keywords (14): cats, pink blanket, red sofa, remote controls, tabby markings, resting, sleeping, fabric, couch, indoor, ...                                                                                   |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: "Cats Resting on a Pink Couch" \| Description: "Two cats are comfortably sprawled out on a vibrant pink couch, basking in the soft light of the day. Their relaxed postu... \| Keywords (12): cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, basking, cozy, serene, scene.                                                                                   |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: "Cats Sleeping on a Red Couch" \| Description: "Two cats are comfortably sleeping on a bright pink couch, each holding a remote control in their paws." \| Keywords (10): cats, sleeping, couch, red, remote controls, comfortable, peaceful, indoor, feline, cozy.                                                                                                                |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Two Cats Sleeping on Pink Sofa \| Description: Two cats are sleeping on a pink sofa with remote controls beside them. \| Keywords (19): cats, sleeping, pink sofa, remote controls, relaxed, comfortable, indoor, domestic, fur, striped, resting, ...                                                                                                                             |
-| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Two tabby cats sleeping on sofa \| Description: Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats. \| Keywords (18): tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoor, animal, pet, living room, ...                                                                                       |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink surface \| Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with its eyes closed, while... \| Keywords (10): cats, remote controls, pink fabric, lying down, curled up, eyes closed, striped pattern, light, indoor setting, ...                                                                                   |
+| [`mlx-community/Qwen3-Omni-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-omni-30b-a3b-instruct-4bit)                           | `no concerns detected` | Title: Two tabby cats sleeping on sofa \| Description: Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats. \| Keywords (18): tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, animal, pet, living room, furniture, ...                                                                                    |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Two cats resting on a pink surface \| Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with a green collar, while... \| Keywords (18): cats, pink fabric, remote controls, green collar, striped fur, lying down, curled, stretched, domestic animals, ...                                                                                    |
 | [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Two Cats Sleeping on Pink Sofa \| Description: Two tabby cats rest peacefully on a bright pink sofa. Remote controls lie beside them. Natural daylight illuminates the scene. \| Keywords (10): cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feline                                                                                                           |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa next to remotes \| Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote co... \| Keywords (18): cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, ...[3,062 characters of reasoning omitted; complete output in the evidence block]     |
-| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa with remotes. \| Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote co... \| Keywords (19): tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, ...[1,952 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two tabby cats lying on a pink sofa with remotes \| Description: Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green... \| Keywords (18): cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, ...[2,478 characters of reasoning omitted; complete output in the evidence block]      |
+| [`mlx-community/Qwen3.6-35B-A3B-4bit`](#model-mlx-community-qwen36-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Two tabby cats sleeping on a pink sofa with remotes \| Description: Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A... \| Keywords (17): tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, ...[3,254 characters of reasoning omitted; complete output in the evidence block]     |
 | [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Two tabby cats resting beside remote controls on pink sofa \| Description: Two striped tabby cats lie asleep on a vivid pink sofa, one wearing a green collar tag,... \| Keywords (14): tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white remotes, sleeping cats, ...[2,135 characters of reasoning omitted; complete output in the evidence block]     |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | Title: Two Cats on a Couch \| Description: Two cats are sleeping on a pink couch. \| Keywords (4): cats, couch, sleeping, pink                                                                                                                                                                                                                                                            |
 | [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Two Cats Resting on a Pink Couch with Remotes \| Description: Two tabby cats are lying on a pink couch, with a remote control placed between them. The cats appear to be... \| Keywords (10): cats, resting, pink couch, remote control, tabby, sleeping, indoor, bright lighting, tail, visible                                                                                   |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Two Cats Resting on a Pink Blanket \| Description: Two tabby cats are lying on a pink blanket, one stretched out and the other curled up. A remote contr... \| Keywords (18): cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch, paws, stripes, sleeping, pet, ...                                                                                   |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Two tabby cats sleeping on pink cushion \| Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby. \| Keywords (17): cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, ...[2,396 characters of reasoning omitted; complete output in the evidence block]      |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Two Cats Resting on a Pink Blanket \| Description: Two tabby cats are lying on a pink blanket, one stretched out and the other curled up, with remote control... \| Keywords (19): cats, tabby, pink blanket, resting, remote controls, relaxed, indoor, fur, paws, stripes, sofa, cushions, ...                                                                                   |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Two sleeping tabby cats on pink fabric \| Description: Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control. \| Keywords (18): cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, ...[3,091 characters of reasoning omitted; complete output in the evidence block]        |
 | [`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4`](#model-nvidia-nvidia-nemotron-35-super-vl-120b-a12b-nvfp4)                  | `no concerns detected` | Title: Two tabby cats sleeping on pink sofa \| Description: Two tabby cats are asleep on a bright pink fabric surface. White remote controls rest behind them near a... \| Keywords (15): cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabric, indoor, domestic, pet, fur, resting[2,856 characters of reasoning omitted; complete output in the evidence block]     |
 | [`sahilchachra/LensVLM-9B-MXFP4`](#model-sahilchachra-lensvlm-9b-mxfp4)                                                             | `no concerns detected` | Title: Two Cats Sleeping on Pink Blanket \| Description: Two tabby cats are lying asleep on a vibrant pink blanket, accompanied by two white remote controls. One cat is s... \| Keywords (11): cats, sleeping, pink blanket, remote controls, tabby, rest, indoor, fur, relaxation, domestic, &lt;/think&gt;[430 characters of reasoning omitted; complete output in the evidence block] |
 | [`TechnoBaptist/Ternary-Bonsai-2-27B-mlx-2bit`](#model-technobaptist-ternary-bonsai-2-27b-mlx-2bit)                                 | `no concerns detected` | Title: Two Tabby Cats Resting on Pink Fabric \| Description: Two tabby cats lie stretched out on a bright pink fabric surface with their eyes closed. Two white remote control... \| Keywords (14): tabby cat, two cats, pink fabric, remote control, sleeping, resting, striped fur, white remote, ...[1,713 characters of reasoning omitted; complete output in the evidence block]     |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `concerns detected`    | Title: Two cats sleeping on a red sofa \| Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on... \| Keywords (16): cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, ...[1,607 characters of reasoning omitted; complete output in the evidence block]     |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `concerns detected`    | Title: Two tabby cats resting on pink fabric with remotes \| Description: Two tabby cats are lying on a pink fabric surface, near white remote controls. They ap... \| Keywords (18): cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, ...[1,186 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `concerns detected`    | Title: Two tabby cats sleeping on a pink blanket \| Description: Two tabby cats are lying on a pink fleece blanket on a red sofa next to two remote controls. \| Keywords (15): cats, tabby, sleeping, lounging, pink, blanket, sofa, indoor, pets, remote, controls, resting, resting, feline, ...                                                                                       |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `concerns detected`    | Title: Two tabby cats sleeping on a pink surface \| Description: Two tabby cats lie sleeping on a bright pink fabric. Two remote controls are placed near the cat... \| Keywords (17): tabby, cats, sleeping, pink, red, fabric, remote control, domestic, lying, indoor, pet, animal, feline, two, ...                                                                                   |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, their fur patterns contrasting against the soft fabric.                                                                                                                                                                                                                                 |
 | [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `major concerns`       | Title: Two cats sleeping on a pink couch \| Description: Two striped cats are sleeping on a pink couch, with one cat lying on its side and the other on its back, next to a r... \| Keywords (144): cats, sleeping, pink couch, remote control, striped, British English, British, British-English, ...                                                                                   |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The two cats are sleeping on a pink couch.                                                                                                                                                                                                                                                                                                            |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (42): We need British-English. Use only clearly visible facts. Omit uncertain details and unsupported identity, ...                                                                                                                                                                                                      |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | Title: "A Study in Stripes" \| Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting... \| Keywords: (not detected)                                                                                    |
+| [`thinkingmachines/Inkling-2-Mini`](#model-thinkingmachines-inkling-2-mini)                                                         | `major concerns`       | <\|message_model\|><\|content_thinking\|>The user wants British-English catalogue metadata based on the image. Need only clearly visible facts. Need be careful: species? The image shows cats clearly. But instruction says omit unsupported species. However species is clearly visible...                                                                                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.8.0`
-- `mlx`: `0.32.5.dev20261121+8803ac3ca`
-- `transformers`: `5.24.0`
+- `mlx-vlm`: `0.8.1`
+- `mlx`: `0.33.0.dev20261127+266a9bd01`
+- `transformers`: `5.24.1`
 - `tokenizers`: `0.23.3`
-- `huggingface-hub`: `2.4.0`
+- `huggingface-hub`: `2.5.0`
 - *Python Version:* 3.14.7
 - *OS:* Darwin 27.2.0
 - *macOS Version:* 27.2.1
@@ -199,16 +203,16 @@ Complete generated or crash evidence for every attempted model.
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
 - *Model load time:* 0.99s
-- *Generation time:* 1.49s
-- *Total time:* 2.62s
-- *Prompt preparation time:* 0.0356
-- *First-token latency:* 0.55
-- *Cleanup time:* 0.0897
+- *Generation time:* 2.03s
+- *Total time:* 3.15s
+- *Prompt preparation time:* 0.035
+- *First-token latency:* 1.12
+- *Cleanup time:* 0.088
 - *Prompt tokens:* 734
 - *Generation tokens:* 56
 - *Total tokens:* 790
-- *Prompt throughput (raw):* 1,335 tok/s
-- *Generation throughput (raw):* 61.5 tok/s
+- *Prompt throughput (raw):* 653 tok/s
+- *Generation throughput (raw):* 63.7 tok/s
 - *Peak memory (GB):* 9.7
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.13
@@ -254,17 +258,17 @@ Keywords: cats, sleeping, pink sofa, remote controls, domestic, comfort, tranqui
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.30s
-- *Generation time:* 0.89s
-- *Total time:* 1.29s
-- *Prompt preparation time:* 0.0139
-- *First-token latency:* 0.797
-- *Cleanup time:* 0.066
+- *Model load time:* 0.39s
+- *Generation time:* 0.15s
+- *Total time:* 0.64s
+- *Prompt preparation time:* 0.0136
+- *First-token latency:* 0.0619
+- *Cleanup time:* 0.0725
 - *Prompt tokens:* 350
 - *Generation tokens:* 47
 - *Total tokens:* 397
-- *Prompt throughput (raw):* 439 tok/s
-- *Generation throughput (raw):* 570 tok/s
+- *Prompt throughput (raw):* 5,655 tok/s
+- *Generation throughput (raw):* 569 tok/s
 - *Peak memory (GB):* 1.3
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.02
@@ -315,20 +319,20 @@ cats, pink couch, relaxation, tabby, comfortable, cozy
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.11s
-- *Generation time:* 28.08s
-- *Total time:* 31.34s
-- *Prompt preparation time:* 0.00955
-- *First-token latency:* 0.894
-- *Cleanup time:* 0.128
+- *Model load time:* 2.07s
+- *Generation time:* 19.04s
+- *Total time:* 21.25s
+- *Prompt preparation time:* 0.00973
+- *First-token latency:* 2
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 461
-- *Generation tokens:* 865
-- *Total tokens:* 1,326
-- *Prompt throughput (raw):* 516 tok/s
-- *Generation throughput (raw):* 31.8 tok/s
+- *Generation tokens:* 551
+- *Total tokens:* 1,012
+- *Prompt throughput (raw):* 231 tok/s
+- *Generation throughput (raw):* 32.4 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
-- *Cache memory (GB):* 0.30
+- *Cache memory (GB):* 0.26
 - *Model-load active memory (GB):* 16.1
 - *Post-cleanup active memory (GB):* 0.00185
 - *Post-cleanup cache memory (GB):* 0.0
@@ -349,14 +353,11 @@ cats, pink couch, relaxation, tabby, comfortable, cozy
 #### Final answer
 
 ```text
-Title:
-Two tabby cats lying on pink fabric beside remotes
+Title: Two Tabby Cats Resting on Pink Fabric
 
-Description:
-Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the scene is lit by even indoor light.
+Description: Two tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the even indoor lighting highlights their striped coats.
 
-Keywords:
-tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws
+Keywords: tabby cat, sleeping, pink fabric, sofa, remote control, striped coat, resting, indoor, cushion, magenta, lounging, feline, relaxed, stretched, napping
 ```
 
 *Readable output:*
@@ -366,28 +367,25 @@ The user wants British-English catalogue metadata based strictly on visible fact
 
 Visible facts: Two tabby cats lying on a bright pink/magenta fabric surface (looks like a sofa or cushion). There are two white remote controls visible — one near the left cat's head, one between the two cats. The cats are stretched out, appearing to sleep or rest. The left cat is smaller, stretched diagonally with paws extended. The right cat is larger, curled slightly with head down. The background top shows a darker red/maroon fabric (sofa back). Lighting appears even, indoor.
 
-I must avoid unsupported identity, location, event, brand, species (well, "cat" is visible, that's fine — species is cat, that's clearly visible), period, intent. I should not say "sleeping" if uncertain? They appear to be resting with eyes closed. The left cat's eyes look closed; the right cat's eyes look closed. I can say "resting" or "lying". I'll say "lying" to be safe, maybe "appearing to rest".
+I must avoid unsupported identity, location, event, brand, species (well, "cat" is visible, tabby pattern is visible), period, intent. I can say "tabby cats" since the pattern is clearly visible. I should not claim breed. I can mention remote controls. I can mention pink fabric.
 
-Title: 5-10 words concrete. "Two tabby cats resting on pink sofa with remotes" — count words: Two(1) tabby(2) cats(3) resting(4) on(5) pink(6) sofa(7) with(8) remotes(9). 9 words. Good. But "sofa" — is it clearly a sofa? The top maroon part suggests a sofa back. The pink is a cover. I can say "pink fabric" to be safe. Title: "Two tabby cats lying on pink fabric beside remotes" — Two(1) tabby(2) cats(3) lying(4) on(5) pink(6) fabric(7) beside(8) remotes(9). 9 words. Good.
+Title: 5-10 words, concrete. Something like "Two Tabby Cats Resting on Pink Fabric" — that's 7 words. Good.
 
-Description: 1-2 sentences factual. Mention main subject (two tabby cats), setting (bright pink fabric surface with maroon backdrop), action (lying stretched out), lighting (even indoor), distinctive details (two white remote controls, striped coats, one smaller one larger).
+Description: 1-2 sentences factual. Mention main subject (two tabby cats), setting (pink fabric surface with maroon backdrop), action (lying/sleeping), lighting (even indoor), distinctive details (two white remote controls nearby).
 
-Keywords: 10-18 unique comma-separated. British English spelling. Include: tabby cat, cats, pink fabric, remote control, sofa, resting, striped coat, indoor, animal, pet, lying down, magenta, cushion, sleep. Need 10-18. Let me list: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, sleep, whiskers. That's 16. Good. Ensure British spelling — "feline" fine, no American spellings. "remote control" fine.
+Keywords: 10-18 unique comma-separated. British English spelling. Include: tabby cat, cats, sleeping, pink fabric, sofa, remote control, resting, striped coat, indoor, cushion, magenta, lounging, feline, relaxed.
 
-Check no uncertain details. Whiskers visible on right cat — yes. Sleep — eyes appear closed, but I'll keep "resting" and "sleep" maybe risky. I'll include "sleeping" as keyword? The instruction says omit uncertain. Eyes look closed, but to be safe I'll use "resting" not "sleeping". I'll drop "sleep". Replace with "paws". Paws visible. Good.
+Let me count keywords to ensure 10-18. I'll list: tabby cat, sleeping, pink fabric, sofa, remote control, striped coat, resting, indoor, cushion, magenta, lounging, feline, relaxed, stretched, napping. That's 15. Good.
 
-Final keywords: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws. 16.
+Ensure British English: "sofa" is fine, "cushion" fine. No American spellings like "color". I'll use "magenta" and "pink". Good.
 
 Now produce exactly three sections.
 &lt;/think&gt;
-Title:
-Two tabby cats lying on pink fabric beside remotes
+Title: Two Tabby Cats Resting on Pink Fabric
 
-Description:
-Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the scene is lit by even indoor light.
+Description: Two tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the even indoor lighting highlights their striped coats.
 
-Keywords:
-tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws
+Keywords: tabby cat, sleeping, pink fabric, sofa, remote control, striped coat, resting, indoor, cushion, magenta, lounging, feline, relaxed, stretched, napping
 </pre>
 
 <details>
@@ -398,28 +396,25 @@ The user wants British-English catalogue metadata based strictly on visible fact
 
 Visible facts: Two tabby cats lying on a bright pink/magenta fabric surface (looks like a sofa or cushion). There are two white remote controls visible — one near the left cat's head, one between the two cats. The cats are stretched out, appearing to sleep or rest. The left cat is smaller, stretched diagonally with paws extended. The right cat is larger, curled slightly with head down. The background top shows a darker red/maroon fabric (sofa back). Lighting appears even, indoor.
 
-I must avoid unsupported identity, location, event, brand, species (well, "cat" is visible, that's fine — species is cat, that's clearly visible), period, intent. I should not say "sleeping" if uncertain? They appear to be resting with eyes closed. The left cat's eyes look closed; the right cat's eyes look closed. I can say "resting" or "lying". I'll say "lying" to be safe, maybe "appearing to rest".
+I must avoid unsupported identity, location, event, brand, species (well, "cat" is visible, tabby pattern is visible), period, intent. I can say "tabby cats" since the pattern is clearly visible. I should not claim breed. I can mention remote controls. I can mention pink fabric.
 
-Title: 5-10 words concrete. "Two tabby cats resting on pink sofa with remotes" — count words: Two(1) tabby(2) cats(3) resting(4) on(5) pink(6) sofa(7) with(8) remotes(9). 9 words. Good. But "sofa" — is it clearly a sofa? The top maroon part suggests a sofa back. The pink is a cover. I can say "pink fabric" to be safe. Title: "Two tabby cats lying on pink fabric beside remotes" — Two(1) tabby(2) cats(3) lying(4) on(5) pink(6) fabric(7) beside(8) remotes(9). 9 words. Good.
+Title: 5-10 words, concrete. Something like "Two Tabby Cats Resting on Pink Fabric" — that's 7 words. Good.
 
-Description: 1-2 sentences factual. Mention main subject (two tabby cats), setting (bright pink fabric surface with maroon backdrop), action (lying stretched out), lighting (even indoor), distinctive details (two white remote controls, striped coats, one smaller one larger).
+Description: 1-2 sentences factual. Mention main subject (two tabby cats), setting (pink fabric surface with maroon backdrop), action (lying/sleeping), lighting (even indoor), distinctive details (two white remote controls nearby).
 
-Keywords: 10-18 unique comma-separated. British English spelling. Include: tabby cat, cats, pink fabric, remote control, sofa, resting, striped coat, indoor, animal, pet, lying down, magenta, cushion, sleep. Need 10-18. Let me list: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, sleep, whiskers. That's 16. Good. Ensure British spelling — "feline" fine, no American spellings. "remote control" fine.
+Keywords: 10-18 unique comma-separated. British English spelling. Include: tabby cat, cats, sleeping, pink fabric, sofa, remote control, resting, striped coat, indoor, cushion, magenta, lounging, feline, relaxed.
 
-Check no uncertain details. Whiskers visible on right cat — yes. Sleep — eyes appear closed, but I'll keep "resting" and "sleep" maybe risky. I'll include "sleeping" as keyword? The instruction says omit uncertain. Eyes look closed, but to be safe I'll use "resting" not "sleeping". I'll drop "sleep". Replace with "paws". Paws visible. Good.
+Let me count keywords to ensure 10-18. I'll list: tabby cat, sleeping, pink fabric, sofa, remote control, striped coat, resting, indoor, cushion, magenta, lounging, feline, relaxed, stretched, napping. That's 15. Good.
 
-Final keywords: tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws. 16.
+Ensure British English: "sofa" is fine, "cushion" fine. No American spellings like "color". I'll use "magenta" and "pink". Good.
 
 Now produce exactly three sections.
 </think>
-Title:
-Two tabby cats lying on pink fabric beside remotes
+Title: Two Tabby Cats Resting on Pink Fabric
 
-Description:
-Two striped tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the scene is lit by even indoor light.
+Description: Two tabby cats lie stretched out on a bright pink fabric surface, with a darker maroon backdrop behind them. Two white remote controls rest on the fabric near the cats, and the even indoor lighting highlights their striped coats.
 
-Keywords:
-tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped coat, resting, lying down, indoor lighting, pet, animal, cushion, whiskers, paws
+Keywords: tabby cat, sleeping, pink fabric, sofa, remote control, striped coat, resting, indoor, cushion, magenta, lounging, feline, relaxed, stretched, napping
 ```
 
 </details>
@@ -442,18 +437,18 @@ tabby cat, feline, pink fabric, magenta, remote control, sofa, maroon, striped c
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.09s
-- *Generation time:* 2.36s
-- *Total time:* 4.15s
-- *Prompt preparation time:* 0.587
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.103
+- *Model load time:* 1.11s
+- *Generation time:* 2.24s
+- *Total time:* 4.01s
+- *Prompt preparation time:* 0.542
+- *First-token latency:* 0.952
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 2,909
 - *Generation tokens:* 82
 - *Total tokens:* 2,991
-- *Prompt throughput (raw):* 2,759 tok/s
+- *Prompt throughput (raw):* 3,057 tok/s
 - *Generation throughput (raw):* 102 tok/s
-- *Peak memory (GB):* 6.5
+- *Peak memory (GB):* 6.6
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 5.46
@@ -484,12 +479,12 @@ Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, ho
 
 ---
 
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
 
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -497,44 +492,96 @@ Keywords: cats, sleeping, pink blanket, sofa, remote control, tabby, relaxed, ho
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.18s
-- *Generation time:* 1.88s
-- *Total time:* 5.29s
-- *Prompt preparation time:* 0.031
-- *First-token latency:* 0.633
-- *Cleanup time:* 0.169
-- *Prompt tokens:* 386
-- *Generation tokens:* 66
-- *Total tokens:* 452
-- *Prompt throughput (raw):* 610 tok/s
-- *Generation throughput (raw):* 66.1 tok/s
-- *Peak memory (GB):* 28
-- *Active memory (GB):* 27
-- *Cache memory (GB):* 0.01
-- *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0107
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.66s
+- *Generation time:* 5.16s
+- *Total time:* 6.96s
+- *Prompt preparation time:* 0.0198
+- *First-token latency:* 0.899
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 545
+- *Generation tokens:* 495
+- *Total tokens:* 1,040
+- *Prompt throughput (raw):* 606 tok/s
+- *Generation throughput (raw):* 116 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.09
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.00207
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Rendered prompt characters:* 662
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
+
+#### Final answer
+
+```text
+Title: Two cats sleeping on a red sofa.
+
+Description: Two cats, one light-colored and one dark, are sleeping on a red sofa indoors. The scene is lit softly, with one cat resting its head on the other.
+
+Keywords: cats, two cats, sleeping, on a sofa, red sofa, indoor, pet, feline, light cat, dark cat, white paws, white markings.
+```
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie resting on a pink fabric surface next to two remote controls.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote controls, lounging, resting, striped, fur, fabric, domestic
+Alright, let's get this done. I need to create some metadata for an image, and the instructions are pretty clear. First things first: the title. I need something short and sweet. "Two cats on a sofa" seems about right, at five words. Now for the description. It's crucial to stick to what's actually *there*. Two cats, one light, one dark, on a red sofa, both asleep. The lighting is soft, probably indoor. No need to mention brands, breeds, or anything like that. Okay, here we go: "Two cats are sleeping on a red sofa. One is light-colored with white paws, the other is dark with white markings. The scene is lit softly indoors." That's a good, factual description, covers everything. Now for the keywords. I need to be specific but not too restrictive. Let's see... "cats", "two cats", "sleeping", "on a sofa", "red sofa", "indoor", "pet", "feline", "light cat", "dark cat", "white paws", "white markings". That's ten. Perfect.
+
+Let's double-check everything. Title: good. Description: good. Keywords: good. No fluff, just facts. The image description is accurate, it is a good representation of the image. The focus is on the cats and the setting. All instructions are followed.
+
+**Final Answer:**
+
+Title: Two cats sleeping on a red sofa.
+
+Description: Two cats, one light and one dark, are sleeping on a red sofa indoors. The scene is lit softly, with one cat resting with its head on the other.
+
+Keywords: cats, two cats, sleeping, on a sofa, red sofa, indoor, pet, feline, light cat, dark cat, white paws, white markings.
+&lt;/think&gt;
+
+Title: Two cats sleeping on a red sofa.
+
+Description: Two cats, one light-colored and one dark, are sleeping on a red sofa indoors. The scene is lit softly, with one cat resting its head on the other.
+
+Keywords: cats, two cats, sleeping, on a sofa, red sofa, indoor, pet, feline, light cat, dark cat, white paws, white markings.
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get this done. I need to create some metadata for an image, and the instructions are pretty clear. First things first: the title. I need something short and sweet. "Two cats on a sofa" seems about right, at five words. Now for the description. It's crucial to stick to what's actually *there*. Two cats, one light, one dark, on a red sofa, both asleep. The lighting is soft, probably indoor. No need to mention brands, breeds, or anything like that. Okay, here we go: "Two cats are sleeping on a red sofa. One is light-colored with white paws, the other is dark with white markings. The scene is lit softly indoors." That's a good, factual description, covers everything. Now for the keywords. I need to be specific but not too restrictive. Let's see... "cats", "two cats", "sleeping", "on a sofa", "red sofa", "indoor", "pet", "feline", "light cat", "dark cat", "white paws", "white markings". That's ten. Perfect.
+
+Let's double-check everything. Title: good. Description: good. Keywords: good. No fluff, just facts. The image description is accurate, it is a good representation of the image. The focus is on the cats and the setting. All instructions are followed.
+
+**Final Answer:**
+
+Title: Two cats sleeping on a red sofa.
+
+Description: Two cats, one light and one dark, are sleeping on a red sofa indoors. The scene is lit softly, with one cat resting with its head on the other.
+
+Keywords: cats, two cats, sleeping, on a sofa, red sofa, indoor, pet, feline, light cat, dark cat, white paws, white markings.
+</think>
+
+Title: Two cats sleeping on a red sofa.
+
+Description: Two cats, one light-colored and one dark, are sleeping on a red sofa indoors. The scene is lit softly, with one cat resting its head on the other.
+
+Keywords: cats, two cats, sleeping, on a sofa, red sofa, indoor, pet, feline, light cat, dark cat, white paws, white markings.
+```
+
+</details>
 
 </details>
 
@@ -554,17 +601,17 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote controls, l
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.69s
-- *Generation time:* 1.67s
-- *Total time:* 3.53s
-- *Prompt preparation time:* 0.03
-- *First-token latency:* 0.259
-- *Cleanup time:* 0.111
+- *Model load time:* 1.70s
+- *Generation time:* 1.89s
+- *Total time:* 3.77s
+- *Prompt preparation time:* 0.0296
+- *First-token latency:* 0.552
+- *Cleanup time:* 0.115
 - *Prompt tokens:* 390
-- *Generation tokens:* 88
-- *Total tokens:* 478
-- *Prompt throughput (raw):* 1,506 tok/s
-- *Generation throughput (raw):* 63.1 tok/s
+- *Generation tokens:* 84
+- *Total tokens:* 474
+- *Prompt throughput (raw):* 707 tok/s
+- *Generation throughput (raw):* 63.3 tok/s
 - *Peak memory (GB):* 7.5
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.25
@@ -589,67 +636,9 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote controls, l
 <pre class="model-output-readable">
 Title: Two Tabby Cats on a Pink Sofa
 
-Description: Two tabby cats lie on a pink fabric sofa, with one resting horizontally and the other positioned vertically. Two remote controls are also visible near the cats.
+Description: Two striped tabby cats lie on a pink sofa, with one resting its head on a remote control. The cats are positioned in a relaxed pose on the fabric.
 
-Keywords: cats, tabby, sofa, couch, pet, sleeping, reclining, domestic animals, pink fabric, remote controls, furniture, tabby cat, resting, indoor, grey and brown, stripes, paws, tail
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
-
-### mlx-community/gemma-4-26b-a4b-it-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.34s
-- *Generation time:* 0.94s
-- *Total time:* 3.44s
-- *Prompt preparation time:* 0.0101
-- *First-token latency:* 0.336
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 390
-- *Generation tokens:* 75
-- *Total tokens:* 465
-- *Prompt throughput (raw):* 1,161 tok/s
-- *Generation throughput (raw):* 127 tok/s
-- *Peak memory (GB):* 16
-- *Active memory (GB):* 15
-- *Cache memory (GB):* 0.17
-- *Model-load active memory (GB):* 15.4
-- *Post-cleanup active memory (GB):* 0.0118
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 526
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0d77464eeb233a2da68ebf9d7dc4edaac7db956d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two tabby cats sleeping on a pink surface
-
-Description: Two tabby cats lie on a pink fabric surface next to two remote controls. The cats are positioned with their bodies facing different directions under bright lighting.
-
-Keywords: tabby, cat, sleeping, pink, fabric, remote, electronics, domestic, animal, lying, indoor, bright, two, cats, striped
+Keywords: cats, tabby, pets, sofa, remote control, sleeping, lounging, feline, furniture, grey, brown, stripes, domestic animals, pink, bedding, paws, fur
 </pre>
 
 </details>
@@ -670,18 +659,18 @@ Keywords: tabby, cat, sleeping, pink, fabric, remote, electronics, domestic, ani
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.57s
-- *Generation time:* 0.72s
-- *Total time:* 2.43s
-- *Prompt preparation time:* 0.00963
-- *First-token latency:* 0.166
-- *Cleanup time:* 0.105
+- *Model load time:* 1.62s
+- *Generation time:* 0.97s
+- *Total time:* 2.74s
+- *Prompt preparation time:* 0.00929
+- *First-token latency:* 0.375
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 386
-- *Generation tokens:* 67
-- *Total tokens:* 453
-- *Prompt throughput (raw):* 2,321 tok/s
+- *Generation tokens:* 72
+- *Total tokens:* 458
+- *Prompt throughput (raw):* 1,031 tok/s
 - *Generation throughput (raw):* 124 tok/s
-- *Peak memory (GB):* 5.9
+- *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.07
 - *Model-load active memory (GB):* 5.16
@@ -703,9 +692,9 @@ Keywords: tabby, cat, sleeping, pink, fabric, remote, electronics, domestic, ani
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two cats rest upon bright pink fabric
-Description: Two cats lie on a vividly coloured pink surface under soft lighting. They are accompanied by a remote control device.
-Keywords: cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, lounged, indoors, tortoiseshell, domestic, creature, fluffy
+Title: Two cats rest upon a pink surface
+Description: Two cats lie on a bright pink surface. One cat on the left displays horizontal banding, while the cat on the right has vertical stripes.
+Keywords: cats, two, pink, surface, reclining, stripes, feline, animal, indoors, domestic, tortoiseshell, tabby, nap, resting
 </pre>
 
 </details>
@@ -726,20 +715,20 @@ Keywords: cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, loung
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.07s
-- *Generation time:* 10.47s
-- *Total time:* 11.71s
-- *Prompt preparation time:* 0.0271
-- *First-token latency:* 0.46
-- *Cleanup time:* 0.118
+- *Model load time:* 1.05s
+- *Generation time:* 6.92s
+- *Total time:* 8.12s
+- *Prompt preparation time:* 0.0243
+- *First-token latency:* 0.865
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 495
-- *Generation tokens:* 819
-- *Total tokens:* 1,314
-- *Prompt throughput (raw):* 1,077 tok/s
-- *Generation throughput (raw):* 81.9 tok/s
+- *Generation tokens:* 499
+- *Total tokens:* 994
+- *Prompt throughput (raw):* 572 tok/s
+- *Generation throughput (raw):* 82.6 tok/s
 - *Peak memory (GB):* 8.0
 - *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.11
+- *Cache memory (GB):* 0.07
 - *Model-load active memory (GB):* 7.08
 - *Post-cleanup active memory (GB):* 0.00269
 - *Post-cleanup cache memory (GB):* 0.0
@@ -760,8 +749,8 @@ Keywords: cats, tabby, pile, fabric, pink, sleeping, reptiles, appendages, loung
 
 ```text
 Title: Two Tabby Cats on Pink Couch with Remotes
-Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it.
-Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies with head down.
+Keywords: tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down
 ```
 
 *Readable output:*
@@ -769,57 +758,34 @@ Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown t
 <pre class="model-output-readable">
 &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two tabby cats on a pink couch with remote controls. So title could be "Two Tabby Cats on Pink Couch with Remotes".
 
-Next, the description: 1-2 sentences, factual. Need to include main subject (two tabby cats), setting (pink couch), action (lying down, sleeping), distinctive details (remote controls, cat colors, positions). Let's draft: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it."
+Next, the description: 1-2 sentences, factual. Need to include main subject (two tabby cats), setting (pink couch), action (lying down, resting), distinctive details (remote controls, cat colors, positions). Let's draft: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies with head down."
 
-Then keywords: unique, comma-separated. Need to pick from visible facts: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, pink fabric, two cats, remote control, couch, pet, animal, domestic cat, tabby pattern, pink upholstery, remote controls on couch, two tabby cats resting on pink couch with remote controls.
+Then keywords: unique, comma-separated. Need to pick from visible facts: tabby cats, pink couch, remote controls, lying down, resting, eyes closed, head down, striped fur, domestic cat (but wait, the instruction says omit species if uncertain? No, the instruction says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is allowed if clearly visible? The cats are clearly tabby, domestic cats. So keywords could include: tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down.
 
-Now, pick the most relevant and unique ones, keeping it within 10-18. Let's list possible keywords:
+Need to pick 10-18 unique ones. Let's list possible:
 
 - tabby cats
 - pink couch
 - remote controls
 - lying down
-- sleeping
-- brown tabby
+- resting
 - striped fur
-- pink fabric
-- two cats
-- remote control
-- couch
-- pet
-- animal
 - domestic cat
-- tabby pattern
-- pink upholstery
+- couch
+- remotes
+- eyes closed
+- head down
 
-Now, select the most concise and unique ones. Let's aim for around 12-15. Let's pick:
+Now, need to ensure they are unique and clearly visible. Let's pick a good set. For example:
 
-tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down
 
-Wait, but need to ensure they are unique and clearly visible. Let's check the image again: two tabby cats (one lighter, one darker brown tabby), pink couch (upholstery), remote controls (two, one light blue, one white with buttons), lying down/sleeping, striped fur, two cats, remote control, couch, pet, domestic cat.
+That's 14 keywords, which is within 10-18. Now, check if all are unique and clearly visible. Yes.
 
-Now, title: "Two Tabby Cats on Pink Couch with Remotes" – that's 10 words, good.
-
-Description: Need to be 1-2 sentences. Let's make it concise: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." That's two sentences, factual.
-
-Keywords: Let's pick the most relevant and unique ones, ensuring they are comma-separated and within 10-18. Let's list:
-
-tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
-
-That's 15 keywords, which is within 10-18. They are all clearly visible and unique.
-
-Now, check if all sections are correct:
-
-Title: "Two Tabby Cats on Pink Couch with Remotes" – 10 words, concrete.
-
-Description: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." – 1-2 sentences, factual.
-
-Keywords: "tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat" – 15 unique, comma-separated keywords.
-
-All sections are correct. Now, return exactly these three sections and nothing else.&lt;/think&gt;
+Now, compile the sections.&lt;/think&gt;
 Title: Two Tabby Cats on Pink Couch with Remotes
-Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it.
-Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies with head down.
+Keywords: tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down
 </pre>
 
 <details>
@@ -828,57 +794,34 @@ Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown t
 ```text
 <think>Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two tabby cats on a pink couch with remote controls. So title could be "Two Tabby Cats on Pink Couch with Remotes".
 
-Next, the description: 1-2 sentences, factual. Need to include main subject (two tabby cats), setting (pink couch), action (lying down, sleeping), distinctive details (remote controls, cat colors, positions). Let's draft: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it."
+Next, the description: 1-2 sentences, factual. Need to include main subject (two tabby cats), setting (pink couch), action (lying down, resting), distinctive details (remote controls, cat colors, positions). Let's draft: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies with head down."
 
-Then keywords: unique, comma-separated. Need to pick from visible facts: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, pink fabric, two cats, remote control, couch, pet, animal, domestic cat, tabby pattern, pink upholstery, remote controls on couch, two tabby cats resting on pink couch with remote controls.
+Then keywords: unique, comma-separated. Need to pick from visible facts: tabby cats, pink couch, remote controls, lying down, resting, eyes closed, head down, striped fur, domestic cat (but wait, the instruction says omit species if uncertain? No, the instruction says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is allowed if clearly visible? The cats are clearly tabby, domestic cats. So keywords could include: tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down.
 
-Now, pick the most relevant and unique ones, keeping it within 10-18. Let's list possible keywords:
+Need to pick 10-18 unique ones. Let's list possible:
 
 - tabby cats
 - pink couch
 - remote controls
 - lying down
-- sleeping
-- brown tabby
+- resting
 - striped fur
-- pink fabric
-- two cats
-- remote control
-- couch
-- pet
-- animal
 - domestic cat
-- tabby pattern
-- pink upholstery
+- couch
+- remotes
+- eyes closed
+- head down
 
-Now, select the most concise and unique ones. Let's aim for around 12-15. Let's pick:
+Now, need to ensure they are unique and clearly visible. Let's pick a good set. For example:
 
-tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down
 
-Wait, but need to ensure they are unique and clearly visible. Let's check the image again: two tabby cats (one lighter, one darker brown tabby), pink couch (upholstery), remote controls (two, one light blue, one white with buttons), lying down/sleeping, striped fur, two cats, remote control, couch, pet, domestic cat.
+That's 14 keywords, which is within 10-18. Now, check if all are unique and clearly visible. Yes.
 
-Now, title: "Two Tabby Cats on Pink Couch with Remotes" – that's 10 words, good.
-
-Description: Need to be 1-2 sentences. Let's make it concise: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." That's two sentences, factual.
-
-Keywords: Let's pick the most relevant and unique ones, ensuring they are comma-separated and within 10-18. Let's list:
-
-tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
-
-That's 15 keywords, which is within 10-18. They are all clearly visible and unique.
-
-Now, check if all sections are correct:
-
-Title: "Two Tabby Cats on Pink Couch with Remotes" – 10 words, concrete.
-
-Description: "Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it." – 1-2 sentences, factual.
-
-Keywords: "tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat" – 15 unique, comma-separated keywords.
-
-All sections are correct. Now, return exactly these three sections and nothing else.</think>
+Now, compile the sections.</think>
 Title: Two Tabby Cats on Pink Couch with Remotes
-Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies beside it.
-Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown tabby, striped fur, two cats, remote control, couch, pet, domestic cat
+Description: Two tabby cats lie on a pink couch, with remote controls nearby. One cat rests with eyes closed, the other lies with head down.
+Keywords: tabby cats, pink couch, remote controls, lying down, resting, striped fur, domestic cat, couch, remotes, eyes closed, head down
 ```
 
 </details>
@@ -901,17 +844,17 @@ Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown t
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.62s
-- *Generation time:* 0.61s
-- *Total time:* 1.39s
-- *Prompt preparation time:* 0.0317
-- *First-token latency:* 0.244
-- *Cleanup time:* 0.107
+- *Model load time:* 0.71s
+- *Generation time:* 0.64s
+- *Total time:* 1.48s
+- *Prompt preparation time:* 0.0305
+- *First-token latency:* 0.246
+- *Cleanup time:* 0.0953
 - *Prompt tokens:* 734
-- *Generation tokens:* 57
-- *Total tokens:* 791
-- *Prompt throughput (raw):* 3,012 tok/s
-- *Generation throughput (raw):* 178 tok/s
+- *Generation tokens:* 68
+- *Total tokens:* 802
+- *Prompt throughput (raw):* 2,985 tok/s
+- *Generation throughput (raw):* 186 tok/s
 - *Peak memory (GB):* 4.7
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.13
@@ -934,9 +877,9 @@ Keywords: tabby cats, pink couch, remote controls, lying down, sleeping, brown t
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Feline Serenity on a Red Couch"
-Description: Two striped cats lounging on a red blanket, one with a remote control nearby.
-Keywords: cats, striped, red, blanket, lounging, remote control, comfort, rest, domestic, leisure
+Title: "Feline Serenity on a Vibrant Red Sofa"
+Description: Two striped cats lounging on a red sofa, one with a remote control nearby, under soft lighting.
+Keywords: cats, striped, red sofa, remote control, lounging, soft lighting, comfort, domestic, tranquility, striped pattern.
 </pre>
 
 </details>
@@ -957,17 +900,17 @@ Keywords: cats, striped, red, blanket, lounging, remote control, comfort, rest, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.17s
-- *Generation time:* 3.93s
-- *Total time:* 5.25s
-- *Prompt preparation time:* 0.0292
-- *First-token latency:* 2.22
-- *Cleanup time:* 0.11
+- *Model load time:* 1.21s
+- *Generation time:* 4.02s
+- *Total time:* 5.38s
+- *Prompt preparation time:* 0.029
+- *First-token latency:* 2.36
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 3,435
-- *Generation tokens:* 90
-- *Total tokens:* 3,525
-- *Prompt throughput (raw):* 1,550 tok/s
-- *Generation throughput (raw):* 55.6 tok/s
+- *Generation tokens:* 87
+- *Total tokens:* 3,522
+- *Prompt throughput (raw):* 1,456 tok/s
+- *Generation throughput (raw):* 55.4 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.79
@@ -996,7 +939,7 @@ Description:
 Two cats are sleeping on a pink sofa, each with a remote control nearby. The lighting is soft, highlighting the relaxed posture of the cats and the vibrant pink fabric of the sofa.
 
 Keywords:
-cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy, domestic, resting, comfort, household, feline, nap, indoors, tranquility
+cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, domestic, pets, cozy, resting, comfort, indoor, feline, nap, household
 </pre>
 
 </details>
@@ -1017,17 +960,17 @@ cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 0.58s
-- *Total time:* 1.47s
-- *Prompt preparation time:* 0.0177
-- *First-token latency:* 0.233
-- *Cleanup time:* 0.0854
+- *Model load time:* 0.78s
+- *Generation time:* 0.99s
+- *Total time:* 1.89s
+- *Prompt preparation time:* 0.0163
+- *First-token latency:* 0.631
+- *Cleanup time:* 0.0865
 - *Prompt tokens:* 344
-- *Generation tokens:* 73
-- *Total tokens:* 417
-- *Prompt throughput (raw):* 1,478 tok/s
-- *Generation throughput (raw):* 217 tok/s
+- *Generation tokens:* 77
+- *Total tokens:* 421
+- *Prompt throughput (raw):* 545 tok/s
+- *Generation throughput (raw):* 220 tok/s
 - *Peak memory (GB):* 3.6
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.02
@@ -1051,9 +994,142 @@ cats, sleeping, sofa, pink, remote controls, striped, relaxed, home, pets, cozy,
 
 <pre class="model-output-readable">
 Title: Two cats sleeping on a pink couch.
-Description: Two tabby cats are lying on a pink couch with remote controls nearby. The lighting is bright, highlighting the cats' fur patterns and the vibrant color of the couch.
-Keywords: cats, pink couch, tabby, sleeping, remote controls, bright lighting, fur patterns, relaxation, indoor, domestic
+Description: Two tabby cats are lying on a pink couch, one with a remote nearby. The scene is well-lit, highlighting the cats' fur patterns and the vibrant couch color.
+Keywords: cats, pink couch, tabby, sleeping, remotes, fur patterns, well-lit, cozy, domestic, relaxation
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-o-45-4bit"></a>
+
+### mlx-community/MiniCPM-o-4_5-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-o-4_5-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
+- *Model load time:* 1.10s
+- *Generation time:* 3.83s
+- *Total time:* 5.09s
+- *Prompt preparation time:* 0.0128
+- *First-token latency:* 0.282
+- *Cleanup time:* 0.12
+- *Prompt tokens:* 173
+- *Generation tokens:* 368
+- *Total tokens:* 541
+- *Prompt throughput (raw):* 614 tok/s
+- *Generation throughput (raw):* 105 tok/s
+- *Peak memory (GB):* 7.0
+- *Active memory (GB):* 6.1
+- *Cache memory (GB):* 0.13
+- *Model-load active memory (GB):* 6.15
+- *Post-cleanup active memory (GB):* 0.0049
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 508
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 592c09d85e7bffbc8f8e45a417aa8e9a96119814
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-o-4_5-4bit/snapshots/592c09d85e7bffbc8f8e45a417aa8e9a96119814
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.6, "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+#### Final answer
+
+```text
+Title:
+Two tabby cats resting on pink fabric with remote controls
+
+Description:
+Two tabby cats lie relaxed on a pink surface, accompanied by two remote controls. Soft indoor lighting illuminates the scene, highlighting the striped fur patterns and casual arrangement.
+
+Keywords: cats, tabby, pink, couch, remotes, resting, indoor, fur, striped, relaxed, fabric, lounging, animals, pets, home, accessories
+```
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+User wants me to create British-English catalogue metadata based on the provided image. I need to extract concrete, visible facts without adding uncertain details.
+
+First, I'll analyze the image:
+
+- There are two tabby cats lying on a pink surface, likely a couch or blanket.
+- Both cats are relaxed, one is lying down, the other slightly arched.
+- There are two remote controls visible between the cats.
+- The setting is indoors, with soft lighting, possibly natural or ambient.
+- The cats have striped fur patterns, typical of tabby cats.
+- No visible brand, location, or event details.
+
+Now, structure the response as per the instructions.
+
+Title: Should be 5-10 words. "Two tabby cats resting on pink fabric with remotes."
+
+Description: Must be 1-2 sentences. The main subjects are two tabby cats lying on a pink surface, with remote controls nearby. The lighting is even, suggesting indoor ambient light. Distinctive details include the pink fabric, the tabby patterns, and the remotes.
+
+Keywords: Need 10-18 unique, comma-separated. Consider: cats, tabby, pink, couch, remotes, resting, indoor, fur, striped, relaxed, fabric, lounging, animals, pets, home, accessories.
+
+Check for uniqueness and relevance to visible facts only.
+&lt;/think&gt;
+
+Title:
+Two tabby cats resting on pink fabric with remote controls
+
+Description:
+Two tabby cats lie relaxed on a pink surface, accompanied by two remote controls. Soft indoor lighting illuminates the scene, highlighting the striped fur patterns and casual arrangement.
+
+Keywords: cats, tabby, pink, couch, remotes, resting, indoor, fur, striped, relaxed, fabric, lounging, animals, pets, home, accessories
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+User wants me to create British-English catalogue metadata based on the provided image. I need to extract concrete, visible facts without adding uncertain details.
+
+First, I'll analyze the image:
+
+- There are two tabby cats lying on a pink surface, likely a couch or blanket.
+- Both cats are relaxed, one is lying down, the other slightly arched.
+- There are two remote controls visible between the cats.
+- The setting is indoors, with soft lighting, possibly natural or ambient.
+- The cats have striped fur patterns, typical of tabby cats.
+- No visible brand, location, or event details.
+
+Now, structure the response as per the instructions.
+
+Title: Should be 5-10 words. "Two tabby cats resting on pink fabric with remotes."
+
+Description: Must be 1-2 sentences. The main subjects are two tabby cats lying on a pink surface, with remote controls nearby. The lighting is even, suggesting indoor ambient light. Distinctive details include the pink fabric, the tabby patterns, and the remotes.
+
+Keywords: Need 10-18 unique, comma-separated. Consider: cats, tabby, pink, couch, remotes, resting, indoor, fur, striped, relaxed, fabric, lounging, animals, pets, home, accessories.
+
+Check for uniqueness and relevance to visible facts only.
+</think>
+
+Title:
+Two tabby cats resting on pink fabric with remote controls
+
+Description:
+Two tabby cats lie relaxed on a pink surface, accompanied by two remote controls. Soft indoor lighting illuminates the scene, highlighting the striped fur patterns and casual arrangement.
+
+Keywords: cats, tabby, pink, couch, remotes, resting, indoor, fur, striped, relaxed, fabric, lounging, animals, pets, home, accessories
+```
+
+</details>
 
 </details>
 
@@ -1074,16 +1150,16 @@ Keywords: cats, pink couch, tabby, sleeping, remote controls, bright lighting, f
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
 - *Model load time:* 0.94s
-- *Generation time:* 1.00s
-- *Total time:* 2.08s
-- *Prompt preparation time:* 0.0248
-- *First-token latency:* 0.106
-- *Cleanup time:* 0.0958
+- *Generation time:* 2.00s
+- *Total time:* 3.08s
+- *Prompt preparation time:* 0.0279
+- *First-token latency:* 0.834
+- *Cleanup time:* 0.0965
 - *Prompt tokens:* 330
-- *Generation tokens:* 268
-- *Total tokens:* 598
-- *Prompt throughput (raw):* 3,121 tok/s
-- *Generation throughput (raw):* 313 tok/s
+- *Generation tokens:* 368
+- *Total tokens:* 698
+- *Prompt throughput (raw):* 396 tok/s
+- *Generation throughput (raw):* 325 tok/s
 - *Peak memory (GB):* 3.5
 - *Active memory (GB):* 2.7
 - *Cache memory (GB):* 0.05
@@ -1107,32 +1183,44 @@ Keywords: cats, pink couch, tabby, sleeping, remote controls, bright lighting, f
 #### Final answer
 
 ```text
-Title: Two tabby cats sleep on pink couch  
-Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with striped fur.  
-Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy
+Title: Two Tabby Cats Rest on Pink Couch  
+Description: Two tabby cats lie relaxed on a pink fabric couch, one with a remote and green ear tag, both in a calm indoor setting.  
+Keywords: tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort
 ```
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Okay, let me tackle this. First, the title needs to be 5-10 words. Let’s think: "Two cats sleep on pink couch." That’s 5 words. Next, description. The main subjects are two tabby cats, lying on a pink fabric couch. One is on the left with a remote, the other on the right with a remote. Lighting is indoor, soft. Distinctive details: striped fur, green ear tag on left cat. Keywords should be unique. Let’s list: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. Check count: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. That’s 12 keywords. Make sure it’s clear and based on visible facts.
+Okay, so I need to create a British-English catalogue metadata based on the image. First, the title should be concise. Let me think: the image shows two cats on a pink couch. The title needs to be 5-10 words. Maybe "Two Cats Rest on Pink Couch." That’s 8 words, so it fits.
+
+Next, the description. The main subjects are two tabby cats. One is on the left with a remote, the other on the right with a remote. They’re lying on a pink fabric, relaxed, lighting is indoor. Distinctive details: striped fur, green ear tag on left cat.
+
+Now, the keywords. Need 10-18 unique words. Let’s list: tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort. Wait, count them. Let’s make sure each is unique.
+
+Tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort. That’s 15 keywords. Let’s check if they’re all visible. The left cat has a remote, right cat has a remote. The setting is a pink couch. The cats are resting. The details are stripes, green ear. Yep, that’s covered.
 &lt;/think&gt;
 
-Title: Two tabby cats sleep on pink couch
-Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with striped fur.
-Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy
+Title: Two Tabby Cats Rest on Pink Couch
+Description: Two tabby cats lie relaxed on a pink fabric couch, one with a remote and green ear tag, both in a calm indoor setting.
+Keywords: tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Okay, let me tackle this. First, the title needs to be 5-10 words. Let’s think: "Two cats sleep on pink couch." That’s 5 words. Next, description. The main subjects are two tabby cats, lying on a pink fabric couch. One is on the left with a remote, the other on the right with a remote. Lighting is indoor, soft. Distinctive details: striped fur, green ear tag on left cat. Keywords should be unique. Let’s list: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. Check count: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy. That’s 12 keywords. Make sure it’s clear and based on visible facts.
+Okay, so I need to create a British-English catalogue metadata based on the image. First, the title should be concise. Let me think: the image shows two cats on a pink couch. The title needs to be 5-10 words. Maybe "Two Cats Rest on Pink Couch." That’s 8 words, so it fits.
+
+Next, the description. The main subjects are two tabby cats. One is on the left with a remote, the other on the right with a remote. They’re lying on a pink fabric, relaxed, lighting is indoor. Distinctive details: striped fur, green ear tag on left cat.
+
+Now, the keywords. Need 10-18 unique words. Let’s list: tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort. Wait, count them. Let’s make sure each is unique.
+
+Tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort. That’s 15 keywords. Let’s check if they’re all visible. The left cat has a remote, right cat has a remote. The setting is a pink couch. The cats are resting. The details are stripes, green ear. Yep, that’s covered.
 </think>
 
-Title: Two tabby cats sleep on pink couch  
-Description: Two tabby cats rest on a pink fabric couch, one with a remote and green ear tag, both in indoor lighting with striped fur.  
-Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur, lying, resting, indoor, cozy
+Title: Two Tabby Cats Rest on Pink Couch  
+Description: Two tabby cats lie relaxed on a pink fabric couch, one with a remote and green ear tag, both in a calm indoor setting.  
+Keywords: tabby, pink, couch, remote, resting, cat, relief, stripes, green, ear, tag, relaxation, indoor, fabric, lying, comfort
 ```
 
 </details>
@@ -1155,17 +1243,17 @@ Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_7)
-- *Model load time:* 3.02s
-- *Generation time:* 5.51s
-- *Total time:* 8.73s
-- *Prompt preparation time:* 0.0154
-- *First-token latency:* 0.557
-- *Cleanup time:* 0.16
+- *Model load time:* 2.75s
+- *Generation time:* 5.85s
+- *Total time:* 8.77s
+- *Prompt preparation time:* 0.0158
+- *First-token latency:* 0.392
+- *Cleanup time:* 0.135
 - *Prompt tokens:* 330
-- *Generation tokens:* 431
-- *Total tokens:* 761
-- *Prompt throughput (raw):* 592 tok/s
-- *Generation throughput (raw):* 87.4 tok/s
+- *Generation tokens:* 477
+- *Total tokens:* 807
+- *Prompt throughput (raw):* 841 tok/s
+- *Generation throughput (raw):* 87.7 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.11
@@ -1191,9 +1279,9 @@ Keywords: tabby, cat, sleep, pink, couch, remote, green, ear, tag, stripes, fur,
 ```text
 Title: Two Tabby Cats Resting on Pink Sofa
 
-Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The cats appear to be sleeping or resting, with their striped fur patterns clearly visible against the pink background.
+Description: Two tabby cats with striped fur are lying on a pink sofa cushion, each near a white remote control. The cats appear to be resting or sleeping in an indoor setting with even lighting.
 
-Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink
+Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit, feline, lounging
 ```
 
 *Readable output:*
@@ -1201,24 +1289,26 @@ Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, dom
 <pre class="model-output-readable">
 I need to create British-English catalogue metadata based on the image. Let me start by analyzing the image carefully.
 
-First, the main subjects are two tabby cats. They are lying on a pink surface, which looks like a couch or sofa. There are two remote controls visible near the cats. The cats are resting or sleeping. The lighting seems to be natural or indoor, but I should focus on clearly visible facts.
+First, the main subjects are two tabby cats. They are lying on a pink surface, which looks like a sofa or cushion. There are two remote controls visible near the cats. The cats are resting or sleeping. The lighting seems to be natural or indoor, but I should focus on clearly visible facts.
 
 For the title, I need a concrete 5-10-word title. Something like "Two Tabby Cats Resting on Pink Sofa" would work.
 
-Now for the description: The main subject is two tabby cats lying on a bright pink fabric surface, likely a sofa. Each cat is near a white remote control. The cats appear to be sleeping or resting. The lighting is even, highlighting the cats' fur patterns and the pink fabric.
+Now the description: I need to describe the main subject, setting, action, lighting, and distinctive details. The main subjects are two tabby cats. The setting is a pink sofa or cushion. The action is that they are lying down, possibly sleeping. The lighting is even, likely indoor. Distinctive details include the two remote controls nearby.
 
-Keywords: I need 10-18 unique keywords. Let's list them: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink.
+Keywords: I need 10-18 unique, comma-separated keywords. Let's list them: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit.
 
-Wait, I need to make sure they are unique and relevant. Let's check: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink. Some might be redundant, but I'll keep them as distinct terms.
+Wait, I need to make sure the keywords are unique and relevant. Let me check the image again. The cats are tabby, the surface is pink, there are remotes, they are resting. So keywords could be: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit, feline, lounging.
 
-Now, structuring the response exactly as required.
+Let me count the keywords. That's 16 keywords, which is within the 10-18 range.
+
+Now, structure the output exactly as specified: Title, Description, Keywords.
 &lt;/think&gt;
 
 Title: Two Tabby Cats Resting on Pink Sofa
 
-Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The cats appear to be sleeping or resting, with their striped fur patterns clearly visible against the pink background.
+Description: Two tabby cats with striped fur are lying on a pink sofa cushion, each near a white remote control. The cats appear to be resting or sleeping in an indoor setting with even lighting.
 
-Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink
+Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit, feline, lounging
 </pre>
 
 <details>
@@ -1227,24 +1317,26 @@ Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, dom
 ```text
 I need to create British-English catalogue metadata based on the image. Let me start by analyzing the image carefully.
 
-First, the main subjects are two tabby cats. They are lying on a pink surface, which looks like a couch or sofa. There are two remote controls visible near the cats. The cats are resting or sleeping. The lighting seems to be natural or indoor, but I should focus on clearly visible facts.
+First, the main subjects are two tabby cats. They are lying on a pink surface, which looks like a sofa or cushion. There are two remote controls visible near the cats. The cats are resting or sleeping. The lighting seems to be natural or indoor, but I should focus on clearly visible facts.
 
 For the title, I need a concrete 5-10-word title. Something like "Two Tabby Cats Resting on Pink Sofa" would work.
 
-Now for the description: The main subject is two tabby cats lying on a bright pink fabric surface, likely a sofa. Each cat is near a white remote control. The cats appear to be sleeping or resting. The lighting is even, highlighting the cats' fur patterns and the pink fabric.
+Now the description: I need to describe the main subject, setting, action, lighting, and distinctive details. The main subjects are two tabby cats. The setting is a pink sofa or cushion. The action is that they are lying down, possibly sleeping. The lighting is even, likely indoor. Distinctive details include the two remote controls nearby.
 
-Keywords: I need 10-18 unique keywords. Let's list them: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink.
+Keywords: I need 10-18 unique, comma-separated keywords. Let's list them: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit.
 
-Wait, I need to make sure they are unique and relevant. Let's check: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink. Some might be redundant, but I'll keep them as distinct terms.
+Wait, I need to make sure the keywords are unique and relevant. Let me check the image again. The cats are tabby, the surface is pink, there are remotes, they are resting. So keywords could be: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit, feline, lounging.
 
-Now, structuring the response exactly as required.
+Let me count the keywords. That's 16 keywords, which is within the 10-18 range.
+
+Now, structure the output exactly as specified: Title, Description, Keywords.
 </think>
 
 Title: Two Tabby Cats Resting on Pink Sofa
 
-Description: Two tabby cats lie on a bright pink fabric surface, each positioned near a white remote control. The cats appear to be sleeping or resting, with their striped fur patterns clearly visible against the pink background.
+Description: Two tabby cats with striped fur are lying on a pink sofa cushion, each near a white remote control. The cats appear to be resting or sleeping in an indoor setting with even lighting.
 
-Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, domestic cats, striped fur, couch, fabric, pet, indoor, relaxation, animal, furniture, remote, cat, pink
+Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, striped fur, domestic cats, furniture, indoor, pet, animal, cushion, relaxation, cohabit, feline, lounging
 ```
 
 </details>
@@ -1267,17 +1359,17 @@ Keywords: tabby cats, pink sofa, remote controls, resting, sleeping, feline, dom
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.24s
-- *Generation time:* 1.93s
+- *Model load time:* 1.27s
+- *Generation time:* 1.91s
 - *Total time:* 3.30s
-- *Prompt preparation time:* 0.0165
-- *First-token latency:* 0.72
-- *Cleanup time:* 0.0987
+- *Prompt preparation time:* 0.0163
+- *First-token latency:* 0.693
+- *Cleanup time:* 0.0939
 - *Prompt tokens:* 1,070
 - *Generation tokens:* 81
 - *Total tokens:* 1,151
-- *Prompt throughput (raw):* 1,485 tok/s
-- *Generation throughput (raw):* 67.5 tok/s
+- *Prompt throughput (raw):* 1,544 tok/s
+- *Generation throughput (raw):* 69.9 tok/s
 - *Peak memory (GB):* 8.9
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.23
@@ -1327,17 +1419,17 @@ cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.78s
-- *Generation time:* 0.74s
-- *Total time:* 1.65s
-- *Prompt preparation time:* 0.0171
-- *First-token latency:* 0.214
-- *Cleanup time:* 0.104
+- *Model load time:* 0.79s
+- *Generation time:* 0.71s
+- *Total time:* 1.61s
+- *Prompt preparation time:* 0.0161
+- *First-token latency:* 0.189
+- *Cleanup time:* 0.0851
 - *Prompt tokens:* 1,069
-- *Generation tokens:* 102
-- *Total tokens:* 1,171
-- *Prompt throughput (raw):* 4,992 tok/s
-- *Generation throughput (raw):* 209 tok/s
+- *Generation tokens:* 103
+- *Total tokens:* 1,172
+- *Prompt throughput (raw):* 5,646 tok/s
+- *Generation throughput (raw):* 212 tok/s
 - *Peak memory (GB):* 3.7
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.16
@@ -1360,13 +1452,13 @@ cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, 
 
 <pre class="model-output-readable">
 Title:
-Two resting tabby cats on a pink sofa
+Two Kitten Friends on a Pink Couch
 
 Description:
-Two adult tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft, natural lighting highlights their striped fur patterns and relaxed postures.
+Two striped kittens lie relaxed on a bright pink cushion, each with a remote control beside them. The larger kitten is curled, while the smaller one stretches out, bathed in soft indoor lighting.
 
 Keywords:
-tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-setting, domestic-pets, household-items, resting-scene, pet-photography, domestic-interior, soft-lighting
+kitten, domestic-cat, pink-cushion, remote-control, indoor-setting, stretching, curled, striped-fur, cozy, domestic-interior, pet-photo, resting, companionable
 </pre>
 
 </details>
@@ -1387,17 +1479,17 @@ tabby-cats, pink-sofa, remote-controls, indoor-resting, striped-fur, cozy-settin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 12.11s
-- *Generation time:* 7.68s
-- *Total time:* 20.11s
-- *Prompt preparation time:* 0.0299
-- *First-token latency:* 5.44
-- *Cleanup time:* 0.285
+- *Model load time:* 8.42s
+- *Generation time:* 5.23s
+- *Total time:* 13.96s
+- *Prompt preparation time:* 0.0181
+- *First-token latency:* 3.01
+- *Cleanup time:* 0.279
 - *Prompt tokens:* 549
 - *Generation tokens:* 82
 - *Total tokens:* 631
-- *Prompt throughput (raw):* 101 tok/s
-- *Generation throughput (raw):* 91.1 tok/s
+- *Prompt throughput (raw):* 182 tok/s
+- *Generation throughput (raw):* 93.1 tok/s
 - *Peak memory (GB):* 69
 - *Active memory (GB):* 68
 - *Cache memory (GB):* 0.46
@@ -1423,10 +1515,10 @@ Title:
 Two cats resting on a pink sofa
 
 Description:
-Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and the sofa's colour.
+Two cats are lying on a pink sofa with a remote control nearby. Soft lighting highlights their relaxed poses and the sofa’s texture.
 
 Keywords:
-cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relaxation, soft lighting, living room, animal, comfort, leisure, home decor, sofa cushion, pet accessories
+cats, sofa, pink, remote control, resting, indoor, pet, cushion, soft lighting, domestic scene, relaxed poses, living room, furniture, cozy, pet accessories, home decor, comfort
 </pre>
 
 </details>
@@ -1439,11 +1531,9 @@ cats, sofa, pink, remote control, resting, indoor, pet, cushion, domestic, relax
 
 #### Human accuracy note
 
-Reviewed by john on 2026-10-25 for this exact image, model revision and
-output. This is a person's judgement, not one of the mechanical checks.
+An earlier note by john (2026-10-25) no longer applies: the output changed.
 
-Describes the pictured tabby cats as calico cats and gives incorrect
-positional details.
+This output has not been reviewed.
 
 <details>
 <summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
@@ -1455,18 +1545,18 @@ positional details.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.02s
-- *Generation time:* 1.85s
-- *Total time:* 3.00s
-- *Prompt preparation time:* 0.0194
-- *First-token latency:* 0.451
-- *Cleanup time:* 0.0934
+- *Model load time:* 1.03s
+- *Generation time:* 3.24s
+- *Total time:* 4.39s
+- *Prompt preparation time:* 0.0183
+- *First-token latency:* 1.53
+- *Cleanup time:* 0.0904
 - *Prompt tokens:* 873
-- *Generation tokens:* 95
-- *Total tokens:* 968
-- *Prompt throughput (raw):* 1,936 tok/s
-- *Generation throughput (raw):* 71.1 tok/s
-- *Peak memory (GB):* 8.2
+- *Generation tokens:* 124
+- *Total tokens:* 997
+- *Prompt throughput (raw):* 570 tok/s
+- *Generation throughput (raw):* 73.6 tok/s
+- *Peak memory (GB):* 7.9
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 6.45
@@ -1490,9 +1580,9 @@ positional details.
 <pre class="model-output-readable">
 Title: Two Calico Cats Sleeping on Pink Bedding
 
-Description: Two calico cats are sleeping side by side on pink bedding. They are positioned with their heads facing each other and their tails touching. The cats have white, black, and brown fur. Two white remote controls are visible behind the cats.
+Description: Two calico cats with black, orange, and white fur are sleeping side by side on pink bedding. They are positioned with their heads facing each other and their tails touching. The cats are lying on their sides with their paws stretched out. The scene is well-lit, highlighting the cats' distinctive coat patterns and the soft texture of the bedding.
 
-Keywords: calico cats, sleeping, pink bedding, white remotes, black and brown fur, white cats, striped cats, cozy, relaxed, feline
+Keywords: calico cats, sleeping, pink bedding, black fur, orange fur, white fur, side by side, heads facing each other, tails touching, well-lit, soft bedding
 </pre>
 
 </details>
@@ -1513,17 +1603,17 @@ Keywords: calico cats, sleeping, pink bedding, white remotes, black and brown fu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 1.30s
-- *Generation time:* 3.14s
-- *Total time:* 4.57s
-- *Prompt preparation time:* 0.0219
-- *First-token latency:* 0.737
-- *Cleanup time:* 0.105
+- *Model load time:* 1.28s
+- *Generation time:* 3.77s
+- *Total time:* 5.19s
+- *Prompt preparation time:* 0.0211
+- *First-token latency:* 1.45
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 860
 - *Generation tokens:* 70
 - *Total tokens:* 930
-- *Prompt throughput (raw):* 1,167 tok/s
-- *Generation throughput (raw):* 30.3 tok/s
+- *Prompt throughput (raw):* 592 tok/s
+- *Generation throughput (raw):* 31.4 tok/s
 - *Peak memory (GB):* 12
 - *Active memory (GB):* 8.5
 - *Cache memory (GB):* 3.1
@@ -1557,61 +1647,6 @@ Keywords: cats, pink blanket, remote controls, sleeping, white remote, comfortab
 
 ---
 
-<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.67s
-- *Generation time:* 36.40s
-- *Total time:* 39.24s
-- *Prompt preparation time:* 0.0294
-- *First-token latency:* 0.891
-- *Cleanup time:* 0.125
-- *Prompt tokens:* 545
-- *Generation tokens:* 884
-- *Total tokens:* 1,429
-- *Prompt throughput (raw):* 612 tok/s
-- *Generation throughput (raw):* 24.9 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 24
-- *Cache memory (GB):* 0.12
-- *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00703
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 710
-- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 865ee8de65799cc4ee406587e4b607063708f358
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/865ee8de65799cc4ee406587e4b607063708f358
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two cats resting on pink blanket sofa
-Description: Two cats lie on a bright pink blanket on a red sofa, one with its head resting down and eyes closed, the other with its head lowered. Two white remote controls lie on the fabric beside the cats.
-Keywords: cats, pink blanket, red sofa, remote controls, tabby markings, resting, sleeping, fabric, couch, indoor, white remotes, fur, paws, collar
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
 
 ### mlx-community/North-Micro-Vision-Instruct-4bit
@@ -1626,20 +1661,20 @@ Keywords: cats, pink blanket, red sofa, remote controls, tabby markings, resting
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.05s
-- *Generation time:* 0.48s
-- *Total time:* 1.65s
-- *Prompt preparation time:* 0.016
-- *First-token latency:* 0.157
-- *Cleanup time:* 0.092
+- *Model load time:* 1.07s
+- *Generation time:* 0.39s
+- *Total time:* 1.59s
+- *Prompt preparation time:* 0.0207
+- *First-token latency:* 0.148
+- *Cleanup time:* 0.0902
 - *Prompt tokens:* 418
-- *Generation tokens:* 78
-- *Total tokens:* 496
-- *Prompt throughput (raw):* 2,662 tok/s
-- *Generation throughput (raw):* 267 tok/s
+- *Generation tokens:* 57
+- *Total tokens:* 475
+- *Prompt throughput (raw):* 2,830 tok/s
+- *Generation throughput (raw):* 266 tok/s
 - *Peak memory (GB):* 3.3
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.11
+- *Cache memory (GB):* 0.10
 - *Model-load active memory (GB):* 2.18
 - *Post-cleanup active memory (GB):* 0.00756
 - *Post-cleanup cache memory (GB):* 0.0
@@ -1658,11 +1693,11 @@ Keywords: cats, pink blanket, red sofa, remote controls, tabby markings, resting
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Cats Resting on a Pink Couch"
+Title: "Cats Sleeping on a Red Couch"
 
-Description: "Two cats are comfortably sprawled out on a vibrant pink couch, basking in the soft light of the day. Their relaxed postures and the cozy setting create a serene and tranquil scene."
+Description: "Two cats are comfortably sleeping on a bright pink couch, each holding a remote control in their paws."
 
-Keywords: cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, basking, cozy, serene, scene.
+Keywords: cats, sleeping, couch, red, remote controls, comfortable, peaceful, indoor, feline, cozy.
 </pre>
 
 </details>
@@ -1683,17 +1718,17 @@ Keywords: cats, couch, resting, lounging, pink, soft light, relaxed, tranquil, b
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.83s
-- *Generation time:* 1.91s
-- *Total time:* 2.85s
-- *Prompt preparation time:* 0.0183
-- *First-token latency:* 0.227
-- *Cleanup time:* 0.0925
+- *Model load time:* 0.98s
+- *Generation time:* 2.04s
+- *Total time:* 3.13s
+- *Prompt preparation time:* 0.0173
+- *First-token latency:* 0.385
+- *Cleanup time:* 0.0916
 - *Prompt tokens:* 883
 - *Generation tokens:* 94
 - *Total tokens:* 977
-- *Prompt throughput (raw):* 3,890 tok/s
-- *Generation throughput (raw):* 58.1 tok/s
+- *Prompt throughput (raw):* 2,295 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
 - *Peak memory (GB):* 9.1
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.42
@@ -1741,17 +1776,17 @@ Keywords: cats, sleeping, pink sofa, remote controls, relaxed, comfortable, indo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_omni_moe)
-- *Model load time:* 2.29s
-- *Generation time:* 1.24s
-- *Total time:* 3.73s
-- *Prompt preparation time:* 0.0245
-- *First-token latency:* 0.366
-- *Cleanup time:* 0.152
+- *Model load time:* 2.40s
+- *Generation time:* 1.29s
+- *Total time:* 3.87s
+- *Prompt preparation time:* 0.025
+- *First-token latency:* 0.361
+- *Cleanup time:* 0.141
 - *Prompt tokens:* 409
-- *Generation tokens:* 81
-- *Total tokens:* 490
-- *Prompt throughput (raw):* 1,116 tok/s
-- *Generation throughput (raw):* 93.6 tok/s
+- *Generation tokens:* 87
+- *Total tokens:* 496
+- *Prompt throughput (raw):* 1,133 tok/s
+- *Generation throughput (raw):* 95.3 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 22
 - *Cache memory (GB):* 0.07
@@ -1780,7 +1815,7 @@ Description:
 Two tabby cats are sleeping on a bright pink sofa. The sofa has two remote controls placed near the cats.
 
 Keywords:
-tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoor, animal, pet, living room, comfort, relaxation, animal companions, domestic animals, household, feline, rest
+tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, animal, pet, living room, furniture, animal resting, animal sleep, animal comfort, animal relaxation, animal rest, animal cuddling, animal companionship
 </pre>
 
 </details>
@@ -1801,17 +1836,17 @@ tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.88s
-- *Generation time:* 0.97s
-- *Total time:* 3.01s
-- *Prompt preparation time:* 0.0211
-- *First-token latency:* 0.33
-- *Cleanup time:* 0.126
+- *Model load time:* 1.89s
+- *Generation time:* 1.06s
+- *Total time:* 3.12s
+- *Prompt preparation time:* 0.0202
+- *First-token latency:* 0.332
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 409
-- *Generation tokens:* 83
-- *Total tokens:* 492
-- *Prompt throughput (raw):* 1,239 tok/s
-- *Generation throughput (raw):* 133 tok/s
+- *Generation tokens:* 97
+- *Total tokens:* 506
+- *Prompt throughput (raw):* 1,231 tok/s
+- *Generation throughput (raw):* 135 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.07
@@ -1835,9 +1870,9 @@ tabby cats, sleeping, sofa, pink, remote controls, domestic cats, resting, indoo
 <pre class="model-output-readable">
 Title: Two cats resting on a pink surface
 
-Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with its eyes closed, while the other lies on its side. Two remote controls are visible on the surface near the cats.
+Description: Two cats are lying on a bright pink fabric surface. One cat is curled up with a green collar, while the other lies stretched out; two remote controls are visible nearby.
 
-Keywords: cats, remote controls, pink fabric, lying down, curled up, eyes closed, striped pattern, light, indoor setting, domestic animals
+Keywords: cats, pink fabric, remote controls, green collar, striped fur, lying down, curled, stretched, domestic animals, soft surface, household items, resting, pets, animal companionship, domestic cats, feline, cozy, relaxed
 </pre>
 
 </details>
@@ -1859,16 +1894,16 @@ Keywords: cats, remote controls, pink fabric, lying down, curled up, eyes closed
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.89s
-- *Generation time:* 0.84s
-- *Total time:* 1.87s
-- *Prompt preparation time:* 0.0104
-- *First-token latency:* 0.204
-- *Cleanup time:* 0.117
+- *Generation time:* 0.80s
+- *Total time:* 1.81s
+- *Prompt preparation time:* 0.00998
+- *First-token latency:* 0.179
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 409
 - *Generation tokens:* 60
 - *Total tokens:* 469
-- *Prompt throughput (raw):* 2,001 tok/s
-- *Generation throughput (raw):* 103 tok/s
+- *Prompt throughput (raw):* 2,280 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 6.8
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.11
@@ -1915,17 +1950,17 @@ Keywords: cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feli
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.41s
-- *Generation time:* 7.66s
-- *Total time:* 10.24s
-- *Prompt preparation time:* 0.0247
-- *First-token latency:* 0.334
-- *Cleanup time:* 0.129
+- *Model load time:* 2.43s
+- *Generation time:* 6.30s
+- *Total time:* 8.90s
+- *Prompt preparation time:* 0.0239
+- *First-token latency:* 0.345
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 419
-- *Generation tokens:* 898
-- *Total tokens:* 1,317
-- *Prompt throughput (raw):* 1,254 tok/s
-- *Generation throughput (raw):* 123 tok/s
+- *Generation tokens:* 768
+- *Total tokens:* 1,187
+- *Prompt throughput (raw):* 1,214 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.12
@@ -1949,11 +1984,9 @@ Keywords: cats, sleeping, pink, sofa, remote, tabby, rest, daylight, couch, feli
 #### Final answer
 
 ```text
-Title: Two tabby cats sleeping on pink sofa next to remotes
-
-Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
-
-Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion
+Title: Two tabby cats lying on a pink sofa with remotes
+Description: Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
+Keywords: cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying
 ```
 
 *Readable output:*
@@ -1966,43 +1999,42 @@ The user wants catalogue metadata for the provided image.
     *   Cat 1 (Left): Lying on its back/side, stretched out. Looks like a young cat or kitten based on size, but it's hard to be certain. It has a green collar.
     *   Cat 2 (Right): Lying on its side/stomach, facing the other cat but slightly angled away. Larger than the one on the left. Also tabby.
 *   **Setting:** A bright pink sofa or couch with fabric folds.
-*   **Objects:** Two remote controls. One is white/grey with blue buttons (left), one is white with colorful buttons (center/right).
-*   **Lighting:** Bright, likely natural daylight or strong indoor lighting. Shadows are soft but distinct.
-*   **Action:** Sleeping or resting peacefully.
+*   **Objects:** Two remote controls. One is white/grey with blue buttons (left), one is white/grey with multi-colored buttons (center).
+*   **Lighting:** Looks like indoor lighting, fairly even.
+*   **Action:** Sleeping or resting.
 
-**2. Draft Title (5-10 words):**
-*   *Draft 1:* Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
-*   *Draft 2:* Sleeping tabby cats resting on bright pink couch cushions. (9 words) - Good.
-*   *Draft 3:* Two striped cats lying on pink sofa next to remotes. (10 words) - Good.
-*   *Selection:* Two tabby cats sleeping on pink sofa next to remotes.
+**2. Draft Title:**
+*   Needs to be concrete, 5-10 words.
+*   *Idea 1:* Two tabby cats sleeping on a pink sofa with remotes. (9 words) - Good.
+*   *Idea 2:* Tabby cats resting on a pink couch next to remotes. (10 words) - Good.
+*   *Selection:* Two tabby cats resting on a pink sofa with remotes.
 
-**3. Draft Description (1-2 sentences):**
-*   *Focus:* Main subject, setting, action, lighting, details.
-*   *Draft 1:* Two tabby cats are lying asleep on a bright pink sofa. There are two remote controls near them, one near the head of the cat on the left and another between the cats. The lighting is bright and casts soft shadows.
-*   *Refining for constraints:* Needs to be factual and concise.
-*   *Final Version:* Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+**3. Draft Description:**
+*   Needs to be 1-2 sentences. Factual.
+*   Needs to cover: main subject, setting, action, lighting, distinctive details.
+*   *Draft:* Two tabby cats are lying on a bright pink fabric sofa surface. A white remote control rests near the smaller cat on the left, and another remote is positioned between the animals.
+*   *Refining:* Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
 
-**4. Draft Keywords (10-18 unique, comma-separated):**
-*   *Brainstorming:* cats, tabby, pets, sleeping, sofa, couch, pink, remote, television, controls, feline, animals, resting, fabric, stripes, collar, green, furniture, domestic.
-*   *Selection:* cats, tabby, sleeping, sofa, couch, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, pets, stretching. (18 items)
-*   *Refining:* cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion.
+**4. Draft Keywords:**
+*   Needs 10-18 unique, comma-separated keywords.
+*   *List:* cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying.
 
-**5. Final Review:**
-*   Title: Two tabby cats sleeping on pink sofa next to remotes. (9 words) -&gt; Check.
-*   Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left. (2 sentences) -&gt; Check.
-*   Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion. (18 keywords) -&gt; Check.
+**5. Final Review against constraints:**
+*   British English? Yes (sofa, catalogue, etc. - though the text is neutral).
+*   5-10 word title? "Two tabby cats lying on a pink sofa with remotes" (10 words).
+*   1-2 sentence description? Yes.
+*   10-18 keywords? Yes.
+*   No uncertain details? Yes.
 
-**6. Formatting:**
-Ensure "Title:", "Description:", "Keywords:" headers are present and no extra text is added.
-
-*Self-Correction during drafting:* The prompt asks for "British-English catalogue metadata". "Couch" and "Sofa" are fine
+**6. Final Output Generation:**
+Title: Two tabby cats lying on a pink sofa with remotes
+Description: Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
+Keywords: cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying
 &lt;/think&gt;
 
-Title: Two tabby cats sleeping on pink sofa next to remotes
-
-Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
-
-Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion
+Title: Two tabby cats lying on a pink sofa with remotes
+Description: Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
+Keywords: cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying
 </pre>
 
 <details>
@@ -2016,43 +2048,42 @@ The user wants catalogue metadata for the provided image.
     *   Cat 1 (Left): Lying on its back/side, stretched out. Looks like a young cat or kitten based on size, but it's hard to be certain. It has a green collar.
     *   Cat 2 (Right): Lying on its side/stomach, facing the other cat but slightly angled away. Larger than the one on the left. Also tabby.
 *   **Setting:** A bright pink sofa or couch with fabric folds.
-*   **Objects:** Two remote controls. One is white/grey with blue buttons (left), one is white with colorful buttons (center/right).
-*   **Lighting:** Bright, likely natural daylight or strong indoor lighting. Shadows are soft but distinct.
-*   **Action:** Sleeping or resting peacefully.
+*   **Objects:** Two remote controls. One is white/grey with blue buttons (left), one is white/grey with multi-colored buttons (center).
+*   **Lighting:** Looks like indoor lighting, fairly even.
+*   **Action:** Sleeping or resting.
 
-**2. Draft Title (5-10 words):**
-*   *Draft 1:* Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
-*   *Draft 2:* Sleeping tabby cats resting on bright pink couch cushions. (9 words) - Good.
-*   *Draft 3:* Two striped cats lying on pink sofa next to remotes. (10 words) - Good.
-*   *Selection:* Two tabby cats sleeping on pink sofa next to remotes.
+**2. Draft Title:**
+*   Needs to be concrete, 5-10 words.
+*   *Idea 1:* Two tabby cats sleeping on a pink sofa with remotes. (9 words) - Good.
+*   *Idea 2:* Tabby cats resting on a pink couch next to remotes. (10 words) - Good.
+*   *Selection:* Two tabby cats resting on a pink sofa with remotes.
 
-**3. Draft Description (1-2 sentences):**
-*   *Focus:* Main subject, setting, action, lighting, details.
-*   *Draft 1:* Two tabby cats are lying asleep on a bright pink sofa. There are two remote controls near them, one near the head of the cat on the left and another between the cats. The lighting is bright and casts soft shadows.
-*   *Refining for constraints:* Needs to be factual and concise.
-*   *Final Version:* Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
+**3. Draft Description:**
+*   Needs to be 1-2 sentences. Factual.
+*   Needs to cover: main subject, setting, action, lighting, distinctive details.
+*   *Draft:* Two tabby cats are lying on a bright pink fabric sofa surface. A white remote control rests near the smaller cat on the left, and another remote is positioned between the animals.
+*   *Refining:* Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
 
-**4. Draft Keywords (10-18 unique, comma-separated):**
-*   *Brainstorming:* cats, tabby, pets, sleeping, sofa, couch, pink, remote, television, controls, feline, animals, resting, fabric, stripes, collar, green, furniture, domestic.
-*   *Selection:* cats, tabby, sleeping, sofa, couch, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, pets, stretching. (18 items)
-*   *Refining:* cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion.
+**4. Draft Keywords:**
+*   Needs 10-18 unique, comma-separated keywords.
+*   *List:* cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying.
 
-**5. Final Review:**
-*   Title: Two tabby cats sleeping on pink sofa next to remotes. (9 words) -> Check.
-*   Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left. (2 sentences) -> Check.
-*   Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion. (18 keywords) -> Check.
+**5. Final Review against constraints:**
+*   British English? Yes (sofa, catalogue, etc. - though the text is neutral).
+*   5-10 word title? "Two tabby cats lying on a pink sofa with remotes" (10 words).
+*   1-2 sentence description? Yes.
+*   10-18 keywords? Yes.
+*   No uncertain details? Yes.
 
-**6. Formatting:**
-Ensure "Title:", "Description:", "Keywords:" headers are present and no extra text is added.
-
-*Self-Correction during drafting:* The prompt asks for "British-English catalogue metadata". "Couch" and "Sofa" are fine
+**6. Final Output Generation:**
+Title: Two tabby cats lying on a pink sofa with remotes
+Description: Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
+Keywords: cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying
 </think>
 
-Title: Two tabby cats sleeping on pink sofa next to remotes
-
-Description: Two tabby cats lie sleeping and stretching on a bright pink sofa cushion. Two remote controls rest near the cats, one positioned by the head of the smaller cat on the left.
-
-Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, resting, fabric, stripes, furniture, collar, green, stretching, pets, cushion
+Title: Two tabby cats lying on a pink sofa with remotes
+Description: Two tabby cats lie stretched out on the bright pink fabric of a sofa. One cat wears a green collar, and two remote controls are positioned near the resting animals.
+Keywords: cat, cats, tabby, sleeping, resting, sofa, couch, pink, remote, controls, pet, animal, domestic, striped, fabric, green, collar, lying
 ```
 
 </details>
@@ -2075,20 +2106,20 @@ Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.43s
-- *Generation time:* 5.78s
-- *Total time:* 8.39s
-- *Prompt preparation time:* 0.0242
-- *First-token latency:* 0.357
-- *Cleanup time:* 0.131
+- *Model load time:* 2.47s
+- *Generation time:* 7.33s
+- *Total time:* 9.97s
+- *Prompt preparation time:* 0.0241
+- *First-token latency:* 0.336
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 419
-- *Generation tokens:* 653
-- *Total tokens:* 1,072
-- *Prompt throughput (raw):* 1,175 tok/s
-- *Generation throughput (raw):* 121 tok/s
+- *Generation tokens:* 909
+- *Total tokens:* 1,328
+- *Prompt throughput (raw):* 1,247 tok/s
+- *Generation throughput (raw):* 130 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.12
+- *Cache memory (GB):* 0.13
 - *Model-load active memory (GB):* 20.4
 - *Post-cleanup active memory (GB):* 0.00957
 - *Post-cleanup cache memory (GB):* 0.0
@@ -2109,9 +2140,9 @@ Keywords: cats, tabby, sleeping, sofa, pink, remote, controls, feline, animals, 
 #### Final answer
 
 ```text
-Title: Two tabby cats sleeping on pink sofa with remotes.
-Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
-Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, grey, buttons, fabric, pattern, kittens
+Title: Two tabby cats sleeping on a pink sofa with remotes
+Description: Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the cat on the left, while another remote lies between the pair.
+Keywords: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, sofa, throw, cushions, fabric
 ```
 
 *Readable output:*
@@ -2119,78 +2150,52 @@ Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paw
 <pre class="model-output-readable">
 The user wants metadata for an image of two cats on a sofa.
 I need to extract specific details:
-- **Subject:** Two tabby cats. One is small/kitten, one is adult/larger.
-- **Setting:** A bright pink sofa/couch.
-- **Objects:** Two remote controls (grey/silver).
-- **Action:** Sleeping/resting.
-- **Lighting:** Natural, soft, indoor lighting.
-- **Distinctive details:** The kittens' striped fur, the pink fabric, the position of the remotes.
+- **Subject:** Two tabby cats. One looks slightly smaller/younger (kitten) but is hard to be certain, so I'll stick to "two tabby cats".
+- **Setting:** A bright pink sofa or couch with a pink blanket/throw.
+- **Action:** Sleeping or resting.
+- **Details:** There are two remote controls visible. One near the left cat's head, one between the cats.
+- **Lighting:** Looks like natural, somewhat bright daylight, casting soft shadows.
+- **Visuals:** Striped fur patterns, black paws, pink background.
 
-**Drafting Title:**
-Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
+Drafting the Title:
+- Two tabby cats sleeping on a pink sofa with remotes. (10 words) - Good.
 
-**Drafting Description:**
-Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+Drafting the Description:
+- Two tabby cats are asleep on a bright pink sofa covered with a matching pink throw blanket. A white remote control rests near each cat's head, positioned between them and near the left paw.
 
-**Drafting Keywords:**
-tabby cats, pink sofa, sleeping kittens, remote controls, furniture, striped fur, paws, cushions, pets, animals, resting, domestic, grey remote, texture, fabric, stripes, back, front paws, rear paws.
+Refining Description for constraints (British English, factual):
+- Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the smaller cat on the left, while another remote lies between the pair.
 
-Let's refine keywords to be unique and distinct.
-1. tabby cats
-2. pink sofa
-3. sleeping kittens
-4. remote controls
-5. furniture
-6. striped fur
-7. paws
-8. cushions
-9. pets
-10. animals
-11. resting
-12. domestic
-13. grey remote
-14. texture
-15. fabric
-16. stripes
-17. back
-18. front paws
+Drafting Keywords:
+- tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, soft furnishings, wireless remote.
 
-Wait, "back" and "front paws" might be redundant with "paws". Let's stick to visible objects and clear descriptors.
-- tabby
-- cats
-- pink
-- sofa
-- remote
-- controls
-- sleeping
-- fur
-- stripes
-- paws
-- cushions
-- furniture
-- pets
-- animals
-- grey
-- buttons
-- fabric
-- pattern
+Let's count keywords: 15. That fits the 10-18 range.
 
-Let's count: 18 words. Perfect.
+Final Polish:
+Title: Two tabby cats sleeping on a pink sofa with remotes
+Description: Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the cat on the left, while another remote lies between the pair.
+Keywords: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, soft furnishings, wireless remote
 
-Final check of the prompt requirements:
-- British-English catalogue metadata. (No specific British spelling issues really, just standard English).
-- Only clearly visible facts. (Yes).
-- Omit uncertain details. (Yes, didn't guess breeds or specific room names).
-- 5-10 word title. (Yes).
-- 1-2 sentence description. (Yes).
-- 10-18 unique keywords. (Yes).
+Wait, check the "unique" constraint.
+tabby, cats, sleeping, pink, sofa, remote, control, blanket, stripes, feline, resting, furniture, domestic, animals, paws, tail, couch, soft, furnishings, wireless, remote (duplicate word "remote").
+Let's make them more distinct phrases or just single words if needed, but the prompt asks for "unique, comma-separated keywords". Usually, this means distinct terms.
+Let's try: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic, paws, tail, couch, sofa, throw, cushions, pattern, fabric.
 
-Let's assemble.
+Let's re-evaluate the "unique" constraint. It usually means don't repeat the same word.
+List: tabby, cats, sleeping, pink, sofa, remote, control, blanket, stripes, feline, resting, furniture, domestic, animals, paws, tail, couch, soft, furnishings, wireless, remote (duplicate).
+Let's remove "remote" from the end.
+List: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, sofa, throw, cushions, pattern, fabric.
+
+Let's stick to single words or short phrases that are distinct.
+tabby, cats, sleeping, pink, sofa, remote, control, blanket, stripes, feline, resting, furniture, domestic, animals, paws, tail, couch, throw, cushions. (17 words).
+
+Let's look at the image again.
+-
 &lt;/think&gt;
 
-Title: Two tabby cats sleeping on pink sofa with remotes.
-Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
-Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, grey, buttons, fabric, pattern, kittens
+Title: Two tabby cats sleeping on a pink sofa with remotes
+Description: Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the cat on the left, while another remote lies between the pair.
+Keywords: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, sofa, throw, cushions, fabric
 </pre>
 
 <details>
@@ -2199,78 +2204,52 @@ Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paw
 ```text
 The user wants metadata for an image of two cats on a sofa.
 I need to extract specific details:
-- **Subject:** Two tabby cats. One is small/kitten, one is adult/larger.
-- **Setting:** A bright pink sofa/couch.
-- **Objects:** Two remote controls (grey/silver).
-- **Action:** Sleeping/resting.
-- **Lighting:** Natural, soft, indoor lighting.
-- **Distinctive details:** The kittens' striped fur, the pink fabric, the position of the remotes.
+- **Subject:** Two tabby cats. One looks slightly smaller/younger (kitten) but is hard to be certain, so I'll stick to "two tabby cats".
+- **Setting:** A bright pink sofa or couch with a pink blanket/throw.
+- **Action:** Sleeping or resting.
+- **Details:** There are two remote controls visible. One near the left cat's head, one between the cats.
+- **Lighting:** Looks like natural, somewhat bright daylight, casting soft shadows.
+- **Visuals:** Striped fur patterns, black paws, pink background.
 
-**Drafting Title:**
-Two tabby cats sleeping on pink sofa with remotes. (9 words) - Good.
+Drafting the Title:
+- Two tabby cats sleeping on a pink sofa with remotes. (10 words) - Good.
 
-**Drafting Description:**
-Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
+Drafting the Description:
+- Two tabby cats are asleep on a bright pink sofa covered with a matching pink throw blanket. A white remote control rests near each cat's head, positioned between them and near the left paw.
 
-**Drafting Keywords:**
-tabby cats, pink sofa, sleeping kittens, remote controls, furniture, striped fur, paws, cushions, pets, animals, resting, domestic, grey remote, texture, fabric, stripes, back, front paws, rear paws.
+Refining Description for constraints (British English, factual):
+- Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the smaller cat on the left, while another remote lies between the pair.
 
-Let's refine keywords to be unique and distinct.
-1. tabby cats
-2. pink sofa
-3. sleeping kittens
-4. remote controls
-5. furniture
-6. striped fur
-7. paws
-8. cushions
-9. pets
-10. animals
-11. resting
-12. domestic
-13. grey remote
-14. texture
-15. fabric
-16. stripes
-17. back
-18. front paws
+Drafting Keywords:
+- tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, soft furnishings, wireless remote.
 
-Wait, "back" and "front paws" might be redundant with "paws". Let's stick to visible objects and clear descriptors.
-- tabby
-- cats
-- pink
-- sofa
-- remote
-- controls
-- sleeping
-- fur
-- stripes
-- paws
-- cushions
-- furniture
-- pets
-- animals
-- grey
-- buttons
-- fabric
-- pattern
+Let's count keywords: 15. That fits the 10-18 range.
 
-Let's count: 18 words. Perfect.
+Final Polish:
+Title: Two tabby cats sleeping on a pink sofa with remotes
+Description: Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the cat on the left, while another remote lies between the pair.
+Keywords: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, soft furnishings, wireless remote
 
-Final check of the prompt requirements:
-- British-English catalogue metadata. (No specific British spelling issues really, just standard English).
-- Only clearly visible facts. (Yes).
-- Omit uncertain details. (Yes, didn't guess breeds or specific room names).
-- 5-10 word title. (Yes).
-- 1-2 sentence description. (Yes).
-- 10-18 unique keywords. (Yes).
+Wait, check the "unique" constraint.
+tabby, cats, sleeping, pink, sofa, remote, control, blanket, stripes, feline, resting, furniture, domestic, animals, paws, tail, couch, soft, furnishings, wireless, remote (duplicate word "remote").
+Let's make them more distinct phrases or just single words if needed, but the prompt asks for "unique, comma-separated keywords". Usually, this means distinct terms.
+Let's try: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic, paws, tail, couch, sofa, throw, cushions, pattern, fabric.
 
-Let's assemble.
+Let's re-evaluate the "unique" constraint. It usually means don't repeat the same word.
+List: tabby, cats, sleeping, pink, sofa, remote, control, blanket, stripes, feline, resting, furniture, domestic, animals, paws, tail, couch, soft, furnishings, wireless, remote (duplicate).
+Let's remove "remote" from the end.
+List: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, sofa, throw, cushions, pattern, fabric.
+
+Let's stick to single words or short phrases that are distinct.
+tabby, cats, sleeping, pink, sofa, remote, control, blanket, stripes, feline, resting, furniture, domestic, animals, paws, tail, couch, throw, cushions. (17 words).
+
+Let's look at the image again.
+-
 </think>
 
-Title: Two tabby cats sleeping on pink sofa with remotes.
-Description: Two tabby cats are resting on a bright pink sofa cushion, flanked by two grey remote controls. The smaller cat on the left lies on its back while the larger cat on the right sleeps facing downwards.
-Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paws, cushions, furniture, pets, animals, grey, buttons, fabric, pattern, kittens
+Title: Two tabby cats sleeping on a pink sofa with remotes
+Description: Two tabby cats lie asleep side-by-side on a bright pink sofa covered with a matching pink blanket. A white remote control rests near the head of the cat on the left, while another remote lies between the pair.
+Keywords: tabby cats, sleeping, pink sofa, remote control, blanket, stripes, feline, resting, furniture, domestic animals, paws, tail, couch, sofa, throw, cushions, fabric
 ```
 
 </details>
@@ -2293,17 +2272,17 @@ Keywords: tabby, cats, pink, sofa, remote, controls, sleeping, fur, stripes, paw
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.89s
-- *Generation time:* 21.45s
-- *Total time:* 23.52s
-- *Prompt preparation time:* 0.0107
-- *First-token latency:* 0.711
-- *Cleanup time:* 0.143
+- *Model load time:* 1.93s
+- *Generation time:* 20.41s
+- *Total time:* 22.51s
+- *Prompt preparation time:* 0.0102
+- *First-token latency:* 0.749
+- *Cleanup time:* 0.139
 - *Prompt tokens:* 461
 - *Generation tokens:* 640
 - *Total tokens:* 1,101
-- *Prompt throughput (raw):* 648 tok/s
-- *Generation throughput (raw):* 30.9 tok/s
+- *Prompt throughput (raw):* 615 tok/s
+- *Generation throughput (raw):* 32.6 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.29
@@ -2434,17 +2413,17 @@ tabby cats, striped coats, pink sofa, magenta fabric, remote controls, white rem
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.61s
-- *Generation time:* 0.72s
-- *Total time:* 1.51s
-- *Prompt preparation time:* 0.0681
-- *First-token latency:* 0.383
-- *Cleanup time:* 0.113
+- *Model load time:* 0.67s
+- *Generation time:* 0.93s
+- *Total time:* 1.76s
+- *Prompt preparation time:* 0.0614
+- *First-token latency:* 0.621
+- *Cleanup time:* 0.0908
 - *Prompt tokens:* 1,204
 - *Generation tokens:* 31
 - *Total tokens:* 1,235
-- *Prompt throughput (raw):* 3,141 tok/s
-- *Generation throughput (raw):* 117 tok/s
+- *Prompt throughput (raw):* 1,939 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.30
@@ -2490,18 +2469,18 @@ Keywords: cats, couch, sleeping, pink
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.83s
-- *Generation time:* 0.77s
-- *Total time:* 1.73s
-- *Prompt preparation time:* 0.0127
-- *First-token latency:* 0.136
-- *Cleanup time:* 0.106
+- *Model load time:* 0.81s
+- *Generation time:* 0.73s
+- *Total time:* 1.66s
+- *Prompt preparation time:* 0.0118
+- *First-token latency:* 0.118
+- *Cleanup time:* 0.0987
 - *Prompt tokens:* 420
 - *Generation tokens:* 88
 - *Total tokens:* 508
-- *Prompt throughput (raw):* 3,095 tok/s
-- *Generation throughput (raw):* 149 tok/s
-- *Peak memory (GB):* 5.2
+- *Prompt throughput (raw):* 3,562 tok/s
+- *Generation throughput (raw):* 153 tok/s
+- *Peak memory (GB):* 5.3
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 3.93
@@ -2545,17 +2524,17 @@ Keywords: cats, resting, pink couch, remote control, tabby, sleeping, indoor, br
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.64s
-- *Generation time:* 3.11s
-- *Total time:* 4.89s
-- *Prompt preparation time:* 0.0114
-- *First-token latency:* 0.666
-- *Cleanup time:* 0.118
+- *Model load time:* 1.66s
+- *Generation time:* 3.20s
+- *Total time:* 5.00s
+- *Prompt preparation time:* 0.0117
+- *First-token latency:* 0.797
+- *Cleanup time:* 0.115
 - *Prompt tokens:* 538
 - *Generation tokens:* 87
 - *Total tokens:* 625
-- *Prompt throughput (raw):* 808 tok/s
-- *Generation throughput (raw):* 35.9 tok/s
+- *Prompt throughput (raw):* 675 tok/s
+- *Generation throughput (raw):* 36.5 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.14
@@ -2581,10 +2560,10 @@ Title:
 Two Cats Resting on a Pink Blanket
 
 Description:
-Two tabby cats are lying on a pink blanket, one stretched out and the other curled up. A remote control is visible near the cats.
+Two tabby cats are lying on a pink blanket, one stretched out and the other curled up, with remote controls nearby.
 
 Keywords:
-cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch, paws, stripes, sleeping, pet, animal, lounge, cushion, relaxed posture, domestic
+cats, tabby, pink blanket, resting, remote controls, relaxed, indoor, fur, paws, stripes, sofa, cushions, lounging, peaceful, domestic, pet, animal, cozy, household
 </pre>
 
 </details>
@@ -2606,17 +2585,17 @@ cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.12s
-- *Generation time:* 4.72s
-- *Total time:* 7.01s
-- *Prompt preparation time:* 0.0241
-- *First-token latency:* 0.342
-- *Cleanup time:* 0.121
+- *Model load time:* 2.18s
+- *Generation time:* 5.85s
+- *Total time:* 8.19s
+- *Prompt preparation time:* 0.0236
+- *First-token latency:* 0.561
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 421
-- *Generation tokens:* 706
-- *Total tokens:* 1,127
-- *Prompt throughput (raw):* 1,232 tok/s
-- *Generation throughput (raw):* 162 tok/s
+- *Generation tokens:* 879
+- *Total tokens:* 1,300
+- *Prompt throughput (raw):* 751 tok/s
+- *Generation throughput (raw):* 166 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.08
@@ -2641,9 +2620,9 @@ cats, tabby, pink blanket, resting, remote control, fur, relaxed, indoor, couch,
 #### Final answer
 
 ```text
-Title: Two tabby cats sleeping on pink cushion  
-Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby.  
-Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding
+Title: Two sleeping tabby cats on pink fabric
+Description: Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control.
+Keywords: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears
 ```
 
 *Readable output:*
@@ -2651,43 +2630,40 @@ Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, 
 <pre class="model-output-readable">
 We need to produce British-English catalogue metadata using only clearly visible facts. Omit uncertain details. Provide title (5-10 words), description (1-2 sentences factual), keywords (10-18 unique, comma-separated). Must be exactly three sections, no extra text.
 
-We need to infer what is visible: two cats sleeping on a pink surface (likely a couch or cushion). There are two remote controls (white). The cats are tabby. The setting: a pink fabric (cushion) on a red background (maybe a sofa). Lighting appears natural indoor. Distinctive details: remote controls, pink fabric, tabby cats.
+We need to infer what is visible: two cats sleeping on a pink surface (likely a couch or cushion). There are two remote controls (white). The cats are tabby. The setting appears to be indoor, bright lighting (maybe natural). The cats are lying on their sides, eyes closed, sleeping. The pink surface is a blanket or fabric. The remote controls are white with buttons. The cats have distinct patterns: one has darker stripes, other has brownish tabby with spots.
 
-Title 5-10 words: "Two tabby cats sleeping on pink cushion". That's 6 words. Good.
+We must avoid uncertain details like breed, age, etc. Use only visible facts. So description: "Two tabby cats lie sleeping on a pink fabric surface, each beside a white remote control." That's factual.
 
-Description: 1-2 sentences, factual. "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence. Could be two sentences but okay.
+Title 5-10 words: maybe "Two sleeping tabby cats on pink fabric". Count words: Two(1) sleeping(2) tabby(3) cats(4) on(5) pink(6) fabric(7). That's 7 words, okay.
 
-Keywords: need 10-18 unique, comma-separated. Let's list: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding. Need 10-18, ensure uniqueness. Count: cat(1), tabby(2), pink(3), cushion(4), remote(5), white(6), sleeping(7), domestic(8), animal(9), furniture(10), indoor(11), relaxed(12), paws(13), ears(14), whiskers(15), sofa(16), bedding(17). That's 17, within 10-18. Ensure comma-separated.
+Keywords 10-18 unique, comma-separated. Must be unique. Let's list: cat, tabby, pink, fabric, remote, remote control, sleeping, couch, cushion, white, white remote, two cats, domestic cat, feline, relaxed, indoor, home, pet. Need 10-18 items. Ensure uniqueness (no repeats). Let's count: cat(1), tabby(2), pink(3), fabric(4), remote(5), remote control(6) (maybe treat as separate? but it's phrase; maybe "remote" and "remote control" are separate but could be considered duplicate concept. Better keep distinct terms: "remote", "remote control" maybe okay but they are similar. Let's avoid duplication. Let's make list: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears. That's 16. Ensure each is unique. Let's verify duplicates: none.
 
-Check no uncertain details: we assume "cushion" is visible, yes pink fabric. Remote controls are white. Cats are tabby. All visible.
+Check count: cat(1), tabby(2), pink(3), fabric(4), remote(5), white(6), sleeping(7), couch(8), cushion(9), domestic(10), feline(11), relaxed(12), indoor(13), home(14), pet(15), whiskers(16), paws(17), ears(18). That's 18, within 10-18.
 
-Now format:
+Now ensure description is 1-2 sentences. We'll write one sentence: "Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control." That's one sentence, factual.
+
+Now title: "Two sleeping tabby cats on pink fabric". That's 7 words, okay.
+
+Now format exactly:
 
 Title:
 Description:
 Keywords:
 
-Make sure each line starts with "Title:", "Description:", "Keywords:".
+Make sure each line starts with label and colon? The instruction: "Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:" So we need to write:
 
-Let's craft.
+Title: Two sleeping tabby cats on pink fabric
+Description: Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control.
+Keywords: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears
 
-Title: "Two tabby cats sleeping on pink cushion" (6 words). Good.
-
-Description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence, factual.
-
-Keywords: "cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding"
-
-Check count: 17 items. Good.
-
-Now ensure British English: "lying" maybe "lying" is fine. "cushion" British. "remote controls" maybe "remote controls" okay. Use British spelling: "remote controls" fine. "pink" same. "cushion" same.
-
-Check description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's okay.
-
-Now output exactly three sections, nothing else.
+Check punctuation: Title line should not have extra colon? It says "Title:" then content. So we need "Title:" then space
 &lt;/think&gt;
-Title: Two tabby cats sleeping on pink cushion
-Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby.
-Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding
+Title: Two sleeping tabby cats on pink fabric
+Description: Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control.
+Keywords: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears
 </pre>
 
 <details>
@@ -2696,43 +2672,40 @@ Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, 
 ```text
 We need to produce British-English catalogue metadata using only clearly visible facts. Omit uncertain details. Provide title (5-10 words), description (1-2 sentences factual), keywords (10-18 unique, comma-separated). Must be exactly three sections, no extra text.
 
-We need to infer what is visible: two cats sleeping on a pink surface (likely a couch or cushion). There are two remote controls (white). The cats are tabby. The setting: a pink fabric (cushion) on a red background (maybe a sofa). Lighting appears natural indoor. Distinctive details: remote controls, pink fabric, tabby cats.
+We need to infer what is visible: two cats sleeping on a pink surface (likely a couch or cushion). There are two remote controls (white). The cats are tabby. The setting appears to be indoor, bright lighting (maybe natural). The cats are lying on their sides, eyes closed, sleeping. The pink surface is a blanket or fabric. The remote controls are white with buttons. The cats have distinct patterns: one has darker stripes, other has brownish tabby with spots.
 
-Title 5-10 words: "Two tabby cats sleeping on pink cushion". That's 6 words. Good.
+We must avoid uncertain details like breed, age, etc. Use only visible facts. So description: "Two tabby cats lie sleeping on a pink fabric surface, each beside a white remote control." That's factual.
 
-Description: 1-2 sentences, factual. "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence. Could be two sentences but okay.
+Title 5-10 words: maybe "Two sleeping tabby cats on pink fabric". Count words: Two(1) sleeping(2) tabby(3) cats(4) on(5) pink(6) fabric(7). That's 7 words, okay.
 
-Keywords: need 10-18 unique, comma-separated. Let's list: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding. Need 10-18, ensure uniqueness. Count: cat(1), tabby(2), pink(3), cushion(4), remote(5), white(6), sleeping(7), domestic(8), animal(9), furniture(10), indoor(11), relaxed(12), paws(13), ears(14), whiskers(15), sofa(16), bedding(17). That's 17, within 10-18. Ensure comma-separated.
+Keywords 10-18 unique, comma-separated. Must be unique. Let's list: cat, tabby, pink, fabric, remote, remote control, sleeping, couch, cushion, white, white remote, two cats, domestic cat, feline, relaxed, indoor, home, pet. Need 10-18 items. Ensure uniqueness (no repeats). Let's count: cat(1), tabby(2), pink(3), fabric(4), remote(5), remote control(6) (maybe treat as separate? but it's phrase; maybe "remote" and "remote control" are separate but could be considered duplicate concept. Better keep distinct terms: "remote", "remote control" maybe okay but they are similar. Let's avoid duplication. Let's make list: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears. That's 16. Ensure each is unique. Let's verify duplicates: none.
 
-Check no uncertain details: we assume "cushion" is visible, yes pink fabric. Remote controls are white. Cats are tabby. All visible.
+Check count: cat(1), tabby(2), pink(3), fabric(4), remote(5), white(6), sleeping(7), couch(8), cushion(9), domestic(10), feline(11), relaxed(12), indoor(13), home(14), pet(15), whiskers(16), paws(17), ears(18). That's 18, within 10-18.
 
-Now format:
+Now ensure description is 1-2 sentences. We'll write one sentence: "Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control." That's one sentence, factual.
+
+Now title: "Two sleeping tabby cats on pink fabric". That's 7 words, okay.
+
+Now format exactly:
 
 Title:
 Description:
 Keywords:
 
-Make sure each line starts with "Title:", "Description:", "Keywords:".
+Make sure each line starts with label and colon? The instruction: "Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:" So we need to write:
 
-Let's craft.
+Title: Two sleeping tabby cats on pink fabric
+Description: Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control.
+Keywords: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears
 
-Title: "Two tabby cats sleeping on pink cushion" (6 words). Good.
-
-Description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's one sentence, factual.
-
-Keywords: "cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding"
-
-Check count: 17 items. Good.
-
-Now ensure British English: "lying" maybe "lying" is fine. "cushion" British. "remote controls" maybe "remote controls" okay. Use British spelling: "remote controls" fine. "pink" same. "cushion" same.
-
-Check description: "Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby." That's okay.
-
-Now output exactly three sections, nothing else.
+Check punctuation: Title line should not have extra colon? It says "Title:" then content. So we need "Title:" then space
 </think>
-Title: Two tabby cats sleeping on pink cushion  
-Description: Two tabby cats are lying asleep on a bright pink cushion, with white remote controls placed nearby.  
-Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, furniture, indoor, relaxed, paws, ears, whiskers, sofa, bedding
+Title: Two sleeping tabby cats on pink fabric
+Description: Two tabby cats are sleeping on a pink fabric surface, each positioned beside a white remote control.
+Keywords: cat, tabby, pink, fabric, remote, white, sleeping, couch, cushion, domestic, feline, relaxed, indoor, home, pet, whiskers, paws, ears
 ```
 
 </details>
@@ -2756,17 +2729,17 @@ Keywords: cat, tabby, pink, cushion, remote, white, sleeping, domestic, animal, 
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type nemotron_h_omni via
   nemotron_h_nano_omni)
-- *Model load time:* 16.97s
-- *Generation time:* 38.03s
-- *Total time:* 55.31s
-- *Prompt preparation time:* 0.0276
-- *First-token latency:* 10.5
-- *Cleanup time:* 0.245
+- *Model load time:* 15.11s
+- *Generation time:* 42.29s
+- *Total time:* 57.73s
+- *Prompt preparation time:* 0.0285
+- *First-token latency:* 13.3
+- *Cleanup time:* 0.265
 - *Prompt tokens:* 420
 - *Generation tokens:* 797
 - *Total tokens:* 1,217
-- *Prompt throughput (raw):* 39.9 tok/s
-- *Generation throughput (raw):* 30.3 tok/s
+- *Prompt throughput (raw):* 31.5 tok/s
+- *Generation throughput (raw):* 31.0 tok/s
 - *Peak memory (GB):* 81
 - *Active memory (GB):* 78
 - *Cache memory (GB):* 0.21
@@ -2923,17 +2896,17 @@ Keywords: cat, cats, tabby, sleeping, pink, sofa, cushion, remote, control, fabr
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.17s
-- *Generation time:* 2.29s
-- *Total time:* 3.61s
-- *Prompt preparation time:* 0.0095
-- *First-token latency:* 0.247
-- *Cleanup time:* 0.118
+- *Model load time:* 1.26s
+- *Generation time:* 2.20s
+- *Total time:* 3.59s
+- *Prompt preparation time:* 0.0108
+- *First-token latency:* 0.265
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 419
 - *Generation tokens:* 198
 - *Total tokens:* 617
-- *Prompt throughput (raw):* 1,696 tok/s
-- *Generation throughput (raw):* 97.4 tok/s
+- *Prompt throughput (raw):* 1,583 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.12
@@ -3028,17 +3001,17 @@ Two Cats Sleeping on Pink Blanket
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   prism_hadamard_qwen35)
-- *Model load time:* 1.37s
-- *Generation time:* 13.64s
-- *Total time:* 15.17s
-- *Prompt preparation time:* 0.0267
-- *First-token latency:* 1.64
-- *Cleanup time:* 0.114
+- *Model load time:* 1.25s
+- *Generation time:* 14.58s
+- *Total time:* 15.97s
+- *Prompt preparation time:* 0.0225
+- *First-token latency:* 2.42
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 461
 - *Generation tokens:* 517
 - *Total tokens:* 978
-- *Prompt throughput (raw):* 282 tok/s
-- *Generation throughput (raw):* 43.2 tok/s
+- *Prompt throughput (raw):* 191 tok/s
+- *Generation throughput (raw):* 42.7 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 8.6
 - *Cache memory (GB):* 0.62
@@ -3130,254 +3103,115 @@ Keywords: tabby cat, two cats, pink fabric, remote control, sleeping, resting, s
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
 <details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: sofa
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.60s
-- *Generation time:* 4.25s
-- *Total time:* 6.00s
-- *Prompt preparation time:* 0.0206
-- *First-token latency:* 0.512
-- *Cleanup time:* 0.11
-- *Prompt tokens:* 545
-- *Generation tokens:* 540
-- *Total tokens:* 1,085
-- *Prompt throughput (raw):* 1,063 tok/s
-- *Generation throughput (raw):* 145 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.00207
+- *Observations:* Duplicate keywords: resting
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.21s
+- *Generation time:* 2.78s
+- *Total time:* 6.20s
+- *Prompt preparation time:* 0.028
+- *First-token latency:* 1.07
+- *Cleanup time:* 0.142
+- *Prompt tokens:* 386
+- *Generation tokens:* 70
+- *Total tokens:* 456
+- *Prompt throughput (raw):* 361 tok/s
+- *Generation throughput (raw):* 47.9 tok/s
+- *Peak memory (GB):* 28
+- *Active memory (GB):* 27
+- *Cache memory (GB):* 0.01
+- *Model-load active memory (GB):* 27.2
+- *Post-cleanup active memory (GB):* 0.0107
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 662
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Rendered prompt characters:* 498
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_k": 0, "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
-
-#### Final answer
-
-```text
-Title: Two cats sleeping on a red sofa
-
-Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-```
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get this done. I need to create some metadata for an image, and it's got to be spot-on.
-
-First, the image itself. I see two cats, definitely on a red sofa, and they're *sleeping*. One's a calico or tortoiseshell, and the other is a tiger-striped or tuxedo. The lighting is soft, probably natural. The image quality looks good.
-
-Okay, the title. It needs to be short and sweet, and in British English. I think "Two cats sleeping on a red sofa" is perfect. Concise and accurate.
-
-Now, the description. I'll cover the main subject (two cats), the setting (red sofa), the action (sleeping), and the lighting (soft, natural). I'll also mention the distinct details, like the different colors and patterns of the cats. I'll make sure to be objective and stick to what I *see*.
-
-Finally, the keywords. I need to be thorough here. I'll include terms like "cat," "cats," "kittens," "sleeping," "sofa," "red," and some breed-related terms. I'll also add words like "pet" and "domestic" to be as specific as possible. I'll make sure the keywords are distinct and relevant to the image.
-
-Let's get this right.
-
-**Title:** Two cats sleeping on a red sofa
-
-**Description:** A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-**Keywords:** cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-
-That should cover it. It's all about clear, factual observations. Nothing speculative, just what's right in front of me.
-&lt;/think&gt;
-
-Title: Two cats sleeping on a red sofa
-
-Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
+Title: Two tabby cats sleeping on a pink blanket
+Description: Two tabby cats are lying on a pink fleece blanket on a red sofa next to two remote controls.
+Keywords: cats, tabby, sleeping, lounging, pink, blanket, sofa, indoor, pets, remote, controls, resting, resting, feline, domestic
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get this done. I need to create some metadata for an image, and it's got to be spot-on.
-
-First, the image itself. I see two cats, definitely on a red sofa, and they're *sleeping*. One's a calico or tortoiseshell, and the other is a tiger-striped or tuxedo. The lighting is soft, probably natural. The image quality looks good.
-
-Okay, the title. It needs to be short and sweet, and in British English. I think "Two cats sleeping on a red sofa" is perfect. Concise and accurate.
-
-Now, the description. I'll cover the main subject (two cats), the setting (red sofa), the action (sleeping), and the lighting (soft, natural). I'll also mention the distinct details, like the different colors and patterns of the cats. I'll make sure to be objective and stick to what I *see*.
-
-Finally, the keywords. I need to be thorough here. I'll include terms like "cat," "cats," "kittens," "sleeping," "sofa," "red," and some breed-related terms. I'll also add words like "pet" and "domestic" to be as specific as possible. I'll make sure the keywords are distinct and relevant to the image.
-
-Let's get this right.
-
-**Title:** Two cats sleeping on a red sofa
-
-**Description:** A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-**Keywords:** cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-
-That should cover it. It's all about clear, factual observations. Nothing speculative, just what's right in front of me.
-</think>
-
-Title: Two cats sleeping on a red sofa
-
-Description: A close-up image of two cats, one with calico fur and the other with tiger-striped fur, sleeping together on a red sofa. Soft, natural light illuminates the scene.
-
-Keywords: cat, cats, sleeping, sofa, red, pet, domestic, kitten, calico, tiger-striped, tuxedo, fur, lying, petting, sunlight, sofa.
-```
-
-</details>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-minicpm-o-45-4bit"></a>
+<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
 
-### mlx-community/MiniCPM-o-4_5-4bit
+### mlx-community/gemma-4-26b-a4b-it-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/MiniCPM-o-4_5-4bit</summary>
+<summary>Complete evidence: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: lounging
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.08s
-- *Generation time:* 3.78s
-- *Total time:* 5.01s
-- *Prompt preparation time:* 0.0136
-- *First-token latency:* 0.133
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 173
-- *Generation tokens:* 367
-- *Total tokens:* 540
-- *Prompt throughput (raw):* 1,301 tok/s
-- *Generation throughput (raw):* 102 tok/s
-- *Peak memory (GB):* 7.0
-- *Active memory (GB):* 6.1
-- *Cache memory (GB):* 0.13
-- *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.0049
+- *Observations:* Duplicate keywords: cats
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
+- *Model load time:* 2.37s
+- *Generation time:* 0.96s
+- *Total time:* 3.50s
+- *Prompt preparation time:* 0.0102
+- *First-token latency:* 0.334
+- *Cleanup time:* 0.13
+- *Prompt tokens:* 390
+- *Generation tokens:* 77
+- *Total tokens:* 467
+- *Prompt throughput (raw):* 1,166 tok/s
+- *Generation throughput (raw):* 126 tok/s
+- *Peak memory (GB):* 16
+- *Active memory (GB):* 15
+- *Cache memory (GB):* 0.17
+- *Model-load active memory (GB):* 15.4
+- *Post-cleanup active memory (GB):* 0.0118
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 508
+- *Rendered prompt characters:* 526
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 592c09d85e7bffbc8f8e45a417aa8e9a96119814
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-o-4_5-4bit/snapshots/592c09d85e7bffbc8f8e45a417aa8e9a96119814
+- *Resolved model revision:* 0d77464eeb233a2da68ebf9d7dc4edaac7db956d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-#### Final answer
-
-```text
-Title:
-Two tabby cats resting on pink fabric with remotes
-
-Description:
-Two tabby cats are lying on a pink fabric surface, near white remote controls. They appear relaxed, possibly sleeping, under even indoor lighting.
-
-Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes
-```
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;
-User wants me to create British-English catalogue metadata based on the provided image. I need to extract concrete, visible facts without adding uncertain details.
+Title: Two tabby cats sleeping on a pink surface
 
-First, I'll analyze the image:
+Description: Two tabby cats lie sleeping on a bright pink fabric. Two remote controls are placed near the cats on the red and pink surface.
 
-- There are two tabby cats lying on a pink surface, likely a couch or blanket.
-- Both cats are near remote controls, which are white and placed near them.
-- The cats are relaxed, possibly sleeping or resting.
-- The setting appears to be indoors, on a red/pink fabric.
-- Lighting seems natural or even, no harsh shadows.
-- Distinctive details: tabby patterns, remote controls, pink/red fabric.
-
-Now, crafting the title: It should be 5-10 words. Maybe "Two Tabby Cats Resting on Pink Fabric".
-
-Description: Must be 1-2 sentences. Focus on main subject (cats), setting (pink/red surface), action (resting), lighting (even), and details (remotes, tabby patterns).
-
-Keywords: Need 10-18 unique, comma-separated. Possible: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes.
-
-I should make sure all are from visible facts only, no assumptions about location, brand, etc.
-&lt;/think&gt;
-
-Title:
-Two tabby cats resting on pink fabric with remotes
-
-Description:
-Two tabby cats are lying on a pink fabric surface, near white remote controls. They appear relaxed, possibly sleeping, under even indoor lighting.
-
-Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes
+Keywords: tabby, cats, sleeping, pink, red, fabric, remote control, domestic, lying, indoor, pet, animal, feline, two, cats, fuzzy, striped
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-User wants me to create British-English catalogue metadata based on the provided image. I need to extract concrete, visible facts without adding uncertain details.
-
-First, I'll analyze the image:
-
-- There are two tabby cats lying on a pink surface, likely a couch or blanket.
-- Both cats are near remote controls, which are white and placed near them.
-- The cats are relaxed, possibly sleeping or resting.
-- The setting appears to be indoors, on a red/pink fabric.
-- Lighting seems natural or even, no harsh shadows.
-- Distinctive details: tabby patterns, remote controls, pink/red fabric.
-
-Now, crafting the title: It should be 5-10 words. Maybe "Two Tabby Cats Resting on Pink Fabric".
-
-Description: Must be 1-2 sentences. Focus on main subject (cats), setting (pink/red surface), action (resting), lighting (even), and details (remotes, tabby patterns).
-
-Keywords: Need 10-18 unique, comma-separated. Possible: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes.
-
-I should make sure all are from visible facts only, no assumptions about location, brand, etc.
-</think>
-
-Title:
-Two tabby cats resting on pink fabric with remotes
-
-Description:
-Two tabby cats are lying on a pink fabric surface, near white remote controls. They appear relaxed, possibly sleeping, under even indoor lighting.
-
-Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging, pets, animals, sofa, relaxation, home, comfortable, felines, striped, lounging, remotes
-```
-
-</details>
 
 </details>
 
@@ -3399,18 +3233,18 @@ Keywords: cats, tabby, resting, pink, fabric, remote controls, indoor, lounging,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.65s
-- *Generation time:* 0.41s
-- *Total time:* 1.18s
-- *Prompt preparation time:* 0.0281
-- *First-token latency:* 0.292
-- *Cleanup time:* 0.0861
+- *Model load time:* 0.68s
+- *Generation time:* 0.66s
+- *Total time:* 1.45s
+- *Prompt preparation time:* 0.0279
+- *First-token latency:* 0.543
+- *Cleanup time:* 0.0851
 - *Prompt tokens:* 120
 - *Generation tokens:* 32
 - *Total tokens:* 152
-- *Prompt throughput (raw):* 411 tok/s
-- *Generation throughput (raw):* 395 tok/s
-- *Peak memory (GB):* 2.1
+- *Prompt throughput (raw):* 221 tok/s
+- *Generation throughput (raw):* 398 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.02
 - *Model-load active memory (GB):* 1.25
@@ -3458,17 +3292,17 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
   english examples of data, british english examples of content, british
   english examples of examples
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl)
-- *Model load time:* 0.58s
-- *Generation time:* 3.02s
-- *Total time:* 3.73s
-- *Prompt preparation time:* 0.0293
-- *First-token latency:* 0.343
-- *Cleanup time:* 0.0888
+- *Model load time:* 0.59s
+- *Generation time:* 3.10s
+- *Total time:* 3.82s
+- *Prompt preparation time:* 0.029
+- *First-token latency:* 0.431
+- *Cleanup time:* 0.0904
 - *Prompt tokens:* 3,438
 - *Generation tokens:* 1,000
 - *Total tokens:* 4,438
-- *Prompt throughput (raw):* 10,009 tok/s
-- *Generation throughput (raw):* 379 tok/s
+- *Prompt throughput (raw):* 7,984 tok/s
+- *Generation throughput (raw):* 380 tok/s
 - *Peak memory (GB):* 2.3
 - *Active memory (GB):* 1.1
 - *Cache memory (GB):* 0.56
@@ -3516,17 +3350,17 @@ Keywords: cats, sleeping, pink couch, remote control, striped, British English, 
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 0.89s
-- *Generation time:* 1.57s
-- *Total time:* 2.69s
-- *Prompt preparation time:* 0.0439
-- *First-token latency:* 1.38
-- *Cleanup time:* 0.179
+- *Model load time:* 0.88s
+- *Generation time:* 1.33s
+- *Total time:* 2.41s
+- *Prompt preparation time:* 0.0396
+- *First-token latency:* 1.17
+- *Cleanup time:* 0.153
 - *Prompt tokens:* 3,512
 - *Generation tokens:* 14
 - *Total tokens:* 3,526
-- *Prompt throughput (raw):* 2,554 tok/s
-- *Generation throughput (raw):* 92.0 tok/s
+- *Prompt throughput (raw):* 3,011 tok/s
+- *Generation throughput (raw):* 107 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.55
@@ -3565,6 +3399,244 @@ Keywords: cats, sleeping, pink couch, remote control, striped, British English, 
 
 ---
 
+<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
+
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Response repeats the same text; Unrecognised model control
+  tokens remain visible; Required labelled fields not detected: title,
+  description; Response appears cut off at the token limit; Conversation-role
+  control tokens remain visible; Duplicate keywords: location, event, brand,
+  species, period, or intent
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Model load time:* 2.73s
+- *Generation time:* 41.20s
+- *Total time:* 44.14s
+- *Prompt preparation time:* 0.0298
+- *First-token latency:* 1.18
+- *Cleanup time:* 0.154
+- *Prompt tokens:* 545
+- *Generation tokens:* 1,000
+- *Total tokens:* 1,545
+- *Prompt throughput (raw):* 462 tok/s
+- *Generation throughput (raw):* 25.0 tok/s
+- *Peak memory (GB):* 25
+- *Active memory (GB):* 24
+- *Cache memory (GB):* 0.09
+- *Model-load active memory (GB):* 23.9
+- *Post-cleanup active memory (GB):* 0.00703
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 710
+- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 865ee8de65799cc4ee406587e4b607063708f358
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/865ee8de65799cc4ee406587e4b607063708f358
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ to=self&lt;|message|&gt;Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+
+We need British-English. Use only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+We see two cats? Possibly cats. Tabby? Could be cats. Should not assume species? It's clearly cats. Might be okay. Species? The instruction says omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. Species is maybe uncertain? It looks like cats. But maybe we should say "two cats"? That is species. Instruction says omit unsupported species. Hmm. "Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." Could be we should not label species? Might be risky. Might say "two felines"? That's species. Hmm.
+
+Maybe we can describe as "two tabby animals". That's still species. Could say "two animals". Might be safe.
+
+It says using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+So maybe we should not say cats. Could say "two tabby-striped animals". That's describing pattern not species.
+
+Better to say "two striped animals". Hmm.
+
+Maybe we can say "two cats" is clearly visible. Is species unsupported? Cat is clearly visible. Might be acceptable.
+
+The instruction to omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. Probably means don't assume brand of remote, don't assume location, don't assume time period. Species is visible: they are cats. Might be okay.
+
+But to be safe, perhaps describe as "two tabby cats" is common knowledge. I think it's okay.
+
+Title: concrete 5-10 word title. Eg "Two Tabby Cats Resting on Pink Fabric". That's 7 words? Two(1) Tabby(2) Cats(3) Resting(4) on(5) Pink(6) Fabric(7). Good.
+
+Description: 1-2 sentence factual description of main subject, setting, action, lighting, and distinctive details.
+
+Main subject: two tabby cats lying on pink blanket on red sofa. One sleeping head down, one with head down. Two remote controls. Pink blanket, red cushion.
+
+Lighting: appears bright daylight? Maybe natural lighting. Can't be sure. Might omit lighting? Need mention lighting. Might say "brightly lit". Could be visible.
+
+Distinctive details: one has green collar, black tail, remote controls.
+
+Make description 1-2 sentences.
+
+Keywords: 10-18 unique comma-separated keywords.
+
+Keywords: tabby cat, pink blanket, red sofa, remote control, sleeping, resting, striped fur, green collar, indoor, fabric, couch, pet, animal, ...
+
+Must be unique, comma-separated.
+
+Return exactly three sections.
+
+Title:
+Description:
+Keywords:
+
+Make sure no extra text.
+
+Let's produce:
+
+Title: Two Tabby Cats Resting On Pink Blanket
+
+That's 7 words? Two(1) Tabby(2) Cats(3) Resting(4) On(5) Pink(6) Blanket(7). Good.
+
+Description: Two tabby-striped animals lie on a bright pink fabric surface with red cushions behind them. One animal is sleeping with eyes closed and a green collar, while the other rests with its head lowered; two white remote controls lie on the fabric.
+
+That's one sentence? Actually two sentences. Might be okay 1-2 sentence. It's two sentences.
+
+Make sure British English: "colour"? Not needed. "Fibre"? okay.
+
+Keywords: two animals, tabby, pink blanket, red sofa, remote controls, sleeping, resting, striped fur, green collar, indoor, fabric, cushions, white remotes, relaxed pose
+
+That's 14 items.
+
+Ensure comma-separated.
+
+Let's output exactly.
+
+Potential issue: species. I used animals. Good.
+
+Might avoid "cat". Use animals.
+
+The title says Tabby Cats. That includes species cats. Might conflict. Could change title to "Two Tabby Animals Resting On Pink Blanket". That's 7 words? Two(1) Tabby(2) Animals(3) Resting(4) On(5) Pink(6) Blanket(7). Good.
+
+Use animals consistently.
+
+Let's do Title: Two Tabby Animals Resting On Pink Blanket
+
+Description
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ to=self<|message|>Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+
+We need British-English. Use only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+We see two cats? Possibly cats. Tabby? Could be cats. Should not assume species? It's clearly cats. Might be okay. Species? The instruction says omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. Species is maybe uncertain? It looks like cats. But maybe we should say "two cats"? That is species. Instruction says omit unsupported species. Hmm. "Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." Could be we should not label species? Might be risky. Might say "two felines"? That's species. Hmm.
+
+Maybe we can describe as "two tabby animals". That's still species. Could say "two animals". Might be safe.
+
+It says using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+So maybe we should not say cats. Could say "two tabby-striped animals". That's describing pattern not species.
+
+Better to say "two striped animals". Hmm.
+
+Maybe we can say "two cats" is clearly visible. Is species unsupported? Cat is clearly visible. Might be acceptable.
+
+The instruction to omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. Probably means don't assume brand of remote, don't assume location, don't assume time period. Species is visible: they are cats. Might be okay.
+
+But to be safe, perhaps describe as "two tabby cats" is common knowledge. I think it's okay.
+
+Title: concrete 5-10 word title. Eg "Two Tabby Cats Resting on Pink Fabric". That's 7 words? Two(1) Tabby(2) Cats(3) Resting(4) on(5) Pink(6) Fabric(7). Good.
+
+Description: 1-2 sentence factual description of main subject, setting, action, lighting, and distinctive details.
+
+Main subject: two tabby cats lying on pink blanket on red sofa. One sleeping head down, one with head down. Two remote controls. Pink blanket, red cushion.
+
+Lighting: appears bright daylight? Maybe natural lighting. Can't be sure. Might omit lighting? Need mention lighting. Might say "brightly lit". Could be visible.
+
+Distinctive details: one has green collar, black tail, remote controls.
+
+Make description 1-2 sentences.
+
+Keywords: 10-18 unique comma-separated keywords.
+
+Keywords: tabby cat, pink blanket, red sofa, remote control, sleeping, resting, striped fur, green collar, indoor, fabric, couch, pet, animal, ...
+
+Must be unique, comma-separated.
+
+Return exactly three sections.
+
+Title:
+Description:
+Keywords:
+
+Make sure no extra text.
+
+Let's produce:
+
+Title: Two Tabby Cats Resting On Pink Blanket
+
+That's 7 words? Two(1) Tabby(2) Cats(3) Resting(4) On(5) Pink(6) Blanket(7). Good.
+
+Description: Two tabby-striped animals lie on a bright pink fabric surface with red cushions behind them. One animal is sleeping with eyes closed and a green collar, while the other rests with its head lowered; two white remote controls lie on the fabric.
+
+That's one sentence? Actually two sentences. Might be okay 1-2 sentence. It's two sentences.
+
+Make sure British English: "colour"? Not needed. "Fibre"? okay.
+
+Keywords: two animals, tabby, pink blanket, red sofa, remote controls, sleeping, resting, striped fur, green collar, indoor, fabric, cushions, white remotes, relaxed pose
+
+That's 14 items.
+
+Ensure comma-separated.
+
+Let's output exactly.
+
+Potential issue: species. I used animals. Good.
+
+Might avoid "cat". Use animals.
+
+The title says Tabby Cats. That includes species cats. Might conflict. Could change title to "Two Tabby Animals Resting On Pink Blanket". That's 7 words? Two(1) Tabby(2) Animals(3) Resting(4) On(5) Pink(6) Blanket(7). Good.
+
+Use animals consistently.
+
+Let's do Title: Two Tabby Animals Resting On Pink Blanket
+
+Description
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-nanollava-15-4bit"></a>
 
 ### mlx-community/nanoLLaVA-1.5-4bit
@@ -3580,18 +3652,18 @@ Keywords: cats, sleeping, pink couch, remote control, striped, British English, 
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.51s
-- *Generation time:* 0.38s
-- *Total time:* 1.02s
-- *Prompt preparation time:* 0.0144
-- *First-token latency:* 0.0883
-- *Cleanup time:* 0.119
+- *Model load time:* 0.50s
+- *Generation time:* 0.47s
+- *Total time:* 1.09s
+- *Prompt preparation time:* 0.0145
+- *First-token latency:* 0.214
+- *Cleanup time:* 0.0974
 - *Prompt tokens:* 116
 - *Generation tokens:* 97
 - *Total tokens:* 213
-- *Prompt throughput (raw):* 1,314 tok/s
-- *Generation throughput (raw):* 353 tok/s
-- *Peak memory (GB):* 1.5
+- *Prompt throughput (raw):* 542 tok/s
+- *Generation throughput (raw):* 400 tok/s
+- *Peak memory (GB):* 1.3
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 0.612
@@ -3616,6 +3688,111 @@ Keywords: cats, sleeping, pink couch, remote control, striped, British English, 
 Title: "A Study in Stripes"
 Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
 </pre>
+
+</details>
+
+---
+
+<a id="model-thinkingmachines-inkling-2-mini"></a>
+
+### thinkingmachines/Inkling-2-Mini
+
+<details>
+<summary>Complete evidence: thinkingmachines/Inkling-2-Mini</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation needs reproduction
+- *Observations:* Unrecognised model control tokens remain visible; Required
+  labelled fields not detected: title, description, keywords; Response appears
+  cut off at the token limit; Conversation-role control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type inkling2_loop via
+  inkling2)
+- *Model load time:* 2.13s
+- *Generation time:* 27.46s
+- *Total time:* 29.74s
+- *Prompt preparation time:* 0.024
+- *First-token latency:* 0.338
+- *Cleanup time:* 0.111
+- *Prompt tokens:* 318
+- *Generation tokens:* 1,000
+- *Total tokens:* 1,318
+- *Prompt throughput (raw):* 940 tok/s
+- *Generation throughput (raw):* 37.0 tok/s
+- *Peak memory (GB):* 22
+- *Active memory (GB):* 21
+- *Cache memory (GB):* 0.27
+- *Model-load active memory (GB):* 19.5
+- *Post-cleanup active memory (GB):* 0.0159
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 638
+- *Processor:* mlx_vlm.models.inkling2.processing_inkling2.Inkling2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* c9d028302cd0f035fdf8e7e91f089a4ce94d2195
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--thinkingmachines--Inkling-2-Mini/snapshots/c9d028302cd0f035fdf8e7e91f089a4ce94d2195
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|content_model_end_sampling\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|message_model|&gt;&lt;|content_thinking|&gt;The user wants British-English catalogue metadata based on the image. Need only clearly visible facts. Need be careful: species? The image shows cats clearly. But instruction says omit unsupported species. However species is clearly visible: two cats. It says omit unsupported identity, location, event, brand, species — hmm "species" listed as unsupported? They say omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. But cats are clearly visible; maybe species should be omitted? It says using only clearly visible facts, omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. So explicitly species should be omitted even if visible? The phrase says omit ... species ... So I should not state "cat"? That seems odd because main subject is cats. But the instruction explicitly lists species as a category to omit. Maybe they want not to identify breed, only visual. But main subject is two tabby cats; species is arguably supported. However the user specifically includes species in omit list. Need follow: omit species. Can describe as "two striped felines"? That still implies species. Better maybe "two tabby cats"? Let's parse carefully.
+
+"Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent."
+
+This is a style instruction likely from benchmark: don't guess identity/location/event/brand/species/period/intent. But if the image clearly shows cats, saying species is clearly visible, not unsupported. The benchmark may intend to prevent identifying real people etc. "species" likely refers to animals/people? They say unsupported species maybe for unknown animals. But here species obvious. Yet the user specifically says omit species; safest is to avoid explicitly naming species/breeds. Use "two sleepy striped animals"? That's awkward and perhaps implies animal. Could use "two reclining striped felines" no.
+
+Need produce British English. No brand: remotes maybe have visible colored buttons but brand not readable; omit brand. No location: pink sofa/blanket? Location is "sofa" setting can be described as setting; location (where) not. It says omit location, but setting can be described: magenta/pink fabric. We can say "a pink upholstered surface". That's setting not geographic location.
+
+Need 5-10 word concrete title. Something like "Two striped animals resting on a pink fabric surface". 7 words? Two(1) striped2 animals3 resting4 on5 a6 pink7 fabric8 surface9. Good.
+
+Description 1-2 sentences factual: "Two tabby-striped felines are curled asleep on a bright pink upholstered seat, with two remote controls tucked between them. The left animal lies along the edge with its paw stretched outward; the larger right animal rests on its belly with hind legs extended to the side." This names felines/tabby maybe species/breed. Need avoid species? Could say "two striped sheltered animals"? Hmm.
+
+Cats are the main subject; excluding species would make description impossible. I think clearly visible facts include two cats; species isn't "unsupported". The omit list likely means don't name real-world species if not known? But cats are unmistakable. The final answer can say "two cats" despite list. The benchmark likely evaluates factuality; omitting cats would be weird.
+
+Need keywords 10-18 unique comma-separated. Keywords can include "sleeping", "tabby", "pink", "sofa", "remote control", "striped", "fabric", "paws", "toy"? There's a dark feather/tail on left maybe cat tail; not toy. Keywords: two cats, tabby stripes, pink upholstery, remote controls, sleeping, stretched paws, relaxed posture, indoor setting, close-up, magenta fabric. Need 10-18. British spelling: upholstery? "sofa" ok. No brand. "遥控" no.
+
+Need exact sections and nothing else. Ensure title 5-10 words. Description 1-2 sentences. Keywords comma-separated.
+
+Need be cautious "cats" species maybe. I'll include "cats" because clear. British English: "upholstered" etc. Avoid "sofa" location? fine.
+
+Need final only exactly sections. Use Title:, Description:,
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|message_model|><|content_thinking|>The user wants British-English catalogue metadata based on the image. Need only clearly visible facts. Need be careful: species? The image shows cats clearly. But instruction says omit unsupported species. However species is clearly visible: two cats. It says omit unsupported identity, location, event, brand, species — hmm "species" listed as unsupported? They say omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. But cats are clearly visible; maybe species should be omitted? It says using only clearly visible facts, omit uncertain details and unsupported identity, location, event, brand, species, period, or intent. So explicitly species should be omitted even if visible? The phrase says omit ... species ... So I should not state "cat"? That seems odd because main subject is cats. But the instruction explicitly lists species as a category to omit. Maybe they want not to identify breed, only visual. But main subject is two tabby cats; species is arguably supported. However the user specifically includes species in omit list. Need follow: omit species. Can describe as "two striped felines"? That still implies species. Better maybe "two tabby cats"? Let's parse carefully.
+
+"Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent."
+
+This is a style instruction likely from benchmark: don't guess identity/location/event/brand/species/period/intent. But if the image clearly shows cats, saying species is clearly visible, not unsupported. The benchmark may intend to prevent identifying real people etc. "species" likely refers to animals/people? They say unsupported species maybe for unknown animals. But here species obvious. Yet the user specifically says omit species; safest is to avoid explicitly naming species/breeds. Use "two sleepy striped animals"? That's awkward and perhaps implies animal. Could use "two reclining striped felines" no.
+
+Need produce British English. No brand: remotes maybe have visible colored buttons but brand not readable; omit brand. No location: pink sofa/blanket? Location is "sofa" setting can be described as setting; location (where) not. It says omit location, but setting can be described: magenta/pink fabric. We can say "a pink upholstered surface". That's setting not geographic location.
+
+Need 5-10 word concrete title. Something like "Two striped animals resting on a pink fabric surface". 7 words? Two(1) striped2 animals3 resting4 on5 a6 pink7 fabric8 surface9. Good.
+
+Description 1-2 sentences factual: "Two tabby-striped felines are curled asleep on a bright pink upholstered seat, with two remote controls tucked between them. The left animal lies along the edge with its paw stretched outward; the larger right animal rests on its belly with hind legs extended to the side." This names felines/tabby maybe species/breed. Need avoid species? Could say "two striped sheltered animals"? Hmm.
+
+Cats are the main subject; excluding species would make description impossible. I think clearly visible facts include two cats; species isn't "unsupported". The omit list likely means don't name real-world species if not known? But cats are unmistakable. The final answer can say "two cats" despite list. The benchmark likely evaluates factuality; omitting cats would be weird.
+
+Need keywords 10-18 unique comma-separated. Keywords can include "sleeping", "tabby", "pink", "sofa", "remote control", "striped", "fabric", "paws", "toy"? There's a dark feather/tail on left maybe cat tail; not toy. Keywords: two cats, tabby stripes, pink upholstery, remote controls, sleeping, stretched paws, relaxed posture, indoor setting, close-up, magenta fabric. Need 10-18. British spelling: upholstery? "sofa" ok. No brand. "遥控" no.
+
+Need exact sections and nothing else. Ensure title 5-10 words. Description 1-2 sentences. Keywords comma-separated.
+
+Need be cautious "cats" species maybe. I'll include "cats" because clear. British English: "upholstered" etc. Avoid "sofa" location? fine.
+
+Need final only exactly sections. Use Title:, Description:, 
+```
+
+</details>
 
 </details>
 

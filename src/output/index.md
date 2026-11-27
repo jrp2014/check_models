@@ -1,6 +1,6 @@
 # Check Models Output Index
 
-Run: started 2026-11-21 23:42:25 GMT; check_models 0.17.146 @ 6f3a5278e
+Run: started 2026-11-27 13:11:59 GMT; check_models 0.17.147 @ ec94ae2b6
 
 Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 
@@ -11,14 +11,14 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 5m 37s
+- Run duration: 6m 04s
 - Evaluation lane: blind
 - Prompt hints: no description or keyword hints
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - Input image: JPEG, 640 x 480 pixels (0.3 MP), 0.2 MB
-- Models attempted: 41 (completed 41, crashed 0, indeterminate 0)
-- Mechanical checks: no concerns detected 35, concerns detected 2, major concerns 4 (generation 1, answer format 3), not assessed 0
-- Observations, most important first: Response repeats the same text (1), Unrecognised model control tokens remain visible (1), Required labelled fields not detected (3), Response appears cut off at the token limit (1), Repeated keyword entries (3)
+- Models attempted: 42 (completed 42, crashed 0, indeterminate 0)
+- Mechanical checks: no concerns detected 34, concerns detected 2, major concerns 6 (generation 2, answer format 4), not assessed 0
+- Observations, most important first: Response repeats the same text (2), Unrecognised model control tokens remain visible (3), Required labelled fields not detected (5), Response appears cut off at the token limit (3), Conversation-role control tokens remain visible (2); 1 more kind in diagnostics
 
 ## Start here
 
